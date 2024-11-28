@@ -1,0 +1,6 @@
+@BSOFT.API_HostAddress = http://localhost:5174
+
+GET {{BSOFT.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
