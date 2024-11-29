@@ -1,11 +1,49 @@
 {
   "version": 3,
   "targets": {
-    "net8.0": {}
+    "net8.0": {
+      "BSOFT.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "BSOFT.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/BSOFT.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/BSOFT.Application.dll": {}
+        }
+      },
+      "BSOFT.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/BSOFT.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/BSOFT.Domain.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "BSOFT.Application/1.0.0": {
+      "type": "project",
+      "path": "../BSOFT.Application/BSOFT.Application.csproj",
+      "msbuildProject": "../BSOFT.Application/BSOFT.Application.csproj"
+    },
+    "BSOFT.Domain/1.0.0": {
+      "type": "project",
+      "path": "../BSOFT.Domain/BSOFT.Domain.csproj",
+      "msbuildProject": "../BSOFT.Domain/BSOFT.Domain.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net8.0": []
+    "net8.0": [
+      "BSOFT.Application >= 1.0.0",
+      "BSOFT.Domain >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\Administrator\\.nuget\\packages\\": {}
@@ -34,7 +72,14 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\Projects\\ProjectRepo\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj": {
+              "projectPath": "D:\\Projects\\ProjectRepo\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj"
+            },
+            "D:\\Projects\\ProjectRepo\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj": {
+              "projectPath": "D:\\Projects\\ProjectRepo\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
