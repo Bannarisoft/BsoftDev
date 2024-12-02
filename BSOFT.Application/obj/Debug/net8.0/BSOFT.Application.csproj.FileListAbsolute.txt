@@ -1,0 +1,5 @@
+D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Application.csproj.AssemblyReference.cache
+D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Application.AssemblyInfoInputs.cache
+D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Application.AssemblyInfo.cs
+D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Application.csproj.CoreCompileInputs.cache
