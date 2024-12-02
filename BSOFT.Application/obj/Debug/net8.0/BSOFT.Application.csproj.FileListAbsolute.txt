@@ -3,13 +3,3 @@ D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Applicati
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Application.AssemblyInfoInputs.cache
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Application.AssemblyInfo.cs
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Application.csproj.CoreCompileInputs.cache
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\bin\Debug\net8.0\BSOFT.Application.deps.json
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\bin\Debug\net8.0\BSOFT.Application.dll
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\bin\Debug\net8.0\BSOFT.Application.pdb
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\bin\Debug\net8.0\BSOFT.Domain.dll
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\bin\Debug\net8.0\BSOFT.Domain.pdb
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Ap.A8CBF786.Up2Date
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Application.dll
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\refint\BSOFT.Application.dll
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\BSOFT.Application.pdb
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Application\obj\Debug\net8.0\ref\BSOFT.Application.dll

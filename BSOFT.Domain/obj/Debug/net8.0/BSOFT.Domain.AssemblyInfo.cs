@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BSOFT.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1db7b9b543dc3a1144d6ce3c0a30499c5a2b90e1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0bf68849370d4a74eac9cd89a10ac02c83e5e89b")]
 [assembly: System.Reflection.AssemblyProductAttribute("BSOFT.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BSOFT.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

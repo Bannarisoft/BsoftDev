@@ -1,3 +1,4 @@
+using AutoMapper;
 using BSOFT.Domain.Interfaces;
 using MediatR;
 using System;
@@ -11,18 +12,17 @@ namespace BSOFT.Application.Users.Queries.GetUsers
     public class GetUserQueryHandler : IRequestHandler<GetUserQuery,List<UserVm>>
     {
         private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        public GetUserQueryHandler(IUserRepository userRepository)
+        public GetUserQueryHandler(IUserRepository userRepository , IMapper mapper)
         {
             _userRepository = userRepository;
+            _mapper = mapper;
         }
         public async Task<List<UserVm>> Handle(GetUserQuery request, CancellationToken cancellationToken)
         {
             var users = await _userRepository.GetAllUsersAsync();
-            var userList = users.Select(x => new UserVm
-            {FirstName = x.FirstName,LastName = x.LastName,
-            UserName = x.UserName,UserPassword = x.UserPassword,Id = x.Id}).ToList();
-
+            var userList = _mapper.Map<List<UserVm>>(users);
             return userList;
         }
     }
