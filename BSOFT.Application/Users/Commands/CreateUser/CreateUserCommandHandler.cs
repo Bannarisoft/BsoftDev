@@ -27,7 +27,14 @@ namespace BSOFT.Application.Users.Commands.CreateUser
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 UserName = request.UserName,
-                UserPassword = request.UserPassword
+                UserPassword = request.UserPassword,
+                UserType = request.UserType,
+                Mobile = request.Mobile,
+                EmailId = request.EmailId,
+                CreatedBy = request.CreatedBy,
+                Created_Time = request.Created_Time,
+                Modified_Time = request.Modified_Time,
+                ModifiedBy = request.ModifiedBy           
             };
 
             var result = await _userRepository.CreateAsync(userEntity);
