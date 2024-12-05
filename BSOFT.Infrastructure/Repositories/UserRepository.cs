@@ -25,13 +25,9 @@ namespace BSOFT.Infrastructure.Repositories
 
         public async Task<int> DeleteAsync(int id)
         {
-            var userToDelete = await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (userToDelete != null)
-            {
-                _applicationDbContext.Users.Remove(userToDelete);
-                return await _applicationDbContext.SaveChangesAsync();
-            }
-            return 0; // No user found
+            return await _applicationDbContext.Users
+                .Where(model => model.Id == id)
+                .ExecuteDeleteAsync();
         }
 
         public async Task<List<User>> GetAllUsersAsync()
@@ -47,17 +43,16 @@ namespace BSOFT.Infrastructure.Repositories
 
         public async Task<int> UpdateAsync(int id, User user)
         {
-            var existingUser = await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (existingUser != null)
-            {
-                existingUser.FirstName = user.FirstName;
-                existingUser.LastName = user.LastName;
-                existingUser.UserPassword = user.UserPassword;
+            return await _applicationDbContext.Users
+                    .Where(model => model.Id == id)
+                    .ExecuteUpdateAsync(setters => setters
+                        .SetProperty(m => m.Id,user.Id)
+                        .SetProperty(m => m.FirstName,user.FirstName)
+                        .SetProperty(m => m.LastName,user.LastName)
+                        .SetProperty(m => m.UserName,user.UserName)
+                        .SetProperty(m => m.UserPassword,user.UserPassword)
 
-                _applicationDbContext.Users.Update(existingUser);
-                return await _applicationDbContext.SaveChangesAsync();
-            }
-            return 0; // No user found
+                        );
         }
     }
 }

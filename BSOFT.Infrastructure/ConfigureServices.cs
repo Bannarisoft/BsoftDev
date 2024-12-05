@@ -27,7 +27,7 @@ namespace BSOFT.Infrastructure
                 services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-                services.AddScoped<IUserRepository, UserRepository>();
+                services.AddTransient<IUserRepository, UserRepository>();
 
                 return services;
             }
