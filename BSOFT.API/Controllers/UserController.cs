@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using BSOFT.Application.Users.Queries.GetUsers;
 using BSOFT.Application.Users.Queries.GetUserById;
 using BSOFT.Application.Users.Commands.CreateUser;
+using BSOFT.Application.Users.Commands.UpdateUser;
+using BSOFT.Application.Users.Commands.DeleteUser;
+
 
 
 
@@ -36,6 +39,28 @@ namespace BSOFT.API.Controllers
         {
             var createdUser = await Mediator.Send(command);
             return CreatedAtAction(nameof(GetByIdAsync), new { id = createdUser.Id }, createdUser);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAsync(int id, UpdateUserCommand command)
+        {
+            if(id != command.Id)
+            {
+                return BadRequest();
+            }
+            await Mediator.Send(command);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var  result = await Mediator.Send(new DeleteUserCommand { Id = id});
+            if(result == 0)
+            {
+                return BadRequest();
+            }
+            return NoContent();
         }
     }
 }

@@ -23,7 +23,11 @@ namespace BSOFT.Application.Users.Commands.UpdateUser
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 UserName = request.UserName,
-                UserPassword = request.UserPassword
+                IsActive = request.IsActive,
+                UserPassword = request.UserPassword,
+                UserType = request.UserType,
+                Mobile = request.Mobile,
+                EmailId = request.EmailId
             };
 
             return await _userRepository.UpdateAsync(request.Id, UpdateuserEntity);
