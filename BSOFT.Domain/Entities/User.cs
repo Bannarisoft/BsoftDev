@@ -23,6 +23,7 @@ namespace BSOFT.Domain.Entities
     public int ModifiedBy { get; set; }
     public DateTime Modified_Time { get; set; }
     public string? ModifiedByName { get; set; }
+    public int MyProperty { get; set; }
        
     }
 }
