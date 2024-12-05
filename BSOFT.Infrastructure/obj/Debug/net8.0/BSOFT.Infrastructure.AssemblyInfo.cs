@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BSOFT.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+870ff8a2f41c955a8e16a805732a67fab0dc7849")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fa0ca8644d6e2734fe1654880d88522394db2c71")]
 [assembly: System.Reflection.AssemblyProductAttribute("BSOFT.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BSOFT.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
