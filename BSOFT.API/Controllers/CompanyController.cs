@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using BSOFT.Application.Companies.Queries.GetCompanies;
 using BSOFT.Application.Companies.Commands.CreateCompany;
 using BSOFT.Application.Companies.Queries.GetCompanyById;
+using BSOFT.Application.Companies.Commands.UpdateCompany;
+using BSOFT.Application.Companies.Commands.DeleteCompany;
 using Microsoft.AspNetCore.Http;
 
 namespace BSOFT.API.Controllers
@@ -17,6 +19,7 @@ namespace BSOFT.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllCompaniesAsync()
         {
+           
             var companies = await Mediator.Send(new GetCompanyQuery());
             return Ok(companies);
         }
@@ -35,6 +38,25 @@ namespace BSOFT.API.Controllers
                 return NotFound();
             }
             return Ok(company);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, UpdateCompanyCommand command )
+        {
+            if(id != command.Id)
+            {
+                return BadRequest();
+            }
+            await Mediator.Send(command);
+
+            return NoContent();
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await Mediator.Send(new DeleteCompanyCommand {Id=id });
+
+            return NoContent();
         }
     }
 }

@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System;
-
+using MediatR;
+using FluentValidation;
+using BSOFT.Application.Common.Behaviours;
 namespace BSOFT.Application
 {
     public static class ConfigureServices
@@ -12,11 +14,12 @@ namespace BSOFT.Application
 
             // Use a specific AddAutoMapper overload
             services.AddAutoMapper(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
-
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             // Add MediatR
             services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                cfg.AddBehavior(typeof(IPipelineBehavior<,>),typeof(ValidationBehaviour<,>));
             });
 
             return services;

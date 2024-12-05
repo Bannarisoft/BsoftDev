@@ -12,6 +12,8 @@ namespace BSOFT.Domain.Interfaces
         Task<List<Company>> GetAllCompaniesAsync();
         Task<Company> CreateAsync(Company company);
         Task<Company> GetByIdAsync(int id);
+        Task<int> UpdateAsync(int id,Company company);
+        Task<int> DeleteAsync(int id);
        
     }
 }
