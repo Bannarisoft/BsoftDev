@@ -1,0 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using BSOFT.Domain.Entities;
+using System.Text;
+
+namespace BSOFT.Domain.Interfaces
+{
+    public interface ICompanyRepository
+    {
+        Task<List<Company>> GetAllCompaniesAsync();
+        Task<Company> CreateAsync(Company company);
+        Task<Company> GetByIdAsync(int id);
+       
+    }
+}
