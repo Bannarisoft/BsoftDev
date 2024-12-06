@@ -14,6 +14,8 @@ namespace BSOFT.Domain.Interfaces
         Task<User> CreateAsync(User user);
         Task<int> UpdateAsync(int id,User user);
         Task<int> DeleteAsync(int id);
+        Task<User> GetUserByUsernameAsync(string username);
+        // Task<User> ValidateUserAsync(string username, string PasswordHash);
 
     }
 

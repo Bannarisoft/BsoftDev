@@ -24,11 +24,17 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("BSOFT.Domain.Entities.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+
+                    b.Property<int>("CoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -36,8 +42,12 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Property<string>("CreatedByName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Created_Time")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DivId")
+                        .HasColumnType("int");
 
                     b.Property<string>("EmailId")
                         .IsRequired()
@@ -58,14 +68,24 @@ namespace BSOFT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("ModifiedBy")
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Modified_Time")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("ModifiedIP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -78,7 +98,7 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Property<int>("UserType")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.ToTable("Users");
                 });

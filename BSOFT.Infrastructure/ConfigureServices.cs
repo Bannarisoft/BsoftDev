@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using BSOFT.Domain.Interfaces;
 using BSOFT.Infrastructure.Repositories;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,8 @@ namespace BSOFT.Infrastructure
                 options.UseSqlServer(connectionString));
 
                 services.AddTransient<IUserRepository, UserRepository>();
+                services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
+
 
                 return services;
             }
