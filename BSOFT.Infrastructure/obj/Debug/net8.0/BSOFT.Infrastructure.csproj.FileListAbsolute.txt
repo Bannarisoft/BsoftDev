@@ -1,3 +1,8 @@
+D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.Infrastructure.csproj.AssemblyReference.cache
+D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.Infrastructure.AssemblyInfoInputs.cache
+D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.Infrastructure.AssemblyInfo.cs
+D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.Infrastructure.csproj.CoreCompileInputs.cache
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\bin\Debug\net8.0\BSOFT.Infrastructure.deps.json
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\bin\Debug\net8.0\BSOFT.Infrastructure.runtimeconfig.json
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\bin\Debug\net8.0\BSOFT.Infrastructure.dll
@@ -6,11 +11,6 @@ D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\bin\Debug\net8.0\BSOFT.Applic
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\bin\Debug\net8.0\BSOFT.Domain.dll
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\bin\Debug\net8.0\BSOFT.Domain.pdb
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\bin\Debug\net8.0\BSOFT.Application.pdb
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.Infrastructure.csproj.AssemblyReference.cache
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.Infrastructure.AssemblyInfoInputs.cache
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.Infrastructure.AssemblyInfo.cs
-D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.Infrastructure.csproj.CoreCompileInputs.cache
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.In.007E81A0.Up2Date
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\BSOFT.Infrastructure.dll
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Infrastructure\obj\Debug\net8.0\refint\BSOFT.Infrastructure.dll

@@ -19,18 +19,23 @@ namespace BSOFT.Application.Users.Commands.UpdateUser
         {
             var UpdateuserEntity = new User()
             {
-                Id = request.Id,
+                UserId = request.UserId,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 UserName = request.UserName,
                 IsActive = request.IsActive,
-                UserPassword = request.UserPassword,
+                PasswordHash = request.PasswordHash,
                 UserType = request.UserType,
                 Mobile = request.Mobile,
-                EmailId = request.EmailId
+                EmailId = request.EmailId,
+                CoId = request.CoId,
+                UnitId = request.UnitId,
+                DivId = request.DivId,
+                RoleId = request.RoleId
+
             };
 
-            return await _userRepository.UpdateAsync(request.Id, UpdateuserEntity);
+            return await _userRepository.UpdateAsync(request.UserId, UpdateuserEntity);
         }
     }
 }

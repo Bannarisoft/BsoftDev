@@ -1,4 +1,5 @@
 using BSOFT.Application.Users.Queries.GetUsers;
+using BSOFT.Application.UserLogin.Commands.UserLogin;
 using BSOFT.Domain.Entities;
 using BSOFT.Domain.Interfaces;
 using AutoMapper;
@@ -28,15 +29,19 @@ namespace BSOFT.Application.Users.Commands.CreateUser
                 LastName = request.LastName,
                 UserName = request.UserName,
                 IsActive = request.IsActive,
-                UserPassword = request.UserPassword,
+                PasswordHash = request.PasswordHash,
                 UserType = request.UserType,
                 Mobile = request.Mobile,
                 EmailId = request.EmailId,
+                CoId = request.CoId,
+                UnitId = request.UnitId,
+                DivId = request.DivId,
+                RoleId = request.RoleId,
                 CreatedBy = request.CreatedBy,
-                Created_Time = request.Created_Time,
+                CreatedAt = request.CreatedAt,
                 CreatedByName = request.CreatedByName,
                 ModifiedBy = request.ModifiedBy,
-                Modified_Time = request.Modified_Time,
+                ModifiedAt = request.ModifiedAt,
                 ModifiedByName = request.ModifiedByName           
             };
 
