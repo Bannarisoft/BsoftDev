@@ -28,6 +28,10 @@ namespace BSOFT.Infrastructure
                 options.UseSqlServer(connectionString));
 
                 services.AddScoped<IUserRepository, UserRepository>();
+                services.AddScoped<IUnitRepository, UnitRepository>();
+                services.AddScoped<IEntityRepository,EntityRepository>();
+
+
 
                 return services;
             }

@@ -10,3 +10,15 @@ D:\Projects\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\BSOFT.Domain.dll
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\refint\BSOFT.Domain.dll
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\BSOFT.Domain.pdb
 D:\Projects\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\ref\BSOFT.Domain.dll
+E:\ProjectRepo\BSOFT\BSOFT.Domain\bin\Debug\net8.0\BSOFT.Domain.deps.json
+E:\ProjectRepo\BSOFT\BSOFT.Domain\bin\Debug\net8.0\BSOFT.Domain.dll
+E:\ProjectRepo\BSOFT\BSOFT.Domain\bin\Debug\net8.0\BSOFT.Domain.pdb
+E:\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\BSOFT.Domain.csproj.AssemblyReference.cache
+E:\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\BSOFT.Domain.GeneratedMSBuildEditorConfig.editorconfig
+E:\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\BSOFT.Domain.AssemblyInfoInputs.cache
+E:\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\BSOFT.Domain.AssemblyInfo.cs
+E:\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\BSOFT.Domain.csproj.CoreCompileInputs.cache
+E:\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\BSOFT.Domain.dll
+E:\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\refint\BSOFT.Domain.dll
+E:\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\BSOFT.Domain.pdb
+E:\ProjectRepo\BSOFT\BSOFT.Domain\obj\Debug\net8.0\ref\BSOFT.Domain.dll
