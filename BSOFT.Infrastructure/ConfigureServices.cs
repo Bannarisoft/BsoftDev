@@ -28,6 +28,9 @@ namespace BSOFT.Infrastructure
                 options.UseSqlServer(connectionString));
 
                 services.AddScoped<IUserRepository, UserRepository>();
+                services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+                services.AddScoped<IRoleRepository, RoleRepository>();
+                
 
                 return services;
             }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+tjBjQIlmN4=",
+  "dgSpecHash": "XJnKemOldhk=",
   "success": true,
-  "projectFilePath": "D:\\Projects\\ProjectRepo\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj",
+  "projectFilePath": "D:\\ProjectRepository\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Administrator\\.nuget\\packages\\mediatr\\12.4.1\\mediatr.12.4.1.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
