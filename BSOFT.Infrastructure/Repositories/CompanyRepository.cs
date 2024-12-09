@@ -28,12 +28,13 @@ namespace BSOFT.Infrastructure.Repositories
         }
          public async Task<Company> GetByIdAsync(int id)
         {
+            Console.WriteLine("Hello",id);
             return await _applicationDbContext.Companies.AsNoTracking()
-                .FirstOrDefaultAsync(b => b.Id == id);
+                .FirstOrDefaultAsync(b => b.CoId == id);
         }
            public async Task<int> UpdateAsync(int id, Company company)
         {
-            var existingCompany = await _applicationDbContext.Companies.FirstOrDefaultAsync(u => u.Id == id);
+            var existingCompany = await _applicationDbContext.Companies.FirstOrDefaultAsync(u => u.CoId == id);
             if (existingCompany != null)
             {
                 existingCompany.CompanyName = company.CompanyName;
@@ -41,7 +42,7 @@ namespace BSOFT.Infrastructure.Repositories
                 existingCompany.Address1 = company.Address1;
                 existingCompany.Address2 = company.Address2;
                 existingCompany.Address3 = company.Address3;
-                existingCompany.PhoneNumber = company.PhoneNumber;
+                existingCompany.Phone = company.Phone;
                 existingCompany.Email = company.Email;
                 existingCompany.GstNumber = company.GstNumber;
                 existingCompany.TIN = company.TIN;
@@ -49,11 +50,12 @@ namespace BSOFT.Infrastructure.Repositories
                 existingCompany.CSTNo = company.CSTNo;
                 existingCompany.YearofEstablishment = company.YearofEstablishment;
                 existingCompany.Website = company.Website;
-                existingCompany.Entity = company.Entity;
+                existingCompany.EntityId = company.EntityId;
                 existingCompany.IsActive = company.IsActive;
                 existingCompany.ModifiedBy = company.ModifiedBy;
-                existingCompany.Modified_Time = company.Modified_Time;
+                existingCompany.ModifiedAt = company.ModifiedAt;
                 existingCompany.ModifiedByName = company.ModifiedByName;
+                existingCompany.ModifiedIP = company.ModifiedIP;
 
                 _applicationDbContext.Companies.Update(existingCompany);
                 return await _applicationDbContext.SaveChangesAsync();
@@ -62,7 +64,7 @@ namespace BSOFT.Infrastructure.Repositories
         }
          public async Task<int> DeleteAsync(int id)
         {
-            var companyToDelete = await _applicationDbContext.Companies.FirstOrDefaultAsync(u => u.Id == id);
+            var companyToDelete = await _applicationDbContext.Companies.FirstOrDefaultAsync(u => u.CoId == id);
             if (companyToDelete != null)
             {
                 _applicationDbContext.Companies.Remove(companyToDelete);

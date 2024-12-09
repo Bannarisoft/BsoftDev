@@ -29,7 +29,7 @@ namespace BSOFT.Application.Companies.Commands.CreateCompany
                 Address1 = request.Address1,
                 Address2 = request.Address2,
                 Address3 = request.Address3,
-                PhoneNumber = request.PhoneNumber,
+                Phone = request.Phone,
                 Email = request.Email,
                 GstNumber = request.GstNumber,
                 TIN = request.TIN,
@@ -38,14 +38,12 @@ namespace BSOFT.Application.Companies.Commands.CreateCompany
                 YearofEstablishment = request.YearofEstablishment,
                 Website = request.Website,
                 Logo = request.Logo,
-                Entity = request.Entity,
+                EntityId = request.EntityId,
                 IsActive = request.IsActive,
                 CreatedBy = request.CreatedBy,
-                Created_Time = request.Created_Time,
+                CreatedAt = request.CreatedAt,
                 CreatedByName = request.CreatedByName,
-                ModifiedBy = request.ModifiedBy, 
-                Modified_Time = request.Modified_Time,
-                ModifiedByName = request.ModifiedByName            
+                CreatedIP =request.CreatedIP           
             };
 
             var result = await _companyRepository.CreateAsync(companyEntity);

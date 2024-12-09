@@ -22,6 +22,8 @@ namespace BSOFT.Application.Companies.Queries.GetCompanyById
         } 
         public async Task<CompanyVm> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
         {
+           
+
           var company = await _companyRepository.GetByIdAsync(request.CompanyId);
           return _mapper.Map<CompanyVm>(company);
         }

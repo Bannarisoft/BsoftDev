@@ -21,13 +21,13 @@ namespace BSOFT.Application.Companies.Commands.UpdateCompany
         {
             var UpdatecompanyEntity = new Company()
             {
-                Id = request.Id,
+                CoId = request.CoId,
                 CompanyName = request.CompanyName,
                 LegalName = request.LegalName,
                 Address1 = request.Address1,
                 Address2 = request.Address2,
                 Address3 = request.Address3,
-                PhoneNumber = request.PhoneNumber,
+                Phone = request.Phone,
                 Email = request.Email,
                 GstNumber = request.GstNumber,
                 TIN = request.TIN,
@@ -36,14 +36,15 @@ namespace BSOFT.Application.Companies.Commands.UpdateCompany
                 YearofEstablishment = request.YearofEstablishment,
                 Website = request.Website,
                 Logo = request.Logo,
-                Entity = request.Entity,
+                EntityId = request.EntityId,
                 IsActive = request.IsActive,
                 ModifiedBy = request.ModifiedBy, 
-                Modified_Time = request.Modified_Time,
-                ModifiedByName = request.ModifiedByName  
+                ModifiedAt = request.ModifiedAt,
+                ModifiedByName = request.ModifiedByName,
+                ModifiedIP = request.ModifiedIP  
             };
 
-            return await _companyRepository.UpdateAsync(request.Id, UpdatecompanyEntity);
+            return await _companyRepository.UpdateAsync(request.CoId, UpdatecompanyEntity);
         }
     }
 }
