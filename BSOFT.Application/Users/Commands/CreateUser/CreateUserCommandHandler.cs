@@ -23,30 +23,43 @@ namespace BSOFT.Application.Users.Commands.CreateUser
 
         public async Task<UserVm> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            var userEntity = new User
-            {
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                UserName = request.UserName,
-                IsActive = request.IsActive,
-                PasswordHash = request.PasswordHash,
-                UserType = request.UserType,
-                Mobile = request.Mobile,
-                EmailId = request.EmailId,
-                CoId = request.CoId,
-                UnitId = request.UnitId,
-                DivId = request.DivId,
-                RoleId = request.RoleId,
-                CreatedBy = request.CreatedBy,
-                CreatedAt = request.CreatedAt,
-                CreatedByName = request.CreatedByName,
-                ModifiedBy = request.ModifiedBy,
-                ModifiedAt = request.ModifiedAt,
-                ModifiedByName = request.ModifiedByName           
-            };
+            // Use AutoMapper to map CreateUserCommand to User entity
+            var userEntity = _mapper.Map<User>(request);
+            userEntity.Id = Guid.NewGuid(); // Assign a new GUID for the User ID
 
-            var result = await _userRepository.CreateAsync(userEntity);
-            return _mapper.Map<UserVm>(result);
+            // Save the user to the repository
+            var createdUser = await _userRepository.CreateAsync(userEntity);
+
+            // Map the created User entity to UserVm
+            return _mapper.Map<UserVm>(createdUser);
+
+            // var userEntity = new User
+            // {
+            //     Id = Guid.NewGuid(),
+            //     FirstName = request.FirstName,
+            //     LastName = request.LastName,
+            //     UserName = request.UserName,
+            //     IsActive = request.IsActive,
+            //     PasswordHash = request.PasswordHash,
+            //     UserType = request.UserType,
+            //     Mobile = request.Mobile,
+            //     EmailId = request.EmailId,
+            //     CoId = request.CoId,
+            //     UnitId = request.UnitId,
+            //     DivId = request.DivId,
+            //     RoleId = request.RoleId,
+            //     CreatedBy = request.CreatedBy,
+            //     CreatedAt = request.CreatedAt,
+            //     CreatedByName = request.CreatedByName,
+            //     CreatedIP = request.CreatedIP,
+            //     ModifiedBy = request.ModifiedBy,
+            //     ModifiedAt = request.ModifiedAt,
+            //     ModifiedByName = request.ModifiedByName,    
+            //     ModifiedIP = request.ModifiedIP       
+            // };
+
+            // var result = await _userRepository.CreateAsync(userEntity);
+            // return _mapper.Map<UserVm>(result);
         }
     }
 }

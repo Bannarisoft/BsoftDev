@@ -10,6 +10,6 @@ namespace BSOFT.Application.Users.Commands.DeleteUser
 {
     public class DeleteUserCommand : IRequest<int>
     {
-        public int UserId { get; set; }
+        public Guid Id { get; set; }
     }
 }

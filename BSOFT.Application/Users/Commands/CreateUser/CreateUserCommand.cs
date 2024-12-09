@@ -11,7 +11,8 @@ namespace BSOFT.Application.Users.Commands.CreateUser
 {
     public class CreateUserCommand : IRequest<UserVm>
     {
-    public int UserId { get; set; }
+    // public Guid Id { get; set; }
+    // public int UserId { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string UserName { get; set; }
@@ -27,8 +28,10 @@ namespace BSOFT.Application.Users.Commands.CreateUser
     public int CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; }
     public string? CreatedByName { get; set; }
+    public string? CreatedIP { get; set; }
     public int ModifiedBy { get; set; }
     public DateTime ModifiedAt { get; set; }
     public string? ModifiedByName { get; set; }
+    public string? ModifiedIP { get; set; }
     }
 }

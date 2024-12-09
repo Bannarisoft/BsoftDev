@@ -20,30 +20,30 @@ namespace BSOFT.Infrastructure.Repositories
 
         public async Task<User> CreateAsync(User user)
         {
-            await _applicationDbContext.Users.AddAsync(user);
+            await _applicationDbContext.User.AddAsync(user);
             await _applicationDbContext.SaveChangesAsync();
             return user;
         }
 
-        public async Task<int> DeleteAsync(int id)
+        public async Task<int> DeleteAsync(Guid id)
         {
-            return await _applicationDbContext.Users
-                .Where(model => model.UserId == id)
+            return await _applicationDbContext.User
+                .Where(model => model.Id == id)
                 .ExecuteDeleteAsync();
         }
 
         public async Task<List<User>> GetAllUsersAsync()
         {
-            return await _applicationDbContext.Users.ToListAsync();
+            return await _applicationDbContext.User.ToListAsync();
         }
 
-        public async Task<User> GetByIdAsync(int id)
+        public async Task<User?> GetByIdAsync(Guid id)
         {
-            return await _applicationDbContext.Users.AsNoTracking()
-                .FirstOrDefaultAsync(b => b.UserId == id);
+            return await _applicationDbContext.User.AsNoTracking()
+                .FirstOrDefaultAsync(b => b.Id == id);
         }
 
-        public async Task<int> UpdateAsync(int id, User user)
+        public async Task<int> UpdateAsync(Guid id, User user)
         {
             // return await _applicationDbContext.Users
             //         .Where(model => model.Id == id)
@@ -55,7 +55,7 @@ namespace BSOFT.Infrastructure.Repositories
             //             .SetProperty(m => m.UserPassword,user.UserPassword)
 
             //             );
-            var existingUser = await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == id);
+            var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.Id == id);
             if (existingUser != null)
             {
                 existingUser.FirstName = user.FirstName;
@@ -70,26 +70,15 @@ namespace BSOFT.Infrastructure.Repositories
                 existingUser.UnitId = user.UnitId;
                 existingUser.RoleId = user.RoleId;
 
-                _applicationDbContext.Users.Update(existingUser);
+                _applicationDbContext.User.Update(existingUser);
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
         }
 
-        private readonly List<User> _users = new()
+        public async Task<User?> GetByUsernameAsync(string username)
         {
-            new User
-            {
-                Id = Guid.NewGuid(),
-                UserName = "testuser",
-                PasswordHash = Convert.ToBase64String(System.Security.Cryptography.SHA256.Create()
-                    .ComputeHash(Encoding.UTF8.GetBytes("password")))
-            }
-        };
-
-        public Task<User> GetUserByUsernameAsync(string username)
-        {
-            return Task.FromResult(_users.FirstOrDefault(u => u.UserName == username));
+            return await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserName == username);
         }
         
     }

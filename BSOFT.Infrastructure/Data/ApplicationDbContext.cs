@@ -15,7 +15,7 @@ namespace BSOFT.Infrastructure.Data
         : base(dbContextOptions) 
         {           
         }
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> User { get; set; }
 
     }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace BSOFT.Domain.Entities
 {
+    [Table("User", Schema = "AppSecurity")]
     public class User
     {
     public Guid Id { get; set; }
-    public int UserId { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string UserName { get; set; }
@@ -26,10 +27,10 @@ namespace BSOFT.Domain.Entities
     public string? CreatedByName { get; set; }
     public DateTime CreatedAt { get; set; }
     public string CreatedIP { get; set; }
-    public int ModifiedBy { get; set; }
+    public int? ModifiedBy { get; set; }
     public string? ModifiedByName { get; set; }
-    public DateTime ModifiedAt { get; set; }
-    public string ModifiedIP { get; set; }
+    public DateTime? ModifiedAt { get; set; }
+    public string? ModifiedIP { get; set; }
 
        
     }

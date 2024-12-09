@@ -24,7 +24,7 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdAsync(int id)
+        public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             var user = await Mediator.Send(new GetUserByIdQuery() { UserId = id});
             if(user == null)
@@ -38,13 +38,13 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> CreateAsync(CreateUserCommand command)
         {
             var createdUser = await Mediator.Send(command);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = createdUser.UserId }, createdUser);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = createdUser.Id }, createdUser);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(int id, UpdateUserCommand command)
+        public async Task<IActionResult> UpdateAsync(Guid id, UpdateUserCommand command)
         {
-            if(id != command.UserId)
+            if(id != command.Id)
             {
                 return BadRequest();
             }
@@ -53,9 +53,9 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(int id)
+        public async Task<IActionResult> DeleteAsync(Guid id)
         {
-            var  result = await Mediator.Send(new DeleteUserCommand { UserId = id});
+            var  result = await Mediator.Send(new DeleteUserCommand { Id = id});
             if(result == 0)
             {
                 return BadRequest();
