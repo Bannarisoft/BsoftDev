@@ -1,3 +1,7 @@
+using BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
+using BSOFT.Application.RoleEntitlements.Queries.GetRoles;
+using BSOFT.Application.Role.Queries.GetRoleById;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,11 +22,23 @@ namespace BSOFT.API.Controllers
         return CreatedAtAction(nameof(GetRoleEntitlement), new { id = result }, dto);
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetRoleEntitlement(int id)
+    {
+            var query = new GetRoleByIdQuery { RoleId = id };
+            var result = await Mediator.Send(query);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAllRoleEntitlements()
     {
         var query = new GetAllRoleEntitlementsQuery();
-        var result = await _mediator.Send(query);
+        var result = await Mediator.Send(query);
         return Ok(result);
     }
 

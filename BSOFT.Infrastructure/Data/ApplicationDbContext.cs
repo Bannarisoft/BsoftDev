@@ -15,38 +15,33 @@ namespace BSOFT.Infrastructure.Data
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions) 
-        : base(dbContextOptions) 
+            : base(dbContextOptions) 
         {           
         }
+
         public DbSet<User> User { get; set; }
         public DbSet<RoleEntitlement> RoleEntitlement { get; set; }
-        
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<User>()
-            .HasKey(u => u.UserId); // Primary key
-        }
         public DbSet<Department> Department { get; set; } 
-         public DbSet<Role> Role { get; set; } 
+        public DbSet<Role> Role { get; set; } 
         public DbSet<Company> Companies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // User entity configuration
+            modelBuilder.Entity<User>()
+                .HasKey(u => u.UserId); // Primary key
+
+            // Department entity configuration
             modelBuilder.Entity<Department>()
-                .HasKey(d => d.DeptId);
+                .HasKey(d => d.DeptId); // Primary key
+
+            // RoleEntitlement entity configuration
+            modelBuilder.Entity<RoleEntitlement>()
+                .HasMany(x => x.MenuPermissions)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade); // Cascade delete behavior
 
             base.OnModelCreating(modelBuilder);
         }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-        modelBuilder.Entity<RoleEntitlement>()
-            .HasMany(x => x.MenuPermissions)
-            .WithOne()
-            .OnDelete(DeleteBehavior.Cascade);
-
-        base.OnModelCreating(modelBuilder);
-    }
-
     }
 }

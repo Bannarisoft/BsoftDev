@@ -1,7 +1,7 @@
 using BSOFT.Domain.Entities;
 using BSOFT.Application.Common.Mappings;
 
-namespace BSOFT.Application.RoleEntitlement.Queries.GetUsers
+namespace BSOFT.Application.RoleEntitlements.Queries.GetRoles
 {
 public class CreateRoleEntitlementDto
 {

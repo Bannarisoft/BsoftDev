@@ -1,5 +1,6 @@
 using AutoMapper;
-using BSOFT.Application.RoleEntitlement.Commands;
+using BSOFT.Application.RoleEntitlements.Commands;
+using BSOFT.Application.RoleEntitlements.Queries.GetRoles;
 using BSOFT.Domain.Entities;
 
 namespace BSOFT.Application.Common.Mappings

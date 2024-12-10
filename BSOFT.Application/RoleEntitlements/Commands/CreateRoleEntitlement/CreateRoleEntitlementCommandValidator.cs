@@ -1,3 +1,4 @@
+using BSOFT.Application.RoleEntitlements.Queries.GetRoles;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -5,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BSOFT.Application.RoleEntitlement.Commands.CreateRoleEntitlement
+namespace BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
     public class CreateRoleEntitlementCommandValidator : AbstractValidator<CreateRoleEntitlementDto>
     {

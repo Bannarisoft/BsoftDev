@@ -1,4 +1,4 @@
-namespace BSOFT.Application.RoleEntitlement.Queries.GetUsers
+namespace BSOFT.Application.RoleEntitlements.Queries.GetRoles
 {
     public class RoleEntitlementDto
     {

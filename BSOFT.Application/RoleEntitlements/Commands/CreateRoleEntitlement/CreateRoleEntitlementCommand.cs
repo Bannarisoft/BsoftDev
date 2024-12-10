@@ -1,3 +1,4 @@
+using BSOFT.Application.RoleEntitlements.Queries.GetRoles;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BSOFT.Application.RoleEntitlement.Commands.CreateRoleEntitlement
+namespace BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
     public class CreateRoleEntitlementCommand : IRequest<int>
     {

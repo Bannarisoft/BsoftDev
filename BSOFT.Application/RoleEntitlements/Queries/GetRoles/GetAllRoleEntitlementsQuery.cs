@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BSOFT.Application.RoleEntitlement.Queries.GetUsers
+namespace BSOFT.Application.RoleEntitlements.Queries.GetRoles
 {
     public class GetAllRoleEntitlementsQuery : IRequest<List<RoleEntitlementDto>>
     {
