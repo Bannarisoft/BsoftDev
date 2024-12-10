@@ -24,11 +24,9 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("BSOFT.Domain.Entities.User", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("CoId")
                         .HasColumnType("int");
@@ -68,16 +66,23 @@ namespace BSOFT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ModifiedAt")
+                    b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ModifiedBy")
+                    b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -87,20 +92,19 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("UserPassword")
+                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserType")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User", "AppSecurity");
                 });
 #pragma warning restore 612, 618
         }

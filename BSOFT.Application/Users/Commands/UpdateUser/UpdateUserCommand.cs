@@ -10,7 +10,7 @@ namespace BSOFT.Application.Users.Commands.UpdateUser
 {
     public class UpdateUserCommand : IRequest<int>
     {
-    
+    // public Guid Id { get; set; }
     public int UserId { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
@@ -24,6 +24,11 @@ namespace BSOFT.Application.Users.Commands.UpdateUser
     public int UnitId { get; set; }
     public int DivId { get; set; }
     public int RoleId { get; set; }
+    public string Role { get; set; }
+    public int ModifiedBy { get; set; }
+    public DateTime ModifiedAt { get; set; }
+    public string? ModifiedByName { get; set; }
+    public string? ModifiedIP { get; set; } 
 
     }
 }

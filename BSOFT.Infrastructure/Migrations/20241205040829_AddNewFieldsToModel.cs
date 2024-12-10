@@ -11,6 +11,7 @@ namespace BSOFT.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
 
+
         }
 
         /// <inheritdoc />
