@@ -7,8 +7,6 @@ using BSOFT.Application.Users.Commands.UpdateUser;
 using BSOFT.Application.Users.Commands.DeleteUser;
 
 
-
-
 namespace BSOFT.API.Controllers
 {
     [Route("api/[controller]")]

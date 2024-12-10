@@ -19,6 +19,7 @@ namespace BSOFT.Infrastructure.Data
         {           
         }
         public DbSet<User> User { get; set; }
+        public DbSet<RoleEntitlement> RoleEntitlement { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +37,16 @@ namespace BSOFT.Infrastructure.Data
 
             base.OnModelCreating(modelBuilder);
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+        modelBuilder.Entity<RoleEntitlement>()
+            .HasMany(x => x.MenuPermissions)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        base.OnModelCreating(modelBuilder);
+    }
 
     }
 }
