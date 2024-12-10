@@ -10,10 +10,10 @@ namespace BSOFT.Domain.Interfaces
     public interface IUserRepository
     {
         Task<List<User>> GetAllUsersAsync();
-        Task<User?> GetByIdAsync(Guid id);
+        Task<User?> GetByIdAsync(int userId);
         Task<User> CreateAsync(User user);
-        Task<int> UpdateAsync(Guid id,User user);
-        Task<int> DeleteAsync(Guid id);
+        Task<int> UpdateAsync(int userId,User user);
+        Task<int> DeleteAsync(int userId);
         Task<User?> GetByUsernameAsync(string username);
         // Task<User> ValidateUserAsync(string username, string PasswordHash);
 

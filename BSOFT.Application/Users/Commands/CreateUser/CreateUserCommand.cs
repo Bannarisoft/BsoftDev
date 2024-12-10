@@ -25,6 +25,7 @@ namespace BSOFT.Application.Users.Commands.CreateUser
     public int UnitId { get; set; }
     public int DivId { get; set; }
     public int RoleId { get; set; }
+    public string Role { get; set; }
     public int CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; }
     public string? CreatedByName { get; set; }

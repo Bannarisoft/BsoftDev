@@ -16,6 +16,12 @@ namespace BSOFT.Infrastructure.Data
         {           
         }
         public DbSet<User> User { get; set; }
+        
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+            .HasKey(u => u.UserId); // Primary key
+        }
 
     }
 }

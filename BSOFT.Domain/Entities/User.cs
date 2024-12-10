@@ -10,7 +10,8 @@ namespace BSOFT.Domain.Entities
     [Table("User", Schema = "AppSecurity")]
     public class User
     {
-    public Guid Id { get; set; }
+    // public Guid Id { get; set; }
+    public int UserId { get; set; }// Identity column
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string UserName { get; set; }
@@ -23,6 +24,7 @@ namespace BSOFT.Domain.Entities
     public int UnitId { get; set; }
     public int DivId { get; set; }
     public int RoleId { get; set; }
+    public string Role { get; set; }
     public int CreatedBy { get; set; }
     public string? CreatedByName { get; set; }
     public DateTime CreatedAt { get; set; }

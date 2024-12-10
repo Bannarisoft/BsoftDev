@@ -24,7 +24,7 @@ namespace BSOFT.Application.Users.Commands.UpdateUser
             var updateUserEntity = _mapper.Map<User>(request);
 
             // Update the user in the repository
-            return await _userRepository.UpdateAsync(request.Id, updateUserEntity);
+            return await _userRepository.UpdateAsync(request.UserId, updateUserEntity);
             // var UpdateuserEntity = new User()
             // {
             //     FirstName = request.FirstName,

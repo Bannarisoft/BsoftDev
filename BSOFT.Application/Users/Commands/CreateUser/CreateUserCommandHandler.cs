@@ -25,7 +25,8 @@ namespace BSOFT.Application.Users.Commands.CreateUser
         {
             // Use AutoMapper to map CreateUserCommand to User entity
             var userEntity = _mapper.Map<User>(request);
-            userEntity.Id = Guid.NewGuid(); // Assign a new GUID for the User ID
+            // userEntity.Id = Guid.NewGuid(); // Assign a new GUID for the User ID
+            // userEntity.UserId = 0;
 
             // Save the user to the repository
             var createdUser = await _userRepository.CreateAsync(userEntity);
@@ -48,6 +49,7 @@ namespace BSOFT.Application.Users.Commands.CreateUser
             //     UnitId = request.UnitId,
             //     DivId = request.DivId,
             //     RoleId = request.RoleId,
+            //     Role = request.Role,
             //     CreatedBy = request.CreatedBy,
             //     CreatedAt = request.CreatedAt,
             //     CreatedByName = request.CreatedByName,

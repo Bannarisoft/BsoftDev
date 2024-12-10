@@ -23,10 +23,10 @@ namespace BSOFT.API.Controllers
             return Ok(users);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdAsync(Guid id)
+        [HttpGet("{userid}")]
+        public async Task<IActionResult> GetByIdAsync(int userid)
         {
-            var user = await Mediator.Send(new GetUserByIdQuery() { UserId = id});
+            var user = await Mediator.Send(new GetUserByIdQuery() { UserId = userid});
             if(user == null)
             {
                 return NotFound();
@@ -41,10 +41,10 @@ namespace BSOFT.API.Controllers
             return CreatedAtAction(nameof(GetByIdAsync), new { id = createdUser.Id }, createdUser);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(Guid id, UpdateUserCommand command)
+        [HttpPut("{userid}")]
+        public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
         {
-            if(id != command.Id)
+            if(userid != command.UserId)
             {
                 return BadRequest();
             }
@@ -52,10 +52,10 @@ namespace BSOFT.API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(Guid id)
+        [HttpDelete("{userid}")]
+        public async Task<IActionResult> DeleteAsync(int userid)
         {
-            var  result = await Mediator.Send(new DeleteUserCommand { Id = id});
+            var  result = await Mediator.Send(new DeleteUserCommand { UserId = userid});
             if(result == 0)
             {
                 return BadRequest();

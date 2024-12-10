@@ -10,6 +10,6 @@ namespace BSOFT.Application.Users.Queries.GetUserById
 {
     public class GetUserByIdQuery : IRequest<UserVm>
     {
-        public Guid UserId { get; set; }
+        public int UserId { get; set; }
     }
 }
