@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using BSOFT.Application.Users.Queries.GetUsers;
 using BSOFT.Application.Users.Queries.GetUserById;
 using BSOFT.Application.Users.Commands.CreateUser;
+using BSOFT.Application.Users.Commands.UpdateUser;
+using BSOFT.Application.Users.Commands.DeleteUser;
+
 
 
 
@@ -20,10 +23,10 @@ namespace BSOFT.API.Controllers
             return Ok(users);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdAsync(int id)
+        [HttpGet("{userid}")]
+        public async Task<IActionResult> GetByIdAsync(int userid)
         {
-            var user = await Mediator.Send(new GetUserByIdQuery() { UserId = id});
+            var user = await Mediator.Send(new GetUserByIdQuery() { UserId = userid});
             if(user == null)
             {
                 return NotFound();
@@ -36,6 +39,28 @@ namespace BSOFT.API.Controllers
         {
             var createdUser = await Mediator.Send(command);
             return CreatedAtAction(nameof(GetByIdAsync), new { id = createdUser.Id }, createdUser);
+        }
+
+        [HttpPut("{userid}")]
+        public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
+        {
+            if(userid != command.UserId)
+            {
+                return BadRequest();
+            }
+            await Mediator.Send(command);
+            return NoContent();
+        }
+
+        [HttpDelete("{userid}")]
+        public async Task<IActionResult> DeleteAsync(int userid)
+        {
+            var  result = await Mediator.Send(new DeleteUserCommand { UserId = userid});
+            if(result == 0)
+            {
+                return BadRequest();
+            }
+            return NoContent();
         }
     }
 }
