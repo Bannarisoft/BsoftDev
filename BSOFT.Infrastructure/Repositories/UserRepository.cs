@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
+using BSOFT.Infrastructure.Repositories;
 using BSOFT.Domain.Interfaces;
 using BSOFT.Domain.Entities;
+using System.Text;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -18,46 +20,58 @@ namespace BSOFT.Infrastructure.Repositories
 
         public async Task<User> CreateAsync(User user)
         {
-            await _applicationDbContext.Users.AddAsync(user);
+            await _applicationDbContext.User.AddAsync(user);
             await _applicationDbContext.SaveChangesAsync();
             return user;
         }
 
-        public async Task<int> DeleteAsync(int id)
+        public async Task<int> DeleteAsync(int userId)
         {
-            var userToDelete = await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (userToDelete != null)
-            {
-                _applicationDbContext.Users.Remove(userToDelete);
-                return await _applicationDbContext.SaveChangesAsync();
-            }
-            return 0; // No user found
+            return await _applicationDbContext.User
+                .Where(model => model.UserId == userId)
+                .ExecuteDeleteAsync();
         }
 
         public async Task<List<User>> GetAllUsersAsync()
         {
-            return await _applicationDbContext.Users.ToListAsync();
+            return await _applicationDbContext.User.ToListAsync();
         }
 
-        public async Task<User> GetByIdAsync(int id)
+        public async Task<User?> GetByIdAsync(int userId)
         {
-            return await _applicationDbContext.Users.AsNoTracking()
-                .FirstOrDefaultAsync(b => b.Id == id);
+            return await _applicationDbContext.User.AsNoTracking()
+                .FirstOrDefaultAsync(b => b.UserId == userId);
         }
 
-        public async Task<int> UpdateAsync(int id, User user)
+        public async Task<int> UpdateAsync(int userId, User user)
         {
-            var existingUser = await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+            var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
             if (existingUser != null)
             {
+                existingUser.UserId = user.UserId;
                 existingUser.FirstName = user.FirstName;
                 existingUser.LastName = user.LastName;
-                existingUser.UserPassword = user.UserPassword;
+                existingUser.UserName = user.UserName;
+                existingUser.PasswordHash = user.PasswordHash;
+                existingUser.UserType = user.UserType;
+                existingUser.Mobile = user.Mobile;
+                existingUser.EmailId = user.EmailId;
+                existingUser.CoId = user.CoId;
+                existingUser.DivId = user.DivId;
+                existingUser.UnitId = user.UnitId;
+                existingUser.RoleId = user.RoleId;
+                existingUser.Role = user.Role;
 
-                _applicationDbContext.Users.Update(existingUser);
+                _applicationDbContext.User.Update(existingUser);
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
         }
+
+        public async Task<User?> GetByUsernameAsync(string username)
+        {
+            return await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserName == username);
+        }
+        
     }
 }

@@ -1,13 +1,13 @@
+using  FluentValidation;
+using  MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MediatR;
-using FluentValidation;
 
 namespace BSOFT.Application.Common.Behaviours
 {
-    public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+     public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
