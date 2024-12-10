@@ -16,12 +16,23 @@ namespace BSOFT.Infrastructure.Data
         {           
         }
         public DbSet<User> User { get; set; }
+        public DbSet<RoleEntitlement> RoleEntitlement { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
             .HasKey(u => u.UserId); // Primary key
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+        modelBuilder.Entity<RoleEntitlement>()
+            .HasMany(x => x.MenuPermissions)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        base.OnModelCreating(modelBuilder);
+    }
 
     }
 }
