@@ -18,14 +18,4 @@ namespace BSOFT.Domain.Entities
     
     }
 
-    public class MenuPermission
-    {
-    public string MenuName { get; set; }
-    public bool CanView { get; set; }
-    public bool CanAdd { get; set; }
-    public bool CanUpdate { get; set; }
-    public bool CanDelete { get; set; }
-    public bool CanExport { get; set; }
-    public bool CanApprove { get; set; }
-    }
 }
