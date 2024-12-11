@@ -1,0 +1,31 @@
+using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+
+
+namespace BSOFT.Application.Entity.Commands.UpdateEntity
+{
+    public class UpdateEntityCommand : IRequest<int>
+    {
+     public int EntityId { get; set; }
+    //public string EntityCode { get; set; }
+    public string EntityName { get; set; }
+    public string EntityDescription { get; set; }
+    public string Address { get; set; }
+    public string Phone  { get; set; }
+    public string Email { get; set; }
+    public byte IsActive { get; set; }
+    public int CreatedBy { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public string CreatedByName { get; set; }
+    public string CreatedIP { get; set; }
+    public int ModifiedBy { get; set; } 
+    public string ModifiedByName { get; set; }    
+    public DateTime ModifiedAt { get; set; }
+    public string ModifiedIP { get; set; }
+    }
+}

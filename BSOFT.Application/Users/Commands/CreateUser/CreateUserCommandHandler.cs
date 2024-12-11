@@ -1,5 +1,4 @@
 using BSOFT.Application.Users.Queries.GetUsers;
-using BSOFT.Application.UserLogin.Commands.UserLogin;
 using BSOFT.Domain.Entities;
 using BSOFT.Domain.Interfaces;
 using AutoMapper;

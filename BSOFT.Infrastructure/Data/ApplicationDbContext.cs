@@ -18,12 +18,16 @@ namespace BSOFT.Infrastructure.Data
             : base(dbContextOptions) 
         {           
         }
+        public DbSet<Unit> Unit { get; set; } 
+        public DbSet<Entity> Entity { get; set; } 
 
         public DbSet<User> User { get; set; }
         public DbSet<RoleEntitlement> RoleEntitlement { get; set; }
         public DbSet<Department> Department { get; set; } 
         public DbSet<Role> Role { get; set; } 
         public DbSet<Company> Companies { get; set; }
+        public DbSet<Division> Divisions { get; set; }
+        public DbSet<MenuPermission> MenuPermission { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
