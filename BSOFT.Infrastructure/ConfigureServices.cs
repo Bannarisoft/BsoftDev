@@ -1,3 +1,7 @@
+using BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
+using BSOFT.Application.RoleEntitlements.Queries.GetRoles;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
@@ -31,12 +35,25 @@ namespace BSOFT.Infrastructure
                 services.AddTransient<IUserRepository, UserRepository>();
                 services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
                 services.AddTransient<IRoleEntitlementRepository, RoleEntitlementRepository>();
-                services.AddAutoMapper(typeof(CreateUserProfile));
-                services.AddAutoMapper(typeof(UpdateUserProfile));
+                // services.AddAutoMapper(typeof(CreateUserProfile));
+                // services.AddAutoMapper(typeof(UpdateUserProfile));
+                // services.AddAutoMapper(typeof(RoleEntitlementProfile));
+                services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile), typeof(RoleEntitlementProfile));
+
+
                 services.AddScoped<IDepartmentRepository, DepartmentRepository>();
                 services.AddScoped<IRoleRepository, RoleRepository>();
                 
                 services.AddScoped<ICompanyRepository, CompanyRepository>();
+
+            // Add FluentValidation
+                services.AddControllers()
+                    .AddFluentValidation(fv =>
+                    {
+                        fv.RegisterValidatorsFromAssemblyContaining<CreateRoleEntitlementCommandValidator>();
+                    }); 
+
+                services.AddTransient<IValidator<CreateRoleEntitlementVm>, CreateRoleEntitlementCommandValidator>();
 
 
                 return services;

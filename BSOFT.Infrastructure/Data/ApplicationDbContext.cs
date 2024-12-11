@@ -42,7 +42,7 @@ namespace BSOFT.Infrastructure.Data
             .HasForeignKey(mp => mp.RoleEntitlementId);
 
             modelBuilder.Entity<MenuPermission>()
-            .HasKey(mp => mp.Id); // Ensure primary key is defined
+            .HasKey(mp => mp.MenuPermissionId); // Ensure primary key is defined
 
 
     
