@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ProjectRepository\\BSOFT\\BSOFT.Infrastructure\\BSOFT.Infrastructure.csproj": {}
+    "D:\\Bannari\\BSOFT\\BSOFT.Infrastructure\\BSOFT.Infrastructure.csproj": {}
   },
   "projects": {
-    "D:\\ProjectRepository\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj": {
+    "D:\\Bannari\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ProjectRepository\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj",
+        "projectUniqueName": "D:\\Bannari\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj",
         "projectName": "BSOFT.Application",
-        "projectPath": "D:\\ProjectRepository\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj",
+        "projectPath": "D:\\Bannari\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\ProjectRepository\\BSOFT\\BSOFT.Application\\obj\\",
+        "outputPath": "D:\\Bannari\\BSOFT\\BSOFT.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -28,8 +28,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\ProjectRepository\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj": {
-                "projectPath": "D:\\ProjectRepository\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj"
+              "D:\\Bannari\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj": {
+                "projectPath": "D:\\Bannari\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj"
               }
             }
           }
@@ -65,6 +65,10 @@
               "target": "Package",
               "version": "[7.0.0, )"
             },
+            "Microsoft.AspNetCore.Http": {
+              "target": "Package",
+              "version": "[2.2.2, )"
+            },
             "Microsoft.Extensions.Configuration": {
               "target": "Package",
               "version": "[9.0.0, )"
@@ -94,14 +98,14 @@
         }
       }
     },
-    "D:\\ProjectRepository\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj": {
+    "D:\\Bannari\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ProjectRepository\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj",
+        "projectUniqueName": "D:\\Bannari\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj",
         "projectName": "BSOFT.Domain",
-        "projectPath": "D:\\ProjectRepository\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj",
+        "projectPath": "D:\\Bannari\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\ProjectRepository\\BSOFT\\BSOFT.Domain\\obj\\",
+        "outputPath": "D:\\Bannari\\BSOFT\\BSOFT.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -138,6 +142,14 @@
             "MediatR": {
               "target": "Package",
               "version": "[12.4.1, )"
+            },
+            "Microsoft.AspNetCore.Http": {
+              "target": "Package",
+              "version": "[2.2.2, )"
+            },
+            "System.ComponentModel.Annotations": {
+              "target": "Package",
+              "version": "[5.0.0, )"
             }
           },
           "imports": [
@@ -160,14 +172,14 @@
         }
       }
     },
-    "D:\\ProjectRepository\\BSOFT\\BSOFT.Infrastructure\\BSOFT.Infrastructure.csproj": {
+    "D:\\Bannari\\BSOFT\\BSOFT.Infrastructure\\BSOFT.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ProjectRepository\\BSOFT\\BSOFT.Infrastructure\\BSOFT.Infrastructure.csproj",
+        "projectUniqueName": "D:\\Bannari\\BSOFT\\BSOFT.Infrastructure\\BSOFT.Infrastructure.csproj",
         "projectName": "BSOFT.Infrastructure",
-        "projectPath": "D:\\ProjectRepository\\BSOFT\\BSOFT.Infrastructure\\BSOFT.Infrastructure.csproj",
+        "projectPath": "D:\\Bannari\\BSOFT\\BSOFT.Infrastructure\\BSOFT.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\ProjectRepository\\BSOFT\\BSOFT.Infrastructure\\obj\\",
+        "outputPath": "D:\\Bannari\\BSOFT\\BSOFT.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -184,11 +196,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\ProjectRepository\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj": {
-                "projectPath": "D:\\ProjectRepository\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj"
+              "D:\\Bannari\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj": {
+                "projectPath": "D:\\Bannari\\BSOFT\\BSOFT.Application\\BSOFT.Application.csproj"
               },
-              "D:\\ProjectRepository\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj": {
-                "projectPath": "D:\\ProjectRepository\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj"
+              "D:\\Bannari\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj": {
+                "projectPath": "D:\\Bannari\\BSOFT\\BSOFT.Domain\\BSOFT.Domain.csproj"
               }
             }
           }
@@ -209,6 +221,12 @@
           "targetAlias": "net8.0",
           "dependencies": {
             "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
               "version": "[9.0.0, )"
             },

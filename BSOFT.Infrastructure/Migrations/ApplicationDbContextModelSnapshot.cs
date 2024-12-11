@@ -22,7 +22,6 @@ namespace BSOFT.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
- 			modelBuilder.Entity("BSOFT.Domain.Entities.Department", b =>
             modelBuilder.Entity("BSOFT.Domain.Entities.Company", b =>
                 {
                     b.Property<int>("CoId")
@@ -116,7 +115,7 @@ namespace BSOFT.Infrastructure.Migrations
                     b.ToTable("Company", "AppData");
                 });
 
-            modelBuilder.Entity("BSOFT.Domain.Entities.User", b =>
+            modelBuilder.Entity("BSOFT.Domain.Entities.Department", b =>
                 {
                     b.Property<int>("DeptId")
                         .ValueGeneratedOnAdd()
@@ -169,6 +168,59 @@ namespace BSOFT.Infrastructure.Migrations
                     b.HasKey("DeptId");
 
                     b.ToTable("Department", "AppData");
+                });
+
+            modelBuilder.Entity("BSOFT.Domain.Entities.Division", b =>
+                {
+                    b.Property<int>("DivId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DivId"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte>("IsActive")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ShortName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DivId");
+
+                    b.ToTable("Division", "AppData");
                 });
 
             modelBuilder.Entity("BSOFT.Domain.Entities.Role", b =>
@@ -228,9 +280,11 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("BSOFT.Domain.Entities.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
                     b.Property<int>("CoId")
                         .HasColumnType("int");
@@ -296,9 +350,6 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -306,7 +357,7 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Property<int>("UserType")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.ToTable("User", "AppSecurity");
                 });

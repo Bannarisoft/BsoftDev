@@ -24,18 +24,15 @@ namespace BSOFT.Infrastructure.Data
         {
             modelBuilder.Entity<User>()
             .HasKey(u => u.UserId); // Primary key
+            modelBuilder.Entity<Department>()
+                .HasKey(d => d.DeptId);
         }
         public DbSet<Department> Department { get; set; } 
          public DbSet<Role> Role { get; set; } 
         public DbSet<Company> Companies { get; set; }
+        public DbSet<Division> Divisions { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Department>()
-                .HasKey(d => d.DeptId);
-
-            base.OnModelCreating(modelBuilder);
-        }
+       
 
     }
 }
