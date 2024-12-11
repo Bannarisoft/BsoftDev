@@ -54,19 +54,38 @@ namespace BSOFT.API.Controllers
         return Ok("Updated Successfully");
     }
 
-
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id)
-    {
-        var result = await Mediator.Send(new DeleteDepartmentCommand { DeptId = id });
-        if (result ==null)
+    [HttpPut("delete/{id}")]
+        
+        public async Task<IActionResult> Delete(int id,DeleteDepartmentCommand deleteDepartmentCommand)
         {
-             return NotFound();
+             if(id != deleteDepartmentCommand.DeptId)
+            {
+                return BadRequest();
+            }
+            await Mediator.Send(deleteDepartmentCommand);
+
+            return NoContent();
         }
 
-        return Ok("Deleted Successfully");
-    }
+    // [HttpPut("delete/{id}")]
+    // public async Task<IActionResult> DeleteAsync(int id)
+    // {
+      
+    //       if(id != deleteDivisionCommand.DivId)
+    //         {
+    //             return BadRequest();
+    //         }
+    //         await Mediator.Send(deleteDivisionCommand);
+
+    //         return NoContent();
+
+    //     if (result ==null)
+    //     {
+    //          return NotFound();
+    //     }
+
+    //     return Ok("Deleted Successfully");
+    // }
 
 
     }

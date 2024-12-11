@@ -22,8 +22,6 @@ namespace BSOFT.Application.Departments.Commands.CreateDepartment
          RuleFor(v => v.CoId)
             .NotEmpty().WithMessage("CompanyId is required.");                   
 
-        RuleFor(v => v.IsActive)
-            .NotEmpty().WithMessage("IsActive is required.");
                
         }
         

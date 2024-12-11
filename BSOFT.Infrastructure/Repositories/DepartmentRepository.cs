@@ -55,12 +55,17 @@ namespace BSOFT.Infrastructure.Repositories
             return 0; // No user found
     }
 
-    public async Task<int> DeleteAsync(int id)
+    public async Task<int> DeleteAsync(int id ,Department department )
     {
             var deptToDelete = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.DeptId == id);
             if (deptToDelete != null)
             {
-                _applicationDbContext.Department.Remove(deptToDelete);
+                deptToDelete.IsActive = department.IsActive;
+                deptToDelete.ModifiedBy = department.ModifiedBy;
+                deptToDelete.ModifiedAt = department.ModifiedAt;
+                deptToDelete.ModifiedByName=department.ModifiedByName;
+                deptToDelete.ModifiedIP=department.ModifiedIP;                
+           
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
