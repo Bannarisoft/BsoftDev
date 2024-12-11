@@ -18,6 +18,8 @@ namespace BSOFT.Infrastructure.Data
             : base(dbContextOptions) 
         {           
         }
+        public DbSet<Unit> Unit { get; set; } 
+        public DbSet<Entity> Entity { get; set; } 
 
         public DbSet<User> User { get; set; }
         public DbSet<RoleEntitlement> RoleEntitlement { get; set; }
