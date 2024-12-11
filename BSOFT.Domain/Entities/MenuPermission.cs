@@ -10,7 +10,7 @@ namespace BSOFT.Domain.Entities
     [Table("MenuPermission", Schema = "AppSecurity")]
     public class MenuPermission
     {
-    public int Id { get; set; } // Primary Key
+    public int MenuPermissionId { get; set; } // Primary Key
     public string MenuName { get; set; }
     public bool CanView { get; set; }
     public bool CanAdd { get; set; }

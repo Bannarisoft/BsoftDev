@@ -15,9 +15,9 @@ namespace BSOFT.API.Controllers
     {
 
     [HttpPost]
-    public async Task<IActionResult> CreateRoleEntitlement([FromBody] CreateRoleEntitlementDto dto)
+    public async Task<IActionResult> CreateRoleEntitlement([FromBody] CreateRoleEntitlementVm dto)
     {
-        var command = new CreateRoleEntitlementCommand { RoleEntitlementDto = dto };
+        var command = new CreateRoleEntitlementCommand { RoleEntitlementVm = dto };
         var result = await Mediator.Send(command);
         return CreatedAtAction(nameof(GetRoleEntitlement), new { id = result }, dto);
     }
