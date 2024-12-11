@@ -1,6 +1,4 @@
 /BSOFT.Application/obj
 /BSOFT.Application/bin
-/BSOFT.API/obj
-/BSOFT.API/bin
-
-.fake
+/BSOFT.Domain/obj
+/BSOFT.Domain/bin

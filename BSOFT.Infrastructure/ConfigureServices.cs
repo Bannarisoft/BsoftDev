@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using BSOFT.Domain.Interfaces;
 using BSOFT.Infrastructure.Repositories;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,10 +28,17 @@ namespace BSOFT.Infrastructure
                 services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-                services.AddScoped<IUserRepository, UserRepository>();
-                services.AddScoped<IUnitRepository, UnitRepository>();
+                services.AddTransient<IUserRepository, UserRepository>();
+                services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
+                services.AddTransient<IRoleEntitlementRepository, RoleEntitlementRepository>();
+                services.AddAutoMapper(typeof(CreateUserProfile));
+                services.AddAutoMapper(typeof(UpdateUserProfile));
+                services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+                services.AddScoped<IRoleRepository, RoleRepository>();
+                
+                services.AddScoped<ICompanyRepository, CompanyRepository>();
+				services.AddScoped<IUnitRepository, UnitRepository>();
                 services.AddScoped<IEntityRepository,EntityRepository>();
-
 
 
                 return services;

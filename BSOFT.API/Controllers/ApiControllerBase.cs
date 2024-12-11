@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
 {
-    [Route("api/[controller]")]
+
     [ApiController]
+    [Route("api/[controller]")]
+ 
 
     public abstract class ApiControllerBase : ControllerBase
     {
