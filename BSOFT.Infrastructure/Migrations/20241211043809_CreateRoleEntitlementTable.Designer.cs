@@ -4,6 +4,7 @@ using BSOFT.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241211043809_CreateRoleEntitlementTable")]
+    partial class CreateRoleEntitlementTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,11 +175,11 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("BSOFT.Domain.Entities.MenuPermission", b =>
                 {
-                    b.Property<int>("MenuPermissionId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MenuPermissionId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("CanAdd")
                         .HasColumnType("bit");
@@ -203,7 +206,7 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Property<int>("RoleEntitlementId")
                         .HasColumnType("int");
 
-                    b.HasKey("MenuPermissionId");
+                    b.HasKey("Id");
 
                     b.HasIndex("RoleEntitlementId");
 
@@ -267,11 +270,11 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("BSOFT.Domain.Entities.RoleEntitlement", b =>
                 {
-                    b.Property<int>("RoleEntitlementId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleEntitlementId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -280,29 +283,11 @@ namespace BSOFT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedByName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedIP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("RoleName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("RoleEntitlementId");
+                    b.HasKey("Id");
 
                     b.ToTable("RoleEntitlement", "AppSecurity");
                 });

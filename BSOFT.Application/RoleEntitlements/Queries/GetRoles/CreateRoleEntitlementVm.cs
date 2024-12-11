@@ -3,13 +3,17 @@ using BSOFT.Application.Common.Mappings;
 
 namespace BSOFT.Application.RoleEntitlements.Queries.GetRoles
 {
-public class CreateRoleEntitlementDto
+public class CreateRoleEntitlementVm
 {
     public string RoleName { get; set; }
-    public List<MenuPermissionDto> MenuPermissions { get; set; } = new List<MenuPermissionDto>();
+    public DateTime CreatedAt { get; set; }
+    public string CreatedBy { get; set; }
+    public string? CreatedByName { get; set; }
+    public string? CreatedIP { get; set; }
+    public List<MenuPermissionVm> MenuPermissions { get; set; } = new List<MenuPermissionVm>();
 }
 
-public class MenuPermissionDto
+public class MenuPermissionVm
 {
     public string MenuName { get; set; }
     public bool CanView { get; set; }
