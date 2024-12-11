@@ -37,10 +37,15 @@ namespace BSOFT.Infrastructure.Data
 
             // RoleEntitlement entity configuration
             modelBuilder.Entity<RoleEntitlement>()
-                .HasMany(x => x.MenuPermissions)
-                .WithOne()
-                .OnDelete(DeleteBehavior.Cascade); // Cascade delete behavior
+            .HasMany(re => re.MenuPermissions)
+            .WithOne(mp => mp.RoleEntitlement)
+            .HasForeignKey(mp => mp.RoleEntitlementId);
 
+            modelBuilder.Entity<MenuPermission>()
+            .HasKey(mp => mp.Id); // Ensure primary key is defined
+
+
+    
             base.OnModelCreating(modelBuilder);
         }
     }
