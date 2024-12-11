@@ -29,11 +29,17 @@ namespace BSOFT.Infrastructure
                 options.UseSqlServer(connectionString));
 
                 services.AddTransient<IUserRepository, UserRepository>();
+                services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
+                services.AddTransient<IRoleEntitlementRepository, RoleEntitlementRepository>();
+                services.AddAutoMapper(typeof(CreateUserProfile));
+                services.AddAutoMapper(typeof(UpdateUserProfile));
                 services.AddScoped<IDepartmentRepository, DepartmentRepository>();
                 services.AddScoped<IRoleRepository, RoleRepository>();
                 
                 services.AddScoped<ICompanyRepository, CompanyRepository>();
-                services.AddScoped<IDivisionRepository, DivisionRepository>();
+				services.AddScoped<IUnitRepository, UnitRepository>();
+                services.AddScoped<IEntityRepository,EntityRepository>();
+ 				services.AddScoped<IDivisionRepository, DivisionRepository>();
 
 
                 return services;
