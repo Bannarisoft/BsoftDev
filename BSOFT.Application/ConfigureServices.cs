@@ -1,5 +1,3 @@
-using BSOFT.Application.UserLogin.Commands.UserLogin;
-using BSOFT.Application.Common.Behaviors;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,9 +27,9 @@ namespace BSOFT.Application
             {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
                 //Validation
-                cfg.AddBehavior(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
+                cfg.AddBehavior(typeof(IPipelineBehavior<,>),typeof(ValidationBehaviour<,>));
 
-                cfg.RegisterServicesFromAssembly(typeof(UserLoginCommandHandler).Assembly);
+                
             });
 
             return services;
