@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BSOFT.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+039370513087b90e3f91fc29e4e5ccf7dc919c69")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5444dd2e0f96906a7fcf27ed5e44faf253ae6437")]
 [assembly: System.Reflection.AssemblyProductAttribute("BSOFT.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BSOFT.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

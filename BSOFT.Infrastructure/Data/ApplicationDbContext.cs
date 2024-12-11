@@ -26,6 +26,8 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<Department> Department { get; set; } 
         public DbSet<Role> Role { get; set; } 
         public DbSet<Company> Companies { get; set; }
+        public DbSet<Division> Divisions { get; set; }
+        public DbSet<MenuPermission> MenuPermission { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

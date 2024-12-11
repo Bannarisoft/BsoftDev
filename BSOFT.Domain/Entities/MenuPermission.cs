@@ -19,8 +19,8 @@ namespace BSOFT.Domain.Entities
     public bool CanExport { get; set; }
     public bool CanApprove { get; set; }
 
-    // // Optional: Link back to RoleEntitlement
-    // public int RoleEntitlementId { get; set; }
-    // public RoleEntitlement RoleEntitlement { get; set; }
+    // Optional: Link back to RoleEntitlement
+    public int RoleEntitlementId { get; set; }
+    public RoleEntitlement RoleEntitlement { get; set; }
     }
 }
