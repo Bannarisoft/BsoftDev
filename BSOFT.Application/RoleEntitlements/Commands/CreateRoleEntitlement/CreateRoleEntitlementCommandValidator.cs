@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
-    public class CreateRoleEntitlementCommandValidator : AbstractValidator<CreateRoleEntitlementDto>
+    public class CreateRoleEntitlementCommandValidator : AbstractValidator<CreateRoleEntitlementVm>
     {
         public CreateRoleEntitlementCommandValidator()
         {

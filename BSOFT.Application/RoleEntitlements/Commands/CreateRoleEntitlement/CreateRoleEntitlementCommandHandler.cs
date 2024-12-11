@@ -22,13 +22,13 @@ public class CreateRoleEntitlementCommandHandler : IRequestHandler<CreateRoleEnt
 
     public async Task<int> Handle(CreateRoleEntitlementCommand request, CancellationToken cancellationToken)
     {
-        var roleEntitlement = _mapper.Map<RoleEntitlement>(request.RoleEntitlementDto);
+        var roleEntitlement = _mapper.Map<RoleEntitlement>(request.RoleEntitlementVm);
         roleEntitlement.CreatedAt = DateTime.UtcNow;
         roleEntitlement.CreatedBy = "System"; // Replace with the logged-in user
 
         await _repository.AddAsync(roleEntitlement);
 
-        return roleEntitlement.Id;
+        return roleEntitlement.RoleEntitlementId;
     }
 }
 

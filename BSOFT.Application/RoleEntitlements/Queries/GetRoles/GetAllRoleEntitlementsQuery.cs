@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BSOFT.Application.RoleEntitlements.Queries.GetRoles
 {
-    public class GetAllRoleEntitlementsQuery : IRequest<List<RoleEntitlementDto>>
+    public class GetAllRoleEntitlementsQuery : IRequest<List<RoleEntitlementVm>>
     {
         
     }
