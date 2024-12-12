@@ -7,6 +7,8 @@ using FluentValidation;
 using MediatR;
 using BSOFT.Application.Common.Behaviours;
 using BSOFT.Application.Units.Commands.CreateUnit;
+using BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
+using BSOFT.Application.Role.Queries.GetRolesAutocomplete;
 
 
 namespace BSOFT.Application
@@ -28,7 +30,10 @@ namespace BSOFT.Application
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
                 //Validation
                 cfg.AddBehavior(typeof(IPipelineBehavior<,>),typeof(ValidationBehaviour<,>));
-
+                cfg.RegisterServicesFromAssemblies(
+                                typeof(CreateRoleEntitlementCommandHandler).Assembly,
+                                typeof(GetRolesAutocompleteQueryHandler).Assembly
+    );
                 
             });
 

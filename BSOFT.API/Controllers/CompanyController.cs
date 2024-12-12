@@ -10,6 +10,7 @@ using BSOFT.Application.Companies.Commands.UpdateCompany;
 using BSOFT.Application.Companies.Commands.DeleteCompany;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using BSOFT.Application.Companies.Queries.GetCompanyAutoComplete;
 
 namespace BSOFT.API.Controllers
 {
@@ -17,7 +18,7 @@ namespace BSOFT.API.Controllers
     [Route("api/[controller]")]
     public class CompanyController : ApiControllerBase
     {
-        [HttpGet]
+        [HttpGet("GetAllCompaniesAsync")]
         public async Task<IActionResult> GetAllCompaniesAsync()
         {
            
@@ -83,6 +84,13 @@ namespace BSOFT.API.Controllers
             await Mediator.Send(new DeleteCompanyCommand {Id=id });
 
             return NoContent();
+        }
+         [HttpGet("GetCompany")]
+        public async Task<IActionResult> GetCompany([FromQuery] string searchPattern)
+        {
+           
+            var companies = await Mediator.Send(new GetCompanyAutoCompleteQuery {SearchPattern = searchPattern});
+            return Ok(companies);
         }
          private string GetContentType(string path)
          {

@@ -65,7 +65,17 @@ namespace BSOFT.Infrastructure.Repositories
             return 0; // No user found
     }
 
-
+    public async Task<List<Role>> GetRolesAsync(string searchTerm)
+    {
+        return await _applicationDbContext.Role
+        .Where(r => EF.Functions.Like(r.Name, $"%{searchTerm}%")) // Case-insensitive search
+        .Select(r => new Role
+        {
+            RoleId = r.RoleId,      
+            Name = r.Name    
+        })
+        .ToListAsync();
+    }
 
 
     }

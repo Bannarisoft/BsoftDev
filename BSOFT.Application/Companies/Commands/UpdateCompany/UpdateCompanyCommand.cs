@@ -25,9 +25,5 @@ namespace BSOFT.Application.Companies.Commands.UpdateCompany
         public string Logo { get; set; }
         public int EntityId { get; set; }
         public byte IsActive { get; set; }
-        public int ModifiedBy { get; set; }
-        public DateTime ModifiedAt { get; set; }
-        public string ModifiedByName { get; set; }
-        public string ModifiedIP { get; set; }
     }
 }

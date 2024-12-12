@@ -25,11 +25,15 @@ namespace BSOFT.Infrastructure.Repositories
             return user;
         }
 
-        public async Task<int> DeleteAsync(int userId)
+        public async Task<int> DeleteAsync(int userId,User user)
         {
-            return await _applicationDbContext.User
-                .Where(model => model.UserId == userId)
-                .ExecuteDeleteAsync();
+            var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (existingUser != null)
+            {
+                existingUser.IsActive = user.IsActive;
+                return await _applicationDbContext.SaveChangesAsync();
+            }
+            return 0; // No user found
         }
 
         public async Task<List<User>> GetAllUsersAsync()
@@ -61,6 +65,7 @@ namespace BSOFT.Infrastructure.Repositories
                 existingUser.UnitId = user.UnitId;
                 existingUser.RoleId = user.RoleId;
                 existingUser.Role = user.Role;
+                existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
 
                 _applicationDbContext.User.Update(existingUser);
                 return await _applicationDbContext.SaveChangesAsync();

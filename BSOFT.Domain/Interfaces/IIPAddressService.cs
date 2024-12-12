@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BSOFT.Domain.Interfaces
 {
-    public interface IPAddressService
+    public interface IIPAddressService
     {
         string GetSystemIPAddress();
     }

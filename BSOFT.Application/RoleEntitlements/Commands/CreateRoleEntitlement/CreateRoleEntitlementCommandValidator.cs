@@ -12,7 +12,7 @@ namespace BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement
     {
         public CreateRoleEntitlementCommandValidator()
         {
-            RuleFor(x => x.RoleName).NotEmpty().WithMessage("Role Name is required.");
+            RuleFor(x => x.RoleId).NotEmpty().WithMessage("Role Name is required.");
             RuleFor(x => x.MenuPermissions).NotEmpty().WithMessage("Menu Mapping is required.");
             RuleForEach(x => x.MenuPermissions).ChildRules(menu =>
         {
