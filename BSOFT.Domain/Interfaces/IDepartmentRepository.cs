@@ -16,5 +16,10 @@ namespace BSOFT.Domain.Interfaces
          Task<int> UpdateAsync(int id, Department department);
         
          Task<int> DeleteAsync(int id,Department department);
+           
+        Task<List<Department>> GetAllDepartmentAutoCompleteAsync();
+
+        Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync();
+        
     }
 }

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
+
 namespace BSOFT.Domain.Entities
 {
     [Table("Department", Schema = "AppData")]
@@ -23,6 +24,7 @@ namespace BSOFT.Domain.Entities
         public string CreatedByName { get; set; }
         public string CreatedIP { get; set; }         
         public int? ModifiedBy  { get; set; }
+      
         public DateTime? ModifiedAt  { get; set; }
         public string? ModifiedByName { get; set; }
         public string? ModifiedIP { get; set; }                  

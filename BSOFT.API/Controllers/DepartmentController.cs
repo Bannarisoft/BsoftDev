@@ -5,6 +5,8 @@ using BSOFT.Application.Departments.Queries.GetDepartmentById;
 using BSOFT.Application.Departments.Commands.CreateDepartment;
 using BSOFT.Application.Departments.Commands.UpdateDepartment;
 using BSOFT.Application.Departments.Commands.DeleteDepartment;
+using BSOFT.Application.Departments.Queries.GetDepartmentAutoComplete;
+using BSOFT.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
 using BSOFT.Domain.Interfaces;
 
 namespace BSOFT.API.Controllers
@@ -14,9 +16,8 @@ namespace BSOFT.API.Controllers
     public class DepartmentController : ApiControllerBase
     {
        [HttpGet]
-        public async Task<IActionResult> GetAllDepartmentAsync()
-        {
-           
+       public async Task<IActionResult> GetAllDepartmentAsync()
+        {          
             var departments =await Mediator.Send(new GetDepartmentQuery());
             return Ok(departments);
         }
@@ -41,7 +42,7 @@ namespace BSOFT.API.Controllers
         }
 
 
-      [HttpPut("{id}")]
+      [HttpPut("update/{id}")]
     public async Task<IActionResult> UpdateAsync(int id, UpdateDepartmentCommand command)
     {
        
@@ -67,25 +68,30 @@ namespace BSOFT.API.Controllers
             return NoContent();
         }
 
-    // [HttpPut("delete/{id}")]
-    // public async Task<IActionResult> DeleteAsync(int id)
-    // {
-      
-    //       if(id != deleteDivisionCommand.DivId)
-    //         {
-    //             return BadRequest();
-    //         }
-    //         await Mediator.Send(deleteDivisionCommand);
+        [HttpGet("GetAutoComplete")]
+       public async Task<IActionResult> GetAllDepartmentAutoCompleteAsync()
+        {          
+            var departments =await Mediator.Send(new GetDepartmentAutoCompleteQuery());
+         
+            return Ok(departments);
+        }
 
-    //         return NoContent();
+        //  [HttpGet("GetAutoCompleteSearch")]
+        //  public async Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync()
+        // {
+        //     return await _context.Department.ToListAsync();
+        // }
 
-    //     if (result ==null)
-    //     {
-    //          return NotFound();
-    //     }
 
-    //     return Ok("Deleted Successfully");
-    // }
+         [HttpGet("autocomplete")]
+        public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync([FromQuery] string searchDept)
+        {
+            var query = new GetDepartmentAutoCompleteSearchQuery { SearchDept = searchDept };
+            var result = await Mediator.Send(query);
+            return Ok(result);
+        }
+
+   
 
 
     }

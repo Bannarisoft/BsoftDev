@@ -18,7 +18,8 @@ namespace BSOFT.Infrastructure.Repositories
     public async Task<List<Department>>GetAllDepartmentAsync()
     {
         
-        return await _applicationDbContext.Department.ToListAsync();
+       return await _applicationDbContext.Department.ToListAsync();
+        
     }
 
     public async Task<Department> GetByIdAsync(int id)
@@ -62,14 +63,30 @@ namespace BSOFT.Infrastructure.Repositories
             {
                 Console.WriteLine("helloooooooo");
                 deptToDelete.IsActive = department.IsActive;
-                deptToDelete.ModifiedBy = department.ModifiedBy;
-                deptToDelete.ModifiedAt = department.ModifiedAt ?? DateTime.UtcNow;
-                deptToDelete.ModifiedByName=department.ModifiedByName;
-                deptToDelete.ModifiedIP=department.ModifiedIP;   
+                // deptToDelete.ModifiedBy = department.ModifiedBy;
+                 deptToDelete.ModifiedAt = department.ModifiedAt ?? DateTime.UtcNow;
+                // deptToDelete.ModifiedByName=department.ModifiedByName;
+                // deptToDelete.ModifiedIP=department.ModifiedIP;   
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
     }
+
+
+
+       public async Task<List<Department>>GetAllDepartmentAutoCompleteAsync()
+    {
+        
+       return await _applicationDbContext.Department.ToListAsync();
+        
+    }
+
+  public async Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync()
+        {
+            return await _applicationDbContext.Department.ToListAsync();
+        }
+
+
 
 
     
