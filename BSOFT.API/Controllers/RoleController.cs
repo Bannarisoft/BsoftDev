@@ -5,6 +5,7 @@ using BSOFT.Application.Role.Queries.GetRoleById;
 using BSOFT.Application.Role.Commands.CreateRole;
 using BSOFT.Application.Role.Commands.DeleteRole;
 using BSOFT.Application.Role.Commands.UpdateRole;
+using BSOFT.Application.Role.Queries.GetRolesAutocomplete;
 using BSOFT.Domain.Interfaces;
 
 namespace BSOFT.API.Controllers
@@ -63,6 +64,13 @@ namespace BSOFT.API.Controllers
 
         var UpdateRoleCommand = await Mediator.Send(command);
         return Ok("Updated Successfully");
+    }
+
+    [HttpGet("roles")]
+    public async Task<IActionResult> GetRoles([FromQuery] string searchTerm)
+    {
+        var roles = await Mediator.Send(new GetRolesAutocompleteQuery { SearchTerm = searchTerm });
+        return Ok(roles);
     }
 
     }

@@ -12,5 +12,6 @@ namespace BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement
     public class CreateRoleEntitlementCommand : IRequest<int>
     {
         public CreateRoleEntitlementVm RoleEntitlementVm { get; set; }
+        public List<string> Roles { get; set; }
     }
 }

@@ -17,7 +17,12 @@ namespace BSOFT.Application.Users.Commands.DeleteUser
         }
         public async Task<int> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
-            return await _userRepository.DeleteAsync(request.UserId);
+            var UserUpdate = new User()
+            {
+                UserId = request.UserId,
+                IsActive = request.IsActive 
+            };
+            return await _userRepository.DeleteAsync(request.UserId,UserUpdate);
         }
     }
 }

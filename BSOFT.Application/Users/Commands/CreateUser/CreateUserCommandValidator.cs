@@ -39,7 +39,7 @@ namespace BSOFT.Application.Users.Commands.CreateUser
                 .MaximumLength(10).WithMessage("Mobile must not exceed 10 characters.")
                 .Matches(@"^\d+$").WithMessage("Mobile number must contain only numeric characters.");
 
-            RuleFor(v => v.Role)
+            RuleFor(v => v.RoleId)
                 .NotEmpty().WithMessage("Role is required.");
         }
 

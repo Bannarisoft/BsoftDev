@@ -36,10 +36,10 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> CreateAsync(CreateUserCommand command)
         {
             var createdUser = await Mediator.Send(command);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = createdUser.Id }, createdUser);
+            return CreatedAtAction(nameof(GetByIdAsync), new { userid = createdUser.Id }, createdUser);
         }
 
-        [HttpPut("{userid}")]
+        [HttpPut("update/{userid}")]
         public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
         {
             if(userid != command.UserId)
@@ -49,17 +49,19 @@ namespace BSOFT.API.Controllers
             await Mediator.Send(command);
             return NoContent();
         }
-
-        [HttpDelete("{userid}")]
-        public async Task<IActionResult> DeleteAsync(int userid)
+        
+        [HttpPut("delete/{userid}")]
+        public async Task<IActionResult> DeleteAsync(int userid,DeleteUserCommand command)
         {
-            var  result = await Mediator.Send(new DeleteUserCommand { UserId = userid});
-            if(result == 0)
+             if(userid != command.UserId)
             {
                 return BadRequest();
             }
+            await Mediator.Send(command);
+
             return NoContent();
         }
+
     }
 }
 

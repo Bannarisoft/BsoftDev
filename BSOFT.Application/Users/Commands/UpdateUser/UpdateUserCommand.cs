@@ -16,6 +16,7 @@ namespace BSOFT.Application.Users.Commands.UpdateUser
     public string LastName { get; set; }
     public string UserName { get; set; }
     public byte IsActive { get; set; }
+    public bool IsFirstTimeUser { get; set; }
     public string PasswordHash { get; set; }
     public int UserType { get; set; }
     public string Mobile { get; set; }
