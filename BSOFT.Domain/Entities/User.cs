@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BSOFT.Domain.Entities
 {
-    [Table("User", Schema = "AppSecurity")]
+    [Table("Users", Schema = "AppSecurity")]
     public class User
     {
     // public Guid Id { get; set; }
@@ -16,6 +16,7 @@ namespace BSOFT.Domain.Entities
     public string LastName { get; set; }
     public string UserName { get; set; }
     public byte IsActive { get; set; }
+    public bool IsFirstTimeUser { get; set; } = false;
     public string PasswordHash { get; set; }
     public int UserType { get; set; }
     public string Mobile { get; set; }

@@ -5,7 +5,8 @@ namespace BSOFT.Application.RoleEntitlements.Queries.GetRoles
 {
 public class CreateRoleEntitlementVm
 {
-    public string RoleName { get; set; }
+    public int RoleId { get; set; }
+    // public List<string> Role { get; set; }
     public DateTime CreatedAt { get; set; }
     public string CreatedBy { get; set; }
     public string? CreatedByName { get; set; }

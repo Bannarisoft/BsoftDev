@@ -14,7 +14,7 @@ namespace BSOFT.Domain.Interfaces
         Task<Role> CreateAsync(Role role);
         Task<int> DeleteAsync(int id);
         Task<int> UpdateAsync(int id, Role role);
-
+        Task<List<Role>> GetRolesAsync(string searchTerm);  
       
     }
 }
