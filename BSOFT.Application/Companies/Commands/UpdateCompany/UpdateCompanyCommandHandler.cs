@@ -37,11 +37,7 @@ namespace BSOFT.Application.Companies.Commands.UpdateCompany
                 Website = request.Website,
                 Logo = request.Logo,
                 EntityId = request.EntityId,
-                IsActive = request.IsActive,
-                ModifiedBy = request.ModifiedBy, 
-                ModifiedAt = request.ModifiedAt,
-                ModifiedByName = request.ModifiedByName,
-                ModifiedIP = request.ModifiedIP  
+                IsActive = request.IsActive 
             };
 
             return await _companyRepository.UpdateAsync(request.CoId, UpdatecompanyEntity);

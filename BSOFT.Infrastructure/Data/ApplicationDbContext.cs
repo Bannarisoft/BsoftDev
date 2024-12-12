@@ -9,14 +9,20 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using BSOFT.Domain.Interfaces;
+using BSOFT.Domain.Common;
 
 namespace BSOFT.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions) 
+        private readonly IIPAddressService _ipAddressService;
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions, IIPAddressService ipAddressService) 
             : base(dbContextOptions) 
-        {           
+        {  
+            _ipAddressService = ipAddressService;         
         }
         public DbSet<Unit> Unit { get; set; } 
         public DbSet<Entity> Entity { get; set; } 
@@ -51,6 +57,39 @@ namespace BSOFT.Infrastructure.Data
 
     
             base.OnModelCreating(modelBuilder);
+        }
+         public override int SaveChanges()
+        {
+            UpdateIpFields();
+            return base.SaveChanges();
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            UpdateIpFields();
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void UpdateIpFields()
+        {
+            string currentIp = _ipAddressService.GetSystemIPAddress();
+            foreach (EntityEntry entry in ChangeTracker.Entries<BaseEntity>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Property("CreatedIP").CurrentValue = currentIp;
+                    entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
+                    entry.Property("CreatedBy").CurrentValue = 1;
+                    entry.Property("CreatedByName").CurrentValue = "Test";
+                }
+                if (entry.State == EntityState.Modified)
+                {
+                    entry.Property("ModifiedIP").CurrentValue = currentIp;
+                    entry.Property("ModifiedAt").CurrentValue = DateTime.UtcNow;
+                    entry.Property("ModifiedBy").CurrentValue = 1;
+                    entry.Property("ModifiedByName").CurrentValue = "Test";
+                }
+            }
         }
     }
 }

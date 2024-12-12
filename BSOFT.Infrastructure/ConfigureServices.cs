@@ -48,7 +48,7 @@ namespace BSOFT.Infrastructure
 				services.AddScoped<IUnitRepository, UnitRepository>();
                 services.AddScoped<IEntityRepository,EntityRepository>();
  				services.AddScoped<IDivisionRepository, DivisionRepository>();
-
+                services.AddScoped<IIPAddressService, IPAddressService>();
             // Add FluentValidation
                 services.AddControllers()
                     .AddFluentValidation(fv =>

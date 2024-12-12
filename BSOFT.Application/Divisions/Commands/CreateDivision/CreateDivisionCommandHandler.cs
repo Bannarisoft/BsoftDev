@@ -27,11 +27,7 @@ namespace BSOFT.Application.Divisions.Commands.CreateDivision
                 ShortName = request.ShortName,
                 Name = request.Name,
                 CompanyId = request.CompanyId,
-                IsActive = request.IsActive,
-                CreatedBy = request.CreatedBy,
-                CreatedAt = request.CreatedAt,
-                CreatedByName = request.CreatedByName,
-                CreatedIP =request.CreatedIP           
+                IsActive = request.IsActive          
             };
 
             var result = await _divisionRepository.CreateAsync(division);

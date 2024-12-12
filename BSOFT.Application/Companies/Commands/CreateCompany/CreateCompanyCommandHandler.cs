@@ -39,11 +39,7 @@ namespace BSOFT.Application.Companies.Commands.CreateCompany
                 Website = request.Website,
                 Logo = request.Logo,
                 EntityId = request.EntityId,
-                IsActive = request.IsActive,
-                CreatedBy = request.CreatedBy,
-                CreatedAt = request.CreatedAt,
-                CreatedByName = request.CreatedByName,
-                CreatedIP =request.CreatedIP           
+                IsActive = request.IsActive         
             };
 
             var result = await _companyRepository.CreateAsync(companyEntity);
