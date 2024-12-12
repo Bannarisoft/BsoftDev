@@ -22,14 +22,12 @@ namespace BSOFT.Application.Departments.Commands.DeleteDepartment
                 DeptId = request.DeptId,
                 IsActive = request.IsActive ,
                 ModifiedBy =request.ModifiedBy,
-                ModifiedAt =request.ModifiedAt,
+                ModifiedAt =request.ModifiedAt ,
                 ModifiedByName=request.ModifiedByName,
                 ModifiedIP=request.ModifiedIP
 
             };
             return await _departmentRepository.DeleteAsync(request.DeptId,Updatedepartment);
-
-
 
         //return await _departmentRepository.DeleteAsync(request.DeptId);
       }

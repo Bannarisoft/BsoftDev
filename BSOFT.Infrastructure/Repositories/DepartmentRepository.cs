@@ -42,10 +42,9 @@ namespace BSOFT.Infrastructure.Repositories
                 existingDept.ShortName = department.ShortName;
                 existingDept.DeptName = department.DeptName;
                 existingDept.CoId = department.CoId;
-                existingDept.IsActive = department.IsActive;
-                
+                existingDept.IsActive = department.IsActive;                
                 existingDept.ModifiedBy = department.ModifiedBy;
-                existingDept.ModifiedAt = department.ModifiedAt;
+                existingDept.ModifiedAt = department.ModifiedAt  ?? DateTime.UtcNow;
                 existingDept.ModifiedByName=department.ModifiedByName;
                 existingDept.ModifiedIP=department.ModifiedIP;
 
@@ -57,15 +56,16 @@ namespace BSOFT.Infrastructure.Repositories
 
     public async Task<int> DeleteAsync(int id ,Department department )
     {
+        
             var deptToDelete = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.DeptId == id);
             if (deptToDelete != null)
             {
+                Console.WriteLine("helloooooooo");
                 deptToDelete.IsActive = department.IsActive;
                 deptToDelete.ModifiedBy = department.ModifiedBy;
-                deptToDelete.ModifiedAt = department.ModifiedAt;
+                deptToDelete.ModifiedAt = department.ModifiedAt ?? DateTime.UtcNow;
                 deptToDelete.ModifiedByName=department.ModifiedByName;
-                deptToDelete.ModifiedIP=department.ModifiedIP;                
-           
+                deptToDelete.ModifiedIP=department.ModifiedIP;   
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found

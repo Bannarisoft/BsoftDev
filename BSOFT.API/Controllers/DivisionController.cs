@@ -54,7 +54,10 @@ namespace BSOFT.API.Controllers
 
             return NoContent();
         }
+
+
         [HttpPut("delete/{id}")]
+        
         public async Task<IActionResult> Delete(int id,DeleteDivisionCommand deleteDivisionCommand)
         {
              if(id != deleteDivisionCommand.DivId)
