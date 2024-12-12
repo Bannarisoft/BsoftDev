@@ -12,12 +12,6 @@ namespace BSOFT.Application.Divisions.Commands.UpdateDivision
         public string ShortName { get; set; }
         public string Name { get; set; }
         public int CompanyId { get; set; }
-        public string? Collectrate { get; set; }
-        public string Range { get; set; }
         public byte IsActive { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedAt { get; set; }
-        public string? ModifiedByName { get; set; }
-        public string? ModifiedIP { get; set; }
     }
 }

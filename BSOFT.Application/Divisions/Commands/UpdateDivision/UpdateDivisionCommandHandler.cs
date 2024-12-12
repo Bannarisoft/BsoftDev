@@ -22,11 +22,7 @@ namespace BSOFT.Application.Divisions.Commands.UpdateDivision
                 DivId = request.DivId,
                 ShortName = request.ShortName,
                 Name = request.Name,
-                CompanyId = request.CompanyId,
-                ModifiedBy = request.ModifiedBy, 
-                ModifiedAt = request.ModifiedAt,
-                ModifiedByName = request.ModifiedByName,
-                ModifiedIP = request.ModifiedIP  
+                CompanyId = request.CompanyId 
             };
 
             return await _divisionRepository.UpdateAsync(request.DivId, Updatedivision);

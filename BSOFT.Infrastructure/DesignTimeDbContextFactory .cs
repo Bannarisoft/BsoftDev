@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using BSOFT.Domain.Interfaces;
+using BSOFT.Infrastructure.Repositories;
 
 namespace BSOFT.Infrastructure
 {
@@ -21,8 +23,8 @@ namespace BSOFT.Infrastructure
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             optionsBuilder.UseSqlServer(connectionString);
-
-            return new ApplicationDbContext(optionsBuilder.Options);
+            IIPAddressService ipAddressService = new IPAddressService();
+            return new ApplicationDbContext(optionsBuilder.Options, ipAddressService);
         }
     }
 }

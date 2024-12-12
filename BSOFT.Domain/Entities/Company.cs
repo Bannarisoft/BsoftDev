@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using BSOFT.Domain.Common;
 
 
 namespace BSOFT.Domain.Entities
 {
     [Table("Company", Schema = "AppData")]
-    public class Company
+    public class Company : BaseEntity
     {
         [Key]
         public int CoId { get; set; }
@@ -30,13 +31,5 @@ namespace BSOFT.Domain.Entities
         public string? Logo { get; set; }
         public int EntityId { get; set; }
         public byte IsActive { get; set; }
-        public int CreatedBy { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public string? CreatedByName { get; set; }
-        public string CreatedIP { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedAt { get; set; }
-        public string? ModifiedByName { get; set; }
-        public string? ModifiedIP { get; set; }
     }
 }

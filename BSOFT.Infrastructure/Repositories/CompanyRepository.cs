@@ -28,7 +28,7 @@ namespace BSOFT.Infrastructure.Repositories
         }
          public async Task<Company> GetByIdAsync(int id)
         {
-            Console.WriteLine("Hello",id);
+            
             return await _applicationDbContext.Companies.AsNoTracking()
                 .FirstOrDefaultAsync(b => b.CoId == id);
         }
@@ -52,10 +52,6 @@ namespace BSOFT.Infrastructure.Repositories
                 existingCompany.Website = company.Website;
                 existingCompany.EntityId = company.EntityId;
                 existingCompany.IsActive = company.IsActive;
-                existingCompany.ModifiedBy = company.ModifiedBy;
-                existingCompany.ModifiedAt = company.ModifiedAt;
-                existingCompany.ModifiedByName = company.ModifiedByName;
-                existingCompany.ModifiedIP = company.ModifiedIP;
 
                 _applicationDbContext.Companies.Update(existingCompany);
                 return await _applicationDbContext.SaveChangesAsync();
@@ -71,6 +67,17 @@ namespace BSOFT.Infrastructure.Repositories
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
+        }
+         public async Task<List<Company>>  GetCompany(string searchPattern = null)
+        {
+                       return await _applicationDbContext.Companies
+                 .Where(r => EF.Functions.Like(r.CompanyName, $"%{searchPattern}%")) 
+                 .Select(r => new Company
+                 {
+                     CoId = r.CoId,
+                     CompanyName = r.CompanyName
+                 })
+                 .ToListAsync();
         }
     }
 }
