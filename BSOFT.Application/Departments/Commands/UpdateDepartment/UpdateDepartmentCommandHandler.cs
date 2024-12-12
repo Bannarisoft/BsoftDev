@@ -27,7 +27,6 @@ namespace BSOFT.Application.Departments.Commands.UpdateDepartment
                 DeptName =request.DeptName,
                 CoId =request.CoId,
                 IsActive =request.IsActive,
-
                 ModifiedBy     =request.ModifiedBy,
                 ModifiedAt  =request.ModifiedAt,
                 ModifiedByName=request.ModifiedByName,
