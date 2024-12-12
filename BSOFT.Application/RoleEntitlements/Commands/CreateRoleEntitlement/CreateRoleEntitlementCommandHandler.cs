@@ -25,6 +25,7 @@ public class CreateRoleEntitlementCommandHandler : IRequestHandler<CreateRoleEnt
         var roleEntitlement = _mapper.Map<RoleEntitlement>(request.RoleEntitlementVm);
         roleEntitlement.CreatedAt = DateTime.UtcNow;
         roleEntitlement.CreatedBy = "System"; // Replace with the logged-in user
+        // roleEntitlement.Roles = request.Roles;
 
         await _repository.AddAsync(roleEntitlement);
 

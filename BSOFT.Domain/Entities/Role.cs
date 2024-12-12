@@ -25,6 +25,8 @@ namespace BSOFT.Domain.Entities
         public int ModifiedBy  { get; set; }
         public DateTime ModifiedAt  { get; set; }
         public string ModifiedByName { get; set; }
-        public string ModifiedIP { get; set; }               
+        public string ModifiedIP { get; set; }   
+
+        public List<RoleEntitlement> RoleEntitlements { get; set; } = new List<RoleEntitlement>();            
     }
 }
