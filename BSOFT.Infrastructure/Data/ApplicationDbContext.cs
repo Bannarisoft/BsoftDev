@@ -51,10 +51,9 @@ namespace BSOFT.Infrastructure.Data
             .WithOne(mp => mp.RoleEntitlement)
             .HasForeignKey(mp => mp.RoleEntitlementId);
             
-            // modelBuilder.Entity<RoleEntitlement>()
-            // .HasOne(re => re.Role)
-            // .WithMany(r => r.RoleEntitlements)
-            // .HasForeignKey(re => re.RoleId);
+            modelBuilder.Entity<RoleEntitlement>()
+            .Property(re => re.RoleId)
+            .IsRequired();
 
             modelBuilder.Entity<MenuPermission>()
             .HasKey(mp => mp.MenuPermissionId); // Ensure primary key is defined
