@@ -1,3 +1,4 @@
+using BSOFT.Domain.Common;
 using System.ComponentModel.DataAnnotations.Schema;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 namespace BSOFT.Domain.Entities
 {
     [Table("Users", Schema = "AppSecurity")]
-    public class User
+    public class User : BaseEntity
     {
     // public Guid Id { get; set; }
     public int UserId { get; set; }// Identity column
@@ -24,17 +25,9 @@ namespace BSOFT.Domain.Entities
     public int CoId { get; set; }
     public int UnitId { get; set; }
     public int DivId { get; set; }
+    [ForeignKey("RoleId")]
     public int RoleId { get; set; }
-    public string Role { get; set; }
-    public int CreatedBy { get; set; }
-    public string? CreatedByName { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string CreatedIP { get; set; }
-    public int? ModifiedBy { get; set; }
-    public string? ModifiedByName { get; set; }
-    public DateTime? ModifiedAt { get; set; }
-    public string? ModifiedIP { get; set; }
+    // public string Role { get; set; }
 
-       
     }
 }
