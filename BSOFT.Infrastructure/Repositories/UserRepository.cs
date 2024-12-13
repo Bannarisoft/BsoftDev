@@ -64,7 +64,7 @@ namespace BSOFT.Infrastructure.Repositories
                 existingUser.DivId = user.DivId;
                 existingUser.UnitId = user.UnitId;
                 existingUser.RoleId = user.RoleId;
-                existingUser.Role = user.Role;
+                // existingUser.Role = user.Role;
                 existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
 
                 _applicationDbContext.User.Update(existingUser);

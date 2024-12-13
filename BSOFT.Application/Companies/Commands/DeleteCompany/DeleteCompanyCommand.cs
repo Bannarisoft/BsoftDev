@@ -11,5 +11,6 @@ namespace BSOFT.Application.Companies.Commands.DeleteCompany
     public class DeleteCompanyCommand : IRequest<int>
     {
         public int Id { get; set; }
+        public byte IsActive { get; set; }
     }
 }

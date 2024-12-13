@@ -35,9 +35,6 @@ namespace BSOFT.Infrastructure
                 services.AddTransient<IUserRepository, UserRepository>();
                 services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
                 services.AddTransient<IRoleEntitlementRepository, RoleEntitlementRepository>();
-                // services.AddAutoMapper(typeof(CreateUserProfile));
-                // services.AddAutoMapper(typeof(UpdateUserProfile));
-                // services.AddAutoMapper(typeof(RoleEntitlementProfile));
                 services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile), typeof(RoleEntitlementProfile));
 
 
@@ -49,15 +46,6 @@ namespace BSOFT.Infrastructure
                 services.AddScoped<IEntityRepository,EntityRepository>();
  				services.AddScoped<IDivisionRepository, DivisionRepository>();
                 services.AddScoped<IIPAddressService, IPAddressService>();
-            // Add FluentValidation
-                services.AddControllers()
-                    .AddFluentValidation(fv =>
-                    {
-                        fv.RegisterValidatorsFromAssemblyContaining<CreateRoleEntitlementCommandValidator>();
-                    }); 
-
-                services.AddTransient<IValidator<CreateRoleEntitlementVm>, CreateRoleEntitlementCommandValidator>();
-
 
                 return services;
             }

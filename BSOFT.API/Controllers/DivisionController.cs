@@ -10,6 +10,7 @@ using BSOFT.Application.Divisions.Commands.UpdateDivision;
 using BSOFT.Application.Divisions.Commands.DeleteDivision;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using BSOFT.Application.Divisions.Queries.GetDivisionAutoComplete;
 
 namespace BSOFT.API.Controllers
 {
@@ -67,6 +68,13 @@ namespace BSOFT.API.Controllers
             await Mediator.Send(deleteDivisionCommand);
 
             return NoContent();
+        }
+         [HttpGet("GetDivision")]
+        public async Task<IActionResult> GetDivision([FromQuery] string searchPattern)
+        {
+           
+            var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = searchPattern});
+            return Ok(divisions);
         }
       
       

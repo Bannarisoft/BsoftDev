@@ -13,7 +13,7 @@ namespace BSOFT.Domain.Interfaces
         Task<Company> CreateAsync(Company company);
         Task<Company> GetByIdAsync(int id);
         Task<int> UpdateAsync(int id,Company company);
-        Task<int> DeleteAsync(int id);
+        Task<int> DeleteAsync(int id,Company company);
         Task<List<Company>> GetCompany(string searchPattern);
        
     }

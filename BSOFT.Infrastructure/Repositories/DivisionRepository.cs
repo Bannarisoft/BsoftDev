@@ -38,10 +38,6 @@ namespace BSOFT.Infrastructure.Repositories
                 existingDivision.Name = division.Name;
                 existingDivision.CompanyId = division.CompanyId;
                 existingDivision.IsActive = division.IsActive;
-                existingDivision.ModifiedBy = division.ModifiedBy;
-                existingDivision.ModifiedAt = division.ModifiedAt;
-                existingDivision.ModifiedByName = division.ModifiedByName;
-                existingDivision.ModifiedIP = division.ModifiedIP;
 
                 _applicationDbContext.Divisions.Update(existingDivision);
                 return await _applicationDbContext.SaveChangesAsync();
@@ -57,6 +53,17 @@ namespace BSOFT.Infrastructure.Repositories
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
+        }
+            public async Task<List<Division>>  GetDivision(string searchPattern = null)
+        {
+                       return await _applicationDbContext.Divisions
+                 .Where(d => EF.Functions.Like(d.Name, $"%{searchPattern}%")) 
+                 .Select(d => new Division
+                 {
+                     DivId = d.DivId,
+                     Name = d.Name
+                 })
+                 .ToListAsync();
         }
     }
 }
