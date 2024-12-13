@@ -67,7 +67,7 @@ namespace BSOFT.API.Controllers
                  });
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> Update(int id, UpdateCompanyCommand command )
         {
             if(id != command.CoId)
@@ -78,10 +78,14 @@ namespace BSOFT.API.Controllers
 
             return NoContent();
         }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpPut("delete/{id}")]
+        public async Task<IActionResult> Delete(int id,DeleteCompanyCommand deleteCompanyCommand)
         {
-            await Mediator.Send(new DeleteCompanyCommand {Id=id });
+              if(id != deleteCompanyCommand.Id)
+            {
+                return BadRequest();
+            }
+            await Mediator.Send(deleteCompanyCommand);
 
             return NoContent();
         }

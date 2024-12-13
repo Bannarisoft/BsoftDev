@@ -18,7 +18,12 @@ namespace BSOFT.Application.Companies.Commands.DeleteCompany
         }
         public async Task<int> Handle(DeleteCompanyCommand request, CancellationToken cancellationToken)
         {
-            return await _companyRepository.DeleteAsync(request.Id);
+             var Updatecompany = new Company()
+            {
+                CoId = request.Id,
+                IsActive = request.IsActive 
+            };
+            return await _companyRepository.DeleteAsync(request.Id,Updatecompany);
         }
     }
 }
