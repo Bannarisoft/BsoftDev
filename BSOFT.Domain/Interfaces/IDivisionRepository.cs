@@ -14,5 +14,6 @@ namespace BSOFT.Domain.Interfaces
         Task<Division> GetByIdAsync(int id);
         Task<int> UpdateAsync(int id,Division division);
         Task<int> DeleteAsync(int id,Division division);
+        Task<List<Division>> GetDivision(string searchPattern);
     }
 }
