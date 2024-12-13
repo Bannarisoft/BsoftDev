@@ -76,13 +76,6 @@ namespace BSOFT.API.Controllers
             return Ok(departments);
         }
 
-        //  [HttpGet("GetAutoCompleteSearch")]
-        //  public async Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync()
-        // {
-        //     return await _context.Department.ToListAsync();
-        // }
-
-
          [HttpGet("autocomplete")]
         public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync([FromQuery] string searchDept)
         {
