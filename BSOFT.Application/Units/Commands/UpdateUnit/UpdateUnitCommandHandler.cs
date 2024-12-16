@@ -19,7 +19,7 @@ namespace BSOFT.Application.Units.Commands.UpdateUnit
             var UpdateunitEntity = new BSOFT.Domain.Entities.Unit()
             {
                 UnitId=request.UnitId,
-                Name = request.Name,
+                UnitName = request.UnitName,
                 ShortName = request.ShortName,
                 Address1 = request.Address1,
                 Address2 = request.Address2,
@@ -29,11 +29,8 @@ namespace BSOFT.Application.Units.Commands.UpdateUnit
                 UnitHeadName = request.UnitHeadName,
                 Mobile = request.Mobile,
                 Email = request.Email,
-                IsActive = request.IsActive,
-                ModifiedBy=request.ModifiedBy,
-                ModifiedByName=request.ModifiedByName,
-                ModifiedAt=request.ModifiedAt,
-                ModifiedIP=request.ModifiedIP       
+                IsActive = request.IsActive
+                    
             };
 
             return await _unitRepository.UpdateAsync(request.UnitId, UpdateunitEntity);

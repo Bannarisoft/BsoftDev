@@ -11,7 +11,7 @@ namespace BSOFT.Application.Units.Commands.CreateUnit
     {
         public CreateUnitCommandValidator()
         {
-             RuleFor(v => v.Name)
+             RuleFor(v => v.UnitName)
         .NotEmpty().WithMessage("UnitName is required.")
         .MaximumLength(50).WithMessage("UnitName must not exceed 50 characters.");
 
