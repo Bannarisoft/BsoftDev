@@ -25,10 +25,7 @@ namespace BSOFT.Application.Entity.Commands.UpdateEntity
                 Phone = request.Phone,
                 Email = request.Email,
                 IsActive = request.IsActive,
-                ModifiedBy=request.ModifiedBy,
-                ModifiedByName=request.ModifiedByName,
-                ModifiedAt=request.ModifiedAt,
-                ModifiedIP=request.ModifiedIP       
+                 
             };
 
             return await _entityRepository.UpdateAsync(request.EntityId, UpdateEntity);
