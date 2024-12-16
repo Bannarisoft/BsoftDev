@@ -23,11 +23,10 @@ namespace BSOFT.Application.Entity.Commands.UpdateEntity
             .NotEmpty().WithMessage("Headquarters Address is required.")
             .MaximumLength(250).WithMessage("Headquarters Address is required and cannot exceed 200 characters.");
 
-         RuleFor(v => v.Phone)
-          .NotEmpty().WithMessage("Phone number is required.")
-           .Matches(@"^\+?[1-9]\d{1,14}$").WithMessage("Phone number must be in a valid format.")  // E.164 phone number format
-          .Must(NotContainInvalidCharactersPhone).WithMessage("Phone number contains invalid characters.")
-          .MaximumLength(15).WithMessage("Phone number is required and cannot exceed 15 Digits.");
+            RuleFor(v => v.Phone)
+            .NotEmpty().WithMessage("PhoneNumber is required.")
+            .MaximumLength(10).WithMessage("PhoneNumber must not exceed 10 characters.");
+
 
             RuleFor(v => v.Email)
             .NotEmpty().WithMessage("Email is required.")
@@ -43,11 +42,6 @@ namespace BSOFT.Application.Entity.Commands.UpdateEntity
         return email.All(c => !invalidChars.Contains(c) && c != ' ');
     }
     
-    private bool NotContainInvalidCharactersPhone(string phone)
-    {
-        // Define invalid characters based on your validation requirements
-        var invalidChars = new[] { '@', '#', '$', '%', '^', '&', '*', '(', ')' };
-        return !phone.Any(c => invalidChars.Contains(c));
-    }
+   
     }
 }

@@ -35,15 +35,7 @@ namespace BSOFT.Application.Entity.Commands.CreateEntity
                 Address = request.Address,
                 Phone = request.Phone,
                 Email = request.Email,
-                IsActive = request.IsActive,
-                CreatedBy=request.CreatedBy,
-                CreatedAt=request.CreatedAt,
-                CreatedByName=request.CreatedByName,
-                CreatedIP=request.CreatedIP,
-                ModifiedBy=request.ModifiedBy,
-                ModifiedByName=request.ModifiedByName,
-                ModifiedAt=request.ModifiedAt,
-                ModifiedIP=request.ModifiedIP        
+                IsActive = request.IsActive      
 
             };
 
