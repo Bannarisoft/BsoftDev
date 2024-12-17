@@ -17,6 +17,8 @@ namespace BSOFT.Domain.Interfaces
       Task<Entity> CreateAsync(Entity entity);
       Task<int> UpdateAsync(int Id,Entity entity);
       Task<int> DeleteAsync(int Id,Entity entity);
+      
+
 
 
        
