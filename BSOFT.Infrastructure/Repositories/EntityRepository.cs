@@ -59,22 +59,18 @@ namespace BSOFT.Infrastructure.Repositories
                 existingentity.Phone = entity.Phone;
                 existingentity.Email = entity.Email;
                 existingentity.IsActive = entity.IsActive;
-                existingentity.ModifiedBy = entity.ModifiedBy;
-                existingentity.ModifiedByName = entity.ModifiedByName;
-                existingentity.ModifiedAt = entity.ModifiedAt;
-                existingentity.ModifiedIP = entity.ModifiedIP;
                 _applicationDbContext.Entity.Update(existingentity);
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
         }
 
-        public async Task<int> DeleteAsync(int id)
+        public async Task<int> DeleteAsync(int id,Entity entity)
         {
             var EntityToDelete = await _applicationDbContext.Entity.FirstOrDefaultAsync(u => u.EntityId == id);
             if (EntityToDelete != null)
             {
-                _applicationDbContext.Entity.Remove(EntityToDelete);
+                EntityToDelete.IsActive = entity.IsActive;
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found

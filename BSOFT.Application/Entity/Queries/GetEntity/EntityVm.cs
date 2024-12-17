@@ -4,10 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using BSOFT.Domain.Entities;
 using BSOFT.Application.Common.Mappings;
+using Microsoft.AspNetCore.Http;
+using BSOFT.Application.Common;
+
 
 namespace BSOFT.Application.Entity.Queries.GetEntity
 {
-    public class EntityVm : IMapFrom<BSOFT.Domain.Entities.Entity>
+    public class EntityVm : BaseEntityVm,IMapFrom<BSOFT.Domain.Entities.Entity>
     {
     public int EntityId { get; set; }
     public string EntityCode { get; set; }
@@ -17,13 +20,6 @@ namespace BSOFT.Application.Entity.Queries.GetEntity
     public string Phone  { get; set; }
     public string Email { get; set; }
     public byte IsActive { get; set; }
-    public int CreatedBy { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string CreatedByName { get; set; }
-    public string CreatedIP { get; set; }
-    public int ModifiedBy { get; set; } 
-    public string ModifiedByName { get; set; }    
-    public DateTime ModifiedAt { get; set; }
-    public string ModifiedIP { get; set; }
+   
     }
 }
