@@ -19,7 +19,7 @@ namespace BSOFT.Domain.Interfaces
            
         Task<List<Department>> GetAllDepartmentAutoCompleteAsync();
 
-        Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync();
+        Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync(string SearchDept);
         
     }
 }

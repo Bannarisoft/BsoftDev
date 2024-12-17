@@ -52,13 +52,8 @@ namespace BSOFT.Infrastructure.Repositories
                 existingRole.Name = role.Name;
                 existingRole.Description = role.Description;
                 existingRole.CoId = role.CoId;
-                existingRole.IsActive = role.IsActive;
-                
-                existingRole.ModifiedBy = role.ModifiedBy;
-                existingRole.ModifiedAt = role.ModifiedAt;
-                existingRole.ModifiedByName=role.ModifiedByName;
-                existingRole.ModifiedIP=role.ModifiedIP;
-
+                existingRole.IsActive = role.IsActive;                
+               
                 _applicationDbContext.Role.Update(existingRole);
                 return await _applicationDbContext.SaveChangesAsync();
             }

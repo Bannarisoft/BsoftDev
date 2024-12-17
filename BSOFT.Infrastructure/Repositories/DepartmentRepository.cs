@@ -43,11 +43,7 @@ namespace BSOFT.Infrastructure.Repositories
                 existingDept.ShortName = department.ShortName;
                 existingDept.DeptName = department.DeptName;
                 existingDept.CoId = department.CoId;
-                existingDept.IsActive = department.IsActive;                
-                existingDept.ModifiedBy = department.ModifiedBy;
-                existingDept.ModifiedAt = department.ModifiedAt  ?? DateTime.UtcNow;
-                existingDept.ModifiedByName=department.ModifiedByName;
-                existingDept.ModifiedIP=department.ModifiedIP;
+                existingDept.IsActive = department.IsActive;                                
 
                 _applicationDbContext.Department.Update(existingDept);
                 return await _applicationDbContext.SaveChangesAsync();
@@ -61,19 +57,12 @@ namespace BSOFT.Infrastructure.Repositories
             var deptToDelete = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.DeptId == id);
             if (deptToDelete != null)
             {
-                Console.WriteLine("helloooooooo");
+               
                 deptToDelete.IsActive = department.IsActive;
-                // deptToDelete.ModifiedBy = department.ModifiedBy;
-                 deptToDelete.ModifiedAt = department.ModifiedAt ?? DateTime.UtcNow;
-                // deptToDelete.ModifiedByName=department.ModifiedByName;
-                // deptToDelete.ModifiedIP=department.ModifiedIP;   
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
     }
-
-
-
        public async Task<List<Department>>GetAllDepartmentAutoCompleteAsync()
     {
         
@@ -81,12 +70,22 @@ namespace BSOFT.Infrastructure.Repositories
         
     }
 
-  public async Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync()
+//   public async Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync()
+//         {
+//             return await _applicationDbContext.Department.ToListAsync();
+//         }
+
+    public async Task<List<Department>>  GetAllDepartmentAutoCompleteSearchAsync(string SearchDept = null)
         {
-            return await _applicationDbContext.Department.ToListAsync();
+                       return await _applicationDbContext.Department
+                 .Where(d => EF.Functions.Like(d.DeptName, $"%{SearchDept}%")) 
+                 .Select(d => new Department
+                 {
+                     DeptId = d.DeptId,
+                     DeptName = d.DeptName
+                 })
+                 .ToListAsync();
         }
-
-
 
 
     

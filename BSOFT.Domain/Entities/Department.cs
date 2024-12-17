@@ -5,13 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using BSOFT.Domain.Common;
 
 
 namespace BSOFT.Domain.Entities
 {
     [Table("Department", Schema = "AppData")]
-    public class Department
+    public class Department : BaseEntity
     {
          [Key]
         public int DeptId { get; set; }
@@ -19,15 +19,7 @@ namespace BSOFT.Domain.Entities
         public string DeptName { get; set; }
         public int CoId { get; set; }
         public byte  IsActive { get; set; }
-        // public int CreatedBy  { get; set; }
-        // public DateTime CreatedAt  { get; set; }
-        // public string CreatedByName { get; set; }
-        // public string CreatedIP { get; set; }         
-        // public int? ModifiedBy  { get; set; }
-      
-        // public DateTime? ModifiedAt  { get; set; }
-        // public string? ModifiedByName { get; set; }
-        // public string? ModifiedIP { get; set; }                  
+                  
 
     }
        

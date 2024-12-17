@@ -26,11 +26,8 @@ namespace BSOFT.Application.Departments.Commands.UpdateDepartment
                 ShortName =request.ShortName,
                 DeptName =request.DeptName,
                 CoId =request.CoId,
-                IsActive =request.IsActive,
-                ModifiedBy     =request.ModifiedBy,
-                ModifiedAt  =request.ModifiedAt,
-                ModifiedByName=request.ModifiedByName,
-                ModifiedIP=request.ModifiedIP
+                IsActive =request.IsActive
+               
 
             };
             return await _departmentRepository.UpdateAsync(request.DeptId,UpdatedepartmentEntity);

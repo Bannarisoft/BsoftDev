@@ -6,3 +6,5 @@
 /BSOFT.API/bin
 /BSOFT.Infrastructure/obj
 /BSOFT.Infrastructure/bin
+
+.fake
