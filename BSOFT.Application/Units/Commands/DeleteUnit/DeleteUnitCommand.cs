@@ -11,5 +11,7 @@ namespace BSOFT.Application.Units.Commands.DeleteUnit
     public class DeleteUnitCommand : IRequest<int>
     {
          public int UnitId { get; set; }
+         public byte IsActive { get; set; }
+
     }
 }

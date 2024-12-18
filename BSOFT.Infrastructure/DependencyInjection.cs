@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using BSOFT.Infrastructure.Repositories;
 using MediatR;
 using System;
@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace BSOFT.Infrastructure
 {
-    public static class ConfigureServices
+    public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices
             (this IServiceCollection services, IConfiguration configuration)
@@ -32,7 +32,7 @@ namespace BSOFT.Infrastructure
                 services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-                services.AddTransient<IUserRepository, UserRepository>();
+                services.AddScoped<IUserRepository, UserRepository>();
                 services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
                 services.AddTransient<IRoleEntitlementRepository, RoleEntitlementRepository>();
                 services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile), typeof(RoleEntitlementProfile));

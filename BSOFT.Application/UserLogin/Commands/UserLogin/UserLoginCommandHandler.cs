@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using BSOFT.Domain.Entities;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
 using System;

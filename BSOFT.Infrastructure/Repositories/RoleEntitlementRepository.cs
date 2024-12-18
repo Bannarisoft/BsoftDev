@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using BSOFT.Infrastructure.Repositories;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using BSOFT.Domain.Entities;
 using System.Text;
 using System.Collections.Generic;

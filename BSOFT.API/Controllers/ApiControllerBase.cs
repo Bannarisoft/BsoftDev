@@ -7,15 +7,16 @@ namespace BSOFT.API.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
- 
-
     public abstract class ApiControllerBase : ControllerBase
     {
-        private ISender _mediator;
+        private readonly ISender _mediator;
 
-        protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
-        
-        
+        protected ApiControllerBase(ISender mediator)
+        {
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+        }
+
+        protected ISender Mediator => _mediator;
     }
 }
 

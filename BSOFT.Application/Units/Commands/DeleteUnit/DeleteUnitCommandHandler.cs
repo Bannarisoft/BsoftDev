@@ -1,4 +1,4 @@
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using BSOFT.Domain.Entities;
 using MediatR;
 using System.Threading;
@@ -18,7 +18,13 @@ namespace BSOFT.Application.Units.Commands.DeleteUnit
         }
         public async Task<int> Handle(DeleteUnitCommand request, CancellationToken cancellationToken)
         {
-            return await _unitRepository.DeleteAsync(request.UnitId);
+            var Updateunit = new BSOFT.Domain.Entities.Unit()
+            {
+                UnitId = request.UnitId,
+                IsActive = request.IsActive 
+            };
+            
+            return await _unitRepository.DeleteAsync(request.UnitId,Updateunit);
         }
     }
 }

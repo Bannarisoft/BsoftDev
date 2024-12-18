@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using BSOFT.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -36,47 +36,50 @@ namespace BSOFT.Infrastructure.Repositories
 
         public async Task<int>UpdateAsync(int id, Unit unit)
         {
-            var existingUser = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.UnitId == id);
-            if (existingUser != null)
+            var existingunit = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.UnitId == id);
+            if (existingunit != null)
             {
-                existingUser.Name = unit.Name;
-                existingUser.ShortName = unit.ShortName;
-                existingUser.Address1 = unit.Address1;
+                existingunit.UnitName = unit.UnitName;
+                existingunit.ShortName = unit.ShortName;
+                existingunit.Address1 = unit.Address1;
 
-                existingUser.Address2 = unit.Address2;
-                existingUser.Address3 = unit.Address3;
-                existingUser.CoId = unit.CoId;
+                existingunit.Address2 = unit.Address2;
+                existingunit.Address3 = unit.Address3;
+                existingunit.CoId = unit.CoId;
 
-                existingUser.DivId = unit.DivId;
-                existingUser.UnitHeadName = unit.UnitHeadName;
-                existingUser.Mobile = unit.Mobile;
+                existingunit.DivId = unit.DivId;
+                existingunit.UnitHeadName = unit.UnitHeadName;
+                existingunit.Mobile = unit.Mobile;
 
-                existingUser.Email = unit.Email;
-                existingUser.IsActive = unit.IsActive;
-                existingUser.ModifiedBy = unit.ModifiedBy;
-                existingUser.ModifiedByName = unit.ModifiedByName;
-
-                existingUser.ModifiedAt = unit.ModifiedAt;
-                existingUser.ModifiedIP = unit.ModifiedIP;
-
-
-
-
-                _applicationDbContext.Unit.Update(existingUser);
+                existingunit.Email = unit.Email;
+                existingunit.IsActive = unit.IsActive;
+                _applicationDbContext.Unit.Update(existingunit);
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
         }
 
-        public async Task<int> DeleteAsync(int id)
+        public async Task<int> DeleteAsync(int id,Unit unit)
         {
             var unitToDelete = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.UnitId == id);
             if (unitToDelete != null)
             {
-                _applicationDbContext.Unit.Remove(unitToDelete);
+                unitToDelete.IsActive = unit.IsActive;
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
+        }
+
+         public async Task<List<Unit>> GetUnit(string searchPattern = null)
+        {
+                       return await _applicationDbContext.Unit
+                 .Where(r => EF.Functions.Like(r.UnitName, $"%{searchPattern}%")) 
+                 .Select(r => new Unit
+                 {
+                     UnitId = r.UnitId,
+                     UnitName = r.UnitName
+                 })
+                 .ToListAsync();
         }
     }
 }

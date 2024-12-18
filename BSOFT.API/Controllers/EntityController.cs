@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BSOFT.Application.Entity.Queries.GetEntity;
@@ -6,7 +7,11 @@ using BSOFT.Application.Entity.Queries.GetEntityLastCode;
 using BSOFT.Application.Entity.Commands.CreateEntity;
 using BSOFT.Application.Entity.Commands.UpdateEntity;
 using BSOFT.Application.Entity.Commands.DeleteEntity;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+
 
 namespace BSOFT.API.Controllers
 {
@@ -14,6 +19,9 @@ namespace BSOFT.API.Controllers
     [ApiController]
     public class EntityController : ApiControllerBase
     {
+        public EntityController(ISender mediator) : base(mediator)
+        {
+        }
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllEntityAsync()
         {
@@ -59,18 +67,15 @@ namespace BSOFT.API.Controllers
         return Ok("Updated Successfully");
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id)
+    [HttpPut("delete/{id}")]
+    public async Task<IActionResult> DeleteAsync(int id,DeleteEntityCommand command)
     {
-        var result = await Mediator.Send(new DeleteEntityCommand { EntityId = id });
-        if (result ==null)
+        if(id != command.EntityId)
         {
-             return NotFound();
+           return BadRequest(); 
         }
-
-        return Ok("Deleted Successfully");
-    }
-
-
+        await Mediator.Send(command);
+        return Ok("Status Closed Successfully");
+   }
     }
 }

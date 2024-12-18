@@ -1,6 +1,6 @@
 using BSOFT.Application.Units.Queries.GetUnits;
 using BSOFT.Domain.Entities;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
 using System;
@@ -26,7 +26,7 @@ namespace BSOFT.Application.Units.Commands.CreateUnit
         {
             var unitEntity = new BSOFT.Domain.Entities.Unit
             {
-                Name = request.Name,
+                UnitName = request.UnitName,
                 ShortName = request.ShortName,
                 Address1 = request.Address1,
                 Address2 = request.Address2,
@@ -36,15 +36,7 @@ namespace BSOFT.Application.Units.Commands.CreateUnit
                 UnitHeadName = request.UnitHeadName,
                 Mobile = request.Mobile,
                 Email = request.Email,
-                IsActive = request.IsActive,
-                CreatedBy=request.CreatedBy,
-                CreatedAt=request.CreatedAt,
-                CreatedByName=request.CreatedByName,
-                CreatedIP=request.CreatedIP,
-                ModifiedBy=request.ModifiedBy,
-                ModifiedByName=request.ModifiedByName,
-                ModifiedAt=request.ModifiedAt,
-                ModifiedIP=request.ModifiedIP        
+                IsActive = request.IsActive  
 
             };
 

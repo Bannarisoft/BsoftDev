@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BSOFT.Domain.Interfaces
+namespace BSOFT.Application.Common.Interfaces
 {
     public interface IUnitRepository
     {
@@ -13,6 +13,7 @@ namespace BSOFT.Domain.Interfaces
        Task<Unit> GetByIdAsync(int Id);
        Task<Unit> CreateAsync(Unit unit);
        Task<int> UpdateAsync(int Id,Unit unit);
-       Task<int> DeleteAsync(int Id);
+       Task<int> DeleteAsync(int Id,Unit unit);
+       Task<List<Unit>> GetUnit(string searchPattern);
     }
 }

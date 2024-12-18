@@ -1,5 +1,5 @@
 using BSOFT.Application.Units.Queries.GetUnits;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
 using System;

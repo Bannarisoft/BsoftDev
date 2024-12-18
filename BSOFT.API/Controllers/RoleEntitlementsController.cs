@@ -14,6 +14,9 @@ namespace BSOFT.API.Controllers
     
     public class RoleEntitlementsController : ApiControllerBase
     {
+        public RoleEntitlementsController(ISender mediator) : base(mediator)
+        {
+        }
 
     [HttpPost]
     public async Task<IActionResult> CreateRoleEntitlement([FromBody] CreateRoleEntitlementVm dto)

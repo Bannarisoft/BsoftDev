@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BSOFT.Application.Units.Queries.GetUnits;
@@ -5,7 +6,11 @@ using BSOFT.Application.Units.Queries.GetUnitById;
 using BSOFT.Application.Units.Commands.CreateUnit;
 using BSOFT.Application.Units.Commands.DeleteUnit;
 using BSOFT.Application.Units.Commands.UpdateUnit;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using BSOFT.Application.Units.Queries.GetUnitAutoComplete;
 
 namespace BSOFT.API.Controllers
 {
@@ -13,6 +18,9 @@ namespace BSOFT.API.Controllers
     [ApiController]
     public class UnitController : ApiControllerBase
     {
+        public UnitController(ISender mediator) : base(mediator)
+        {
+        }
         [HttpGet]
         public async Task<IActionResult> GetAllUnitsAsync()
         {
@@ -53,18 +61,25 @@ namespace BSOFT.API.Controllers
     }
 
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id)
+    [HttpPut("delete/{id}")]
+    public async Task<IActionResult> DeleteAsync(int id,DeleteUnitCommand command)
     {
-        var result = await Mediator.Send(new DeleteUnitCommand { UnitId = id });
-        if (result ==null)
+         if(id != command.UnitId)
         {
-             return NotFound();
+           return BadRequest("UnitId Mismatch"); 
         }
+        await Mediator.Send(command);
 
-        return Ok("Deleted Successfully");
+        return Ok("Status Closed Successfully");
     }
 
-        
+       [HttpGet("GetUnit")]
+        public async Task<IActionResult> GetUnit([FromQuery] string searchPattern)
+        {
+           
+            var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = searchPattern});
+            return Ok(units);
+        }
+     
     }
 }
