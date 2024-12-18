@@ -27,7 +27,7 @@ namespace BSOFT.Application.Units.Queries.GetUnitAutoComplete
             // Map to the application-specific DTO
             return unit.Select(r => new UnitAutoCompleteVm
             {
-                UnitId = r.UnitId,
+                UnitId = r.Id,
                 UnitName = r.UnitName
             }).ToList();
 
