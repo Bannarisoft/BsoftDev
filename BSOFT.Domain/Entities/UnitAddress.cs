@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BSOFT.Domain.Entities
 {
-    [Table("UnitAddress", Schema = "AppData")]
+ 
         public class UnitAddress
     {
         public int Id { get; set; }
@@ -21,19 +21,21 @@ namespace BSOFT.Domain.Entities
 
         public int CityId { get; set; }
 
-        [MaxLength(250)]
+       
         public string AddressLine1 { get; set; }
 
-        [MaxLength(250)]
+
         public string AddressLine2 { get; set; }
 
         public int PinCode  { get; set; }
         
-        [MaxLength(15)]
-        public string ContactNumber { get; set; }
+    
+        public string  ContactNumber { get; set; }
 
-        [MaxLength(15)]
-        public string AlternateNumber { get; set; }
+      
+        public string  AlternateNumber { get; set; }
+
+         public Unit Unit { get; set; }
          
 
     }
