@@ -1,3 +1,4 @@
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,9 @@ namespace BSOFT.API.Controllers
     [Route("api/[controller]")]
     public class DivisionController : ApiControllerBase
     {
+        public DivisionController(ISender mediator) : base(mediator)
+        {
+        }
          [HttpGet]
         public async Task<IActionResult> GetAllDivisionsAsync()
         {

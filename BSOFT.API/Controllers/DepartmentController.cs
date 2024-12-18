@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BSOFT.Application.Departments.Queries.GetDepartments;
@@ -7,7 +8,7 @@ using BSOFT.Application.Departments.Commands.UpdateDepartment;
 using BSOFT.Application.Departments.Commands.DeleteDepartment;
 using BSOFT.Application.Departments.Queries.GetDepartmentAutoComplete;
 using BSOFT.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 
 namespace BSOFT.API.Controllers
 {
@@ -15,6 +16,9 @@ namespace BSOFT.API.Controllers
     [Route("api/[controller]")]
     public class DepartmentController : ApiControllerBase
     {
+        public DepartmentController(ISender mediator) : base(mediator)
+        {
+        }
        [HttpGet]
        public async Task<IActionResult> GetAllDepartmentAsync()
         {          

@@ -1,5 +1,5 @@
 using AutoMapper;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using MediatR;
 using System;
 using System.Collections.Generic;

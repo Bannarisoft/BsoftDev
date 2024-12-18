@@ -9,9 +9,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using BSOFT.Domain.Common;
 
 namespace BSOFT.Infrastructure.Data
