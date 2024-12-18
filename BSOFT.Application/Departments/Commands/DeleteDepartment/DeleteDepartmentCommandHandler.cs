@@ -1,5 +1,5 @@
 using MediatR;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using BSOFT.Domain.Entities;
 using System.Threading;
 using System.Threading.Tasks;

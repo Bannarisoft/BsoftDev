@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BSOFT.Domain.Interfaces
+namespace BSOFT.Application.Common.Interfaces
 {
     public interface IIPAddressService
     {

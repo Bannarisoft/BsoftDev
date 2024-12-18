@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BSOFT.Application.Users.Queries.GetUsers;
@@ -6,7 +7,6 @@ using BSOFT.Application.Users.Commands.CreateUser;
 using BSOFT.Application.Users.Commands.UpdateUser;
 using BSOFT.Application.Users.Commands.DeleteUser;
 
-
 namespace BSOFT.API.Controllers
 {
     [Route("api/[controller]")]
@@ -14,6 +14,10 @@ namespace BSOFT.API.Controllers
 
     public class UserController : ApiControllerBase
     {
+        public UserController(ISender mediator) : base(mediator)
+        {
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAllUsersAsync()
         {
@@ -24,8 +28,13 @@ namespace BSOFT.API.Controllers
         [HttpGet("{userid}")]
         public async Task<IActionResult> GetByIdAsync(int userid)
         {
-            var user = await Mediator.Send(new GetUserByIdQuery() { UserId = userid});
-            if(user == null)
+            if (userid <= 0)
+            {
+                return BadRequest("Invalid user ID");
+            }
+
+            var user = await Mediator.Send(new GetUserByIdQuery() { UserId = userid });
+            if (user == null)
             {
                 return NotFound();
             }
@@ -42,18 +51,28 @@ namespace BSOFT.API.Controllers
         [HttpPut("update/{userid}")]
         public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
         {
-            if(userid != command.UserId)
+            if (userid <= 0)
+            {
+                return BadRequest("Invalid user ID");
+            }
+
+            if (userid != command.UserId)
             {
                 return BadRequest();
             }
             await Mediator.Send(command);
             return NoContent();
         }
-        
+
         [HttpPut("delete/{userid}")]
-        public async Task<IActionResult> DeleteAsync(int userid,DeleteUserCommand command)
+        public async Task<IActionResult> DeleteAsync(int userid, DeleteUserCommand command)
         {
-             if(userid != command.UserId)
+            if (userid <= 0)
+            {
+                return BadRequest("Invalid user ID");
+            }
+
+            if (userid != command.UserId)
             {
                 return BadRequest();
             }
@@ -61,7 +80,5 @@ namespace BSOFT.API.Controllers
 
             return NoContent();
         }
-
     }
 }
-
