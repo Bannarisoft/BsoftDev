@@ -6,10 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace BSOFT.Domain.Interfaces
+namespace BSOFT.Application.Common.Interfaces
 {
+  using Entity = BSOFT.Domain.Entities.Entity;
     public interface IEntityRepository
     {
+      
        Task<List<Entity>> GetAllEntityAsync();
        Task<Entity> GetByIdAsync(int Id);
        Task<string> GenerateEntityCodeAsync();

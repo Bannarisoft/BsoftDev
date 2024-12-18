@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using BSOFT.Domain.Entities;
 using System.Text;
 
-namespace BSOFT.Domain.Interfaces
+namespace BSOFT.Application.Common.Interfaces
 {
     public interface IDivisionRepository
     {

@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BSOFT.Application.Units.Queries.GetUnits;
@@ -5,7 +6,7 @@ using BSOFT.Application.Units.Queries.GetUnitById;
 using BSOFT.Application.Units.Commands.CreateUnit;
 using BSOFT.Application.Units.Commands.DeleteUnit;
 using BSOFT.Application.Units.Commands.UpdateUnit;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +18,9 @@ namespace BSOFT.API.Controllers
     [ApiController]
     public class UnitController : ApiControllerBase
     {
+        public UnitController(ISender mediator) : base(mediator)
+        {
+        }
         [HttpGet]
         public async Task<IActionResult> GetAllUnitsAsync()
         {

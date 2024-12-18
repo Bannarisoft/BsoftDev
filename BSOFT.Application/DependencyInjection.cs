@@ -3,14 +3,12 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System;
-using FluentValidation;
-using MediatR;
 using BSOFT.Application.Common.Behaviors;
 
 
 namespace BSOFT.Application
 {
-    public static class ConfigureServices
+    public static class DependencyInjection
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
@@ -26,10 +24,8 @@ namespace BSOFT.Application
             {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
                 //Validation
-                cfg.AddBehavior(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
-                   
+                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             });
-
             return services;
         }
     }

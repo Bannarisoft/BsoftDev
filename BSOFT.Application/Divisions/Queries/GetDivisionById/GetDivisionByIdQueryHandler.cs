@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using MediatR;
 using System.Text;
 using BSOFT.Application.Divisions.Queries.GetDivisions;

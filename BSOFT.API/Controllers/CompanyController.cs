@@ -1,3 +1,4 @@
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,10 @@ namespace BSOFT.API.Controllers
     [Route("api/[controller]")]
     public class CompanyController : ApiControllerBase
     {
+        public CompanyController(ISender mediator) : base(mediator)
+        {
+        }
+
         [HttpGet("GetAllCompaniesAsync")]
         public async Task<IActionResult> GetAllCompaniesAsync()
         {

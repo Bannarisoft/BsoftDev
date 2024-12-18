@@ -1,4 +1,4 @@
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using BSOFT.Domain.Entities;
 using MediatR;
 using System.Threading;
