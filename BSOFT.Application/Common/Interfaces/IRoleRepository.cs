@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BSOFT.Domain.Interfaces
+namespace BSOFT.Application.Common.Interfaces
 {
+    using Role = BSOFT.Domain.Entities.Role;
     public interface IRoleRepository
     {
         

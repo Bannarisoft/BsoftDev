@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using BSOFT.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;

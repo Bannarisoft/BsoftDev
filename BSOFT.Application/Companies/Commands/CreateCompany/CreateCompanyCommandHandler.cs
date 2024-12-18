@@ -1,6 +1,6 @@
 using BSOFT.Application.Companies.Queries.GetCompanies;
 using BSOFT.Domain.Entities;
-using BSOFT.Domain.Interfaces;
+using BSOFT.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
 using System;
