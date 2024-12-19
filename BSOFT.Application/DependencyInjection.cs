@@ -16,7 +16,6 @@ namespace BSOFT.Application
 
             // Use a specific AddAutoMapper overload
             services.AddAutoMapper(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
-            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             // Add MediatR

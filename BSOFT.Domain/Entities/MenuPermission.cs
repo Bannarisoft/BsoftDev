@@ -21,6 +21,6 @@ namespace BSOFT.Domain.Entities
 
     // Optional: Link back to RoleEntitlement
     public int RoleEntitlementId { get; set; }
-    public RoleEntitlement RoleEntitlement { get; set; }
+    // public RoleEntitlement RoleEntitlement { get; set; }
     }
 }

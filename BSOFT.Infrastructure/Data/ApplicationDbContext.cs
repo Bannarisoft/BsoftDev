@@ -45,14 +45,14 @@ namespace BSOFT.Infrastructure.Data
                 .HasKey(d => d.DeptId); // Primary key
 
             // RoleEntitlement entity configuration
-            modelBuilder.Entity<RoleEntitlement>()
-            .HasMany(re => re.MenuPermissions)
-            .WithOne(mp => mp.RoleEntitlement)
-            .HasForeignKey(mp => mp.RoleEntitlementId);
+            // modelBuilder.Entity<RoleEntitlement>()
+            // .HasMany(re => re.MenuPermissions)
+            // .WithOne(mp => mp.RoleEntitlement)
+            // .HasForeignKey(mp => mp.RoleEntitlementId);
             
-            modelBuilder.Entity<RoleEntitlement>()
-            .Property(re => re.RoleId)
-            .IsRequired();
+            // modelBuilder.Entity<RoleEntitlement>()
+            // .Property(re => re.RoleId)
+            // .IsRequired();
 
             modelBuilder.Entity<MenuPermission>()
             .HasKey(mp => mp.MenuPermissionId); // Ensure primary key is defined

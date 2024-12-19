@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BSOFT.Application.Users.Commands.CreateUser
 {
-    public class CreateUserCommand : IRequest<UserVm>
+    public class CreateUserCommand : IRequest<UserDto>
     {
     // public Guid Id { get; set; }
     // public int UserId { get; set; }
@@ -22,14 +22,9 @@ namespace BSOFT.Application.Users.Commands.CreateUser
     public int UserType { get; set; }
     public string Mobile { get; set; }
     public string EmailId { get; set; }
-    public int CoId { get; set; }
+    public int CompanyId { get; set; }
     public int UnitId { get; set; }
-    public int DivId { get; set; }
-    public int RoleId { get; set; }
-    // public List<string> Roles { get; set; }
-    // public int CreatedBy { get; set; }
-    // public DateTime CreatedAt { get; set; }
-    // public string? CreatedByName { get; set; }
-    // public string? CreatedIP { get; set; }
+    public int DivisionId { get; set; }
+    public int UserRoleId { get; set; }
     }
 }

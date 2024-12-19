@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BSOFT.Application.Users.Queries.GetUsers
 {
-    public class GetUserQuery : IRequest<List<UserVm>>
+    public class GetUserQuery : IRequest<List<UserDto>>
     {
         
     }
