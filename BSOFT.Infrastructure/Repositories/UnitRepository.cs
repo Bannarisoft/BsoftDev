@@ -24,7 +24,7 @@ namespace BSOFT.Infrastructure.Repositories
         public async Task<Unit> GetByIdAsync(int id)
         {
             return await _applicationDbContext.Unit.AsNoTracking()
-                .FirstOrDefaultAsync(b => b.UnitId == id);
+                .FirstOrDefaultAsync(b => b.Id == id);
         }
 
         public async Task<Unit> CreateAsync(Unit unit)
@@ -36,22 +36,13 @@ namespace BSOFT.Infrastructure.Repositories
 
         public async Task<int>UpdateAsync(int id, Unit unit)
         {
-            var existingunit = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.UnitId == id);
+            var existingunit = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.Id == id);
             if (existingunit != null)
             {
                 existingunit.UnitName = unit.UnitName;
                 existingunit.ShortName = unit.ShortName;
-                existingunit.Address1 = unit.Address1;
+  
 
-                existingunit.Address2 = unit.Address2;
-                existingunit.Address3 = unit.Address3;
-                existingunit.CoId = unit.CoId;
-
-                existingunit.DivId = unit.DivId;
-                existingunit.UnitHeadName = unit.UnitHeadName;
-                existingunit.Mobile = unit.Mobile;
-
-                existingunit.Email = unit.Email;
                 existingunit.IsActive = unit.IsActive;
                 _applicationDbContext.Unit.Update(existingunit);
                 return await _applicationDbContext.SaveChangesAsync();
@@ -61,7 +52,7 @@ namespace BSOFT.Infrastructure.Repositories
 
         public async Task<int> DeleteAsync(int id,Unit unit)
         {
-            var unitToDelete = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.UnitId == id);
+            var unitToDelete = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.Id == id);
             if (unitToDelete != null)
             {
                 unitToDelete.IsActive = unit.IsActive;
@@ -76,7 +67,7 @@ namespace BSOFT.Infrastructure.Repositories
                  .Where(r => EF.Functions.Like(r.UnitName, $"%{searchPattern}%")) 
                  .Select(r => new Unit
                  {
-                     UnitId = r.UnitId,
+                     Id = r.Id,
                      UnitName = r.UnitName
                  })
                  .ToListAsync();

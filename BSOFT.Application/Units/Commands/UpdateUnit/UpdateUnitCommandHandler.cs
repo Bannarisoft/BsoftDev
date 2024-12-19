@@ -18,17 +18,11 @@ namespace BSOFT.Application.Units.Commands.UpdateUnit
         {
             var UpdateunitEntity = new BSOFT.Domain.Entities.Unit()
             {
-                UnitId=request.UnitId,
+                Id=request.UnitId,
                 UnitName = request.UnitName,
                 ShortName = request.ShortName,
-                Address1 = request.Address1,
-                Address2 = request.Address2,
-                Address3 = request.Address3,
-                CoId = request.CoId,
-                DivId = request.DivId,
-                UnitHeadName = request.UnitHeadName,
-                Mobile = request.Mobile,
-                Email = request.Email,
+              
+                
                 IsActive = request.IsActive
                     
             };
