@@ -3,7 +3,7 @@ using BSOFT.Application.Common.Mappings;
 
 namespace BSOFT.Application.Users.Queries.GetUsers
 {
-    public class UserVm : IMapFrom<User>
+    public class UserDto : IMapFrom<User>
     {
     
     public Guid Id { get; set; }
@@ -16,18 +16,9 @@ namespace BSOFT.Application.Users.Queries.GetUsers
     public int UserType { get; set; }
     public string Mobile { get; set; }
     public string EmailId { get; set; }
-    public int CoId { get; set; }
+    public int CompanyId { get; set; }
     public int? UnitId { get; set; }
-    public int DivId { get; set; }
-    public int RoleId { get; set; }
-    public int CreatedBy { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string? CreatedByName { get; set; }
-    public string CreatedIP { get; set; }
-    public int ModifiedBy { get; set; }
-    public DateTime ModifiedAt { get; set; }
-    public string? ModifiedByName { get; set; }
-    public string? ModifiedIP { get; set; }
-    public string Token { get; set; }
+    public int DivisionId { get; set; }
+    public int UserRoleId { get; set; }
     }
 }

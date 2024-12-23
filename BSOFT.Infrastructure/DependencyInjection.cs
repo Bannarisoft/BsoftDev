@@ -1,19 +1,15 @@
-using BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
-using BSOFT.Application.RoleEntitlements.Queries.GetRoles;
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using BSOFT.Application.Common.Interfaces;
 using BSOFT.Infrastructure.Repositories;
-using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BSOFT.Application.Common.Mappings;
 
 
 namespace BSOFT.Infrastructure
@@ -34,8 +30,8 @@ namespace BSOFT.Infrastructure
 
                 services.AddScoped<IUserRepository, UserRepository>();
                 services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
-                services.AddTransient<IRoleEntitlementRepository, RoleEntitlementRepository>();
-                services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile), typeof(RoleEntitlementProfile));
+                // services.AddTransient<IRoleEntitlementRepository, RoleEntitlementsRepository>();
+                services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile));
 
 
                 services.AddScoped<IDepartmentRepository, DepartmentRepository>();

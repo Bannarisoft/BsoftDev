@@ -4,6 +4,7 @@ using BSOFT.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241219060003_UserIDColumnsChanges")]
+    partial class UserIDColumnsChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -426,16 +429,24 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("BSOFT.Domain.Entities.Unit", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("UnitId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UnitId"));
 
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int")
-                        .HasColumnName("CompanyId");
+                    b.Property<string>("Address1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Address2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Address3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CoId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -451,13 +462,19 @@ namespace BSOFT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DivisionId")
-                        .HasColumnType("int")
-                        .HasColumnName("DivisionId");
+                    b.Property<int>("DivId")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte>("IsActive")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Mobile")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
@@ -473,137 +490,31 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("ShortName")
                         .IsRequired()
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("ShortName");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UnitHeadName")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("UnitHeadName");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UnitName")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("UnitName");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("UnitId");
 
                     b.ToTable("Unit", "AppData");
-                });
-
-            modelBuilder.Entity("BSOFT.Domain.Entities.UnitAddress", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AddressLine1")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("AddressLine1");
-
-                    b.Property<string>("AddressLine2")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("AddressLine2");
-
-                    b.Property<string>("AlternateNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("AlternateNumber");
-
-                    b.Property<int>("CityId")
-                        .HasColumnType("int")
-                        .HasColumnName("CityId");
-
-                    b.Property<string>("ContactNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("ContactNumber");
-
-                    b.Property<int>("CountryId")
-                        .HasColumnType("int")
-                        .HasColumnName("CountryId");
-
-                    b.Property<int>("PinCode")
-                        .HasColumnType("int")
-                        .HasColumnName("PinCode");
-
-                    b.Property<int>("StateId")
-                        .HasColumnType("int")
-                        .HasColumnName("StateId");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("UnitId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UnitId");
-
-                    b.ToTable("UnitAddress", "AppData");
-                });
-
-            modelBuilder.Entity("BSOFT.Domain.Entities.UnitContacts", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Designation")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("Designation");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("Email");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("Name");
-
-                    b.Property<string>("PhoneNo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("PhoneNo");
-
-                    b.Property<string>("Remarks")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Remarks");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("UnitId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UnitId");
-
-                    b.ToTable("UnitContacts", "AppData");
                 });
 
             modelBuilder.Entity("BSOFT.Domain.Entities.User", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
                     b.Property<int>("CompanyId")
-                        .HasColumnType("int")
-                        .HasColumnName("CompanyId");
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -620,40 +531,29 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DivisionId")
-                        .HasColumnType("int")
-                        .HasColumnName("DivisionId");
+                        .HasColumnType("int");
 
                     b.Property<string>("EmailId")
                         .IsRequired()
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("EmailId");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("FirstName");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("Id");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
+                    b.Property<byte>("IsActive")
+                        .HasColumnType("tinyint");
 
                     b.Property<bool>("IsFirstTimeUser")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsFirstTimeUser");
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("LastName");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Mobile")
                         .IsRequired()
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("Mobile");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
@@ -669,25 +569,20 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("PasswordHash");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("UnitId");
+                        .HasColumnType("int");
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("UserName");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserRoleId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserRoleId");
+                        .HasColumnType("int");
 
                     b.Property<int>("UserType")
-                        .HasColumnType("int")
-                        .HasColumnName("UserType");
+                        .HasColumnType("int");
 
                     b.HasKey("UserId");
 
@@ -703,38 +598,9 @@ namespace BSOFT.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BSOFT.Domain.Entities.UnitAddress", b =>
-                {
-                    b.HasOne("BSOFT.Domain.Entities.Unit", "Unit")
-                        .WithMany("UnitAddress")
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Unit");
-                });
-
-            modelBuilder.Entity("BSOFT.Domain.Entities.UnitContacts", b =>
-                {
-                    b.HasOne("BSOFT.Domain.Entities.Unit", "Unit")
-                        .WithMany("UnitContacts")
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Unit");
-                });
-
             modelBuilder.Entity("BSOFT.Domain.Entities.RoleEntitlement", b =>
                 {
                     b.Navigation("MenuPermissions");
-                });
-
-            modelBuilder.Entity("BSOFT.Domain.Entities.Unit", b =>
-                {
-                    b.Navigation("UnitAddress");
-
-                    b.Navigation("UnitContacts");
                 });
 #pragma warning restore 612, 618
         }
