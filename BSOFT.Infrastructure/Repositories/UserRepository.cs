@@ -60,10 +60,10 @@ namespace BSOFT.Infrastructure.Repositories
                 existingUser.UserType = user.UserType;
                 existingUser.Mobile = user.Mobile;
                 existingUser.EmailId = user.EmailId;
-                existingUser.CompanyId = user.CompanyId;
-                existingUser.DivisionId = user.DivisionId;
+                existingUser.CoId = user.CoId;
+                existingUser.DivId = user.DivId;
                 existingUser.UnitId = user.UnitId;
-                existingUser.UserRoleId = user.UserRoleId;
+                // existingUser.RoleId = user.RoleId;
                 // existingUser.Role = user.Role;
                 existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
 

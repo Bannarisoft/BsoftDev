@@ -28,18 +28,10 @@ namespace BSOFT.Application.Departments.Commands.CreateDepartment
             {
             ShortName=request.ShortName,
             DeptName =request.DeptName,
-            CoId=request.CoId,            
-            IsActive=request.IsActive,
+            CompanyId=request.CompanyId,            
+            IsActive=request.IsActive
 
-            CreatedBy=request.CreatedBy,
-            CreatedAt=request.CreatedAt,
-            CreatedByName=request.CreatedByName,
-            CreatedIP=request.CreatedIP,
-
-            // ModifiedBy=request.ModifiedBy,
-            // ModifiedAt=request.ModifiedAt,
-            // ModifiedByName =request.ModifiedByName,
-            // ModifiedIP=request.ModifiedIP
+           
             };
              var result=await _departmentRepository.CreateAsync(departmentEntity);
             return _mapper.Map<DepartmentVm>(result);

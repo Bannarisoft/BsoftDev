@@ -7,22 +7,19 @@ using System.Text;
 using System.Threading.Tasks;
 using BSOFT.Domain.Common;
 
-
 namespace BSOFT.Domain.Entities
 {
-    [Table("Department", Schema = "AppData")]
-    public class Department : BaseEntity
-    {
-         [Key]
+    [Table("UserRole", Schema = "AppSecurity")]
+    public class UserRole  : BaseEntity
+    {        
         public int Id { get; set; }
-        [MaxLength(15)]
-        public string ShortName { get; set; }
-        public string DeptName { get; set; }
+        public string RoleName { get; set; }
+        public string Description { get; set; }
         public int CompanyId { get; set; }
         public byte  IsActive { get; set; }
-                  
+       
+        // public List<User> Users { get; set; } = new List<User>();
+        // public List<RoleEntitlement> RoleEntitlements { get; set; } = new List<RoleEntitlement>();            
 
     }
-       
-   
 }

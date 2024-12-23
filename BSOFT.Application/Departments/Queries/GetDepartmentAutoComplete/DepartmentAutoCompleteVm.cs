@@ -5,7 +5,7 @@ namespace BSOFT.Application.Departments.Queries.GetDepartmentAutoComplete
 {
     public class DepartmentAutoCompleteVm  :IMapFrom<Department>
     {
-     public int DeptId { get; set; }
+     public int Id { get; set; }
     public string DeptName { get; set; }
     }
 }

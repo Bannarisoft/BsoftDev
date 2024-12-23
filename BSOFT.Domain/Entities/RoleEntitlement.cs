@@ -1,4 +1,4 @@
-using BSOFT.Domain.Common;
+using System.ComponentModel.DataAnnotations.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,17 +7,22 @@ using System.Threading.Tasks;
 
 namespace BSOFT.Domain.Entities
 {
-    public class RoleEntitlement : BaseEntity
+    [Table("RoleEntitlement", Schema = "AppSecurity")]
+    public class RoleEntitlement
     {
-    public int Id { get; set; }
-    public string RoleName { get; set; }
-    public string MenuName { get; set; }
-    public bool CanView { get; set; }
-    public bool CanAdd { get; set; }
-    public bool CanUpdate { get; set; }
-    public bool CanDelete { get; set; }
-    public bool CanExport { get; set; }
-    public bool RequiresApproval { get; set; }
+    public int RoleEntitlementId { get; set; }
+    // [ForeignKey("RoleId")]
+    // public int RoleId { get; set; }
+    public List<MenuPermission> MenuPermissions { get; set; } = new List<MenuPermission>();
+    public DateTime CreatedAt { get; set; }
+    public string CreatedBy { get; set; }
+    public string? CreatedByName { get; set; }
+    public string? CreatedIP { get; set; }
+    public int? ModifiedBy { get; set; }
+    public string? ModifiedByName { get; set; }
+    public DateTime? ModifiedAt { get; set; }
+    public string? ModifiedIP { get; set; }    
+    
     }
 
 }

@@ -35,7 +35,7 @@ namespace BSOFT.Infrastructure
 
 
                 services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-                services.AddScoped<IRoleRepository, RoleRepository>();
+                services.AddScoped<IUserRoleRepository, UserRoleRepository>();
                 
                 services.AddScoped<ICompanyRepository, CompanyRepository>();
 				services.AddScoped<IUnitRepository, UnitRepository>();
