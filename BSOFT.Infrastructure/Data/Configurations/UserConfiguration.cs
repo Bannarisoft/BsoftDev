@@ -14,7 +14,9 @@ namespace BSOFT.Infrastructure.Data.Configurations
 
             builder.Property(u => u.Id)
                 .HasColumnName("Id")
-                .HasColumnType("uniqueidentifier");
+                .HasColumnType("uniqueidentifier")
+                .IsRequired()
+                .HasDefaultValueSql("NEWID()");
 
             builder.Property(u => u.UserId)
                 .HasColumnName("UserId")

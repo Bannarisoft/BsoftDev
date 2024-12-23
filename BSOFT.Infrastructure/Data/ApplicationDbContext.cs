@@ -31,12 +31,10 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<UnitContacts> UnitContacts { get; set; }
         public DbSet<Department> Department { get; set; } 
         public DbSet<User> User { get; set; }
-        public DbSet<Role> Role { get; set; } 
+        public DbSet<UserRole> UserRole { get; set; } 
         public DbSet<Company> Companies { get; set; }
         public DbSet<Division> Divisions { get; set; }
-        public DbSet<RoleEntitlement> RoleEntitlements { get; set; }
-        public DbSet<Module> Modules { get; set; }
-        public DbSet<Menu> Menus { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,16 +42,7 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UnitConfiguration());
             modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
             modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
-            modelBuilder.ApplyConfiguration(new RoleEntitlementConfigurations());
-            modelBuilder.ApplyConfiguration(new ModuleConfigurations());
-            modelBuilder.ApplyConfiguration(new MenuConfigurations());
 
-
-            // RoleEntitlement entity configuration
-            // modelBuilder.Entity<RoleEntitlement>()
-            // .HasMany(re => re.MenuPermissions)
-            // .WithOne(mp => mp.RoleEntitlement)
-            // .HasForeignKey(mp => mp.RoleEntitlementId);
                                                                      
             base.OnModelCreating(modelBuilder);
         }
