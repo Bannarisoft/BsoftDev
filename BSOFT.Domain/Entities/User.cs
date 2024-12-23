@@ -25,9 +25,9 @@ namespace BSOFT.Domain.Entities
     public int CoId { get; set; }
     public int UnitId { get; set; }
     public int DivId { get; set; }
-    [ForeignKey("RoleId")]
-    public int RoleId { get; set; }
-    // public string Role { get; set; }
+    // [ForeignKey("RoleId")]
+    // public int RoleId { get; set; }
+    // // public string Role { get; set; }
 
     }
 }

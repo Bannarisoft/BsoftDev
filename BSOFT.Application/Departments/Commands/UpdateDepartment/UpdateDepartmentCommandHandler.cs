@@ -22,18 +22,15 @@ namespace BSOFT.Application.Departments.Commands.UpdateDepartment
             var UpdatedepartmentEntity = new BSOFT.Domain.Entities.Department()
             {
 
-                DeptId=request.DeptId,
+                Id=request.Id,
                 ShortName =request.ShortName,
                 DeptName =request.DeptName,
-                CoId =request.CoId,
-                IsActive =request.IsActive,
-                ModifiedBy     =request.ModifiedBy,
-                ModifiedAt  =request.ModifiedAt,
-                ModifiedByName=request.ModifiedByName,
-                ModifiedIP=request.ModifiedIP
+                CompanyId =request.CompanyId,
+                IsActive =request.IsActive
+               
 
             };
-            return await _departmentRepository.UpdateAsync(request.DeptId,UpdatedepartmentEntity);
+            return await _departmentRepository.UpdateAsync(request.Id,UpdatedepartmentEntity);
         
         }
     }

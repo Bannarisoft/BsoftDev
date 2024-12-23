@@ -11,8 +11,8 @@ namespace BSOFT.Domain.Entities
     public class RoleEntitlement
     {
     public int RoleEntitlementId { get; set; }
-    [ForeignKey("RoleId")]
-    public int RoleId { get; set; }
+    // [ForeignKey("RoleId")]
+    // public int RoleId { get; set; }
     public List<MenuPermission> MenuPermissions { get; set; } = new List<MenuPermission>();
     public DateTime CreatedAt { get; set; }
     public string CreatedBy { get; set; }
