@@ -9,8 +9,12 @@ namespace BSOFT.Application.Common.Interfaces
 {
     public interface IRoleEntitlementRepository
     {
-        Task AddAsync(RoleEntitlement roleEntitlement);
-        Task<List<RoleEntitlement>> GetAllAsync();
+    // Task<RoleEntitlement> GetAsync(int id);
+    // Task CreateAsync(RoleEntitlement roleEntitlement);
+    // Task UpdateAsync(RoleEntitlement roleEntitlement);
+    // Task DeleteAsync(int id);
+    Task AddRoleEntitlementsAsync(IEnumerable<RoleEntitlement> roleEntitlements);
+    Task<List<Modules>> GetModulesWithMenusAsync();
     }
 
 }

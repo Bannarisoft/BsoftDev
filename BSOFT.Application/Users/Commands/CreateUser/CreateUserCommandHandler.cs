@@ -22,8 +22,12 @@ namespace BSOFT.Application.Users.Commands.CreateUser
 
         public async Task<UserDto> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
+             // Generate a new GUID for the user
+            var userId = Guid.NewGuid();
+
             // Use AutoMapper to map CreateUserCommand to User entity
             var userEntity = _mapper.Map<User>(request);
+            userEntity.Id = userId; // Assign the new GUID to the user entity
 
             // Save the user to the repository
             var createdUser = await _userRepository.CreateAsync(userEntity);

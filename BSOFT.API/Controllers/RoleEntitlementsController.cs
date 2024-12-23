@@ -1,5 +1,6 @@
 using BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
-using BSOFT.Application.RoleEntitlements.Queries.GetRoles;
+using BSOFT.Application.Common.Interfaces;
+// using BSOFT.Application.RoleEntitlements.Queries.GetRoles;
 using BSOFT.Application.Role.Queries.GetRolesAutocomplete;
 using BSOFT.Application.Role.Queries.GetRoleById;
 using MediatR;
@@ -8,49 +9,36 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
 {
-    
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    
     
     public class RoleEntitlementsController : ApiControllerBase
     {
-        public RoleEntitlementsController(ISender mediator) : base(mediator)
+        private readonly IRoleEntitlementRepository _repository;
+        public RoleEntitlementsController(ISender mediator, IRoleEntitlementRepository repository) : base(mediator)
         {
+            _repository = repository;
         }
 
     [HttpPost]
-    public async Task<IActionResult> CreateRoleEntitlement([FromBody] CreateRoleEntitlementVm dto)
+    public async Task<IActionResult> CreateRoleEntitlement(CreateRoleEntitlementCommand command)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        var command = new CreateRoleEntitlementCommand { RoleEntitlementVm = dto };
         var result = await Mediator.Send(command);
-        return CreatedAtAction(nameof(GetRoleEntitlement), new { id = result }, dto);
+        return Ok(new { Message = "Role Entitlement created successfully.", CreatedCount = result });
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetRoleEntitlement(int id)
+    [HttpGet("modules")]
+    public async Task<IActionResult> GetModulesWithMenus()
     {
-            var query = new GetRoleByIdQuery { RoleId = id };
-            var result = await Mediator.Send(query);
-            if (result == null)
-            {
-                return NotFound();
-            }
-            return Ok(result);
+        var modules = await _repository.GetModulesWithMenusAsync();
+        return Ok(modules.Select(module => new
+        {
+            module.Id,
+            module.Name,
+            Menus = module.Menus.Select(menu => new { menu.Id, menu.Name })
+        }));
     }
-
-    [HttpGet]
-    public async Task<IActionResult> GetAllRoleEntitlements()
-    {
-        var query = new GetAllRoleEntitlementsQuery();
-        var result = await Mediator.Send(query);
-        return Ok(result);
-    }
-
 
     }
 }

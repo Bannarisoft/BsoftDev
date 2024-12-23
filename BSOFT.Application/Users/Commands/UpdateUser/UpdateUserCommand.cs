@@ -25,7 +25,6 @@ namespace BSOFT.Application.Users.Commands.UpdateUser
     public int UnitId { get; set; }
     public int DivisionId { get; set; }
     public int UserRoleId { get; set; }
-    // public string Role { get; set; }
 
     }
 }

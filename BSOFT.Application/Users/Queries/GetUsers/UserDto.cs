@@ -20,14 +20,5 @@ namespace BSOFT.Application.Users.Queries.GetUsers
     public int? UnitId { get; set; }
     public int DivisionId { get; set; }
     public int UserRoleId { get; set; }
-    // public int CreatedBy { get; set; }
-    // public DateTime CreatedAt { get; set; }
-    // public string? CreatedByName { get; set; }
-    // public string CreatedIP { get; set; }
-    // public int ModifiedBy { get; set; }
-    // public DateTime ModifiedAt { get; set; }
-    // public string? ModifiedByName { get; set; }
-    // public string? ModifiedIP { get; set; }
-    // public string Token { get; set; }
     }
 }

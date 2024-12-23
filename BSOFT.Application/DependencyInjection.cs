@@ -1,3 +1,4 @@
+using BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ namespace BSOFT.Application
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
                 //Validation
                 cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+                cfg.RegisterServicesFromAssembly(typeof(CreateRoleEntitlementCommandHandler).Assembly);
             });
             return services;
         }

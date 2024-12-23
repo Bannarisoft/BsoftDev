@@ -1,36 +1,37 @@
-using BSOFT.Application.RoleEntitlements.Commands;
+using FluentValidation;
 using BSOFT.Domain.Entities;
 using BSOFT.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
 using System;
-using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
-public class CreateRoleEntitlementCommandHandler : IRequestHandler<CreateRoleEntitlementCommand, int>
-{
-    private readonly IMapper _mapper;
+    public class CreateRoleEntitlementCommandHandler : IRequestHandler<CreateRoleEntitlementCommand, int>
+    {
     private readonly IRoleEntitlementRepository _repository;
-
-    public CreateRoleEntitlementCommandHandler(IMapper mapper, IRoleEntitlementRepository repository)
+    private readonly IMapper _mapper;
+    public CreateRoleEntitlementCommandHandler(IRoleEntitlementRepository repository, IMapper mapper)
     {
-        _mapper = mapper;
         _repository = repository;
+        _mapper = mapper;
     }
-
-    public async Task<int> Handle(CreateRoleEntitlementCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateRoleEntitlementCommand request, CancellationToken cancellationToken)
     {
-        var roleEntitlement = _mapper.Map<RoleEntitlement>(request.RoleEntitlementVm);
-        roleEntitlement.CreatedAt = DateTime.UtcNow;
-        roleEntitlement.CreatedBy = "System"; // Replace with the logged-in user
-        // roleEntitlement.Roles = request.Roles;
+        if (string.IsNullOrEmpty(request.RoleName) || !request.MenuPermissions.Any())
+        {
+            throw new ValidationException("Role Name and Menu Permissions are mandatory.");
+        }
 
-        await _repository.AddAsync(roleEntitlement);
+        var roleEntitlements = _mapper.Map<List<RoleEntitlement>>(request.MenuPermissions);
+        roleEntitlements.ForEach(e => e.RoleName = request.RoleName);
 
-        return roleEntitlement.RoleEntitlementId;
+        await _repository.AddRoleEntitlementsAsync(roleEntitlements);
+        return roleEntitlements.Count;
     }
-}
-
+        
+    }
 }
