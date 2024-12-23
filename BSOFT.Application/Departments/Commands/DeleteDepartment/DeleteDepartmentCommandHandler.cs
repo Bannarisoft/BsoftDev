@@ -19,11 +19,11 @@ namespace BSOFT.Application.Departments.Commands.DeleteDepartment
       {       
          var Updatedepartment = new Department()
             {
-                DeptId = request.DeptId,
+                Id = request.Id,
                 IsActive = request.IsActive                
 
             };
-            return await _departmentRepository.DeleteAsync(request.DeptId,Updatedepartment);     
+            return await _departmentRepository.DeleteAsync(request.Id,Updatedepartment);     
       }
 
     }

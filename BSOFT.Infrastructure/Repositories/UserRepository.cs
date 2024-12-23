@@ -63,7 +63,7 @@ namespace BSOFT.Infrastructure.Repositories
                 existingUser.CoId = user.CoId;
                 existingUser.DivId = user.DivId;
                 existingUser.UnitId = user.UnitId;
-                existingUser.RoleId = user.RoleId;
+                // existingUser.RoleId = user.RoleId;
                 // existingUser.Role = user.Role;
                 existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
 

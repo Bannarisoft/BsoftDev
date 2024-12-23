@@ -28,7 +28,7 @@ namespace BSOFT.Application.Departments.Commands.CreateDepartment
             {
             ShortName=request.ShortName,
             DeptName =request.DeptName,
-            CoId=request.CoId,            
+            CompanyId=request.CompanyId,            
             IsActive=request.IsActive
 
            

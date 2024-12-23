@@ -3,17 +3,15 @@ using BSOFT.Application.Common.Mappings;
 using Microsoft.AspNetCore.Http;
 using BSOFT.Application.Common;
 
-
-namespace BSOFT.Application.Departments.Queries.GetDepartments
+namespace BSOFT.Application.UserRole.Queries.GetRole
 {
-    public class DepartmentVm : BaseEntityVm ,IMapFrom<Department>
-
-    {
+    public class UserRoleVm : BaseEntityVm,IMapFrom<BSOFT.Domain.Entities.UserRole>
+    {        
+ 
         public int Id { get; set; }
-        public string ShortName { get; set; }
-        public string DeptName { get; set; }
+        public string RoleName { get; set; }
+        public string Description { get; set; }
         public int CompanyId { get; set; }
         public byte  IsActive { get; set; }
-      
     }
-}   
+}

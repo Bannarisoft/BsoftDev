@@ -10,7 +10,7 @@ namespace BSOFT.Application.Departments.Commands.DeleteDepartment
 {
     public class DeleteDepartmentCommand :IRequest<int>
     {
-        public int DeptId { get; set; }
+        public int Id { get; set; }
         public byte IsActive { get; set; }   
          
   

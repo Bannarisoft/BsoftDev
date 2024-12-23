@@ -10,10 +10,10 @@ namespace BSOFT.Application.Departments.Commands.UpdateDepartment
 {
     public class UpdateDepartmentCommand : IRequest<int>
     {
-        public int DeptId { get; set; }
+        public int Id { get; set; }
         public string ShortName { get; set; }
         public string DeptName { get; set; }
-        public int CoId { get; set; }
+        public int CompanyId { get; set; }
         public byte  IsActive { get; set; }
              
     }

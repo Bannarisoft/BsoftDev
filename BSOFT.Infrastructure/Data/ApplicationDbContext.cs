@@ -29,7 +29,7 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<User> User { get; set; }
         public DbSet<RoleEntitlement> RoleEntitlement { get; set; }
         public DbSet<Department> Department { get; set; } 
-        public DbSet<Role> Role { get; set; } 
+        public DbSet<UserRole> UserRole { get; set; } 
         public DbSet<Company> Companies { get; set; }
         public DbSet<Division> Divisions { get; set; }
         public DbSet<MenuPermission> MenuPermission { get; set; }
@@ -42,7 +42,7 @@ namespace BSOFT.Infrastructure.Data
 
             // Department entity configuration
             modelBuilder.Entity<Department>()
-                .HasKey(d => d.DeptId); // Primary key
+                .HasKey(d => d.Id); // Primary key
 
             // RoleEntitlement entity configuration
             modelBuilder.Entity<RoleEntitlement>()
@@ -50,9 +50,9 @@ namespace BSOFT.Infrastructure.Data
             .WithOne(mp => mp.RoleEntitlement)
             .HasForeignKey(mp => mp.RoleEntitlementId);
             
-            modelBuilder.Entity<RoleEntitlement>()
-            .Property(re => re.RoleId)
-            .IsRequired();
+            // modelBuilder.Entity<RoleEntitlement>()
+            // .Property(re => re.RoleId)
+            // .IsRequired();
 
             modelBuilder.Entity<MenuPermission>()
             .HasKey(mp => mp.MenuPermissionId); // Ensure primary key is defined

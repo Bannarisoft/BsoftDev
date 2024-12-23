@@ -32,25 +32,12 @@ namespace BSOFT.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
             // Map to the application-specific DTO
             return division.Select(d => new DepartmentAutoCompleteVm
             {
-               DeptId = d.DeptId,
+                Id = d.Id,
                 DeptName = d.DeptName
             }).ToList();
-            // Fetch departments from repository
-            // var departments = await _departmentRepository.GetAllDepartmentAutoCompleteSearchAsync(request.SearchDept);
-            // // Filter and project results
-            // var filteredDepartments = departments
-            //     .Where(d => string.IsNullOrEmpty(request.SearchDept) || d.DeptName.Contains(request.SearchDept))
-            //     .Select(d => new DepartmentAutoCompleteVm
-            //     {
-            //         DeptId = d.DeptId,
-            //         DeptName = d.DeptName
-            //     })
-            //     .ToList();
-
-            // return filteredDepartments;
+            
         }
         }
          
     }
-
 

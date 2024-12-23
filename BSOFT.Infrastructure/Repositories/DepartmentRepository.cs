@@ -24,7 +24,7 @@ namespace BSOFT.Infrastructure.Repositories
 
     public async Task<Department> GetByIdAsync(int id)
     {
-        return await _applicationDbContext.Department.AsNoTracking().FirstOrDefaultAsync(b=>b.DeptId==id);        
+        return await _applicationDbContext.Department.AsNoTracking().FirstOrDefaultAsync(b=>b.Id==id);        
     
     }        
 
@@ -37,12 +37,12 @@ namespace BSOFT.Infrastructure.Repositories
 
      public async Task<int>UpdateAsync(int id, Department department)
     {
-            var existingDept = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.DeptId == id);
+            var existingDept = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.Id == id);
             if (existingDept != null)
             {
                 existingDept.ShortName = department.ShortName;
                 existingDept.DeptName = department.DeptName;
-                existingDept.CoId = department.CoId;
+                existingDept.CompanyId = department.CompanyId;
                 existingDept.IsActive = department.IsActive;                                
 
                 _applicationDbContext.Department.Update(existingDept);
@@ -54,7 +54,7 @@ namespace BSOFT.Infrastructure.Repositories
     public async Task<int> DeleteAsync(int id ,Department department )
     {
         
-            var deptToDelete = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.DeptId == id);
+            var deptToDelete = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.Id == id);
             if (deptToDelete != null)
             {
                
@@ -81,7 +81,7 @@ namespace BSOFT.Infrastructure.Repositories
                  .Where(d => EF.Functions.Like(d.DeptName, $"%{SearchDept}%")) 
                  .Select(d => new Department
                  {
-                     DeptId = d.DeptId,
+                     Id = d.Id,
                      DeptName = d.DeptName
                  })
                  .ToListAsync();

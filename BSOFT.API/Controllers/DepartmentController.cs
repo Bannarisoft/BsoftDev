@@ -42,7 +42,7 @@ namespace BSOFT.API.Controllers
         {
             var createdepartment=await Mediator.Send(command);
             return Ok("Created successfully");
-            return CreatedAtAction(nameof(GetByIdAsync),new {id=createdepartment.DeptId},createdepartment);
+            return CreatedAtAction(nameof(GetByIdAsync),new {id=createdepartment.Id},createdepartment);
         }
 
 
@@ -50,7 +50,7 @@ namespace BSOFT.API.Controllers
     public async Task<IActionResult> UpdateAsync(int id, UpdateDepartmentCommand command)
     {
        
-        if (id != command.DeptId)
+        if (id != command.Id)
         {
             return BadRequest("UnitId Mismatch");
         }
@@ -63,7 +63,7 @@ namespace BSOFT.API.Controllers
         
         public async Task<IActionResult> Delete(int id,DeleteDepartmentCommand deleteDepartmentCommand)
         {
-             if(id != deleteDepartmentCommand.DeptId)
+             if(id != deleteDepartmentCommand.Id)
             {
                 return BadRequest();
             }
