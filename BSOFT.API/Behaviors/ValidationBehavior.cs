@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 // using ValidationException = BSOFT.Application.Common.Exceptions.ValidationException;
 
-namespace BSOFT.Application.Common.Behaviors
+namespace BSOFT.API.Behaviors
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : notnull // 'where' should be lowercase

@@ -48,7 +48,7 @@ namespace BSOFT.API.Controllers
             return CreatedAtAction(nameof(GetByIdAsync), new { userid = createdUser.Id }, createdUser);
         }
 
-        [HttpPut("update/{userid}")]
+        [HttpPut("{userid}")]
         public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
         {
             if (userid <= 0)
@@ -64,7 +64,7 @@ namespace BSOFT.API.Controllers
             return NoContent();
         }
 
-        [HttpPut("delete/{userid}")]
+        [HttpDelete("{userid}")]
         public async Task<IActionResult> DeleteAsync(int userid, DeleteUserCommand command)
         {
             if (userid <= 0)
