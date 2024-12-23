@@ -20,7 +20,7 @@ namespace BSOFT.Application.Units.Commands.DeleteUnit
         {
             var Updateunit = new BSOFT.Domain.Entities.Unit()
             {
-                UnitId = request.UnitId,
+                Id = request.UnitId,
                 IsActive = request.IsActive 
             };
             

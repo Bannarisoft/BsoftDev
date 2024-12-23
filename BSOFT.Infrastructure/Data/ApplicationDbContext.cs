@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using BSOFT.Application.Common.Interfaces;
 using BSOFT.Domain.Common;
+using BSOFT.Infrastructure.Data.Configurations;
 
 namespace BSOFT.Infrastructure.Data
 {
@@ -23,26 +24,34 @@ namespace BSOFT.Infrastructure.Data
         {  
             _ipAddressService = ipAddressService;         
         }
-        public DbSet<Unit> Unit { get; set; } 
+        
         public DbSet<Entity> Entity { get; set; } 
 
-        public DbSet<User> User { get; set; }
+        public DbSet<Unit> Unit { get; set; } 
+        public DbSet<UnitAddress> UnitAddress { get; set; }
+        public DbSet<UnitContacts> UnitContacts { get; set; }
         public DbSet<RoleEntitlement> RoleEntitlement { get; set; }
         public DbSet<Department> Department { get; set; } 
-        public DbSet<UserRole> UserRole { get; set; } 
+
+        public DbSet<User> User { get; set; }
+        public DbSet<Role> Role { get; set; } 
         public DbSet<Company> Companies { get; set; }
         public DbSet<Division> Divisions { get; set; }
         public DbSet<MenuPermission> MenuPermission { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+        modelBuilder.ApplyConfiguration(new UnitConfiguration());
+        modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
+        modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
             // User entity configuration
             modelBuilder.Entity<User>()
                 .HasKey(u => u.UserId); // Primary key
 
             // Department entity configuration
             modelBuilder.Entity<Department>()
-                .HasKey(d => d.Id); // Primary key
+                .HasKey(d => d.DeptId); // Primary key
 
             // RoleEntitlement entity configuration
             modelBuilder.Entity<RoleEntitlement>()
@@ -50,9 +59,9 @@ namespace BSOFT.Infrastructure.Data
             .WithOne(mp => mp.RoleEntitlement)
             .HasForeignKey(mp => mp.RoleEntitlementId);
             
-            // modelBuilder.Entity<RoleEntitlement>()
-            // .Property(re => re.RoleId)
-            // .IsRequired();
+            modelBuilder.Entity<RoleEntitlement>()
+            .Property(re => re.RoleId)
+            .IsRequired();
 
             modelBuilder.Entity<MenuPermission>()
             .HasKey(mp => mp.MenuPermissionId); // Ensure primary key is defined
