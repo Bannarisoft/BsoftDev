@@ -6,44 +6,48 @@ using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace BSOFT.Application.Companies.Commands.CreateCompany
 {
-    public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand, CompanyVm>
+    public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand, int>
     {
-         private readonly ICompanyRepository _companyRepository;
-        private readonly IMapper _mapper;
+         private readonly ICompanyRepository _icompanyRepository;
+         private readonly ICompanyAddressRepository _icompanyAddressRepository;
+         private readonly ICompanyContactRepository _icompanyContactRepository;
+        private readonly IMapper _imapper;
 
-        public CreateCompanyCommandHandler(ICompanyRepository companyRepository, IMapper mapper)
+        public CreateCompanyCommandHandler(ICompanyRepository icompanyRepository,ICompanyAddressRepository icompanyAddressRepository,ICompanyContactRepository icompanyContactRepository, IMapper imapper)
         {
-            _companyRepository = companyRepository;
-            _mapper = mapper;
+            _icompanyRepository = icompanyRepository;
+            _icompanyAddressRepository = icompanyAddressRepository;
+            _icompanyContactRepository = icompanyContactRepository;
+            _imapper = imapper;
         }
 
-        public async Task<CompanyVm> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
         {
-            var companyEntity = new Company
+            
+                var company  = _imapper.Map<Company>(request);
+               
+                var companyaddress =     _imapper.Map<CompanyAddress>(request.CompanyAddresses);
+                var companycontact =     _imapper.Map<CompanyContact>(request.CompanyContacts);
+             
+         
+            var CompanyId = await _icompanyRepository.CreateAsync(company);
+                
+            if (CompanyId != null)
             {
-                CompanyName = request.CompanyName,
-                LegalName = request.LegalName,
-                Address1 = request.Address1,
-                Address2 = request.Address2,
-                Address3 = request.Address3,
-                Phone = request.Phone,
-                Email = request.Email,
-                GstNumber = request.GstNumber,
-                TIN = request.TIN,
-                TAN = request.TAN,
-                CSTNo = request.CSTNo,   
-                YearofEstablishment = request.YearofEstablishment,
-                Website = request.Website,
-                Logo = request.Logo,
-                EntityId = request.EntityId,
-                IsActive = request.IsActive         
-            };
+                
+                 companyaddress.CompanyId = CompanyId.Id;
+                 companycontact.CompanyId = CompanyId.Id;
+                 
+                await _icompanyAddressRepository.CreateAsync(companyaddress);
+                
+                await _icompanyContactRepository.CreateAsync(companycontact);
+            }
 
-            var result = await _companyRepository.CreateAsync(companyEntity);
-            return _mapper.Map<CompanyVm>(result);
+            return CompanyId.Id;
         }
     }
 }

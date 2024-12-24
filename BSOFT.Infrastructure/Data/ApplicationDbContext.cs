@@ -36,6 +36,8 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<User> User { get; set; }
         public DbSet<Role> Role { get; set; } 
         public DbSet<Company> Companies { get; set; }
+        public DbSet<CompanyAddress> companyAddresses { get; set; }
+        public DbSet<CompanyContact> CompanyContacts { get; set; }
         public DbSet<Division> Divisions { get; set; }
         public DbSet<MenuPermission> MenuPermission { get; set; }
 
@@ -45,6 +47,9 @@ namespace BSOFT.Infrastructure.Data
         modelBuilder.ApplyConfiguration(new UnitConfiguration());
         modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
         modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
+        modelBuilder.ApplyConfiguration(new CompanyConfiguration());
+        modelBuilder.ApplyConfiguration(new CompanyAddressConfiguration());
+        modelBuilder.ApplyConfiguration(new CompanyContactConfiguration());
             // User entity configuration
             modelBuilder.Entity<User>()
                 .HasKey(u => u.UserId); // Primary key

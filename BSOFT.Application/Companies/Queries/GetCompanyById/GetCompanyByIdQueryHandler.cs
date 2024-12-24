@@ -10,7 +10,7 @@ using BSOFT.Application.Companies.Queries.GetCompanies;
 
 namespace BSOFT.Application.Companies.Queries.GetCompanyById
 {
-    public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery,CompanyVm>
+    public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery,CompanyDTO>
     {
         private readonly ICompanyRepository _companyRepository;
         private readonly IMapper _mapper;
@@ -20,12 +20,12 @@ namespace BSOFT.Application.Companies.Queries.GetCompanyById
             _companyRepository =companyRepository;
             _mapper =mapper;
         } 
-        public async Task<CompanyVm> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
+        public async Task<CompanyDTO> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
         {
            
 
           var company = await _companyRepository.GetByIdAsync(request.CompanyId);
-          return _mapper.Map<CompanyVm>(company);
+          return _mapper.Map<CompanyDTO>(company);
         }
     }
 }
