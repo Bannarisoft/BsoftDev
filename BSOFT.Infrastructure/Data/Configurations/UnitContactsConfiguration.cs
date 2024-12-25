@@ -48,8 +48,8 @@ namespace BSOFT.Infrastructure.Data.Configurations
 
         builder.Property(uc => uc.Remarks)
             .HasColumnName("Remarks")
-            .HasColumnType("varchar(250)")
-            .IsRequired();
+            .HasColumnType("varchar(250)");
+          
 
         builder.HasOne(uc => uc.Unit)
             .WithMany(u => u.UnitContacts)
