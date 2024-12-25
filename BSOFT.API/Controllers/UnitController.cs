@@ -40,29 +40,29 @@ namespace BSOFT.API.Controllers
         }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync(CreateUnitCommand command)
+    public async Task<IActionResult> CreateUnitAsync(CreateUnitCommand command)
     {
         var createdUnit = await Mediator.Send(command);
         return Ok("Created Successfully");
-        return CreatedAtAction(nameof(GetByIdAsync), new { id = createdUnit.UnitId }, createdUnit);
+       
     }
 
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, UpdateUnitCommand command)
+    public async Task<IActionResult> UpdateUnitAsync(int id, UpdateUnitCommand command)
     {
         if (id != command.UnitId)
         {
             return BadRequest("UnitId Mismatch");
         }
-
-        var updatedunit = await Mediator.Send(command);
+        command.UnitId = id;
+        var result = await Mediator.Send(command);
         return Ok("Updated Successfully");
     }
 
 
     [HttpPut("delete/{id}")]
-    public async Task<IActionResult> DeleteAsync(int id,DeleteUnitCommand command)
+    public async Task<IActionResult> DeleteUnitAsync(int id,DeleteUnitCommand command)
     {
          if(id != command.UnitId)
         {

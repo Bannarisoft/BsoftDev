@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 namespace BSOFT.Domain.Entities
 {
  
-        public class UnitAddress
+    public class UnitAddress
     {
         public int Id { get; set; }
 
@@ -25,7 +25,7 @@ namespace BSOFT.Domain.Entities
         public string AddressLine1 { get; set; }
 
 
-        public string AddressLine2 { get; set; }
+        public string? AddressLine2 { get; set; }
 
         public int PinCode  { get; set; }
         
@@ -33,7 +33,7 @@ namespace BSOFT.Domain.Entities
         public string  ContactNumber { get; set; }
 
       
-        public string  AlternateNumber { get; set; }
+        public string?  AlternateNumber { get; set; }
 
          public Unit Unit { get; set; }
          
