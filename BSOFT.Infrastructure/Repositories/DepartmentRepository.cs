@@ -24,7 +24,7 @@ namespace BSOFT.Infrastructure.Repositories
 
     public async Task<Department> GetByIdAsync(int id)
     {
-        return await _applicationDbContext.Department.AsNoTracking().FirstOrDefaultAsync(b=>b.DeptId==id);        
+        return await _applicationDbContext.Department.AsNoTracking().FirstOrDefaultAsync(b=>b.Id==id);        
     
     }        
 
@@ -37,17 +37,13 @@ namespace BSOFT.Infrastructure.Repositories
 
      public async Task<int>UpdateAsync(int id, Department department)
     {
-            var existingDept = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.DeptId == id);
+            var existingDept = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.Id == id);
             if (existingDept != null)
             {
                 existingDept.ShortName = department.ShortName;
                 existingDept.DeptName = department.DeptName;
-                existingDept.CoId = department.CoId;
-                existingDept.IsActive = department.IsActive;                
-                existingDept.ModifiedBy = department.ModifiedBy;
-                existingDept.ModifiedAt = department.ModifiedAt  ?? DateTime.UtcNow;
-                existingDept.ModifiedByName=department.ModifiedByName;
-                existingDept.ModifiedIP=department.ModifiedIP;
+                existingDept.CompanyId = department.CompanyId;
+                existingDept.IsActive = department.IsActive;                                
 
                 _applicationDbContext.Department.Update(existingDept);
                 return await _applicationDbContext.SaveChangesAsync();
@@ -58,22 +54,15 @@ namespace BSOFT.Infrastructure.Repositories
     public async Task<int> DeleteAsync(int id ,Department department )
     {
         
-            var deptToDelete = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.DeptId == id);
+            var deptToDelete = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.Id == id);
             if (deptToDelete != null)
             {
-                Console.WriteLine("helloooooooo");
+               
                 deptToDelete.IsActive = department.IsActive;
-                // deptToDelete.ModifiedBy = department.ModifiedBy;
-                 deptToDelete.ModifiedAt = department.ModifiedAt ?? DateTime.UtcNow;
-                // deptToDelete.ModifiedByName=department.ModifiedByName;
-                // deptToDelete.ModifiedIP=department.ModifiedIP;   
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
     }
-
-
-
        public async Task<List<Department>>GetAllDepartmentAutoCompleteAsync()
     {
         
@@ -81,12 +70,22 @@ namespace BSOFT.Infrastructure.Repositories
         
     }
 
-  public async Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync()
+//   public async Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync()
+//         {
+//             return await _applicationDbContext.Department.ToListAsync();
+//         }
+
+    public async Task<List<Department>>  GetAllDepartmentAutoCompleteSearchAsync(string SearchDept = null)
         {
-            return await _applicationDbContext.Department.ToListAsync();
+                       return await _applicationDbContext.Department
+                 .Where(d => EF.Functions.Like(d.DeptName, $"%{SearchDept}%")) 
+                 .Select(d => new Department
+                 {
+                     Id = d.Id,
+                     DeptName = d.DeptName
+                 })
+                 .ToListAsync();
         }
-
-
 
 
     

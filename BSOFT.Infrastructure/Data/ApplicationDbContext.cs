@@ -26,52 +26,24 @@ namespace BSOFT.Infrastructure.Data
         }
         
         public DbSet<Entity> Entity { get; set; } 
-
         public DbSet<Unit> Unit { get; set; } 
         public DbSet<UnitAddress> UnitAddress { get; set; }
         public DbSet<UnitContacts> UnitContacts { get; set; }
-        public DbSet<RoleEntitlement> RoleEntitlement { get; set; }
         public DbSet<Department> Department { get; set; } 
-
         public DbSet<User> User { get; set; }
-        public DbSet<Role> Role { get; set; } 
+        public DbSet<UserRole> UserRole { get; set; } 
         public DbSet<Company> Companies { get; set; }
         public DbSet<Division> Divisions { get; set; }
-        public DbSet<MenuPermission> MenuPermission { get; set; }
-        public DbSet<Countries> Countries { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new UnitConfiguration());
             modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
             modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
-            modelBuilder.ApplyConfiguration(new CountryConfiguration());
-            //modelBuilder.ApplyConfiguration(new BaseConfiguration());
 
-            // User entity configuration
-            modelBuilder.Entity<User>()
-                .HasKey(u => u.UserId); // Primary key
-
-            // Department entity configuration
-            modelBuilder.Entity<Department>()
-                .HasKey(d => d.DeptId); // Primary key
-
-            // RoleEntitlement entity configuration
-            modelBuilder.Entity<RoleEntitlement>()
-            .HasMany(re => re.MenuPermissions)
-            .WithOne(mp => mp.RoleEntitlement)
-            .HasForeignKey(mp => mp.RoleEntitlementId);
-            
-            modelBuilder.Entity<RoleEntitlement>()
-            .Property(re => re.RoleId)
-            .IsRequired();
-
-            modelBuilder.Entity<MenuPermission>()
-            .HasKey(mp => mp.MenuPermissionId); // Ensure primary key is defined
-
-            
-    
+                                                                     
             base.OnModelCreating(modelBuilder);
         }
          public override int SaveChanges()
