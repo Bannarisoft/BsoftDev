@@ -4,6 +4,7 @@ using BSOFT.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241224095219_RecreateCountryTableV2")]
+    partial class RecreateCountryTableV2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,42 +139,34 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnName("CountryName");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("CreatedAt");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("CreatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("CreatedBy");
+                        .HasColumnType("int");
 
                     b.Property<string>("CreatedByName")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("CreatedByName");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedIP")
                         .IsRequired()
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("CreatedIP");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("IsActive");
 
                     b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("ModifiedAt");
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("ModifiedBy");
+                        .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("ModifiedByName");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("ModifiedIP");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

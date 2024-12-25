@@ -14,6 +14,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BSOFT.Domain.Common.Interface;
+using System.Data;
+using Microsoft.Data.SqlClient;
+using BSOFT.Application.Country.Queries.GetCountries;
+using BSOFT.Application.Common.Mappings;
 
 
 namespace BSOFT.Infrastructure
@@ -30,7 +35,9 @@ namespace BSOFT.Infrastructure
                 throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
             }
                 services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlServer(connectionString));                
+
+                services.AddTransient<IDbConnection>(_ => new SqlConnection(connectionString));                                
 
                 services.AddScoped<IUserRepository, UserRepository>();
                 services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
@@ -46,7 +53,9 @@ namespace BSOFT.Infrastructure
                 services.AddScoped<IEntityRepository,EntityRepository>();
  				services.AddScoped<IDivisionRepository, DivisionRepository>();
                 services.AddScoped<IIPAddressService, IPAddressService>();
-
+                services.AddScoped<ICountryRepository, CountryRepository>();
+                services.AddAutoMapper(typeof(CountryProfile).Assembly);
+                
                 return services;
             }
     }

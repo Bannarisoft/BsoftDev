@@ -38,13 +38,17 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<Company> Companies { get; set; }
         public DbSet<Division> Divisions { get; set; }
         public DbSet<MenuPermission> MenuPermission { get; set; }
+        public DbSet<Countries> Countries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-        modelBuilder.ApplyConfiguration(new UnitConfiguration());
-        modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
-        modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
+            modelBuilder.ApplyConfiguration(new UnitConfiguration());
+            modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
+            modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
+            modelBuilder.ApplyConfiguration(new CountryConfiguration());
+            //modelBuilder.ApplyConfiguration(new BaseConfiguration());
+
             // User entity configuration
             modelBuilder.Entity<User>()
                 .HasKey(u => u.UserId); // Primary key
@@ -66,7 +70,7 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.Entity<MenuPermission>()
             .HasKey(mp => mp.MenuPermissionId); // Ensure primary key is defined
 
-
+            
     
             base.OnModelCreating(modelBuilder);
         }
