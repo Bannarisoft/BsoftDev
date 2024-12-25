@@ -9,7 +9,7 @@ using System.Text;
 
 namespace BSOFT.Application.Companies.Queries.GetCompanies
 {
-    public class GetCompanyQueryHandler : IRequestHandler<GetCompanyQuery,List<CompanyVm>>
+    public class GetCompanyQueryHandler : IRequestHandler<GetCompanyQuery,List<CompanyDTO>>
     {
         private readonly ICompanyRepository _companyRepository;
         private readonly IMapper _mapper;
@@ -18,11 +18,11 @@ namespace BSOFT.Application.Companies.Queries.GetCompanies
             _companyRepository =companyRepository;
             _mapper =mapper;
         } 
-        public async Task<List<CompanyVm>> Handle(GetCompanyQuery requst, CancellationToken cancellationToken){
+        public async Task<List<CompanyDTO>> Handle(GetCompanyQuery requst, CancellationToken cancellationToken){
 
             var companies = await _companyRepository.GetAllCompaniesAsync();
             
-            var companylist = _mapper.Map<List<CompanyVm>>(companies);
+            var companylist = _mapper.Map<List<CompanyDTO>>(companies);
 
             return companylist;
         }

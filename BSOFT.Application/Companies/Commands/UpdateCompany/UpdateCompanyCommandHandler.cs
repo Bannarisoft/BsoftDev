@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using BSOFT.Application.Common.Interfaces;
 using BSOFT.Domain.Entities;
 using MediatR;
@@ -10,37 +11,38 @@ namespace BSOFT.Application.Companies.Commands.UpdateCompany
 {
     public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand, int>
     {
-        private readonly ICompanyRepository _companyRepository;
+        private readonly ICompanyRepository _icompanyRepository;
+        private readonly ICompanyAddressRepository _icompanyAddressRepository;
+        private readonly ICompanyContactRepository _icompanyContactRepository;
+        private readonly IMapper _imapper;
 
-        public UpdateCompanyCommandHandler(ICompanyRepository companyRepository)
+        public UpdateCompanyCommandHandler(ICompanyRepository icompanyRepository, ICompanyAddressRepository icompanyAddressRepository, ICompanyContactRepository icompanyContactRepository, IMapper imapper)
         {
-            _companyRepository = companyRepository;
+            _icompanyRepository = icompanyRepository;
+            _icompanyAddressRepository = icompanyAddressRepository;
+            _icompanyContactRepository = icompanyContactRepository;
+            _imapper = imapper;
         }
 
           public async Task<int> Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
         {
-            var UpdatecompanyEntity = new Company()
-            {
-                CoId = request.CoId,
-                CompanyName = request.CompanyName,
-                LegalName = request.LegalName,
-                Address1 = request.Address1,
-                Address2 = request.Address2,
-                Address3 = request.Address3,
-                Phone = request.Phone,
-                Email = request.Email,
-                GstNumber = request.GstNumber,
-                TIN = request.TIN,
-                TAN = request.TAN,
-                CSTNo = request.CSTNo,   
-                YearofEstablishment = request.YearofEstablishment,
-                Website = request.Website,
-                Logo = request.Logo,
-                EntityId = request.EntityId,
-                IsActive = request.IsActive 
-            };
+            var company  = _imapper.Map<Company>(request.Company);
+               
+                var companyaddress =     _imapper.Map<CompanyAddress>(request.CompanyAddresses);
+                var companycontact =     _imapper.Map<CompanyContact>(request.CompanyContacts);
+               var  CompanyId = await _icompanyRepository.UpdateAsync(request.Company.Id, company);
+           
 
-            return await _companyRepository.UpdateAsync(request.CoId, UpdatecompanyEntity);
+              if (CompanyId != null)
+            {
+               
+                 Console.WriteLine("Update Hello Handler");
+                await _icompanyAddressRepository.UpdateAsync(company.Id,companyaddress);
+                
+                await _icompanyContactRepository.UpdateAsync(company.Id,companycontact);
+            }
+
+            return 1;
         }
     }
 }

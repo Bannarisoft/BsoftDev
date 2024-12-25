@@ -13,23 +13,27 @@ namespace BSOFT.Application.Companies.Queries.GetCompanyAutoComplete
 {
     public class GetCompanyAutoCompleteQueryHandler : IRequestHandler<GetCompanyAutoCompleteQuery,List<CompanyAutoCompleteVm>>
     {
-        private readonly ICompanyRepository _companyRepository;
-        private readonly IMapper _mapper;
-         public GetCompanyAutoCompleteQueryHandler(ICompanyRepository companyRepository, IMapper mapper)
+        private readonly ICompanyRepository _icompanyRepository;
+        private readonly ICompanyAddressRepository _icompanyAddressRepository;
+        private readonly ICompanyContactRepository _icompanyContactRepository;
+        private readonly IMapper _imapper;
+         public GetCompanyAutoCompleteQueryHandler(ICompanyRepository icompanyRepository,ICompanyAddressRepository icompanyAddressRepository,ICompanyContactRepository icompanyContactRepository, IMapper imapper)
          {
-             _companyRepository =companyRepository;
-            _mapper =mapper;
+             _icompanyRepository =icompanyRepository;
+             _icompanyAddressRepository =icompanyAddressRepository;
+             _icompanyContactRepository =icompanyContactRepository;
+            _imapper =imapper;
          }  
           public async Task<List<CompanyAutoCompleteVm>> Handle(GetCompanyAutoCompleteQuery request, CancellationToken cancellationToken)
           {
                 
        
-            var company = await _companyRepository.GetCompany(request.SearchPattern);
+            var company = await _icompanyRepository.GetCompany(request.SearchPattern);
             // Map to the application-specific DTO
-            return company.Select(r => new CompanyAutoCompleteVm
+            return company.Select(c => new CompanyAutoCompleteVm
             {
-                CoId = r.CoId,
-                CompanyName = r.CompanyName
+                CompanyId = c.Id,
+                CompanyName = c.CompanyName
             }).ToList();
 
          } 

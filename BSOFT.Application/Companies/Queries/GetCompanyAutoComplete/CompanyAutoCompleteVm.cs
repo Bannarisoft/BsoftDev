@@ -9,7 +9,7 @@ namespace BSOFT.Application.Companies.Queries.GetCompanyAutoComplete
 {
     public class CompanyAutoCompleteVm : IMapFrom<Company>
     {
-        public int CoId { get; set; }
+        public int CompanyId { get; set; }
         public string CompanyName { get; set; }
     }
 }

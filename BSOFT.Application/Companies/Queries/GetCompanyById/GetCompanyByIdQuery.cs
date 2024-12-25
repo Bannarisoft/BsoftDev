@@ -8,7 +8,7 @@ using BSOFT.Application.Companies.Queries.GetCompanies;
 
 namespace BSOFT.Application.Companies.Queries.GetCompanyById
 {
-    public class GetCompanyByIdQuery : IRequest<CompanyVm>
+    public class GetCompanyByIdQuery : IRequest<CompanyDTO>
     {
         public int CompanyId { get; set; }
     }
