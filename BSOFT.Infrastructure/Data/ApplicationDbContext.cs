@@ -26,23 +26,24 @@ namespace BSOFT.Infrastructure.Data
         }
         
         public DbSet<Entity> Entity { get; set; } 
-
         public DbSet<Unit> Unit { get; set; } 
         public DbSet<UnitAddress> UnitAddress { get; set; }
         public DbSet<UnitContacts> UnitContacts { get; set; }
-        public DbSet<RoleEntitlement> RoleEntitlement { get; set; }
         public DbSet<Department> Department { get; set; } 
-
         public DbSet<User> User { get; set; }
-        public DbSet<Role> Role { get; set; } 
+        public DbSet<UserRole> UserRole { get; set; } 
         public DbSet<Company> Companies { get; set; }
         public DbSet<CompanyAddress> companyAddresses { get; set; }
         public DbSet<CompanyContact> CompanyContacts { get; set; }
         public DbSet<Division> Divisions { get; set; }
-        public DbSet<MenuPermission> MenuPermission { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new UnitConfiguration());
+            modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
+            modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
 
         modelBuilder.ApplyConfiguration(new UnitConfiguration());
         modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());

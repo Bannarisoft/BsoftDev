@@ -1,14 +1,9 @@
-using BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
-using BSOFT.Application.RoleEntitlements.Queries.GetRoles;
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using BSOFT.Application.Common.Interfaces;
 using BSOFT.Infrastructure.Repositories;
-using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,22 +30,22 @@ namespace BSOFT.Infrastructure
 
                 services.AddScoped<IUserRepository, UserRepository>();
                 services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
-                services.AddTransient<IRoleEntitlementRepository, RoleEntitlementRepository>();
-                services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile), typeof(RoleEntitlementProfile),typeof(CompanyProfile));
+                // services.AddTransient<IRoleEntitlementRepository, RoleEntitlementsRepository>();
+                services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile));
 
 
                 services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-                services.AddScoped<IRoleRepository, RoleRepository>();
+                services.AddScoped<IUserRoleRepository, UserRoleRepository>();
                 
                 services.AddScoped<ICompanyRepository, CompanyRepository>();
-                services.AddScoped<ICompanyAddressRepository, CompanyAddressRepository>();
+ 				services.AddScoped<ICompanyAddressRepository, CompanyAddressRepository>();
                 services.AddScoped<ICompanyContactRepository, CompanyContactRepository>();
-                // services.AddAutoMapper(typeof(CompanyProfile));
+                 services.AddAutoMapper(typeof(CompanyProfile));
 				services.AddScoped<IUnitRepository, UnitRepository>();
                 services.AddScoped<IEntityRepository,EntityRepository>();
  				services.AddScoped<IDivisionRepository, DivisionRepository>();
                 services.AddScoped<IIPAddressService, IPAddressService>();
-                services.AddTransient<IFileUploadService, FileUploadRepository>();
+				services.AddTransient<IFileUploadService, FileUploadRepository>();
 
                 return services;
             }

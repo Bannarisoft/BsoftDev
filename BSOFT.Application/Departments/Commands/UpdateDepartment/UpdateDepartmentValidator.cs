@@ -19,7 +19,7 @@ namespace BSOFT.Application.Departments.Commands.UpdateDepartment
             .NotEmpty().WithMessage("Department Name is required.")
              .MaximumLength(30).WithMessage("Department must not exceed 30 characters.");
 
-         RuleFor(v => v.CoId)
+         RuleFor(v => v.CompanyId)
             .NotEmpty().WithMessage("CompanyId is required.");                   
 
       

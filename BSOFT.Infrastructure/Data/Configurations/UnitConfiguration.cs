@@ -47,6 +47,12 @@ namespace BSOFT.Infrastructure.Data.Configurations
             .HasColumnType("varchar(50)")
             .IsRequired();
 
+        builder.Property(u => u.CINNO)
+            .HasColumnName("CINNO")
+            .HasColumnType("varchar(50)")
+            .IsRequired();
+
+
          builder.Property(u => u.IsActive)
     .HasColumnName("IsActive")
     .HasColumnType("bit")
