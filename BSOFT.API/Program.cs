@@ -1,16 +1,25 @@
+using MediatR;
+using BSOFT.API.Behaviors;
 using BSOFT.Application;
 using BSOFT.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Validate JWT Key
-string jwtKey = builder.Configuration["Jwt:Key"];
+string? jwtKey = builder.Configuration["Jwt:Key"];
 if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
 {
     throw new InvalidOperationException("Jwt:Key must be at least 32 characters long.");
 }
 
 // Add services to the container.
+
+//Validation
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+});
 
 //Add layer dependency 
 builder.Services.AddApplicationServices();

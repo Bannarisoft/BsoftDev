@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BSOFT.Application.Users.Queries.GetUsers
 {
-    public class GetUserQueryHandler : IRequestHandler<GetUserQuery,List<UserVm>>
+    public class GetUserQueryHandler : IRequestHandler<GetUserQuery,List<UserDto>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
@@ -19,11 +19,13 @@ namespace BSOFT.Application.Users.Queries.GetUsers
             _userRepository = userRepository;
             _mapper = mapper;
         }
-        public async Task<List<UserVm>> Handle(GetUserQuery request, CancellationToken cancellationToken)
+        public async Task<List<UserDto>> Handle(GetUserQuery request, CancellationToken cancellationToken)
         {
             var users = await _userRepository.GetAllUsersAsync();
-            var userList = _mapper.Map<List<UserVm>>(users);
+            var userList = _mapper.Map<List<UserDto>>(users);
             return userList;
         }
     }
 }
+
+

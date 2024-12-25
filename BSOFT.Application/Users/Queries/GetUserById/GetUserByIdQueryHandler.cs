@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BSOFT.Application.Users.Queries.GetUserById
 {
-    public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery,UserVm>
+    public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery,UserDto>
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
@@ -21,10 +21,10 @@ namespace BSOFT.Application.Users.Queries.GetUserById
             _userRepository = userRepository;
             _mapper = mapper;
         }
-        public async Task<UserVm> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+        public async Task<UserDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {
           var user = await _userRepository.GetByIdAsync(request.UserId);
-          return _mapper.Map<UserVm>(user);
+          return _mapper.Map<UserDto>(user);
         }
     }
 }

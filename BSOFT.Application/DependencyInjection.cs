@@ -1,10 +1,9 @@
+// using BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System;
-using BSOFT.Application.Common.Behaviors;
-using BSOFT.Application.Common.Mappings;
 
 
 namespace BSOFT.Application
@@ -17,19 +16,16 @@ namespace BSOFT.Application
 
             // Use a specific AddAutoMapper overload
             services.AddAutoMapper(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
-            services.AddAutoMapper(typeof(UnitProfile).Assembly);
-            services.AddAutoMapper(typeof(CreateUnitProfile).Assembly);
-            services.AddAutoMapper(typeof(UpdateUnitProfile).Assembly);
-            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             // Add MediatR
-            services.AddMediatR(cfg =>
-            {
-                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-                //Validation
-                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            });
+            // services.AddMediatR(cfg =>
+            // {
+            //     cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            //     //Validation
+            //     cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            //     // cfg.RegisterServicesFromAssembly(typeof(CreateRoleEntitlementCommandHandler).Assembly);
+            // });
             return services;
         }
     }
