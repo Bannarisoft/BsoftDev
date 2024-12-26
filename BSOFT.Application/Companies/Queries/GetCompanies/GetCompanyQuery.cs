@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BSOFT.Application.Companies.Queries.GetCompanies
 {
-    public class GetCompanyQuery : IRequest<List<CompanyVm>>
+    public class GetCompanyQuery : IRequest<List<CompanyDTO>>
     {
         
     }

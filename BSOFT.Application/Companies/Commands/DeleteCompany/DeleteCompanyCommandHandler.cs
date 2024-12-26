@@ -20,7 +20,7 @@ namespace BSOFT.Application.Companies.Commands.DeleteCompany
         {
              var Updatecompany = new Company()
             {
-                CoId = request.Id,
+                Id = request.Id,
                 IsActive = request.IsActive 
             };
             return await _companyRepository.DeleteAsync(request.Id,Updatecompany);

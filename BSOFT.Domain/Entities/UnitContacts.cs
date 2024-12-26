@@ -27,7 +27,7 @@ namespace BSOFT.Domain.Entities
         public string PhoneNo { get; set; }
 
   
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         public Unit Unit { get; set; }
     }

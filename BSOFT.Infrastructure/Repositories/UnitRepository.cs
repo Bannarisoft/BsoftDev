@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using BSOFT.Application.Common.Interfaces;
 using BSOFT.Domain.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.HttpResults;
+
 
 namespace BSOFT.Infrastructure.Repositories
 {
@@ -23,43 +23,31 @@ namespace BSOFT.Infrastructure.Repositories
 
         public async Task<Unit> GetByIdAsync(int id)
         {
-            return await _applicationDbContext.Unit.AsNoTracking()
-                .FirstOrDefaultAsync(b => b.Id == id);
+            return await _applicationDbContext.Unit.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
         }
 
-        public async Task<Unit> CreateAsync(Unit unit)
+       public async Task<int> CreateUnitAsync(Unit unit)
+       {
+        _applicationDbContext.Unit.Add(unit);
+        await _applicationDbContext.SaveChangesAsync();
+        return unit.Id;
+    }
+
+       public async Task<UnitAddress> CreateUnitAddressAsync(UnitAddress unitAddress)
+       {
+        _applicationDbContext.UnitAddress.Add(unitAddress);
+        await _applicationDbContext.SaveChangesAsync();
+        return unitAddress;
+       }
+
+        public async Task<UnitContacts> CreateUnitContactsAsync(UnitContacts unitContacts)
         {
-            await _applicationDbContext.Unit.AddAsync(unit);
-            await _applicationDbContext.SaveChangesAsync();
-            return unit;
+        _applicationDbContext.UnitContacts.Add(unitContacts);
+        await _applicationDbContext.SaveChangesAsync();
+        return unitContacts;
         }
 
-        public async Task<int>UpdateAsync(int id, Unit unit)
-        {
-            var existingunit = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.Id == id);
-            if (existingunit != null)
-            {
-                existingunit.UnitName = unit.UnitName;
-                existingunit.ShortName = unit.ShortName;
-  
-
-                existingunit.IsActive = unit.IsActive;
-                _applicationDbContext.Unit.Update(existingunit);
-                return await _applicationDbContext.SaveChangesAsync();
-            }
-            return 0; // No user found
-        }
-
-        public async Task<int> DeleteAsync(int id,Unit unit)
-        {
-            var unitToDelete = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.Id == id);
-            if (unitToDelete != null)
-            {
-                unitToDelete.IsActive = unit.IsActive;
-                return await _applicationDbContext.SaveChangesAsync();
-            }
-            return 0; // No user found
-        }
+      
 
          public async Task<List<Unit>> GetUnit(string searchPattern = null)
         {
@@ -72,5 +60,70 @@ namespace BSOFT.Infrastructure.Repositories
                  })
                  .ToListAsync();
         }
+
+
+        public async Task UpdateUnitAddressAsync(int Id, UnitAddress unitAddress)
+        {
+            var existingUnitAddress = await _applicationDbContext.UnitAddress.FirstOrDefaultAsync(u => u.UnitId == Id);
+            if (existingUnitAddress != null)
+            {
+                existingUnitAddress.CountryId = unitAddress.CountryId;
+                existingUnitAddress.StateId = unitAddress.StateId;
+                existingUnitAddress.CityId = unitAddress.CityId;
+                existingUnitAddress.AddressLine1 = unitAddress.AddressLine1;
+                existingUnitAddress.AddressLine2 = unitAddress.AddressLine2;
+                existingUnitAddress.PinCode = unitAddress.PinCode;
+                existingUnitAddress.ContactNumber = unitAddress.ContactNumber;
+                existingUnitAddress.AlternateNumber = unitAddress.AlternateNumber;
+                await _applicationDbContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateUnitContactsAsync(int Id, UnitContacts unitContacts)
+        {
+             var existingUnitContacts = await _applicationDbContext.UnitContacts.FirstOrDefaultAsync(u => u.UnitId == Id);
+            if (existingUnitContacts != null)
+            {
+                existingUnitContacts.Name = unitContacts.Name;
+                existingUnitContacts.Designation = unitContacts.Designation;
+                existingUnitContacts.Email = unitContacts.Email;
+                existingUnitContacts.PhoneNo = unitContacts.PhoneNo;
+                existingUnitContacts.Remarks = unitContacts.Remarks;
+                await _applicationDbContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateUnitAsync(int Id, Unit unit)
+        {
+       var existingUnit = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.Id == Id);
+        if (existingUnit != null)
+        {
+        existingUnit.UnitName = unit.UnitName;
+        existingUnit.ShortName = unit.ShortName;
+        existingUnit.CompanyId = unit.CompanyId;
+        existingUnit.DivisionId = unit.DivisionId;
+        existingUnit.UnitHeadName = unit.UnitHeadName;
+        existingUnit.CINNO = unit.CINNO;
+        existingUnit.IsActive = unit.IsActive;
+        await _applicationDbContext.SaveChangesAsync();
+        }
+        }
+
+        public async Task DeleteUnitAsync(int Id, Unit unit)
+        {
+            var unitToDelete = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.Id == Id);
+            if (unitToDelete != null)
+            {
+                unitToDelete.IsActive = unit.IsActive;
+                await _applicationDbContext.SaveChangesAsync();
+               
+            }
+          
+        
+           
+        }
+
+
+        
     }
 }

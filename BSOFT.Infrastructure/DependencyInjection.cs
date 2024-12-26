@@ -42,10 +42,14 @@ namespace BSOFT.Infrastructure
                 services.AddScoped<IUserRoleRepository, UserRoleRepository>();
                 
                 services.AddScoped<ICompanyRepository, CompanyRepository>();
+ 				services.AddScoped<ICompanyAddressRepository, CompanyAddressRepository>();
+                services.AddScoped<ICompanyContactRepository, CompanyContactRepository>();
+                 services.AddAutoMapper(typeof(CompanyProfile));
 				services.AddScoped<IUnitRepository, UnitRepository>();
                 services.AddScoped<IEntityRepository,EntityRepository>();
  				services.AddScoped<IDivisionRepository, DivisionRepository>();
                 services.AddScoped<IIPAddressService, IPAddressService>();
+				services.AddTransient<IFileUploadService, FileUploadRepository>();
 
                 return services;
             }

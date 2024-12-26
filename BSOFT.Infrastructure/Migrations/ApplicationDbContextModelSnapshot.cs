@@ -116,6 +116,68 @@ namespace BSOFT.Infrastructure.Migrations
                     b.ToTable("Company", "AppData");
                 });
 
+            modelBuilder.Entity("BSOFT.Domain.Entities.CountryEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(5)")
+                        .HasColumnName("CountryCode");
+
+                    b.Property<string>("CountryName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("CountryName");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("CreatedAt");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("CreatedBy");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("CreatedByName");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(25)")
+                        .HasColumnName("CreatedIP");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("ModifiedAt");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("ModifiedBy");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("ModifiedByName");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(25)")
+                        .HasColumnName("ModifiedIP");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Country", "AppData");
+                });
+
             modelBuilder.Entity("BSOFT.Domain.Entities.Department", b =>
                 {
                     b.Property<int>("Id")
@@ -426,6 +488,11 @@ namespace BSOFT.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CINNO")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("CINNO");
+
                     b.Property<int>("CompanyId")
                         .HasColumnType("int")
                         .HasColumnName("CompanyId");
@@ -499,12 +566,10 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnName("AddressLine1");
 
                     b.Property<string>("AddressLine2")
-                        .IsRequired()
                         .HasColumnType("varchar(250)")
                         .HasColumnName("AddressLine2");
 
                     b.Property<string>("AlternateNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("AlternateNumber");
 
@@ -570,7 +635,6 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnName("PhoneNo");
 
                     b.Property<string>("Remarks")
-                        .IsRequired()
                         .HasColumnType("varchar(250)")
                         .HasColumnName("Remarks");
 

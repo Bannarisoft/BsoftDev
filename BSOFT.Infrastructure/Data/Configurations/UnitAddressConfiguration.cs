@@ -48,8 +48,8 @@ namespace BSOFT.Infrastructure.Data.Configurations
 
         builder.Property(ua => ua.AddressLine2)
             .HasColumnName("AddressLine2")
-            .HasColumnType("varchar(250)")
-            .IsRequired();
+            .HasColumnType("varchar(250)");
+           
 
         builder.Property(ua => ua.PinCode)
             .HasColumnName("PinCode")
@@ -63,8 +63,8 @@ namespace BSOFT.Infrastructure.Data.Configurations
 
         builder.Property(ua => ua.AlternateNumber)
             .HasColumnName("AlternateNumber")
-            .HasColumnType("nvarchar(20)")
-            .IsRequired();
+            .HasColumnType("nvarchar(20)");
+      
 
         builder.HasOne(ua => ua.Unit)
             .WithMany(u => u.UnitAddress)
