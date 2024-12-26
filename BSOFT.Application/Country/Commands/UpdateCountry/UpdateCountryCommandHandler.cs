@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BSOFT.Domain.Common.Interface;
+using BSOFT.Application.Common.Interface;
 using MediatR;
 
 using BSOFT.Domain.Entities;
-using BSOFT.Application.Country.DTO;
+using BSOFT.Application.Country.Queries.GetCountries;
 using AutoMapper;
 
 namespace BSOFT.Application.Country.Commands.Update

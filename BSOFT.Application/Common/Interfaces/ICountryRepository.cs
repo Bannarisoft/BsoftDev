@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BSOFT.Domain.Entities;
 
-namespace BSOFT.Domain.Common.Interface
+namespace BSOFT.Application.Common.Interface
 {
     public interface ICountryRepository
     {

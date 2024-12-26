@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using BSOFT.Application.Country.DTO;
-using BSOFT.Domain.Common.Interface;
+using BSOFT.Application.Country.Queries.GetCountries;
+using BSOFT.Application.Country.Queries.GetCountryById;
+using BSOFT.Application.Common.Interface;
 using Dapper;
 using MediatR;
+using BSOFT.Application.Country.Queries.GetcountryById;
 
 namespace BSOFT.Application.Country.Queries.GetCountryById
 {

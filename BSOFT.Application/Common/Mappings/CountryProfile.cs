@@ -1,6 +1,7 @@
 using AutoMapper;
+using BSOFT.Application.Country.Commands.CreateCountry;
 using BSOFT.Application.Country.Commands;
-using BSOFT.Application.Country.DTO;
+using BSOFT.Application.Country.Queries.GetCountries;
 using BSOFT.Domain.Entities;
 
 namespace BSOFT.Application.Common.Mappings

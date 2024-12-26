@@ -1,4 +1,4 @@
-using BSOFT.Domain.Common.Interface;
+using BSOFT.Application.Common.Interface;
 using BSOFT.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;

@@ -1,12 +1,15 @@
+using BSOFT.Application.Country.Queries.GetCountries;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using BSOFT.Application.Country.DTO;
-using MediatR;
 
-namespace BSOFT.Application.Country.Queries
+namespace BSOFT.Application.Country.Queries.GetcountryById
 {
-    public record GetCountryByIdQuery(int Id) : IRequest<CountryDto>;
-    
+    public class GetCountryByIdQuery : IRequest<CountryDto>
+    {
+        public int Id { get; set; }
+    }
 }
