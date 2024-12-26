@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BSOFT.Domain.Common.Interface;
+using BSOFT.Application.Common.Interface;
 using BSOFT.Domain.Entities;
 using MediatR;
 using static BSOFT.Application.Country.Commands.DeleteCountryCommand;

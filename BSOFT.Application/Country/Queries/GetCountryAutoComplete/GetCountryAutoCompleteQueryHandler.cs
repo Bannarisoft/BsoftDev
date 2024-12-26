@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using BSOFT.Application.Country.DTO;
-using BSOFT.Domain.Common.Interface;
+using BSOFT.Application.Common.Interface;
+using BSOFT.Application.Country.Queries.GetCountries;
+using BSOFT.Application.Country.Queries.GetCountryAutoComplete;
+using AutoMapper;
 using Dapper;
 using MediatR;
 
 namespace BSOFT.Application.Country.Queries.GetCountryAutoComplete
 {
-    public class GetCountryAutoCompleteQueryHandler : IRequestHandler<GetCountryAutoCompleteQuery, List<CountryDto>>
+    public class GetCountryAutoCompleteQueryHandler : IRequestHandler<GetcountryAutoCompleteQuery, List<CountryDto>>
+    
 {
      private readonly IDbConnection _dbConnection;
 
@@ -19,7 +22,7 @@ namespace BSOFT.Application.Country.Queries.GetCountryAutoComplete
         _dbConnection = dbConnection;
     }
 
-    public async Task<List<CountryDto>> Handle(GetCountryAutoCompleteQuery request, CancellationToken cancellationToken)
+    public async Task<List<CountryDto>> Handle(GetcountryAutoCompleteQuery request, CancellationToken cancellationToken)
     {
           var query = @"
             SELECT Id, countryCode, countryName, IsActive

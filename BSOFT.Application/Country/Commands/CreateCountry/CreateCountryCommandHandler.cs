@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using BSOFT.Application.Country.DTO;
-using BSOFT.Domain.Common.Interface;
+using BSOFT.Application.Country.Queries.GetCountries;
 using BSOFT.Domain.Entities;
+using BSOFT.Application.Common.Interfaces;
+using AutoMapper;
 using MediatR;
+using BSOFT.Application.Common.Interface;
 
 namespace BSOFT.Application.Country.Commands.CreateCountry
 {    
@@ -27,17 +24,6 @@ namespace BSOFT.Application.Country.Commands.CreateCountry
         {
          // Map the CreateCountryCommand to the Country entity
              var countryEntity = _mapper.Map<Countries>(request);
-
-            // Save the country entity to the repository
-          /*      await _countryRepository.CreateAsync(countryEntity);
-
-            // Map the saved country entity to CountryDto
-            var countryDto = _mapper.Map<CountryDto>(countryEntity);
-
-            // Return the CountryDto
-            return countryDto;
- */
-
             var result=await _countryRepository.CreateAsync(countryEntity);
             return _mapper.Map<CountryDto>(result);
         }

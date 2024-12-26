@@ -36,6 +36,11 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<CompanyAddress> companyAddresses { get; set; }
         public DbSet<CompanyContact> CompanyContacts { get; set; }
         public DbSet<Division> Divisions { get; set; }
+        public DbSet<Modules> Modules { get; set; }
+        public DbSet<Menu> Menus { get; set; }
+        public DbSet<RoleEntitlement> RoleEntitlements { get; set; }
+        public DbSet<Countries> Countries { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,36 +49,18 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UnitConfiguration());
             modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
             modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleEntitlementConfigurations());
+            modelBuilder.ApplyConfiguration(new MenuConfiguration());
+            modelBuilder.ApplyConfiguration(new ModulesConfiguration());
+            modelBuilder.ApplyConfiguration(new CountryConfiguration());
+            modelBuilder.ApplyConfiguration(new UnitConfiguration());
+            modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
+            modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
+            modelBuilder.ApplyConfiguration(new CompanyConfiguration());
+            modelBuilder.ApplyConfiguration(new CompanyAddressConfiguration());
+            modelBuilder.ApplyConfiguration(new CompanyContactConfiguration());
 
-        modelBuilder.ApplyConfiguration(new UnitConfiguration());
-        modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
-        modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
-        modelBuilder.ApplyConfiguration(new CompanyConfiguration());
-        modelBuilder.ApplyConfiguration(new CompanyAddressConfiguration());
-        modelBuilder.ApplyConfiguration(new CompanyContactConfiguration());
-            // User entity configuration
-            modelBuilder.Entity<User>()
-                .HasKey(u => u.UserId); // Primary key
-
-            // Department entity configuration
-            modelBuilder.Entity<Department>()
-                .HasKey(d => d.DeptId); // Primary key
-
-            // RoleEntitlement entity configuration
-            modelBuilder.Entity<RoleEntitlement>()
-            .HasMany(re => re.MenuPermissions)
-            .WithOne(mp => mp.RoleEntitlement)
-            .HasForeignKey(mp => mp.RoleEntitlementId);
-            
-            modelBuilder.Entity<RoleEntitlement>()
-            .Property(re => re.RoleId)
-            .IsRequired();
-
-            modelBuilder.Entity<MenuPermission>()
-            .HasKey(mp => mp.MenuPermissionId); // Ensure primary key is defined
-
-
-    
+               
             base.OnModelCreating(modelBuilder);
         }
          public override int SaveChanges()

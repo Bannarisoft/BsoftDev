@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BSOFT.Application.Country.Commands;
-using BSOFT.Application.Country.Queries;
+using BSOFT.Application.Country.Commands.CreateCountry;
+using BSOFT.Application.Country.Queries.GetCountries;
+using BSOFT.Application.Country.Queries.GetCountryAutoComplete;
+using BSOFT.Application.Country.Queries.GetcountryById;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -31,9 +34,9 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpGet("{countryid}")]
-        public async Task<IActionResult> GetByIdAsync(int countryid)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var country = await Mediator.Send(new GetCountryByIdQuery(countryid)); 
+            var country = await Mediator.Send(new GetCountryByIdQuery() {Id=id}); 
             if(country == null)
             {
                 BadRequest("Invalid CountryID");
@@ -85,9 +88,11 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetCountry([FromQuery] string searchPattern)
         {
            
-            var countries = await Mediator.Send(new GetCountryAutoCompleteQuery(searchPattern)); // Pass `searchPattern` to the constructor
+            var countries = await Mediator.Send(new GetcountryAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
             return Ok(countries);
         }
+
+
      
     }
 }

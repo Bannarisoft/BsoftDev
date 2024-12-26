@@ -8,7 +8,7 @@ using BSOFT.Application.Validation;
 using System.Security.Cryptography.X509Certificates;
 using BSOFT.Application.Country.Commands;
 
-namespace BSOFT.Application.Units.Commands.CreateUnit
+namespace BSOFT.Application.Country.Commands.CreateCountry
 {
     public class CreateCountryCommandValidator : AbstractValidator<CreateCountryCommand>
     {
@@ -25,9 +25,7 @@ namespace BSOFT.Application.Units.Commands.CreateUnit
             int maxLength ;
              foreach (var rule in _validationRules )
             {
-                //string propertyName = rule.Property;
-                //string errorMessage = $"{propertyName} {rule.Error}"; 
-                switch (rule.Rule)
+                   switch (rule.Rule)
                 {
                     case "NotEmpty":
                         RuleFor(x => x.CountryName)
@@ -41,11 +39,11 @@ namespace BSOFT.Application.Units.Commands.CreateUnit
                         maxLength=50;
                         RuleFor(x =>x.CountryName)
                             .MaximumLength(maxLength) // or some other length from rule.Length                
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitName)} {rule.Error} {maxLength}");
+                            .WithMessage($"{nameof(CreateCountryCommand.CountryName)} {rule.Error} {maxLength}");
                          maxLength=6;
                          RuleFor(x => x.CountryCode)
                             .MaximumLength(maxLength) // or some other length from rule.Length                
-                            .WithMessage($"{nameof(CreateUnitCommand.ShortName)} {rule.Error} {maxLength}");                          
+                            .WithMessage($"{nameof(CreateCountryCommand.CountryCode)} {rule.Error} {maxLength}");                          
                         break;                    
                    default:
                     // Log a warning or handle unknown rule

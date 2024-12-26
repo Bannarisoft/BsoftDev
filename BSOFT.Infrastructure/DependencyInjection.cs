@@ -10,7 +10,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BSOFT.Application.Common.Mappings;
-
+using BSOFT.Application.Common.Interface;
+using System.Data;
+using Microsoft.Data.SqlClient;
 
 namespace BSOFT.Infrastructure
 {
@@ -28,24 +30,34 @@ namespace BSOFT.Infrastructure
                 services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
+                // Register IDbConnection if required
+                services.AddTransient<IDbConnection>(sp =>
+                {
+                    return new SqlConnection(connectionString);
+                });
+
                 services.AddScoped<IUserRepository, UserRepository>();
                 services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
-                // services.AddTransient<IRoleEntitlementRepository, RoleEntitlementsRepository>();
-                services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile));
-
-
+                services.AddScoped<IRoleEntitlementRepository, RoleEntitlementRepository>();
+                services.AddScoped<IModuleRepository, ModuleRepository>();
                 services.AddScoped<IDepartmentRepository, DepartmentRepository>();
                 services.AddScoped<IUserRoleRepository, UserRoleRepository>();
-                
                 services.AddScoped<ICompanyRepository, CompanyRepository>();
  				services.AddScoped<ICompanyAddressRepository, CompanyAddressRepository>();
                 services.AddScoped<ICompanyContactRepository, CompanyContactRepository>();
-                 services.AddAutoMapper(typeof(CompanyProfile));
-				services.AddScoped<IUnitRepository, UnitRepository>();
+                services.AddScoped<IUnitRepository, UnitRepository>();
                 services.AddScoped<IEntityRepository,EntityRepository>();
  				services.AddScoped<IDivisionRepository, DivisionRepository>();
                 services.AddScoped<IIPAddressService, IPAddressService>();
 				services.AddTransient<IFileUploadService, FileUploadRepository>();
+                services.AddScoped<ICountryRepository, CountryRepository>();
+
+
+                services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile));
+                services.AddAutoMapper(typeof(RoleEntitlementMappingProfile));
+                services.AddAutoMapper(typeof(ModuleProfile));
+                services.AddAutoMapper(typeof(CompanyProfile));
+				
 
                 return services;
             }

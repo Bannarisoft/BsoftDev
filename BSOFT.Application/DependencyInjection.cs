@@ -19,13 +19,13 @@ namespace BSOFT.Application
 
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             // Add MediatR
-            // services.AddMediatR(cfg =>
-            // {
-            //     cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            //     //Validation
-            //     cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            //     // cfg.RegisterServicesFromAssembly(typeof(CreateRoleEntitlementCommandHandler).Assembly);
-            // });
+            services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                //Validation
+                // cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+                // cfg.RegisterServicesFromAssembly(typeof(CreateRoleEntitlementCommandHandler).Assembly);
+            });
             return services;
         }
     }
