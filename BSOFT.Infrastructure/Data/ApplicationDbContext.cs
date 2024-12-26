@@ -34,6 +34,9 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<UserRole> UserRole { get; set; } 
         public DbSet<Company> Companies { get; set; }
         public DbSet<Division> Divisions { get; set; }
+        public DbSet<Modules> Modules { get; set; }
+        public DbSet<Menu> Menus { get; set; }
+        public DbSet<RoleEntitlement> RoleEntitlements { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -42,6 +45,10 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UnitConfiguration());
             modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
             modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleEntitlementConfigurations());
+            modelBuilder.ApplyConfiguration(new MenuConfiguration());
+            modelBuilder.ApplyConfiguration(new ModulesConfiguration());
+
 
                                                                      
             base.OnModelCreating(modelBuilder);

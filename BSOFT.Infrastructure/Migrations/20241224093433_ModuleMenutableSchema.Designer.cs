@@ -4,6 +4,7 @@ using BSOFT.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241224093433_ModuleMenutableSchema")]
+    partial class ModuleMenutableSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -297,12 +300,9 @@ namespace BSOFT.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("MenuName")
                         .IsRequired()
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ModuleId")
                         .HasColumnType("int");
@@ -311,7 +311,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("Menus", "AppData");
+                    b.ToTable("Menus");
                 });
 
             modelBuilder.Entity("BSOFT.Domain.Entities.Modules", b =>
@@ -322,17 +322,13 @@ namespace BSOFT.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ModuleName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Modules", "AppData");
+                    b.ToTable("Modules");
                 });
 
             modelBuilder.Entity("BSOFT.Domain.Entities.RoleEntitlement", b =>

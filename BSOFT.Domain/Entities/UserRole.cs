@@ -18,8 +18,7 @@ namespace BSOFT.Domain.Entities
         public int CompanyId { get; set; }
         public byte  IsActive { get; set; }
        
-        // public List<User> Users { get; set; } = new List<User>();
-        // public List<RoleEntitlement> RoleEntitlements { get; set; } = new List<RoleEntitlement>();            
+        public ICollection<RoleEntitlement> RoleEntitlements { get; set; } = new List<RoleEntitlement>();       
 
     }
 }

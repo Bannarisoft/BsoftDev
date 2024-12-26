@@ -30,8 +30,12 @@ namespace BSOFT.Infrastructure
 
                 services.AddScoped<IUserRepository, UserRepository>();
                 services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
-                // services.AddTransient<IRoleEntitlementRepository, RoleEntitlementsRepository>();
+                services.AddScoped<IRoleEntitlementRepository, RoleEntitlementRepository>();
+                services.AddScoped<IModuleRepository, ModuleRepository>();
                 services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile));
+                services.AddAutoMapper(typeof(RoleEntitlementMappingProfile));
+                services.AddAutoMapper(typeof(ModuleProfile));
+
 
 
                 services.AddScoped<IDepartmentRepository, DepartmentRepository>();
