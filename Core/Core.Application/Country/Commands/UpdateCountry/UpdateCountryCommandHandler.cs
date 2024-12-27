@@ -7,6 +7,7 @@ using MediatR;
 using Core.Domain.Entities;
 using Core.Application.Country.Queries.GetCountries;
 using AutoMapper;
+using Core.Application.Country.Commands.UpdateCountry;
 
 namespace Core.Application.Country.Commands.Update
 {    

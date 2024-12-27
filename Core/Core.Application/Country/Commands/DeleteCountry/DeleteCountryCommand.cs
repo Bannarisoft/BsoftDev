@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Core.Application.Country.Commands
+namespace Core.Application.Country.Commands.DeleteCountry
 {
        public class DeleteCountryCommand : IRequest<int>
        {
