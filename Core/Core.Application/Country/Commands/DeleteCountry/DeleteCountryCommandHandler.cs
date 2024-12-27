@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interface;
+
 using Core.Domain.Entities;
 using MediatR;
 
-namespace Core.Application.Country.Commands.Delete
+namespace Core.Application.Country.Commands.DeleteCountry
 {
   public class DeleteCountryCommandHandler : IRequestHandler<DeleteCountryCommand, int>
     {

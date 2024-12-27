@@ -10,7 +10,7 @@ namespace Core.Domain.Common
 {
     public abstract class BaseEntity
     {
-        public byte  IsActive { get; set; }
+        public byte  IsActive { get; set; }=1;
         public int CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
       

@@ -3,6 +3,7 @@ using Core.Application.Country.Commands.CreateCountry;
 using Core.Application.Country.Commands;
 using Core.Application.Country.Queries.GetCountries;
 using Core.Domain.Entities;
+using Core.Application.Country.Commands.UpdateCountry;
 
 namespace Core.Application.Common.Mappings
 {    
