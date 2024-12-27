@@ -47,7 +47,7 @@ namespace BSOFT.API.Controllers
 
     [HttpDelete]
     [Route("Delete/{moduleId}")]
-    public async Task<IActionResult> SoftDeleteModule(int moduleId)
+    public async Task<IActionResult> DeleteModule(int moduleId)
     {
         await Mediator.Send(new DeleteModuleCommand { ModuleId = moduleId });
         return Ok(new { Message = "Module deleted successfully." });

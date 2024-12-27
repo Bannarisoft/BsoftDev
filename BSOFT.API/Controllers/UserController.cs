@@ -48,43 +48,53 @@ namespace BSOFT.API.Controllers
             var createdUser = await Mediator.Send(command);
             return Ok(new { Message = "User created successfully.", userid = createdUser.Id });
         }
-        // public async Task<IActionResult> CreateAsync(CreateUserCommand command)
+        [HttpPut]
+        [Route("Update")]
+        public async Task<IActionResult> UpdateAsync([FromBody] UpdateUserCommand command)
+        {
+            await Mediator.Send(command);
+            return Ok(new { Message = "User updated successfully." });
+        }
+        
+        [HttpDelete]
+        [Route("Delete/{userid}")]
+        public async Task<IActionResult> DeleteAsync(int userid)
+        {
+            await Mediator.Send(new DeleteUserCommand { UserId = userid });
+            return Ok(new { Message = "User deleted successfully." });
+        }
+
+        // [HttpPut("{userid}")]
+        // public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
         // {
-        //     var createdUser = await Mediator.Send(command);
-        //     return CreatedAtAction(nameof(GetByIdAsync),new { Message = "User created successfully.", userid = createdUser.Id }, createdUser);
+        //     if (userid <= 0)
+        //     {
+        //         return BadRequest("Invalid user ID");
+        //     }
+
+        //     if (userid != command.UserId)
+        //     {
+        //         return BadRequest();
+        //     }
+        //     await Mediator.Send(command);
+        //     return NoContent();
         // }
 
-        [HttpPut("{userid}")]
-        public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
-        {
-            if (userid <= 0)
-            {
-                return BadRequest("Invalid user ID");
-            }
+        // [HttpDelete("{userid}")]
+        // public async Task<IActionResult> DeleteAsync(int userid, DeleteUserCommand command)
+        // {
+        //     if (userid <= 0)
+        //     {
+        //         return BadRequest("Invalid user ID");
+        //     }
 
-            if (userid != command.UserId)
-            {
-                return BadRequest();
-            }
-            await Mediator.Send(command);
-            return NoContent();
-        }
+        //     if (userid != command.UserId)
+        //     {
+        //         return BadRequest();
+        //     }
+        //     await Mediator.Send(command);
 
-        [HttpDelete("{userid}")]
-        public async Task<IActionResult> DeleteAsync(int userid, DeleteUserCommand command)
-        {
-            if (userid <= 0)
-            {
-                return BadRequest("Invalid user ID");
-            }
-
-            if (userid != command.UserId)
-            {
-                return BadRequest();
-            }
-            await Mediator.Send(command);
-
-            return NoContent();
-        }
+        //     return NoContent();
+        // }
     }
 }
