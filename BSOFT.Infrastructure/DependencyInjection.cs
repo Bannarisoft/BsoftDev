@@ -2,17 +2,18 @@ using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using BSOFT.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces;
 using BSOFT.Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BSOFT.Application.Common.Mappings;
-using BSOFT.Application.Common.Interface;
+using Core.Application.Common.Mappings;
+using Core.Application.Common.Interface;
 using System.Data;
 using Microsoft.Data.SqlClient;
+
 
 namespace BSOFT.Infrastructure
 {
@@ -58,6 +59,12 @@ namespace BSOFT.Infrastructure
                 services.AddAutoMapper(typeof(ModuleProfile));
                 services.AddAutoMapper(typeof(CompanyProfile));
 				
+                // Add FluentValidation to services
+                // services.AddControllers()
+                //     .AddFluentValidation(config =>
+                //     {
+                //         config.RegisterValidatorsFromAssemblyContaining<CreateCountryCommandValidator>();
+                //     });
 
                 return services;
             }

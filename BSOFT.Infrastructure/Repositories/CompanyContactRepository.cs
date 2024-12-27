@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BSOFT.Infrastructure.Data;
-using BSOFT.Application.Common.Interfaces;
-using BSOFT.Domain.Entities;
+using Core.Application.Common.Interfaces;
+using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.JsonPatch;
 

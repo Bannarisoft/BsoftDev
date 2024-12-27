@@ -3,9 +3,9 @@ using MediatR;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using BSOFT.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
-using BSOFT.Application.RoleEntitlements.Commands.UpdateRoleRntitlement;
-using BSOFT.Application.RoleEntitlements.Queries.GetRoleEntitlements;
+using Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
+using Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement;
+using Core.Application.RoleEntitlements.Queries.GetRoleEntitlements;
 
 using System;
 using System.Collections.Generic;

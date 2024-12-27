@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
-using BSOFT.Application.Common.Interfaces;
-using BSOFT.Domain.Entities;
+using Core.Application.Common.Interfaces;
+using Core.Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 

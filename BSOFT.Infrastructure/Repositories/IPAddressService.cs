@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BSOFT.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces;
 using System.Net;
 
 namespace BSOFT.Infrastructure.Repositories

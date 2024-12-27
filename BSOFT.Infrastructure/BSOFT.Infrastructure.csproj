@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\BSOFT.Domain\BSOFT.Domain.csproj" />
-    <ProjectReference Include="..\BSOFT.Application\BSOFT.Application.csproj" />
+    <ProjectReference Include="..\Core\Core.Domain\Core.Domain.csproj" />           
+    <ProjectReference Include="..\Core\Core.Application\Core.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="9.0.0" />

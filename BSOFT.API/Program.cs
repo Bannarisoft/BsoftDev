@@ -1,7 +1,8 @@
 using MediatR;
 using BSOFT.API.Behaviors;
-using BSOFT.Application;
+using Core.Application;
 using BSOFT.Infrastructure;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +13,6 @@ if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
     throw new InvalidOperationException("Jwt:Key must be at least 32 characters long.");
 }
 
-// Add services to the container.
-
 //Validation
 builder.Services.AddMediatR(cfg =>
 {
@@ -21,21 +20,23 @@ builder.Services.AddMediatR(cfg =>
     cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 });
 
+
+// Add services to the container.
+
 //Add layer dependency 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers();
+   
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
 var app = builder.Build();
-
-
-       
+    
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
