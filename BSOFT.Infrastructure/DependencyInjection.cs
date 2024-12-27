@@ -31,7 +31,7 @@ namespace BSOFT.Infrastructure
                 services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-                // Register IDbConnection if required
+                // Register IDbConnection for Dapper
                 services.AddTransient<IDbConnection>(sp =>
                 {
                     return new SqlConnection(connectionString);
@@ -58,13 +58,6 @@ namespace BSOFT.Infrastructure
                 services.AddAutoMapper(typeof(RoleEntitlementMappingProfile));
                 services.AddAutoMapper(typeof(ModuleProfile));
                 services.AddAutoMapper(typeof(CompanyProfile));
-				
-                // Add FluentValidation to services
-                // services.AddControllers()
-                //     .AddFluentValidation(config =>
-                //     {
-                //         config.RegisterValidatorsFromAssemblyContaining<CreateCountryCommandValidator>();
-                //     });
 
                 return services;
             }
