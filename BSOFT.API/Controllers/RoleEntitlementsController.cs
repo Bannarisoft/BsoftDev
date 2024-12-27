@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using MediatR;
+using BSOFT.Infrastructure.Data;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +19,35 @@ namespace BSOFT.API.Controllers
 [Route("api/[controller]")]
 public class RoleEntitlementsController : ApiControllerBase
 {
-    public RoleEntitlementsController(ISender mediator) : base(mediator)
-    {
-    }
+    // public RoleEntitlementsController(ISender mediator) : base(mediator)
+    // {
+    // }
+
+    private readonly IValidator<CreateRoleEntitlementCommand> _createRoleEntitlementCommandValidator;
+         private readonly IValidator<UpdateRoleEntitlementCommand> _updateRoleEntitlementCommandValidator;
+         private readonly ApplicationDbContext _dbContext;
+         
+       public RoleEntitlementsController(ISender mediator, 
+                             IValidator<CreateRoleEntitlementCommand> createRoleEntitlementCommandValidator, 
+                             IValidator<UpdateRoleEntitlementCommand> updateRoleEntitlementCommandValidator, 
+                             ApplicationDbContext dbContext) 
+         : base(mediator)
+        {        
+            _createRoleEntitlementCommandValidator = createRoleEntitlementCommandValidator;
+            _updateRoleEntitlementCommandValidator = updateRoleEntitlementCommandValidator;    
+            _dbContext = dbContext;  
+             
+        }
 
     [HttpPost]
     public async Task<IActionResult> CreateRoleEntitlement(CreateRoleEntitlementCommand command)
     {
-        Console.WriteLine($"Request Payload: {JsonConvert.SerializeObject(command)}");
+        var validationResult = await _createRoleEntitlementCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+        return BadRequest(validationResult.Errors);
+        }
+
         var result = await Mediator.Send(command);
         return Ok(new { Message = "Role Entitlement created successfully.", CreatedCount = result });
     }
@@ -33,6 +55,13 @@ public class RoleEntitlementsController : ApiControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateRoleEntitlement(UpdateRoleEntitlementCommand command)
     {
+        var validationResult = await _updateRoleEntitlementCommandValidator.ValidateAsync(command);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+
         try
         {
             var result = await Mediator.Send(command);
