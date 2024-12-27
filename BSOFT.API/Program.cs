@@ -3,6 +3,12 @@ using BSOFT.API.Behaviors;
 using Core.Application;
 using BSOFT.Infrastructure;
 using FluentValidation.AspNetCore;
+using FluentValidation;
+using Core.Application.Country.Commands.CreateCountry;
+using BSOFT.API.Validation.Common.Country;
+using BSOFT.API.Validation.Common;
+using Core.Application.Country.Commands.UpdateCountry;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +26,10 @@ builder.Services.AddMediatR(cfg =>
     cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 });
 
-
+//FLuent Validation
+builder.Services.AddScoped<MaxLengthProvider>();
+builder.Services.AddScoped<IValidator<CreateCountryCommand>, CreateCountryCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateCountryCommand>, UpdateCountryCommandValidator>();
 // Add services to the container.
 
 //Add layer dependency 
