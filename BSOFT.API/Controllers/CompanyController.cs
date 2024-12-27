@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using BSOFT.Application.Companies.Queries.GetCompanies;
-using BSOFT.Application.Companies.Commands.CreateCompany;
-using BSOFT.Application.Companies.Queries.GetCompanyById;
-using BSOFT.Application.Companies.Commands.UpdateCompany;
-using BSOFT.Application.Companies.Commands.DeleteCompany;
+using Core.Application.Companies.Queries.GetCompanies;
+using Core.Application.Companies.Commands.CreateCompany;
+using Core.Application.Companies.Queries.GetCompanyById;
+using Core.Application.Companies.Commands.UpdateCompany;
+using Core.Application.Companies.Commands.DeleteCompany;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-using BSOFT.Application.Companies.Queries.GetCompanyAutoComplete;
-using BSOFT.Application.Common.Interfaces;
+using Core.Application.Companies.Queries.GetCompanyAutoComplete;
+using Core.Application.Common.Interfaces;
 using System.Text.Json;
 
 namespace BSOFT.API.Controllers

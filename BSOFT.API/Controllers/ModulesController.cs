@@ -1,8 +1,7 @@
 using MediatR;
-using BSOFT.Application.Modules.Commands.DeleteModule;
-using BSOFT.Application.Modules.Commands.UpdateModule;
-using BSOFT.Application.Modules.Commands.CreateModule;
-using BSOFT.Application.Modules.Queries.GetModules;
+using Core.Application.Modules.Commands.UpdateModule;
+using Core.Application.Modules.Commands.CreateModule;
+using Core.Application.Modules.Queries.GetModules;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BSOFT.Application.Modules.Commands.DeleteModule;
 
 namespace BSOFT.API.Controllers
 {

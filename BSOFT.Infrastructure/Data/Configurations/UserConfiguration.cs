@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using BSOFT.Domain.Entities;
+using Core.Domain.Entities;
 
 namespace BSOFT.Infrastructure.Data.Configurations
 {

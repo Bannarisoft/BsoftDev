@@ -1,0 +1,30 @@
+using Core.Application.Common.Interfaces;
+using Core.Domain.Entities;
+using MediatR;
+using AutoMapper;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Core.Application.Users.Commands.UpdateUser
+{
+    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, int>
+    {
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
+
+        public UpdateUserCommandHandler(IUserRepository userRepository, IMapper mapper)
+        {
+            _userRepository = userRepository;
+            _mapper = mapper;
+        }
+
+        public async Task<int> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+        {
+            // Use AutoMapper to map UpdateUserCommand to User entity
+            var updateUserEntity = _mapper.Map<User>(request);
+
+            // Update the user in the repository
+            return await _userRepository.UpdateAsync(request.UserId, updateUserEntity);
+         }
+    }
+}

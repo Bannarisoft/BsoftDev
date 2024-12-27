@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System.IO;
-using BSOFT.Domain.Entities;
+using Core.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +10,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using BSOFT.Application.Common.Interfaces;
-using BSOFT.Domain.Common;
+using Core.Application.Common.Interfaces;
+using Core.Domain.Common;
 using BSOFT.Infrastructure.Data.Configurations;
 
 namespace BSOFT.Infrastructure.Data

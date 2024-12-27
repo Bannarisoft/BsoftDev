@@ -1,11 +1,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using BSOFT.Application.Users.Queries.GetUsers;
-using BSOFT.Application.Users.Queries.GetUserById;
-using BSOFT.Application.Users.Commands.CreateUser;
-using BSOFT.Application.Users.Commands.UpdateUser;
-using BSOFT.Application.Users.Commands.DeleteUser;
+using Core.Application.Users.Queries.GetUsers;
+using Core.Application.Users.Queries.GetUserById;
+using Core.Application.Users.Commands.CreateUser;
+using Core.Application.Users.Commands.UpdateUser;
+using Core.Application.Users.Commands.DeleteUser;
 
 namespace BSOFT.API.Controllers
 {
@@ -42,11 +42,17 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync(CreateUserCommand command)
+        [Route("Create")]
+        public async Task<IActionResult> CreateAsync([FromBody] CreateUserCommand command)
         {
             var createdUser = await Mediator.Send(command);
-            return CreatedAtAction(nameof(GetByIdAsync), new { userid = createdUser.Id }, createdUser);
+            return Ok(new { Message = "User created successfully.", userid = createdUser.Id });
         }
+        // public async Task<IActionResult> CreateAsync(CreateUserCommand command)
+        // {
+        //     var createdUser = await Mediator.Send(command);
+        //     return CreatedAtAction(nameof(GetByIdAsync),new { Message = "User created successfully.", userid = createdUser.Id }, createdUser);
+        // }
 
         [HttpPut("{userid}")]
         public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
-using BSOFT.Application.Common.Interfaces;
-using BSOFT.Domain.Entities;
+using Core.Application.Common.Interfaces;
+using Core.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,35 +11,35 @@ namespace BSOFT.Infrastructure.Repositories
 {
     public class ModuleRepository : IModuleRepository
     {
-    private readonly ApplicationDbContext _context;
+    private readonly ApplicationDbContext _applicationDbContext;
 
-    public ModuleRepository(ApplicationDbContext context)
+    public ModuleRepository(ApplicationDbContext applicationDbContext)
     {
-        _context = context;
+        _applicationDbContext = applicationDbContext;
     }
      public async Task<Modules> GetModuleByIdAsync(int id)
     {
-        return await _context.Modules.Include(m => m.Menus).FirstOrDefaultAsync(m => m.Id == id);
+        return await _applicationDbContext.Modules.Include(m => m.Menus).FirstOrDefaultAsync(m => m.Id == id);
     }
 
     public async Task<List<Modules>> GetAllModulesAsync()
     {
-        return await _context.Modules.Include(m => m.Menus).ToListAsync();
+        return await _applicationDbContext.Modules.Include(m => m.Menus).ToListAsync();
     }
 
     public async Task AddModuleAsync(Modules module)
     {
-        await _context.Modules.AddAsync(module);
+        await _applicationDbContext.Modules.AddAsync(module);
     }
 
     public async Task SaveChangesAsync()
     {
-        await _context.SaveChangesAsync();
+        await _applicationDbContext.SaveChangesAsync();
     }
 
     public async Task UpdateModuleAsync(Modules module)
     {
-        var existingModule = await _context.Modules.Include(m => m.Menus).FirstOrDefaultAsync(m => m.Id == module.Id);
+        var existingModule = await _applicationDbContext.Modules.Include(m => m.Menus).FirstOrDefaultAsync(m => m.Id == module.Id);
 
         if (existingModule != null)
         {
@@ -59,7 +59,7 @@ namespace BSOFT.Infrastructure.Repositories
 
     public async Task DeleteModuleAsync(int moduleId)
     {
-        var module = await _context.Modules.Include(m => m.Menus).FirstOrDefaultAsync(m => m.Id == moduleId);
+        var module = await _applicationDbContext.Modules.Include(m => m.Menus).FirstOrDefaultAsync(m => m.Id == moduleId);
 
         if (module != null)
         {
