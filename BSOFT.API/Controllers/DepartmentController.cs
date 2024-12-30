@@ -1,14 +1,14 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using BSOFT.Application.Departments.Queries.GetDepartments;
-using BSOFT.Application.Departments.Queries.GetDepartmentById;
-using BSOFT.Application.Departments.Commands.CreateDepartment;
-using BSOFT.Application.Departments.Commands.UpdateDepartment;
-using BSOFT.Application.Departments.Commands.DeleteDepartment;
-using BSOFT.Application.Departments.Queries.GetDepartmentAutoComplete;
-using BSOFT.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
-using BSOFT.Application.Common.Interfaces;
+using Core.Application.Departments.Queries.GetDepartments;
+using Core.Application.Departments.Queries.GetDepartmentById;
+using Core.Application.Departments.Commands.CreateDepartment;
+using Core.Application.Departments.Commands.UpdateDepartment;
+using Core.Application.Departments.Commands.DeleteDepartment;
+using Core.Application.Departments.Queries.GetDepartmentAutoComplete;
+using Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
+using Core.Application.Common.Interfaces;
 
 namespace BSOFT.API.Controllers
 {

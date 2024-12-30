@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System.IO;
-using BSOFT.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces;
 using BSOFT.Infrastructure.Repositories;
 
 namespace BSOFT.Infrastructure

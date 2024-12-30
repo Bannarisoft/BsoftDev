@@ -1,16 +1,16 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using BSOFT.Application.Units.Queries.GetUnits;
-using BSOFT.Application.Units.Queries.GetUnitById;
-using BSOFT.Application.Units.Commands.CreateUnit;
-using BSOFT.Application.Units.Commands.DeleteUnit;
-using BSOFT.Application.Units.Commands.UpdateUnit;
-using BSOFT.Application.Common.Interfaces;
+using Core.Application.Units.Queries.GetUnits;
+using Core.Application.Units.Queries.GetUnitById;
+using Core.Application.Units.Commands.CreateUnit;
+using Core.Application.Units.Commands.DeleteUnit;
+using Core.Application.Units.Commands.UpdateUnit;
+using Core.Application.Common.Interfaces;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using BSOFT.Application.Units.Queries.GetUnitAutoComplete;
+using Core.Application.Units.Queries.GetUnitAutoComplete;
 
 namespace BSOFT.API.Controllers
 {

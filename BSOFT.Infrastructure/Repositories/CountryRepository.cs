@@ -1,5 +1,5 @@
-using BSOFT.Domain.Common.Interface;
-using BSOFT.Domain.Entities;
+using Core.Application.Common.Interface;
+using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 

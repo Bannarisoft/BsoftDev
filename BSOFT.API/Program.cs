@@ -1,7 +1,23 @@
 using MediatR;
-using BSOFT.API.Behaviors;
-using BSOFT.Application;
+using Core.Application;
 using BSOFT.Infrastructure;
+using FluentValidation.AspNetCore;
+using FluentValidation;
+using Core.Application.Country.Commands.CreateCountry;
+using BSOFT.API.Validation.Common.Country;
+using BSOFT.API.Validation.Common;
+using Core.Application.Country.Commands.UpdateCountry;
+using BSOFT.API.Validation.Common.Users;
+using Core.Application.Users.Commands.CreateUser;
+using Core.Application.Users.Commands.UpdateUser;
+using Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
+using Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement;
+using BSOFT.API.Validation.Common.RoleEntitlements;
+using Core.Application.Modules.Commands.CreateModule;
+using Core.Application.Modules.Commands.UpdateModule;
+using BSOFT.API.Validation.Common.Module;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,14 +28,26 @@ if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
     throw new InvalidOperationException("Jwt:Key must be at least 32 characters long.");
 }
 
-// Add services to the container.
+// //Validation
+// builder.Services.AddMediatR(cfg =>
+// {
+//     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+//     cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+// });
 
-//Validation
-builder.Services.AddMediatR(cfg =>
-{
-    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
-    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-});
+//FLuent Validation
+builder.Services.AddScoped<MaxLengthProvider>();
+builder.Services.AddScoped<IValidator<CreateCountryCommand>, CreateCountryCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateCountryCommand>, UpdateCountryCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateRoleEntitlementCommand>, CreateRoleEntitlementCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateRoleEntitlementCommand>, UpdateRoleEntitlementCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateModuleCommand>, CreateModuleCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateModuleCommand>, UpdateModuleCommandValidator>();
+
+
+// Add services to the container.
 
 //Add layer dependency 
 builder.Services.AddApplicationServices();
@@ -27,15 +55,14 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers();
+   
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
 var app = builder.Build();
-
-
-       
+    
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

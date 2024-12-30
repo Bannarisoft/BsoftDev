@@ -5,6 +5,7 @@
     },
     {
         "rule": "Email",      
+        "pattern": "^[\\w-\\.]+@[\\w-]+\\.[a-zA-Z]{2,}$", 
         "error": "Invalid email address format."
     } , 
     {
@@ -25,15 +26,22 @@
         "error": " must be in the correct format (e.g., '22AAAAA1234A1Z5')."
     },
     {
-        "Rule": "AlphabeticOnly",    
+        "Rule": "AlphabeticOnly", 
+        "pattern": "^[A-Za-z]+$",        
         "Error": " must contain only alphabetic characters."
     },
     {
         "Rule": "NumericOnly", 
+        "pattern": "^[0-9]{10}$",
         "Error": " must contain only numeric values."
     },
     {
         "rule": "ByteValue",
         "error": " must be either 0 or 1."
+    },
+    {
+        "rule": "MobileNumber",  
+        "pattern": "^[0-9]{10}$", 
+        "error": " Mobile number must be exactly 10 digits."
     }
 ]

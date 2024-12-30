@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
-using BSOFT.Application.Common.Interfaces;
-using BSOFT.Domain.Entities;
+using Core.Application.Common.Interfaces;
+using Core.Domain.Entities;
 
 namespace BSOFT.Infrastructure.Repositories
 {

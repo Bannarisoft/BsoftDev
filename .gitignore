@@ -8,3 +8,7 @@
 /BSOFT.Infrastructure/bin
 
 .fake
+/Core/Core.Application/obj
+/Core/Core.Application/bin
+/Core/Core.Domain/obj
+/Core/Core.Domain/bin

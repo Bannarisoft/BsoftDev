@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using BSOFT.Application.Divisions.Queries.GetDivisions;
-using BSOFT.Application.Divisions.Commands.CreateDivision;
-using BSOFT.Application.Divisions.Queries.GetDivisionById;
-using BSOFT.Application.Divisions.Commands.UpdateDivision;
-using BSOFT.Application.Divisions.Commands.DeleteDivision;
+using Core.Application.Divisions.Queries.GetDivisions;
+using Core.Application.Divisions.Commands.CreateDivision;
+using Core.Application.Divisions.Queries.GetDivisionById;
+using Core.Application.Divisions.Commands.UpdateDivision;
+using Core.Application.Divisions.Commands.DeleteDivision;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-using BSOFT.Application.Divisions.Queries.GetDivisionAutoComplete;
+using Core.Application.Divisions.Queries.GetDivisionAutoComplete;
 
 namespace BSOFT.API.Controllers
 {

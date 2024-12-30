@@ -1,13 +1,13 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using BSOFT.Application.UserRole.Queries.GetRole;
-using BSOFT.Application.UserRole.Queries.GetRoleById;
-using BSOFT.Application.UserRole.Commands.CreateRole;
-using BSOFT.Application.UserRole.Commands.DeleteRole;
-using BSOFT.Application.UserRole.Commands.UpdateRole;
-using BSOFT.Application.UserRole.Queries.GetRolesAutocomplete;
-using BSOFT.Application.Common.Interfaces;
+using Core.Application.UserRole.Queries.GetRole;
+using Core.Application.UserRole.Queries.GetRoleById;
+using Core.Application.UserRole.Commands.CreateRole;
+using Core.Application.UserRole.Commands.DeleteRole;
+using Core.Application.UserRole.Commands.UpdateRole;
+using Core.Application.UserRole.Queries.GetRolesAutocomplete;
+using Core.Application.Common.Interfaces;
 
 namespace BSOFT.API.Controllers
 {

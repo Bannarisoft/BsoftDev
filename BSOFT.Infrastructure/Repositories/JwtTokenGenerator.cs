@@ -2,8 +2,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
-using BSOFT.Application.Common.Interfaces;
-using BSOFT.Domain.Entities;
+using Core.Application.Common.Interfaces;
+using Core.Domain.Entities;
 using System.Text;
 
 namespace BSOFT.Infrastructure.Repositories
