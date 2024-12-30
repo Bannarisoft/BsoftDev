@@ -108,7 +108,8 @@ namespace BSOFT.API.Controllers
         [HttpPut("delete/{id}")]
         public async Task<IActionResult> Delete(int id,DeleteCompanyCommand deleteCompanyCommand)
         {
-              if(id != deleteCompanyCommand.Id)
+            Console.WriteLine(id);
+              if(id == 0)
             {
                 return BadRequest();
             }

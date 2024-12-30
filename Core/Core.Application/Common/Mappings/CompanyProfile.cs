@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Companies.Commands.CreateCompany;
+using Core.Application.Companies.Commands.DeleteCompany;
 using Core.Application.Companies.Queries.GetCompanies;
 using Core.Domain.Entities;
 
@@ -49,6 +50,9 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.Phone))
             .ReverseMap();
+
+            CreateMap<CompanyDeleteDTO, Company>()
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
         
         // // Add mappings for lists
         // CreateMap<List<CompanyAddressDTO>, List<CompanyAddress>>();
