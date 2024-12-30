@@ -41,11 +41,11 @@ namespace BSOFT.Application.Units.Commands.CreateUnit
                         maxLength=50;
                         RuleFor(x =>x.CountryName)
                             .MaximumLength(maxLength) // or some other length from rule.Length                
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitName)} {rule.Error} {maxLength}");
+                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.UnitName)} {rule.Error} {maxLength}");
                          maxLength=6;
                          RuleFor(x => x.CountryCode)
                             .MaximumLength(maxLength) // or some other length from rule.Length                
-                            .WithMessage($"{nameof(CreateUnitCommand.ShortName)} {rule.Error} {maxLength}");                          
+                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.ShortName)} {rule.Error} {maxLength}");                          
                         break;                    
                    default:
                     // Log a warning or handle unknown rule

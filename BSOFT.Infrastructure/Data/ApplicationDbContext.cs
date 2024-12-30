@@ -36,6 +36,7 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<CompanyAddress> companyAddresses { get; set; }
         public DbSet<CompanyContact> CompanyContacts { get; set; }
         public DbSet<Division> Divisions { get; set; }
+        public DbSet<Countries> Countries { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -57,20 +58,20 @@ namespace BSOFT.Infrastructure.Data
 
             // Department entity configuration
             modelBuilder.Entity<Department>()
-                .HasKey(d => d.DeptId); // Primary key
+                .HasKey(d => d.Id); // Primary key
 
             // RoleEntitlement entity configuration
-            modelBuilder.Entity<RoleEntitlement>()
-            .HasMany(re => re.MenuPermissions)
-            .WithOne(mp => mp.RoleEntitlement)
-            .HasForeignKey(mp => mp.RoleEntitlementId);
+            // modelBuilder.Entity<RoleEntitlement>()
+            // .HasMany(re => re.MenuPermissions)
+            // .WithOne(mp => mp.RoleEntitlement)
+            // .HasForeignKey(mp => mp.RoleEntitlementId);
             
-            modelBuilder.Entity<RoleEntitlement>()
-            .Property(re => re.RoleId)
-            .IsRequired();
+            // modelBuilder.Entity<RoleEntitlement>()
+            // .Property(re => re.RoleId)
+            // .IsRequired();
 
-            modelBuilder.Entity<MenuPermission>()
-            .HasKey(mp => mp.MenuPermissionId); // Ensure primary key is defined
+            // modelBuilder.Entity<MenuPermission>()
+            // .HasKey(mp => mp.MenuPermissionId); // Ensure primary key is defined
 
 
     
