@@ -8,23 +8,42 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper;
+using System.Data;
 
 namespace Core.Application.Entity.Queries.GetEntityById
 {
-    public class GetEntityByIdQueryHandler : IRequestHandler<GetEntityByIdQuery,EntityVm>
+    public class GetEntityByIdQueryHandler : IRequestHandler<GetEntityByIdQuery, EntityDto?>
     {
     private readonly IEntityRepository _entityRepository;
-     private readonly IMapper _mapper;
+    private readonly IDbConnection _dbConnection;
 
-         public GetEntityByIdQueryHandler(IEntityRepository entityRepository, IMapper mapper)
+    public GetEntityByIdQueryHandler(IDbConnection dbConnection)
+    {
+            _dbConnection = dbConnection;
+    }
+
+    public async Task<EntityDto?> Handle(GetEntityByIdQuery request, CancellationToken cancellationToken)
+    {
+        var query = "SELECT * FROM AppData.Entity WHERE Id = @Id";
+        var entityresult = await _dbConnection.QuerySingleOrDefaultAsync<EntityDto>(query, new { Id = request.EntityId });
+        // Return null if the country is not found
+        if (entityresult == null)
         {
-            _entityRepository = entityRepository;
-            _mapper = mapper;
+            return null;
         }
-        public async Task<EntityVm> Handle(GetEntityByIdQuery request, CancellationToken cancellationToken)
+        // Map the entity to a DTO
+        return new EntityDto
         {
-          var entity = await _entityRepository.GetByIdAsync(request.EntityId);
-          return _mapper.Map<EntityVm>(entity);
-        }
+            Id = entityresult.Id,
+            EntityCode = entityresult.EntityCode,
+            EntityName = entityresult.EntityName,
+            EntityDescription = entityresult.EntityDescription,
+            Address= entityresult.Address,
+            Phone= entityresult.Phone,
+            Email= entityresult.Email,
+            IsActive = entityresult.IsActive
+        };
+    }
     }
 }

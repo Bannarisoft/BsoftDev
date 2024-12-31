@@ -11,6 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Units.Queries.GetUnitAutoComplete;
+using FluentValidation;
+using BSOFT.Infrastructure.Data;
 
 namespace BSOFT.API.Controllers
 {
@@ -18,8 +20,15 @@ namespace BSOFT.API.Controllers
     [ApiController]
     public class UnitController : ApiControllerBase
     {
-        public UnitController(ISender mediator) : base(mediator)
+        private readonly IValidator<CreateUnitCommand> _createUnitCommandValidator;
+        private readonly IValidator<UpdateUnitCommand> _updateUnitCommandValidator;
+        private readonly ApplicationDbContext _dbContext;
+        public UnitController(ISender mediator,IValidator<CreateUnitCommand> createUnitCommandValidator,IValidator<UpdateUnitCommand> updateUnitCommandValidator,ApplicationDbContext dbContext) 
+        : base(mediator)
         {
+            _createUnitCommandValidator = createUnitCommandValidator;   
+            _updateUnitCommandValidator = updateUnitCommandValidator; 
+            _dbContext = dbContext;  
         }
         [HttpGet]
         public async Task<IActionResult> GetAllUnitsAsync()
@@ -31,7 +40,7 @@ namespace BSOFT.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var unit = await Mediator.Send(new GetUnitByIdQuery() { UnitId = id});
+            var unit = await Mediator.Send(new GetUnitByIdQuery() { Id = id});
             if(unit == null)
             {
                 BadRequest("ID in the URL does not match the command Unit.");
@@ -42,15 +51,25 @@ namespace BSOFT.API.Controllers
     [HttpPost]
     public async Task<IActionResult> CreateUnitAsync(CreateUnitCommand command)
     {
+        var validationResult = await _createUnitCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+        return BadRequest(validationResult.Errors);
+        }
         var createdUnit = await Mediator.Send(command);
         return Ok("Created Successfully");
        
     }
 
 
-    [HttpPut("{id}")]
+    [HttpPut("update/{id}")]
     public async Task<IActionResult> UpdateUnitAsync(int id, UpdateUnitCommand command)
     {
+        var validationResult = await _updateUnitCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+        return BadRequest(validationResult.Errors);
+        }
         if (id != command.UnitId)
         {
             return BadRequest("UnitId Mismatch");
@@ -61,7 +80,7 @@ namespace BSOFT.API.Controllers
     }
 
 
-    [HttpPut("delete/{id}")]
+    [HttpDelete("delete/{id}")]
     public async Task<IActionResult> DeleteUnitAsync(int id,DeleteUnitCommand command)
     {
          if(id != command.UnitId)
@@ -76,7 +95,6 @@ namespace BSOFT.API.Controllers
        [HttpGet("GetUnit")]
         public async Task<IActionResult> GetUnit([FromQuery] string searchPattern)
         {
-           
             var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = searchPattern});
             return Ok(units);
         }

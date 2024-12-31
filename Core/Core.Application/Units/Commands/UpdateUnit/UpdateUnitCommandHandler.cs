@@ -28,7 +28,6 @@ namespace Core.Application.Units.Commands.UpdateUnit
         try
         {
 
-
         var unit = _mapper.Map<Core.Domain.Entities.Unit>(request.UpdateUnitDto);
 
         // Create the unit

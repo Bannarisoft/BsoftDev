@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Entity.Commands.CreateEntity
 {
-    public class CreateEntityCommand : IRequest<EntityVm>
+    public class CreateEntityCommand : IRequest<EntityDto>
     {
-    public int EntityId { get; set; }
-   // public string EntityCode { get; set; }
     public string EntityName { get; set; }
     public string EntityDescription { get; set; }
     public string Address { get; set; }

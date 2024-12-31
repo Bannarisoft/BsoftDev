@@ -8,6 +8,13 @@ using Core.Application.Country.Commands.CreateCountry;
 using BSOFT.API.Validation.Common.Country;
 using BSOFT.API.Validation.Common;
 using Core.Application.Country.Commands.UpdateCountry;
+using Core.Application.Entity.Commands.CreateEntity;
+using BSOFT.API.Validation.Common.Entity;
+using Core.Application.Entity.Commands.UpdateEntity;
+using Core.Application.Units.Commands.CreateUnit;
+using BSOFT.API.Validation.Common.Unit;
+using Core.Application.Units.Commands.UpdateUnit;
+using BSOFT.API.Validation.Common.Unit.BSOFT.API.Validation.Common.Unit;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +37,10 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddScoped<MaxLengthProvider>();
 builder.Services.AddScoped<IValidator<CreateCountryCommand>, CreateCountryCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateCountryCommand>, UpdateCountryCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateEntityCommand>, CreateEntityCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateEntityCommand>, UpdateEntityCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateUnitCommand>, CreateUnitCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateUnitCommand>, UpdateUnitCommandValidator>();
 // Add services to the container.
 
 //Add layer dependency 
