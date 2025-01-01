@@ -8,7 +8,12 @@ using Core.Application.Country.Commands.CreateCountry;
 using BSOFT.API.Validation.Common.Country;
 using BSOFT.API.Validation.Common;
 using Core.Application.Country.Commands.UpdateCountry;
-
+using Core.Application.Departments.Commands.CreateDepartment;
+using BSOFT.API.Validation.Common.Department;
+using Core.Application.Departments.Commands.UpdateDepartment;   
+using BSOFT.API.Validation.Common.UserRole;
+using Core.Application.UserRole.Commands.CreateRole; 
+using Core.Application.UserRole.Commands.UpdateRole;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +35,13 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddScoped<MaxLengthProvider>();
 builder.Services.AddScoped<IValidator<CreateCountryCommand>, CreateCountryCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateCountryCommand>, UpdateCountryCommandValidator>();
+
+builder.Services.AddScoped<IValidator<CreateDepartmentCommand>, CreateDepartmentCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateDepartmentCommand>, UpdateDepartmentCommandValidator>();
+
+builder.Services.AddScoped<IValidator<CreateRoleCommand>, CreateRoleCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateRoleCommand>, UpdateRoleCommandValidator>();
+
 // Add services to the container.
 
 //Add layer dependency 

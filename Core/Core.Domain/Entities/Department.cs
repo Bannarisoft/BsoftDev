@@ -10,16 +10,16 @@ using Core.Domain.Common;
 
 namespace Core.Domain.Entities
 {
-    [Table("Department", Schema = "AppData")]
+  
     public class Department : BaseEntity
     {
-         [Key]
-        public int Id { get; set; }
-        [MaxLength(15)]
+         
+       public int Id { get; set; }
+       
         public string ShortName { get; set; }
         public string DeptName { get; set; }
         public int CompanyId { get; set; }
-        public byte  IsActive { get; set; }
+        public new byte  IsActive { get; set; }
                   
 
     }

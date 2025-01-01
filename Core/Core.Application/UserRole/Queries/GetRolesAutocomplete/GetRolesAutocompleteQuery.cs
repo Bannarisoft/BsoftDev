@@ -1,3 +1,4 @@
+using Core.Application.UserRole.Queries.GetRole;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -7,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 {
-    public class GetRolesAutocompleteQuery : IRequest<List<GetRolesAutocompleteVm>>
+    public class GetRolesAutocompleteQuery : IRequest<List<UserRoleDto>>
     {
-        public string SearchTerm { get; set; }
+        public string SearchPattern { get; set; }
     }
 }

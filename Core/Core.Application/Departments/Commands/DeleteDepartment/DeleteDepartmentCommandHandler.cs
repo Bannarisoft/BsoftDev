@@ -3,27 +3,26 @@ using Core.Application.Common.Interfaces;
 using Core.Domain.Entities;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
+using  Core.Application.Departments.Queries.GetDepartments;
 
 namespace Core.Application.Departments.Commands.DeleteDepartment
 {
     public class DeleteDepartmentCommandHandler :IRequestHandler<DeleteDepartmentCommand ,int>
     {
-      private readonly IDepartmentRepository _departmentRepository;  
+      private readonly IDepartmentRepository _IdepartmentRepository;  
+       private readonly IMapper _mapper;
       
-      public DeleteDepartmentCommandHandler (IDepartmentRepository departmentRepository)
+      public DeleteDepartmentCommandHandler (IDepartmentRepository departmentRepository , IMapper mapper)
       {
-        _departmentRepository =departmentRepository;
+         _IdepartmentRepository = departmentRepository;
+            _mapper = mapper;
       }
 
       public async Task<int>Handle(DeleteDepartmentCommand request, CancellationToken cancellationToken)
       {       
-         var Updatedepartment = new Department()
-            {
-                Id = request.Id,
-                IsActive = request.IsActive                
-
-            };
-            return await _departmentRepository.DeleteAsync(request.Id,Updatedepartment);     
+          var updatedDepartment = _mapper.Map<Department>(request.departmentStatusDto);
+            return await _IdepartmentRepository.DeleteAsync(request.Id, updatedDepartment);              
       }
 
     }

@@ -9,6 +9,8 @@ using Core.Application.Departments.Commands.DeleteDepartment;
 using Core.Application.Departments.Queries.GetDepartmentAutoComplete;
 using Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
 using Core.Application.Common.Interfaces;
+using System.Data.Common;
+using BSOFT.Infrastructure.Data;
 
 namespace BSOFT.API.Controllers
 {
@@ -16,8 +18,11 @@ namespace BSOFT.API.Controllers
     [Route("api/[controller]")]
     public class DepartmentController : ApiControllerBase
     {
-        public DepartmentController(ISender mediator) : base(mediator)
+
+          private readonly ApplicationDbContext _dbContext;
+        public DepartmentController(ISender mediator ,ApplicationDbContext dbContext) : base(mediator)
         {
+             _dbContext = dbContext; 
         }
        [HttpGet]
        public async Task<IActionResult> GetAllDepartmentAsync()
@@ -38,11 +43,13 @@ namespace BSOFT.API.Controllers
 
         }
         [HttpPost]
-        public async Task<IActionResult>CreateAsync(CreateDepartmentCommand command)
+         [Route("Create")]
+        public async Task<IActionResult>CreateAsync([FromBody] CreateDepartmentCommand command)
         {
-            var createdepartment=await Mediator.Send(command);
-            return Ok("Created successfully");
-            return CreatedAtAction(nameof(GetByIdAsync),new {id=createdepartment.Id},createdepartment);
+            Console.WriteLine("DEPT Create");
+            var createDepartment=await Mediator.Send(command);                    
+             return Ok(new { Message = "Department created successfully.", id = createDepartment.Id });
+               // return CreatedAtAction(nameof(GetByIdAsync),new {id=createdepartment.Id},createdepartment);
         }
 
 
@@ -55,8 +62,35 @@ namespace BSOFT.API.Controllers
             return BadRequest("UnitId Mismatch");
         }
 
-        var updateddepartment = await Mediator.Send(command);
+        var UpdateDepartment = await Mediator.Send(command);
         return Ok("Updated Successfully");
+
+
+    // Use the validator for UpdateCountryCommand
+        // var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
+
+        // if (!validationResult.IsValid)
+        // {
+        //     return BadRequest(validationResult.Errors);
+        // }
+
+        // if (countryid != command.Id)
+        // {
+        //     return BadRequest("CountryId Mismatch");
+        // }   
+        // var country = await _dbContext.Countries
+        //                             .FirstOrDefaultAsync(c => c.Id == countryid && c.IsActive == 1);
+
+        // if (country == null)
+        // {
+        //     return BadRequest("Only active countries (IsActive = 1) can be updated.");
+        // }
+
+        // await Mediator.Send(command);
+        // return NoContent();
+
+
+
     }
 
     [HttpPut("delete/{id}")]
@@ -83,7 +117,7 @@ namespace BSOFT.API.Controllers
          [HttpGet("autocomplete")]
         public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync([FromQuery] string searchDept)
         {
-            var query = new GetDepartmentAutoCompleteSearchQuery { SearchDept = searchDept };
+            var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = searchDept };
             var result = await Mediator.Send(query);
             return Ok(result);
         }

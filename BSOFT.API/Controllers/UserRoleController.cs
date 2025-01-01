@@ -45,8 +45,10 @@ namespace BSOFT.API.Controllers
         [HttpPost]
         public async Task<IActionResult>CreateAsync(CreateRoleCommand command)
         {
-            var createrole = await Mediator.Send(command);
-            return CreatedAtAction(nameof(GetByIdAsync),new {roleid = createrole.Id},createrole);
+           
+             Console.WriteLine("UserRole Create");
+            var createrole=await Mediator.Send(command);                    
+             return Ok(new { Message = "UserRole created successfully.", id = createrole.Id });
         }
 
          [HttpDelete("delete/{id}")]
@@ -83,7 +85,7 @@ namespace BSOFT.API.Controllers
     [HttpGet("roles")]
     public async Task<IActionResult> GetRoles([FromQuery] string searchTerm)
     {
-        var roles = await Mediator.Send(new GetRolesAutocompleteQuery { SearchTerm = searchTerm });
+        var roles = await Mediator.Send(new GetRolesAutocompleteQuery { SearchPattern = searchTerm });
         return Ok(roles);
     }
 
