@@ -60,6 +60,10 @@ builder.Services.AddScoped<IValidator<CreateEntityCommand>, CreateEntityCommandV
 builder.Services.AddScoped<IValidator<UpdateEntityCommand>, UpdateEntityCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateUnitCommand>, CreateUnitCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateUnitCommand>, UpdateUnitCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateDepartmentCommand>, CreateDepartmentCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateDepartmentCommand>, UpdateDepartmentCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateRoleCommand>, CreateRoleCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateRoleCommand>, UpdateRoleCommandValidator>();
 
 
 // Add services to the container.

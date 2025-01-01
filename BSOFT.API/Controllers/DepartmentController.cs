@@ -11,6 +11,7 @@ using Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
 using Core.Application.Common.Interfaces;
 using System.Data.Common;
 using BSOFT.Infrastructure.Data;
+using FluentValidation;
 
 namespace BSOFT.API.Controllers
 {
@@ -19,10 +20,18 @@ namespace BSOFT.API.Controllers
     public class DepartmentController : ApiControllerBase
     {
 
+        private readonly IValidator<CreateDepartmentCommand> _createDepartmentCommandValidator;
+        private readonly IValidator<UpdateDepartmentCommand> _updateDepartmentCommandValidator;
           private readonly ApplicationDbContext _dbContext;
-        public DepartmentController(ISender mediator ,ApplicationDbContext dbContext) : base(mediator)
+        public DepartmentController(ISender mediator 
+        , IValidator<CreateDepartmentCommand> createDepartmentCommandValidator
+        ,IValidator<UpdateDepartmentCommand> updateDepartmentCommandValidator, 
+         ApplicationDbContext dbContext  ) : base(mediator)
         {
+            _createDepartmentCommandValidator=createDepartmentCommandValidator;
+            _updateDepartmentCommandValidator=updateDepartmentCommandValidator;
              _dbContext = dbContext; 
+
         }
        [HttpGet]
        public async Task<IActionResult> GetAllDepartmentAsync()
@@ -37,7 +46,7 @@ namespace BSOFT.API.Controllers
             var  department = await Mediator.Send(new GetDepartmentByIdQuery() {DepartmentId=id});
             if(department ==null)
             {
-                return  NotFound();                
+                BadRequest("ID in the URL does not match the command Department.");               
             }
             return Ok(department);
 
@@ -46,50 +55,32 @@ namespace BSOFT.API.Controllers
          [Route("Create")]
         public async Task<IActionResult>CreateAsync([FromBody] CreateDepartmentCommand command)
         {
-            Console.WriteLine("DEPT Create");
-            var createDepartment=await Mediator.Send(command);                    
-             return Ok(new { Message = "Department created successfully.", id = createDepartment.Id });
-               // return CreatedAtAction(nameof(GetByIdAsync),new {id=createdepartment.Id},createdepartment);
+
+            var validationResult = await _createDepartmentCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+        return BadRequest(validationResult.Errors);
+        }
+        var createdepartment = await Mediator.Send(command);
+        return Ok("Created Successfully");         
         }
 
 
       [HttpPut("update/{id}")]
     public async Task<IActionResult> UpdateAsync(int id, UpdateDepartmentCommand command)
     {
-       
+         var validationResult = await _updateDepartmentCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+        return BadRequest(validationResult.Errors);
+        }
         if (id != command.Id)
         {
-            return BadRequest("UnitId Mismatch");
+            return BadRequest("Department Id Mismatch");
         }
 
         var UpdateDepartment = await Mediator.Send(command);
         return Ok("Updated Successfully");
-
-
-    // Use the validator for UpdateCountryCommand
-        // var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
-
-        // if (!validationResult.IsValid)
-        // {
-        //     return BadRequest(validationResult.Errors);
-        // }
-
-        // if (countryid != command.Id)
-        // {
-        //     return BadRequest("CountryId Mismatch");
-        // }   
-        // var country = await _dbContext.Countries
-        //                             .FirstOrDefaultAsync(c => c.Id == countryid && c.IsActive == 1);
-
-        // if (country == null)
-        // {
-        //     return BadRequest("Only active countries (IsActive = 1) can be updated.");
-        // }
-
-        // await Mediator.Send(command);
-        // return NoContent();
-
-
 
     }
 
@@ -125,5 +116,9 @@ namespace BSOFT.API.Controllers
    
 
 
+    }
+
+    internal class CreateDepartmentCommandCommand
+    {
     }
 }
