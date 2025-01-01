@@ -52,8 +52,6 @@ namespace BSOFT.Infrastructure
                 services.AddScoped<IIPAddressService, IPAddressService>();
 				services.AddTransient<IFileUploadService, FileUploadRepository>();
                 services.AddScoped<ICountryRepository, CountryRepository>();
-
-
                 services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile));
                 services.AddAutoMapper(typeof(RoleEntitlementMappingProfile));
                 services.AddAutoMapper(typeof(ModuleProfile));
@@ -62,7 +60,7 @@ namespace BSOFT.Infrastructure
                 services.AddAutoMapper(typeof(UserRoleProfile) , typeof(UpdateUserRoleProfile));
   				services.AddAutoMapper(typeof(EntityProfile));
                 services.AddAutoMapper(typeof(UnitProfile));
-
+                services.AddAutoMapper(typeof(CreateUnitProfile), typeof(UpdateUnitProfile));
                 return services;
             }
     }
