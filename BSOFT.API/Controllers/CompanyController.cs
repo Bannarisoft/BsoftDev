@@ -14,6 +14,7 @@ using System.IO;
 using Core.Application.Companies.Queries.GetCompanyAutoComplete;
 using Core.Application.Common.Interfaces;
 using System.Text.Json;
+using FluentValidation;
 
 namespace BSOFT.API.Controllers
 {
@@ -22,23 +23,37 @@ namespace BSOFT.API.Controllers
     public class CompanyController : ApiControllerBase
     {
         private readonly IFileUploadService _ifileUploadService;
+        // private readonly IValidator<CompanyDTO>  _CreateCompanyCommandvalidator;
+        private readonly IValidator<CreateCompanyCommand>  _CreateCompanyCommandvalidator;
+        private readonly IValidator<UpdateCompanyCommand> _UpdateCompanyCommandvalidator;
 
-        public CompanyController(ISender mediator, IFileUploadService ifileUploadService) : base(mediator)
+        public CompanyController(ISender mediator, IFileUploadService ifileUploadService, IValidator<CreateCompanyCommand> createCompanyCommandValidator, IValidator<UpdateCompanyCommand> updateCompanyCommandValidator) 
+        : base(mediator)
         {
             _ifileUploadService = ifileUploadService;
+            _CreateCompanyCommandvalidator = createCompanyCommandValidator;
+            _UpdateCompanyCommandvalidator = updateCompanyCommandValidator;
         }
 
         [HttpGet("GetAllCompaniesAsync")]
         public async Task<IActionResult> GetAllCompaniesAsync()
         {
-           
+            var companies = await Mediator.Send(new GetCompanyQuery());
+            var activecompanies = companies.Where(c => c.IsActive == 1).ToList(); 
             // var companies = await Mediator.Send(new GetCompanyQuery());
             // return Ok(companies);
-            return Ok("Success");
+            return Ok(activecompanies);
         }
          [HttpPost]
         public async Task<IActionResult> CreateAsync([FromForm] CreateCompanyCommand command)
         {
+            var validationResult = await _CreateCompanyCommandvalidator.ValidateAsync(command);
+            Console.WriteLine("validationResult");
+            Console.WriteLine(validationResult.IsValid);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
             if(command.File ==null && command.File.Length ==0)
             {
                 return BadRequest("Invalid file");
@@ -78,12 +93,27 @@ namespace BSOFT.API.Controllers
             //          ContentType = contentType,
             //          FileName = company.Logo
             //      });
-            return Ok("Success");
+            if (id <= 0)
+            {
+                return BadRequest("Invalid company ID");
+            }
+
+            var company = await Mediator.Send(new GetCompanyByIdQuery() { CompanyId = id });
+            if (company == null)
+            {
+                return NotFound();
+            }
+            return Ok(company);
         }
 
         [HttpPut("update/{id}")]
         public async Task<IActionResult> Update([FromForm] int id, UpdateCompanyCommand command )
         {
+            var validationResult = await _UpdateCompanyCommandvalidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
             if(command.File ==null && command.File.Length ==0)
             {
                 return BadRequest("Invalid file");
@@ -108,7 +138,8 @@ namespace BSOFT.API.Controllers
         [HttpPut("delete/{id}")]
         public async Task<IActionResult> Delete(int id,DeleteCompanyCommand deleteCompanyCommand)
         {
-              if(id != deleteCompanyCommand.Id)
+            Console.WriteLine(id);
+              if(id == 0)
             {
                 return BadRequest();
             }

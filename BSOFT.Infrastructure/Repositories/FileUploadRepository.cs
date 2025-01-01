@@ -11,10 +11,10 @@ namespace BSOFT.Infrastructure.Repositories
     {
         public async Task<(bool IsSuccess, string FilePath, string ErrorMessage)> UploadFileAsync(IFormFile file, string uploadPath)
         {
-            if (file.Length > 10 * 1024 * 1024)
-            {
-                throw new ArgumentException("File size exceeds limit");
-            }
+            // if (file.Length > 10 * 1024 * 1024)
+            // {
+            //     throw new ArgumentException("File size exceeds limit");
+            // }
               string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
 
         
