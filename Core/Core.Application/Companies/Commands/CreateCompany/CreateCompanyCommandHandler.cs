@@ -28,7 +28,7 @@ namespace Core.Application.Companies.Commands.CreateCompany
         public async Task<int> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
         {
             
-                var company  = _imapper.Map<Company>(request);
+                var company  = _imapper.Map<Company>(request.Company);
                
                 var companyaddress =     _imapper.Map<CompanyAddress>(request.CompanyAddresses);
                 var companycontact =     _imapper.Map<CompanyContact>(request.CompanyContacts);
