@@ -11,8 +11,15 @@ namespace Core.Application.UserLogin.Commands.UserLogin
 {
     public class UserLoginCommand : IRequest<LoginResponse>
     {
+        // public LoginRequest Request { get; set; }
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+
+    // public UserLoginCommand(string username, string password)
+    // {
+    //     Username = username;
+    //     Password = password;
+    // }
     }
 
 }

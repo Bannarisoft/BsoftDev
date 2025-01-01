@@ -42,19 +42,19 @@ namespace BSOFT.Infrastructure.Data.Configurations
             builder.Property(u => u.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
-                .HasConversion(
-                    v => v == 1, // convert byte to bool
-                    v => v ? (byte)1 : (byte)0 // convert bool to byte
-                )
+                // .HasConversion(
+                //     v => v == 1, // convert byte to bool
+                //     v => v ? (byte)1 : (byte)0 // convert bool to byte
+                // )
                 .IsRequired();
 
             builder.Property(u => u.IsFirstTimeUser)
                 .HasColumnName("IsFirstTimeUser")
                 .HasColumnType("bit")
-                .HasConversion(
-                    v => v == 1, // convert byte to bool
-                    v => v ? (byte)1 : (byte)0 // convert bool to byte
-                )
+                // .HasConversion(
+                //     v => v == 1, // convert byte to bool
+                //     v => v ? (byte)1 : (byte)0 // convert bool to byte
+                // )
                 .IsRequired();
 
             builder.Property(u => u.PasswordHash)
@@ -97,6 +97,15 @@ namespace BSOFT.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
+            // builder.HasOne(u => u.UserRole)
+            //     .WithMany(ur => ur.Users)
+            //     .HasForeignKey(u => u.UserRoleId)
+            //     .OnDelete(DeleteBehavior.Cascade);
+
+                 builder.HasMany(u => u.UserRoles)
+               .WithOne(ur => ur.User)
+               .HasForeignKey(ur => ur.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

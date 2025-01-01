@@ -17,7 +17,12 @@ namespace Core.Domain.Entities
         public string Description { get; set; }
         public int CompanyId { get; set; }
         public byte  IsActive { get; set; }
+        // public UserRole Role { get; set; }
+         // Foreign Key to User
+        public int UserId { get; set; } 
+        public User User { get; set; } // Navigation property to User
        
+        //  public ICollection<User> Users { get; set; } = new List<User>();
         public ICollection<RoleEntitlement> RoleEntitlements { get; set; } = new List<RoleEntitlement>();       
 
     }

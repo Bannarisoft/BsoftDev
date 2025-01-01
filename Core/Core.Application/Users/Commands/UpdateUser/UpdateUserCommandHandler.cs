@@ -20,11 +20,33 @@ namespace Core.Application.Users.Commands.UpdateUser
 
         public async Task<int> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            // Use AutoMapper to map UpdateUserCommand to User entity
-            var updateUserEntity = _mapper.Map<User>(request);
+            // Fetch the existing user
+            var existingUser = await _userRepository.GetByIdAsync(request.UserId);
+
+            if (existingUser == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+             _mapper.Map(request, existingUser);
+
+            // Hash the password if it's provided in the request
+            if (!string.IsNullOrWhiteSpace(request.PasswordHash))
+            {
+                existingUser.SetPassword(request.PasswordHash); // Ensure SetPassword handles hashing
+            }
 
             // Update the user in the repository
-            return await _userRepository.UpdateAsync(request.UserId, updateUserEntity);
+            await _userRepository.UpdateAsync(request.UserId,existingUser);
+
+            // Return the updated user's ID
+            return existingUser.UserId;
+
+            // // Use AutoMapper to map UpdateUserCommand to User entity
+            // var updateUserEntity = _mapper.Map<User>(request);
+
+            // // Update the user in the repository
+            // return await _userRepository.UpdateAsync(request.UserId, updateUserEntity);
          }
     }
 }

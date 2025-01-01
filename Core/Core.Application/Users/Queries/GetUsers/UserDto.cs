@@ -11,7 +11,7 @@ namespace Core.Application.Users.Queries.GetUsers
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string UserName { get; set; }
-    public byte IsActive { get; set; }
+    public bool IsActive { get; set; }
     public string PasswordHash { get; set; }
     public int UserType { get; set; }
     public string Mobile { get; set; }

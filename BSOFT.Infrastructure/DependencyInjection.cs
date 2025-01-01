@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Core.Application.Common.Interfaces;
 using BSOFT.Infrastructure.Repositories;
+using Core.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +22,7 @@ namespace BSOFT.Infrastructure
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices
-            (this IServiceCollection services, IConfiguration configuration)
+            (this IServiceCollection services, IConfiguration configuration, WebApplicationBuilder builder)
             {
                 var connectionString = configuration.GetConnectionString("DefaultConnection");
 
@@ -38,7 +40,8 @@ namespace BSOFT.Infrastructure
                 });
 
                 services.AddScoped<IUserRepository, UserRepository>();
-                services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
+                // services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
+                services.AddSingleton<IJwtTokenHelper, JwtTokenHelper>();
                 services.AddScoped<IRoleEntitlementRepository, RoleEntitlementRepository>();
                 services.AddScoped<IModuleRepository, ModuleRepository>();
                 services.AddScoped<IDepartmentRepository, DepartmentRepository>();
@@ -58,6 +61,8 @@ namespace BSOFT.Infrastructure
                 services.AddAutoMapper(typeof(RoleEntitlementMappingProfile));
                 services.AddAutoMapper(typeof(ModuleProfile));
                 services.AddAutoMapper(typeof(CompanyProfile));
+                services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
 
                 return services;
             }
