@@ -1,12 +1,9 @@
 using Core.Application.Entity.Queries.GetEntity;
 using Core.Application.Entity.Queries.GetEntityLastCode;
-using Core.Domain.Entities;
 using Core.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+
 
 namespace Core.Application.Entity.Commands.CreateEntity
 {

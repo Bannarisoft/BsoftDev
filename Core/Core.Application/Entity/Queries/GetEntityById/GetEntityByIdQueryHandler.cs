@@ -1,13 +1,6 @@
 using Core.Application.Entity.Queries.GetEntity;
 using Core.Application.Common.Interfaces;
-using AutoMapper;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Dapper;
 using System.Data;
 

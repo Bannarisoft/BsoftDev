@@ -1,13 +1,6 @@
-using AutoMapper;
-using Core.Application.Common.Interfaces;
 using Dapper;
 using MediatR;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Application.Units.Queries.GetUnits
 {

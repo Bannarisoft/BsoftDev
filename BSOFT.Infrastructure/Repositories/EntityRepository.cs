@@ -2,8 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+
 
 namespace BSOFT.Infrastructure.Repositories
 {
@@ -26,19 +25,6 @@ namespace BSOFT.Infrastructure.Repositories
             return await _applicationDbContext.Entity.AsNoTracking()
                 .FirstOrDefaultAsync(b => b.Id == id);
         }
-     // Last Entity Code Check 
-    public async Task<string> GenerateEntityCodeAsync()
-    {
-      var lastCode = await _applicationDbContext.Entity
-        .OrderByDescending(e => e.Id)
-        .Select(e => e.EntityCode)
-        .FirstOrDefaultAsync() ?? "ENT-00000";
-
-    var nextCodeNumber = int.Parse(lastCode[(lastCode.IndexOf('-') + 1)..]) + 1;
-
-    return $"ENT-{nextCodeNumber:D5}";;
-    }
-
        public async Task<Entity> CreateAsync(Entity entity)
         {
             await _applicationDbContext.Entity.AddAsync(entity);

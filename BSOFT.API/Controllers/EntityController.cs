@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Core.Application.Entity.Queries.GetEntity;
 using Core.Application.Entity.Queries.GetEntityById;
@@ -7,10 +6,6 @@ using Core.Application.Entity.Queries.GetEntityLastCode;
 using Core.Application.Entity.Commands.CreateEntity;
 using Core.Application.Entity.Commands.UpdateEntity;
 using Core.Application.Entity.Commands.DeleteEntity;
-using Core.Application.Common.Interfaces;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentValidation;
 using BSOFT.Infrastructure.Data;
 using Core.Application.Entity.Queries.GetEntityAutoComplete;
@@ -52,7 +47,7 @@ namespace BSOFT.API.Controllers
             return Ok(entitybyid);
         }
 
-        [HttpGet("GenerateEntityCode")]
+        [HttpGet("GenerateNewEntityCode")]
         public async Task<IActionResult> GenerateEntityCodeAsync()
         {
             var lastentitycode = await Mediator.Send(new GetEntityLastCodeQuery());
@@ -103,7 +98,6 @@ namespace BSOFT.API.Controllers
     [HttpGet("GetEntitysearch")]
         public async Task<IActionResult> GetEntity([FromQuery] string searchPattern)
         {
-           
             var entities = await Mediator.Send(new GetEntityAutocompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
             var activeentities = entities.Where(c => c.IsActive == 1).ToList(); 
             return Ok(activeentities);

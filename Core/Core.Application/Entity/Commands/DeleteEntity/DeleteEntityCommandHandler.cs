@@ -1,10 +1,7 @@
 using AutoMapper;
 using Core.Application.Common.Interfaces;
-using Core.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Core.Application.Entity.Commands.DeleteEntity
 {

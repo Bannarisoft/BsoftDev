@@ -1,12 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.Common.Interface;
-using Core.Application.Country.Queries.GetCountries;
-using Core.Application.Country.Queries.GetCountryAutoComplete;
-using AutoMapper;
 using Dapper;
 using MediatR;
 using Core.Application.Entity.Queries.GetEntity;
@@ -24,9 +16,9 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
     public async Task<List<EntityDto>> Handle(GetEntityAutocompleteQuery request, CancellationToken cancellationToken)
     {
         var query = @"
-            SELECT Id, EntityCode, EntityName, IsActive
+            SELECT *
             FROM AppData.Entity
-            WHERE EntityName LIKE @SearchPattern OR EntityCode LIKE @SearchPattern
+            WHERE EntityName LIKE @SearchPattern OR EntityCode LIKE @SearchPattern and IsActive = 1
             ORDER BY EntityName";
        // Execute the query and map the result to a list of CountryDto
         var entities = await _dbConnection.QueryAsync<EntityDto>(
@@ -44,7 +36,11 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
             Id = entities.Id,
             EntityCode = entities.EntityCode,
             EntityName = entities.EntityName,
-            IsActive = entities.IsActive
+            IsActive = entities.IsActive,
+            EntityDescription = entities.EntityDescription,
+            Address = entities.Address,
+            Phone = entities.Phone,
+            Email = entities.Email
         }).ToList();  
     }
     }

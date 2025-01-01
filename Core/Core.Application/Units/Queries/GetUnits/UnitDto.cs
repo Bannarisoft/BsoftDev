@@ -1,6 +1,3 @@
-using Core.Domain.Entities;
-using Core.Application.Common.Mappings;
-
 namespace Core.Application.Units.Queries.GetUnits
 {
     public class UnitDto
