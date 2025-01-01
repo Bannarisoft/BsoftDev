@@ -31,7 +31,7 @@ namespace BSOFT.Infrastructure
                 services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-                // Register IDbConnection if required
+                // Register IDbConnection for Dapper
                 services.AddTransient<IDbConnection>(sp =>
                 {
                     return new SqlConnection(connectionString);
@@ -52,23 +52,14 @@ namespace BSOFT.Infrastructure
                 services.AddScoped<IIPAddressService, IPAddressService>();
 				services.AddTransient<IFileUploadService, FileUploadRepository>();
                 services.AddScoped<ICountryRepository, CountryRepository>();
-                services.AddAutoMapper(typeof(UnitProfile),typeof(CreateUnitProfile),typeof(UpdateUnitProfile));
+
+
                 services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile));
                 services.AddAutoMapper(typeof(RoleEntitlementMappingProfile));
                 services.AddAutoMapper(typeof(ModuleProfile));
                 services.AddAutoMapper(typeof(CompanyProfile));
-                services.AddAutoMapper(typeof(EntityProfile));
+  				services.AddAutoMapper(typeof(EntityProfile));
                 services.AddAutoMapper(typeof(UnitProfile));
-                
-
-                
-				
-                // Add FluentValidation to services
-                // services.AddControllers()
-                //     .AddFluentValidation(config =>
-                //     {
-                //         config.RegisterValidatorsFromAssemblyContaining<CreateCountryCommandValidator>();
-                //     });
 
                 return services;
             }

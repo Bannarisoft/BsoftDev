@@ -1,4 +1,7 @@
+using BSOFT.Infrastructure.Data;
+using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Core.Application.Users.Queries.GetUsers;
@@ -14,10 +17,26 @@ namespace BSOFT.API.Controllers
 
     public class UserController : ApiControllerBase
     {
-        public UserController(ISender mediator) : base(mediator)
-        {
-        }
+        // public UserController(ISender mediator) : base(mediator)
+        // {
+        // }
 
+         private readonly IValidator<CreateUserCommand> _createUserCommandValidator;
+         private readonly IValidator<UpdateUserCommand> _updateUserCommandValidator;
+         private readonly ApplicationDbContext _dbContext;
+         
+       public UserController(ISender mediator, 
+                             IValidator<CreateUserCommand> createUserCommandValidator, 
+                             IValidator<UpdateUserCommand> updateUserCommandValidator, 
+                             ApplicationDbContext dbContext) 
+         : base(mediator)
+        {        
+            _createUserCommandValidator = createUserCommandValidator;
+            _updateUserCommandValidator = updateUserCommandValidator;    
+            _dbContext = dbContext;  
+             
+        }
+        
         [HttpGet]
         public async Task<IActionResult> GetAllUsersAsync()
         {
@@ -45,46 +64,67 @@ namespace BSOFT.API.Controllers
         [Route("Create")]
         public async Task<IActionResult> CreateAsync([FromBody] CreateUserCommand command)
         {
+            var validationResult = await _createUserCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+            return BadRequest(validationResult.Errors);
+            }
+
             var createdUser = await Mediator.Send(command);
             return Ok(new { Message = "User created successfully.", userid = createdUser.Id });
+        }        
+        [HttpPut]
+        [Route("Update")]
+        public async Task<IActionResult> UpdateAsync([FromBody] UpdateUserCommand command)
+        {
+            var validationResult = await _updateUserCommandValidator.ValidateAsync(command);
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
+            await Mediator.Send(command);
+            return Ok(new { Message = "User updated successfully." });
+        }      
+        [HttpDelete]
+        [Route("Delete/{userid}")]
+        public async Task<IActionResult> DeleteAsync(int userid)
+        {
+            await Mediator.Send(new DeleteUserCommand { UserId = userid });
+            return Ok(new { Message = "User deleted successfully." });
         }
-        // public async Task<IActionResult> CreateAsync(CreateUserCommand command)
+
+        // [HttpPut("{userid}")]
+        // public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
         // {
-        //     var createdUser = await Mediator.Send(command);
-        //     return CreatedAtAction(nameof(GetByIdAsync),new { Message = "User created successfully.", userid = createdUser.Id }, createdUser);
+        //     if (userid <= 0)
+        //     {
+        //         return BadRequest("Invalid user ID");
+        //     }
+
+        //     if (userid != command.UserId)
+        //     {
+        //         return BadRequest();
+        //     }
+        //     await Mediator.Send(command);
+        //     return NoContent();
         // }
 
-        [HttpPut("{userid}")]
-        public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
-        {
-            if (userid <= 0)
-            {
-                return BadRequest("Invalid user ID");
-            }
+        // [HttpDelete("{userid}")]
+        // public async Task<IActionResult> DeleteAsync(int userid, DeleteUserCommand command)
+        // {
+        //     if (userid <= 0)
+        //     {
+        //         return BadRequest("Invalid user ID");
+        //     }
 
-            if (userid != command.UserId)
-            {
-                return BadRequest();
-            }
-            await Mediator.Send(command);
-            return NoContent();
-        }
+        //     if (userid != command.UserId)
+        //     {
+        //         return BadRequest();
+        //     }
+        //     await Mediator.Send(command);
 
-        [HttpDelete("{userid}")]
-        public async Task<IActionResult> DeleteAsync(int userid, DeleteUserCommand command)
-        {
-            if (userid <= 0)
-            {
-                return BadRequest("Invalid user ID");
-            }
-
-            if (userid != command.UserId)
-            {
-                return BadRequest();
-            }
-            await Mediator.Send(command);
-
-            return NoContent();
-        }
+        //     return NoContent();
+        // }
     }
 }
