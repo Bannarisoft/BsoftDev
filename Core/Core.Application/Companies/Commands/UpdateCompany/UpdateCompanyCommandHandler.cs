@@ -35,8 +35,6 @@ namespace Core.Application.Companies.Commands.UpdateCompany
 
               if (CompanyId != null)
             {
-               
-                 Console.WriteLine("Update Hello Handler");
                 await _icompanyAddressRepository.UpdateAsync(company.Id,companyaddress);
                 
                 await _icompanyContactRepository.UpdateAsync(company.Id,companycontact);

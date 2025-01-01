@@ -13,7 +13,7 @@ namespace Core.Application.Common.Interfaces
         Task<List<UserRole>> GetAllRoleAsync();
         Task<UserRole> GetByIdAsync(int id);
         Task<UserRole> CreateAsync(UserRole userrole);
-        Task<int> DeleteAsync(int id);
+        Task<int> DeleteAsync(int id, UserRole userrole);
         Task<int> UpdateAsync(int id, UserRole userrole);
         Task<List<UserRole>> GetRolesAsync(string searchTerm); 
         

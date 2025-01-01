@@ -65,13 +65,16 @@ namespace BSOFT.Infrastructure.Repositories
         }
          public async Task<int> DeleteAsync(int id,Company company)
         {
-            
+            Console.WriteLine("Hello Handler");
+            Console.WriteLine(id);
+            Console.WriteLine(company.IsActive);
             var companyToDelete = await _applicationDbContext.Companies.FirstOrDefaultAsync(u => u.Id == id);
             if (companyToDelete != null)
             {
                 companyToDelete.IsActive = company.IsActive;
                 return await _applicationDbContext.SaveChangesAsync();
             }
+            Console.WriteLine(companyToDelete.Id);
             return 0; // No user found
         }
          public async Task<List<Company>>  GetCompany(string searchPattern = null)

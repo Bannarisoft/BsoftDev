@@ -2,14 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+
 
 namespace BSOFT.Infrastructure.Repositories
 {
     public class EntityRepository : IEntityRepository
     {
-         private readonly ApplicationDbContext _applicationDbContext;
+        private readonly ApplicationDbContext _applicationDbContext;
 
         public EntityRepository(ApplicationDbContext applicationDbContext)
         {
@@ -24,22 +23,8 @@ namespace BSOFT.Infrastructure.Repositories
         public async Task<Entity> GetByIdAsync(int id)
         {
             return await _applicationDbContext.Entity.AsNoTracking()
-                .FirstOrDefaultAsync(b => b.EntityId == id);
+                .FirstOrDefaultAsync(b => b.Id == id);
         }
-     // Last Entity Code Check 
-    public async Task<string> GenerateEntityCodeAsync()
-    {
-      var lastCode = await _applicationDbContext.Entity
-        .OrderByDescending(e => e.EntityCode)
-        .ThenByDescending(e => e.EntityId)
-        .Select(e => e.EntityCode)
-        .FirstOrDefaultAsync() ?? "ENT-00000";
-
-    var nextCodeNumber = int.Parse(lastCode[(lastCode.IndexOf('-') + 1)..]) + 1;
-
-    return $"ENT-{nextCodeNumber:D5}";;
-    }
-
        public async Task<Entity> CreateAsync(Entity entity)
         {
             await _applicationDbContext.Entity.AddAsync(entity);
@@ -49,7 +34,7 @@ namespace BSOFT.Infrastructure.Repositories
 
         public async Task<int>UpdateAsync(int id, Entity entity)
         {
-            var existingentity = await _applicationDbContext.Entity.FirstOrDefaultAsync(u => u.EntityId == id);
+            var existingentity = await _applicationDbContext.Entity.FirstOrDefaultAsync(u => u.Id == id);
             if (existingentity != null)
             {
                 existingentity.EntityName = entity.EntityName;
@@ -67,14 +52,22 @@ namespace BSOFT.Infrastructure.Repositories
 
         public async Task<int> DeleteAsync(int id,Entity entity)
         {
-            var EntityToDelete = await _applicationDbContext.Entity.FirstOrDefaultAsync(u => u.EntityId == id);
+            var EntityToDelete = await _applicationDbContext.Entity.FirstOrDefaultAsync(u => u.Id == id);
             if (EntityToDelete != null)
             {
                 EntityToDelete.IsActive = entity.IsActive;
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
-        } 
+        }
+
+        public async Task<List<Entity>> GetByEntityNameAsync(string searchPattern)
+        {
+            return await _applicationDbContext.Entity
+            .Where(c => c.EntityName.Contains(searchPattern, StringComparison.OrdinalIgnoreCase) || c.EntityCode.Contains(searchPattern) )
+            .OrderBy(c => c.EntityName)
+            .ToListAsync();               
+        }
 
         
     }

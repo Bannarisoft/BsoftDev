@@ -1,34 +1,32 @@
-using Core.Application.Entity.Queries.GetEntity;
-using Core.Application.Common.Interfaces;
-using AutoMapper;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data;
+using Dapper;
 
 
 namespace Core.Application.Entity.Queries.GetEntityLastCode
 {
     public class GetEntityLastCodeQueryHandler : IRequestHandler<GetEntityLastCodeQuery,string>
     {
-     private readonly IEntityRepository _entityRepository;
-     private readonly IMapper _mapper;
+    private readonly IDbConnection _dbConnection;
 
-       public GetEntityLastCodeQueryHandler(IEntityRepository entityRepository, IMapper mapper)
-        {
-            _entityRepository = entityRepository;
-            _mapper = mapper;
-        }
-
-          // Last Entity Code Check 
-
-        public async Task<string> Handle(GetEntityLastCodeQuery request, CancellationToken cancellationToken)
+    public GetEntityLastCodeQueryHandler(IDbConnection dbConnection)
+    {
+        _dbConnection = dbConnection;
+    } 
+       // Last Entity Code Check 
+       public async Task<string> Handle(GetEntityLastCodeQuery request, CancellationToken cancellationToken)
        {
-            var lastentitycodecheck = await _entityRepository.GenerateEntityCodeAsync();
-            return _mapper.Map<string>(lastentitycodecheck);
+          var query = "SELECT TOP 1 EntityCode FROM AppData.Entity ORDER BY Id DESC";
+          var lastCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
+
+          if (string.IsNullOrEmpty(lastCode))
+          {
+            lastCode = "ENT-00000";
+          }
+
+          var nextCodeNumber = int.Parse(lastCode[(lastCode.IndexOf('-') + 1)..]) + 1;
+
+          return $"ENT-{nextCodeNumber:D5}";
        
        }
 

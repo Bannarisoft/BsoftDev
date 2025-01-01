@@ -7,9 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Core.Application.Departments.Queries.GetDepartmentById
 {
-    public class GetDepartmentByIdQuery :IRequest<DepartmentVm>
+    public class GetDepartmentByIdQuery :IRequest<DepartmentDto>
     {
         
         public int DepartmentId { get; set; }

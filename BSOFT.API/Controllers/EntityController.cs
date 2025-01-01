@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Core.Application.Entity.Queries.GetEntity;
 using Core.Application.Entity.Queries.GetEntityById;
@@ -7,10 +6,9 @@ using Core.Application.Entity.Queries.GetEntityLastCode;
 using Core.Application.Entity.Commands.CreateEntity;
 using Core.Application.Entity.Commands.UpdateEntity;
 using Core.Application.Entity.Commands.DeleteEntity;
-using Core.Application.Common.Interfaces;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using FluentValidation;
+using BSOFT.Infrastructure.Data;
+using Core.Application.Entity.Queries.GetEntityAutoComplete;
 
 
 namespace BSOFT.API.Controllers
@@ -19,10 +17,19 @@ namespace BSOFT.API.Controllers
     [ApiController]
     public class EntityController : ApiControllerBase
     {
-        public EntityController(ISender mediator) : base(mediator)
+        private readonly IValidator<CreateEntityCommand> _createEntityCommandValidator;
+        private readonly IValidator<UpdateEntityCommand> _updateEntityCommandValidator;
+        private readonly ApplicationDbContext _dbContext;
+        public EntityController(ISender mediator, 
+                             IValidator<CreateEntityCommand> createEntityCommandValidator, 
+                             IValidator<UpdateEntityCommand> updateEntityCommandValidator,ApplicationDbContext dbContext) 
+        : base(mediator)
         {
+            _createEntityCommandValidator = createEntityCommandValidator;    
+            _updateEntityCommandValidator = updateEntityCommandValidator;    
+            _dbContext = dbContext;  
         }
-        [HttpGet("GetAll")]
+        [HttpGet]
         public async Task<IActionResult> GetAllEntityAsync()
         {
             var entity = await Mediator.Send(new GetEntityQuery());
@@ -40,7 +47,7 @@ namespace BSOFT.API.Controllers
             return Ok(entitybyid);
         }
 
-        [HttpGet("GenerateEntityCode")]
+        [HttpGet("GenerateNewEntityCode")]
         public async Task<IActionResult> GenerateEntityCodeAsync()
         {
             var lastentitycode = await Mediator.Send(new GetEntityLastCodeQuery());
@@ -50,14 +57,24 @@ namespace BSOFT.API.Controllers
     [HttpPost]
     public async Task<IActionResult> CreateAsync(CreateEntityCommand command)
     {
+        var validationResult = await _createEntityCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+        return BadRequest(validationResult.Errors);
+        }
         var createdEntity = await Mediator.Send(command);
         return Ok("Created Successfully");
-        return CreatedAtAction(nameof(GetByIdAsync), new { id = createdEntity.EntityId}, createdEntity);
+       
     }
 
-     [HttpPut("{id}")]
+     [HttpPut("update/{id}")]
     public async Task<IActionResult> UpdateAsync(int id, UpdateEntityCommand command)
     {
+        var validationResult = await _updateEntityCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+        return BadRequest(validationResult.Errors);
+        }
         if (id != command.EntityId)
         {
             return BadRequest("EntityId Mismatch");
@@ -67,7 +84,7 @@ namespace BSOFT.API.Controllers
         return Ok("Updated Successfully");
     }
 
-    [HttpPut("delete/{id}")]
+    [HttpDelete("delete/{id}")]
     public async Task<IActionResult> DeleteAsync(int id,DeleteEntityCommand command)
     {
         if(id != command.EntityId)
@@ -76,6 +93,14 @@ namespace BSOFT.API.Controllers
         }
         await Mediator.Send(command);
         return Ok("Status Closed Successfully");
-   }
     }
+
+    [HttpGet("GetEntitysearch")]
+        public async Task<IActionResult> GetEntity([FromQuery] string searchPattern)
+        {
+            var entities = await Mediator.Send(new GetEntityAutocompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
+            var activeentities = entities.Where(c => c.IsActive == 1).ToList(); 
+            return Ok(activeentities);
+        }
+}
 }

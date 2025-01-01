@@ -6,27 +6,49 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper;
+using System.Data;
+using Core.Domain.Entities;
+using Core.Application.Departments.Queries.GetDepartments;
 
 
 namespace Core.Application.Departments.Queries.GetDepartmentAutoComplete
 {
-    public class GetDepartmentAutoCompleteQueryHandler : IRequestHandler<GetDepartmentAutoCompleteQuery,List<DepartmentAutoCompleteVm>>
+    public class GetDepartmentAutoCompleteQueryHandler : IRequestHandler<GetDepartmentAutoCompleteQuery,List<DepartmentDto>>
     {
         
-      private readonly IDepartmentRepository _departmentRepository;
-      private readonly IMapper _mapper;
+      private readonly IDbConnection _dbConnection;
 
-      public GetDepartmentAutoCompleteQueryHandler(IDepartmentRepository departmentRepository,IMapper mapper)
+      public GetDepartmentAutoCompleteQueryHandler(IDbConnection dbConnection)
       {
-        _departmentRepository =departmentRepository;
-        _mapper =mapper;
+       _dbConnection = dbConnection;
       }
-      public async Task<List<DepartmentAutoCompleteVm>>Handle(GetDepartmentAutoCompleteQuery request, CancellationToken cancellationToken)
-      {
-        var deparment =await _departmentRepository.GetAllDepartmentAsync();
-    var departmentList=_mapper.Map<List<DepartmentAutoCompleteVm>>(deparment);
-    return departmentList;
-      }
+
+      public async Task<List<DepartmentDto>> Handle(GetDepartmentAutoCompleteQuery request, CancellationToken cancellationToken)
+    {
+          var query = @"
+            select CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
+            WHERE DeptName LIKE @SearchPattern OR Id LIKE @SearchPattern
+            ORDER BY DeptName";
+       // Execute the query and map the result to a list of CountryDto
+        var department = await _dbConnection.QueryAsync<DepartmentDto>(
+            query, 
+            new { SearchPattern = $"%{request.SearchPattern}%" }  // Use the search pattern with wildcards
+        );
+        if (department == null || !department.Any())
+        {
+            return new List<DepartmentDto>(); // Return empty list if no matches are found
+        }
+
+        // Map the results to DTOs
+        return department.Select(Department => new DepartmentDto
+        {
+            Id = Department.Id,           
+            DeptName = Department.DeptName
+            
+        }).ToList();
+    }
+     
 
     }
 }
