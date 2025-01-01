@@ -59,6 +59,7 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new CompanyConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyAddressConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyContactConfiguration());
+            modelBuilder.ApplyConfiguration(new EntityConfigurations());
 
                
             base.OnModelCreating(modelBuilder);
