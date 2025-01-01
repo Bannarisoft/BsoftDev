@@ -9,29 +9,23 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Divisions.Commands.CreateDivision
 {
-    public class CreateDivisionCommandHandler : IRequestHandler<CreateDivisionCommand, DivisionVm>
+    public class CreateDivisionCommandHandler : IRequestHandler<CreateDivisionCommand, int>
     {
          private readonly IDivisionRepository _divisionRepository;
-        private readonly IMapper _mapper;
+        private readonly IMapper _imapper;
 
-        public CreateDivisionCommandHandler(IDivisionRepository divisionRepository, IMapper mapper)
+        public CreateDivisionCommandHandler(IDivisionRepository divisionRepository, IMapper imapper)
         {
             _divisionRepository = divisionRepository;
-            _mapper = mapper;
+            _imapper = imapper;
         }
 
-        public async Task<DivisionVm> Handle(CreateDivisionCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateDivisionCommand request, CancellationToken cancellationToken)
         {
-            var division = new Division
-            {
-                ShortName = request.ShortName,
-                Name = request.Name,
-                CompanyId = request.CompanyId,
-                IsActive = request.IsActive          
-            };
+            var division  = _imapper.Map<Division>(request);
 
-            var result = await _divisionRepository.CreateAsync(division);
-            return _mapper.Map<DivisionVm>(result);
+            var divisionresult = await _divisionRepository.CreateAsync(division);
+            return divisionresult.Id;
         }
     }
 }

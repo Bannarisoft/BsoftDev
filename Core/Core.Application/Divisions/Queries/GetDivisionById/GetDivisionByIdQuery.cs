@@ -8,8 +8,8 @@ using Core.Application.Divisions.Queries.GetDivisions;
 
 namespace Core.Application.Divisions.Queries.GetDivisionById
 {
-    public class GetDivisionByIdQuery : IRequest<DivisionVm>
+    public class GetDivisionByIdQuery : IRequest<DivisionDTO>
     {
-        public int DivId { get; set; }
+        public int Id { get; set; }
     }
 }

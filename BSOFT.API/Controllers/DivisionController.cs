@@ -12,6 +12,7 @@ using Core.Application.Divisions.Commands.DeleteDivision;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Core.Application.Divisions.Queries.GetDivisionAutoComplete;
+using FluentValidation;
 
 namespace BSOFT.API.Controllers
 {
@@ -19,27 +20,37 @@ namespace BSOFT.API.Controllers
     [Route("api/[controller]")]
     public class DivisionController : ApiControllerBase
     {
-        public DivisionController(ISender mediator) : base(mediator)
+        private readonly IValidator<CreateDivisionCommand> _createDivisionCommandValidator;
+        private readonly IValidator<UpdateDivisionCommand> _updateDivisionCommandValidator;
+        public DivisionController(ISender mediator,IValidator<CreateDivisionCommand> createDivisionCommandValidator,IValidator<UpdateDivisionCommand> updateDivisionCommandValidator) 
+        : base(mediator)
         {
+            _createDivisionCommandValidator = createDivisionCommandValidator;
+            _updateDivisionCommandValidator = updateDivisionCommandValidator;
         }
          [HttpGet]
         public async Task<IActionResult> GetAllDivisionsAsync()
         {
-           
-            var divisions = await Mediator.Send(new GetDivisionQuery());
-            return Ok(divisions);
+           var divisions = await Mediator.Send(new GetDivisionQuery());
+            var activedivisions = divisions.Where(c => c.IsActive == 1).ToList(); 
+            return Ok(activedivisions);
         }
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateDivisionCommand command)
         {
+            var validationResult = await _createDivisionCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
             var createdDivision = await Mediator.Send(command);
-            return CreatedAtAction(nameof(GetByIdAsync), new { DivId = createdDivision.DivId }, createdDivision);
+            return Ok(createdDivision);
         }
          [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
            
-            var division = await Mediator.Send(new GetDivisionByIdQuery() { DivId = id});
+            var division = await Mediator.Send(new GetDivisionByIdQuery() { Id = id});
           
              if(division == null)
             {
@@ -51,13 +62,18 @@ namespace BSOFT.API.Controllers
         [HttpPut("update/{id}")]
         public async Task<IActionResult> Update(int id, UpdateDivisionCommand command )
         {
-            if(id != command.DivId)
+            var validationResult = await _updateDivisionCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
+            if(id != command.Id)
             {
                 return BadRequest();
             }
-            await Mediator.Send(command);
+           var updatedDivision = await Mediator.Send(command);
 
-            return NoContent();
+            return Ok(updatedDivision);
         }
 
 
@@ -65,13 +81,13 @@ namespace BSOFT.API.Controllers
         
         public async Task<IActionResult> Delete(int id,DeleteDivisionCommand deleteDivisionCommand)
         {
-             if(id != deleteDivisionCommand.DivId)
+             if(id != deleteDivisionCommand.Id)
             {
                 return BadRequest();
             }
-            await Mediator.Send(deleteDivisionCommand);
+           var updatedDivision = await Mediator.Send(deleteDivisionCommand);
 
-            return NoContent();
+            return Ok(updatedDivision);
         }
          [HttpGet("GetDivision")]
         public async Task<IActionResult> GetDivision([FromQuery] string searchPattern)

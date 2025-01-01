@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.Divisions.Commands.CreateDivision
 {
-    public class CreateDivisionCommand : IRequest<DivisionVm>
+    public class CreateDivisionCommand : IRequest<int>
     {
-        public int DivId { get; set; }
+        public int Id { get; set; }
         public string ShortName { get; set; }
         public string Name { get; set; }
         public int CompanyId { get; set; }

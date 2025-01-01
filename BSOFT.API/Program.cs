@@ -27,6 +27,9 @@ using Core.Application.Companies.Commands.CreateCompany;
 using Core.Application.Companies.Queries.GetCompanies;
 using BSOFT.API.Validation.Common.Companies;
 using Core.Application.Companies.Commands.UpdateCompany;
+using Core.Application.Divisions.Commands.CreateDivision;
+using BSOFT.API.Validation.Common.Divisions;
+using Core.Application.Divisions.Commands.UpdateDivision;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,6 +64,8 @@ builder.Services.AddScoped<IValidator<CreateUnitCommand>, CreateUnitCommandValid
 builder.Services.AddScoped<IValidator<UpdateUnitCommand>, UpdateUnitCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateCompanyCommand>, CreateCompanyCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateCompanyCommand>, UpdateCompanyCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateDivisionCommand>, CreateDivisionCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateDivisionCommand>, UpdateDivisionCommandValidator>();
 
 // Add services to the container.
 

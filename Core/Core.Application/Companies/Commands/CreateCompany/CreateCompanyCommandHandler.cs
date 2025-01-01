@@ -1,12 +1,7 @@
-using Core.Application.Companies.Queries.GetCompanies;
 using Core.Domain.Entities;
 using Core.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text.Json;
 
 namespace Core.Application.Companies.Commands.CreateCompany
 {

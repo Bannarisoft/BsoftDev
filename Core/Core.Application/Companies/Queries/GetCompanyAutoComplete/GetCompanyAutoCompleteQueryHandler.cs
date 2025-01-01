@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
-using Core.Application.Common.Interfaces;
 using MediatR;
-using System.Text;
 using Core.Application.Companies.Queries.GetCompanies;
 using System.Data;
 using Dapper;

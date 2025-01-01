@@ -27,11 +27,11 @@ namespace BSOFT.Infrastructure.Repositories
          public async Task<Division> GetByIdAsync(int id)
         {
             return await _applicationDbContext.Divisions.AsNoTracking()
-                .FirstOrDefaultAsync(b => b.DivId == id);
+                .FirstOrDefaultAsync(b => b.Id == id);
         }
            public async Task<int> UpdateAsync(int id, Division division)
         {
-            var existingDivision = await _applicationDbContext.Divisions.FirstOrDefaultAsync(u => u.DivId == id);
+            var existingDivision = await _applicationDbContext.Divisions.FirstOrDefaultAsync(u => u.Id == id);
             if (existingDivision != null)
             {
                 existingDivision.ShortName = division.ShortName;
@@ -46,7 +46,7 @@ namespace BSOFT.Infrastructure.Repositories
         }
          public async Task<int> DeleteAsync(int id,Division division)
         {
-            var existingDivision = await _applicationDbContext.Divisions.FirstOrDefaultAsync(u => u.DivId == id);
+            var existingDivision = await _applicationDbContext.Divisions.FirstOrDefaultAsync(u => u.Id == id);
             if (existingDivision != null)
             {
                 existingDivision.IsActive = division.IsActive;
@@ -60,7 +60,7 @@ namespace BSOFT.Infrastructure.Repositories
                  .Where(d => EF.Functions.Like(d.Name, $"%{searchPattern}%")) 
                  .Select(d => new Division
                  {
-                     DivId = d.DivId,
+                     Id = d.Id,
                      Name = d.Name
                  })
                  .ToListAsync();
