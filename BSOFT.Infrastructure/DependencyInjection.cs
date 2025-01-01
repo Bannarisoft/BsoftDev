@@ -61,6 +61,7 @@ namespace BSOFT.Infrastructure
   				services.AddAutoMapper(typeof(EntityProfile));
                 services.AddAutoMapper(typeof(UnitProfile));
                 services.AddAutoMapper(typeof(CreateUnitProfile), typeof(UpdateUnitProfile));
+				services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
                 return services;
             }
     }

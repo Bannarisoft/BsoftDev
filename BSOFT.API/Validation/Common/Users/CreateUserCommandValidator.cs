@@ -68,9 +68,9 @@ namespace BSOFT.API.Validation.Common.Users
                         break; 
 
                     case "Password":
-                        RuleFor(x => x.PasswordHash)
+                        RuleFor(x => x.Password)
                         .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                        .WithMessage($"{nameof(CreateUserCommand.PasswordHash)} {rule.Error}");
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
                         break; 
                         
                     case "UserType":

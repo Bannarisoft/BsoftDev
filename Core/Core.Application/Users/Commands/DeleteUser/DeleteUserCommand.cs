@@ -11,6 +11,6 @@ namespace Core.Application.Users.Commands.DeleteUser
     public class DeleteUserCommand : IRequest<int>
     {
         public int UserId { get; set; }
-        public byte IsActive { get; set; }
+        public bool IsActive { get; set; }
     }
 }

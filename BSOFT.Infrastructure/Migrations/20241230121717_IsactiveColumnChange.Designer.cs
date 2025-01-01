@@ -4,6 +4,7 @@ using BSOFT.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241230121717_IsactiveColumnChange")]
+    partial class IsactiveColumnChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -324,11 +327,12 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("ShortName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Department", (string)null);
+                    b.ToTable("Department", "AppData");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Division", b =>
@@ -849,6 +853,8 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasKey("UserId");
 
+                    b.HasIndex("UserRoleId");
+
                     b.ToTable("Users", "AppSecurity");
                 });
 
@@ -902,7 +908,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserRole", (string)null);
+                    b.ToTable("UserRole", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.CompanyAddress", b =>
@@ -987,16 +993,7 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("Unit");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Company", b =>
-                {
-                    b.Navigation("CompanyAddress");
-
-                    b.Navigation("CompanyContact");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
-                {
-modelBuilder.Entity("Core.Domain.Entities.User", b =>
+            modelBuilder.Entity("Core.Domain.Entities.User", b =>
                 {
                     b.HasOne("Core.Domain.Entities.UserRole", "UserRole")
                         .WithMany("Users")
@@ -1015,7 +1012,8 @@ modelBuilder.Entity("Core.Domain.Entities.User", b =>
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
-                {                    b.Navigation("RoleEntitlements");
+                {
+                    b.Navigation("RoleEntitlements");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Modules", b =>
@@ -1035,6 +1033,8 @@ modelBuilder.Entity("Core.Domain.Entities.User", b =>
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
                 {
                     b.Navigation("RoleEntitlements");
+
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }
