@@ -7,25 +7,55 @@ using Core.Application.Common.Interfaces;
 using MediatR;
 using System.Text;
 using Core.Application.Companies.Queries.GetCompanies;
+using System.Data;
+using Dapper;
 
 namespace Core.Application.Companies.Queries.GetCompanyById
 {
-    public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery,CompanyDTO>
+    public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery,GetCompanyDTO>
     {
-        private readonly ICompanyRepository _companyRepository;
+        private readonly IDbConnection _dbConnection;
         private readonly IMapper _mapper;
 
-         public GetCompanyByIdQueryHandler(ICompanyRepository companyRepository, IMapper mapper)
+         public GetCompanyByIdQueryHandler(IDbConnection dbConnection, IMapper mapper)
         {
-            _companyRepository =companyRepository;
+            _dbConnection = dbConnection;
             _mapper =mapper;
         } 
-        public async Task<CompanyDTO> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
+        public async Task<GetCompanyDTO> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
         {
+            const string query = @"
+            SELECT 
+                C.Id, 
+                C.CompanyName, 
+                C.LegalName,
+                GstNumber,
+                TIN,
+                TAN,
+                CSTNo,
+                YearOfEstablishment,
+                Website,
+                Logo,
+                EntityId, 
+                IsActive,
+                AddressLine1,
+                AddressLine2,
+                PinCode,
+                CountryId,
+                StateId,
+                CityId,
+                A.Phone AS AddressPhone, 
+                Name,
+                Designation,
+                Email,
+                B.Phone AS ContactPhone,
+                Remark
+            FROM AppData.Company C
+            LEFT JOIN AppData.CompanyAddress A ON A.CompanyId = C.Id
+            LEFT JOIN AppData.CompanyContact B ON B.CompanyId = C.Id WHERE C.Id = @CompanyId";
            
-
-          var company = await _companyRepository.GetByIdAsync(request.CompanyId);
-          return _mapper.Map<CompanyDTO>(company);
+             var company = await _dbConnection.QueryFirstOrDefaultAsync<GetCompanyDTO>(query, new { CompanyId = request.CompanyId });
+            return _mapper.Map<GetCompanyDTO>(company);
         }
     }
 }

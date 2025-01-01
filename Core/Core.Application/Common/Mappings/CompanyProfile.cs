@@ -53,6 +53,8 @@ namespace Core.Application.Common.Mappings
 
             CreateMap<CompanyDeleteDTO, Company>()
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+
+           
         
         // // Add mappings for lists
         // CreateMap<List<CompanyAddressDTO>, List<CompanyAddress>>();

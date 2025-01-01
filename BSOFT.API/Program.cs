@@ -16,6 +16,10 @@ using BSOFT.API.Validation.Common.RoleEntitlements;
 using Core.Application.Modules.Commands.CreateModule;
 using Core.Application.Modules.Commands.UpdateModule;
 using BSOFT.API.Validation.Common.Module;
+using Core.Application.Companies.Commands.CreateCompany;
+using Core.Application.Companies.Queries.GetCompanies;
+using BSOFT.API.Validation.Common.Companies;
+using Core.Application.Companies.Commands.UpdateCompany;
 
 
 
@@ -45,6 +49,8 @@ builder.Services.AddScoped<IValidator<CreateRoleEntitlementCommand>, CreateRoleE
 builder.Services.AddScoped<IValidator<UpdateRoleEntitlementCommand>, UpdateRoleEntitlementCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateModuleCommand>, CreateModuleCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateModuleCommand>, UpdateModuleCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateCompanyCommand>, CreateCompanyCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateCompanyCommand>, UpdateCompanyCommandValidator>();
 
 
 // Add services to the container.
