@@ -16,7 +16,13 @@ using BSOFT.API.Validation.Common.RoleEntitlements;
 using Core.Application.Modules.Commands.CreateModule;
 using Core.Application.Modules.Commands.UpdateModule;
 using BSOFT.API.Validation.Common.Module;
-
+using Core.Application.Entity.Commands.CreateEntity;
+using BSOFT.API.Validation.Common.Entity;
+using Core.Application.Entity.Commands.UpdateEntity;
+using Core.Application.Units.Commands.CreateUnit;
+using BSOFT.API.Validation.Common.Unit;
+using Core.Application.Units.Commands.UpdateUnit;
+using BSOFT.API.Validation.Common.Unit.BSOFT.API.Validation.Common.Unit;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,6 +51,10 @@ builder.Services.AddScoped<IValidator<CreateRoleEntitlementCommand>, CreateRoleE
 builder.Services.AddScoped<IValidator<UpdateRoleEntitlementCommand>, UpdateRoleEntitlementCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateModuleCommand>, CreateModuleCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateModuleCommand>, UpdateModuleCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateEntityCommand>, CreateEntityCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateEntityCommand>, UpdateEntityCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateUnitCommand>, CreateUnitCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateUnitCommand>, UpdateUnitCommandValidator>();
 
 
 // Add services to the container.

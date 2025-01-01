@@ -15,9 +15,6 @@ namespace Core.Application.Common.Mappings
     {
          CreateMap<UpdateUnitCommand, Unit>();
          CreateMap<DeleteUnitCommand, Unit>();
-         
-        // CreateMap<UnitAddressDto, UnitAddress>();
-        // CreateMap<UnitContactsDto, UnitContacts>();
     }
      
     }

@@ -1,14 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations.Schema;
-using Core.Domain.Common;
-using System.ComponentModel.DataAnnotations;
-
 namespace Core.Domain.Entities
 {
- 
+
     public class UnitAddress
     {
         public int Id { get; set; }
@@ -21,7 +13,6 @@ namespace Core.Domain.Entities
 
         public int CityId { get; set; }
 
-       
         public string AddressLine1 { get; set; }
 
 
