@@ -26,7 +26,7 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 
               var query = @"
             select Id,RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole 
-            WHERE RoleName LIKE @SearchPattern OR Id LIKE @SearchPattern
+            WHERE RoleName LIKE @SearchPattern OR Id LIKE @SearchPattern and IsActive =1
             ORDER BY RoleName";
        // Execute the query and map the result to a list of CountryDto
         var userrole = await _dbConnection.QueryAsync<UserRoleDto>(
