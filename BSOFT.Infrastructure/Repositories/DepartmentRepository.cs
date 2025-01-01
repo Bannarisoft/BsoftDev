@@ -86,11 +86,5 @@ namespace BSOFT.Infrastructure.Repositories
                  })
                  .ToListAsync();
         }
-
-
-    
-
-
-
     }
 }

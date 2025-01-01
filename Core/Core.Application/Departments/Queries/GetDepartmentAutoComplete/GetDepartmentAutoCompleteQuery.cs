@@ -1,3 +1,4 @@
+using Core.Application.Departments.Queries.GetDepartments;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,8 +9,9 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Departments.Queries.GetDepartmentAutoComplete
 {
-    public class GetDepartmentAutoCompleteQuery : IRequest<List<DepartmentAutoCompleteVm>>
+    public class GetDepartmentAutoCompleteQuery : IRequest<List<DepartmentDto>>
     {
+         public string SearchPattern { get; set; }
         
     }
 }

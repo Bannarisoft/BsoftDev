@@ -27,7 +27,12 @@ using Core.Application.Companies.Commands.CreateCompany;
 using Core.Application.Companies.Queries.GetCompanies;
 using BSOFT.API.Validation.Common.Companies;
 using Core.Application.Companies.Commands.UpdateCompany;
-
+using Core.Application.Departments.Commands.CreateDepartment;
+using BSOFT.API.Validation.Common.Department;
+using Core.Application.Departments.Commands.UpdateDepartment;   
+using BSOFT.API.Validation.Common.UserRole;
+using Core.Application.UserRole.Commands.CreateRole; 
+using Core.Application.UserRole.Commands.UpdateRole;
 
 var builder = WebApplication.CreateBuilder(args);
 

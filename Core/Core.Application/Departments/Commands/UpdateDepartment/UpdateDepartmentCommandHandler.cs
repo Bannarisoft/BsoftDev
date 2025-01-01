@@ -1,37 +1,43 @@
 using Core.Application.Common.Interfaces;
 using Core.Domain.Entities;
 using MediatR;
+using AutoMapper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Core.Application.Departments.Queries.GetDepartments;
 
 namespace Core.Application.Departments.Commands.UpdateDepartment
 {
-    public class UpdateDepartmentCommandHandler  : IRequestHandler<UpdateDepartmentCommand ,int>
+    public class UpdateDepartmentCommandHandler  : IRequestHandler<UpdateDepartmentCommand ,DepartmentDto>
     {
-        public readonly IDepartmentRepository _departmentRepository;
+        public readonly IDepartmentRepository _IDepartmentRepository;
+       private readonly IMapper _Imapper;
+        private readonly ILogger<UpdateDepartmentCommandHandler> _logger;
 
-        public UpdateDepartmentCommandHandler(IDepartmentRepository departmentRepository)
+        public UpdateDepartmentCommandHandler(IDepartmentRepository iDepartmentRepository, IMapper Imapper, ILogger<UpdateDepartmentCommandHandler> logger)
         {
-            _departmentRepository =departmentRepository;
+            _IDepartmentRepository = iDepartmentRepository;
+            _Imapper = Imapper;
+            _logger = logger;
         }
 
-        public async Task<int>Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
-        {
-            var UpdatedepartmentEntity = new Core.Domain.Entities.Department()
-            {
+    
+       public async Task<DepartmentDto> Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
+       {
 
-                Id=request.Id,
-                ShortName =request.ShortName,
-                DeptName =request.DeptName,
-                CompanyId =request.CompanyId,
-                IsActive =request.IsActive
-               
+     
+            var department = _Imapper.Map<Department>(request);
+            await _IDepartmentRepository.UpdateAsync(request.Id, department);
+            var departmentDto = _Imapper.Map<DepartmentDto>(department);
+          
+            return departmentDto;
 
-            };
-            return await _departmentRepository.UpdateAsync(request.Id,UpdatedepartmentEntity);
-        
-        }
+       }
+
+
     }
 }

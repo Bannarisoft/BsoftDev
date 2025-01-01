@@ -9,6 +9,9 @@ using Core.Application.Departments.Commands.DeleteDepartment;
 using Core.Application.Departments.Queries.GetDepartmentAutoComplete;
 using Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
 using Core.Application.Common.Interfaces;
+using System.Data.Common;
+using BSOFT.Infrastructure.Data;
+using FluentValidation;
 
 namespace BSOFT.API.Controllers
 {
@@ -16,8 +19,19 @@ namespace BSOFT.API.Controllers
     [Route("api/[controller]")]
     public class DepartmentController : ApiControllerBase
     {
-        public DepartmentController(ISender mediator) : base(mediator)
+
+        private readonly IValidator<CreateDepartmentCommand> _createDepartmentCommandValidator;
+        private readonly IValidator<UpdateDepartmentCommand> _updateDepartmentCommandValidator;
+          private readonly ApplicationDbContext _dbContext;
+        public DepartmentController(ISender mediator 
+        , IValidator<CreateDepartmentCommand> createDepartmentCommandValidator
+        ,IValidator<UpdateDepartmentCommand> updateDepartmentCommandValidator, 
+         ApplicationDbContext dbContext  ) : base(mediator)
         {
+            _createDepartmentCommandValidator=createDepartmentCommandValidator;
+            _updateDepartmentCommandValidator=updateDepartmentCommandValidator;
+             _dbContext = dbContext; 
+
         }
        [HttpGet]
        public async Task<IActionResult> GetAllDepartmentAsync()
@@ -32,31 +46,42 @@ namespace BSOFT.API.Controllers
             var  department = await Mediator.Send(new GetDepartmentByIdQuery() {DepartmentId=id});
             if(department ==null)
             {
-                return  NotFound();                
+                BadRequest("ID in the URL does not match the command Department.");               
             }
             return Ok(department);
 
         }
         [HttpPost]
-        public async Task<IActionResult>CreateAsync(CreateDepartmentCommand command)
+         [Route("Create")]
+        public async Task<IActionResult>CreateAsync([FromBody] CreateDepartmentCommand command)
         {
-            var createdepartment=await Mediator.Send(command);
-            return Ok("Created successfully");
-            return CreatedAtAction(nameof(GetByIdAsync),new {id=createdepartment.Id},createdepartment);
+
+            var validationResult = await _createDepartmentCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+        return BadRequest(validationResult.Errors);
+        }
+        var createdepartment = await Mediator.Send(command);
+        return Ok("Created Successfully");         
         }
 
 
       [HttpPut("update/{id}")]
     public async Task<IActionResult> UpdateAsync(int id, UpdateDepartmentCommand command)
     {
-       
+         var validationResult = await _updateDepartmentCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+        return BadRequest(validationResult.Errors);
+        }
         if (id != command.Id)
         {
-            return BadRequest("UnitId Mismatch");
+            return BadRequest("Department Id Mismatch");
         }
 
-        var updateddepartment = await Mediator.Send(command);
+        var UpdateDepartment = await Mediator.Send(command);
         return Ok("Updated Successfully");
+
     }
 
     [HttpPut("delete/{id}")]
@@ -83,7 +108,7 @@ namespace BSOFT.API.Controllers
          [HttpGet("autocomplete")]
         public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync([FromQuery] string searchDept)
         {
-            var query = new GetDepartmentAutoCompleteSearchQuery { SearchDept = searchDept };
+            var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = searchDept };
             var result = await Mediator.Send(query);
             return Ok(result);
         }
@@ -91,5 +116,9 @@ namespace BSOFT.API.Controllers
    
 
 
+    }
+
+    internal class CreateDepartmentCommandCommand
+    {
     }
 }

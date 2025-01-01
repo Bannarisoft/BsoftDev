@@ -6,35 +6,55 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper;
 using Core.Application.Departments.Queries.GetDepartmentAutoComplete;
+using System.Data;
+using Core.Application.Departments.Queries.GetDepartments;
 
 
 namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
 {
-    public class GetDepartmentAutoCompleteSearchQueryHandler : IRequestHandler<GetDepartmentAutoCompleteSearchQuery, List<DepartmentAutoCompleteVm>>
+    public class GetDepartmentAutoCompleteSearchQueryHandler : IRequestHandler<GetDepartmentAutoCompleteSearchQuery, List<DepartmentDto>>
     {
-       private readonly IDepartmentRepository _departmentRepository;
-        private readonly IMapper _mapper;
+      private readonly IDbConnection _dbConnection;
 
-        public GetDepartmentAutoCompleteSearchQueryHandler(IDepartmentRepository departmentRepository, IMapper mapper)
+        public GetDepartmentAutoCompleteSearchQueryHandler(IDbConnection dbConnection)
         {
-            _departmentRepository = departmentRepository;
-            _mapper = mapper;
+             _dbConnection = dbConnection;
         }
 
-        public async Task<List<DepartmentAutoCompleteVm>> Handle(GetDepartmentAutoCompleteSearchQuery request, CancellationToken cancellationToken)
+        public async Task<List<DepartmentDto>> Handle(GetDepartmentAutoCompleteSearchQuery request, CancellationToken cancellationToken)
         {
+            var query = @"
+            select Id,CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
+            WHERE DeptName LIKE @SearchPattern OR Id LIKE @SearchPattern and IsActive =1
+            ORDER BY DeptName";
+        // var query = @"
+        //             SELECT Id, countryCode, countryName, IsActive
+        //             FROM AppData.Country
+        //             WHERE countryName LIKE @SearchPattern OR countryCode LIKE @SearchPattern
+        //             ORDER BY countryName";
+            // Execute the query and map the result to a list of CountryDto
+                var department = await _dbConnection.QueryAsync<DepartmentDto>(
+                    query, 
+                    new { SearchPattern = $"%{request.SearchPattern}%" }  // Use the search pattern with wildcards
+                );
+                if (department == null || !department.Any())
+                {
+                    return new List<DepartmentDto>(); // Return empty list if no matches are found
+                }
 
-
+                // Map the results to DTOs
+                return department.Select(Department => new DepartmentDto
+                {
+                    Id = Department.Id,
+                    ShortName = Department.ShortName,
+                    DeptName = Department.DeptName,
+                    IsActive = Department.IsActive
+                }).ToList();
 
             
-            var division = await _departmentRepository.GetAllDepartmentAutoCompleteSearchAsync(request.SearchDept);
-            // Map to the application-specific DTO
-            return division.Select(d => new DepartmentAutoCompleteVm
-            {
-                Id = d.Id,
-                DeptName = d.DeptName
-            }).ToList();
+           
             
         }
         }

@@ -1,33 +1,34 @@
+using Dapper;
 using AutoMapper;
 using Core.Application.Common.Interfaces;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data;
+
 
 namespace Core.Application.Departments.Queries.GetDepartments
 {
-    public class GetDepartmentQueryHandler :IRequestHandler<GetDepartmentQuery,List<DepartmentVm>>
+    public class GetDepartmentQueryHandler :IRequestHandler<GetDepartmentQuery,List<DepartmentDto>>
     {
-
-     private readonly IDepartmentRepository _departmentRepository;
+       private readonly IDbConnection _dbConnection;
+    //   private readonly IDepartmentRepository _departmentRepository;
      private readonly IMapper _mapper;
 
 
-     public GetDepartmentQueryHandler(IDepartmentRepository departmentRepository,IMapper mapper)
+     public GetDepartmentQueryHandler(IDbConnection dbConnection)
         {
-            _departmentRepository=departmentRepository;
-            _mapper =mapper;
+          _dbConnection = dbConnection;
+            
         }
 
-        public async Task<List<DepartmentVm>> Handle(GetDepartmentQuery request ,CancellationToken cancellationToken )
+        public async Task<List<DepartmentDto>> Handle(GetDepartmentQuery request ,CancellationToken cancellationToken )
         {
-            Console.WriteLine("Hello Handler");
-            var department=await _departmentRepository.GetAllDepartmentAsync();
-            var deparmentList= _mapper.Map<List<DepartmentVm>>(department);
-            return deparmentList;
+            const string query = @"SELECT  * FROM AppData.Department";
+            var department = await _dbConnection.QueryAsync<DepartmentDto>(query);
+           return department.AsList();
+
+           
         }
+
+      
     }
 }

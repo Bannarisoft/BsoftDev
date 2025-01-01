@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Commands.CreateRole
 {
-    public class CreateRoleCommand  : IRequest<UserRoleVm>
+    public class CreateRoleCommand  : IRequest<UserRoleDto>
     {
         
  
