@@ -56,6 +56,8 @@ namespace BSOFT.Infrastructure
                 services.AddAutoMapper(typeof(RoleEntitlementMappingProfile));
                 services.AddAutoMapper(typeof(ModuleProfile));
                 services.AddAutoMapper(typeof(CompanyProfile));
+				services.AddAutoMapper(typeof(DepartmentProfile) , typeof(UpdateDepartmentProfile));
+                services.AddAutoMapper(typeof(UserRoleProfile) , typeof(UpdateUserRoleProfile));
   				services.AddAutoMapper(typeof(EntityProfile));
                 services.AddAutoMapper(typeof(UnitProfile));
                 services.AddAutoMapper(typeof(CreateUnitProfile), typeof(UpdateUnitProfile));

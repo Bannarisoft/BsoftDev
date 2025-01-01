@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Departments.Commands.CreateDepartment
 {
-    public class CreateDepartmentCommand : IRequest<DepartmentVm>
+    public class CreateDepartmentCommand : IRequest<DepartmentDto>
     {
     //    public int DeptId { get; set; }
         public string ShortName { get; set; }

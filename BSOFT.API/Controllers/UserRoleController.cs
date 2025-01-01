@@ -8,6 +8,9 @@ using Core.Application.UserRole.Commands.DeleteRole;
 using Core.Application.UserRole.Commands.UpdateRole;
 using Core.Application.UserRole.Queries.GetRolesAutocomplete;
 using Core.Application.Common.Interfaces;
+using FluentValidation;
+using BSOFT.API.Validation.Common.UserRole;
+using BSOFT.Infrastructure.Data;
 
 namespace BSOFT.API.Controllers
 {
@@ -15,8 +18,17 @@ namespace BSOFT.API.Controllers
     [Route("api/[controller]")]
     public class UserRoleController : ApiControllerBase
     {
-        public UserRoleController(ISender mediator) : base(mediator)
+         private readonly IValidator<CreateRoleCommand> _createRoleCommandValidator;
+        private readonly IValidator<UpdateRoleCommand> _updateRoleCommandValidator;
+         private readonly ApplicationDbContext _dbContext;
+        public UserRoleController(ISender mediator    , IValidator<CreateRoleCommand> createRoleCommandValidator,
+        IValidator<UpdateRoleCommand> updateRoleCommandValidator, 
+        ApplicationDbContext dbContext ) : base(mediator)
         {
+            _createRoleCommandValidator= createRoleCommandValidator;
+            _updateRoleCommandValidator= updateRoleCommandValidator;
+             _dbContext = dbContext; 
+
         }
        
         [HttpGet]
@@ -45,8 +57,16 @@ namespace BSOFT.API.Controllers
         [HttpPost]
         public async Task<IActionResult>CreateAsync(CreateRoleCommand command)
         {
-            var createrole = await Mediator.Send(command);
-            return CreatedAtAction(nameof(GetByIdAsync),new {roleid = createrole.Id},createrole);
+                    var validationResult = await _createRoleCommandValidator.ValidateAsync(command);
+                if (!validationResult.IsValid)
+                {
+                return BadRequest(validationResult.Errors);
+                }
+                var createuserrole = await Mediator.Send(command);
+                return Ok("Created Successfully");
+            //  Console.WriteLine("UserRole Create");
+            // var createrole=await Mediator.Send(command);                    
+            //  return Ok(new { Message = "UserRole created successfully.", id = createrole.Id });
         }
 
          [HttpDelete("delete/{id}")]
@@ -68,22 +88,34 @@ namespace BSOFT.API.Controllers
      [HttpPut("update/{id}")]
     public async Task<IActionResult> UpdateAsync(int id, UpdateRoleCommand command)
     {      
-       if (id <= 0)
+          var validationResult = await _updateRoleCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
         {
-            return BadRequest("Invalid role ID");
+        return BadRequest(validationResult.Errors);
         }
-            if (id != command.Id)
+        if (id != command.Id)
         {
-            return BadRequest();
+            return BadRequest("UserRole Id Mismatch");
         }
-            await Mediator.Send(command);
+
+        var UpdateUserRole = await Mediator.Send(command);
         return Ok("Updated Successfully");
+    //    if (id <= 0)
+    //     {
+    //         return BadRequest("Invalid role ID");
+    //     }
+    //         if (id != command.Id)
+    //     {
+    //         return BadRequest();
+    //     }
+    //         await Mediator.Send(command);
+    //     return Ok("Updated Successfully");
     }
 
     [HttpGet("roles")]
     public async Task<IActionResult> GetRoles([FromQuery] string searchTerm)
     {
-        var roles = await Mediator.Send(new GetRolesAutocompleteQuery { SearchTerm = searchTerm });
+        var roles = await Mediator.Send(new GetRolesAutocompleteQuery { SearchPattern = searchTerm });
         return Ok(roles);
     }
 

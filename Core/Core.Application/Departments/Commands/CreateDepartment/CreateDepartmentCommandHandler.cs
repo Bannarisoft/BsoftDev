@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Departments.Commands.CreateDepartment
 {
-    public class CreateDepartmentCommandHandler :IRequestHandler<CreateDepartmentCommand, DepartmentVm >
+    public class CreateDepartmentCommandHandler :IRequestHandler<CreateDepartmentCommand, DepartmentDto >
     {
         private readonly IDepartmentRepository _departmentRepository;
         private readonly IMapper _mapper;
@@ -22,19 +22,36 @@ namespace Core.Application.Departments.Commands.CreateDepartment
             _mapper=mapper;
         }
 
-        public async Task<DepartmentVm>Handle(CreateDepartmentCommand request,CancellationToken cancellationToken)
-        {
-            var departmentEntity=new Department
-            {
-            ShortName=request.ShortName,
-            DeptName =request.DeptName,
-            CompanyId=request.CompanyId,            
-            IsActive=request.IsActive
+        // public async Task<DepartmentVm>Handle(CreateDepartmentCommand request,CancellationToken cancellationToken)
+        // {
+        //     var departmentEntity=new Department
+        //     {
+        //     ShortName=request.ShortName,
+        //     DeptName =request.DeptName,
+        //     CompanyId=request.CompanyId,            
+        //     IsActive=request.IsActive
 
            
-            };
-             var result=await _departmentRepository.CreateAsync(departmentEntity);
-            return _mapper.Map<DepartmentVm>(result);
-         }
+        //     };
+        //      var result=await _departmentRepository.CreateAsync(departmentEntity);
+        //     return _mapper.Map<DepartmentVm>(result);
+        //  }
+
+       public async Task<DepartmentDto> Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
+        {
+              var departmentEntity = _mapper.Map<Department>(request);
+          //  departmentEntity.Id = ID; // Assign the new GUID to the user entity
+
+            // Save the user to the repository
+            var createdDepartment = await _departmentRepository.CreateAsync(departmentEntity);
+            
+            if (createdDepartment == null)
+            {
+                throw new InvalidOperationException("Failed to create user");
+            }
+
+            // Map the created User entity to UserDto
+            return _mapper.Map<DepartmentDto>(createdDepartment);
+        }
     }  
 }
