@@ -15,7 +15,6 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 
 
-
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -32,7 +31,7 @@ namespace BSOFT.Infrastructure
                 services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-                // Register IDbConnection if required
+                // Register IDbConnection for Dapper
                 services.AddTransient<IDbConnection>(sp =>
                 {
                     return new SqlConnection(connectionString);
@@ -42,7 +41,7 @@ namespace BSOFT.Infrastructure
                 services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
                 services.AddScoped<IRoleEntitlementRepository, RoleEntitlementRepository>();
                 services.AddScoped<IModuleRepository, ModuleRepository>();
-                services.AddScoped<IDepartmentRepository, DepartmentRepository>();                
+                services.AddScoped<IDepartmentRepository, DepartmentRepository>();
                 services.AddScoped<IUserRoleRepository, UserRoleRepository>();
                 services.AddScoped<ICompanyRepository, CompanyRepository>();
  				services.AddScoped<ICompanyAddressRepository, CompanyAddressRepository>();
@@ -54,19 +53,15 @@ namespace BSOFT.Infrastructure
 				services.AddTransient<IFileUploadService, FileUploadRepository>();
                 services.AddScoped<ICountryRepository, CountryRepository>();
 
+
                 services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile));
                 services.AddAutoMapper(typeof(RoleEntitlementMappingProfile));
                 services.AddAutoMapper(typeof(ModuleProfile));
                 services.AddAutoMapper(typeof(CompanyProfile));
-                services.AddAutoMapper(typeof(DepartmentProfile) , typeof(UpdateDepartmentProfile));
+				services.AddAutoMapper(typeof(DepartmentProfile) , typeof(UpdateDepartmentProfile));
                 services.AddAutoMapper(typeof(UserRoleProfile) , typeof(UpdateUserRoleProfile));
-				
-                // Add FluentValidation to services
-                // services.AddControllers()
-                //     .AddFluentValidation(config =>
-                //     {
-                //         config.RegisterValidatorsFromAssemblyContaining<CreateCountryCommandValidator>();
-                //     });
+  				services.AddAutoMapper(typeof(EntityProfile));
+                services.AddAutoMapper(typeof(UnitProfile));
 
                 return services;
             }

@@ -43,5 +43,20 @@
         "rule": "MobileNumber",  
         "pattern": "^[0-9]{10}$", 
         "error": " Mobile number must be exactly 10 digits."
+    },   
+    {
+        "rule": "Password",  
+        "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+        "error": "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one digit, and one special character."
+    },
+    {
+        "rule": "UserType",
+        "pattern": "^(1|2)$",
+        "error": "UserType must be either 1 or 2."
+    },
+    {
+        "rule": "ModuleId",
+        "pattern": "^[1-9][0-9]*$",
+        "error": "ModuleId and MenuId must be greater than 0."
     }
 ]
