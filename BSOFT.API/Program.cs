@@ -23,6 +23,10 @@ using Core.Application.Units.Commands.CreateUnit;
 using BSOFT.API.Validation.Common.Unit;
 using Core.Application.Units.Commands.UpdateUnit;
 using BSOFT.API.Validation.Common.Unit.BSOFT.API.Validation.Common.Unit;
+using Core.Application.Companies.Commands.CreateCompany;
+using Core.Application.Companies.Queries.GetCompanies;
+using BSOFT.API.Validation.Common.Companies;
+using Core.Application.Companies.Commands.UpdateCompany;
 using Core.Application.Departments.Commands.CreateDepartment;
 using BSOFT.API.Validation.Common.Department;
 using Core.Application.Departments.Commands.UpdateDepartment;   
@@ -60,11 +64,8 @@ builder.Services.AddScoped<IValidator<CreateEntityCommand>, CreateEntityCommandV
 builder.Services.AddScoped<IValidator<UpdateEntityCommand>, UpdateEntityCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateUnitCommand>, CreateUnitCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateUnitCommand>, UpdateUnitCommandValidator>();
-builder.Services.AddScoped<IValidator<CreateDepartmentCommand>, CreateDepartmentCommandValidator>();
-builder.Services.AddScoped<IValidator<UpdateDepartmentCommand>, UpdateDepartmentCommandValidator>();
-builder.Services.AddScoped<IValidator<CreateRoleCommand>, CreateRoleCommandValidator>();
-builder.Services.AddScoped<IValidator<UpdateRoleCommand>, UpdateRoleCommandValidator>();
-
+builder.Services.AddScoped<IValidator<CreateCompanyCommand>, CreateCompanyCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateCompanyCommand>, UpdateCompanyCommandValidator>();
 
 // Add services to the container.
 

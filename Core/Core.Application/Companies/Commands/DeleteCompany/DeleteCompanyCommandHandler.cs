@@ -11,19 +11,23 @@ namespace Core.Application.Companies.Commands.DeleteCompany
 {
     public class DeleteCompanyCommandHandler : IRequestHandler<DeleteCompanyCommand, int>
     {
-        private readonly ICompanyRepository _companyRepository;
-         public DeleteCompanyCommandHandler(ICompanyRepository companyRepository)
+        private readonly ICompanyRepository _icompanyRepository;
+        private readonly IMapper _imapper;
+         public DeleteCompanyCommandHandler(ICompanyRepository companyRepository ,IMapper imapper)
         {
-            _companyRepository = companyRepository;
+            _icompanyRepository = companyRepository;
+            _imapper = imapper;
         }
+
         public async Task<int> Handle(DeleteCompanyCommand request, CancellationToken cancellationToken)
         {
-             var Updatecompany = new Company()
-            {
-                Id = request.Id,
-                IsActive = request.IsActive 
-            };
-            return await _companyRepository.DeleteAsync(request.Id,Updatecompany);
+            var company  = _imapper.Map<Company>(request.CompanyDelete);
+            //  var Updatecompany = new Company()
+            // {
+            //     Id = request.Id,
+            //     IsActive = request.IsActive 
+            // };
+            return await _icompanyRepository.DeleteAsync(request.Id,company);
         }
     }
 }
