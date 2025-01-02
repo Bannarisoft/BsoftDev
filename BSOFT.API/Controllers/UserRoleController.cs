@@ -9,7 +9,6 @@ using Core.Application.UserRole.Commands.UpdateRole;
 using Core.Application.UserRole.Queries.GetRolesAutocomplete;
 using Core.Application.Common.Interfaces;
 using FluentValidation;
-using BSOFT.API.Validation.Common.UserRole;
 using BSOFT.Infrastructure.Data;
 
 namespace BSOFT.API.Controllers

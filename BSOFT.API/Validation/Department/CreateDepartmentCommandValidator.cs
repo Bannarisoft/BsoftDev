@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
+using Core.Application.Departments.Commands;
 using Core.Application.Departments.Commands.CreateDepartment;
-using Core.Application.Departments.Commands.UpdateDepartment;
+using Core.Domain.Entities;
+using BSOFT.API.Validation.Common;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace BSOFT.API.Validation.Common.Department
+namespace BSOFT.API.Validation.Department
 {
-    public class UpdateDepartmentCommandValidator :AbstractValidator<UpdateDepartmentCommand>
+    public class CreateDepartmentCommandValidator : AbstractValidator<CreateDepartmentCommand>
     {
+           private readonly List<ValidationRule> _validationRules;
 
-         private readonly List<ValidationRule> _validationRules;
-
-
-     public UpdateDepartmentCommandValidator(MaxLengthProvider maxLengthProvider)
+           public CreateDepartmentCommandValidator(MaxLengthProvider maxLengthProvider)
            {
                     var DepartmentShortNameMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.Department>("ShortName") ?? 6;
-                   var DepartmentDeptNameMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.Department>("DeptName") ?? 50; 
-                    _validationRules = ValidationRuleLoader.LoadValidationRules();
+                   var DepartmentDeptNameMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.Department>("DeptName") ?? 50;            
+
+                   _validationRules = ValidationRuleLoader.LoadValidationRules();
                    if (_validationRules == null || !_validationRules.Any())
                    {
                        throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -33,20 +35,20 @@ namespace BSOFT.API.Validation.Common.Department
                             // Apply NotEmpty validation
                             RuleFor(x => x.DeptName).MaximumLength(DepartmentDeptNameMaxLength)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(UpdateDepartmentCommand.DeptName)} {rule.Error}");
+                                .WithMessage($"{nameof(CreateDepartmentCommand.DeptName)} {rule.Error}");
                             RuleFor(x => x.ShortName).MaximumLength(DepartmentShortNameMaxLength)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(UpdateDepartmentCommand.ShortName)} {rule.Error}");
+                                .WithMessage($"{nameof(CreateDepartmentCommand.ShortName)} {rule.Error}");
                             break;
 
                             case "MaxLength":
                             // Apply MaxLength validation using dynamic max length values
                             RuleFor(x => x.DeptName)
                                 .MaximumLength(DepartmentDeptNameMaxLength)
-                                .WithMessage($"{nameof(UpdateDepartmentCommand.DeptName)} {rule.Error} {DepartmentDeptNameMaxLength}");
+                                .WithMessage($"{nameof(CreateDepartmentCommand.DeptName)} {rule.Error} {DepartmentDeptNameMaxLength}");
                             RuleFor(x => x.ShortName)
                             .MaximumLength(DepartmentDeptNameMaxLength)
-                            .WithMessage($"{nameof(UpdateDepartmentCommand.ShortName)} {rule.Error} {DepartmentShortNameMaxLength}"); break;
+                            .WithMessage($"{nameof(CreateDepartmentCommand.ShortName)} {rule.Error} {DepartmentShortNameMaxLength}"); break;
                             default:
                                // Handle unknown rule (log or throw)
                                Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
@@ -58,6 +60,5 @@ namespace BSOFT.API.Validation.Common.Department
 
            }
 
-        
     }
 }

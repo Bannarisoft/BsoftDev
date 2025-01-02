@@ -87,15 +87,15 @@ namespace BSOFT.Infrastructure.Repositories
             return 0; // No user found
         }
 
-        public async Task<User?> GetByUsernameAsync(string username)
+        public async Task<User?> GetByUsernameAsync(string searchPattern)
         {
-            if (string.IsNullOrWhiteSpace(username))
+            if (string.IsNullOrWhiteSpace(searchPattern))
             {
-                throw new ArgumentException("Username cannot be null or empty.", nameof(username));
+                throw new ArgumentException("Username cannot be null or empty.", nameof(searchPattern));
             }
 
             const string query = "SELECT * FROM AppSecurity.Users WHERE UserName = @Username";
-            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { Username = username });
+            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { Username = searchPattern });
         }
         // public async Task<User?> GetByUsernameAsync(string username)
         // {

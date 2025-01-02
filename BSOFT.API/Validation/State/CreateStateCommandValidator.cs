@@ -7,7 +7,7 @@ using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
 using BSOFT.API.Validation.Common;
 
-namespace BSOFT.API.Validation.Common.State
+namespace BSOFT.API.Validation.State
 {
     public class CreateStateCommandValidator : AbstractValidator<CreateStateCommand>
     {

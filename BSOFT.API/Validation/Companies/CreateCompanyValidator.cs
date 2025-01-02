@@ -9,7 +9,7 @@ using Core.Domain.Entities;
 using BSOFT.API.Validation.Common;
 using Core.Application.Companies.Queries.GetCompanies;
 
-namespace BSOFT.API.Validation.Common.Companies
+namespace BSOFT.API.Validation.Companies
 {
     public class CreateCompanyValidator : AbstractValidator<CompanyDTO>
     {

@@ -1,8 +1,9 @@
+using BSOFT.API.Validation.Common;
 using Core.Application.Divisions.Commands.UpdateDivision;
 using Core.Domain.Entities;
 using FluentValidation;
 
-namespace BSOFT.API.Validation.Common.Divisions
+namespace BSOFT.API.Validation.Divisions
 {
     public class UpdateDivisionCommandValidator : AbstractValidator<UpdateDivisionCommand>
     {
