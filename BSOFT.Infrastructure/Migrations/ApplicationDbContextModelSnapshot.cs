@@ -1036,7 +1036,9 @@ modelBuilder.Entity("Core.Domain.Entities.User", b =>
                 {
                     b.Navigation("RoleEntitlements");
                 });
+            });
 #pragma warning restore 612, 618
+        
         }
     }
 }
