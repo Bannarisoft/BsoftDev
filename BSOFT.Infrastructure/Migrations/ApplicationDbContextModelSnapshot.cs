@@ -994,8 +994,7 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("CompanyContact");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
-                {
+           
 modelBuilder.Entity("Core.Domain.Entities.User", b =>
                 {
                     b.HasOne("Core.Domain.Entities.UserRole", "UserRole")

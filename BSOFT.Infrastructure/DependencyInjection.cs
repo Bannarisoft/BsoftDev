@@ -13,6 +13,7 @@ using Core.Application.Common.Mappings;
 using Core.Application.Common.Interface;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using Core.Domain.Entities;
 
 
 namespace BSOFT.Infrastructure
