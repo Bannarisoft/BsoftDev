@@ -12,18 +12,18 @@ namespace Core.Application.Divisions.Commands.DeleteDivision
     public class DeleteDivisionCommandHandler : IRequestHandler<DeleteDivisionCommand, int>
     {
         private readonly IDivisionRepository _divisionRepository;
-        public DeleteDivisionCommandHandler(IDivisionRepository divisionRepository)
+        private readonly IMapper _imapper;
+        public DeleteDivisionCommandHandler(IDivisionRepository divisionRepository, IMapper imapper)
         {
             _divisionRepository = divisionRepository;
+            _imapper = imapper;
         }
          public async Task<int> Handle(DeleteDivisionCommand request, CancellationToken cancellationToken)
         {
-            var Updatedivision = new Division()
-            {
-                DivId = request.DivId,
-                IsActive = request.IsActive 
-            };
-            return await _divisionRepository.DeleteAsync(request.DivId,Updatedivision);
+            var division  = _imapper.Map<Division>(request);
+            var divisionresult = await _divisionRepository.DeleteAsync(request.Id, division);
+          
+            return divisionresult;
         }
     }
 }

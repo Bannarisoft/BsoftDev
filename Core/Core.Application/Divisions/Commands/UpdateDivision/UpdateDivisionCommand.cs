@@ -8,7 +8,7 @@ namespace Core.Application.Divisions.Commands.UpdateDivision
 {
     public class UpdateDivisionCommand : IRequest<int>
     {
-         public int DivId { get; set; }
+         public int Id { get; set; }
         public string ShortName { get; set; }
         public string Name { get; set; }
         public int CompanyId { get; set; }

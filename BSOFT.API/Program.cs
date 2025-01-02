@@ -38,6 +38,9 @@ using Core.Application.Departments.Commands.UpdateDepartment;
 using BSOFT.API.Validation.Common.UserRole;
 using Core.Application.UserRole.Commands.CreateRole; 
 using Core.Application.UserRole.Commands.UpdateRole;
+using Core.Application.Divisions.Commands.CreateDivision;
+using BSOFT.API.Validation.Common.Divisions;
+using Core.Application.Divisions.Commands.UpdateDivision;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +68,8 @@ builder.Services.AddScoped<IValidator<CreateUnitCommand>, CreateUnitCommandValid
 builder.Services.AddScoped<IValidator<UpdateUnitCommand>, UpdateUnitCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateCompanyCommand>, CreateCompanyCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateCompanyCommand>, UpdateCompanyCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateDivisionCommand>, CreateDivisionCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateDivisionCommand>, UpdateDivisionCommandValidator>();
 
 // Add services to the container.
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));

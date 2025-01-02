@@ -1,12 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FluentValidation;
-using Core.Application.Entity.Commands;
 using Core.Application.Entity.Commands.CreateEntity;
-using Core.Domain.Entities;
-using BSOFT.API.Validation.Common;
-using BSOFT.Infrastructure.Migrations;
 namespace BSOFT.API.Validation.Common.Entity
 {
     public class CreateEntityCommandValidator : AbstractValidator<CreateEntityCommand>
