@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
-using Core.Application.UserRole.Commands.UpdateRole;
+using Core.Application.UserRole.Commands.CreateRole;
+using BSOFT.API.Validation.Common;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace BSOFT.API.Validation.Common.UserRole
+namespace BSOFT.API.Validation.UserRole
 {
-    public class UpdateRoleCommandValidator:AbstractValidator<UpdateRoleCommand>
+
+     
+    public class CreateRoleCommandValidator  : AbstractValidator<CreateRoleCommand>
     {
 
-         private readonly List<ValidationRule> _validationRules;
-        public UpdateRoleCommandValidator (MaxLengthProvider maxLengthProvider)
+     private readonly List<ValidationRule> _validationRules;
+
+          public CreateRoleCommandValidator(MaxLengthProvider maxLengthProvider)
            {
 
                     var DepartmentShortNameMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.UserRole>("RoleName") ?? 50;
@@ -32,17 +37,17 @@ namespace BSOFT.API.Validation.Common.UserRole
                                // Apply NotEmpty validation
                                RuleFor(x => x.RoleName).MaximumLength(DepartmentShortNameMaxLength)
                                    .NotEmpty()
-                                   .WithMessage($"{nameof(UpdateRoleCommand.RoleName)} {rule.Error}");
+                                   .WithMessage($"{nameof(CreateRoleCommand.RoleName)} {rule.Error}");
                                RuleFor(x => x.Description).MaximumLength(DepartmentDeptNameMaxLength)
                                    .NotEmpty()
-                                   .WithMessage($"{nameof(UpdateRoleCommand.Description)} {rule.Error}");
+                                   .WithMessage($"{nameof(CreateRoleCommand.Description)} {rule.Error}");
                                break;
                            case "MaxLength":
                                // Apply MaxLength validation using dynamic max length values
                                RuleFor(x => x.RoleName).MaximumLength(DepartmentShortNameMaxLength)
-                                   .WithMessage($"{nameof(UpdateRoleCommand.RoleName)} {rule.Error}");
+                                   .WithMessage($"{nameof(CreateRoleCommand.RoleName)} {rule.Error}");
                                RuleFor(x => x.Description).MaximumLength(DepartmentDeptNameMaxLength)
-                                   .WithMessage($"{nameof(UpdateRoleCommand.Description)} {rule.Error}");
+                                   .WithMessage($"{nameof(CreateRoleCommand.Description)} {rule.Error}");
                                break;
                        }
                    }

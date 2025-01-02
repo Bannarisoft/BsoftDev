@@ -1,14 +1,16 @@
 using FluentValidation;
 using Core.Domain.Entities;
-using Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement;
+using Core.Application.Users.Commands.CreateUser;
+using Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
+using BSOFT.API.Validation.Common;
 
-namespace BSOFT.API.Validation.Common.RoleEntitlements
+namespace BSOFT.API.Validation.RoleEntitlements
 {
-    public class UpdateRoleEntitlementCommandValidator : AbstractValidator<UpdateRoleEntitlementCommand>
+    public class CreateRoleEntitlementCommandValidator : AbstractValidator<CreateRoleEntitlementCommand>
     {
       private readonly List<ValidationRule> _validationRules;
-     public UpdateRoleEntitlementCommandValidator(MaxLengthProvider maxLengthProvider)
-     {
+      public CreateRoleEntitlementCommandValidator(MaxLengthProvider maxLengthProvider)
+      {
             _validationRules = ValidationRuleLoader.LoadValidationRules();
             if (_validationRules == null || !_validationRules.Any())
             {
@@ -22,9 +24,9 @@ namespace BSOFT.API.Validation.Common.RoleEntitlements
                     case "NotEmpty":
                         RuleFor(x => x.RoleName)
                             .NotEmpty()
-                            .WithMessage($"{nameof(UpdateRoleEntitlementCommand.RoleName)} {rule.Error}");
+                            .WithMessage($"{nameof(CreateRoleEntitlementCommand.RoleName)} {rule.Error}");
                         break; 
-                        case "ModuleId":
+                    case "ModuleId":
                         RuleForEach(x => x.ModuleMenus).ChildRules(module =>
                         {
                             module.RuleFor(m => m.ModuleId)
@@ -44,6 +46,6 @@ namespace BSOFT.API.Validation.Common.RoleEntitlements
                         break;
                 }
             }
-     }   
+      }   
     }
 }

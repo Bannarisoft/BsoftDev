@@ -2,7 +2,9 @@ using FluentValidation;
 using Core.Application.Units.Commands.CreateUnit;
 using System.Text.RegularExpressions;
 using Core.Application.Units.Queries.GetUnits;
-namespace BSOFT.API.Validation.Common.Unit
+using BSOFT.API.Validation.Common;
+
+namespace BSOFT.API.Validation.Unit
 {
     public class CreateUnitCommandValidator : AbstractValidator<CreateUnitCommand>
     {

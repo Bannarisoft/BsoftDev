@@ -1,13 +1,14 @@
 using FluentValidation;
 using Core.Domain.Entities;
-using Core.Application.Modules.Commands.CreateModule;
+using Core.Application.Modules.Commands.UpdateModule;
+using BSOFT.API.Validation.Common;
 
-namespace BSOFT.API.Validation.Common.Module
+namespace BSOFT.API.Validation.Module
 {
-    public class CreateModuleCommandValidator : AbstractValidator<CreateModuleCommand>
+    public class UpdateModuleCommandValidator : AbstractValidator<UpdateModuleCommand>
     {
-         private readonly List<ValidationRule> _validationRules;
-         public CreateModuleCommandValidator(MaxLengthProvider maxLengthProvider)
+        private readonly List<ValidationRule> _validationRules;
+         public UpdateModuleCommandValidator(MaxLengthProvider maxLengthProvider)
          {
             var MaxLen = maxLengthProvider.GetMaxLength<Modules>("ModuleName") ?? 50;
              _validationRules = ValidationRuleLoader.LoadValidationRules();
@@ -23,12 +24,12 @@ namespace BSOFT.API.Validation.Common.Module
                     case "NotEmpty":
                         RuleFor(x => x.ModuleName)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateModuleCommand.ModuleName)} {rule.Error}");
+                            .WithMessage($"{nameof(UpdateModuleCommand.ModuleName)} {rule.Error}");
                         break; 
                         case "MaxLength":
                         RuleFor(x => x.ModuleName)
                             .MaximumLength(MaxLen) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateModuleCommand.ModuleName)} {rule.Error} {MaxLen}");   
+                            .WithMessage($"{nameof(UpdateModuleCommand.ModuleName)} {rule.Error} {MaxLen}");   
                         break;
                                   
                         default:
@@ -37,6 +38,5 @@ namespace BSOFT.API.Validation.Common.Module
                 }
             }
          }
-        
     }
 }
