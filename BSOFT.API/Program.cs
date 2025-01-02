@@ -106,7 +106,7 @@ builder.Services.AddAuthentication(options =>
 
 //Add layer dependency 
 builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructureServices(builder.Configuration,builder);
+builder.Services.AddInfrastructureServices(builder.Configuration,builder.Services);
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers();

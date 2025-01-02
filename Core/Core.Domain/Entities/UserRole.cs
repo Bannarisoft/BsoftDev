@@ -18,7 +18,8 @@ namespace Core.Domain.Entities
         public string Description { get; set; }
         public int CompanyId { get; set; }
         public new byte  IsActive { get; set; }
-       
+        public int UserId { get; set; }
+        public User User { get; set; }
         public ICollection<RoleEntitlement> RoleEntitlements { get; set; } = new List<RoleEntitlement>();       
 
     }
