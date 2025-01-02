@@ -10,7 +10,7 @@ namespace Core.Application.Divisions.Commands.DeleteDivision
 {
     public class DeleteDivisionCommand : IRequest<int>
     {
-        public int DivId { get; set; }
+        public int Id { get; set; }
         public byte IsActive { get; set; }
     }
 }

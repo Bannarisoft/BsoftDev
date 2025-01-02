@@ -7,32 +7,37 @@ using Core.Application.Common.Interfaces;
 using MediatR;
 using System.Text;
 using Core.Domain.Entities;
+using Core.Application.Divisions.Queries.GetDivisions;
+using System.Data;
+using Dapper;
 
 
 
 namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
 {
-    public class GetDivisionAutoCompleteQueryHandler : IRequestHandler<GetDivisionAutoCompleteQuery,List<DivisionAutoCompleteVm>>
+    public class GetDivisionAutoCompleteQueryHandler : IRequestHandler<GetDivisionAutoCompleteQuery,List<DivisionAutoCompleteDTO>>
     {
-        private readonly IDivisionRepository _divisionRepository;
+        // private readonly IDivisionRepository _divisionRepository;
+        private readonly IDbConnection _dbConnection;
         private readonly IMapper _mapper;
-         public GetDivisionAutoCompleteQueryHandler(IDivisionRepository divisionRepository, IMapper mapper)
+         public GetDivisionAutoCompleteQueryHandler(IDbConnection dbConnection, IMapper mapper)
          {
-             _divisionRepository =divisionRepository;
+            _dbConnection = dbConnection;
             _mapper =mapper;
          }  
-          public async Task<List<DivisionAutoCompleteVm>> Handle(GetDivisionAutoCompleteQuery request, CancellationToken cancellationToken)
+          public async Task<List<DivisionAutoCompleteDTO>> Handle(GetDivisionAutoCompleteQuery request, CancellationToken cancellationToken)
           {
-                
-       
-            var division = await _divisionRepository.GetDivision(request.SearchPattern);
-            // Map to the application-specific DTO
-            return division.Select(d => new DivisionAutoCompleteVm
-            {
-                DivId = d.DivId,
-                Name = d.Name
-            }).ToList();
+                var searchPattern = "%" + request.SearchPattern + "%";
 
+                 const string query = @"
+                 SELECT 
+                Id, 
+                Name
+            FROM AppData.Division where Name like @SearchPattern";
+
+            var division = await _dbConnection.QueryAsync<DivisionAutoCompleteDTO>(query, new { SearchPattern = searchPattern });
+            // Map to the application-specific DTO
+            return division.AsList();
          } 
     }
 }

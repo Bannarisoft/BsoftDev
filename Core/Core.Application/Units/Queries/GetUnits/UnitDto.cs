@@ -1,10 +1,8 @@
-using Core.Domain.Entities;
-using Core.Application.Common.Mappings;
-
 namespace Core.Application.Units.Queries.GetUnits
 {
     public class UnitDto
     {
+    public int Id { get; set; }
     public string UnitName { get; set; }
     public string ShortName { get; set; }
     public int CompanyId { get; set; }

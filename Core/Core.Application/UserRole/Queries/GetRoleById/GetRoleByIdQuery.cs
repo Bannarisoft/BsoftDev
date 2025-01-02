@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Queries.GetRoleById
 {
-    public class GetRoleByIdQuery :IRequest<UserRoleVm>
+    public class GetRoleByIdQuery :IRequest<UserRoleDto>
     {
       public int Id { get; set; }
     }

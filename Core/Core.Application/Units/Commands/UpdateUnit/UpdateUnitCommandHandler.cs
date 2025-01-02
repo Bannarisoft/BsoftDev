@@ -1,12 +1,8 @@
-using Core.Application.Units.Queries.GetUnits;
-using Core.Application.Units.Commands.CreateUnit;
 using Core.Domain.Entities;
 using Core.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
-using System.Net.Http.Headers;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace Core.Application.Units.Commands.UpdateUnit
 {
@@ -27,7 +23,6 @@ namespace Core.Application.Units.Commands.UpdateUnit
         {
         try
         {
-
 
         var unit = _mapper.Map<Core.Domain.Entities.Unit>(request.UpdateUnitDto);
 

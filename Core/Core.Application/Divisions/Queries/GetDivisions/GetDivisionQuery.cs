@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Core.Application.Divisions.Queries.GetDivisions
 {
-    public class GetDivisionQuery : IRequest<List<DivisionVm>>
+    public class GetDivisionQuery : IRequest<List<DivisionDTO>>
     {
         
     }

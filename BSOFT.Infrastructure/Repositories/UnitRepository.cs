@@ -2,8 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
-
 
 namespace BSOFT.Infrastructure.Repositories
 {

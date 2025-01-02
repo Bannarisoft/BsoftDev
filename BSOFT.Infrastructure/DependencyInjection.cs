@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Core.Domain.Entities;
 using Core.Application.Common.Interfaces;
 using BSOFT.Infrastructure.Repositories;
 using System;
@@ -10,16 +11,18 @@ using Microsoft.Data.SqlClient;
 using MongoDB.Driver;
 using Core.Application.Common.Interface;
 using Core.Application.Common.Mappings;
+using Core.Domain.Entities;
+
 
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices
-            (this IServiceCollection services, IConfiguration configuration)
-        {
-            // SQL Server connection string
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            (this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
+            {
+                var connectionString = configuration.GetConnectionString("DefaultConnection");
+
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
@@ -29,19 +32,11 @@ namespace BSOFT.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-              // Validate MongoDB connection string
-            /* var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
-            if (string.IsNullOrWhiteSpace(mongoConnectionString))
-            {
-                throw new InvalidOperationException("Connection string 'MongoDbConnectionString' not found or is empty.");
-            }
- */
-          
-            // Register IDbConnection for raw SQL
-            services.AddTransient<IDbConnection>(sp =>
-            {
-                return new SqlConnection(connectionString);
-            });
+                // Register IDbConnection for Dapper
+                services.AddTransient<IDbConnection>(sp =>
+                {
+                    return new SqlConnection(connectionString);
+                });
 
     // Register MongoDbContext
         services.AddTransient<MongoDbContext>();
@@ -77,6 +72,8 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
+            services.AddScoped<IJwtTokenHelper, JwtTokenHelper>();
+
 
             // AutoMapper profiles
             services.AddAutoMapper(

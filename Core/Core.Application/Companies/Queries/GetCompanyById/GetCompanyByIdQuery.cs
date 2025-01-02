@@ -8,7 +8,7 @@ using Core.Application.Companies.Queries.GetCompanies;
 
 namespace Core.Application.Companies.Queries.GetCompanyById
 {
-    public class GetCompanyByIdQuery : IRequest<CompanyDTO>
+    public class GetCompanyByIdQuery : IRequest<GetCompanyDTO>
     {
         public int CompanyId { get; set; }
     }

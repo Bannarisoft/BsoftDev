@@ -7,25 +7,32 @@ using Core.Application.Common.Interfaces;
 using MediatR;
 using System.Text;
 using Core.Application.Divisions.Queries.GetDivisions;
+using System.Data;
+using Dapper;
 
 namespace Core.Application.Divisions.Queries.GetDivisionById
 {
-    public class GetDivisionByIdQueryHandler : IRequestHandler<GetDivisionByIdQuery,DivisionVm>
+    public class GetDivisionByIdQueryHandler : IRequestHandler<GetDivisionByIdQuery,DivisionDTO>
     {
-        private readonly IDivisionRepository _divisionRepository;
+        // private readonly IDivisionRepository _divisionRepository;
+        private readonly IDbConnection _dbConnection;
         private readonly IMapper _mapper;
 
-         public GetDivisionByIdQueryHandler(IDivisionRepository divisionRepository, IMapper mapper)
+         public GetDivisionByIdQueryHandler(IDbConnection dbConnection, IMapper mapper)
         {
-            _divisionRepository =divisionRepository;
+            _dbConnection = dbConnection;
             _mapper =mapper;
         } 
-        public async Task<DivisionVm> Handle(GetDivisionByIdQuery request, CancellationToken cancellationToken)
+        public async Task<DivisionDTO> Handle(GetDivisionByIdQuery request, CancellationToken cancellationToken)
         {
-           
+            var query = "SELECT * FROM AppData.Division WHERE Id = @Id";
+        var divisionresult = await _dbConnection.QuerySingleOrDefaultAsync<DivisionDTO>(query, new { Id = request.Id });
 
-          var division = await _divisionRepository.GetByIdAsync(request.DivId);
-          return _mapper.Map<DivisionVm>(division);
+         if (divisionresult == null)
+        {
+            return null;
+        }
+          return _mapper.Map<DivisionDTO>(divisionresult);
         }
     }
 }

@@ -1,10 +1,9 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Core.Domain.Common;
 
 namespace Core.Domain.Entities
 {
 
-public class Unit : BaseEntity
+    public class Unit : BaseEntity
 {
 public int Id { get; set; }
 

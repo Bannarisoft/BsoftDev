@@ -1,12 +1,7 @@
-using Core.Application.Companies.Queries.GetCompanies;
 using Core.Domain.Entities;
 using Core.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text.Json;
 
 namespace Core.Application.Companies.Commands.CreateCompany
 {
@@ -28,7 +23,7 @@ namespace Core.Application.Companies.Commands.CreateCompany
         public async Task<int> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
         {
             
-                var company  = _imapper.Map<Company>(request);
+                var company  = _imapper.Map<Company>(request.Company);
                
                 var companyaddress =     _imapper.Map<CompanyAddress>(request.CompanyAddresses);
                 var companycontact =     _imapper.Map<CompanyContact>(request.CompanyContacts);

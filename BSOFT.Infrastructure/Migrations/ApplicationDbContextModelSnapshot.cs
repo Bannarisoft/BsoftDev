@@ -22,134 +22,6 @@ namespace BSOFT.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Core.Domain.Entities.AuditLogs", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("Action");
-
-                    b.Property<string>("Browser")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("Browser");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("CreatedAt");
-
-                    b.Property<string>("Details")
-                        .IsRequired()
-                        .HasColumnType("varchar(2000)")
-                        .HasColumnName("Details");
-
-                    b.Property<string>("IPAddress")
-                        .IsRequired()
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("IPAddress");
-
-                    b.Property<byte>("IsActive")
-                        .HasColumnType("tinyint");
-
-                    b.Property<string>("Module")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("Module");
-
-                    b.Property<string>("OS")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("OS");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("UserName");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AuditLog", (string)null);
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Cities", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CityCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(5)")
-                        .HasColumnName("CityCode");
-
-                    b.Property<string>("CityName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("CityName");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("CreatedAt");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("CreatedBy");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("CreatedByName");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("CreatedIP");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("ModifiedAt");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("ModifiedBy");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("ModifiedByName");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("ModifiedIP");
-
-                    b.Property<int>("StateId")
-                        .HasColumnType("int")
-                        .HasColumnName("StateId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StateId");
-
-                    b.ToTable("City", "AppData");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -452,12 +324,11 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("ShortName")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Department", "AppData");
+                    b.ToTable("Department", (string)null);
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Division", b =>
@@ -707,75 +578,7 @@ namespace BSOFT.Infrastructure.Migrations
                     b.ToTable("RoleEntitlements", "AppSecurity");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.States", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CountryId")
-                        .HasColumnType("int")
-                        .HasColumnName("CountryId");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("CreatedAt");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("CreatedBy");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("CreatedByName");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("CreatedIP");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("ModifiedAt");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("ModifiedBy");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("ModifiedByName");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("ModifiedIP");
-
-                    b.Property<string>("StateCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(5)")
-                        .HasColumnName("StateCode");
-
-                    b.Property<string>("StateName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("StateName");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CountryId");
-
-                    b.ToTable("State", "AppData");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Unit", b =>
+            modelBuilder.Entity("BSOFT.Domain.Entities.Unit", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1099,18 +902,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserRole", "AppSecurity");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Cities", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.States", "States")
-                        .WithMany("Cities")
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("States");
+                    b.ToTable("UserRole", (string)null);
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.CompanyAddress", b =>
@@ -1173,17 +965,6 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("UserRole");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.States", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.Countries", "Countries")
-                        .WithMany("States")
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Countries");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.UnitAddress", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Unit", "Unit")
@@ -1213,14 +994,27 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("CompanyContact");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Countries", b =>
+           
+            modelBuilder.Entity("Core.Domain.Entities.User", b =>
                 {
-                    b.Navigation("States");
+                    b.HasOne("Core.Domain.Entities.UserRole", "UserRole")
+                        .WithMany("Users")
+                        .HasForeignKey("UserRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Company", b =>
+                {
+                    b.Navigation("CompanyAddress");
+
+                    b.Navigation("CompanyContact");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
-                {
-                    b.Navigation("RoleEntitlements");
+                {                    b.Navigation("RoleEntitlements");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Modules", b =>
@@ -1228,11 +1022,6 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("Menus");
 
                     b.Navigation("RoleEntitlements");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.States", b =>
-                {
-                    b.Navigation("Cities");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Unit", b =>
@@ -1246,7 +1035,136 @@ namespace BSOFT.Infrastructure.Migrations
                 {
                     b.Navigation("RoleEntitlements");
                 });
+            modelBuilder.Entity("Core.Domain.Entities.AuditLogs", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("Action");
+
+                    b.Property<string>("Browser")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("Browser");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("CreatedAt");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("Details");
+
+                    b.Property<string>("IPAddress")
+                        .IsRequired()
+                        .HasColumnType("varchar(25)")
+                        .HasColumnName("IPAddress");
+
+                    b.Property<byte>("IsActive")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("Module");
+
+                    b.Property<string>("OS")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("OS");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("UserName");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditLog", (string)null);
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Cities", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CityCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(5)")
+                        .HasColumnName("CityCode");
+
+                    b.Property<string>("CityName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("CityName");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("CreatedAt");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("CreatedBy");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("CreatedByName");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(25)")
+                        .HasColumnName("CreatedIP");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("ModifiedAt");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("ModifiedBy");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("ModifiedByName");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(25)")
+                        .HasColumnName("ModifiedIP");
+
+                    b.Property<int>("StateId")
+                        .HasColumnType("int")
+                        .HasColumnName("StateId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StateId");
+
+                    b.ToTable("City", "AppData");
+                });
+            
 #pragma warning restore 612, 618
+        
         }
     }
 }
