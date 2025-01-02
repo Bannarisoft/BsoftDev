@@ -8,6 +8,12 @@ using Core.Application.Country.Commands.CreateCountry;
 using BSOFT.API.Validation.Common.Country;
 using BSOFT.API.Validation.Common;
 using Core.Application.Country.Commands.UpdateCountry;
+using BSOFT.API.Validation.Common.State;
+using Core.Application.State.Commands.UpdateState;
+using Core.Application.State.Commands.CreateState;
+using BSOFT.API.Validation.Common.City;
+using Core.Application.City.Commands.CreateCity;
+using Core.Application.City.Commands.UpdateCity;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +36,14 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddScoped<MaxLengthProvider>();
 builder.Services.AddScoped<IValidator<CreateCountryCommand>, CreateCountryCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateCountryCommand>, UpdateCountryCommandValidator>();
+
+
+builder.Services.AddScoped<IValidator<CreateStateCommand>, CreateStateCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateStateCommand>, UpdateStateCommandValidator>();
+
+builder.Services.AddScoped<IValidator<CreateCityCommand>, CreateCityCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateCityCommand>, UpdateCityCommandValidator>();
+
 // Add services to the container.
 
 //Add layer dependency 

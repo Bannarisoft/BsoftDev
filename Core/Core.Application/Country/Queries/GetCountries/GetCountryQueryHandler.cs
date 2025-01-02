@@ -21,12 +21,8 @@ namespace Core.Application.Country.Queries.GetCountries
     public async Task<List<CountryDto>> Handle(GetCountryQuery request, CancellationToken cancellationToken)
     {
          const string query = @"
-            SELECT 
-                Id, 
-                countryCode, 
-                countryName, 
-                IsActive 
-            FROM AppData.Country";
+            SELECT Id,CountryCode, CountryName, IsActive ,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
+            FROM AppData.Country with (nolock) where isActive=1";
 
         var countries = await _dbConnection.QueryAsync<CountryDto>(query);
         return countries.AsList();

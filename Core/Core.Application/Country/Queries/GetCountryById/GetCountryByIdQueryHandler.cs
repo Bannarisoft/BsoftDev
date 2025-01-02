@@ -23,7 +23,7 @@ public GetCountryByIdQueryHandler(IDbConnection dbConnection)
 
     public async Task<CountryDto?> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
     {
-        var query = "SELECT Id, countryCode, countryName, IsActive FROM AppData.Country WHERE Id = @Id";
+        var query = "SELECT Id, countryCode, countryName, IsActive,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP FROM AppData.Country with (nolock) WHERE  Id = @Id and isActive=1";
         var country = await _dbConnection.QuerySingleOrDefaultAsync<CountryDto>(query, new { Id = request.Id });
         // Return null if the country is not found
         if (country == null)
@@ -31,14 +31,7 @@ public GetCountryByIdQueryHandler(IDbConnection dbConnection)
             return null;
         }
 
-        // Map the country entity to a DTO
-        return new CountryDto
-        {
-            Id = country.Id,
-            CountryCode = country.CountryCode,
-            CountryName = country.CountryName,
-            IsActive = country.IsActive
-        };
+       return country;
     }
 }
 }

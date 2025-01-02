@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
 using BSOFT.Infrastructure.Data.Configurations;
+using MongoDB.EntityFrameworkCore.Extensions;
 
 namespace BSOFT.Infrastructure.Data
 {
@@ -40,8 +41,10 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<Menu> Menus { get; set; }
         public DbSet<RoleEntitlement> RoleEntitlements { get; set; }
         public DbSet<Countries> Countries { get; set; }
-
-
+        public DbSet<States> States { get; set; }
+        public DbSet<Cities> Cities { get; set; }        
+       
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,9 +61,10 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyAddressConfiguration());
-            modelBuilder.ApplyConfiguration(new CompanyContactConfiguration());
-
-               
+            modelBuilder.ApplyConfiguration(new CompanyContactConfiguration());                          
+            modelBuilder.ApplyConfiguration(new StateConfiguration());       
+            modelBuilder.ApplyConfiguration(new CityConfiguration());  
+              
             base.OnModelCreating(modelBuilder);
         }
          public override int SaveChanges()

@@ -14,6 +14,7 @@ namespace BSOFT.Infrastructure.Data.Configurations
         {
             builder.ToTable("Country", "AppData");
             builder.HasKey(u => u.Id);
+            //builder.HasKey(u => new { u.Id, u.CountryCode });
             builder.Property(u => u.Id)
                         .HasColumnName("Id")
                         .HasColumnType("int")
@@ -31,10 +32,10 @@ namespace BSOFT.Infrastructure.Data.Configurations
 
 
             builder.Property(u => u.IsActive)                   
-            .HasConversion(
+             .HasConversion(
                 v => v == 1, // convert byte to bool
                 v => v ? (byte)1 : (byte)0 // convert bool to byte
-            )
+            ) 
             .HasColumnType("bit")
             .HasColumnName("IsActive")     
             .IsRequired();

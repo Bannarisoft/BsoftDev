@@ -27,7 +27,7 @@ namespace Core.Application.Divisions.Commands.CreateDivision
                 ShortName = request.ShortName,
                 Name = request.Name,
                 CompanyId = request.CompanyId,
-                IsActive = request.IsActive          
+                IsActive = 1         
             };
 
             var result = await _divisionRepository.CreateAsync(division);

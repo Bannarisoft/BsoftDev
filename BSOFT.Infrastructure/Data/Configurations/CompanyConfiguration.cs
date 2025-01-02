@@ -71,9 +71,9 @@ namespace BSOFT.Infrastructure.Data.Configurations
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
                 .HasConversion(
-        v => v == 1, // convert byte to bool
-        v => v ? (byte)1 : (byte)0 // convert bool to byte
-    )
+                        v => v == 1, // convert byte to bool
+                        v => v ? (byte)1 : (byte)0 // convert bool to byte
+                    )
                 .IsRequired();
 
             builder.HasMany(c => c.CompanyAddress)

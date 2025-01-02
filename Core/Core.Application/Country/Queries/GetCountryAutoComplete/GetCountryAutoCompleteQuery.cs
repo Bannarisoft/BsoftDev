@@ -8,9 +8,8 @@ using MediatR;
 
 namespace Core.Application.Country.Queries.GetCountryAutoComplete
 {
-    public class GetcountryAutoCompleteQuery : IRequest<List<CountryDto>>
+    public class GetCountryAutoCompleteQuery : IRequest<List<CountryDto>>
     {
-        public string SearchPattern { get; set; }
-        // public string SearchText { get; set; }
+        public string SearchPattern { get; set; }=string.Empty;
     }
 }

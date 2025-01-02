@@ -21,7 +21,7 @@ namespace Core.Application.Divisions.Commands.DeleteDivision
             var Updatedivision = new Division()
             {
                 DivId = request.DivId,
-                IsActive = request.IsActive 
+                IsActive = request.IsActive
             };
             return await _divisionRepository.DeleteAsync(request.DivId,Updatedivision);
         }
