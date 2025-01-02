@@ -1,3 +1,4 @@
+using Core.Application.Departments.Queries.GetDepartments;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Departments.Commands.UpdateDepartment
 {
-    public class UpdateDepartmentCommand : IRequest<int>
+    public class UpdateDepartmentCommand : IRequest<DepartmentDto>
     {
-        public int Id { get; set; }
+        public int Id { get; set; }       
         public string ShortName { get; set; }
         public string DeptName { get; set; }
         public int CompanyId { get; set; }

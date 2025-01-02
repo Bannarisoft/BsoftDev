@@ -9,6 +9,7 @@ using Core.Application.Users.Queries.GetUserById;
 using Core.Application.Users.Commands.CreateUser;
 using Core.Application.Users.Commands.UpdateUser;
 using Core.Application.Users.Commands.DeleteUser;
+using Core.Application.Users.Queries.GetUserAutoComplete;
 
 namespace BSOFT.API.Controllers
 {
@@ -92,6 +93,15 @@ namespace BSOFT.API.Controllers
         {
             await Mediator.Send(new DeleteUserCommand { UserId = userid });
             return Ok(new { Message = "User deleted successfully." });
+        }
+
+        [HttpGet]
+        [Route("GetUsers")]
+        public async Task<IActionResult> GetByUsernameAsync([FromQuery] string searchPattern)
+        {
+           
+            var users = await Mediator.Send(new GetUserAutoCompleteQuery {SearchPattern = searchPattern});
+            return Ok(users);
         }
 
         // [HttpPut("{userid}")]

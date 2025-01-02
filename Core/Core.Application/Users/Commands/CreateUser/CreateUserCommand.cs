@@ -14,9 +14,9 @@ namespace Core.Application.Users.Commands.CreateUser
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string UserName { get; set; }
-    public byte IsActive { get; set; }
-    public byte IsFirstTimeUser { get; set; } = 0;
-    public string PasswordHash { get; set; }
+    public bool IsActive { get; set; }
+    public bool IsFirstTimeUser { get; set; } = false;
+    public string Password { get; set; }
     public int UserType { get; set; }
     public string Mobile { get; set; }
     public string EmailId { get; set; }

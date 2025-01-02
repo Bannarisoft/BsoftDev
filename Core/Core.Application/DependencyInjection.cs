@@ -1,3 +1,4 @@
+using Core.Application.UserLogin.Commands.UserLogin;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +21,9 @@ namespace Core.Application
             services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                cfg.RegisterServicesFromAssembly(typeof(UserLoginCommandHandler).Assembly);
             });
+            
             return services;
         }
     }

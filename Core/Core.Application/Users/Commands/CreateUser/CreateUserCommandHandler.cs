@@ -29,6 +29,9 @@ namespace Core.Application.Users.Commands.CreateUser
             var userEntity = _mapper.Map<User>(request);
             userEntity.Id = userId; // Assign the new GUID to the user entity
 
+            // Hash and set the password
+            userEntity.SetPassword(request.Password);
+
             // Save the user to the repository
             var createdUser = await _userRepository.CreateAsync(userEntity);
             

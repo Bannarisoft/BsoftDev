@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Queries.GetRole
 {
-    public class GetRoleQuery : IRequest<List<UserRoleVm>>
+    public class GetRoleQuery : IRequest<List<UserRoleDto>>
     {
         
     }

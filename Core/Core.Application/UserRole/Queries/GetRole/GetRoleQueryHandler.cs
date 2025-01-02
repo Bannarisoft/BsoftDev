@@ -1,3 +1,4 @@
+using Dapper;
 using AutoMapper;
 using Core.Application.Common.Interfaces;
 using MediatR;
@@ -6,28 +7,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Domain.Entities;
+using System.Data;
+
 
 namespace Core.Application.UserRole.Queries.GetRole
 {
-    public class GetRoleQueryHandler :IRequestHandler<GetRoleQuery,List<UserRoleVm>>
+    public class GetRoleQueryHandler :IRequestHandler<GetRoleQuery,List<UserRoleDto>>
     {
+       private readonly IDbConnection _dbConnection;
      private readonly IUserRoleRepository _IuserRoleRepository;
      private readonly IMapper _Imapper;
    
 
 
-       public GetRoleQueryHandler(IUserRoleRepository userroleRepository,IMapper mapper)
+       public GetRoleQueryHandler(IDbConnection dbConnection)
         {
-            _IuserRoleRepository=userroleRepository;
-            _Imapper =mapper;
+            _dbConnection = dbConnection;
         }
 
-        public async Task<List<UserRoleVm>> Handle(GetRoleQuery request ,CancellationToken cancellationToken )
+        public async Task<List<UserRoleDto>> Handle(GetRoleQuery request ,CancellationToken cancellationToken )
         {
-            Console.WriteLine("Hello Handler");
-            var userrole=await _IuserRoleRepository.GetAllRoleAsync();
-            var roleList= _Imapper.Map<List<UserRoleVm>>(userrole);
-            return roleList;
+            const string query = @"SELECT  * FROM AppSecurity.UserRole";
+             var department = await _dbConnection.QueryAsync<UserRoleDto>(query);
+           return department.AsList();
         }
+
+
+
   }
 }

@@ -1,5 +1,10 @@
+using System.Text;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MediatR;
 using Core.Application;
+using Core.Domain.Entities;
 using BSOFT.Infrastructure;
 using FluentValidation.AspNetCore;
 using FluentValidation;
@@ -27,26 +32,25 @@ using Core.Application.Companies.Commands.CreateCompany;
 using Core.Application.Companies.Queries.GetCompanies;
 using BSOFT.API.Validation.Common.Companies;
 using Core.Application.Companies.Commands.UpdateCompany;
+using Core.Application.Departments.Commands.CreateDepartment;
+using BSOFT.API.Validation.Common.Department;
+using Core.Application.Departments.Commands.UpdateDepartment;   
+using BSOFT.API.Validation.Common.UserRole;
+using Core.Application.UserRole.Commands.CreateRole; 
+using Core.Application.UserRole.Commands.UpdateRole;
 using Core.Application.Divisions.Commands.CreateDivision;
 using BSOFT.API.Validation.Common.Divisions;
 using Core.Application.Divisions.Commands.UpdateDivision;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Validate JWT Key
-string? jwtKey = builder.Configuration["Jwt:Key"];
-if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
-{
-    throw new InvalidOperationException("Jwt:Key must be at least 32 characters long.");
-}
-
-// //Validation
-// builder.Services.AddMediatR(cfg =>
+// // Validate JWT Key
+// string? jwtKey = builder.Configuration["Jwt:Key"];
+// if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
 // {
-//     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
-//     cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-// });
+//     throw new InvalidOperationException("Jwt:Key must be at least 32 characters long.");
+// }
+
 
 //FLuent Validation
 builder.Services.AddScoped<MaxLengthProvider>();
@@ -68,10 +72,46 @@ builder.Services.AddScoped<IValidator<CreateDivisionCommand>, CreateDivisionComm
 builder.Services.AddScoped<IValidator<UpdateDivisionCommand>, UpdateDivisionCommandValidator>();
 
 // Add services to the container.
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+    };
+});
+
+// builder.Services.AddAuthentication(options =>
+// {
+//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+// })
+// .AddJwtBearer(options =>
+// {
+//     options.TokenValidationParameters = new TokenValidationParameters
+//     {
+//         ValidateIssuerSigningKey = true,
+//         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+//         ValidateIssuer = false,
+//         ValidateAudience = false,
+//         RoleClaimType = ClaimTypes.Role // Ensure roles are validated
+//     };
+// });
 
 //Add layer dependency 
 builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddInfrastructureServices(builder.Configuration,builder);
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers();

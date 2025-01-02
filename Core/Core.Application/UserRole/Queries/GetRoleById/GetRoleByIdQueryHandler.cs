@@ -8,25 +8,42 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
+using Dapper;
 
 
 namespace Core.Application.UserRole.Queries.GetRoleById
 {
-    public class GetRoleByIdQueryHandler :IRequestHandler<GetRoleByIdQuery,UserRoleVm>
+    public class GetRoleByIdQueryHandler :IRequestHandler<GetRoleByIdQuery,UserRoleDto>
     {
 
-        private readonly IUserRoleRepository _roleRepository;
-        private readonly IMapper _mapper;
-          public GetRoleByIdQueryHandler(IUserRoleRepository roleRepository, IMapper mapper)
+                private readonly IDbConnection _dbConnection;
+      
+          public GetRoleByIdQueryHandler(IDbConnection dbConnection)
           {
-            _roleRepository = roleRepository;
-            _mapper=mapper;
+             _dbConnection = dbConnection;
+        
           }
 
-          public async Task<UserRoleVm> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
+          public async Task<UserRoleDto?> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
           {
-            var userrole =await _roleRepository.GetByIdAsync(request.Id);
-            return _mapper.Map<UserRoleVm>(userrole);
+             var query = "SELECT RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole WHERE Id = @Id";
+        var userrole = await _dbConnection.QuerySingleOrDefaultAsync<UserRoleDto>(query, new { Id = request.Id });
+        // Return null if the country is not found
+        if (userrole == null)
+          {
+            return null;
+          }
+
+        // Map the country entity to a DTO
+        return new UserRoleDto
+         {
+            Id = userrole.Id,
+            CompanyId = userrole.CompanyId,
+            RoleName = userrole.RoleName,
+            Description = userrole.Description,
+            IsActive = userrole.IsActive
+          };
           }
 
         

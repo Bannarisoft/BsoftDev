@@ -52,15 +52,16 @@ namespace BSOFT.Infrastructure
                 services.AddScoped<IIPAddressService, IPAddressService>();
 				services.AddTransient<IFileUploadService, FileUploadRepository>();
                 services.AddScoped<ICountryRepository, CountryRepository>();
-
-
                 services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile));
                 services.AddAutoMapper(typeof(RoleEntitlementMappingProfile));
                 services.AddAutoMapper(typeof(ModuleProfile));
                 services.AddAutoMapper(typeof(CompanyProfile));
+				services.AddAutoMapper(typeof(DepartmentProfile) , typeof(UpdateDepartmentProfile));
+                services.AddAutoMapper(typeof(UserRoleProfile) , typeof(UpdateUserRoleProfile));
   				services.AddAutoMapper(typeof(EntityProfile));
                 services.AddAutoMapper(typeof(UnitProfile));
-
+                services.AddAutoMapper(typeof(CreateUnitProfile), typeof(UpdateUnitProfile));
+				services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
                 return services;
             }
     }
