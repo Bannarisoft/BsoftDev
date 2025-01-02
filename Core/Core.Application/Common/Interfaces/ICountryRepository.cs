@@ -13,6 +13,8 @@ namespace Core.Application.Common.Interface
         Task<int>  DeleteAsync(int countryId,Countries country);
         Task<Countries> GetByIdAsync(int countryId);
         Task<List<Countries>> GetAllCountriesAsync();
-        Task<List<Countries>> GetByCountryNameAsync(string countryname);
+        Task<List<Countries>> GetByCountryNameAsync(string countryName);
+        Task<bool> GetCountryByCodeAsync(string countryCode); 
+         
     }
 }

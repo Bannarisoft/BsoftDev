@@ -12,7 +12,12 @@ using Core.Application.Country.Commands.CreateCountry;
 using BSOFT.API.Validation.Common.Country;
 using BSOFT.API.Validation.Common;
 using Core.Application.Country.Commands.UpdateCountry;
-using BSOFT.API.Validation.Common.Users;
+using BSOFT.API.Validation.Common.State;
+using Core.Application.State.Commands.UpdateState;
+using Core.Application.State.Commands.CreateState;
+using BSOFT.API.Validation.Common.City;
+using Core.Application.City.Commands.CreateCity;
+using Core.Application.City.Commands.UpdateCity;using BSOFT.API.Validation.Common.Users;
 using Core.Application.Users.Commands.CreateUser;
 using Core.Application.Users.Commands.UpdateUser;
 using Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
@@ -70,7 +75,11 @@ builder.Services.AddScoped<IValidator<CreateCompanyCommand>, CreateCompanyComman
 builder.Services.AddScoped<IValidator<UpdateCompanyCommand>, UpdateCompanyCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateDivisionCommand>, CreateDivisionCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateDivisionCommand>, UpdateDivisionCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateStateCommand>, CreateStateCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateStateCommand>, UpdateStateCommandValidator>();
 
+builder.Services.AddScoped<IValidator<CreateCityCommand>, CreateCityCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateCityCommand>, UpdateCityCommandValidator>();
 // Add services to the container.
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddAuthentication(options =>

@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.Country.Queries.GetCountryAutoComplete
 {
-    public class GetCountryAutoCompleteQueryHandler : IRequestHandler<GetcountryAutoCompleteQuery, List<CountryDto>>
+    public class GetCountryAutoCompleteQueryHandler : IRequestHandler<GetCountryAutoCompleteQuery, List<CountryDto>>
     
 {
      private readonly IDbConnection _dbConnection;
@@ -22,12 +22,12 @@ namespace Core.Application.Country.Queries.GetCountryAutoComplete
         _dbConnection = dbConnection;
     }
 
-    public async Task<List<CountryDto>> Handle(GetcountryAutoCompleteQuery request, CancellationToken cancellationToken)
+    public async Task<List<CountryDto>> Handle(GetCountryAutoCompleteQuery request, CancellationToken cancellationToken)
     {
           var query = @"
-            SELECT Id, countryCode, countryName, IsActive
-            FROM AppData.Country
-            WHERE countryName LIKE @SearchPattern OR countryCode LIKE @SearchPattern
+            SELECT Id, countryCode, countryName, IsActive,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
+            FROM AppData.Country with (nolock)
+            WHERE countryName LIKE @SearchPattern OR countryCode LIKE @SearchPattern and IsActive = 1
             ORDER BY countryName";
        // Execute the query and map the result to a list of CountryDto
         var countries = await _dbConnection.QueryAsync<CountryDto>(
@@ -39,14 +39,7 @@ namespace Core.Application.Country.Queries.GetCountryAutoComplete
             return new List<CountryDto>(); // Return empty list if no matches are found
         }
 
-        // Map the results to DTOs
-        return countries.Select(country => new CountryDto
-        {
-            Id = country.Id,
-            CountryCode = country.CountryCode,
-            CountryName = country.CountryName,
-            IsActive = country.IsActive
-        }).ToList();
+       return countries.AsList();  
     }
 }
   

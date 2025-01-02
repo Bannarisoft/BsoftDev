@@ -67,5 +67,10 @@ namespace BSOFT.Infrastructure.Repositories
            return 0; // No user found
         }
 
+        public async Task<bool> GetCountryByCodeAsync(string countryCode)
+        {
+               return await _applicationDbContext.Countries
+            .AnyAsync(c => c.CountryCode == countryCode ); // Checks both CityCode and StateId
+        }
     }
 }

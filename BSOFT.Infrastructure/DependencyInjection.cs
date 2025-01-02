@@ -6,14 +6,11 @@ using Core.Domain.Entities;
 using Core.Application.Common.Interfaces;
 using BSOFT.Infrastructure.Repositories;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Core.Application.Common.Mappings;
-using Core.Application.Common.Interface;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using MongoDB.Driver;
+using Core.Application.Common.Interface;
+using Core.Application.Common.Mappings;
 using Core.Domain.Entities;
 
 
@@ -30,7 +27,9 @@ namespace BSOFT.Infrastructure
             {
                 throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
             }
-                services.AddDbContext<ApplicationDbContext>(options =>
+
+            // Register ApplicationDbContext with SQL Server
+            services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
                 // Register IDbConnection for Dapper
@@ -39,33 +38,54 @@ namespace BSOFT.Infrastructure
                     return new SqlConnection(connectionString);
                 });
 
-                services.AddScoped<IUserRepository, UserRepository>();
-                services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
-                services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
-                services.AddScoped<IRoleEntitlementRepository, RoleEntitlementRepository>();
-                services.AddScoped<IModuleRepository, ModuleRepository>();
-                services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-                services.AddScoped<IUserRoleRepository, UserRoleRepository>();
-                services.AddScoped<ICompanyRepository, CompanyRepository>();
- 				services.AddScoped<ICompanyAddressRepository, CompanyAddressRepository>();
-                services.AddScoped<ICompanyContactRepository, CompanyContactRepository>();
-                services.AddScoped<IUnitRepository, UnitRepository>();
-                services.AddScoped<IEntityRepository,EntityRepository>();
- 				services.AddScoped<IDivisionRepository, DivisionRepository>();
-                services.AddScoped<IIPAddressService, IPAddressService>();
-				services.AddTransient<IFileUploadService, FileUploadRepository>();
-                services.AddScoped<ICountryRepository, CountryRepository>();
-                services.AddAutoMapper(typeof(CreateUserProfile), typeof(UpdateUserProfile));
-                services.AddAutoMapper(typeof(RoleEntitlementMappingProfile));
-                services.AddAutoMapper(typeof(ModuleProfile));
-                services.AddAutoMapper(typeof(CompanyProfile));
-				services.AddAutoMapper(typeof(DepartmentProfile) , typeof(UpdateDepartmentProfile));
-                services.AddAutoMapper(typeof(UserRoleProfile) , typeof(UpdateUserRoleProfile));
-  				services.AddAutoMapper(typeof(EntityProfile));
-                services.AddAutoMapper(typeof(UnitProfile));
-                services.AddAutoMapper(typeof(CreateUnitProfile), typeof(UpdateUnitProfile));
-                services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
-                return services;
-            }
+    // Register MongoDbContext
+        services.AddTransient<MongoDbContext>();
+
+    services.AddTransient<IMongoDatabase>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var mongoClient = new MongoClient(configuration.GetConnectionString("MongoDbConnectionString"));
+    return mongoClient.GetDatabase(configuration["MongoDb:DatabaseName"]);
+});
+            //services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
+            //services.AddSingleton<MongoDbContext>();
+
+            // Register repositories
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRoleEntitlementRepository, RoleEntitlementRepository>();
+            services.AddScoped<IModuleRepository, ModuleRepository>();
+            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+            services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
+            services.AddScoped<ICompanyAddressRepository, CompanyAddressRepository>();
+            services.AddScoped<ICompanyContactRepository, CompanyContactRepository>();
+            services.AddScoped<IUnitRepository, UnitRepository>();
+            services.AddScoped<IEntityRepository, EntityRepository>();
+            services.AddScoped<IDivisionRepository, DivisionRepository>();
+            services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<IStateRepository, StateRepository>();
+            services.AddScoped<ICityRepository, CityRepository>();
+            services.AddScoped<IAuditLogRepository, AuditLogMongoRepository>();
+            
+
+            // Miscellaneous services
+            services.AddScoped<IIPAddressService, IPAddressService>();
+            services.AddTransient<IFileUploadService, FileUploadRepository>();
+            services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
+            services.AddScoped<IJwtTokenHelper, JwtTokenHelper>();
+
+
+            // AutoMapper profiles
+            services.AddAutoMapper(
+                typeof(CreateUserProfile),
+                typeof(UpdateUserProfile),
+                typeof(RoleEntitlementMappingProfile),
+                typeof(ModuleProfile),
+                typeof(CompanyProfile),
+                typeof(AuditLogMappingProfile)
+            );
+
+            return services;
+        }
     }
 }

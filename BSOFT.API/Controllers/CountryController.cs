@@ -10,6 +10,7 @@ using Core.Application.Country.Commands.UpdateCountry;
 using Core.Application.Country.Queries.GetCountries;
 using Core.Application.Country.Queries.GetCountryAutoComplete;
 using Core.Application.Country.Queries.GetcountryById;
+using Core.Domain.Entities;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -38,29 +39,26 @@ namespace BSOFT.API.Controllers
         }
         [HttpGet]
         public async Task<IActionResult> GetAllCountriesAsync()
-        {
-            //var countries = await Mediator.Send(new GetCountryQuery());
-            //return Ok(countries);
-
+        {           
             var countries = await Mediator.Send(new GetCountryQuery());
             var activeCountries = countries.Where(c => c.IsActive == 1).ToList(); // Filter active countries
             return Ok(activeCountries);
 
         }
 
-        [HttpGet("{countryid}")]
-        public async Task<IActionResult> GetByIdAsync(int countryid)
+        [HttpGet("{countryId}")]
+        public async Task<IActionResult> GetByIdAsync(int countryId)
         {
-             if (countryid <= 0)
+             if (countryId <= 0)
             {
                 return BadRequest("Invalid Country ID");
             }
 
-            var country = await Mediator.Send(new GetCountryByIdQuery() { Id = countryid });
+            var country = await Mediator.Send(new GetCountryByIdQuery() { Id = countryId });
 
             if (country == null || country.IsActive != 1) // Check if the country is active
             {
-                return NotFound("Active country not found.");
+                return NotFound("This CountryID not Active");
             }
 
             return Ok(country);           
@@ -70,69 +68,72 @@ namespace BSOFT.API.Controllers
     [HttpPost]
     public async Task<IActionResult> CreateAsync(CreateCountryCommand  command)
     { 
-
         var validationResult = await _createCountryCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
         return BadRequest(validationResult.Errors);
-        }
-
+        }        
         // If validation passes, send the command
-        var countryDto = await Mediator.Send(command);
-        return Ok("Created successfully");
-        // Return a 201 Created response with the correct route and ID       
-        //return CreatedAtAction(nameof(GetByIdAsync), new { id = countryDto.Id }, countryDto);
+        var result = await Mediator.Send(command);
+        if (result.IsSuccess)
+        {
+        return Ok(new { Message = "Country created successfully", Country = result.Data });
+        }
+        else
+        {
+        // If the result is a failure, return BadRequest with the error message
+        return BadRequest(result.ErrorMessage);
+        }
+        
     }
-    [HttpPut("{countryid}")]
-    public async Task<IActionResult> UpdateAsync(int countryid, UpdateCountryCommand command)
+    [HttpPut("{countryId}")]
+    public async Task<IActionResult> UpdateAsync(int countryId, UpdateCountryCommand command)
     {
-         // Use the validator for UpdateCountryCommand
-        var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
+         var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
 
         if (!validationResult.IsValid)
         {
             return BadRequest(validationResult.Errors);
         }
-
-        if (countryid != command.Id)
+        if (command.Id<=0)
         {
-            return BadRequest("CountryId Mismatch");
-        }   
-        var country = await _dbContext.Countries
-                                    .FirstOrDefaultAsync(c => c.Id == countryid && c.IsActive == 1);
-
-        if (country == null)
+            return BadRequest("Invalid CountryId");
+        }        
+        var result = await Mediator.Send(command);
+        if (result.IsSuccess)
         {
-            return BadRequest("Only active countries (IsActive = 1) can be updated.");
+        return Ok(new { Message = "Country Updated successfully", City = result.Data });
         }
-
-        await Mediator.Send(command);
-        return NoContent();
+        else
+        {
+        // If the result is a failure, return BadRequest with the error message
+        return BadRequest(result.ErrorMessage);
+        }
     }
-    [HttpDelete("{countryid}")]
-    public async Task<IActionResult> DeleteAsync(int countryid,DeleteCountryCommand command)
+    [HttpDelete("{countryId}")]
+    public async Task<IActionResult> DeleteAsync(int countryId,DeleteCountryCommand command)
     {
-         if(countryid != command.Id)
+       if(countryId != command.Id)
         {
-           return BadRequest("CountryID Mismatch"); 
+           return BadRequest("CountryId Mismatch"); 
         }
-        // Ensure the country is active before deletion
-        var country = await _dbContext.Countries
-                                        .FirstOrDefaultAsync(c => c.Id == countryid && c.IsActive == 1);
-
-        if (country == null)
+          var result = await Mediator.Send(command);
+        if (result.IsSuccess)
         {
-            return BadRequest("Only active countries (IsActive = 1) can be deleted.");
+        return Ok(new { Message = "Country Deleted successfully", Country = result.Data });
         }
-        await Mediator.Send(command);
-        return Ok("Status Closed Successfully");
+        else
+        {
+        // If the result is a failure, return BadRequest with the error message
+        return BadRequest(result.ErrorMessage);
+        }
     }
 
-       [HttpGet("GetCountrysearch")]
+       [HttpGet("GetCountrySearch")]
         public async Task<IActionResult> GetCountry([FromQuery] string searchPattern)
         {
            
-            var countries = await Mediator.Send(new GetcountryAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
+            var countries = await Mediator.Send(new GetCountryAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
             var activeCountries = countries.Where(c => c.IsActive == 1).ToList(); 
             return Ok(activeCountries);
         }

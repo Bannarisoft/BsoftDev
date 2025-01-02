@@ -40,6 +40,10 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<Menu> Menus { get; set; }
         public DbSet<RoleEntitlement> RoleEntitlements { get; set; }
         public DbSet<Countries> Countries { get; set; }
+        public DbSet<States> States { get; set; }
+        public DbSet<Cities> Cities { get; set; }
+
+
 
 
 
@@ -58,6 +62,8 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyAddressConfiguration());
+			modelBuilder.ApplyConfiguration(new StateConfiguration());       
+            modelBuilder.ApplyConfiguration(new CityConfiguration());  
             modelBuilder.ApplyConfiguration(new CompanyContactConfiguration());
             modelBuilder.ApplyConfiguration(new EntityConfigurations());
             modelBuilder.ApplyConfiguration(new DivisionConfiguration());
