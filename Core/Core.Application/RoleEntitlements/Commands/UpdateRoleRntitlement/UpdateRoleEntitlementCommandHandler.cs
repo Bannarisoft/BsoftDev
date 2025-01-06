@@ -6,15 +6,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IRoleEntitlement;
 
 namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
 {
     public class UpdateRoleEntitlementCommandHandler : IRequestHandler<UpdateRoleEntitlementCommand, bool>
     {
-     private readonly IRoleEntitlementRepository _repository;
+     private readonly IRoleEntitlementCommandRepository _repository;
      private readonly IMapper _mapper;
 
-    public UpdateRoleEntitlementCommandHandler(IRoleEntitlementRepository repository, IMapper mapper)
+    public UpdateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper)
     {
         _repository = repository;
         _mapper = mapper;

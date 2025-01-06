@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common;
-using Core.Application.Common.Interface;
+using Core.Application.Common.Interfaces.IState;
 using Core.Application.State.Queries.GetStates;
 using Core.Domain.Entities;
 using MediatR;
@@ -13,18 +9,20 @@ namespace Core.Application.State.Commands.DeleteState
 {
   public class DeleteStateCommandHandler : IRequestHandler<DeleteStateCommand, Result<StateDto>>
     {
-        private readonly IStateRepository _stateRepository;
+        private readonly IStateCommandRepository _stateRepository;
+        private readonly IStateQueryRepository _stateQueryRepository;
         private readonly IMapper _mapper;
 
-        public DeleteStateCommandHandler(IStateRepository stateRepository, IMapper mapper)
+        public DeleteStateCommandHandler(IStateCommandRepository stateRepository, IMapper mapper,IStateQueryRepository stateQueryRepository)
         {
             _stateRepository = stateRepository;
             _mapper = mapper;
+            _stateQueryRepository = stateQueryRepository;
         }
 
         public async Task<Result<StateDto>> Handle(DeleteStateCommand request, CancellationToken cancellationToken)
         {
-            var state = await _stateRepository.GetByIdAsync(request.Id);
+            var state = await _stateQueryRepository.GetByIdAsync(request.Id);
             if (state == null || state.IsActive != 1)
             {
                 return Result<StateDto>.Failure("Invalid StateID. The specified State does not exist or is inactive.");

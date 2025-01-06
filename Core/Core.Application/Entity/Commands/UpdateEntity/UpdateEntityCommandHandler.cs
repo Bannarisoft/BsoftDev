@@ -1,5 +1,6 @@
 using AutoMapper;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IEntity;
 using Core.Application.Entity.Queries.GetEntity;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -8,10 +9,10 @@ namespace Core.Application.Entity.Commands.UpdateEntity
 {
     public class UpdateEntityCommandHandler : IRequestHandler<UpdateEntityCommand, EntityDto>
     {
-       private readonly IEntityRepository _Ientityrepository;
+       private readonly IEntityCommandRepository _Ientityrepository;
         private readonly IMapper _Imapper;
         private readonly ILogger<UpdateEntityCommandHandler> _logger;
-       public UpdateEntityCommandHandler(IEntityRepository Ientityrepository,IMapper Imapper, ILogger<UpdateEntityCommandHandler> Ilogger)
+       public UpdateEntityCommandHandler(IEntityCommandRepository Ientityrepository,IMapper Imapper, ILogger<UpdateEntityCommandHandler> Ilogger)
         {
             _Ientityrepository = Ientityrepository;
             _Imapper = Imapper;

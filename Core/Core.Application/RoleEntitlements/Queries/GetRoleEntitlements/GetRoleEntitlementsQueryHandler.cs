@@ -1,5 +1,6 @@
 using AutoMapper;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IRoleEntitlement;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,10 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlements
 {
     public class GetRoleEntitlementsQueryHandler : IRequestHandler<GetRoleEntitlementsQuery, List<RoleEntitlementDto>>
     {
-        private readonly IRoleEntitlementRepository _repository;
+        private readonly IRoleEntitlementQueryRepository _repository;
         private readonly IMapper _mapper;
         
-    public GetRoleEntitlementsQueryHandler(IRoleEntitlementRepository repository, IMapper mapper)
+    public GetRoleEntitlementsQueryHandler(IRoleEntitlementQueryRepository repository, IMapper mapper)
     {
         _repository = repository;
         _mapper = mapper;

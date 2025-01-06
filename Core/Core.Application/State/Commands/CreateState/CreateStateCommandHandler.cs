@@ -2,9 +2,9 @@ using Core.Domain.Entities;
 using Core.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
-using Core.Application.Common.Interface;
 using Core.Application.State.Queries.GetStates;
 using Core.Application.Common;
+using Core.Application.Common.Interfaces.IState;
 
 namespace Core.Application.State.Commands.CreateState
 {    
@@ -12,10 +12,10 @@ namespace Core.Application.State.Commands.CreateState
      
     {
         private readonly IMapper _mapper;
-        private readonly IStateRepository _stateRepository;
+        private readonly IStateCommandRepository _stateRepository;
 
         // Constructor Injection
-        public CreateStateCommandHandler(IMapper mapper, IStateRepository stateRepository)
+        public CreateStateCommandHandler(IMapper mapper, IStateCommandRepository stateRepository)
         {
             _mapper = mapper;
             _stateRepository = stateRepository;

@@ -3,16 +3,17 @@ using Core.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Core.Application.Common.Interfaces.IUnit;
 
 namespace Core.Application.Units.Commands.UpdateUnit
 {
     public class UpdateUnitCommandHandler : IRequestHandler<UpdateUnitCommand, int>
     {
-        private readonly IUnitRepository _iUnitRepository;
+        private readonly IUnitCommandRepository _iUnitRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<UpdateUnitCommandHandler> _logger;
 
-       public UpdateUnitCommandHandler(IUnitRepository iUnitRepository, IMapper mapper, ILogger<UpdateUnitCommandHandler> logger)
+       public UpdateUnitCommandHandler(IUnitCommandRepository iUnitRepository, IMapper mapper, ILogger<UpdateUnitCommandHandler> logger)
         {
             _iUnitRepository = iUnitRepository;
             _mapper = mapper;

@@ -1,31 +1,28 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.Common.Interface;
+using Core.Application.Common.Interfaces;
 using MediatR;
 using Core.Domain.Entities;
 using AutoMapper;
-using Core.Application.Common.Interfaces;
-using Core.Application.City.Commands.UpdateCity;
 using Core.Application.City.Queries.GetCities;
 using Core.Application.Common;
+using Core.Application.Common.Interfaces.ICity;
 
 namespace Core.Application.City.Commands.UpdateCity
 {       
     public class UpdateCityCommandHandler : IRequestHandler<UpdateCityCommand, Result<CityDto>>
     {
-        private readonly ICityRepository _cityRepository;
+        private readonly ICityCommandRepository _cityRepository;
+        private readonly ICityQueryRepository _cityQueryRepository;
         private readonly IMapper _mapper;
 
-        public UpdateCityCommandHandler(ICityRepository cityRepository, IMapper mapper)
+        public UpdateCityCommandHandler(ICityCommandRepository cityRepository, IMapper mapper,ICityQueryRepository cityQueryRepository)
         {
             _cityRepository = cityRepository;
-             _mapper = mapper;
+            _mapper = mapper;
+            _cityQueryRepository = cityQueryRepository;
         }
     public async Task<Result<CityDto>> Handle(UpdateCityCommand request, CancellationToken cancellationToken)
     {
-        var city = await _cityRepository.GetByIdAsync(request.Id);
+        var city = await _cityQueryRepository.GetByIdAsync(request.Id);
         if (city == null || city.IsActive != 1)
         {
             return Result<CityDto>.Failure("Invalid CityID. The specified City does not exist or is inactive.");
@@ -50,7 +47,7 @@ namespace Core.Application.City.Commands.UpdateCity
         var updateResult = await _cityRepository.UpdateAsync(request.Id, updatedCityEntity);
 
         // Fetch the updated city to map to the DTO
-        var updatedCity = await _cityRepository.GetByIdAsync(request.Id);
+        var updatedCity = await _cityQueryRepository.GetByIdAsync(request.Id);
 
         // If update was successful, map to DTO and return
         if (updatedCity != null)

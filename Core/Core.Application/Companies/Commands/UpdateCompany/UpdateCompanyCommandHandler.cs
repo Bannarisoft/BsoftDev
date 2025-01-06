@@ -4,6 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.ICompany;
+using Core.Application.Common.Interfaces.ICompanyAddress;
+using Core.Application.Common.Interfaces.ICompanyContact;
 using Core.Domain.Entities;
 using MediatR;
 
@@ -11,12 +14,12 @@ namespace Core.Application.Companies.Commands.UpdateCompany
 {
     public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand, int>
     {
-        private readonly ICompanyRepository _icompanyRepository;
-        private readonly ICompanyAddressRepository _icompanyAddressRepository;
-        private readonly ICompanyContactRepository _icompanyContactRepository;
+        private readonly ICompanyCommandRepository _icompanyRepository;
+        private readonly ICompanyAddressCommandRepository _icompanyAddressRepository;
+        private readonly ICompanyContactCommandRepository _icompanyContactRepository;
         private readonly IMapper _imapper;
 
-        public UpdateCompanyCommandHandler(ICompanyRepository icompanyRepository, ICompanyAddressRepository icompanyAddressRepository, ICompanyContactRepository icompanyContactRepository, IMapper imapper)
+        public UpdateCompanyCommandHandler(ICompanyCommandRepository icompanyRepository, ICompanyAddressCommandRepository icompanyAddressRepository, ICompanyContactCommandRepository icompanyContactRepository, IMapper imapper)
         {
             _icompanyRepository = icompanyRepository;
             _icompanyAddressRepository = icompanyAddressRepository;

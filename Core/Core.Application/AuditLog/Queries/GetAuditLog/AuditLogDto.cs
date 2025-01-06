@@ -8,6 +8,7 @@ namespace Core.Application.AuditLog.Queries.GetAuditLog
         public string Id { get; set; } // Use string for ObjectId     
         public int UserId { get; set; }
         public string UserName { get; set; }=string.Empty;
+        public string MachineName { get; set; }=string.Empty;
         public string IPAddress { get; set; }=string.Empty;
         public string OS { get; set; }=string.Empty;
         public string Browser { get; set; }=string.Empty;

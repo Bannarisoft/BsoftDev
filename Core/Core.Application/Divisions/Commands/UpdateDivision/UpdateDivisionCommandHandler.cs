@@ -1,5 +1,6 @@
 using AutoMapper;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IDivision;
 using Core.Domain.Entities;
 using MediatR;
 
@@ -7,9 +8,9 @@ namespace Core.Application.Divisions.Commands.UpdateDivision
 {
     public class UpdateDivisionCommandHandler : IRequestHandler<UpdateDivisionCommand, int>
     {
-        private readonly IDivisionRepository _divisionRepository;
+        private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
-        public UpdateDivisionCommandHandler(IDivisionRepository divisionRepository,IMapper imapper)
+        public UpdateDivisionCommandHandler(IDivisionCommandRepository divisionRepository,IMapper imapper)
         {
             _divisionRepository =divisionRepository;
             _imapper =imapper;

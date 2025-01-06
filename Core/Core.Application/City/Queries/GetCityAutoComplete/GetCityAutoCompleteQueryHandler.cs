@@ -1,43 +1,34 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
-using Dapper;
 using MediatR;
-using Core.Application.City.Queries.GetCities;
+using Core.Application.City.Queries.GetCities; 
+using Core.Application.Common;
+using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.ICity;
 
 namespace Core.Application.City.Queries.GetCityAutoComplete
 {
-    public class GetCityAutoCompleteQueryHandler : IRequestHandler<GetCityAutoCompleteQuery, List<CityDto>>
+    public class GetCityAutoCompleteQueryHandler : IRequestHandler<GetCityAutoCompleteQuery, Result<List<CityDto>>>
     
-{
-     private readonly IDbConnection _dbConnection;
-
-    public GetCityAutoCompleteQueryHandler(IDbConnection dbConnection)
     {
-        _dbConnection = dbConnection;
-    }
+        private readonly ICityQueryRepository _cityRepository;
+        private readonly IMapper _mapper;
 
-    public async Task<List<CityDto>> Handle(GetCityAutoCompleteQuery request, CancellationToken cancellationToken)
-    {
-          var query = @"
-            SELECT Id, CityCode, CityName, IsActive,StateId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
-            FROM AppData.City with (nolock)
-            WHERE CityName LIKE @SearchPattern OR CityCode LIKE @SearchPattern AND IsActive = 1
-            ORDER BY CityName";
-       // Execute the query and map the result to a list of CountryDto
-        var cities = await _dbConnection.QueryAsync<CityDto>(
-            query, 
-            new { SearchPattern = $"%{request.SearchPattern}%" }  // Use the search pattern with wildcards
-        );
-        if (cities == null || !cities.Any())
+        public GetCityAutoCompleteQueryHandler(ICityQueryRepository cityRepository,  IMapper mapper)
         {
-            return new List<CityDto>(); // Return empty list if no matches are found
+            _cityRepository =cityRepository;
+            _mapper =mapper;
         }
-        return cities.AsList();    
+
+        public async Task<Result<List<CityDto>>> Handle(GetCityAutoCompleteQuery request, CancellationToken cancellationToken)
+        {
+            var result = await _cityRepository.GetByCityNameAsync(request.SearchPattern);
+            if (!result.IsSuccess || result.Data == null || !result.Data.Any())
+            {
+                return Result<List<CityDto>>.Failure("No Cities found matching the search pattern.");
+            }
+            var cityDto = _mapper.Map<List<CityDto>>(result.Data);
+            return Result<List<CityDto>>.Success(cityDto);
+        }
     }
-}
   
 }

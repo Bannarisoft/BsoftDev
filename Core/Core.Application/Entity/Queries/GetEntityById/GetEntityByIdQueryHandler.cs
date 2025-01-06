@@ -3,12 +3,13 @@ using Core.Application.Common.Interfaces;
 using MediatR;
 using Dapper;
 using System.Data;
+using Core.Application.Common.Interfaces.IEntity;
 
 namespace Core.Application.Entity.Queries.GetEntityById
 {
     public class GetEntityByIdQueryHandler : IRequestHandler<GetEntityByIdQuery, EntityDto?>
     {
-    private readonly IEntityRepository _entityRepository;
+    private readonly IEntityQueryRepository _entityRepository;
     private readonly IDbConnection _dbConnection;
 
     public GetEntityByIdQueryHandler(IDbConnection dbConnection)

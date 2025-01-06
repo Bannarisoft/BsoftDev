@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
 using System.Data;
+using Core.Application.Common.Interfaces.IUserRole;
 
 
 namespace Core.Application.UserRole.Queries.GetRole
@@ -16,7 +17,7 @@ namespace Core.Application.UserRole.Queries.GetRole
     public class GetRoleQueryHandler :IRequestHandler<GetRoleQuery,List<UserRoleDto>>
     {
        private readonly IDbConnection _dbConnection;
-     private readonly IUserRoleRepository _IuserRoleRepository;
+     private readonly IUserRoleQueryRepository _IuserRoleRepository;
      private readonly IMapper _Imapper;
    
 

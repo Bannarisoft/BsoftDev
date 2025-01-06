@@ -3,23 +3,26 @@ using Core.Application.Common.Interfaces;
 using FluentValidation;
 using AutoMapper;
 using MediatR;
+using Core.Application.Common.Interfaces.IModule;
 
 namespace Core.Application.Modules.Commands.UpdateModule
 {
     public class UpdateModuleCommandHandler: IRequestHandler<UpdateModuleCommand>
     {
-    private readonly IModuleRepository _moduleRepository;
+    private readonly IModuleCommandRepository _moduleRepository;
+    private readonly IModuleQueryRepository _moduleQueryRepository;
     private readonly IMapper _mapper;
 
-    public UpdateModuleCommandHandler(IModuleRepository moduleRepository, IMapper mapper)
+    public UpdateModuleCommandHandler(IModuleCommandRepository moduleRepository, IMapper mapper, IModuleQueryRepository moduleQueryRepository)
     {
         _moduleRepository = moduleRepository;
         _mapper = mapper;
+        _moduleQueryRepository = moduleQueryRepository;
     }
 
     public async Task Handle(UpdateModuleCommand request, CancellationToken cancellationToken)
     {
-    var module = await _moduleRepository.GetModuleByIdAsync(request.ModuleId);
+    var module = await _moduleQueryRepository.GetModuleByIdAsync(request.ModuleId);
     if (module == null || module.IsDeleted)
     {
         throw new ValidationException("Module not found or has been deleted.");

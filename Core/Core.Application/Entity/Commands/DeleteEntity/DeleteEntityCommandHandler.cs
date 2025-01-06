@@ -1,5 +1,6 @@
 using AutoMapper;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IEntity;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -7,11 +8,11 @@ namespace Core.Application.Entity.Commands.DeleteEntity
 {
     public class DeleteEntityCommandHandler  : IRequestHandler<DeleteEntityCommand, int>
     {
-        private readonly IEntityRepository _ientityRepository;
+        private readonly IEntityCommandRepository _ientityRepository;
         private readonly IMapper _Imapper;
         private readonly ILogger<DeleteEntityCommandHandler> _Ilogger;
 
-        public DeleteEntityCommandHandler(IEntityRepository Ientityrepository,IMapper Imapper,ILogger<DeleteEntityCommandHandler> Ilogger)
+        public DeleteEntityCommandHandler(IEntityCommandRepository Ientityrepository,IMapper Imapper,ILogger<DeleteEntityCommandHandler> Ilogger)
         {
             _ientityRepository = Ientityrepository;
             _Imapper = Imapper;

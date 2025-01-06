@@ -7,16 +7,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IUserRole;
 
 namespace Core.Application.UserRole.Commands.CreateRole
 {
     public class CreateRoleCommandHandler :IRequestHandler<CreateRoleCommand, UserRoleDto>
     {
         
-        private readonly IUserRoleRepository _roleRepository;
+        private readonly IUserRoleCommandRepository _roleRepository;
         private readonly IMapper _mapper;
 
-          public CreateRoleCommandHandler(IUserRoleRepository roleRepository,IMapper mapper)
+          public CreateRoleCommandHandler(IUserRoleCommandRepository roleRepository,IMapper mapper)
         {
              _roleRepository=roleRepository;
             _mapper=mapper;

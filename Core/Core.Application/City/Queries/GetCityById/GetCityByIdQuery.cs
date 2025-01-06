@@ -1,15 +1,10 @@
 using Core.Application.City.Queries.GetCities;
-using Core.Application.Country.Queries.GetCountries;
+using Core.Application.Common;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Application.City.Queries.GetCityById
 {
-    public class GetCityByIdQuery : IRequest<CityDto>
+    public class GetCityByIdQuery : IRequest<Result<CityDto>>
     {
         public int Id { get; set; }
     }

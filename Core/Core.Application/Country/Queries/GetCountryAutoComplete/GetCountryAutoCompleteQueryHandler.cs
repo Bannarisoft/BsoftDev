@@ -1,46 +1,34 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.Common.Interface;
+using Core.Application.Common.Interfaces;
 using Core.Application.Country.Queries.GetCountries;
-using Core.Application.Country.Queries.GetCountryAutoComplete;
 using AutoMapper;
-using Dapper;
 using MediatR;
+using Core.Application.Common;
+using Core.Application.Common.Interfaces.ICountry;
 
 namespace Core.Application.Country.Queries.GetCountryAutoComplete
 {
-    public class GetCountryAutoCompleteQueryHandler : IRequestHandler<GetCountryAutoCompleteQuery, List<CountryDto>>
-    
-{
-     private readonly IDbConnection _dbConnection;
-
-    public GetCountryAutoCompleteQueryHandler(IDbConnection dbConnection)
+    public class GetCountryAutoCompleteQueryHandler : IRequestHandler<GetCountryAutoCompleteQuery, Result<List<CountryDto>>>
     {
-        _dbConnection = dbConnection;
-    }
+        private readonly ICountryQueryRepository _countryRepository;
+        private readonly IMapper _mapper;
 
-    public async Task<List<CountryDto>> Handle(GetCountryAutoCompleteQuery request, CancellationToken cancellationToken)
-    {
-          var query = @"
-            SELECT Id, countryCode, countryName, IsActive,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
-            FROM AppData.Country with (nolock)
-            WHERE countryName LIKE @SearchPattern OR countryCode LIKE @SearchPattern and IsActive = 1
-            ORDER BY countryName";
-       // Execute the query and map the result to a list of CountryDto
-        var countries = await _dbConnection.QueryAsync<CountryDto>(
-            query, 
-            new { SearchPattern = $"%{request.SearchPattern}%" }  // Use the search pattern with wildcards
-        );
-        if (countries == null || !countries.Any())
+        public GetCountryAutoCompleteQueryHandler(ICountryQueryRepository countryRepository, IMapper mapper)
         {
-            return new List<CountryDto>(); // Return empty list if no matches are found
+            _countryRepository =countryRepository;
+            _mapper =mapper;
         }
 
-       return countries.AsList();  
+        public async Task<Result<List<CountryDto>>> Handle(GetCountryAutoCompleteQuery request, CancellationToken cancellationToken)
+        {            
+            var result = await _countryRepository.GetByCountryNameAsync(request.SearchPattern);
+            if (!result.IsSuccess || result.Data == null || !result.Data.Any())
+            {
+                return Result<List<CountryDto>>.Failure("No countries found matching the search pattern.");
+            }
+            var countryDto = _mapper.Map<List<CountryDto>>(result.Data);
+            return Result<List<CountryDto>>.Success(countryDto);
+            
+        }
     }
-}
   
 }
