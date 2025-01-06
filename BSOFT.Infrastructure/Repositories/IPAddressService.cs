@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.Common.Interfaces;
 using System.Net;
+using Core.Application.Common.Interfaces;
 
 namespace BSOFT.Infrastructure.Repositories
-{
-    public class IPAddressService : IIPAddressService
+{  public class IPAddressService : IIPAddressService
     {
          public string GetSystemIPAddress()
         {
@@ -27,4 +22,5 @@ namespace BSOFT.Infrastructure.Repositories
         }
         
     }
+
 }

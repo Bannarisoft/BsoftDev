@@ -1,31 +1,28 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.Common.Interface;
 using MediatR;
 using Core.Domain.Entities;
 using AutoMapper;
-using Core.Application.State.Commands.UpdateState;
 using Core.Application.State.Queries.GetStates;
 using Core.Application.Common;
+using Core.Application.Common.Interfaces.IState;
 
 namespace Core.Application.State.Commands.UpdateState
 {    
     public class UpdateStateCommandHandler : IRequestHandler<UpdateStateCommand, Result<StateDto>>
     {
-        private readonly IStateRepository _stateRepository;
+        private readonly IStateCommandRepository _stateRepository;
         private readonly IMapper _mapper;
+        private readonly IStateQueryRepository _stateQueryRepository;
 
-        public UpdateStateCommandHandler(IStateRepository stateRepository, IMapper mapper)
+        public UpdateStateCommandHandler(IStateCommandRepository stateRepository, IMapper mapper, IStateQueryRepository stateQueryRepository)
         {
             _stateRepository = stateRepository;
              _mapper = mapper;
+            _stateQueryRepository = stateQueryRepository;
         }
         
         public async Task<Result<StateDto>> Handle(UpdateStateCommand request, CancellationToken cancellationToken)
         {
-            var state = await _stateRepository.GetByIdAsync(request.Id);
+            var state = await _stateQueryRepository.GetByIdAsync(request.Id);
             if (state == null || state.IsActive != 1)
             {
                 return Result<StateDto>.Failure("Invalid StateID. The specified State does not exist or is inactive.");
@@ -50,7 +47,7 @@ namespace Core.Application.State.Commands.UpdateState
             var updateResult = await _stateRepository.UpdateAsync(request.Id, updatedStateEntity);
 
             // Fetch the updated city to map to the DTO
-            var updatedState = await _stateRepository.GetByIdAsync(request.Id);
+            var updatedState = await _stateQueryRepository.GetByIdAsync(request.Id);
 
             // If update was successful, map to DTO and return
             if (updatedState != null)

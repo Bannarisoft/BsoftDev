@@ -6,15 +6,16 @@ using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IUser;
 
 namespace Core.Application.Users.Commands.CreateUser
 {
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserDto>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserCommandRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public CreateUserCommandHandler(IUserRepository userRepository, IMapper mapper)
+        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
             _mapper = mapper;

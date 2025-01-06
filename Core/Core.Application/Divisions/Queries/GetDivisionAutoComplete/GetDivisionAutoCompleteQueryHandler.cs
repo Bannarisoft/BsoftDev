@@ -10,6 +10,7 @@ using Core.Domain.Entities;
 using Core.Application.Divisions.Queries.GetDivisions;
 using System.Data;
 using Dapper;
+using Core.Application.Common.Interfaces.IDivision;
 
 
 
@@ -17,17 +18,16 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
 {
     public class GetDivisionAutoCompleteQueryHandler : IRequestHandler<GetDivisionAutoCompleteQuery,List<DivisionAutoCompleteDTO>>
     {
-        // private readonly IDivisionRepository _divisionRepository;
-        private readonly IDbConnection _dbConnection;
+        private readonly IDivisionQueryRepository _divisionRepository;
         private readonly IMapper _mapper;
-         public GetDivisionAutoCompleteQueryHandler(IDbConnection dbConnection, IMapper mapper)
+         public GetDivisionAutoCompleteQueryHandler(IDivisionQueryRepository divisionRepository, IMapper mapper)
          {
-            _dbConnection = dbConnection;
+            _divisionRepository =divisionRepository;
             _mapper =mapper;
          }  
           public async Task<List<DivisionAutoCompleteDTO>> Handle(GetDivisionAutoCompleteQuery request, CancellationToken cancellationToken)
           {
-                var searchPattern = "%" + request.SearchPattern + "%";
+             /*    var searchPattern = "%" + request.SearchPattern + "%";
 
                  const string query = @"
                  SELECT 
@@ -37,7 +37,10 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
 
             var division = await _dbConnection.QueryAsync<DivisionAutoCompleteDTO>(query, new { SearchPattern = searchPattern });
             // Map to the application-specific DTO
-            return division.AsList();
+            return division.AsList(); */
+            var result = await _divisionRepository.GetDivision(request.SearchPattern);
+            //return _mapper.Map<List<DivisionDTO>>(result);
+            return _mapper.Map<List<DivisionAutoCompleteDTO>>(result);
          } 
     }
 }

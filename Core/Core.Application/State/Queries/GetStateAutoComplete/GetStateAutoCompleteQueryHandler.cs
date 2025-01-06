@@ -1,48 +1,35 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.Common.Interface;
-using Core.Application.Country.Queries.GetCountries;
-using Core.Application.Country.Queries.GetCountryAutoComplete;
-using AutoMapper;
 using Dapper;
 using MediatR;
 using Core.Application.State.Queries.GetStates;
+using AutoMapper;
+using Core.Application.Common.Interfaces;
+using Core.Application.Common;
+using Core.Application.Common.Interfaces.IState;
 
 namespace Core.Application.State.Queries.GetStateAutoComplete
 {
-    public class GetStateAutoCompleteQueryHandler : IRequestHandler<GetStateAutoCompleteQuery, List<StateDto>>
+    public class GetStateAutoCompleteQueryHandler : IRequestHandler<GetStateAutoCompleteQuery, Result<List<StateDto>>>
     
-{
-     private readonly IDbConnection _dbConnection;
-
-    public GetStateAutoCompleteQueryHandler(IDbConnection dbConnection)
     {
-        _dbConnection = dbConnection;
-    }
-
-    public async Task<List<StateDto>> Handle(GetStateAutoCompleteQuery request, CancellationToken cancellationToken)
-    {
-          var query = @"
-            SELECT Id, StateCode, StateName , IsActive,CountryId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
-            FROM AppData.State with (nolock)
-            WHERE StateName   LIKE @SearchPattern OR StateCode  LIKE @SearchPattern AND IsActive = 1
-            ORDER BY StateName ";
-
-        // Execute the query and map the result to a list of CountryDto
-        var states = await _dbConnection.QueryAsync<StateDto>(
-            query, 
-            new { SearchPattern = $"%{request.SearchPattern}%" }  // Use the search pattern with wildcards
-        );
-        if (states == null || !states.Any())
+        private readonly IStateQueryRepository _stateRepository;
+        private readonly IMapper _mapper;
+        public GetStateAutoCompleteQueryHandler(IStateQueryRepository stateRepository,  IMapper mapper)
         {
-            return new List<StateDto>(); // Return empty list if no matches are found
+            _stateRepository =stateRepository;
+            _mapper =mapper;
         }
-        return states.AsList();        
-    
+
+        public async Task<Result<List<StateDto>>> Handle(GetStateAutoCompleteQuery request, CancellationToken cancellationToken)
+        {
+            var result = await _stateRepository.GetByStateNameAsync(request.SearchPattern);
+            if (!result.IsSuccess || result.Data == null || !result.Data.Any())
+            {
+                return Result<List<StateDto>>.Failure("No Cities found matching the search pattern.");
+            }
+            var stateDto = _mapper.Map<List<StateDto>>(result.Data);
+            return Result<List<StateDto>>.Success(stateDto);         
+        }
     }
-}
-  
+    
 }

@@ -1048,6 +1048,11 @@ namespace BSOFT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)")
                         .HasColumnName("Action");
+                    
+                    b.Property<string>("MachineName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("MachineName");
 
                     b.Property<string>("Browser")
                         .IsRequired()

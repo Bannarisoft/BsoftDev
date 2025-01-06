@@ -7,16 +7,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IDepartment;
 
 namespace Core.Application.Departments.Commands.CreateDepartment
 {
     public class CreateDepartmentCommandHandler :IRequestHandler<CreateDepartmentCommand, DepartmentDto >
     {
-        private readonly IDepartmentRepository _departmentRepository;
+        private readonly IDepartmentCommandRepository _departmentRepository;
         private readonly IMapper _mapper;
            
     
-         public CreateDepartmentCommandHandler(IDepartmentRepository departmentRepository,IMapper mapper)
+         public CreateDepartmentCommandHandler(IDepartmentCommandRepository departmentRepository,IMapper mapper)
         {
              _departmentRepository=departmentRepository;
             _mapper=mapper;

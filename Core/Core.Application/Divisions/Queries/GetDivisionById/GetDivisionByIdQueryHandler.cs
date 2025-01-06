@@ -9,30 +9,33 @@ using System.Text;
 using Core.Application.Divisions.Queries.GetDivisions;
 using System.Data;
 using Dapper;
+using Core.Application.Common.Interfaces.IDivision;
 
 namespace Core.Application.Divisions.Queries.GetDivisionById
 {
     public class GetDivisionByIdQueryHandler : IRequestHandler<GetDivisionByIdQuery,DivisionDTO>
     {
-        // private readonly IDivisionRepository _divisionRepository;
-        private readonly IDbConnection _dbConnection;
+         private readonly IDivisionQueryRepository _divisionRepository;        
         private readonly IMapper _mapper;
 
-         public GetDivisionByIdQueryHandler(IDbConnection dbConnection, IMapper mapper)
+         public GetDivisionByIdQueryHandler(IDivisionQueryRepository divisionRepository, IMapper mapper)
         {
-            _dbConnection = dbConnection;
+            _divisionRepository = divisionRepository;
             _mapper =mapper;
         } 
         public async Task<DivisionDTO> Handle(GetDivisionByIdQuery request, CancellationToken cancellationToken)
         {
-            var query = "SELECT * FROM AppData.Division WHERE Id = @Id";
+            /* var query = "SELECT * FROM AppData.Division WHERE Id = @Id";
         var divisionresult = await _dbConnection.QuerySingleOrDefaultAsync<DivisionDTO>(query, new { Id = request.Id });
 
          if (divisionresult == null)
         {
             return null;
         }
-          return _mapper.Map<DivisionDTO>(divisionresult);
+          return _mapper.Map<DivisionDTO>(divisionresult); */
+        var user = await _divisionRepository.GetByIdAsync(request.Id);
+          return _mapper.Map<DivisionDTO>(user);
+
         }
     }
 }

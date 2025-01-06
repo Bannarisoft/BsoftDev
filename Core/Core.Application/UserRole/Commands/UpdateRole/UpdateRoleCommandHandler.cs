@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IUserRole;
 
 namespace Core.Application.UserRole.Commands.UpdateRole
 {
@@ -14,10 +15,10 @@ namespace Core.Application.UserRole.Commands.UpdateRole
     {
 
 
-        public readonly IUserRoleRepository _IUserRoleRepository;
+        public readonly IUserRoleCommandRepository _IUserRoleRepository;
          private readonly IMapper _Imapper;
-         public readonly IUserRoleRepository _roleRepository;
-          public UpdateRoleCommandHandler(IUserRoleRepository roleRepository ,IMapper mapper)
+         public readonly IUserRoleCommandRepository _roleRepository;
+          public UpdateRoleCommandHandler(IUserRoleCommandRepository roleRepository ,IMapper mapper)
         {
             _IUserRoleRepository = roleRepository;
             _Imapper = mapper;

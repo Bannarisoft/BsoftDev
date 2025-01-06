@@ -3,6 +3,7 @@ using Core.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Core.Application.Common.Interfaces.IUnit;
 
 namespace Core.Application.Units.Commands.CreateUnit
 {
@@ -10,11 +11,11 @@ namespace Core.Application.Units.Commands.CreateUnit
     public class CreateUnitCommandHandler : IRequestHandler<CreateUnitCommand, int>
     {
         
-        private readonly IUnitRepository _iUnitRepository;
+        private readonly IUnitCommandRepository _iUnitRepository;
         private readonly IMapper _mapper;
 
         private readonly ILogger<CreateUnitCommandHandler> _logger;
-        public CreateUnitCommandHandler(IUnitRepository iUnitRepository, IMapper mapper, ILogger<CreateUnitCommandHandler> logger)
+        public CreateUnitCommandHandler(IUnitCommandRepository iUnitRepository, IMapper mapper, ILogger<CreateUnitCommandHandler> logger)
         {
             _iUnitRepository = iUnitRepository;
             _mapper = mapper;

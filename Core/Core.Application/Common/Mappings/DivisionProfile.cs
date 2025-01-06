@@ -14,6 +14,7 @@ namespace Core.Application.Common.Mappings
             CreateMap<CreateDivisionCommand, Division>();
             CreateMap<UpdateDivisionCommand, Division>();
             CreateMap<DeleteDivisionCommand, Division>();
+            CreateMap<Division, DivisionDTO>();
         }
     }
 }

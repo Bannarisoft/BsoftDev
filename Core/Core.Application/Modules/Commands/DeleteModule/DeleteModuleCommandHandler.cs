@@ -3,14 +3,15 @@ using Core.Application.Common.Interfaces;
 using FluentValidation;
 using AutoMapper;
 using MediatR;
+using Core.Application.Common.Interfaces.IModule;
 
 namespace BSOFT.Application.Modules.Commands.DeleteModule
 {
     public class DeleteModuleCommandHandler  : IRequestHandler<DeleteModuleCommand>
     {
-        private readonly IModuleRepository _moduleRepository;
+        private readonly IModuleCommandRepository _moduleRepository;
 
-    public DeleteModuleCommandHandler(IModuleRepository moduleRepository)
+    public DeleteModuleCommandHandler(IModuleCommandRepository moduleRepository)
     {
         _moduleRepository = moduleRepository;
     }

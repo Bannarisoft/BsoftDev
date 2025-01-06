@@ -4,15 +4,16 @@ using MediatR;
 using AutoMapper;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IUser;
 
 namespace Core.Application.Users.Commands.UpdateUser
 {
     public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, int>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserCommandRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public UpdateUserCommandHandler(IUserRepository userRepository, IMapper mapper)
+        public UpdateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
             _mapper = mapper;

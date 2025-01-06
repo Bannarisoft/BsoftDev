@@ -14,17 +14,18 @@ using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IUser;
 
 namespace Core.Application.UserLogin.Commands.UserLogin
 {
     public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginResponse>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserCommandRepository _userRepository;
         
         // private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly IJwtTokenHelper  _jwtTokenHelper;
 
-        public UserLoginCommandHandler(IUserRepository userRepository,  IJwtTokenHelper jwtTokenHelper)
+        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper)
         {
             _userRepository = userRepository;
             // _jwtTokenGenerator = jwtTokenGenerator;

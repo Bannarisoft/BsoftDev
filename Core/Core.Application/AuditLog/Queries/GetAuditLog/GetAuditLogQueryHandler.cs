@@ -35,6 +35,7 @@ namespace Core.Application.AuditLog.Queries.GetAuditLog
                 UserId = log.UserId,
                 UserName = log.UserName,
                 IPAddress = log.IPAddress,
+                MachineName = log.MachineName,
                 OS = log.OS,
                 Browser = log.Browser,
                 Action = log.Action,
