@@ -104,6 +104,7 @@ namespace BSOFT.Infrastructure.Repositories
             return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
 
         }
-        
+
+
     }
 }

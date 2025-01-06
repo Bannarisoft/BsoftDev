@@ -1042,8 +1042,7 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Id");
 
-modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                   SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Action")
                         .IsRequired()

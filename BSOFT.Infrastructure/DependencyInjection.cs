@@ -36,6 +36,7 @@ using BSOFT.Infrastructure.Repositories.Entities;
 using Core.Application.Common.Interfaces.IEntity;
 using BSOFT.Infrastructure.Repositories.Divisions;
 using Core.Application.Common.Interfaces.IDivision;
+using Core.Domain.Entities;
 
 
 namespace BSOFT.Infrastructure
