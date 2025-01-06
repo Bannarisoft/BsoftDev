@@ -45,7 +45,6 @@ namespace BSOFT.Infrastructure.Repositories.Users
         }
 
    
-
         public async Task<User?> GetByUsernameAsync(string username)
         {
             if (string.IsNullOrWhiteSpace(username))
@@ -83,21 +82,19 @@ namespace BSOFT.Infrastructure.Repositories.Users
         //     return result.FirstOrDefault();
         // }
 
-        // public async Task<List<string>> GetUserRolesAsync(int userId)
-        // {
-        //     var user = await _applicationDbContext.User
-        //         .Include(u => u.UserRoles) // Ensure UserRoles are included
-        //         .FirstOrDefaultAsync(u => u.UserId == userId);
+                public async Task<List<string>> GetUserRolesAsync(int userId)
+        {
+                // const string query = @"
+                // SELECT ur.RoleName
+                // FROM AppSecurity.UserRole ur
+                // INNER JOIN AppSecurity.Users u ON ur.Id = u.UserRoleId
+                // WHERE u.UserId = @UserId";
+                const string query = @"
+                SELECT 'Admin' as RoleName FROM AppSecurity.Users u 
+                WHERE u.UserId = @UserId";
+            return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
 
-        //     if (user == null)
-        //     {
-        //         throw new KeyNotFoundException("User not found.");
-        //     }
-
-        //     // Extract RoleName from UserRoles collection
-        //     var roles = user.UserRoles.Select(ur => ur.RoleName).ToList();
-        //     return roles;
-        // }
+        }
         
     }
 }

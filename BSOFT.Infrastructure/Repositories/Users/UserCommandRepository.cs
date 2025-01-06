@@ -85,25 +85,25 @@ namespace BSOFT.Infrastructure.Repositories
         //         const string query = "SELECT * FROM AppSecurity.Users WHERE UserName LIKE @SearchPattern";
         //         return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { SearchPattern = $"%{searchPattern}%" });
         // }
-        public async Task<User?> GetByUsernameAsync(string username)
-        {
-            const string query = "SELECT * FROM AppSecurity.Users WHERE UserName = @Username";
-            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { Username = username });
-        }
+        // public async Task<User?> GetByUsernameAsync(string username)
+        // {
+        //     const string query = "SELECT * FROM AppSecurity.Users WHERE UserName = @Username";
+        //     return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { Username = username });
+        // }
         
-        public async Task<IEnumerable<string>> GetUserRolesAsync(int userId)
-        {
-                // const string query = @"
-                // SELECT ur.RoleName
-                // FROM AppSecurity.UserRole ur
-                // INNER JOIN AppSecurity.Users u ON ur.Id = u.UserRoleId
-                // WHERE u.UserId = @UserId";
-                const string query = @"
-                SELECT 'Admin' as RoleName FROM AppSecurity.Users u 
-                WHERE u.UserId = @UserId";
-            return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
+        // public async Task<IEnumerable<string>> GetUserRolesAsync(int userId)
+        // {
+        //         // const string query = @"
+        //         // SELECT ur.RoleName
+        //         // FROM AppSecurity.UserRole ur
+        //         // INNER JOIN AppSecurity.Users u ON ur.Id = u.UserRoleId
+        //         // WHERE u.UserId = @UserId";
+        //         const string query = @"
+        //         SELECT 'Admin' as RoleName FROM AppSecurity.Users u 
+        //         WHERE u.UserId = @UserId";
+        //     return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
 
-        }
+        // }
 
 
     }
