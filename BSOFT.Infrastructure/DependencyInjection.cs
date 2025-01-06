@@ -11,7 +11,6 @@ using Microsoft.Data.SqlClient;
 using MongoDB.Driver;
 using Core.Application.Common.Interface;
 using Core.Application.Common.Mappings;
-using Core.Domain.Entities;
 
 
 namespace BSOFT.Infrastructure
@@ -32,23 +31,23 @@ namespace BSOFT.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-                // Register IDbConnection for Dapper
-                services.AddTransient<IDbConnection>(sp =>
-                {
-                    return new SqlConnection(connectionString);
-                });
+            // Register IDbConnection for Dapper
+            services.AddTransient<IDbConnection>(sp =>
+            {
+                return new SqlConnection(connectionString);
+            });
 
-    // Register MongoDbContext
-        services.AddTransient<MongoDbContext>();
+            // Register MongoDbContext
+            services.AddTransient<MongoDbContext>();
+            services.AddTransient<IMongoDatabase>(sp =>
+            {
+                var configuration = sp.GetRequiredService<IConfiguration>();
+                var mongoClient = new MongoClient(configuration.GetConnectionString("MongoDbConnectionString"));
+                return mongoClient.GetDatabase(configuration["MongoDb:DatabaseName"]);
+            });
 
-    services.AddTransient<IMongoDatabase>(sp =>
-{
-    var configuration = sp.GetRequiredService<IConfiguration>();
-    var mongoClient = new MongoClient(configuration.GetConnectionString("MongoDbConnectionString"));
-    return mongoClient.GetDatabase(configuration["MongoDb:DatabaseName"]);
-});
-            //services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
-            //services.AddSingleton<MongoDbContext>();
+            // Configure JWT settings
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
             // Register repositories
             services.AddScoped<IUserRepository, UserRepository>();
@@ -74,9 +73,12 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddScoped<IJwtTokenHelper, JwtTokenHelper>();
 
+            // Configure JWT settings
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
             // AutoMapper profiles
             services.AddAutoMapper(
+                typeof(UserLoginProfile),
                 typeof(CreateUserProfile),
                 typeof(UpdateUserProfile),
                 typeof(RoleEntitlementMappingProfile),

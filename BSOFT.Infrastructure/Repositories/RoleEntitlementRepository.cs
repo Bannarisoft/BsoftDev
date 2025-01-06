@@ -43,7 +43,7 @@ namespace BSOFT.Infrastructure.Repositories
     public async Task UpdateRoleEntitlementsAsync(int roleId, List<RoleEntitlement> roleEntitlements, CancellationToken cancellationToken)
     {
         // Remove existing entitlements for the role
-        var existingEntitlements = _applicationDbContext.RoleEntitlements.Where(re => re.RoleId == roleId);
+        var existingEntitlements = _applicationDbContext.RoleEntitlements.Where(re => re.UserRoleId == roleId);
         _applicationDbContext.RoleEntitlements.RemoveRange(existingEntitlements);
 
         // Add updated entitlements

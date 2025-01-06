@@ -41,21 +41,12 @@ namespace BSOFT.Infrastructure.Repositories
             return 0; // No user found
         }
 
-        // public async Task<List<User>> GetAllUsersAsync()
-        // {
-        //     return await _applicationDbContext.User.ToListAsync();
-        // }
         public async Task<List<User>> GetAllUsersAsync()
         {
         const string query = "SELECT * FROM AppSecurity.Users";
         return (await _dbConnection.QueryAsync<User>(query)).ToList();
         }
 
-        // public async Task<User?> GetByIdAsync(int userId)
-        // {
-        //     return await _applicationDbContext.User.AsNoTracking()
-        //         .FirstOrDefaultAsync(b => b.UserId == userId);
-        // }
         public async Task<User?> GetByIdAsync(int userId)
         {
             const string query = "SELECT * FROM AppSecurity.Users WHERE UserId = @UserId";
@@ -78,7 +69,7 @@ namespace BSOFT.Infrastructure.Repositories
                 existingUser.CompanyId = user.CompanyId;
                 existingUser.DivisionId = user.DivisionId;
                 existingUser.UnitId = user.UnitId;
-                existingUser.UserRoleId = user.UserRoleId;
+                // existingUser.UserRoleId = user.UserRoleId;
                 existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
 
                 _applicationDbContext.User.Update(existingUser);
@@ -87,57 +78,29 @@ namespace BSOFT.Infrastructure.Repositories
             return 0; // No user found
         }
 
-        public async Task<User?> GetByUsernameAsync(string searchPattern)
-        {
-            if (string.IsNullOrWhiteSpace(searchPattern))
-            {
-                throw new ArgumentException("Username cannot be null or empty.", nameof(searchPattern));
-            }
-
-            const string query = "SELECT * FROM AppSecurity.Users WHERE UserName = @Username";
-            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { Username = searchPattern });
-        }
-        // public async Task<User?> GetByUsernameAsync(string username)
+        // public async Task<User?> GetByUsernameAsync(string searchPattern)
         // {
-        //     if (string.IsNullOrWhiteSpace(username))
-        //     {
-        //         throw new ArgumentException("Username cannot be null or empty.", nameof(username));
-        //     }
-
-        //     const string query = @"
-        //         SELECT u.*, ur.*
-        //         FROM AppSecurity.Users u
-        //         LEFT JOIN AppSecurity.UserRoles ur ON u.RoleId = ur.Id
-        //         WHERE u.UserName = @Username";
-
-        //     var result = await _dbConnection.QueryAsync<User, UserRole, User>(
-        //         query,
-        //         (user, userRole) =>
-        //         {
-        //             user.UserRoles = new List<UserRole> { userRole }; // Map the UserRole to the User entity
-        //             return user;
-        //         },
-        //         new { Username = username },
-        //         splitOn: "Id"
-        //     );
-
-        //     return result.FirstOrDefault();
+        //         const string query = "SELECT * FROM AppSecurity.Users WHERE UserName LIKE @SearchPattern";
+        //         return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { SearchPattern = $"%{searchPattern}%" });
         // }
-
-        public async Task<List<string>> GetUserRolesAsync(int userId)
+        public async Task<User?> GetByUsernameAsync(string username)
         {
-            var user = await _applicationDbContext.User
-                .Include(u => u.UserRoles) // Ensure UserRoles are included
-                .FirstOrDefaultAsync(u => u.UserId == userId);
+            const string query = "SELECT * FROM AppSecurity.Users WHERE UserName = @Username";
+            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { Username = username });
+        }
+        
+        public async Task<IEnumerable<string>> GetUserRolesAsync(int userId)
+        {
+                // const string query = @"
+                // SELECT ur.RoleName
+                // FROM AppSecurity.UserRole ur
+                // INNER JOIN AppSecurity.Users u ON ur.Id = u.UserRoleId
+                // WHERE u.UserId = @UserId";
+                const string query = @"
+                SELECT 'Admin' as RoleName FROM AppSecurity.Users u 
+                WHERE u.UserId = @UserId";
+            return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
 
-            if (user == null)
-            {
-                throw new KeyNotFoundException("User not found.");
-            }
-
-            // Extract RoleName from UserRoles collection
-            var roles = user.UserRoles.Select(ur => ur.RoleName).ToList();
-            return roles;
         }
         
     }

@@ -63,7 +63,7 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
                 .Select(menu => 
                 {
                     var entitlement = _mapper.Map<RoleEntitlement>(menu);
-                    entitlement.RoleId = role.Id;
+                    entitlement.UserRoleId = role.Id;
                     entitlement.ModuleId = moduleMenu.ModuleId;
                     return entitlement;
                 }))

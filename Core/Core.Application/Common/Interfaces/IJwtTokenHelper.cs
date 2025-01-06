@@ -7,6 +7,6 @@ namespace Core.Application.Common.Interfaces
 {
     public interface IJwtTokenHelper
     {
-        string GenerateToken(string username, List<string> roles);
+        string GenerateToken(string username, IEnumerable<string> roles);
     }
 }

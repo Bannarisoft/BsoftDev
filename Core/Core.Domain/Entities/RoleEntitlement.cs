@@ -9,7 +9,7 @@ namespace Core.Domain.Entities
     public class RoleEntitlement : BaseEntity
     {
     public int Id { get; set; }
-    public int RoleId { get; set; }
+    public int UserRoleId { get; set; }
     public UserRole UserRole { get; set; }
     public int ModuleId { get; set; }
     public Modules Module { get; set; }

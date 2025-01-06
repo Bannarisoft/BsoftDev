@@ -15,7 +15,7 @@ namespace Core.Application.Common.Interfaces
         Task<int> UpdateAsync(int userId,User user);
         Task<int> DeleteAsync(int userId,User user);
         Task<User?> GetByUsernameAsync(string username);
-         Task<List<string>> GetUserRolesAsync(int userId);
+         Task<IEnumerable<string>> GetUserRolesAsync(int userId);
     }
 
 }

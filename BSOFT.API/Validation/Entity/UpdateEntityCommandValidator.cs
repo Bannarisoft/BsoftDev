@@ -8,7 +8,7 @@ using Core.Domain.Entities;
 using BSOFT.API.Validation.Common;
 using BSOFT.Infrastructure.Migrations;
 
-namespace BSOFT.API.Validation.Common.Entity 
+namespace BSOFT.API.Validation.Entity 
 {
     public class UpdateEntityCommandValidator : AbstractValidator<UpdateEntityCommand>
     {

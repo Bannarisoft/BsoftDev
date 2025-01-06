@@ -24,20 +24,6 @@ namespace BSOFT.Infrastructure
 
             optionsBuilder.UseSqlServer(connectionString);
 
-
-              // MongoDB Configuration
-            var mongoSection = configuration.GetSection("MongoDb");
-            var mongoConnectionString = mongoSection.GetValue<string>("MongoDbConnectionString");
-            var mongoDatabaseName = mongoSection.GetValue<string>("DatabaseName");
-
-            if (string.IsNullOrWhiteSpace(mongoConnectionString) || string.IsNullOrWhiteSpace(mongoDatabaseName))
-            {
-                throw new InvalidOperationException("MongoDB connection string or database name not found in configuration.");
-            }
-
-            var mongoClient = new MongoClient(mongoConnectionString);
-            var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
-
             IIPAddressService ipAddressService = new IPAddressService();
             return new ApplicationDbContext(optionsBuilder.Options, ipAddressService);
         }

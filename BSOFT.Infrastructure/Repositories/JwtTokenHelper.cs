@@ -16,31 +16,73 @@ namespace BSOFT.Infrastructure.Repositories
 
     public JwtTokenHelper(IOptions<JwtSettings> jwtSettings)
     {
-        _jwtSettings = jwtSettings.Value;
-    }
-    public string GenerateToken(string username, List<string> roles)
-    {
-        var claims = new List<Claim>
+        if (jwtSettings == null || jwtSettings.Value == null)
         {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+            throw new ArgumentNullException(nameof(jwtSettings), "JWT settings are not configured.");
+        }
 
-        // Add role claims
-        claims.AddRange(roles.ConvertAll(role => new Claim(ClaimTypes.Role, role)));
+            _jwtSettings = jwtSettings.Value;
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        if (string.IsNullOrWhiteSpace(_jwtSettings.SecretKey) || Encoding.UTF8.GetBytes(_jwtSettings.SecretKey).Length < 32)
+        {
+            throw new ArgumentException("JWT SecretKey must be at least 32 bytes long.", nameof(_jwtSettings.SecretKey));
+        }
+    }
+    public string GenerateToken(string username, IEnumerable<string> roles)
+    {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new ArgumentException("Username must be provided.", nameof(username));
+            }
 
-        var token = new JwtSecurityToken(
-            issuer: _jwtSettings.Issuer,
-            audience: _jwtSettings.Audience,
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(_jwtSettings.ExpiresInMinutes),
-            signingCredentials: credentials
-        );
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, username),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            // Add roles as claims
+            foreach (var role in roles)
+            {
+                if (!string.IsNullOrWhiteSpace(role))
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role));
+                }
+            }
+
+            var tokenDescriptor = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+            // var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+            // var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            // var claims = new List<Claim>
+            // {
+            //     new Claim(JwtRegisteredClaimNames.Sub, username),
+            //     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            // };
+
+            // foreach (var role in roles)
+            // {
+            //     claims.Add(new Claim(ClaimTypes.Role, role));
+            // }
+
+            // var token = new JwtSecurityToken(
+            //     issuer: _jwtSettings.Issuer,
+            //     audience: _jwtSettings.Audience,
+            //     claims: claims,
+            //     expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+            //     signingCredentials: creds);
+
+            // return new JwtSecurityTokenHandler().WriteToken(token);
     }
     }
 }
