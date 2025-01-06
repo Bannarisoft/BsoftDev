@@ -1,4 +1,5 @@
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IUser;
 using Core.Domain.Entities;
 using MediatR;
 using System.Threading;
@@ -8,9 +9,9 @@ namespace Core.Application.Users.Commands.DeleteUser
 {
     public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, int>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserCommandRepository _userRepository;
 
-        public DeleteUserCommandHandler(IUserRepository userRepository)
+        public DeleteUserCommandHandler(IUserCommandRepository userRepository)
         {
             _userRepository = userRepository;
             

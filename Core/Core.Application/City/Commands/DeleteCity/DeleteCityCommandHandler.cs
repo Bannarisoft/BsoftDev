@@ -4,6 +4,7 @@ using AutoMapper;
 using Core.Application.City.Queries.GetCities;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Entities;
 using MediatR;
 
@@ -11,18 +12,20 @@ namespace Core.Application.City.Commands.DeleteCity
 {
     public class DeleteCityCommandHandler : IRequestHandler<DeleteCityCommand, Result<CityDto>>
     {
-        private readonly ICityRepository _cityRepository;
+        private readonly ICityCommandRepository _cityRepository;
         private readonly IMapper _mapper;
-        public DeleteCityCommandHandler(ICityRepository cityRepository, IMapper mapper)
+        private readonly ICityQueryRepository _cityQueryRepository;
+        public DeleteCityCommandHandler(ICityCommandRepository cityRepository, IMapper mapper, ICityQueryRepository cityQueryRepository)
         {
             _cityRepository = cityRepository;
              _mapper = mapper;
+            _cityQueryRepository = cityQueryRepository;
         }
 
         public async Task<Result<CityDto>> Handle(DeleteCityCommand request, CancellationToken cancellationToken)
         {
             // Fetch the city to be deleted
-            var city = await _cityRepository.GetByIdAsync(request.Id);
+            var city = await _cityQueryRepository.GetByIdAsync(request.Id);
             if (city == null || city.IsActive != 1)
             {
                 return Result<CityDto>.Failure("Invalid CityID. The specified City does not exist or is inactive.");

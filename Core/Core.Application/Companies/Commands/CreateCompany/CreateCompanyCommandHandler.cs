@@ -2,17 +2,20 @@ using Core.Domain.Entities;
 using Core.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
+using Core.Application.Common.Interfaces.ICompanyContact;
+using Core.Application.Common.Interfaces.ICompanyAddress;
+using Core.Application.Common.Interfaces.ICompany;
 
 namespace Core.Application.Companies.Commands.CreateCompany
 {
     public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand, int>
     {
-         private readonly ICompanyRepository _icompanyRepository;
-         private readonly ICompanyAddressRepository _icompanyAddressRepository;
-         private readonly ICompanyContactRepository _icompanyContactRepository;
+         private readonly ICompanyCommandRepository _icompanyRepository;
+         private readonly ICompanyAddressCommandRepository _icompanyAddressRepository;
+         private readonly ICompanyContactCommandRepository _icompanyContactRepository;
         private readonly IMapper _imapper;
 
-        public CreateCompanyCommandHandler(ICompanyRepository icompanyRepository,ICompanyAddressRepository icompanyAddressRepository,ICompanyContactRepository icompanyContactRepository, IMapper imapper)
+        public CreateCompanyCommandHandler(ICompanyCommandRepository icompanyRepository,ICompanyAddressCommandRepository icompanyAddressRepository,ICompanyContactCommandRepository icompanyContactRepository, IMapper imapper)
         {
             _icompanyRepository = icompanyRepository;
             _icompanyAddressRepository = icompanyAddressRepository;

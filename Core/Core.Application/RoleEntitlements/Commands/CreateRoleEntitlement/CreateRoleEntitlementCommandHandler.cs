@@ -7,15 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IRoleEntitlement;
 
 namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
     public class CreateRoleEntitlementCommandHandler : IRequestHandler<CreateRoleEntitlementCommand, int>
     {
-        private readonly IRoleEntitlementRepository _repository;
+        private readonly IRoleEntitlementCommandRepository _repository;
         private readonly IMapper _mapper;
 
-        public CreateRoleEntitlementCommandHandler(IRoleEntitlementRepository repository, IMapper mapper)
+        public CreateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;

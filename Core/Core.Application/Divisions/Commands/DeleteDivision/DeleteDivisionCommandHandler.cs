@@ -6,14 +6,15 @@ using Core.Application.Common.Interfaces;
 using Core.Domain.Entities;
 using MediatR;
 using AutoMapper;
+using Core.Application.Common.Interfaces.IDivision;
 
 namespace Core.Application.Divisions.Commands.DeleteDivision
 {
     public class DeleteDivisionCommandHandler : IRequestHandler<DeleteDivisionCommand, int>
     {
-        private readonly IDivisionRepository _divisionRepository;
+        private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
-        public DeleteDivisionCommandHandler(IDivisionRepository divisionRepository, IMapper imapper)
+        public DeleteDivisionCommandHandler(IDivisionCommandRepository divisionRepository, IMapper imapper)
         {
             _divisionRepository = divisionRepository;
             _imapper = imapper;

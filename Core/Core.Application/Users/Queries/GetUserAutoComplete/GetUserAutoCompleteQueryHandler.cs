@@ -4,14 +4,15 @@ using MediatR;
 using System.Text;
 using Core.Domain.Entities;
 using Core.Application.Users.Queries.GetUsers;
-
+using Core.Application.Common.Interfaces.IUser;
 namespace Core.Application.Users.Queries.GetUserAutoComplete
 {
     public class GetUserAutoCompleteQueryHandler: IRequestHandler<GetUserAutoCompleteQuery,List<UserDto>>
     {
-        private readonly IUserRepository _userRepository;
+
+        private readonly IUserQueryRepository _userRepository;
         private readonly IMapper _mapper;
-        public GetUserAutoCompleteQueryHandler(IUserRepository userRepository, IMapper mapper)
+		public GetUserAutoCompleteQueryHandler(IUserQueryRepository userRepository, IMapper mapper)
         {
            _userRepository =userRepository;
            _mapper =mapper;

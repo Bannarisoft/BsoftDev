@@ -7,14 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IModule;
 
 namespace Core.Application.Modules.Commands.CreateModule
 {
     public class CreateModuleCommandHandler : IRequestHandler<CreateModuleCommand, int>
     {
-        private readonly IModuleRepository _moduleRepository;
+        private readonly IModuleCommandRepository _moduleRepository;
         private readonly IMapper _mapper;
-    public CreateModuleCommandHandler(IModuleRepository moduleRepository, IMapper mapper)
+    public CreateModuleCommandHandler(IModuleCommandRepository moduleRepository, IMapper mapper)
     {
         _moduleRepository = moduleRepository;
         _mapper = mapper;

@@ -9,16 +9,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Core.Application.Departments.Queries.GetDepartments;
+using Core.Application.Common.Interfaces.IDepartment;
 
 namespace Core.Application.Departments.Commands.UpdateDepartment
 {
     public class UpdateDepartmentCommandHandler  : IRequestHandler<UpdateDepartmentCommand ,DepartmentDto>
     {
-        public readonly IDepartmentRepository _IDepartmentRepository;
+        public readonly IDepartmentCommandRepository _IDepartmentRepository;
        private readonly IMapper _Imapper;
         private readonly ILogger<UpdateDepartmentCommandHandler> _logger;
 
-        public UpdateDepartmentCommandHandler(IDepartmentRepository iDepartmentRepository, IMapper Imapper, ILogger<UpdateDepartmentCommandHandler> logger)
+        public UpdateDepartmentCommandHandler(IDepartmentCommandRepository iDepartmentRepository, IMapper Imapper, ILogger<UpdateDepartmentCommandHandler> logger)
         {
             _IDepartmentRepository = iDepartmentRepository;
             _Imapper = Imapper;

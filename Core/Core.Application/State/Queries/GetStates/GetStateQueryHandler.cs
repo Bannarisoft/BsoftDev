@@ -1,32 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.Common.Interface;
+using AutoMapper;
+using Core.Application.Common.Interfaces.IState;
 using Core.Application.State.Queries.GetStates;
-using Dapper;
 using MediatR;
 
 namespace Core.Application.State.Queries.GetCountries
 {
     public class GetStateQueryHandler : IRequestHandler<GetStateQuery, List<StateDto>>
-{
-    private readonly IDbConnection _dbConnection;
-
-    public GetStateQueryHandler(IDbConnection dbConnection)
     {
-        _dbConnection = dbConnection;
-    }
-    public async Task<List<StateDto>> Handle(GetStateQuery request, CancellationToken cancellationToken)
-    {
-         const string query = @"
-            SELECT 
-                Id,StateCode,StateName, IsActive,countryId ,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
-            FROM AppData.State with (nolock) where IsActive=1";
+        private readonly IStateQueryRepository _stateRepository;
+        private readonly IMapper _mapper;
 
-        var countries = await _dbConnection.QueryAsync<StateDto>(query);
-        return countries.AsList();
+        public GetStateQueryHandler(IStateQueryRepository stateRepository , IMapper mapper)
+        {
+           _stateRepository = stateRepository;
+            _mapper = mapper;
+        }
+        public async Task<List<StateDto>> Handle(GetStateQuery request, CancellationToken cancellationToken)
+        {
+            var states = await _stateRepository.GetAllStatesAsync();
+            var statesList = _mapper.Map<List<StateDto>>(states);
+            return statesList;
+        }
     }
-}
 }
