@@ -7,7 +7,7 @@ using Core.Domain.Entities;
 using BSOFT.API.Validation.Common;
 using Core.Application.City.Commands.CreateCity;
 
-namespace BSOFT.API.Validation.Common.City
+namespace BSOFT.API.Validation.City
 {
     public class CreateCityCommandValidator : AbstractValidator<CreateCityCommand>
     {

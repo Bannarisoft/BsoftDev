@@ -7,7 +7,7 @@ using Core.Domain.Entities;
 using BSOFT.API.Validation.Common;
 using Core.Application.Country.Commands.UpdateCountry;
 
-namespace BSOFT.API.Validation.Common.Country
+namespace BSOFT.API.Validation.Country
 {
     public class UpdateCountryCommandValidator : AbstractValidator<UpdateCountryCommand>
     {

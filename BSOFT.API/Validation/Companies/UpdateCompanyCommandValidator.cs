@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BSOFT.API.Validation.Common;
 using Core.Application.Companies.Commands.UpdateCompany;
 using FluentValidation;
 
-namespace BSOFT.API.Validation.Common.Companies
+namespace BSOFT.API.Validation.Companies
 {
     public class UpdateCompanyCommandValidator : AbstractValidator<UpdateCompanyCommand>
     {

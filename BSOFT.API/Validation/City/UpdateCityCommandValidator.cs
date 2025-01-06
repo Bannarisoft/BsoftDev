@@ -7,7 +7,7 @@ using BSOFT.API.Validation.Common;
 using Core.Application.City.Commands.UpdateCity;
 using Core.Application.City.Commands.CreateCity;
 
-namespace BSOFT.API.Validation.Common.Country
+namespace BSOFT.API.Validation.Country
 {
     public class UpdateCityCommandValidator : AbstractValidator<UpdateCityCommand>
     {
