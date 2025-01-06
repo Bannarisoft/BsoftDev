@@ -4,10 +4,11 @@ using System.Text.RegularExpressions;
 using Core.Application.Units.Queries.GetUnits;
 using Core.Application.Units.Commands.UpdateUnit;
 using BSOFT.Infrastructure.Migrations;
-namespace BSOFT.API.Validation.Common.Unit
+using BSOFT.API.Validation.Common;
+namespace BSOFT.API.Validation.Unit
 {
 
-namespace BSOFT.API.Validation.Common.Unit
+namespace BSOFT.API.Validation.Unit
 {
     public class UpdateUnitCommandValidator : AbstractValidator<UpdateUnitCommand>
     {

@@ -36,6 +36,7 @@ using BSOFT.Infrastructure.Repositories.Entities;
 using Core.Application.Common.Interfaces.IEntity;
 using BSOFT.Infrastructure.Repositories.Divisions;
 using Core.Application.Common.Interfaces.IDivision;
+using Core.Domain.Entities;
 
 
 namespace BSOFT.Infrastructure
@@ -80,8 +81,19 @@ namespace BSOFT.Infrastructure
             });
             services.AddScoped<MongoDbContext>();
 
+      // Register MongoDbContext
+        services.AddTransient<MongoDbContext>();
+            // Register MongoDbContext
+            services.AddTransient<MongoDbContext>();
+            services.AddTransient<IMongoDatabase>(sp =>
+            {
+                var configuration = sp.GetRequiredService<IConfiguration>();
+                var mongoClient = new MongoClient(configuration.GetConnectionString("MongoDbConnectionString"));
+                return mongoClient.GetDatabase(configuration["MongoDb:DatabaseName"]);
+            });
 
-            // Register repositories
+  // Configure JWT settings
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            // Register repositories
             services.AddScoped<IUserQueryRepository, UserQueryRepository>();
             services.AddScoped<IUserCommandRepository, UserCommandRepository>();
             services.AddScoped<IRoleEntitlementCommandRepository, RoleEntitlementCommandRepository>();

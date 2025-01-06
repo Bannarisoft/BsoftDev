@@ -34,25 +34,25 @@ namespace Core.Application.UserLogin.Commands.UserLogin
 
        public async Task<LoginResponse> Handle(UserLoginCommand request, CancellationToken cancellationToken)
         {
-                    var user = await _userRepository.GetByUsernameAsync(request.Username);
+            var user = await _userRepository.GetByUsernameAsync(request.Username);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-        {
-            throw new UnauthorizedAccessException("Invalid username or password.");
-        }
+            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            {
+                throw new UnauthorizedAccessException("Invalid username or password.");
+            }
 
-        // Get user roles
-        var roles = await _userRepository.GetUserRolesAsync(user.UserId);
+            // Get user roles
+            var roles = await _userRepository.GetUserRolesAsync(user.UserId);
 
-        // Generate JWT token
-        var token = _jwtTokenHelper.GenerateToken(user.UserName, roles);
+            // Generate JWT token
+            var token = _jwtTokenHelper.GenerateToken(user.UserName, roles);
 
-        return new LoginResponse
-        {
-            Token = token,
-            UserName = user.UserName,
-            UserRole = roles
-        };
+            return new LoginResponse
+            {
+                Token = token,
+                UserName = user.UserName,
+                UserRole = roles
+            };
         // var user = await _userRepository.GetByUsernameAsync(request.Username);
 
         // if (user == null || !VerifyPassword(user.PasswordHash, request.Password))

@@ -1042,7 +1042,7 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                   SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Action")
                         .IsRequired()
@@ -1106,6 +1106,7 @@ namespace BSOFT.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("Id");
+					b.Navigation("RoleEntitlements");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
@@ -1166,6 +1167,7 @@ namespace BSOFT.Infrastructure.Migrations
                     b.HasIndex("StateId");
 
                     b.ToTable("City", "AppData");
+					b.Navigation("UserRoleAllocations");
                 });
             
 #pragma warning restore 612, 618

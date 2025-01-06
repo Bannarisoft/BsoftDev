@@ -83,21 +83,21 @@ namespace BSOFT.Infrastructure.Repositories.Users
         //     return result.FirstOrDefault();
         // }
 
-        public async Task<List<string>> GetUserRolesAsync(int userId)
-        {
-            var user = await _applicationDbContext.User
-                .Include(u => u.UserRoles) // Ensure UserRoles are included
-                .FirstOrDefaultAsync(u => u.UserId == userId);
+        // public async Task<List<string>> GetUserRolesAsync(int userId)
+        // {
+        //     var user = await _applicationDbContext.User
+        //         .Include(u => u.UserRoles) // Ensure UserRoles are included
+        //         .FirstOrDefaultAsync(u => u.UserId == userId);
 
-            if (user == null)
-            {
-                throw new KeyNotFoundException("User not found.");
-            }
+        //     if (user == null)
+        //     {
+        //         throw new KeyNotFoundException("User not found.");
+        //     }
 
-            // Extract RoleName from UserRoles collection
-            var roles = user.UserRoles.Select(ur => ur.RoleName).ToList();
-            return roles;
-        }
+        //     // Extract RoleName from UserRoles collection
+        //     var roles = user.UserRoles.Select(ur => ur.RoleName).ToList();
+        //     return roles;
+        // }
         
     }
 }

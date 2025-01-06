@@ -26,8 +26,7 @@ namespace Core.Domain.Entities
     public int CompanyId { get; set; }
     public int UnitId { get; set; }
     public int DivisionId { get; set; }
-    public int UserRoleId { get; set; }
-     public ICollection<UserRole> UserRoles { get; set; }
+    public ICollection<UserRoleAllocation> UserRoleAllocations { get; set; }
 
     public void SetPassword(string password)
     {
@@ -37,19 +36,6 @@ namespace Core.Domain.Entities
         // Generate a valid BCrypt hash
         PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
     }
-// public static string HashPassword(string password, byte[] salt)
-// {
-//     using (var sha256 = SHA256.Create())
-//     {
-//         var inputBytes = Encoding.UTF8.GetBytes(password + Convert.ToBase64String(salt));
-//         var hashedBytes = sha256.ComputeHash(inputBytes);
-//         return Convert.ToBase64String(hashedBytes);
-//     }
-// }
-// public static bool VerifyPassword(string password, string hashedPassword, byte[] salt)
-// {
-//     var computedHash = HashPassword(password, salt);
-//     return computedHash == hashedPassword;
-// }
+
     }
 }

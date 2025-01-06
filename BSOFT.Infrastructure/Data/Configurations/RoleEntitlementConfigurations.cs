@@ -25,7 +25,7 @@ namespace BSOFT.Infrastructure.Data.Configurations
             // Role Relationship
             builder.HasOne(re => re.UserRole)
                 .WithMany(r => r.RoleEntitlements)
-                .HasForeignKey(re => re.RoleId)
+                .HasForeignKey(re => re.UserRoleId)
                 .OnDelete(DeleteBehavior.Cascade); // Deletes role entitlements when a role is deleted
 
             // Module Relationship

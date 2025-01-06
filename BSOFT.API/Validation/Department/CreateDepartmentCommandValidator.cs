@@ -7,7 +7,6 @@ using Core.Application.Departments.Commands;
 using Core.Application.Departments.Commands.CreateDepartment;
 using Core.Domain.Entities;
 using BSOFT.API.Validation.Common;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace BSOFT.API.Validation.Department
 {

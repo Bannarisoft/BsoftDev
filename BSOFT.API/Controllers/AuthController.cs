@@ -2,6 +2,7 @@ using Core.Application.UserLogin.Commands.UserLogin;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 
 namespace BSOFT.API.Controllers
 {
@@ -11,43 +12,34 @@ namespace BSOFT.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
-        public AuthController(IMediator mediator)
+        public AuthController(IMediator mediator,IMapper mapper)
         {
             _mediator = mediator;
+            _mapper = mapper;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {   
             
-             try
+            if (!ModelState.IsValid)
             {
-                // Check if the UserLoginCommand supports constructor arguments
-                var command = new UserLoginCommand
-                {
-                    Username = request.Username,
-                    Password = request.Password
-                };
+                return BadRequest(ModelState);
+            }
 
-                var response = await _mediator.Send(command);
-                return Ok(response);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(new { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
-            }
-            // var response = await _mediator.Send(command);
-            // if (response.Token == string.Empty)
-            // {
-            //     return Unauthorized(new { response.Message });
-            // }
+            var command = _mapper.Map<UserLoginCommand>(request);
+            var result = await _mediator.Send(command);
 
-            // return Ok(new { response.Token, response.Message });
+            if (result == null)
+            {
+                return Unauthorized("Invalid username or password.");
+            }
+
+            return Ok(result);
+
+            
         }
     }
 }
