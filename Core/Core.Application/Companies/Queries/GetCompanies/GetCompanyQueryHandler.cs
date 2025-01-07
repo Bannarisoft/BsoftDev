@@ -1,23 +1,21 @@
 using AutoMapper;
 using MediatR;
-using System.Data;
-using Dapper;
+using Core.Application.Common.Interfaces.ICompany;
 
 namespace Core.Application.Companies.Queries.GetCompanies
 {
     public class GetCompanyQueryHandler : IRequestHandler<GetCompanyQuery,List<GetCompanyDTO>>
-    {
-        private readonly IDbConnection _dbConnection;
-        // private readonly ICompanyRepository _companyRepository;
+    {  
+        private readonly ICompanyQueryRepository _companyRepository;
         private readonly IMapper _mapper;
-        public GetCompanyQueryHandler(IDbConnection dbConnection, IMapper mapper)
+        public GetCompanyQueryHandler(ICompanyQueryRepository companyRepository, IMapper mapper)
         {
-           _dbConnection = dbConnection;
-            _mapper =mapper;
+             _companyRepository = companyRepository;
+             _mapper =mapper;
         } 
         public async Task<List<GetCompanyDTO>> Handle(GetCompanyQuery requst, CancellationToken cancellationToken){
 
-        const string query = @"
+        /* const string query = @"
             SELECT 
                 C.Id, 
                 C.CompanyName, 
@@ -51,7 +49,11 @@ namespace Core.Application.Companies.Queries.GetCompanies
             
            // var companylist = _mapper.Map<List<CompanyDTO>>(companies);
 
-            return companies.AsList();
+            return companies.AsList(); */
+
+            var companies = await _companyRepository.GetAllCompaniesAsync();             
+            var companylist = _mapper.Map<List<GetCompanyDTO>>(companies);
+            return companylist.ToList();
         }
     }
 }
