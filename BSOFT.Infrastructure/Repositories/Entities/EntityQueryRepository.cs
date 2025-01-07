@@ -2,35 +2,51 @@ using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Core.Domain.Entities;
 using Core.Application.Common.Interfaces.IEntity;
+using System.Data;
+using Dapper;
 
 
 namespace BSOFT.Infrastructure.Repositories.Entities
 {
     public class EntityQueryRepository : IEntityQueryRepository
     {
-        private readonly ApplicationDbContext _applicationDbContext;
+        private readonly IDbConnection _dbConnection;        
 
-        public EntityQueryRepository(ApplicationDbContext applicationDbContext)
+        public EntityQueryRepository(IDbConnection dbConnection)
         {
-            _applicationDbContext = applicationDbContext;
+             _dbConnection = dbConnection;
         }
 
         public async Task<List<Entity>> GetAllEntityAsync()
-        {
-            return await _applicationDbContext.Entity.ToListAsync();
+        {          
+             const string query = @"
+              SELECT *
+            FROM AppData.Entity";
+            return (await _dbConnection.QueryAsync<Entity>(query)).ToList();
         }
 
         public async Task<Entity> GetByIdAsync(int id)
         {
-            return await _applicationDbContext.Entity.AsNoTracking()
-                .FirstOrDefaultAsync(b => b.Id == id);
+          
+             const string query = "SELECT * FROM AppData.Entity WHERE Id = @Id";
+            return await _dbConnection.QueryFirstOrDefaultAsync<Entity>(query, new { id });
         }  
         public async Task<List<Entity>> GetByEntityNameAsync(string searchPattern)
         {
-            return await _applicationDbContext.Entity
-            .Where(c => c.EntityName.Contains(searchPattern, StringComparison.OrdinalIgnoreCase) || c.EntityCode.Contains(searchPattern) )
-            .OrderBy(c => c.EntityName)
-            .ToListAsync();               
+          if (string.IsNullOrWhiteSpace(searchPattern))
+            {
+                throw new ArgumentException("DivisionName cannot be null or empty.", nameof(searchPattern));
+            }
+
+            const string query = @"
+                 SELECT *
+            FROM AppData.Entity
+            WHERE EntityName LIKE @SearchPattern OR EntityCode LIKE @SearchPattern and IsActive = 1
+            ORDER BY EntityName";
+                
+            // Update the object to use SearchPattern instead of Name
+            var divisions = await _dbConnection.QueryAsync<Entity>(query, new { SearchPattern = $"%{searchPattern}%" });
+            return divisions.ToList();       
         }
 
         

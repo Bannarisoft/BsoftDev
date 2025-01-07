@@ -45,12 +45,16 @@ namespace BSOFT.Infrastructure.Repositories.Divisions
         {
             if (string.IsNullOrWhiteSpace(searchPattern))
             {
-            throw new ArgumentException("DivisionName cannot be null or empty.", nameof(searchPattern));
+                throw new ArgumentException("DivisionName cannot be null or empty.", nameof(searchPattern));
             }
 
             const string query = @"
-            SELECT Id, Name FROM AppData.Division where Name like @SearchPattern";
-            var divisions = await _dbConnection.QueryAsync<Division>(query, new { Name = searchPattern });
+                SELECT Id, Name 
+                FROM AppData.Division 
+                WHERE Name LIKE @SearchPattern";
+                
+            // Update the object to use SearchPattern instead of Name
+            var divisions = await _dbConnection.QueryAsync<Division>(query, new { SearchPattern = $"%{searchPattern}%" });
             return divisions.ToList();
         }
     }
