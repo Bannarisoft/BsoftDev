@@ -19,6 +19,7 @@ namespace BSOFT.Infrastructure.Data.Configurations
             builder.Property(c => c.Id)
                 .HasColumnName("Id")
                 .HasColumnType("int")
+                .ValueGeneratedOnAdd()
                 .IsRequired();
 
             builder.Property(c => c.CompanyName)

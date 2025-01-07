@@ -27,6 +27,8 @@ namespace BSOFT.Infrastructure.Repositories
         }
          public async Task<Company> CreateAsync(Company company)
         {
+            var entry =_applicationDbContext.Entry(company);
+            Console.WriteLine(entry.State);
             await _applicationDbContext.Companies.AddAsync(company);
             await _applicationDbContext.SaveChangesAsync();
             return company;

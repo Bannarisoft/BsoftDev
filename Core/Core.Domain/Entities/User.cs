@@ -29,6 +29,8 @@ namespace Core.Domain.Entities
     public int UserRoleId { get; set; }
      public ICollection<UserRole> UserRoles { get; set; }
 
+     public ICollection<PasswordLog> Passwords { get; set; }
+
     public void SetPassword(string password)
     {
         if (string.IsNullOrWhiteSpace(password))
