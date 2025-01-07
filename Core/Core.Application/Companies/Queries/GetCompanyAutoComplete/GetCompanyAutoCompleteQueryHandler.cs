@@ -2,24 +2,24 @@ using AutoMapper;
 using MediatR;
 using Core.Application.Companies.Queries.GetCompanies;
 using System.Data;
-using Dapper;
-
+using Core.Application.Common.Interfaces.ICompany;
+using Core.Domain.Entities;
 
 
 namespace Core.Application.Companies.Queries.GetCompanyAutoComplete
 {
     public class GetCompanyAutoCompleteQueryHandler : IRequestHandler<GetCompanyAutoCompleteQuery,List<CompanyAutoCompleteDTO>>
-    {
-        private readonly IDbConnection _dbConnection;
-        private readonly IMapper _imapper;
-         public GetCompanyAutoCompleteQueryHandler(IDbConnection dbConnection, IMapper imapper)
+    { 
+        private readonly ICompanyQueryRepository _companyRepository;
+        private readonly IMapper _mapper;
+         public GetCompanyAutoCompleteQueryHandler(ICompanyQueryRepository companyRepository, IMapper mapper)
          {
-             _dbConnection = dbConnection;
-            _imapper =imapper;
+             _companyRepository = companyRepository;
+             _mapper =mapper;
          }  
           public async Task<List<CompanyAutoCompleteDTO>> Handle(GetCompanyAutoCompleteQuery request, CancellationToken cancellationToken)
           {
-            var searchPattern = "%" + request.SearchPattern + "%";
+           /*  var searchPattern = "%" + request.SearchPattern + "%";
 
                  const string query = @"
                  SELECT 
@@ -34,7 +34,11 @@ namespace Core.Application.Companies.Queries.GetCompanyAutoComplete
             //     CompanyId = c.Id,
             //     CompanyName = c.CompanyName
             // }).ToList();
-            return company.AsList();
+            return company.AsList(); */
+
+              var result = await _companyRepository.GetCompany(request.SearchPattern);
+            //return _mapper.Map<List<DivisionDTO>>(result);
+            return _mapper.Map<List<CompanyAutoCompleteDTO>>(result);            
 
          } 
     }

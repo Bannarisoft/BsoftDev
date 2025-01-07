@@ -1,23 +1,26 @@
+using AutoMapper;
+using Core.Application.Common.Interfaces.IUnit;
 using Core.Application.Units.Queries.GetUnits;
 using MediatR;
 using System.Data;
-using Dapper;
 
 namespace Core.Application.Units.Queries.GetUnitById
 {
-    public class GetUnitByIdQueryHandler : IRequestHandler<GetUnitByIdQuery,List<UnitDto>>
+    //public class GetUnitByIdQueryHandler : IRequestHandler<GetUnitByIdQuery,UnitDto>
+    public class GetUnitByIdQueryHandler : IRequest<UnitDto>
     {
-     
-        private readonly IDbConnection _dbConnection;
+         private readonly IUnitQueryRepository _unitRepository;        
+        private readonly IMapper _mapper;
 
-        public GetUnitByIdQueryHandler(IDbConnection dbConnection)
+        public GetUnitByIdQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper)
         {
-            _dbConnection = dbConnection;
+             _unitRepository = unitRepository;
+            _mapper = mapper;
         }
 
-        public async Task<List<UnitDto>> Handle(GetUnitByIdQuery request, CancellationToken cancellationToken)
+        public async Task<UnitDto> Handle(GetUnitByIdQuery request, CancellationToken cancellationToken)
         {
-            var query = @"
+            /* var query = @"
                 SELECT 
                     u.Id,
                     u.UnitName,
@@ -65,7 +68,10 @@ namespace Core.Application.Units.Queries.GetUnitById
             .GroupBy(u => u.Id)
             .Select(g => g.First())
             .ToList();
-            return units;
+            return units; */
+
+            var result = await _unitRepository.GetByIdAsync(request.Id);            
+            return _mapper.Map<UnitDto>(result);
         }
     }
-}
+}   

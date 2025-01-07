@@ -5,7 +5,6 @@ using Core.Application.City.Queries.GetCityById;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ICity;
-using Dapper;
 using MediatR;
 
 namespace Core.Application.Country.Queries.GetCountryById

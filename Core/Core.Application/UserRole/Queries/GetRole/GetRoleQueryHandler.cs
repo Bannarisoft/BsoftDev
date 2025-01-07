@@ -1,4 +1,4 @@
-using Dapper;
+
 using AutoMapper;
 using Core.Application.Common.Interfaces;
 using MediatR;
@@ -16,22 +16,27 @@ namespace Core.Application.UserRole.Queries.GetRole
 {
     public class GetRoleQueryHandler :IRequestHandler<GetRoleQuery,List<UserRoleDto>>
     {
-       private readonly IDbConnection _dbConnection;
-     private readonly IUserRoleQueryRepository _IuserRoleRepository;
-     private readonly IMapper _Imapper;
+       
+     private readonly IUserRoleQueryRepository _userRoleRepository;
+     private readonly IMapper _mapper;
    
 
 
-       public GetRoleQueryHandler(IDbConnection dbConnection)
+       public GetRoleQueryHandler(IUserRoleQueryRepository userRoleRepository, IMapper mapper)
         {
-            _dbConnection = dbConnection;
+            _userRoleRepository = userRoleRepository;
+            _mapper =mapper;
         }
 
         public async Task<List<UserRoleDto>> Handle(GetRoleQuery request ,CancellationToken cancellationToken )
         {
-            const string query = @"SELECT  * FROM AppSecurity.UserRole";
+        /*     const string query = @"SELECT  * FROM AppSecurity.UserRole";
              var department = await _dbConnection.QueryAsync<UserRoleDto>(query);
            return department.AsList();
+ */
+           var users = await _userRoleRepository.GetAllRoleAsync();
+            var userList = _mapper.Map<List<UserRoleDto>>(users);
+            return userList;
         }
 
 
