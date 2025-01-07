@@ -2,16 +2,17 @@ using Core.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Core.Application.Common.Interfaces.IUnit;
 
 namespace Core.Application.Units.Commands.DeleteUnit
 {
     public class DeleteUnitCommandHandler : IRequestHandler<DeleteUnitCommand,int>
     {
-          private readonly IUnitRepository _iunitRepository;
+          private readonly IUnitCommandRepository _iunitRepository;
           private readonly IMapper _Imapper;
            private readonly ILogger<DeleteUnitCommandHandler> _Ilogger;
 
-        public DeleteUnitCommandHandler(IUnitRepository iunitrepository,IMapper Imapper,ILogger<DeleteUnitCommandHandler> Ilogger)
+        public DeleteUnitCommandHandler(IUnitCommandRepository iunitrepository,IMapper Imapper,ILogger<DeleteUnitCommandHandler> Ilogger)
         {
             _iunitRepository = iunitrepository;
             _Imapper = Imapper;

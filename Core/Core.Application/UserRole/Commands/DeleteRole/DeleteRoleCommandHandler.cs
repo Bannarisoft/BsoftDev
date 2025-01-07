@@ -6,16 +6,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IUserRole;
 
 namespace Core.Application.UserRole.Commands.DeleteRole
 {
     public class DeleteRoleCommandHandler  :IRequestHandler<DeleteRoleCommand ,int>
     {
     
-         private readonly IUserRoleRepository _IuserroleRepository;  
+         private readonly IUserRoleCommandRepository _IuserroleRepository;  
              private readonly IMapper _mapper;
       
-      public DeleteRoleCommandHandler (IUserRoleRepository roleRepository , IMapper mapper)
+      public DeleteRoleCommandHandler (IUserRoleCommandRepository roleRepository , IMapper mapper)
       {
         _IuserroleRepository =roleRepository;
          _mapper = mapper;

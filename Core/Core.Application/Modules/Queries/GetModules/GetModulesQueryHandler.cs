@@ -1,15 +1,16 @@
 using AutoMapper;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IModule;
 using MediatR;
 
 namespace Core.Application.Modules.Queries.GetModules
 {
     public class GetModulesQueryHandler : IRequestHandler<GetModulesQuery, List<ModuleDto>>
     {
-    private readonly IModuleRepository _moduleRepository;
+    private readonly IModuleQueryRepository _moduleRepository;
     private readonly IMapper _mapper;
 
-    public GetModulesQueryHandler(IModuleRepository moduleRepository, IMapper mapper)
+    public GetModulesQueryHandler(IModuleQueryRepository moduleRepository, IMapper mapper)
     {
         _moduleRepository = moduleRepository;
         _mapper = mapper;

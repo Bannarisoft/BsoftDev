@@ -1,5 +1,4 @@
 using AutoMapper;
-using Core.Application.Common.Interfaces;
 using MediatR;
 using System.Data;
 using System;
@@ -8,15 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
+using Core.Application.Common.Interfaces.IUser;
 
 namespace Core.Application.Users.Queries.GetUsers
 {
     public class GetUserQueryHandler : IRequestHandler<GetUserQuery,List<UserDto>>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserQueryRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public GetUserQueryHandler(IUserRepository userRepository , IMapper mapper)
+        public GetUserQueryHandler(IUserQueryRepository userRepository , IMapper mapper)
         {
             _userRepository = userRepository;
             _mapper = mapper;

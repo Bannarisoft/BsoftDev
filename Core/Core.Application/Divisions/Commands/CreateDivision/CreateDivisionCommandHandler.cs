@@ -6,15 +6,16 @@ using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IDivision;
 
 namespace Core.Application.Divisions.Commands.CreateDivision
 {
     public class CreateDivisionCommandHandler : IRequestHandler<CreateDivisionCommand, int>
     {
-         private readonly IDivisionRepository _divisionRepository;
+         private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
 
-        public CreateDivisionCommandHandler(IDivisionRepository divisionRepository, IMapper imapper)
+        public CreateDivisionCommandHandler(IDivisionCommandRepository divisionRepository, IMapper imapper)
         {
             _divisionRepository = divisionRepository;
             _imapper = imapper;

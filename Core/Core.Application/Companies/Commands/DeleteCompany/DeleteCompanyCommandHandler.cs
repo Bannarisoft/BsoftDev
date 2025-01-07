@@ -6,14 +6,15 @@ using Core.Application.Common.Interfaces;
 using Core.Domain.Entities;
 using MediatR;
 using AutoMapper;
+using Core.Application.Common.Interfaces.ICompany;
 
 namespace Core.Application.Companies.Commands.DeleteCompany
 {
     public class DeleteCompanyCommandHandler : IRequestHandler<DeleteCompanyCommand, int>
     {
-        private readonly ICompanyRepository _icompanyRepository;
+        private readonly ICompanyCommandRepository _icompanyRepository;
         private readonly IMapper _imapper;
-         public DeleteCompanyCommandHandler(ICompanyRepository companyRepository ,IMapper imapper)
+         public DeleteCompanyCommandHandler(ICompanyCommandRepository companyRepository ,IMapper imapper)
         {
             _icompanyRepository = companyRepository;
             _imapper = imapper;
