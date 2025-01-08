@@ -101,6 +101,9 @@ namespace BSOFT.Infrastructure.Data.Configurations
                 .WithOne()
                 .HasForeignKey(ura => ura.UserId);
 
+
+            
+
         }
     }
 }
