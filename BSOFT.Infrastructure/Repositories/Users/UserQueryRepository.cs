@@ -22,22 +22,12 @@ namespace BSOFT.Infrastructure.Repositories.Users
             _applicationDbContext = applicationDbContext;
              _dbConnection = dbConnection;
         }
-
-        // public async Task<List<User>> GetAllUsersAsync()
-        // {
-        //     return await _applicationDbContext.User.ToListAsync();
-        // }
         public async Task<List<User>> GetAllUsersAsync()
         {
         const string query = "SELECT * FROM AppSecurity.Users";
         return (await _dbConnection.QueryAsync<User>(query)).ToList();
         }
 
-        // public async Task<User?> GetByIdAsync(int userId)
-        // {
-        //     return await _applicationDbContext.User.AsNoTracking()
-        //         .FirstOrDefaultAsync(b => b.UserId == userId);
-        // }
         public async Task<User?> GetByIdAsync(int userId)
         {
             const string query = "SELECT * FROM AppSecurity.Users WHERE UserId = @UserId";

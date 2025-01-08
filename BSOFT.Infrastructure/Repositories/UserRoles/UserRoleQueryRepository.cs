@@ -22,11 +22,11 @@ namespace BSOFT.Infrastructure.Repositories.UserRoles
         return await _applicationDbContext.UserRole.ToListAsync();
     }
 
-    public async Task<UserRole> GetByIdAsync(int id)
+    public async Task<UserRole?> GetByIdAsync(int id)
     {
-        return await _applicationDbContext.UserRole.AsNoTracking().FirstOrDefaultAsync(b=>b.Id==id);        
-    
-    }   
+            return await _applicationDbContext.UserRole.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
+
+        }   
     public async Task<List<UserRole>> GetRolesAsync(string searchTerm)
     {
         return await _applicationDbContext.UserRole

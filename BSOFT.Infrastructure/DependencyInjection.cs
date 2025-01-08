@@ -37,6 +37,9 @@ using Core.Application.Common.Interfaces.IEntity;
 using BSOFT.Infrastructure.Repositories.Divisions;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Domain.Entities;
+using Core.Application.Common.Interfaces.IUserRoleAllocation;
+using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationQueryRepository;
+using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationCommandRepository;
 
 
 namespace BSOFT.Infrastructure
@@ -81,7 +84,7 @@ namespace BSOFT.Infrastructure
             });
             services.AddScoped<MongoDbContext>();
 
-      // Register MongoDbContext
+        // Register MongoDbContext
         services.AddTransient<MongoDbContext>();
             // Register MongoDbContext
             services.AddTransient<MongoDbContext>();
@@ -92,8 +95,9 @@ namespace BSOFT.Infrastructure
                 return mongoClient.GetDatabase(configuration["MongoDb:DatabaseName"]);
             });
 
-  // Configure JWT settings
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            // Register repositories
+         // Configure JWT settings
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            
+        // Register repositories
             services.AddScoped<IUserQueryRepository, UserQueryRepository>();
             services.AddScoped<IUserCommandRepository, UserCommandRepository>();
             services.AddScoped<IRoleEntitlementCommandRepository, RoleEntitlementCommandRepository>();
@@ -123,6 +127,10 @@ namespace BSOFT.Infrastructure
             services.AddScoped<ICityCommandRepository, CityCommandRepository>();
             services.AddScoped<ICityQueryRepository, CityQueryRepository>();
             services.AddScoped<IAuditLogRepository, AuditLogMongoRepository>();
+            services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
+            services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
+
+
                         
             services.AddHttpContextAccessor();            
             
@@ -136,12 +144,14 @@ namespace BSOFT.Infrastructure
 
             // AutoMapper profiles
             services.AddAutoMapper(
-                typeof(CreateUserProfile),
-                typeof(UpdateUserProfile),
+                typeof(UserProfile),
                 typeof(RoleEntitlementMappingProfile),
+                typeof(UserRoleProfile),
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
-                typeof(AuditLogMappingProfile)
+                typeof(AuditLogMappingProfile),
+                typeof(UserRoleAllocationProfile)
+
             );
 
             return services;
