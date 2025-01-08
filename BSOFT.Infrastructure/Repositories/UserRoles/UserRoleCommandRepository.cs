@@ -22,16 +22,6 @@ namespace BSOFT.Infrastructure.Repositories.UserRoles
             await _applicationDbContext.SaveChangesAsync();
             return userrole;
     }
-    //  public async Task<int> DeleteAsync(int id)
-    // {
-    //         var roleToDelete = await _applicationDbContext.UserRole.FirstOrDefaultAsync(u => u.Id == id);
-    //         if (roleToDelete != null)
-    //         {
-    //             _applicationDbContext.UserRole.Remove(roleToDelete);
-    //             return await _applicationDbContext.SaveChangesAsync();
-    //         }
-    //         return 0; // No user found
-    // }
 
         public async Task<int> DeleteAsync(int id ,UserRole userRole )
     {
