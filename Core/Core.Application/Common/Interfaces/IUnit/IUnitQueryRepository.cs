@@ -1,3 +1,4 @@
+using Core.Application.Units.Queries.GetUnits;
 using Core.Domain.Entities;
 
 
@@ -8,7 +9,7 @@ namespace Core.Application.Common.Interfaces.IUnit
     {
        Task<List<Unit>> GetAllUnitsAsync();
        Task<Unit> GetByIdAsync(int Id);     
-       Task<List<Unit>> GetUnit(string searchPattern);
+       Task<List<UnitDto>> GetUnit(string searchPattern);
 
        
 

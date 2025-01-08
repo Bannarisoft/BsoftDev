@@ -1,21 +1,24 @@
 using MediatR;
 using Core.Application.Units.Queries.GetUnits;
 using System.Data;
-using Dapper;
+using Core.Application.Common.Interfaces.IUnit;
+using AutoMapper;
 
 namespace Core.Application.Units.Queries.GetUnitAutoComplete
 {
     public class GetUnitAutoCompleteQueryHandler : IRequestHandler<GetUnitAutoCompleteQuery, List<UnitDto>>
     {
-        private readonly IDbConnection _dbConnection;
-        public GetUnitAutoCompleteQueryHandler(IDbConnection dbConnection)
+         private readonly IUnitQueryRepository _unitRepository;        
+        private readonly IMapper _mapper;
+        public GetUnitAutoCompleteQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper)
         {
-            _dbConnection = dbConnection;
+             _unitRepository = unitRepository;
+            _mapper = mapper;
         }
 
         public async Task<List<UnitDto>> Handle(GetUnitAutoCompleteQuery request, CancellationToken cancellationToken)
         {
-             var query = @"
+            /*  var query = @"
                   SELECT 
                     u.Id,
                     u.UnitName,
@@ -64,7 +67,10 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
                 var units = result.GroupBy(u => u.Id)
                 .Select(g => g.First())
                 .ToList(); 
-                return units;          
+                return units;    */       
+                 var result = await _unitRepository.GetUnit(request.SearchPattern);
+            //return _mapper.Map<List<DivisionDTO>>(result);
+            return _mapper.Map<List<UnitDto>>(result);        
         }
     }
 }

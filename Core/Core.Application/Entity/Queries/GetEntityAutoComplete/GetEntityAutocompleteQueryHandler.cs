@@ -1,21 +1,24 @@
 using System.Data;
-using Dapper;
 using MediatR;
 using Core.Application.Entity.Queries.GetEntity;
+using Core.Application.Common.Interfaces.IEntity;
+using AutoMapper;
 
 namespace Core.Application.Entity.Queries.GetEntityAutoComplete
 {
     public class GetEntityAutocompleteQueryHandler : IRequestHandler<GetEntityAutocompleteQuery, List<EntityDto>>
     {
-    private readonly IDbConnection _dbConnection;
-    public GetEntityAutocompleteQueryHandler(IDbConnection dbConnection)
+        private readonly IEntityQueryRepository _entityRepository;        
+        private readonly IMapper _mapper;
+    public GetEntityAutocompleteQueryHandler(IEntityQueryRepository entityRepository,  IMapper mapper)
     {
-        _dbConnection = dbConnection;
+         _entityRepository = entityRepository;
+         _mapper =mapper;
     }
 
     public async Task<List<EntityDto>> Handle(GetEntityAutocompleteQuery request, CancellationToken cancellationToken)
     {
-        var query = @"
+       /*  var query = @"
             SELECT *
             FROM AppData.Entity
             WHERE EntityName LIKE @SearchPattern OR EntityCode LIKE @SearchPattern and IsActive = 1
@@ -41,7 +44,11 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
             Address = entities.Address,
             Phone = entities.Phone,
             Email = entities.Email
-        }).ToList();  
+        }).ToList();   */
+          var result = await _entityRepository.GetByEntityNameAsync(request.SearchPattern);
+            //return _mapper.Map<List<DivisionDTO>>(result);
+            return _mapper.Map<List<EntityDto>>(result);            
+
     }
     }
     

@@ -1,7 +1,6 @@
 using AutoMapper;
 using Core.Application.Common.Interfaces;
 using MediatR;
-using Dapper;
 using System.Data;
 using System;
 using System.Collections.Generic;
@@ -9,22 +8,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Application.UserRole.Queries.GetRole;
+using Core.Application.Common.Interfaces.IUserRole;
 
 namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 {
     public class GetRolesAutocompleteQueryHandler : IRequestHandler<GetRolesAutocompleteQuery, List<UserRoleDto>>
     {
-         private readonly IDbConnection _dbConnection;
-
-        public GetRolesAutocompleteQueryHandler(IDbConnection dbConnection)
+        private readonly IUserRoleQueryRepository _userRoleRepository;
+     private readonly IMapper _mapper;
+        public GetRolesAutocompleteQueryHandler(IUserRoleQueryRepository userRoleRepository, IMapper mapper)
         {
-          _dbConnection = dbConnection;
+           _userRoleRepository = userRoleRepository;
+            _mapper =mapper;
         }
 
         public async Task<List<UserRoleDto>> Handle(GetRolesAutocompleteQuery request, CancellationToken cancellationToken)
         {
 
-              var query = @"
+             /*  var query = @"
             select Id,RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole 
             WHERE RoleName LIKE @SearchPattern OR Id LIKE @SearchPattern and IsActive =1
             ORDER BY RoleName";
@@ -48,7 +49,10 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
             IsActive=UserRole.IsActive
             
         }).ToList();
-           
+            */
+             var result = await _userRoleRepository.GetRolesAsync(request.SearchPattern);
+            //return _mapper.Map<List<DivisionDTO>>(result);
+            return _mapper.Map<List<UserRoleDto>>(result);        
         }
         
     }

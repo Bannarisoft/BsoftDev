@@ -7,8 +7,6 @@ using Core.Application.Common.Interfaces;
 using MediatR;
 using System.Text;
 using Core.Application.Divisions.Queries.GetDivisions;
-using System.Data;
-using Dapper;
 using Core.Application.Common.Interfaces.IDivision;
 
 namespace Core.Application.Divisions.Queries.GetDivisionById
@@ -33,8 +31,8 @@ namespace Core.Application.Divisions.Queries.GetDivisionById
             return null;
         }
           return _mapper.Map<DivisionDTO>(divisionresult); */
-        var user = await _divisionRepository.GetByIdAsync(request.Id);
-          return _mapper.Map<DivisionDTO>(user);
+        var result = await _divisionRepository.GetByIdAsync(request.Id);
+          return _mapper.Map<DivisionDTO>(result);
 
         }
     }

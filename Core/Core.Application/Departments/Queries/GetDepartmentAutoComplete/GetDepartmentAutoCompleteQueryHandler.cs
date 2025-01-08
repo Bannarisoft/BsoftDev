@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dapper;
 using System.Data;
 using Core.Domain.Entities;
 using Core.Application.Departments.Queries.GetDepartments;
+using Core.Application.Common.Interfaces.IDepartment;
 
 
 namespace Core.Application.Departments.Queries.GetDepartmentAutoComplete
@@ -17,16 +17,18 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoComplete
     public class GetDepartmentAutoCompleteQueryHandler : IRequestHandler<GetDepartmentAutoCompleteQuery,List<DepartmentDto>>
     {
         
-      private readonly IDbConnection _dbConnection;
+        private readonly IDepartmentQueryRepository _departmentRepository;
+        private readonly IMapper _mapper;
 
-      public GetDepartmentAutoCompleteQueryHandler(IDbConnection dbConnection)
+      public GetDepartmentAutoCompleteQueryHandler(IDepartmentQueryRepository divisionRepository,IMapper mapper)
       {
-       _dbConnection = dbConnection;
+            _mapper =mapper;
+            _departmentRepository = divisionRepository;   
       }
 
       public async Task<List<DepartmentDto>> Handle(GetDepartmentAutoCompleteQuery request, CancellationToken cancellationToken)
     {
-          var query = @"
+          /* var query = @"
             select CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
             WHERE DeptName LIKE @SearchPattern OR Id LIKE @SearchPattern
             ORDER BY DeptName";
@@ -46,7 +48,12 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoComplete
             Id = Department.Id,           
             DeptName = Department.DeptName
             
-        }).ToList();
+        }).ToList(); */
+
+        var result = await _departmentRepository.GetAllDepartmentAutoCompleteSearchAsync(request.SearchPattern);
+            //return _mapper.Map<List<DivisionDTO>>(result);
+        return _mapper.Map<List<DepartmentDto>>(result);     
+
     }
      
 

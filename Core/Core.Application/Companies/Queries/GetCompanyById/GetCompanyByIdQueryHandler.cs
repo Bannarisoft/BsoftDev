@@ -8,23 +8,23 @@ using MediatR;
 using System.Text;
 using Core.Application.Companies.Queries.GetCompanies;
 using System.Data;
-using Dapper;
+using Core.Application.Common.Interfaces.ICompany;
+using Core.Domain.Entities;
 
 namespace Core.Application.Companies.Queries.GetCompanyById
 {
     public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery,GetCompanyDTO>
     {
-        private readonly IDbConnection _dbConnection;
+          private readonly ICompanyQueryRepository _companyRepository;
         private readonly IMapper _mapper;
-
-         public GetCompanyByIdQueryHandler(IDbConnection dbConnection, IMapper mapper)
+         public GetCompanyByIdQueryHandler(ICompanyQueryRepository companyRepository, IMapper mapper)
         {
-            _dbConnection = dbConnection;
-            _mapper =mapper;
+              _companyRepository = companyRepository;
+             _mapper =mapper;
         } 
         public async Task<GetCompanyDTO> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
         {
-            const string query = @"
+            /* const string query = @"
             SELECT 
                 C.Id, 
                 C.CompanyName, 
@@ -55,7 +55,9 @@ namespace Core.Application.Companies.Queries.GetCompanyById
             LEFT JOIN AppData.CompanyContact B ON B.CompanyId = C.Id WHERE C.Id = @CompanyId";
            
              var company = await _dbConnection.QueryFirstOrDefaultAsync<GetCompanyDTO>(query, new { CompanyId = request.CompanyId });
-            return _mapper.Map<GetCompanyDTO>(company);
+            return _mapper.Map<GetCompanyDTO>(company); */
+            var result = await _companyRepository.GetByIdAsync(request.CompanyId);
+            return _mapper.Map<GetCompanyDTO>(result);
         }
     }
 }

@@ -1,25 +1,26 @@
 using Core.Application.Entity.Queries.GetEntity;
 using Core.Application.Common.Interfaces;
 using MediatR;
-using Dapper;
 using System.Data;
 using Core.Application.Common.Interfaces.IEntity;
+using AutoMapper;
 
 namespace Core.Application.Entity.Queries.GetEntityById
 {
     public class GetEntityByIdQueryHandler : IRequestHandler<GetEntityByIdQuery, EntityDto?>
     {
-    private readonly IEntityQueryRepository _entityRepository;
-    private readonly IDbConnection _dbConnection;
+     private readonly IEntityQueryRepository _entityRepository;        
+        private readonly IMapper _mapper;
 
-    public GetEntityByIdQueryHandler(IDbConnection dbConnection)
+    public GetEntityByIdQueryHandler(IEntityQueryRepository entityRepository,  IMapper mapper)
     {
-            _dbConnection = dbConnection;
+           _entityRepository = entityRepository;
+         _mapper =mapper;
     }
 
     public async Task<EntityDto?> Handle(GetEntityByIdQuery request, CancellationToken cancellationToken)
     {
-        var query = "SELECT * FROM AppData.Entity WHERE Id = @Id";
+       /*  var query = "SELECT * FROM AppData.Entity WHERE Id = @Id";
         var entityresult = await _dbConnection.QuerySingleOrDefaultAsync<EntityDto>(query, new { Id = request.EntityId });
         // Return null if the country is not found
         if (entityresult == null)
@@ -37,7 +38,9 @@ namespace Core.Application.Entity.Queries.GetEntityById
             Phone= entityresult.Phone,
             Email= entityresult.Email,
             IsActive = entityresult.IsActive
-        };
+        }; */
+            var result = await _entityRepository.GetByIdAsync(request.EntityId);
+          return _mapper.Map<EntityDto>(result);
     }
     }
 }

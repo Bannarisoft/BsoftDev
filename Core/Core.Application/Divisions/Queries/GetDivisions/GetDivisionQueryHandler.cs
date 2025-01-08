@@ -7,7 +7,6 @@ using Core.Application.Common.Interfaces;
 using MediatR;
 using System.Text;
 using System.Data;
-using Dapper;
 using Core.Application.Common.Interfaces.IDivision;
 
 namespace Core.Application.Divisions.Queries.GetDivisions

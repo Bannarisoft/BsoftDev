@@ -9,25 +9,27 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
-using Dapper;
+using Core.Application.Common.Interfaces.IUserRole;
 
 
 namespace Core.Application.UserRole.Queries.GetRoleById
 {
     public class GetRoleByIdQueryHandler :IRequestHandler<GetRoleByIdQuery,UserRoleDto>
     {
-
-                private readonly IDbConnection _dbConnection;
+    private readonly IUserRoleQueryRepository _userRoleRepository;
+     private readonly IMapper _mapper;
+   
       
-          public GetRoleByIdQueryHandler(IDbConnection dbConnection)
+          public GetRoleByIdQueryHandler(IUserRoleQueryRepository userRoleRepository, IMapper mapper)
           {
-             _dbConnection = dbConnection;
+            _userRoleRepository = userRoleRepository;
+            _mapper =mapper;
         
           }
 
-          public async Task<UserRoleDto?> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
+          public async Task<UserRoleDto> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
           {
-             var query = "SELECT RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole WHERE Id = @Id";
+             /* var query = "SELECT RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole WHERE Id = @Id";
         var userrole = await _dbConnection.QuerySingleOrDefaultAsync<UserRoleDto>(query, new { Id = request.Id });
         // Return null if the country is not found
         if (userrole == null)
@@ -43,7 +45,12 @@ namespace Core.Application.UserRole.Queries.GetRoleById
             RoleName = userrole.RoleName,
             Description = userrole.Description,
             IsActive = userrole.IsActive
-          };
+          }; */
+
+         var user = await _userRoleRepository.GetByIdAsync(request.Id);
+          return _mapper.Map<UserRoleDto>(user);
+
+
           }
 
         
