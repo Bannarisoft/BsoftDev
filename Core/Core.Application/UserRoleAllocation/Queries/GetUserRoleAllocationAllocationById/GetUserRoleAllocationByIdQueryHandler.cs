@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
-using Dapper;
+using Core.Application.Common.Interfaces.IUserRoleAllocation;
 
 
 namespace Core.Application.UserRoleAllocation.Queries.GetUserRoleAllocationById
@@ -17,41 +17,37 @@ namespace Core.Application.UserRoleAllocation.Queries.GetUserRoleAllocationById
     public class GetUserRoleAllocationByIdQueryHandler :IRequestHandler<GetUserRoleAllocationByIdQuery,CreateUserRoleAllocationDto>
     {
 
-        private readonly IDbConnection _dbConnection;
+        private readonly IUserRoleAllocationQueryRepository _userRoleAllocationRepository;
         private readonly IMapper _mapper;
       
-        public GetUserRoleAllocationByIdQueryHandler(IDbConnection dbConnection, IMapper mapper)
+        public GetUserRoleAllocationByIdQueryHandler(IUserRoleAllocationQueryRepository userRoleAllocationRepository, IMapper mapper)
         {
-            _dbConnection = dbConnection;
+            _userRoleAllocationRepository = userRoleAllocationRepository;
             _mapper = mapper;
-        
         }
 
         public async Task<CreateUserRoleAllocationDto?> Handle(GetUserRoleAllocationByIdQuery request, CancellationToken cancellationToken)
         {
-                const string query = @"
-                SELECT 
-                    ura.UserId,
-                    ura.UserRoleId
-                FROM 
-                    AppSecurity.UserRoleAllocation ura
-                WHERE 
-                    ura.UserId = @UserId";
+            if (request.UserId <= 0)
+            {
+                throw new ArgumentException("Invalid User ID provided.");
+            }
 
-            // Execute the query to get the roles associated with the user
-            var roles = await _dbConnection.QueryAsync<int>(query, new { UserId = request.UserId });
+            // Fetch roles associated with the user from the repository
+            var userRoleAllocations = await _userRoleAllocationRepository.GetByUserIdAsync(request.UserId);
+            var roleIds = userRoleAllocations.Select(ura => ura.UserRoleId).ToList();
 
-            // Return null if no roles are found for the user
-            if (roles == null || !roles.Any())
+            // Handle case where no roles are found
+            if (roleIds == null || !roleIds.Any())
             {
                 return null;
             }
 
-            // Create the DTO with the UserId and associated RoleIds
+            // Create and return the DTO with the UserId and associated RoleIds
             return new CreateUserRoleAllocationDto
             {
                 UserId = request.UserId,
-                RoleIds = roles.ToList()
+                RoleIds = roleIds.ToList()
             };
           }
 

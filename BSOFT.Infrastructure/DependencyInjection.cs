@@ -169,8 +169,7 @@ namespace BSOFT.Infrastructure
 
             // AutoMapper profiles
             services.AddAutoMapper(
-                typeof(CreateUserProfile),
-                typeof(UpdateUserProfile),
+                typeof(UserProfile),
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),

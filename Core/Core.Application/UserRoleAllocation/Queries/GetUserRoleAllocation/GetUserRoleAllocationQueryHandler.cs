@@ -1,4 +1,3 @@
-using Dapper;
 using AutoMapper;
 using Core.Application.Common.Interfaces;
 using MediatR;
@@ -16,40 +15,23 @@ namespace Core.Application.UserRoleAllocation.Queries.GetUserRoleAllocation
 {
     public class GetUserRoleAllocationQueryHandler :IRequestHandler<GetUserRoleAllocationQuery,List<CreateUserRoleAllocationDto>>
     {
-       private readonly IDbConnection _dbConnection;
-       private readonly IMapper _mapper;
-   
+        private readonly IUserRoleAllocationQueryRepository _userRoleAllocationRepository;
+        private readonly IMapper _mapper;
 
-
-       public GetUserRoleAllocationQueryHandler(IDbConnection dbConnection, IMapper mapper)
+       public GetUserRoleAllocationQueryHandler(IUserRoleAllocationQueryRepository userRoleAllocationRepository, IMapper mapper)
         {
-            _dbConnection = dbConnection;
+            _userRoleAllocationRepository = userRoleAllocationRepository;
             _mapper = mapper;
-
         }
 
         public async Task<List<CreateUserRoleAllocationDto>> Handle(GetUserRoleAllocationQuery request ,CancellationToken cancellationToken )
         {
-            const string query = @"
-                SELECT 
-                    ura.Id, 
-                    ura.UserId, 
-                    ura.UserRoleId, 
-                    ur.RoleName 
-                FROM 
-                    AppSecurity.UserRoleAllocation ura
-                INNER JOIN 
-                    AppSecurity.UserRole ur 
-                ON 
-                    ura.UserRoleId = ur.Id";
+            var userRoleAllocations = await _userRoleAllocationRepository.GetAllAsync();
 
-            // Execute the query and map results to the DTO
-            var result = await _dbConnection.QueryAsync<UserRoleAllocationResponseDto>(query);
+            // Map data to the DTO
+            var allocationDtos = _mapper.Map<List<CreateUserRoleAllocationDto>>(userRoleAllocations);
 
-            // Map the result to the required DTO
-            var mappedResult = _mapper.Map<List<CreateUserRoleAllocationDto>>(result);
-
-            return mappedResult;
+            return allocationDtos;
         }
 
 
