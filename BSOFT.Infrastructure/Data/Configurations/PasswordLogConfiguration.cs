@@ -40,7 +40,8 @@ namespace BSOFT.Infrastructure.Data.Configurations
              builder.Property(p => p.CreatedAt)
                 .HasColumnName("CreatedAt")
                 .HasColumnType("datetime")
-                .IsRequired();
+                .IsRequired()
+                .HasDefaultValueSql("GETDATE()");
 
              builder.Property(p => p.CreatedIP)
                 .HasColumnName("CreatedIP")

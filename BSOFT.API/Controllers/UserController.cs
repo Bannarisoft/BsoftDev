@@ -10,6 +10,7 @@ using Core.Application.Users.Commands.CreateUser;
 using Core.Application.Users.Commands.UpdateUser;
 using Core.Application.Users.Commands.DeleteUser;
 using Core.Application.Users.Queries.GetUserAutoComplete;
+using Core.Application.Users.Commands.UpdateFirstTimeUserPassword;
 
 namespace BSOFT.API.Controllers
 {
@@ -25,16 +26,19 @@ namespace BSOFT.API.Controllers
          private readonly IValidator<CreateUserCommand> _createUserCommandValidator;
          private readonly IValidator<UpdateUserCommand> _updateUserCommandValidator;
          private readonly ApplicationDbContext _dbContext;
+         private readonly IValidator<FirstTimeUserPasswordCommand> _firstTimeUserPasswordCommandValidator;
          
        public UserController(ISender mediator, 
                              IValidator<CreateUserCommand> createUserCommandValidator, 
                              IValidator<UpdateUserCommand> updateUserCommandValidator, 
-                             ApplicationDbContext dbContext) 
+                             ApplicationDbContext dbContext, 
+                             IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator) 
          : base(mediator)
         {        
             _createUserCommandValidator = createUserCommandValidator;
             _updateUserCommandValidator = updateUserCommandValidator;    
             _dbContext = dbContext;  
+            _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
              
         }
         
@@ -102,6 +106,18 @@ namespace BSOFT.API.Controllers
            
             var users = await Mediator.Send(new GetUserAutoCompleteQuery {SearchPattern = searchPattern});
             return Ok(users);
+        }
+        [HttpPut]
+        [Route("FirstTimeUserChangePassword")]
+        public async Task<IActionResult> FirstTimeUserChangePassword([FromBody] FirstTimeUserPasswordCommand command)
+        {
+            var validationResult = await _firstTimeUserPasswordCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
+            await Mediator.Send(command);
+            return Ok(new { Message = "Password change successfully." });
         }
 
         // [HttpPut("{userid}")]

@@ -155,7 +155,7 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddScoped<IJwtTokenHelper, JwtTokenHelper>();            
-
+            services.AddScoped<IChangePassword, FirstTimePasswordChangeRepository>();
 
             // AutoMapper profiles
             services.AddAutoMapper(
@@ -164,7 +164,8 @@ namespace BSOFT.Infrastructure
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
-                typeof(AuditLogMappingProfile)
+                typeof(AuditLogMappingProfile),
+                typeof(ChangePasswordProfile)
             );
 
             return services;

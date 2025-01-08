@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Core.Application.Users.Commands.CreateFirstTimeUserPassword
+namespace Core.Application.Users.Commands.UpdateFirstTimeUserPassword
 {
     public class FirstTimeUserPasswordCommand : IRequest<string>
     {
