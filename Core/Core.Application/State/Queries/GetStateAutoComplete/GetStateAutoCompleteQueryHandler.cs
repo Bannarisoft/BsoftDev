@@ -1,9 +1,6 @@
-using System.Data;
-using Dapper;
 using MediatR;
 using Core.Application.State.Queries.GetStates;
 using AutoMapper;
-using Core.Application.Common.Interfaces;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces.IState;
 

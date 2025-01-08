@@ -9,7 +9,6 @@ using System.Text;
 using Core.Domain.Entities;
 using Core.Application.Divisions.Queries.GetDivisions;
 using System.Data;
-using Dapper;
 using Core.Application.Common.Interfaces.IDivision;
 
 
@@ -40,7 +39,7 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
             return division.AsList(); */
             var result = await _divisionRepository.GetDivision(request.SearchPattern);
             //return _mapper.Map<List<DivisionDTO>>(result);
-            return _mapper.Map<List<DivisionAutoCompleteDTO>>(result);
+            return _mapper.Map<List<DivisionAutoCompleteDTO>>(result);            
          } 
     }
 }
