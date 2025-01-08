@@ -15,11 +15,6 @@ namespace Core.Application.UserLogin.Commands.UserLogin
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
 
-    // public UserLoginCommand(string username, string password)
-    // {
-    //     Username = username;
-    //     Password = password;
-    // }
     }
 
 }

@@ -1,4 +1,5 @@
-using Dapper;
+using AutoMapper;
+using Core.Application.Common.Interfaces.IUnit;
 using MediatR;
 using System.Data;
 
@@ -6,15 +7,17 @@ namespace Core.Application.Units.Queries.GetUnits
 {
     public class GetUnitQueryHandler : IRequestHandler<GetUnitQuery,List<UnitDto>>
     {
-        private readonly IDbConnection _dbConnection;
-        public GetUnitQueryHandler(IDbConnection dbConnection)
+        private readonly IUnitQueryRepository _unitRepository;        
+        private readonly IMapper _mapper;
+        public GetUnitQueryHandler( IUnitQueryRepository unitRepository, IMapper mapper)
         {
-            _dbConnection = dbConnection;
+            _unitRepository = unitRepository;
+            _mapper = mapper;
         }
 
         public async Task<List<UnitDto>> Handle(GetUnitQuery request, CancellationToken cancellationToken)
         {
-            var query = @"
+         /*    var query = @"
                 SELECT 
                     u.Id,
                     u.UnitName,
@@ -61,7 +64,11 @@ namespace Core.Application.Units.Queries.GetUnits
             var units = result.GroupBy(u => u.Id)
             .Select(g => g.First())
             .ToList(); 
-            return units;
+            return units; */
+
+            var units = await _unitRepository.GetAllUnitsAsync();
+            var unitList = _mapper.Map<List<UnitDto>>(units);
+            return unitList;
         }
     }
 }

@@ -1,28 +1,22 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
-using System.IO;
 using Core.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
 using BSOFT.Infrastructure.Data.Configurations;
+
 
 namespace BSOFT.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContext
     {
         private readonly IIPAddressService _ipAddressService;
+         
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions, IIPAddressService ipAddressService) 
-            : base(dbContextOptions) 
+            : base(dbContextOptions)
         {  
-            _ipAddressService = ipAddressService;         
+            _ipAddressService = ipAddressService;               
+               
         }
         
         public DbSet<Entity> Entity { get; set; } 
@@ -42,7 +36,8 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<Countries> Countries { get; set; }
         public DbSet<States> States { get; set; }
         public DbSet<Cities> Cities { get; set; }
-        public DbSet<PasswordComplexityRule> PasswordComplexityRule { get; set; } 
+        public DbSet<UserRoleAllocation> UserRoleAllocations { get; set; }
+        public DbSet<UserSession> UserSession { get; set; }
 
 
 
@@ -70,20 +65,23 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new DivisionConfiguration());
 			modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
-            modelBuilder.ApplyConfiguration(new UserConfiguration());
-            modelBuilder.ApplyConfiguration(new PwdComplexityRuleConfiguration());          
+            modelBuilder.ApplyConfiguration(new UserRoleAllocationConfigurations());
+            modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
+			modelBuilder.ApplyConfiguration(new PwdComplexityRuleConfiguration());
+
+            
                
             base.OnModelCreating(modelBuilder);
         }
          public override int SaveChanges()
         {
-            UpdateIpFields();
+            UpdateIpFields();            
             return base.SaveChanges();
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            UpdateIpFields();
+            UpdateIpFields();            
             return await base.SaveChangesAsync(cancellationToken);
         }
 

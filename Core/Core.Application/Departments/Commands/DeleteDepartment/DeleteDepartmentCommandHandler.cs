@@ -5,15 +5,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using  Core.Application.Departments.Queries.GetDepartments;
+using Core.Application.Common.Interfaces.IDepartment;
 
 namespace Core.Application.Departments.Commands.DeleteDepartment
 {
     public class DeleteDepartmentCommandHandler :IRequestHandler<DeleteDepartmentCommand ,int>
     {
-      private readonly IDepartmentRepository _IdepartmentRepository;  
+      private readonly IDepartmentCommandRepository _IdepartmentRepository;  
        private readonly IMapper _mapper;
       
-      public DeleteDepartmentCommandHandler (IDepartmentRepository departmentRepository , IMapper mapper)
+      public DeleteDepartmentCommandHandler (IDepartmentCommandRepository departmentRepository , IMapper mapper)
       {
          _IdepartmentRepository = departmentRepository;
             _mapper = mapper;

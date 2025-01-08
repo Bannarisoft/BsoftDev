@@ -96,7 +96,7 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpGet]
-        [Route("GetUsers")]
+        [Route("GetUsersByName")]
         public async Task<IActionResult> GetByUsernameAsync([FromQuery] string searchPattern)
         {
            

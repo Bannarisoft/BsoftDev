@@ -6,6 +6,8 @@ using System.IO;
 using Core.Application.Common.Interfaces;
 using BSOFT.Infrastructure.Repositories;
 using MongoDB.Driver;
+using Microsoft.AspNetCore.Http;  // Ensure this is included if needed for IHttpContextAccessor
+
 namespace BSOFT.Infrastructure
 {
     public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
@@ -24,22 +26,12 @@ namespace BSOFT.Infrastructure
 
             optionsBuilder.UseSqlServer(connectionString);
 
-
-            //   // MongoDB Configuration
-            // var mongoSection = configuration.GetSection("MongoDb");
-            // var mongoConnectionString = mongoSection.GetValue<string>("MongoDbConnectionString");
-            // var mongoDatabaseName = mongoSection.GetValue<string>("DatabaseName");
-
-            // if (string.IsNullOrWhiteSpace(mongoConnectionString) || string.IsNullOrWhiteSpace(mongoDatabaseName))
-            // {
-            //     throw new InvalidOperationException("MongoDB connection string or database name not found in configuration.");
-            // }
-
-            // var mongoClient = new MongoClient(mongoConnectionString);
-            // var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
-
+    
+            // Create a dummy or mock IPAddressService implementation
             IIPAddressService ipAddressService = new IPAddressService();
-            return new ApplicationDbContext(optionsBuilder.Options, ipAddressService);
+            
+            return new ApplicationDbContext(optionsBuilder.Options, ipAddressService);  // Pass both dependencies
+            //return new ApplicationDbContext(optionsBuilder.Options);  // Pass both dependencies
         }
     }
 }

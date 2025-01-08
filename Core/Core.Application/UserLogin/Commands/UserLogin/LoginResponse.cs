@@ -12,10 +12,13 @@ namespace Core.Application.UserLogin.Commands.UserLogin
     public class LoginResponse
     {
         public string Token { get; set; } = string.Empty;
-        public string UserName { get; set; }
+        public string UserName { get; set; }= string.Empty;
         // public string UserRole { get; set; }
-        public List<string> UserRole { get; set; }
+        // public List<string> UserRole { get; set; }
+        public IEnumerable<string> UserRole { get; set; } = new List<string>();
         public bool IsAuthenticated { get; set; }
         public string Message { get; set; } = string.Empty;
+
+       
     }
 }

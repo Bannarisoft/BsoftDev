@@ -1,37 +1,34 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Application.Country.Queries.GetCountries;
-using Core.Application.Country.Queries.GetCountryById;
-using Core.Application.Common.Interface;
-using Dapper;
+using Core.Application.Common.Interfaces;
 using MediatR;
-using Core.Application.Country.Queries.GetcountryById;
+using AutoMapper;
+using Core.Application.Common;
+using Core.Application.Common.Interfaces.ICountry;
 
 namespace Core.Application.Country.Queries.GetCountryById
 {
-    public class GetCountryByIdQueryHandler : IRequestHandler<GetCountryByIdQuery, CountryDto?>
-{
-    private readonly IDbConnection _dbConnection;
-
-public GetCountryByIdQueryHandler(IDbConnection dbConnection)
+    public class GetCountryByIdQueryHandler : IRequestHandler<GetCountryByIdQuery, Result<CountryDto>>
     {
-        _dbConnection = dbConnection;
-    }
+        private readonly ICountryQueryRepository _countryRepository;
+        private readonly IMapper _mapper;
 
-    public async Task<CountryDto?> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
-    {
-        var query = "SELECT Id, countryCode, countryName, IsActive,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP FROM AppData.Country with (nolock) WHERE  Id = @Id and isActive=1";
-        var country = await _dbConnection.QuerySingleOrDefaultAsync<CountryDto>(query, new { Id = request.Id });
-        // Return null if the country is not found
-        if (country == null)
+        public GetCountryByIdQueryHandler(ICountryQueryRepository countryRepository, IMapper mapper)
         {
-            return null;
+            _countryRepository = countryRepository;
+            _mapper = mapper;
         }
 
-       return country;
+        public async Task<Result<CountryDto>> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
+        {
+            var country = await _countryRepository.GetByIdAsync(request.Id);
+            if (country == null)
+            {
+                return Result<CountryDto>.Failure($"Country with ID {request.Id} not found.");
+            }
+            
+            var countryDto = _mapper.Map<CountryDto>(country);
+            return Result<CountryDto>.Success(countryDto);
+        }
     }
-}
+
 }

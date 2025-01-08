@@ -7,35 +7,24 @@ using Core.Application.Common.Interfaces;
 using MediatR;
 using System.Text;
 using System.Data;
-using Dapper;
+using Core.Application.Common.Interfaces.IDivision;
 
 namespace Core.Application.Divisions.Queries.GetDivisions
 {
     public class GetDivisionQueryHandler : IRequestHandler<GetDivisionQuery,List<DivisionDTO>>
     {
-        // private readonly IDivisionRepository _divisionRepository;
-        private readonly IDbConnection _dbConnection;
+        private readonly IDivisionQueryRepository _divisionRepository;        
         private readonly IMapper _mapper;
-        public GetDivisionQueryHandler(IDbConnection dbConnection, IMapper mapper)
+        public GetDivisionQueryHandler(IDivisionQueryRepository divisionRepository, IMapper mapper)
         {
-            _dbConnection = dbConnection;
+            _divisionRepository = divisionRepository;
             _mapper =mapper;
         }
         public async Task<List<DivisionDTO>> Handle(GetDivisionQuery requst, CancellationToken cancellationToken)
         {
-            const string query = @"
-            SELECT 
-                Id, 
-                ShortName,
-                Name,
-                CompanyId,
-                IsActive
-            FROM AppData.Division";
-            var divisions = await _dbConnection.QueryAsync<DivisionDTO>(query);
-            
-            var divisionlist = _mapper.Map<List<DivisionDTO>>(divisions);
-
-            return divisionlist.AsList();
+            var users = await _divisionRepository.GetAllDivisionAsync();
+            var userList = _mapper.Map<List<DivisionDTO>>(users);
+            return userList;
         }
     }
 }

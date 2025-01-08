@@ -14,6 +14,7 @@ namespace Core.Application.AuditLog.Commands.CreateAuditLog
 
         public CreateAuditLogCommandHandler(IMapper mapper, IAuditLogRepository auditLogRepository)
         {
+            
             _mapper = mapper;
             _auditLogRepository = auditLogRepository;
         }

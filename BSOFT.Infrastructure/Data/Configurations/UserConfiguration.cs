@@ -92,20 +92,18 @@ namespace BSOFT.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(u => u.UserRoleId)
-                .HasColumnName("UserRoleId")
-                .HasColumnType("int")
-                .IsRequired();
+            // builder.Property(u => u.UserRoleId)
+            //     .HasColumnName("UserRoleId")
+            //     .HasColumnType("int")
+            //     .IsRequired();
 
-            // builder.HasOne(u => u.UserRole)
-            //     .WithMany(ur => ur.Users)
-            //     .HasForeignKey(u => u.UserRoleId)
-            //     .OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(u => u.UserRoleAllocations)
+                .WithOne()
+                .HasForeignKey(ura => ura.UserId);
 
-                 builder.HasMany(u => u.UserRoles)
-               .WithOne(ur => ur.User)
-               .HasForeignKey(ur => ur.UserId)
-               .OnDelete(DeleteBehavior.Cascade);
+
+            
+
         }
     }
 }
