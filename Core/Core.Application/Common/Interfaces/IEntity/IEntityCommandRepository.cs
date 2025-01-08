@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Common.Interfaces.IEntity  
 {
-  using Entity = Core.Domain.Entities.Entity;
+    using Entity = Core.Domain.Entities.Entity;
     public interface IEntityCommandRepository
     {
       
