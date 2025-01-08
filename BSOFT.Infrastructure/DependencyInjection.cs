@@ -37,6 +37,10 @@ using Core.Application.Common.Interfaces.IEntity;
 using BSOFT.Infrastructure.Repositories.Divisions;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Domain.Entities;
+using Core.Application.Common.Interfaces.IUserPasswordNotifications;
+using BSOFT.Infrastructure.Repositories.PwdResetNotifications;
+using Core.Application.Common.Interfaces.IUserSession;
+using BSOFT.Infrastructure.Repositories.UserSession;
 
 
 namespace BSOFT.Infrastructure
@@ -94,8 +98,6 @@ namespace BSOFT.Infrastructure
 
   // Configure JWT settings
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            // Register repositories
-            services.AddScoped<IUserQueryRepository, UserQueryRepository>();
-            services.AddScoped<IUserCommandRepository, UserCommandRepository>();
             services.AddScoped<IRoleEntitlementCommandRepository, RoleEntitlementCommandRepository>();
             services.AddScoped<IRoleEntitlementQueryRepository, RoleEntitlementQueryRepository>();
             services.AddScoped<IModuleCommandRepository, ModuleCommandRepository>();
@@ -123,6 +125,12 @@ namespace BSOFT.Infrastructure
             services.AddScoped<ICityCommandRepository, CityCommandRepository>();
             services.AddScoped<ICityQueryRepository, CityQueryRepository>();
             services.AddScoped<IAuditLogRepository, AuditLogMongoRepository>();
+            services.AddTransient<IUserCommandRepository, UserCommandRepository>();
+            services.AddTransient<IUserQueryRepository, UserQueryRepository>();
+            services.AddTransient<IUserPwdNotificationsQueryRepository, PwdResetNotificationsQueryRepository>();
+            services.AddTransient<IUserSessionCommandRepository, UserSessionCommandRepository>();
+       
+      
                         
             services.AddHttpContextAccessor();            
             
@@ -131,7 +139,7 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IAuditLogService, AuditLogService>();
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
-            services.AddScoped<IJwtTokenHelper, JwtTokenHelper>();            
+            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
 
 
             // AutoMapper profiles
@@ -141,7 +149,8 @@ namespace BSOFT.Infrastructure
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
-                typeof(AuditLogMappingProfile)
+                typeof(AuditLogMappingProfile),
+                typeof(UserSessionProfile)
             );
 
             return services;
