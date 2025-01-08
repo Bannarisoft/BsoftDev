@@ -22,11 +22,7 @@ namespace Core.Application.Companies.Commands.DeleteCompany
         public async Task<int> Handle(DeleteCompanyCommand request, CancellationToken cancellationToken)
         {
             var company  = _imapper.Map<Company>(request.CompanyDelete);
-            //  var Updatecompany = new Company()
-            // {
-            //     Id = request.Id,
-            //     IsActive = request.IsActive 
-            // };
+     
             return await _icompanyRepository.DeleteAsync(request.Id,company);
         }
     }

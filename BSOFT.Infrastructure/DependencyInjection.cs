@@ -66,7 +66,8 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IStateRepository, StateRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<IAuditLogRepository, AuditLogMongoRepository>();
-            
+            services.AddScoped<IPasswordComplexityRepository, PasswordComplexityRepository>();
+            services.AddScoped<IPasswordComplexityRepository, PasswordComplexityRepository>();
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();
@@ -82,7 +83,8 @@ namespace BSOFT.Infrastructure
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
-                typeof(AuditLogMappingProfile)
+                typeof(AuditLogMappingProfile),
+                typeof(PasswordComplexityRuleProfile)
             );
 
             return services;

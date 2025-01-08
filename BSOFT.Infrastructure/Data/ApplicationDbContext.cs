@@ -42,6 +42,7 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<Countries> Countries { get; set; }
         public DbSet<States> States { get; set; }
         public DbSet<Cities> Cities { get; set; }
+        public DbSet<PasswordComplexityRule> PasswordComplexityRule { get; set; } 
 
 
 
@@ -69,6 +70,8 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new DivisionConfiguration());
 			modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new PwdComplexityRuleConfiguration());          
                
             base.OnModelCreating(modelBuilder);
         }

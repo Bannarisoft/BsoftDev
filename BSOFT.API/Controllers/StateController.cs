@@ -20,8 +20,6 @@ namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-
-
     public class StateController : ApiControllerBase
     {
          private readonly IValidator<CreateStateCommand> _createStateCommandValidator;

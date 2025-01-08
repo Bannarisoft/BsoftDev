@@ -25,10 +25,7 @@ namespace Core.Application.Departments.Queries.GetDepartments
             const string query = @"SELECT  * FROM AppData.Department";
             var department = await _dbConnection.QueryAsync<DepartmentDto>(query);
            return department.AsList();
-
            
-        }
-
-      
+        }      
     }
 }

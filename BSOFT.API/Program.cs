@@ -1,12 +1,9 @@
 using System.Text;
-using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using MediatR;
 using Core.Application;
 using Core.Domain.Entities;
 using BSOFT.Infrastructure;
-using FluentValidation.AspNetCore;
 using FluentValidation;
 using Core.Application.Country.Commands.CreateCountry;
 using BSOFT.API.Validation.Country;
@@ -33,21 +30,17 @@ using Core.Application.Units.Commands.CreateUnit;
 using Core.Application.Units.Commands.UpdateUnit;
 using BSOFT.API.Validation.Common.Unit.BSOFT.API.Validation.Common.Unit;
 using Core.Application.Companies.Commands.CreateCompany;
-using Core.Application.Companies.Queries.GetCompanies;
 using BSOFT.API.Validation.Companies;
 using Core.Application.Companies.Commands.UpdateCompany;
-using Core.Application.Departments.Commands.CreateDepartment;
-using BSOFT.API.Validation.Department;
-using Core.Application.Departments.Commands.UpdateDepartment;   
-using BSOFT.API.Validation.UserRole;
-using Core.Application.UserRole.Commands.CreateRole; 
-using Core.Application.UserRole.Commands.UpdateRole;
 using Core.Application.Divisions.Commands.CreateDivision;
 using BSOFT.API.Validation.Divisions;
 using Core.Application.Divisions.Commands.UpdateDivision;
 using BSOFT.API.Validation.Entity;
 using BSOFT.API.Validation.Unit;
 using BSOFT.API.Validation.Common.Entity;
+using Core.Application.PwdComplexityRule.Commands.CreatePasswordComplexityRule;
+using BSOFT.API.Validation.PasswordComplexityrule;
+using Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityRule;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,9 +72,12 @@ builder.Services.AddScoped<IValidator<CreateDivisionCommand>, CreateDivisionComm
 builder.Services.AddScoped<IValidator<UpdateDivisionCommand>, UpdateDivisionCommandValidator>();
 builder.Services.AddScoped<IValidator<CreateStateCommand>, CreateStateCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateStateCommand>, UpdateStateCommandValidator>();
-
 builder.Services.AddScoped<IValidator<CreateCityCommand>, CreateCityCommandValidator>();
 builder.Services.AddScoped<IValidator<UpdateCityCommand>, UpdateCityCommandValidator>();
+
+builder.Services.AddScoped<IValidator<CreatePasswordComplexityRuleCommand>, CreatePasswordComplexityRuleCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdatePasswordComplexityRuleCommand>, UpdatePasswordComplexityRuleCommandValidator>();
+
 // Add services to the container.
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddAuthentication(options =>

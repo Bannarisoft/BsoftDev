@@ -23,10 +23,8 @@ namespace BSOFT.API.Controllers
         private readonly IValidator<CreateDepartmentCommand> _createDepartmentCommandValidator;
         private readonly IValidator<UpdateDepartmentCommand> _updateDepartmentCommandValidator;
           private readonly ApplicationDbContext _dbContext;
-        public DepartmentController(ISender mediator 
-        , IValidator<CreateDepartmentCommand> createDepartmentCommandValidator
-        ,IValidator<UpdateDepartmentCommand> updateDepartmentCommandValidator, 
-         ApplicationDbContext dbContext  ) : base(mediator)
+        public DepartmentController(ISender mediator , IValidator<CreateDepartmentCommand> createDepartmentCommandValidator
+        ,IValidator<UpdateDepartmentCommand> updateDepartmentCommandValidator, ApplicationDbContext dbContext  ) : base(mediator)
         {
             _createDepartmentCommandValidator=createDepartmentCommandValidator;
             _updateDepartmentCommandValidator=updateDepartmentCommandValidator;
@@ -81,11 +79,9 @@ namespace BSOFT.API.Controllers
 
         var UpdateDepartment = await Mediator.Send(command);
         return Ok("Updated Successfully");
-
     }
 
-    [HttpPut("delete/{id}")]
-        
+    [HttpPut("delete/{id}")]        
         public async Task<IActionResult> Delete(int id,DeleteDepartmentCommand deleteDepartmentCommand)
         {
              if(id != deleteDepartmentCommand.Id)
@@ -117,8 +113,5 @@ namespace BSOFT.API.Controllers
 
 
     }
-
-    internal class CreateDepartmentCommandCommand
-    {
-    }
+   
 }
