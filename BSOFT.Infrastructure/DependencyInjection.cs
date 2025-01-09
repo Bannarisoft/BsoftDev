@@ -91,7 +91,7 @@ namespace BSOFT.Infrastructure
 
 
             // Configure JWT settings
-            // services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            
             
             // Register repositories
             services.AddScoped<IRoleEntitlementCommandRepository, RoleEntitlementCommandRepository>();
@@ -128,9 +128,6 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
             services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
             
-       
-      
-                        
             services.AddHttpContextAccessor();            
             
             // Miscellaneous services
