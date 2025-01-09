@@ -1,26 +1,26 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace BSOFT.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class UserRoleAllocate : Migration
+    public partial class passwordlogschema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-         
-            migrationBuilder.CreateTable(
-                name: "UserRoleAllocation",
+            
+              migrationBuilder.CreateTable(
+                name: "PasswordLog",
                 schema: "AppSecurity",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserRoleId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<byte>(type: "tinyint", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -33,17 +33,9 @@ namespace BSOFT.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserRoleAllocations_Id", x => x.Id)
-                        .Annotation("SqlServer:Clustered", true);
+                    table.PrimaryKey("PK_PasswordLog", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserRoleAllocation_UserRole_UserRoleId",
-                        column: x => x.UserRoleId,
-                        principalSchema: "AppSecurity",
-                        principalTable: "UserRole",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserRoleAllocation_Users_UserId",
+                        name: "FK_PasswordLog_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "AppSecurity",
                         principalTable: "Users",
@@ -51,27 +43,19 @@ namespace BSOFT.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+           
             migrationBuilder.CreateIndex(
-                name: "IX_UserRoleAllocation_UserId",
+                name: "IX_PasswordLogs_UserId",
                 schema: "AppSecurity",
-                table: "UserRoleAllocation",
+                table: "PasswordLog",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserRoleAllocation_UserRoleId",
-                schema: "AppSecurity",
-                table: "UserRoleAllocation",
-                column: "UserRoleId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            
-           migrationBuilder.DropTable(
-                name: "UserRoleAllocation");
-
-          
+              migrationBuilder.DropTable(
+                name: "PasswordLog");
         }
     }
 }

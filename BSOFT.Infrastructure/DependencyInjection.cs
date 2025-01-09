@@ -154,6 +154,9 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IUserQueryRepository, UserQueryRepository>();
             services.AddTransient<IUserPwdNotificationsQueryRepository, PwdResetNotificationsQueryRepository>();
             services.AddTransient<IUserSessionCommandRepository, UserSessionCommandRepository>();
+            services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
+            services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
+            
        
       
                         
@@ -165,7 +168,7 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
-
+            services.AddScoped<IChangePassword, PasswordChangeRepository>();
 
             // AutoMapper profiles
             services.AddAutoMapper(
@@ -174,6 +177,7 @@ namespace BSOFT.Infrastructure
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
                 typeof(AuditLogMappingProfile),
+                typeof(ChangePasswordProfile),
                 typeof(UserSessionProfile)
             );
 

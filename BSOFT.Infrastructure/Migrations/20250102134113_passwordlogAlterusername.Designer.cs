@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250103065439_UseIdRemovedRole")]
-    partial class UseIdRemovedRole
+    [Migration("20250102134113_passwordlogAlterusername")]
+    partial class passwordlogAlterusername
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -580,6 +580,45 @@ namespace BSOFT.Infrastructure.Migrations
                     b.ToTable("Modules", "AppData");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.PasswordLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("CreatedAt");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("CreatedIP");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("PasswordHash");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("UserName");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordLog", "AppSecurity");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.RoleEntitlement", b =>
                 {
                     b.Property<int>("Id")
@@ -648,7 +687,7 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Property<int>("ModuleId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserRoleId")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -657,7 +696,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.HasIndex("UserRoleId");
+                    b.HasIndex("RoleId");
 
                     b.ToTable("RoleEntitlements", "AppSecurity");
                 });
@@ -1111,6 +1150,17 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("Module");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.PasswordLog", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.User", "User")
+                        .WithMany("Passwords")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.RoleEntitlement", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Menu", "Menu")
@@ -1127,7 +1177,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasOne("Core.Domain.Entities.UserRole", "UserRole")
                         .WithMany("RoleEntitlements")
-                        .HasForeignKey("UserRoleId")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1174,7 +1224,7 @@ namespace BSOFT.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
                 {
                     b.HasOne("Core.Domain.Entities.User", "User")
-                        .WithMany("UserRole")
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1220,7 +1270,9 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.User", b =>
                 {
-                    b.Navigation("UserRole");
+                    b.Navigation("Passwords");
+
+                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
