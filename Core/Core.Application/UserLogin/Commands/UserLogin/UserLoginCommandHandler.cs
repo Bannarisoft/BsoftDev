@@ -1,26 +1,8 @@
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
-using IdentityModel;
-using IdentityModel.Client;
-using System.IdentityModel.Tokens.Jwt; // For handling JWT tokens
-using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using Core.Domain.Entities;
 using Core.Application.Common.Interfaces;
-using AutoMapper;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IUser;
-using Core.Application.Common.Interfaces.IUserPasswordNotifications;
-using System.Runtime.ConstrainedExecution;
-using DnsClient.Protocol;
-using Core.Application.UserSession.Command;
-using Core.Application.UserSession.Queries.GetUserSession;
-using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.UserLogin.Commands.UserLogin
 {
@@ -28,22 +10,14 @@ namespace Core.Application.UserLogin.Commands.UserLogin
     {
         private readonly IUserCommandRepository _userRepository;
         private readonly IUserQueryRepository _userQueryRepository;
-        private readonly IUserPwdNotificationsQueryRepository _userPwdNotificationsQueryRepository;
-        private readonly IRequestHandler<CreateUserSessionCommand, UserSessionDto> _createUserSessionCommandHandler;
-        private readonly IIPAddressService _ipAddressService;
-         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IJwtTokenHelper  _jwtTokenHelper;
+                private readonly IJwtTokenHelper  _jwtTokenHelper;
 
-        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository,IUserPwdNotificationsQueryRepository userPwdNotificationsQueryRepository,IRequestHandler<CreateUserSessionCommand, UserSessionDto> createUserSessionCommandHandler,IIPAddressService ipAddressService,IHttpContextAccessor httpContextAccessor)
+        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository)
         {
             _userRepository = userRepository;
             _userQueryRepository = userQueryRepository;
             _jwtTokenHelper = jwtTokenHelper;
-            _userPwdNotificationsQueryRepository=userPwdNotificationsQueryRepository;
-            _createUserSessionCommandHandler = createUserSessionCommandHandler;
-            _ipAddressService = ipAddressService;
-            _httpContextAccessor = httpContextAccessor;
-          
+            
         }
 
        public async Task<LoginResponse> Handle(UserLoginCommand request, CancellationToken cancellationToken)
@@ -77,82 +51,6 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                 IsFirstTimeUser = user.IsFirstTimeUser,
                 Message = "Login Successful."
             };
-            
-            // Call the CreateUserSessionCommandHandler
-            var createUserSessionCommand = new CreateUserSessionCommand
-            {
-                UserId = user.UserId,
-                UserName =user.UserName,
-                SessionId =  Guid.NewGuid().ToString(),
-                Token = token,
-                CreatedAt =DateTime.UtcNow,
-                IsActive = 1,
-                Browser = _ipAddressService.GetUserBrowserDetails(_httpContextAccessor.HttpContext.Request.Headers["User-Agent"].ToString()),
-                CreatedIP =_ipAddressService.GetSystemIPAddress(),
-                Status = "I"
-            };
-            
-            var userSessionDto = await _createUserSessionCommandHandler.Handle(createUserSessionCommand, cancellationToken);
-
-
-            // Get password last change date from PasswordLastChange table
-             var passwordLastChange = await _userPwdNotificationsQueryRepository.GetLastPasswordChangeDate(user.UserName.Trim());
-
-           //Check if password has expired
-            var (pwdExpiryDays, pwdExpiryAlertDays) = await _userPwdNotificationsQueryRepository.GetPasswordExpiryDays();
-
-            var passwordAge = (DateTime.Now - passwordLastChange).Value.Days;
-
-            if (passwordLastChange == null)
-            {
-                 return new LoginResponse
-               { 
-                    Token = token,
-                    UserName = user.UserName,
-                    UserRole = roles,
-                    Message = "No Logs For Password Change Detected.",
-                    
-
-               };
-                
-            }
-
-            else if (passwordAge >= pwdExpiryDays)
-            {
-            // Password has expired, prompt user to change password
-                return new LoginResponse
-               { 
-                      Token = token,
-                      UserName = user.UserName,
-                      UserRole = roles,
-                      Message = "Your password has expired. Please update your password to regain access."
-               };
-            }
-            // Password is near expiry, send notification to user
-            else if (passwordAge >= pwdExpiryDays - pwdExpiryAlertDays)
-            {   
-                int daysLeft = pwdExpiryDays - passwordAge;
-                return new LoginResponse
-                {
-
-                Token = token,
-                UserName = user.UserName,
-                UserRole = roles,
-                Message = $"Your password will expire in {daysLeft} days. Please update your password to avoid any disruptions."
-                };
-            }
-            else
-            {
-                return new LoginResponse
-            {
-                Token = token,
-                UserName = user.UserName,
-                UserRole = roles,
-                Message = "Login Successful."
-                
-            };
-           
-            }
 
         }
 
