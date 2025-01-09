@@ -27,7 +27,7 @@ namespace Core.Application.Users.Commands.UpdateFirstTimeUserPassword
             //  try
             //   {
                 
-                var user = await _userQueryRepository.GetByUsernameAsync(request.UserName);
+                var user = await _userQueryRepository.GetByIdAsync(request.UserId);
                 
                  if ( !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                  {
@@ -36,7 +36,7 @@ namespace Core.Application.Users.Commands.UpdateFirstTimeUserPassword
                       
                       passwordLog.PasswordHash = await _ichangePassword.PasswordEncode(request.Password);
                       
-                      var changedPasswordLog = await _ichangePassword.ChangePassword(request.UserId,passwordLog);
+                      var changedPasswordLog = await _ichangePassword.FirstTimeUserChangePassword(request.UserId,passwordLog);
 
                       if (changedPasswordLog != null)
                       {

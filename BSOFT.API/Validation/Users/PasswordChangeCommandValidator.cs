@@ -26,6 +26,9 @@ namespace BSOFT.API.Validation.Users
                         RuleFor(x => x.Password)
                             .NotEmpty()
                             .WithMessage($"{nameof(FirstTimeUserPasswordCommand.Password)} {rule.Error}");
+                        RuleFor(x => x.UserId)
+                            .NotEmpty()
+                            .WithMessage($"{nameof(FirstTimeUserPasswordCommand.UserId)} {rule.Error}");
                         break;
 
                     case "Password":
@@ -33,6 +36,11 @@ namespace BSOFT.API.Validation.Users
                      .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
                      .WithMessage($"{nameof(FirstTimeUserPasswordCommand.Password)} {rule.Error}");
                      break;
+                     case "NumericOnly":
+                        RuleFor(x => x.UserId)
+                        .InclusiveBetween(1, int.MaxValue)
+                        .WithMessage($"{nameof(FirstTimeUserPasswordCommand.UserId)} {rule.Error}");
+                        break;
                   
                     default:
                         

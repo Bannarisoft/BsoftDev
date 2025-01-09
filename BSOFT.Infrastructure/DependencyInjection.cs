@@ -163,7 +163,7 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
-            services.AddScoped<IChangePassword, FirstTimePasswordChangeRepository>();
+            services.AddScoped<IChangePassword, PasswordChangeRepository>();
 
             // AutoMapper profiles
             services.AddAutoMapper(
