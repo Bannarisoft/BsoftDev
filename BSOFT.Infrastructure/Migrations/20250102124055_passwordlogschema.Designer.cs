@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250106101016_UserRoleIdRemovedFromUser")]
-    partial class UserRoleIdRemovedFromUser
+    [Migration("20250102124055_passwordlogschema")]
+    partial class passwordlogschema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -580,6 +580,65 @@ namespace BSOFT.Infrastructure.Migrations
                     b.ToTable("Modules", "AppData");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.PasswordLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("PasswordHash");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordLogs", "AppSecurity");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.RoleEntitlement", b =>
                 {
                     b.Property<int>("Id")
@@ -648,7 +707,7 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Property<int>("ModuleId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserRoleId")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -657,7 +716,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.HasIndex("UserRoleId");
+                    b.HasIndex("RoleId");
 
                     b.ToTable("RoleEntitlements", "AppSecurity");
                 });
@@ -991,6 +1050,10 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("UserName");
 
+                    b.Property<int>("UserRoleId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserRoleId");
+
                     b.Property<int>("UserType")
                         .HasColumnType("int")
                         .HasColumnName("UserType");
@@ -1053,67 +1116,14 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("RoleName");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("UserRole", "AppSecurity");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.UserRoleAllocation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte>("IsActive")
-                        .HasColumnType("tinyint");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
+                        .HasColumnType("int");
 
-                    b.Property<int>("UserRoleId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserRoleId");
-
-                    b.HasKey("Id")
-                        .HasName("PK_UserRoleAllocations_Id");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"));
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserRoleId");
-
-                    b.ToTable("UserRoleAllocation", (string)null);
+                    b.ToTable("UserRole", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Cities", b =>
@@ -1160,6 +1170,17 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("Module");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.PasswordLog", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.User", "User")
+                        .WithMany("Passwords")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.RoleEntitlement", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Menu", "Menu")
@@ -1176,7 +1197,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasOne("Core.Domain.Entities.UserRole", "UserRole")
                         .WithMany("RoleEntitlements")
-                        .HasForeignKey("UserRoleId")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1220,23 +1241,15 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("Unit");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.UserRoleAllocation", b =>
+            modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
                 {
                     b.HasOne("Core.Domain.Entities.User", "User")
-                        .WithMany("UserRoleAllocations")
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.UserRole", "UserRole")
-                        .WithMany("UserRoleAllocations")
-                        .HasForeignKey("UserRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("User");
-
-                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Company", b =>
@@ -1277,14 +1290,14 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.User", b =>
                 {
-                    b.Navigation("UserRoleAllocations");
+                    b.Navigation("Passwords");
+
+                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
                 {
                     b.Navigation("RoleEntitlements");
-
-                    b.Navigation("UserRoleAllocations");
                 });
 #pragma warning restore 612, 618
         }

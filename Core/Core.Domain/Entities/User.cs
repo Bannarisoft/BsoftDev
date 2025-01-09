@@ -28,6 +28,8 @@ namespace Core.Domain.Entities
     public int DivisionId { get; set; }
     public ICollection<UserRoleAllocation> UserRoleAllocations { get; set; }
 
+     public ICollection<PasswordLog> Passwords { get; set; }
+
     public void SetPassword(string password)
     {
         if (string.IsNullOrWhiteSpace(password))

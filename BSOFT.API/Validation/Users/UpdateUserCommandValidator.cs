@@ -78,7 +78,7 @@ namespace BSOFT.API.Validation.Users
                         break;               
                     default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        // Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
                         break;
                 }
             }

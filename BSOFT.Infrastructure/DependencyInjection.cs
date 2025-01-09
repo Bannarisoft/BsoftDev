@@ -65,7 +65,38 @@ namespace BSOFT.Infrastructure
 
                 // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
- 
+    
+    
+          /*   // MongoDB Context
+            var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
+            if (string.IsNullOrWhiteSpace(mongoConnectionString))
+            {
+                throw new InvalidOperationException("MongoDB connection string not found or is empty.");
+            }
+
+            services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
+            services.AddSingleton<IMongoDatabase>(sp =>
+            {
+                var client = sp.GetRequiredService<IMongoClient>();
+                var databaseName = configuration["MongoDb:DatabaseName"];
+                if (string.IsNullOrWhiteSpace(databaseName))
+                {
+                    throw new InvalidOperationException("MongoDB database name not configured.");
+                }
+                return client.GetDatabase(databaseName);
+            });
+            services.AddScoped<MongoDbContext>();
+
+      // Register MongoDbContext
+        services.AddTransient<MongoDbContext>();
+            // Register MongoDbContext
+            services.AddTransient<MongoDbContext>();
+            services.AddTransient<IMongoDatabase>(sp =>
+            {
+                var configuration = sp.GetRequiredService<IConfiguration>();
+                var mongoClient = new MongoClient(configuration.GetConnectionString("MongoDbConnectionString"));
+                return mongoClient.GetDatabase(configuration["MongoDb:DatabaseName"]);
+            }); */
 
              // MongoDB Context
             var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
@@ -90,10 +121,8 @@ namespace BSOFT.Infrastructure
             services.AddScoped<MongoDbContext>();
 
 
-            // Configure JWT settings
-            // services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));        
-
-            // Register repositories
+  // Configure JWT settings
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            // Register repositories
             services.AddScoped<IRoleEntitlementCommandRepository, RoleEntitlementCommandRepository>();
             services.AddScoped<IRoleEntitlementQueryRepository, RoleEntitlementQueryRepository>();
             services.AddScoped<IModuleCommandRepository, ModuleCommandRepository>();
@@ -125,10 +154,9 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IUserQueryRepository, UserQueryRepository>();
             services.AddTransient<IUserPwdNotificationsQueryRepository, PwdResetNotificationsQueryRepository>();
             services.AddTransient<IUserSessionCommandRepository, UserSessionCommandRepository>();
-            services.AddTransient<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
-            services.AddTransient<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
-
-
+            services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
+            services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
+            
        
       
                         
@@ -140,7 +168,7 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
-
+            services.AddScoped<IChangePassword, PasswordChangeRepository>();
 
             // AutoMapper profiles
             services.AddAutoMapper(
@@ -149,6 +177,7 @@ namespace BSOFT.Infrastructure
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
                 typeof(AuditLogMappingProfile),
+                typeof(ChangePasswordProfile),
                 typeof(UserSessionProfile)
             );
 

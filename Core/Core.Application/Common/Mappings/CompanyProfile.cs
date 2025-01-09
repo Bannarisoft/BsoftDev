@@ -19,6 +19,7 @@ namespace Core.Application.Common.Mappings
             //      .ForMember(dest => dest.CompanyContact, opt => opt.MapFrom(src => src.CompanyContacts));
 
                 CreateMap<CompanyDTO, Company>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.CompanyName))
                 .ForMember(dest => dest.LegalName, opt => opt.MapFrom(src => src.LegalName))
                 .ForMember(dest => dest.GstNumber, opt => opt.MapFrom(src => src.GstNumber))
@@ -33,6 +34,7 @@ namespace Core.Application.Common.Mappings
                 .ReverseMap();
                  
         CreateMap<CompanyAddressDTO, CompanyAddress>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.CompanyId))
             .ForMember(dest => dest.AddressLine1, opt => opt.MapFrom(src => src.AddressLine1))
             .ForMember(dest => dest.AddressLine2, opt => opt.MapFrom(src => src.AddressLine2))
@@ -44,6 +46,7 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.AlternatePhone, opt => opt.MapFrom(src => src.AlternatePhone))
             .ReverseMap();
         CreateMap<CompanyContactDTO, CompanyContact>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
         .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.CompanyId))
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.Designation, opt => opt.MapFrom(src => src.Designation))

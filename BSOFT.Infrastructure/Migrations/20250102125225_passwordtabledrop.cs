@@ -5,12 +5,13 @@
 namespace BSOFT.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class UseIdRemovedUserRole : Migration
+    public partial class passwordtabledrop : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-
+                   migrationBuilder.DropTable(
+                name: "PasswordLog");
         }
 
         /// <inheritdoc />
