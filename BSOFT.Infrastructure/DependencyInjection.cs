@@ -121,8 +121,10 @@ namespace BSOFT.Infrastructure
             services.AddScoped<MongoDbContext>();
 
 
-  // Configure JWT settings
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            // Register repositories
+            // Configure JWT settings
+            // services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            
+            
+            // Register repositories
             services.AddScoped<IRoleEntitlementCommandRepository, RoleEntitlementCommandRepository>();
             services.AddScoped<IRoleEntitlementQueryRepository, RoleEntitlementQueryRepository>();
             services.AddScoped<IModuleCommandRepository, ModuleCommandRepository>();
