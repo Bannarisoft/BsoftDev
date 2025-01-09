@@ -11,11 +11,10 @@ namespace Core.Application.UserRole.Commands.CreateRole
     {
         
  
-        public int Id { get; set; }
         public string RoleName { get; set; }
         public string Description { get; set; }
         public int CompanyId { get; set; }
-        public byte  IsActive { get; set; }
+        public byte  IsActive { get; set; } = 1;
        
     }
 }

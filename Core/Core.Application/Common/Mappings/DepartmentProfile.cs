@@ -26,14 +26,6 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
            CreateMap<UpdateDepartmentCommand, Department>() ;
-        //    .ForMember(dest => dest.ShortName, opt => opt.MapFrom(src => src.ShortName))
-        //    .ForMember(dest => dest.DeptName, opt => opt.MapFrom(src => src.DeptName))
-        //    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive)
-        
-          
-
-
-
     }
     }
 }

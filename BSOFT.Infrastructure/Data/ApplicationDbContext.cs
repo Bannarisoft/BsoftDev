@@ -55,8 +55,6 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new ModulesConfiguration());
             modelBuilder.ApplyConfiguration(new CountryConfiguration());
             modelBuilder.ApplyConfiguration(new UnitConfiguration());
-            modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
-            modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyAddressConfiguration());
 			modelBuilder.ApplyConfiguration(new StateConfiguration());       

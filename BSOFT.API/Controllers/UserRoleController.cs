@@ -75,7 +75,7 @@ namespace BSOFT.API.Controllers
             {
                 return BadRequest("Invalid role ID");
             }
-            if (id != command.Id)
+            if (id != command.UserRoleId)
             {
                 return BadRequest();
             }

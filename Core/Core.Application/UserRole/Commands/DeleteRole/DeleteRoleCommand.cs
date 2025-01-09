@@ -9,8 +9,8 @@ namespace Core.Application.UserRole.Commands.DeleteRole
 {
     public class DeleteRoleCommand : IRequest<int>
     {
-        public int Id { get; set; }  
+        public int UserRoleId { get; set; }  
 
-        public  RoleStatusDto  roleStatusDto{ get; set; } 
+        public byte IsActive { get; set; } 
     }
 }

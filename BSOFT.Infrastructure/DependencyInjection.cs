@@ -41,7 +41,9 @@ using Core.Application.Common.Interfaces.IUserPasswordNotifications;
 using BSOFT.Infrastructure.Repositories.PwdResetNotifications;
 using Core.Application.Common.Interfaces.IUserSession;
 using BSOFT.Infrastructure.Repositories.UserSession;
-
+using Core.Application.Common.Interfaces.IUserRoleAllocation;
+using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationQueryRepository;
+using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationCommandRepository;
 
 namespace BSOFT.Infrastructure
 {
@@ -167,8 +169,7 @@ namespace BSOFT.Infrastructure
 
             // AutoMapper profiles
             services.AddAutoMapper(
-                typeof(CreateUserProfile),
-                typeof(UpdateUserProfile),
+                typeof(UserProfile),
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
