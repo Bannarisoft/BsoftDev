@@ -154,6 +154,9 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IUserQueryRepository, UserQueryRepository>();
             services.AddTransient<IUserPwdNotificationsQueryRepository, PwdResetNotificationsQueryRepository>();
             services.AddTransient<IUserSessionCommandRepository, UserSessionCommandRepository>();
+            services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
+            services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
+            
        
       
                         

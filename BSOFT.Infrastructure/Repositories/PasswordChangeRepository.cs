@@ -53,7 +53,7 @@ namespace BSOFT.Infrastructure.Repositories
                 return "Try different password.";
         }
 
-        public async Task<PasswordLog> FirstTimeUserChangePassword(int userId,PasswordLog passwordLog)
+        public async Task<string> FirstTimeUserChangePassword(int userId,PasswordLog passwordLog)
         {
            
             var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
@@ -72,14 +72,14 @@ namespace BSOFT.Infrastructure.Repositories
         
                 if (changes > 0)
                 {
-                    return passwordLog; 
+                    return "Password changed successfully."; 
                 }
             }
             else
             {
-                return passwordLog;
+                return "User not found or is not a existing user.";
             }
-            throw new Exception("Failed to save changes to the database.");
+            return "Failed to save changes to the database.";
         }
 
 

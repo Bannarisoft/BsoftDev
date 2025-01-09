@@ -120,8 +120,8 @@ namespace BSOFT.API.Controllers
             {
                 return BadRequest(validationResult.Errors);
             }
-            await Mediator.Send(command);
-            return Ok(new { Message = "Password change successfully." });
+           var response = await Mediator.Send(command);
+            return Ok(new { Message = response });
         }
         [HttpPut]
         [Route("ChangePassword")]

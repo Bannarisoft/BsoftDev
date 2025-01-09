@@ -40,7 +40,7 @@ namespace Core.Application.Users.Commands.UpdateFirstTimeUserPassword
 
                       if (changedPasswordLog != null)
                       {
-                          return "Password changed successfully.";
+                          return changedPasswordLog;
                       }
 
                      return "Password change failed."; 
