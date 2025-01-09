@@ -32,16 +32,12 @@ namespace Core.Application.UserLogin.Commands.UserLogin
         private readonly IRequestHandler<CreateUserSessionCommand, UserSessionDto> _createUserSessionCommandHandler;
         private readonly IIPAddressService _ipAddressService;
          private readonly IHttpContextAccessor _httpContextAccessor;
-
-        
-        // private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly IJwtTokenHelper  _jwtTokenHelper;
 
         public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository,IUserPwdNotificationsQueryRepository userPwdNotificationsQueryRepository,IRequestHandler<CreateUserSessionCommand, UserSessionDto> createUserSessionCommandHandler,IIPAddressService ipAddressService,IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
             _userQueryRepository = userQueryRepository;
-            // _jwtTokenGenerator = jwtTokenGenerator;
             _jwtTokenHelper = jwtTokenHelper;
             _userPwdNotificationsQueryRepository=userPwdNotificationsQueryRepository;
             _createUserSessionCommandHandler = createUserSessionCommandHandler;
@@ -52,17 +48,35 @@ namespace Core.Application.UserLogin.Commands.UserLogin
 
        public async Task<LoginResponse> Handle(UserLoginCommand request, CancellationToken cancellationToken)
         {
+            
             var user = await _userQueryRepository.GetByUsernameAsync(request.Username);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
-                throw new UnauthorizedAccessException("Invalid username or password.");
+                return new LoginResponse
+                {
+                    IsAuthenticated = false,
+                    IsFirstTimeUser = false,
+                    Message = "Invalid username or password."
+                };
+                // throw new UnauthorizedAccessException("Invalid username or password.");
             }
+
              // Get user roles
             var roles = await _userQueryRepository.GetUserRolesAsync(user.UserId);
 
             // Generate JWT token
             var token = _jwtTokenHelper.GenerateToken(user.UserName, roles);
+
+            return new LoginResponse
+            {
+                Token = token,
+                UserName = user.UserName,
+                UserRole = roles,
+                IsAuthenticated = true,
+                IsFirstTimeUser = user.IsFirstTimeUser,
+                Message = "Login Successful."
+            };
             
             // Call the CreateUserSessionCommandHandler
             var createUserSessionCommand = new CreateUserSessionCommand
@@ -137,57 +151,16 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                 Message = "Login Successful."
                 
             };
-
-
            
             }
 
-
-
-        // var user = await _userRepository.GetByUsernameAsync(request.Username);
-
-        // if (user == null || !VerifyPassword(user.PasswordHash, request.Password))
-        // {
-        //     throw new UnauthorizedAccessException("Invalid Username or Password");
-        // }
-
-        // if (user.UserRole == null || string.IsNullOrEmpty(user.UserRole.RoleName))
-        // {
-        //     throw new UnauthorizedAccessException("User role is not assigned.");
-        // }
-
-        // var token = _jwtTokenGenerator.GenerateToken(user);
-
-        // return new LoginResponse
-        // {
-        //     UserName = user.UserName,
-        //     UserRole = user.UserRole.RoleName,
-        //     Token = token,
-        //     Message = "Login successful",
-        //     IsAuthenticated = true
-        // };
-        //     var user = await _userRepository.GetByUsernameAsync(request.Username);
-        //     if (user == null || !VerifyPassword(user.PasswordHash, request.Password))
-        //     {
-        //         return new LoginResponse
-        //         {
-        //             Message = "Invalid credentials"
-        //         };
-        //     }
-
-        //     var token = _jwtTokenGenerator.GenerateToken(user);
-        //     return new LoginResponse
-        //     {
-        //         Token = token,
-        //         Message = "Login successful"
-        //     };
         }
 
-        // private bool VerifyPassword(string password, string storedHash)
-        // {
-        //     using var sha256 = SHA256.Create();
-        //     var hashedPassword = Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(password)));
-        //     return hashedPassword == storedHash;
-        // }
+        private bool VerifyPassword(string password, string storedHash)
+        {
+            using var sha256 = SHA256.Create();
+            var hashedPassword = Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(password)));
+            return hashedPassword == storedHash;
+        }
     }
 }
