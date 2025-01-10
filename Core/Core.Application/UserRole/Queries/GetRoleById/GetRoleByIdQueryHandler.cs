@@ -40,7 +40,7 @@ namespace Core.Application.UserRole.Queries.GetRoleById
         // Map the country entity to a DTO
         return new UserRoleDto
          {
-            Id = userrole.Id,
+            UserRoleId = userrole.UserRoleId,
             CompanyId = userrole.CompanyId,
             RoleName = userrole.RoleName,
             Description = userrole.Description,

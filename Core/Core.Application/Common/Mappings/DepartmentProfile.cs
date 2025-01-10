@@ -25,8 +25,7 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
-           CreateMap<UpdateDepartmentCommand, Department>() ;                  
-
+           CreateMap<UpdateDepartmentCommand, Department>() ;
     }
     }
 }

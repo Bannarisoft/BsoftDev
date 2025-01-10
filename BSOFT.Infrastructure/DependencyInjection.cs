@@ -41,14 +41,15 @@ using Core.Application.Common.Interfaces.IUserPasswordNotifications;
 using BSOFT.Infrastructure.Repositories.PwdResetNotifications;
 using Core.Application.Common.Interfaces.IUserSession;
 using BSOFT.Infrastructure.Repositories.UserSession;
+using Core.Application.Common.Interfaces.IUserRoleAllocation;
+using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationQueryRepository;
+using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationCommandRepository;
 using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 using BSOFT.Infrastructure.Repositories.PasswordComplexityRule;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
 using BSOFT.Infrastructure.Repositories.AdminSecuritySettings;
 using MediatR;
 using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings;
-
-
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -70,37 +71,6 @@ namespace BSOFT.Infrastructure
                 // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
     
-    
-          /*   // MongoDB Context
-            var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
-            if (string.IsNullOrWhiteSpace(mongoConnectionString))
-            {
-                throw new InvalidOperationException("MongoDB connection string not found or is empty.");
-            }
-
-            services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
-            services.AddSingleton<IMongoDatabase>(sp =>
-            {
-                var client = sp.GetRequiredService<IMongoClient>();
-                var databaseName = configuration["MongoDb:DatabaseName"];
-                if (string.IsNullOrWhiteSpace(databaseName))
-                {
-                    throw new InvalidOperationException("MongoDB database name not configured.");
-                }
-                return client.GetDatabase(databaseName);
-            });
-            services.AddScoped<MongoDbContext>();
-
-      // Register MongoDbContext
-        services.AddTransient<MongoDbContext>();
-            // Register MongoDbContext
-            services.AddTransient<MongoDbContext>();
-            services.AddTransient<IMongoDatabase>(sp =>
-            {
-                var configuration = sp.GetRequiredService<IConfiguration>();
-                var mongoClient = new MongoClient(configuration.GetConnectionString("MongoDbConnectionString"));
-                return mongoClient.GetDatabase(configuration["MongoDb:DatabaseName"]);
-            }); */
 
              // MongoDB Context
             var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
@@ -125,8 +95,10 @@ namespace BSOFT.Infrastructure
             services.AddScoped<MongoDbContext>();
 
 
-  // Configure JWT settings
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            // Register repositories
+            // Configure JWT settings
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            
+            
+            // Register repositories
             services.AddScoped<IRoleEntitlementCommandRepository, RoleEntitlementCommandRepository>();
             services.AddScoped<IRoleEntitlementQueryRepository, RoleEntitlementQueryRepository>();
             services.AddScoped<IModuleCommandRepository, ModuleCommandRepository>();
@@ -158,13 +130,12 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IUserQueryRepository, UserQueryRepository>();
             services.AddTransient<IUserPwdNotificationsQueryRepository, PwdResetNotificationsQueryRepository>();
             services.AddTransient<IUserSessionCommandRepository, UserSessionCommandRepository>();
-        	services.AddScoped<IPasswordComplexityRuleQueryRepository,  PasswordComplexityRuleQueryRepository>();
+            services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
+            services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
+            services.AddScoped<IPasswordComplexityRuleQueryRepository,  PasswordComplexityRuleQueryRepository>();
             services.AddScoped<IPasswordComplexityRuleCommandRepository, PasswordComplexityRuleCommandRepository>();
             services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
             services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();
-            
-            
-                        
             services.AddHttpContextAccessor();            
             
             // Miscellaneous services
@@ -173,21 +144,18 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
-            
+            services.AddScoped<IChangePassword, PasswordChangeRepository>();
 
             // AutoMapper profiles
             services.AddAutoMapper(
-                typeof(CreateUserProfile),
-                typeof(UpdateUserProfile),
+                typeof(UserProfile),
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
                 typeof(AuditLogMappingProfile),
-                typeof(UserSessionProfile),
+                typeof(ChangePasswordProfile),
 				typeof(PasswordComplexityRuleProfile),
-                typeof(AdminSecuritySettingsProfile)
-                
-            );
+                typeof(AdminSecuritySettingsProfile) );         
 
             return services;
         }

@@ -17,37 +17,32 @@ namespace Core.Application.UserRole.Commands.CreateRole
         private readonly IUserRoleCommandRepository _roleRepository;
         private readonly IMapper _mapper;
 
-          public CreateRoleCommandHandler(IUserRoleCommandRepository roleRepository,IMapper mapper)
+        public CreateRoleCommandHandler(IUserRoleCommandRepository roleRepository,IMapper mapper)
         {
              _roleRepository=roleRepository;
             _mapper=mapper;
         }
 
         public async Task<UserRoleDto>Handle(CreateRoleCommand request,CancellationToken cancellationToken)
-        {
-            // var roleEntity=new Core.Domain.Entities.UserRole
-            // {
-            // RoleName=request.RoleName,
-            // Description =request.Description,
-            // CompanyId=request.CompanyId,            
-            // IsActive=request.IsActive
-           
-            // };
-            //  var result=await _roleRepository.CreateAsync(roleEntity);
-            // return _mapper.Map<UserRoleDto>(result);
-             
-               var roleEntity = _mapper.Map<Core.Domain.Entities.UserRole>(request);
-          //  departmentEntity.Id = ID; // Assign the new GUID to the user entity
-
-            // Save the user to the repository
-            var createdUserRole = await _roleRepository.CreateAsync(roleEntity);
-            
-            if (createdUserRole == null)
+        {          
+            // Validate input
+            if (string.IsNullOrWhiteSpace(request.RoleName))
             {
-                throw new InvalidOperationException("Failed to create user");
+                throw new ArgumentException("RoleName cannot be null or empty.");
             }
 
-            // Map the created User entity to UserDto
+            // Map to domain entity
+            var roleEntity = _mapper.Map<Core.Domain.Entities.UserRole>(request);
+
+            // Save to repository
+            var createdUserRole = await _roleRepository.CreateAsync(roleEntity);
+
+            if (createdUserRole == null)
+            {
+                throw new InvalidOperationException("Failed to create the role.");
+            }
+
+            // Map to DTO
             return _mapper.Map<UserRoleDto>(createdUserRole);
 
 
