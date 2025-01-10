@@ -30,6 +30,7 @@ namespace BSOFT.Infrastructure.Repositories
     }
     public string GenerateToken(string username, IEnumerable<string> roles)
     {
+    
             if (string.IsNullOrWhiteSpace(username))
             {
                 throw new ArgumentException("Username must be provided.", nameof(username));
@@ -61,28 +62,7 @@ namespace BSOFT.Infrastructure.Repositories
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
-            // var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-            // var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            // var claims = new List<Claim>
-            // {
-            //     new Claim(JwtRegisteredClaimNames.Sub, username),
-            //     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            // };
-
-            // foreach (var role in roles)
-            // {
-            //     claims.Add(new Claim(ClaimTypes.Role, role));
-            // }
-
-            // var token = new JwtSecurityToken(
-            //     issuer: _jwtSettings.Issuer,
-            //     audience: _jwtSettings.Audience,
-            //     claims: claims,
-            //     expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
-            //     signingCredentials: creds);
-
-            // return new JwtSecurityTokenHandler().WriteToken(token);
+            
     }
     }
 }
