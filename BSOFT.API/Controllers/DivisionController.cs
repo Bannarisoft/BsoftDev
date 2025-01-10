@@ -33,20 +33,37 @@ namespace BSOFT.API.Controllers
         {
            var divisions = await Mediator.Send(new GetDivisionQuery());
             var activedivisions = divisions.Where(c => c.IsActive == 1).ToList(); 
+           
             return Ok(activedivisions);
         }
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateDivisionCommand command)
         {
+            
             var validationResult = await _createDivisionCommandValidator.ValidateAsync(command);
+            
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors);
+                var errorMessages = string.Join("; ", validationResult.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
+                throw new BadHttpRequestException(errorMessages, statusCode: StatusCodes.Status400BadRequest);
+                // return BadRequest(validationResult.Errors);
             }
-            var createdDivision = await Mediator.Send(command);
-            return Ok(createdDivision);
+            var response = await Mediator.Send(command);
+            if(response.IsSuccess)
+            {
+                return CreatedAtAction(nameof(GetByIdAsync), new {  id = response.Data }, response);
+            }
+             if (!string.IsNullOrEmpty(response.ErrorCode))
+             {
+
+                 return StatusCode(StatusCodes.Status500InternalServerError, response);
+             }
+
+            return BadRequest(response);
+            
         }
          [HttpGet("{id}")]
+         [ActionName(nameof(GetByIdAsync))]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
            
@@ -69,11 +86,28 @@ namespace BSOFT.API.Controllers
             }
             if(id != command.Id)
             {
-                return BadRequest();
+                return BadRequest("The ID in the URL does not match the ID in the command.");
             }
-           var updatedDivision = await Mediator.Send(command);
 
-            return Ok(updatedDivision);
+             var divisionExists = await Mediator.Send(new GetDivisionByIdQuery { Id = id });
+
+             if (divisionExists == null)
+             {
+                 return NotFound($"Division with ID {id} not found."); 
+             }
+
+             var response = await Mediator.Send(command);
+             if(response.IsSuccess)
+             {
+                 return Ok(response);
+             }
+             if (!string.IsNullOrEmpty(response.ErrorCode))
+             {
+                 return StatusCode(StatusCodes.Status500InternalServerError, response.Message); 
+             }
+           
+
+            return BadRequest(response);
         }
 
 

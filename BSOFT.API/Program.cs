@@ -2,6 +2,8 @@ using Core.Application;
 using Core.Domain.Entities;
 using BSOFT.Infrastructure;
 using BSOFT.API.Validation.Common;
+using BSOFT.API.GlobalException;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +23,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 
 var app = builder.Build();
     
@@ -35,6 +40,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+ app.UseExceptionHandler();
 
 app.MapControllers();
 
