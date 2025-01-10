@@ -37,6 +37,8 @@ using Core.Application.Common.Interfaces.IEntity;
 using BSOFT.Infrastructure.Repositories.Divisions;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Domain.Entities;
+using Core.Application.Common.Interfaces.AuditLog;
+using Infrastructure.Data;
 
 
 namespace BSOFT.Infrastructure
@@ -60,60 +62,34 @@ namespace BSOFT.Infrastructure
                 // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
     
-    
-          /*   // MongoDB Context
-            var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
-            if (string.IsNullOrWhiteSpace(mongoConnectionString))
-            {
-                throw new InvalidOperationException("MongoDB connection string not found or is empty.");
-            }
-
-            services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
-            services.AddSingleton<IMongoDatabase>(sp =>
-            {
-                var client = sp.GetRequiredService<IMongoClient>();
-                var databaseName = configuration["MongoDb:DatabaseName"];
-                if (string.IsNullOrWhiteSpace(databaseName))
-                {
-                    throw new InvalidOperationException("MongoDB database name not configured.");
-                }
-                return client.GetDatabase(databaseName);
-            });
-            services.AddScoped<MongoDbContext>();
-
-      // Register MongoDbContext
-        services.AddTransient<MongoDbContext>();
-            // Register MongoDbContext
-            services.AddTransient<MongoDbContext>();
-            services.AddTransient<IMongoDatabase>(sp =>
-            {
-                var configuration = sp.GetRequiredService<IConfiguration>();
-                var mongoClient = new MongoClient(configuration.GetConnectionString("MongoDbConnectionString"));
-                return mongoClient.GetDatabase(configuration["MongoDb:DatabaseName"]);
-            }); */
-
              // MongoDB Context
+        services.AddSingleton<IMongoClient>(sp =>
+        {
             var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
             if (string.IsNullOrWhiteSpace(mongoConnectionString))
             {
-                throw new InvalidOperationException("MongoDB connection string not found or is empty.");
+                throw new InvalidOperationException("MongoDB connection string is missing or empty.");
             }
+            return new MongoClient(mongoConnectionString);
+        });
 
-            services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
-            services.AddSingleton<IMongoDatabase>(sp =>
+        services.AddSingleton<IMongoDbContext>(sp =>
+        {
+            var client = sp.GetRequiredService<IMongoClient>();
+            var databaseName = configuration["MongoDb:DatabaseName"];
+            if (string.IsNullOrWhiteSpace(databaseName))
             {
-                var client = sp.GetRequiredService<IMongoClient>();
-                var databaseName = configuration["MongoDb:DatabaseName"];
-                if (string.IsNullOrWhiteSpace(databaseName))
-                {
-                    throw new InvalidOperationException("MongoDB database name not configured.");
-                }
-                return client.GetDatabase(databaseName);
-            });
+                throw new InvalidOperationException("MongoDB database name is missing or empty.");
+            }
+            return new MongoDbContext(client, databaseName);
+        });
 
-            // Register MongoDbContext
-            services.AddScoped<MongoDbContext>();
-
+      // Optional: Register IMongoDatabase if needed directly
+        services.AddSingleton(sp =>
+        {
+            var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
+            return mongoDbContext.GetDatabase();
+        });
 
   // Configure JWT settings
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            // Register repositories
@@ -145,13 +121,12 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IStateQueryRepository, StateQueryRepository>();
             services.AddScoped<ICityCommandRepository, CityCommandRepository>();
             services.AddScoped<ICityQueryRepository, CityQueryRepository>();
-            services.AddScoped<IAuditLogRepository, AuditLogMongoRepository>();
-                        
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();                                 
             services.AddHttpContextAccessor();            
             
+
             // Miscellaneous services
-            services.AddScoped<IIPAddressService, IPAddressService>();
-            services.AddScoped<IAuditLogService, AuditLogService>();
+            services.AddScoped<IIPAddressService, IPAddressService>();            
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddScoped<IJwtTokenHelper, JwtTokenHelper>();            
@@ -163,8 +138,7 @@ namespace BSOFT.Infrastructure
                 typeof(UpdateUserProfile),
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
-                typeof(CompanyProfile),
-                typeof(AuditLogMappingProfile)
+                typeof(CompanyProfile)                
             );
 
             return services;

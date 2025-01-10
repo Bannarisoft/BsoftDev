@@ -5,6 +5,7 @@ using AutoMapper;
 using Core.Application.City.Queries.GetCities;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICity;
+using Core.Domain.Events;
 
 namespace Core.Application.City.Commands.UpdateCity
 {       
@@ -13,16 +14,24 @@ namespace Core.Application.City.Commands.UpdateCity
         private readonly ICityCommandRepository _cityRepository;
         private readonly ICityQueryRepository _cityQueryRepository;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator; 
 
-        public UpdateCityCommandHandler(ICityCommandRepository cityRepository, IMapper mapper,ICityQueryRepository cityQueryRepository)
+        public UpdateCityCommandHandler(ICityCommandRepository cityRepository, IMapper mapper,ICityQueryRepository cityQueryRepository, IMediator mediator)
         {
             _cityRepository = cityRepository;
             _mapper = mapper;
             _cityQueryRepository = cityQueryRepository;
+            _mediator = mediator;
         }
     public async Task<Result<CityDto>> Handle(UpdateCityCommand request, CancellationToken cancellationToken)
     {
         var city = await _cityQueryRepository.GetByIdAsync(request.Id);
+        if (city == null)
+            return Result<CityDto>.Failure("City not found.");
+
+        var oldCityName = city.CityName;
+        city.CityName = request.CityName;
+
         if (city == null || city.IsActive != 1)
         {
             return Result<CityDto>.Failure("Invalid CityID. The specified City does not exist or is inactive.");
@@ -40,25 +49,34 @@ namespace Core.Application.City.Commands.UpdateCity
             return Result<CityDto>.Failure("CityCode already exists in the specified State.");
         }
 
-        // Map the request to the Cities entity
-        var updatedCityEntity = _mapper.Map<Cities>(request);
-
-        // Perform the update
-        var updateResult = await _cityRepository.UpdateAsync(request.Id, updatedCityEntity);
-
-        // Fetch the updated city to map to the DTO
-        var updatedCity = await _cityQueryRepository.GetByIdAsync(request.Id);
-
-        // If update was successful, map to DTO and return
-        if (updatedCity != null)
-        {
-            var cityDto = _mapper.Map<CityDto>(updatedCity);
-            return Result<CityDto>.Success(cityDto);
+        var updatedCityEntity = _mapper.Map<Cities>(request);   
+        try
+        {     
+            var updateResult = await _cityRepository.UpdateAsync(request.Id, updatedCityEntity);            
+            var updatedCity =  await _cityQueryRepository.GetByIdAsync(request.Id);            
+            if (updatedCity != null)
+            {
+                var cityDto = _mapper.Map<CityDto>(updatedCity);
+                //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Update",
+                    actionCode: cityDto.CityCode,
+                    actionName: cityDto.CityName,                            
+                    details: $"State '{oldCityName}' was updated to '{cityDto.CityName}'.  StateCode: {cityDto.CityCode}",
+                    module:"State"
+                );            
+                await _mediator.Publish(domainEvent, cancellationToken);
+                return Result<CityDto>.Success(cityDto);
+            }
+            else
+            {
+                return Result<CityDto>.Failure("City update failed.");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            return Result<CityDto>.Failure("City update failed.");
-        }
+            return Result<CityDto>.Failure($"An error occurred while updating the City: {ex.Message}");
+        }    
     }
     }
 }

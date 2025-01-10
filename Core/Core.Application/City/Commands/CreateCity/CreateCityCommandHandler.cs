@@ -5,6 +5,7 @@ using MediatR;
 using Core.Application.City.Queries.GetCities;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICity;
+using Core.Domain.Events;
 
 namespace Core.Application.City.Commands.CreateCity
 {    
@@ -12,12 +13,14 @@ namespace Core.Application.City.Commands.CreateCity
     {
         private readonly IMapper _mapper;
         private readonly ICityCommandRepository _cityRepository;
+        private readonly IMediator _mediator; 
 
         // Constructor Injection
-        public CreateCityCommandHandler(IMapper mapper, ICityCommandRepository cityRepository)
+        public CreateCityCommandHandler(IMapper mapper, ICityCommandRepository cityRepository, IMediator mediator)
         {
             _mapper = mapper;
             _cityRepository = cityRepository;
+            _mediator = mediator;    
         }
 
         public async Task<Result<CityDto>> Handle(CreateCityCommand request, CancellationToken cancellationToken)
@@ -34,11 +37,27 @@ namespace Core.Application.City.Commands.CreateCity
             }
             // Map the CreateCityCommand to the City entity
             var cityEntity = _mapper.Map<Cities>(request);
-            var result = await _cityRepository.CreateAsync(cityEntity);
-            
-            // Map the result to CityDto and return success
-            var cityDto = _mapper.Map<CityDto>(result);
-            return Result<CityDto>.Success(cityDto);
+            try
+            {  
+                var result = await _cityRepository.CreateAsync(cityEntity);
+                
+                 //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Create",
+                    actionCode: result.CityCode,
+                    actionName: result.CityName,
+                    details: $"City '{result.CityName}' was created. CityCode: {result.CityCode}",
+                    module:"City"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
+                
+                var cityDto = _mapper.Map<CityDto>(result);
+                return Result<CityDto>.Success(cityDto);
+            }
+            catch (Exception ex)
+            {
+                return Result<CityDto>.Failure($"An error occurred while creating the City: {ex.Message}");
+            }
         }
     }
 }

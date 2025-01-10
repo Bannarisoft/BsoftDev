@@ -16,16 +16,15 @@ namespace BSOFT.API.Controllers
     public class StateController : ApiControllerBase
     {
          private readonly IValidator<CreateStateCommand> _createStateCommandValidator;
-         private readonly IValidator<UpdateStateCommand> _updateStateCommandValidator;
-         private readonly ApplicationDbContext _dbContext;
+         private readonly IValidator<UpdateStateCommand> _updateStateCommandValidator;         
          
        public StateController(ISender mediator, 
                              IValidator<CreateStateCommand> createStateCommandValidator, 
-                             IValidator<UpdateStateCommand> updateStateCommandValidator,ApplicationDbContext dbContext) 
+                             IValidator<UpdateStateCommand> updateStateCommandValidator) 
          : base(mediator)
         {        
             _createStateCommandValidator = createStateCommandValidator;    
-            _updateStateCommandValidator = updateStateCommandValidator;    _dbContext = dbContext;  
+            _updateStateCommandValidator = updateStateCommandValidator;     
              
         }
         [HttpGet]
@@ -43,11 +42,9 @@ namespace BSOFT.API.Controllers
                 return BadRequest("Invalid State ID");
             }
             var result = await Mediator.Send(new GetStateByIdQuery { Id = stateId });            
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new { Message = result.ErrorMessage });
-            }
-            return Ok(result.Data);        
+            return result.IsSuccess
+                ? Ok(result.Data)
+                : NotFound(new { Message = result.ErrorMessage });    
             }        
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateStateCommand  command)
@@ -59,18 +56,19 @@ namespace BSOFT.API.Controllers
                 return BadRequest(validationResult.Errors);
             }                
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
-                return Ok(new { Message = "State created successfully", State = result.Data });
-            }
-            else
-            {        
-                return BadRequest(result.ErrorMessage);
-            }
+             return result.IsSuccess
+                ? CreatedAtAction(nameof(GetState), new { id = result.Data.Id }, new { Message = "State created successfully", State = result.Data })
+                : BadRequest(new { Message = result.ErrorMessage }); 
+             //return CreatedAtAction(nameof(GetState), new { id = result.Data.Id }, result);
+            
         }
         [HttpPut("{stateId}")]
         public async Task<IActionResult> UpdateAsync(int stateId, UpdateStateCommand command)
-        {         
+        {   
+            if (stateId != command.Id)
+            {
+                return BadRequest(new { Message = "State ID mismatch" });
+            }
             var validationResult = await _updateStateCommandValidator.ValidateAsync(command);
 
             if (!validationResult.IsValid)
@@ -82,15 +80,10 @@ namespace BSOFT.API.Controllers
                 return BadRequest("Invalid CountryID");
             }
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
-                return Ok(new { Message = "State Updated successfully", State = result.Data });
-            }
-            else
-            {        
-                return BadRequest(result.ErrorMessage);
-            }
-        }
+              return result.IsSuccess
+                ? Ok(new { Message = "State updated successfully", State = result.Data })
+                : BadRequest(new { Message = result.ErrorMessage });
+        }        
         [HttpDelete("{stateId}")]
         public async Task<IActionResult> DeleteAsync(int stateId,DeleteStateCommand command)
         {
@@ -98,26 +91,27 @@ namespace BSOFT.API.Controllers
             {
             return BadRequest("StateID Mismatch"); 
             }
-            var result = await Mediator.Send(command);
-            if (result.IsSuccess)
+            if (stateId <= 0)
             {
-                return Ok(new { Message = "State Deleted successfully", State = result.Data });
+                return BadRequest(new { Message = "Invalid State ID" });
             }
-            else
-            {        
-                return BadRequest(result.ErrorMessage);
-            }
+            var result = await Mediator.Send(command);
+            return result.IsSuccess
+                ? Ok(new { Message = "State deleted successfully" })
+                : BadRequest(new { Message = result.ErrorMessage });
         }
 
         [HttpGet("GetStateSearch")]
             public async Task<IActionResult> GetState([FromQuery] string searchPattern)
             {
-                var result = await Mediator.Send(new GetStateAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
-                if (!result.IsSuccess)
+                if (string.IsNullOrWhiteSpace(searchPattern))
                 {
-                    return NotFound(new { Message = result.ErrorMessage });
+                    return BadRequest(new { Message = "Search pattern is required" });
                 }
-                return Ok(result.Data);
+                var result = await Mediator.Send(new GetStateAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
+                return result.IsSuccess
+                ? Ok(result.Data)
+                : NotFound(new { Message = result.ErrorMessage });
             }    
     }
 }

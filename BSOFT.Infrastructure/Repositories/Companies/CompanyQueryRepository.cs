@@ -100,8 +100,8 @@ namespace BSOFT.Infrastructure.Repositories.Companies
             FROM AppData.Company where CompanyName like @SearchPattern";
                 
             // Update the object to use SearchPattern instead of Name
-            var divisions = await _dbConnection.QueryAsync<Company>(query, new { SearchPattern = $"%{searchPattern}%" });
-            return divisions.ToList();
+            var result = await _dbConnection.QueryAsync<Company>(query, new { SearchPattern = $"%{searchPattern}%" });
+            return result.ToList();
         }
     }
 }
