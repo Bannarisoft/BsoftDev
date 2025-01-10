@@ -7,6 +7,7 @@ using BSOFT.Infrastructure;
 using BSOFT.API.Validation.Common;
 using MediatR;
 using Core.Application.State.Commands.CreateState;
+using Core.Domain.Entities;
 
 
 var builder = WebApplication.CreateBuilder(args);

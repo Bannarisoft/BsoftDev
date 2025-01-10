@@ -37,10 +37,6 @@ using Core.Application.Common.Interfaces.IEntity;
 using BSOFT.Infrastructure.Repositories.Divisions;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Domain.Entities;
-using Core.Application.Common.Interfaces.IUserPasswordNotifications;
-using BSOFT.Infrastructure.Repositories.PwdResetNotifications;
-using Core.Application.Common.Interfaces.IUserSession;
-using BSOFT.Infrastructure.Repositories.UserSession;
 using Core.Application.Common.Interfaces.IUserRoleAllocation;
 using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationQueryRepository;
 using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationCommandRepository;
@@ -70,37 +66,6 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
     
     
-          /*   // MongoDB Context
-            var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
-            if (string.IsNullOrWhiteSpace(mongoConnectionString))
-            {
-                throw new InvalidOperationException("MongoDB connection string not found or is empty.");
-            }
-
-            services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
-            services.AddSingleton<IMongoDatabase>(sp =>
-            {
-                var client = sp.GetRequiredService<IMongoClient>();
-                var databaseName = configuration["MongoDb:DatabaseName"];
-                if (string.IsNullOrWhiteSpace(databaseName))
-                {
-                    throw new InvalidOperationException("MongoDB database name not configured.");
-                }
-                return client.GetDatabase(databaseName);
-            });
-            services.AddScoped<MongoDbContext>();
-
-      // Register MongoDbContext
-        services.AddTransient<MongoDbContext>();
-            // Register MongoDbContext
-            services.AddTransient<MongoDbContext>();
-            services.AddTransient<IMongoDatabase>(sp =>
-            {
-                var configuration = sp.GetRequiredService<IConfiguration>();
-                var mongoClient = new MongoClient(configuration.GetConnectionString("MongoDbConnectionString"));
-                return mongoClient.GetDatabase(configuration["MongoDb:DatabaseName"]);
-            }); */
-
              // MongoDB Context
         services.AddSingleton<IMongoClient>(sp =>
         {
@@ -134,6 +99,10 @@ namespace BSOFT.Infrastructure
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            
             
             // Register repositories
+             services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+            services.AddScoped<IUserCommandRepository, UserCommandRepository>();
+            services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
+            services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
             services.AddScoped<IRoleEntitlementCommandRepository, RoleEntitlementCommandRepository>();
             services.AddScoped<IRoleEntitlementQueryRepository, RoleEntitlementQueryRepository>();
             services.AddScoped<IModuleCommandRepository, ModuleCommandRepository>();
