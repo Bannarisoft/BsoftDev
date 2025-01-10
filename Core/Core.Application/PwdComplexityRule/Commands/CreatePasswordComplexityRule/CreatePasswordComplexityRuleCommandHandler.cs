@@ -7,15 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 
 namespace Core.Application.PwdComplexityRule.Commands.CreatePasswordComplexityRule
 {
     public class CreatePasswordComplexityRuleCommandHandler  :IRequestHandler<CreatePasswordComplexityRuleCommand , PwdRuleDto>
 
     {
-          private readonly IPasswordComplexityRepository _passwordComplexityRepository;
+          private readonly IPasswordComplexityRuleCommandRepository _passwordComplexityRepository;
            private readonly IMapper _mapper;
-           public CreatePasswordComplexityRuleCommandHandler(IPasswordComplexityRepository passwordComplexityRepository ,IMapper mapper )
+           public CreatePasswordComplexityRuleCommandHandler(IPasswordComplexityRuleCommandRepository passwordComplexityRepository ,IMapper mapper )
         {
              _passwordComplexityRepository=passwordComplexityRepository;
                _mapper=mapper;

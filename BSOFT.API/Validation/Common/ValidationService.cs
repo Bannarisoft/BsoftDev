@@ -36,6 +36,12 @@ using BSOFT.API.Validation.Companies;
 using Core.Application.Companies.Commands.CreateCompany;
 using Core.Application.Companies.Commands.UpdateCompany;
 using BSOFT.API.Validation.Unit.BSOFT.API.Validation.Unit;
+using Core.Application.PwdComplexityRule.Commands.CreatePasswordComplexityRule;
+using BSOFT.API.Validation.PasswordComplexityrule;
+using Microsoft.Extensions.DependencyInjection;
+using Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityRule;
+using Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySettings;
+using BSOFT.API.Validation.AdminSecuritySettings;
 
 namespace BSOFT.API.Validation.Common
 {
@@ -68,6 +74,11 @@ namespace BSOFT.API.Validation.Common
         services.AddScoped<IValidator<UpdateCityCommand>, UpdateCityCommandValidator>();
         services.AddScoped<IValidator<CreateRoleCommand>, CreateRoleCommandValidator>();
         services.AddScoped<IValidator<UpdateRoleCommand>, UpdateRoleCommandValidator>();
+        services.AddScoped<IValidator<CreatePasswordComplexityRuleCommand>, CreatePasswordComplexityRuleCommandValidator>();
+        services.AddScoped<IValidator<UpdatePasswordComplexityRuleCommand>, UpdatePasswordComplexityRuleCommandValidator>();
+        services.AddScoped<IValidator<CreateAdminSecuritySettingsCommand>, CreateAdminSecuritySettingsCommandValidator>();
+
+
     }  
     }
 }

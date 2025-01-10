@@ -6,14 +6,15 @@ using Core.Application.Common.Interfaces;
 using MediatR;
 using AutoMapper;
 using Core.Domain.Entities;
+using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 
 namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRule
 {
     public class DeletePasswordComplexityRuleCommandHandler :IRequestHandler<DeletePasswordComplexityRuleCommand,int>
     {
-        private readonly  IPasswordComplexityRepository _IpasswordComplexityRepository;  
+        private readonly  IPasswordComplexityRuleCommandRepository _IpasswordComplexityRepository;  
        private readonly IMapper _mapper;
-        public DeletePasswordComplexityRuleCommandHandler (IPasswordComplexityRepository passwordcomplexityrulerepository , IMapper mapper)
+        public DeletePasswordComplexityRuleCommandHandler (IPasswordComplexityRuleCommandRepository passwordcomplexityrulerepository , IMapper mapper)
       {
          _IpasswordComplexityRepository = passwordcomplexityrulerepository;
             _mapper = mapper;

@@ -21,8 +21,7 @@ namespace BSOFT.Infrastructure.Repositories.Departments
     public async Task<List<Department>>GetAllDepartmentAsync()
     {
         
-        const string query = @"
-           SELECT  * FROM AppData.Department";
+        const string query = @"SELECT  * FROM AppData.Department";
             return (await _dbConnection.QueryAsync<Department>(query)).ToList();
         
     }
@@ -31,27 +30,10 @@ namespace BSOFT.Infrastructure.Repositories.Departments
     {
            const string query = "SELECT * FROM AppData.Department WHERE Id = @Id";
         return await _dbConnection.QueryFirstOrDefaultAsync<Department>(query, new { id });
-        }
+        }   
     
-         
 
-  
-       public async Task<List<Department>>GetAllDepartmentAutoCompleteAsync()
-    {
-         const string query = @"
-           select CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
-            --WHERE DeptName LIKE @SearchDept OR Id LIKE @SearchDept
-            ORDER BY DeptName";
-            return (await _dbConnection.QueryAsync<Department>(query)).ToList();
 
-        
-        
-    }
-
-//   public async Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync()
-//         {
-//             return await _applicationDbContext.Department.ToListAsync();
-//         }
 
     public async Task<List<Department>>  GetAllDepartmentAutoCompleteSearchAsync(string SearchDept = null)
         {
@@ -59,7 +41,6 @@ namespace BSOFT.Infrastructure.Repositories.Departments
             {
                 throw new ArgumentException("DepartmentName cannot be null or empty.", nameof(SearchDept));
             }
-
            const string query = @"
             select Id,CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
             WHERE DeptName LIKE @SearchDept OR Id LIKE @SearchDept and IsActive =1

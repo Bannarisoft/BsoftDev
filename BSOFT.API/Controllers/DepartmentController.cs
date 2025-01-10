@@ -6,7 +6,6 @@ using Core.Application.Departments.Queries.GetDepartmentById;
 using Core.Application.Departments.Commands.CreateDepartment;
 using Core.Application.Departments.Commands.UpdateDepartment;
 using Core.Application.Departments.Commands.DeleteDepartment;
-using Core.Application.Departments.Queries.GetDepartmentAutoComplete;
 using Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
 using Core.Application.Common.Interfaces;
 using System.Data.Common;
@@ -93,13 +92,6 @@ namespace BSOFT.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("GetAutoComplete")]
-       public async Task<IActionResult> GetAllDepartmentAutoCompleteAsync()
-        {          
-            var departments =await Mediator.Send(new GetDepartmentAutoCompleteQuery());
-         
-            return Ok(departments);
-        }
 
          [HttpGet("autocomplete")]
         public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync([FromQuery] string searchDept)

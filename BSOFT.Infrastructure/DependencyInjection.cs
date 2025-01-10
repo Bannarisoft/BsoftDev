@@ -41,6 +41,12 @@ using Core.Application.Common.Interfaces.IUserPasswordNotifications;
 using BSOFT.Infrastructure.Repositories.PwdResetNotifications;
 using Core.Application.Common.Interfaces.IUserSession;
 using BSOFT.Infrastructure.Repositories.UserSession;
+using Core.Application.Common.Interfaces.IPasswordComplexityRule;
+using BSOFT.Infrastructure.Repositories.PasswordComplexityRule;
+using Core.Application.Common.Interfaces.IAdminSecuritySettings;
+using BSOFT.Infrastructure.Repositories.AdminSecuritySettings;
+using MediatR;
+using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings;
 
 
 namespace BSOFT.Infrastructure
@@ -152,9 +158,12 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IUserQueryRepository, UserQueryRepository>();
             services.AddTransient<IUserPwdNotificationsQueryRepository, PwdResetNotificationsQueryRepository>();
             services.AddTransient<IUserSessionCommandRepository, UserSessionCommandRepository>();
-        	services.AddScoped<IPasswordComplexityRepository, PasswordComplexityRepository>();
-            services.AddScoped<IPasswordComplexityRepository, PasswordComplexityRepository>();
-      
+        	services.AddScoped<IPasswordComplexityRuleQueryRepository,  PasswordComplexityRuleQueryRepository>();
+            services.AddScoped<IPasswordComplexityRuleCommandRepository, PasswordComplexityRuleCommandRepository>();
+            services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
+            services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();
+            
+            
                         
             services.AddHttpContextAccessor();            
             
@@ -164,7 +173,7 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
-
+            
 
             // AutoMapper profiles
             services.AddAutoMapper(
@@ -174,8 +183,10 @@ namespace BSOFT.Infrastructure
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
                 typeof(AuditLogMappingProfile),
-                typeof(UserSessionProfile)
-				typeof(PasswordComplexityRuleProfile)
+                typeof(UserSessionProfile),
+				typeof(PasswordComplexityRuleProfile),
+                typeof(AdminSecuritySettingsProfile)
+                
             );
 
             return services;

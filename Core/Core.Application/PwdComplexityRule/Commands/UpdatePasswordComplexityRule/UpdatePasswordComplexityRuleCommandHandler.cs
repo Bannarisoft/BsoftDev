@@ -3,16 +3,17 @@ using Core.Domain.Entities;
 using MediatR;
 using AutoMapper;
 using Core.Application.PwdComplexityRule.Queries;
+using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 
 
 namespace Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityRule
 {
     public class UpdatePasswordComplexityRuleCommandHandler :IRequestHandler<UpdatePasswordComplexityRuleCommand, PwdRuleDto>
     {
-         public readonly IPasswordComplexityRepository  _IPasswordComplexityRepository;
+         public readonly IPasswordComplexityRuleCommandRepository  _IPasswordComplexityRepository;
          private readonly IMapper _Imapper;
          
-          public UpdatePasswordComplexityRuleCommandHandler(IPasswordComplexityRepository passwordComplexityRepository, IMapper mapper)
+          public UpdatePasswordComplexityRuleCommandHandler(IPasswordComplexityRuleCommandRepository passwordComplexityRepository, IMapper mapper)
           {
               _IPasswordComplexityRepository = passwordComplexityRepository;
               _Imapper = mapper;

@@ -13,12 +13,12 @@ namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PwdComplexityRuleController :ApiControllerBase
+    public class PasswordComplexityRuleController :ApiControllerBase
     {
          private readonly IValidator<CreatePasswordComplexityRuleCommand> _createPasswordComplexityRuleCommand;
          private readonly IValidator<UpdatePasswordComplexityRuleCommand> _updatepasswordComplexityRuleCommandValidator; 
          private readonly ApplicationDbContext _dbContext;
-         public PwdComplexityRuleController(ISender mediator , 
+         public PasswordComplexityRuleController(ISender mediator , 
          IValidator<CreatePasswordComplexityRuleCommand> createPasswordComplexityRuleCommandValidator, 
          IValidator<UpdatePasswordComplexityRuleCommand> updatePasswordComplexityRuleCommandValidator,
          ApplicationDbContext dbContext  ) : base(mediator)
