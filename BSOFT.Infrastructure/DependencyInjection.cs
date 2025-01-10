@@ -44,6 +44,7 @@ using BSOFT.Infrastructure.Repositories.UserSession;
 using Core.Application.Common.Interfaces.IUserRoleAllocation;
 using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationQueryRepository;
 using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationCommandRepository;
+using BSOFT.Infrastructure.Logging;
 
 namespace BSOFT.Infrastructure
 {
@@ -65,6 +66,9 @@ namespace BSOFT.Infrastructure
 
                 // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
+
+            // Register Serilog
+            services.AddSerilogLogging(configuration);
     
 
              // MongoDB Context

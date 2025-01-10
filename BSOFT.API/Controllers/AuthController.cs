@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
+using BSOFT.API.Models;
 
 namespace BSOFT.API.Controllers
 {
@@ -23,21 +24,36 @@ namespace BSOFT.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {   
-            
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new ApiErrorResponse(400, "Invalid request data."));
             }
 
             var command = _mapper.Map<UserLoginCommand>(request);
             var result = await _mediator.Send(command);
 
-            if (result == null)
+            if (result == null || !result.IsAuthenticated)
             {
-                return Unauthorized("Invalid username or password.");
+                return Unauthorized(new ApiErrorResponse(401, "Invalid username or password."));
             }
 
             return Ok(result);
+            
+            // if (!ModelState.IsValid)
+            // {
+            //     return BadRequest(ModelState);
+                
+            // }
+
+            // var command = _mapper.Map<UserLoginCommand>(request);
+            // var result = await _mediator.Send(command);
+
+            // if (result == null || !result.IsAuthenticated)
+            // {
+            //     return Unauthorized(result?.Message ?? "Invalid username or password.");
+            // }
+
+            // return Ok(result);
 
             
         }

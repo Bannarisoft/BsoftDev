@@ -6,9 +6,20 @@ using Core.Application;
 using Core.Domain.Entities;
 using BSOFT.Infrastructure;
 using BSOFT.API.Validation.Common;
+using Serilog;
+using BSOFT.API.Middlewares;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog
+// builder.Host.UseSerilog((context, services, configuration) =>
+// {
+//     configuration
+//         .ReadFrom.Configuration(context.Configuration)
+//         .ReadFrom.Services(services)
+//         .Enrich.FromLogContext();
+// });
 
 // Add validation services
 var validationService = new ValidationService();
@@ -38,6 +49,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Configure Serilog
+// builder.Host.UseSerilog();
 
 //Add layer dependency 
 builder.Services.AddApplicationServices();
@@ -52,7 +65,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
-    
+
+// Use Global Exception Middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
+// Register LoggingMiddleware
+app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>();    
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -69,4 +87,18 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+// Handle Serilog lifecycle
+try
+{
+    Log.Information("Starting the application...");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application failed to start.");
+    throw;
+}
+finally
+{
+    Log.CloseAndFlush();
+}
