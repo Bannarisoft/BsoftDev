@@ -37,10 +37,7 @@ using Core.Application.Common.Interfaces.IEntity;
 using BSOFT.Infrastructure.Repositories.Divisions;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Domain.Entities;
-using Core.Application.Common.Interfaces.IUserPasswordNotifications;
-using BSOFT.Infrastructure.Repositories.PwdResetNotifications;
-using Core.Application.Common.Interfaces.IUserSession;
-using BSOFT.Infrastructure.Repositories.UserSession;
+
 
 
 namespace BSOFT.Infrastructure
@@ -150,8 +147,7 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IAuditLogRepository, AuditLogMongoRepository>();
             services.AddTransient<IUserCommandRepository, UserCommandRepository>();
             services.AddTransient<IUserQueryRepository, UserQueryRepository>();
-            services.AddTransient<IUserPwdNotificationsQueryRepository, PwdResetNotificationsQueryRepository>();
-            services.AddTransient<IUserSessionCommandRepository, UserSessionCommandRepository>();
+    
        
       
                         
@@ -173,7 +169,13 @@ namespace BSOFT.Infrastructure
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
                 typeof(AuditLogMappingProfile),
-                typeof(UserSessionProfile)
+                typeof(EntityProfile),
+                typeof(UnitProfile),
+                typeof(UpdateUnitProfile),
+                typeof(CreateUnitProfile),
+                typeof(UpdateUnitProfile),
+                typeof(UserLoginProfile)
+
             );
 
             return services;

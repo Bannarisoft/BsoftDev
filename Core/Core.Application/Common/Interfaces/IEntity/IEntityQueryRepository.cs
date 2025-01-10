@@ -15,8 +15,7 @@ namespace Core.Application.Common.Interfaces.IEntity
       Task<List<Entity>> GetAllEntityAsync();
       Task<Entity> GetByIdAsync(int Id);
       Task<List<Entity>> GetByEntityNameAsync(string entity);
-      
-
+      Task<string> GenerateEntityCodeAsync();
 
 
        

@@ -1,4 +1,6 @@
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using Core.Application.Common.Interfaces;
 
 namespace BSOFT.Infrastructure.Repositories
@@ -60,10 +62,25 @@ namespace BSOFT.Infrastructure.Repositories
     }
 
     return "UnknownBrowser/0.0";
-    }   
+    }
+            // Session Id Creation Based on Below Details
+            // UserId: 123
+            // Device Details: WinNT
+            // IP Address: 192.168.1.100       
+        string IIPAddressService.GenerateSessionId(int userId, string deviceDetails,string ipAddress)
+        {
+          string rawData = $"{userId}-{deviceDetails}-{ipAddress}";
+            using (var sha256 = SHA256.Create())
+            {
+            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+            return Convert.ToBase64String(hashBytes).Substring(0, 32);
+            }
+        }
+    }         
     }
     
     
-}
+    
+
 
 

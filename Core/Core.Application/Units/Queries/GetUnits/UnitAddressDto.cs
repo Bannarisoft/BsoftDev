@@ -1,3 +1,5 @@
+using Core.Application.Common.Mappings;
+
 namespace Core.Application.Units.Queries.GetUnits
 {
     public class UnitAddressDto
