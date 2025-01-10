@@ -36,7 +36,9 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<Countries> Countries { get; set; }
         public DbSet<States> States { get; set; }
         public DbSet<Cities> Cities { get; set; }
+        public DbSet<PasswordLog> PasswordLogs { get; set; }
         public DbSet<UserRoleAllocation> UserRoleAllocations { get; set; }
+        public DbSet<UserSession> UserSession { get; set; }
 
 
 
@@ -53,8 +55,6 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new ModulesConfiguration());
             modelBuilder.ApplyConfiguration(new CountryConfiguration());
             modelBuilder.ApplyConfiguration(new UnitConfiguration());
-            modelBuilder.ApplyConfiguration(new UnitAddressConfiguration());
-            modelBuilder.ApplyConfiguration(new UnitContactsConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyAddressConfiguration());
 			modelBuilder.ApplyConfiguration(new StateConfiguration());       
@@ -65,8 +65,11 @@ namespace BSOFT.Infrastructure.Data
 			modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleAllocationConfigurations());
+            modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
+
 
             
+            modelBuilder.ApplyConfiguration(new PasswordLogConfiguration());
                
             base.OnModelCreating(modelBuilder);
         }

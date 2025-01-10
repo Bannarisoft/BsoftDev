@@ -13,8 +13,5 @@ namespace Core.Application.Common.Interfaces.IUserRole
         Task<UserRole> CreateAsync(UserRole userrole);
         Task<int> DeleteAsync(int id, UserRole userrole);
         Task<int> UpdateAsync(int id, UserRole userrole);
-                
-         
-      
     }
 }

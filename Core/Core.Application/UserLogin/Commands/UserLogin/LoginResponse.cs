@@ -17,6 +17,10 @@ namespace Core.Application.UserLogin.Commands.UserLogin
         // public List<string> UserRole { get; set; }
         public IEnumerable<string> UserRole { get; set; } = new List<string>();
         public bool IsAuthenticated { get; set; }
+        public bool IsFirstTimeUser { get; set; }
+
         public string Message { get; set; } = string.Empty;
+
+       
     }
 }
