@@ -11,11 +11,11 @@ namespace Core.Application.UserRole.Queries.GetRole
 
    public class UserRoleDto : IMapFrom<Core.Domain.Entities.UserRole>
     {
-         public int Id { get; set; }
+         public int UserRoleId  { get; set; }
         public string RoleName { get; set; }
         public string Description { get; set; }
         public int CompanyId { get; set; }
-        public byte  IsActive { get; set; }
+        public byte  IsActive { get; set; }=1;
         
     }
 }

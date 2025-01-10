@@ -1,9 +1,5 @@
 using AutoMapper;
 using Core.Application.UserRole.Queries.GetRole;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Domain.Entities;
 using Core.Application.UserRole.Commands.CreateRole;
 using Core.Application.UserRole.Commands.UpdateRole;
@@ -13,18 +9,27 @@ namespace Core.Application.Common.Mappings
 {
     public class UserRoleProfile : Profile
     {
-
         public UserRoleProfile()
-        {   
-            CreateMap< Core.Domain.Entities.UserRole, UserRoleDto>();
-            CreateMap<RoleStatusDto,  Core.Domain.Entities.UserRole>()
-             .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+        {
+            // Domain -> DTO Mapping
+            CreateMap<Core.Domain.Entities.UserRole, UserRoleDto>();
 
-             CreateMap<CreateRoleCommand, Core.Domain.Entities.UserRole>();
-              CreateMap<UpdateRoleCommand, Core.Domain.Entities.UserRole>() ;
-               CreateMap<DeleteRoleCommand, Core.Domain.Entities.UserRole>() ;
+
+            // Command -> Domain Mapping
+            CreateMap<CreateRoleCommand, Core.Domain.Entities.UserRole>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore()); // Ensures Id is not set during creation
+            
+            CreateMap<UpdateRoleCommand, Core.Domain.Entities.UserRole>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id)) // Explicitly map Id in update scenarios
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.RoleName))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+
+              
+            CreateMap<DeleteRoleCommand, Core.Domain.Entities.UserRole>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UserRoleId)) // Map UserRoleId to Id
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive)); // Map IsActive
+
+
         }
-       
     }
 }

@@ -43,11 +43,6 @@ namespace Core.Application.Users.Commands.UpdateUser
             // Return the updated user's ID
             return existingUser.UserId;
 
-            // // Use AutoMapper to map UpdateUserCommand to User entity
-            // var updateUserEntity = _mapper.Map<User>(request);
-
-            // // Update the user in the repository
-            // return await _userRepository.UpdateAsync(request.UserId, updateUserEntity);
          }
     }
 }

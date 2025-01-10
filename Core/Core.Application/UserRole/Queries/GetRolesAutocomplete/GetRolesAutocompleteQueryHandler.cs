@@ -42,7 +42,7 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
         // Map the results to DTOs
         return userrole.Select(UserRole => new UserRoleDto
         {
-            Id = UserRole.Id,           
+            UserRoleId = UserRole.UserRoleId,           
             RoleName = UserRole.RoleName,
             Description =UserRole.Description,
             CompanyId=UserRole.CompanyId,

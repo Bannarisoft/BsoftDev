@@ -16,38 +16,25 @@ namespace Core.Application.UserRole.Commands.UpdateRole
 
 
         public readonly IUserRoleCommandRepository _IUserRoleRepository;
-         private readonly IMapper _Imapper;
-         public readonly IUserRoleCommandRepository _roleRepository;
-          public UpdateRoleCommandHandler(IUserRoleCommandRepository roleRepository ,IMapper mapper)
+        private readonly IMapper _Imapper;
+        public UpdateRoleCommandHandler(IUserRoleCommandRepository roleRepository ,IMapper mapper)
         {
             _IUserRoleRepository = roleRepository;
             _Imapper = mapper;
         }
 
-        // public async Task<int>Handle(UpdateRoleCommand request, CancellationToken cancellationToken)
-        // {
-        //     var UpdateRoleEntity = new Core.Domain.Entities.UserRole()
-        //     {
+        public async Task<UserRoleDto> Handle(UpdateRoleCommand request, CancellationToken cancellationToken)
+        {
+            // Map the updated data from the request to the domain entity
+            var updatedRole = _Imapper.Map<Core.Domain.Entities.UserRole>(request);
 
-        //         Id=request.Id,
-        //         RoleName =request.RoleName,
-        //         Description =request.Description,
-        //         CompanyId =request.CompanyId,
-        //         IsActive =request.IsActive
-        //     };
-        //     return await _roleRepository.UpdateAsync(request.Id,UpdateRoleEntity);
-        
-        // }
+            // Update the role in the repository
+            await _IUserRoleRepository.UpdateAsync(request.Id, updatedRole);
 
-         public async Task<UserRoleDto> Handle(UpdateRoleCommand request, CancellationToken cancellationToken)
-       {
+            // Map the updated entity back to a DTO
+            var userRoleDto = _Imapper.Map<UserRoleDto>(updatedRole);
 
-     
-            var userrole = _Imapper.Map<Core.Domain.Entities.UserRole>(request);
-            await _IUserRoleRepository.UpdateAsync(request.Id, userrole);
-            var userroleDto = _Imapper.Map<UserRoleDto>(userrole);
-          
-            return userroleDto;
+            return userRoleDto;
 
        }
         

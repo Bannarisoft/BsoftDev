@@ -37,8 +37,9 @@ using Core.Application.Common.Interfaces.IEntity;
 using BSOFT.Infrastructure.Repositories.Divisions;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Domain.Entities;
-
-
+using Core.Application.Common.Interfaces.IUserRoleAllocation;
+using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationQueryRepository;
+using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationCommandRepository;
 
 namespace BSOFT.Infrastructure
 {
@@ -61,37 +62,6 @@ namespace BSOFT.Infrastructure
                 // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
     
-    
-          /*   // MongoDB Context
-            var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
-            if (string.IsNullOrWhiteSpace(mongoConnectionString))
-            {
-                throw new InvalidOperationException("MongoDB connection string not found or is empty.");
-            }
-
-            services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
-            services.AddSingleton<IMongoDatabase>(sp =>
-            {
-                var client = sp.GetRequiredService<IMongoClient>();
-                var databaseName = configuration["MongoDb:DatabaseName"];
-                if (string.IsNullOrWhiteSpace(databaseName))
-                {
-                    throw new InvalidOperationException("MongoDB database name not configured.");
-                }
-                return client.GetDatabase(databaseName);
-            });
-            services.AddScoped<MongoDbContext>();
-
-      // Register MongoDbContext
-        services.AddTransient<MongoDbContext>();
-            // Register MongoDbContext
-            services.AddTransient<MongoDbContext>();
-            services.AddTransient<IMongoDatabase>(sp =>
-            {
-                var configuration = sp.GetRequiredService<IConfiguration>();
-                var mongoClient = new MongoClient(configuration.GetConnectionString("MongoDbConnectionString"));
-                return mongoClient.GetDatabase(configuration["MongoDb:DatabaseName"]);
-            }); */
 
              // MongoDB Context
             var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
@@ -116,8 +86,10 @@ namespace BSOFT.Infrastructure
             services.AddScoped<MongoDbContext>();
 
 
-  // Configure JWT settings
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            // Register repositories
+            // Configure JWT settings
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            
+            
+            // Register repositories
             services.AddScoped<IRoleEntitlementCommandRepository, RoleEntitlementCommandRepository>();
             services.AddScoped<IRoleEntitlementQueryRepository, RoleEntitlementQueryRepository>();
             services.AddScoped<IModuleCommandRepository, ModuleCommandRepository>();
@@ -147,10 +119,9 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IAuditLogRepository, AuditLogMongoRepository>();
             services.AddTransient<IUserCommandRepository, UserCommandRepository>();
             services.AddTransient<IUserQueryRepository, UserQueryRepository>();
-    
-       
-      
-                        
+            services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
+            services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
+            
             services.AddHttpContextAccessor();            
             
             // Miscellaneous services
@@ -159,23 +130,22 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
-
+            services.AddScoped<IChangePassword, PasswordChangeRepository>();
 
             // AutoMapper profiles
             services.AddAutoMapper(
-                typeof(CreateUserProfile),
-                typeof(UpdateUserProfile),
+                typeof(UserProfile),
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
                 typeof(AuditLogMappingProfile),
-                typeof(EntityProfile),
+                typeof(ChangePasswordProfile),
+				typeof(EntityProfile),
                 typeof(UnitProfile),
                 typeof(UpdateUnitProfile),
                 typeof(CreateUnitProfile),
                 typeof(UpdateUnitProfile),
                 typeof(UserLoginProfile)
-
             );
 
             return services;
