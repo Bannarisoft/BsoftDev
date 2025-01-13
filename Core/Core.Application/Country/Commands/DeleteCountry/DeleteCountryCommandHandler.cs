@@ -1,9 +1,9 @@
 using AutoMapper;
 using Core.Application.Common;
-using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Application.Country.Queries.GetCountries;
 using Core.Domain.Entities;
+using Core.Domain.Events;
 using MediatR;
 
 namespace Core.Application.Country.Commands.DeleteCountry
@@ -13,12 +13,14 @@ namespace Core.Application.Country.Commands.DeleteCountry
         private readonly ICountryCommandRepository _countryRepository;
         private readonly ICountryQueryRepository _countryQueryRepository;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator; 
         
-        public DeleteCountryCommandHandler(ICountryCommandRepository countryRepository, IMapper mapper, ICountryQueryRepository countryQueryRepository)
+        public DeleteCountryCommandHandler(ICountryCommandRepository countryRepository, IMapper mapper, ICountryQueryRepository countryQueryRepository, IMediator mediator)
         {
             _countryRepository = countryRepository;
             _mapper = mapper;
             _countryQueryRepository = countryQueryRepository;
+            _mediator = mediator;
         }       
         public async Task<Result<CountryDto>> Handle(DeleteCountryCommand request, CancellationToken cancellationToken)
         {
@@ -30,17 +32,33 @@ namespace Core.Application.Country.Commands.DeleteCountry
             var countryUpdate = new Countries
             {
                 Id = request.Id,
-                CountryCode = country.CountryCode, // Preserve original CityCode
-                CountryName = country.CountryName, // Preserve original CityName
+                CountryCode = country.CountryCode, 
+                CountryName = country.CountryName, 
                 IsActive = 0
             };
-            var updateResult = await _countryRepository.DeleteAsync(request.Id, countryUpdate);
-            if (updateResult > 0)
+            try
             {
-               var countryDto = _mapper.Map<CountryDto>(countryUpdate);               
-                return Result<CountryDto>.Success(countryDto);
+                var updateResult = await _countryRepository.DeleteAsync(request.Id, countryUpdate);
+                if (updateResult > 0)
+                {
+                    var countryDto = _mapper.Map<CountryDto>(countryUpdate); 
+                    //Domain Event  
+                    var domainEvent = new AuditLogsDomainEvent(
+                        actionDetail: "Delete",
+                        actionCode: countryDto.CountryCode,
+                        actionName: countryDto.CountryName,
+                        details: $"Country '{countryDto.CountryName}' was created. CountryCode: {countryDto.CountryCode}",
+                        module:"Country"
+                    );               
+                    await _mediator.Publish(domainEvent, cancellationToken);              
+                    return Result<CountryDto>.Success(countryDto);
+                }
+                return Result<CountryDto>.Failure("Country deletion failed.");
             }
-            return Result<CountryDto>.Failure("Country deletion failed.");
+            catch (Exception ex)
+            {
+                return Result<CountryDto>.Failure($"An error occurred while deleting the Country: {ex.Message}");
+            }
         }
     }
 }

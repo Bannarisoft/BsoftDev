@@ -32,8 +32,8 @@ namespace Core.Application.AuditLog.Queries.GetAuditLog
             var auditLogDto = auditLogs.Select(log => new AuditLogDto
             {    
                 Id = log.Id.ToString(),          
-                UserId = log.UserId,
-                UserName = log.UserName,
+                CreatedBy = log.CreatedBy,
+                CreatedByName = log.CreatedByName,
                 IPAddress = log.IPAddress,
                 MachineName = log.MachineName,
                 OS = log.OS,

@@ -16,16 +16,15 @@ namespace BSOFT.API.Controllers
     public class CountryController : ApiControllerBase
     {
          private readonly IValidator<CreateCountryCommand> _createCountryCommandValidator;
-         private readonly IValidator<UpdateCountryCommand> _updateCountryCommandValidator;
-         private readonly ApplicationDbContext _dbContext;
+         private readonly IValidator<UpdateCountryCommand> _updateCountryCommandValidator;         
          
        public CountryController(ISender mediator, 
                              IValidator<CreateCountryCommand> createCountryCommandValidator, 
-                             IValidator<UpdateCountryCommand> updateCountryCommandValidator,ApplicationDbContext dbContext) 
+                             IValidator<UpdateCountryCommand> updateCountryCommandValidator) 
          : base(mediator)
         {        
             _createCountryCommandValidator = createCountryCommandValidator;    
-            _updateCountryCommandValidator = updateCountryCommandValidator;    _dbContext = dbContext;  
+            _updateCountryCommandValidator = updateCountryCommandValidator;    
              
         }
         [HttpGet]

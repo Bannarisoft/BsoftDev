@@ -1,5 +1,4 @@
 using BSOFT.Infrastructure.Data;
-using Core.Application.AuditLog.Commands.CreateAuditLog;
 using Core.Application.AuditLog.Queries;
 using Core.Application.AuditLog.Queries.GetAuditLog;
 using FluentValidation;
@@ -12,13 +11,12 @@ namespace BSOFT.API.Controllers
     [Route("api/[controller]")]
     public class AuditLogController : ApiControllerBase
     {
-       private readonly MongoDbContext _dbContext;
+       //private readonly MongoDbContext _dbContext;
          
-       public AuditLogController(ISender mediator, 
-                           MongoDbContext dbContext) 
+       public AuditLogController(ISender mediator) 
          : base(mediator)
         {        
-             _dbContext = dbContext;  
+            // _dbContext = dbContext;  
              
         }
         [HttpGet]
@@ -29,7 +27,7 @@ namespace BSOFT.API.Controllers
             //var activeCities = auditLogs.Where(c => c.IsActive == 1).ToList(); 
             return Ok(auditLogs);
         }        
-        [HttpPost]
+ /*        [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateAuditLogCommand  command)
         {       
             var result = await Mediator.Send(command);
@@ -41,7 +39,7 @@ namespace BSOFT.API.Controllers
             {        
             return BadRequest(result.ErrorMessage);
             }        
-        }
+        } */
         [HttpGet("GetAuditLogSearch")]
             public async Task<IActionResult> GetAuditLog([FromQuery] string searchPattern)
             {

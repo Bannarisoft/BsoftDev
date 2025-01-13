@@ -3,11 +3,12 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Core.Application;
-using Core.Domain.Entities;
 using BSOFT.Infrastructure;
 using BSOFT.API.Validation.Common;
 using Serilog;
-using BSOFT.API.Middlewares;
+using BSOFT.API.Middlewares;using MediatR;
+using Core.Application.State.Commands.CreateState;
+using Core.Domain.Entities;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +21,6 @@ var builder = WebApplication.CreateBuilder(args);
 //         .ReadFrom.Services(services)
 //         .Enrich.FromLogContext();
 // });
-
 // Add validation services
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
@@ -49,8 +49,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configure Serilog
-// builder.Host.UseSerilog();
 
 //Add layer dependency 
 builder.Services.AddApplicationServices();
@@ -65,14 +63,28 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+ 
+ // Map endpoint to handle CreateStateCommand
+app.MapPost("/state", async (
+    CreateStateCommand request,
+    IMediator mediator,
+    CancellationToken cancellationToken) =>
+{
+    var result = await mediator.Send(request, cancellationToken);
 
 // Use Global Exception Middleware
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Register LoggingMiddleware
-app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>();    
+app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>();     if (!result.IsSuccess)
+    {
+        return Results.BadRequest(result.ErrorMessage);
+    }
 
-// Configure the HTTP request pipeline.
+    return Results.Created($"/states/{result.Data.Id}", result.Data);
+});
+
+// Configure the HTTP request pipeline. 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -87,18 +99,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Handle Serilog lifecycle
-try
-{
-    Log.Information("Starting the application...");
-    app.Run();
-}
-catch (Exception ex)
-{
-    Log.Fatal(ex, "Application failed to start.");
-    throw;
-}
-finally
-{
-    Log.CloseAndFlush();
-}
+app.Run();

@@ -17,15 +17,15 @@ namespace BSOFT.API.Controllers
     {
          private readonly IValidator<CreateCityCommand> _createCityCommandValidator;
          private readonly IValidator<UpdateCityCommand> _updateCityCommandValidator;
-         private readonly ApplicationDbContext _dbContext;
+         
          
        public CityController(ISender mediator, 
                              IValidator<CreateCityCommand> createCityCommandValidator, 
-                             IValidator<UpdateCityCommand> updateCityCommandValidator,ApplicationDbContext dbContext) 
+                             IValidator<UpdateCityCommand> updateCityCommandValidator) 
          : base(mediator)
         {        
             _createCityCommandValidator = createCityCommandValidator;    
-            _updateCityCommandValidator = updateCityCommandValidator;    _dbContext = dbContext;  
+            _updateCityCommandValidator = updateCityCommandValidator;    
              
         }
         [HttpGet]
