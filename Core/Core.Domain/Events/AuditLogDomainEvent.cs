@@ -9,7 +9,6 @@ namespace Core.Domain.Events
         public string ActionName { get; }
         public string Details { get; }
         public string Module { get; }
-
         public AuditLogsDomainEvent(string actionDetail, string actionCode, string actionName, string details,string module)
         {
             ActionDetail = actionDetail;
