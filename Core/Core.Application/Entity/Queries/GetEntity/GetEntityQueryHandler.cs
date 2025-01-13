@@ -21,9 +21,9 @@ namespace Core.Application.Entity.Queries.GetEntity
             FROM AppData.Entity";
         var Entities = await _dbConnection.QueryAsync<EntityDto>(query);
         return Entities.AsList(); */
-         var users = await _entityRepository.GetAllEntityAsync();
-            var userList = _mapper.Map<List<EntityDto>>(users);
-            return userList;
+         var entities = await _entityRepository.GetAllEntityAsync();
+            var entitiesList = _mapper.Map<List<EntityDto>>(entities);
+            return entitiesList;
 
         }
     }
