@@ -1,4 +1,5 @@
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IEntity;
 using MediatR;
@@ -20,21 +21,38 @@ namespace Core.Application.Entity.Commands.DeleteEntity
             
         }
         public async Task<int> Handle(DeleteEntityCommand request, CancellationToken cancellationToken)
-        {
+        {       
         try
         {
-           var entity = _Imapper.Map<Core.Domain.Entities.Entity>(request.UpdateEntityStatusDto);
-           await _ientityRepository.DeleteAsync(request.EntityId,entity);
-           return entity.Id;
-        }   
+        // Map the command to the Entity
+        var entity = _Imapper.Map<Core.Domain.Entities.Entity>(request);
+
+        // Call repository to delete the entity
+        var result = await _ientityRepository.DeleteEntityAsync(request.EntityId, entity);
+
+        if (result == -1) // Entity not found
+        {
+            throw new CustomException(
+                "Entity not found",
+                new[] { $"The entity with ID {request.EntityId} does not exist." },
+                CustomException.HttpStatus.NotFound
+            );
+        }
+
+        return result; // Return the number of affected rows (e.g., 1 for success)
+    }
+        catch (CustomException ex)
+        {
+        _Ilogger.LogWarning(ex, $"CustomException: {ex.Message}");
+        throw; // Re-throw custom exceptions
+        }
         catch (Exception ex)
         {
-                // Log the exception
-                _Ilogger.LogError(ex, "Error updating Entity");
+        _Ilogger.LogError(ex, "Unexpected error occurred while deleting the entity.");
+        throw new Exception("An unexpected error occurred while deleting the entity.", ex);
+        }
+}
 
-                // Throw a custom exception 
-                throw new Exception("Error updating Entity", ex);
-        }
-        }
+         
     }
 }

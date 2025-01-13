@@ -18,6 +18,11 @@ namespace Core.Application.Common.Interfaces.IEntity
       Task<string> GenerateEntityCodeAsync();
 
 
+  
+
+
+
+
        
     }
 }

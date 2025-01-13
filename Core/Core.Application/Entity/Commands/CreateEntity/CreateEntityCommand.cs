@@ -3,8 +3,9 @@ using MediatR;
 
 namespace Core.Application.Entity.Commands.CreateEntity
 {
-    public class CreateEntityCommand : IRequest<EntityDto>
+    public class CreateEntityCommand : IRequest<int>
     {
+
     public string EntityName { get; set; }
     public string EntityDescription { get; set; }
     public string Address { get; set; }

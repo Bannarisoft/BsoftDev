@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.Entity.Commands.UpdateEntity
 {
-    public class UpdateEntityCommand : IRequest<EntityDto>
+    public class UpdateEntityCommand : IRequest<int>
     {
     public int EntityId { get; set; }
     public string EntityName { get; set; }

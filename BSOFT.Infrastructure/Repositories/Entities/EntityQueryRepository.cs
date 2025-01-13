@@ -5,6 +5,8 @@ using Core.Application.Common.Interfaces.IEntity;
 using System.Data;
 using Dapper;
 using Core.Application.Entity.Queries.GetEntityLastCode;
+using Core.Application.Common.Exceptions;
+using Microsoft.Data.SqlClient;
 
 
 namespace BSOFT.Infrastructure.Repositories.Entities
@@ -18,13 +20,6 @@ namespace BSOFT.Infrastructure.Repositories.Entities
              _dbConnection = dbConnection;
         }
 
-        public async Task<List<Entity>> GetAllEntityAsync()
-        {          
-             const string query = @"
-              SELECT *
-            FROM AppData.Entity";
-            return (await _dbConnection.QueryAsync<Entity>(query)).ToList();
-        }
 
         public async Task<Entity> GetByIdAsync(int id)
         {
@@ -32,7 +27,23 @@ namespace BSOFT.Infrastructure.Repositories.Entities
             const string query = "SELECT * FROM AppData.Entity WHERE Id = @Id";
             return await _dbConnection.QueryFirstOrDefaultAsync<Entity>(query, new { id });
         }  
-        public async Task<List<Entity>> GetByEntityNameAsync(string searchPattern)
+
+        public async Task<string> GenerateEntityCodeAsync()
+        {
+            var query = @"SELECT TOP 1 EntityCode FROM AppData.Entity ORDER BY Id DESC";
+            var lastCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
+
+            if (string.IsNullOrEmpty(lastCode))
+            {
+              lastCode = "ENT-00000";
+            }
+
+            var nextCodeNumber = int.Parse(lastCode[(lastCode.IndexOf('-') + 1)..]) + 1;
+
+            return $"ENT-{nextCodeNumber:D5}"; 
+        }
+
+           public async Task<List<Entity>> GetByEntityNameAsync(string searchPattern)
         {
           if (string.IsNullOrWhiteSpace(searchPattern))
             {
@@ -50,19 +61,14 @@ namespace BSOFT.Infrastructure.Repositories.Entities
             return Entitylist.ToList();       
         }
 
-        public async Task<string> GenerateEntityCodeAsync()
-        {
-            var query = @"SELECT TOP 1 EntityCode FROM AppData.Entity ORDER BY Id DESC";
-            var lastCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
-
-            if (string.IsNullOrEmpty(lastCode))
-            {
-              lastCode = "ENT-00000";
-            }
-
-            var nextCodeNumber = int.Parse(lastCode[(lastCode.IndexOf('-') + 1)..]) + 1;
-
-            return $"ENT-{nextCodeNumber:D5}"; 
+        public async Task<List<Entity>> GetAllEntityAsync()
+        {          
+             const string query = @"
+              SELECT *
+            FROM AppData.Entity";
+            return (await _dbConnection.QueryAsync<Entity>(query)).ToList();
         }
+
+        
     }
 }
