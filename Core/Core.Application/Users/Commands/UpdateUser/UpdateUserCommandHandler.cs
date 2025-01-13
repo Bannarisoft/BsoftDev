@@ -1,10 +1,8 @@
-using Core.Application.Common.Interfaces;
-using Core.Domain.Entities;
 using MediatR;
 using AutoMapper;
-using System.Threading;
-using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IUser;
+using Core.Domain.Events;
+
 
 namespace Core.Application.Users.Commands.UpdateUser
 {
@@ -12,11 +10,15 @@ namespace Core.Application.Users.Commands.UpdateUser
     {
         private readonly IUserCommandRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator; 
 
-        public UpdateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper)
+
+        public UpdateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _mediator = mediator;
+            
         }
 
         public async Task<int> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
@@ -29,7 +31,19 @@ namespace Core.Application.Users.Commands.UpdateUser
                 throw new KeyNotFoundException("User not found.");
             }
 
+            var OldUserName = existingUser.UserName;
+            existingUser.UserName = request.UserName;
+
              _mapper.Map(request, existingUser);
+            //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Update",
+                    actionCode: existingUser.UserName,
+                    actionName: existingUser.FirstName + " " + existingUser.LastName,
+                    details: $"User '{OldUserName}' was updated to '{existingUser.UserName}'.  FirstName: {existingUser.FirstName}",
+                    module:"User"
+                );            
+                await _mediator.Publish(domainEvent, cancellationToken);
 
             // Hash the password if it's provided in the request
             if (!string.IsNullOrWhiteSpace(request.PasswordHash))

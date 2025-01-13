@@ -4,6 +4,7 @@ using Core.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging; // This is where the ILogger interface is defined
 using Core.Application.Common.Interfaces.IUser;
+using Core.Domain.Events;
 
 namespace Core.Application.UserLogin.Commands.UserLogin
 {
@@ -13,12 +14,15 @@ namespace Core.Application.UserLogin.Commands.UserLogin
         private readonly IUserQueryRepository _userQueryRepository;
         private readonly IJwtTokenHelper  _jwtTokenHelper;
         private readonly ILogger<UserLoginCommandHandler> _logger;
+        private readonly IMediator _mediator; 
 
-        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository,ILogger<UserLoginCommandHandler> logger)
+
+        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository, IMediator mediator,ILogger<UserLoginCommandHandler> logger)
         {
             _userRepository = userRepository;
             _userQueryRepository = userQueryRepository;
             _jwtTokenHelper = jwtTokenHelper;
+             _mediator = mediator; 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             
         }
@@ -28,7 +32,7 @@ namespace Core.Application.UserLogin.Commands.UserLogin
             _logger.LogInformation("Handling user login request for Username: {Username}", request.Username);
             
             var user = await _userQueryRepository.GetByUsernameAsync(request.Username);
-                        // Validate request input
+            // Validate request input
             if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
             {
                 _logger.LogWarning("Invalid login attempt with missing credentials.");
@@ -71,6 +75,15 @@ namespace Core.Application.UserLogin.Commands.UserLogin
             // Generate JWT token
             var token = _jwtTokenHelper.GenerateToken(user.UserName, roles);
             _logger.LogInformation("JWT token generated for Username: {Username}", user.UserName);
+            //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Create",
+                    actionCode: user.UserName,
+                    actionName: token + " " + roles,
+                    details: $"User '{user.UserName}' was created. Token: {token}, Roles: {roles}",
+                    module:"User"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
 
             return new LoginResponse
             {

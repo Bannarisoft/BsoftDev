@@ -1,12 +1,10 @@
 using Core.Application.Users.Queries.GetUsers;
 using Core.Domain.Entities;
-using Core.Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IUser;
+using Core.Domain.Events;
+
 
 namespace Core.Application.Users.Commands.CreateUser
 {
@@ -14,11 +12,15 @@ namespace Core.Application.Users.Commands.CreateUser
     {
         private readonly IUserCommandRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator; 
 
-        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper)
+
+        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _mediator = mediator;    
+
         }
 
         public async Task<UserDto> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -35,6 +37,16 @@ namespace Core.Application.Users.Commands.CreateUser
 
             // Save the user to the repository
             var createdUser = await _userRepository.CreateAsync(userEntity);
+                            
+            //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "Create",
+                actionCode: createdUser.UserName,
+                actionName: createdUser.FirstName + " " + createdUser.LastName,
+                details: $"User '{createdUser.UserName}' was created. FirstName: {createdUser.FirstName}, {createdUser.LastName}",
+                module:"User"
+            );
+            await _mediator.Publish(domainEvent, cancellationToken);
             
             if (createdUser == null)
             {
