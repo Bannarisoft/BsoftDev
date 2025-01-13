@@ -3,9 +3,11 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Core.Application;
-using Core.Domain.Entities;
 using BSOFT.Infrastructure;
 using BSOFT.API.Validation.Common;
+using MediatR;
+using Core.Application.State.Commands.CreateState;
+using Core.Domain.Entities;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,9 +54,24 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
-    
+ 
+ // Map endpoint to handle CreateStateCommand
+app.MapPost("/state", async (
+    CreateStateCommand request,
+    IMediator mediator,
+    CancellationToken cancellationToken) =>
+{
+    var result = await mediator.Send(request, cancellationToken);
 
-// Configure the HTTP request pipeline.
+    if (!result.IsSuccess)
+    {
+        return Results.BadRequest(result.ErrorMessage);
+    }
+
+    return Results.Created($"/states/{result.Data.Id}", result.Data);
+});
+
+// Configure the HTTP request pipeline. 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

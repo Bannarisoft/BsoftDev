@@ -1,11 +1,19 @@
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
+using System.Security.Claims;
 using Core.Application.Common.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace BSOFT.Infrastructure.Repositories
 {  public class IPAddressService : IIPAddressService
     {
+         private readonly IHttpContextAccessor _httpContextAccessor;
+
+        // Constructor
+        public IPAddressService(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+
          public string GetSystemIPAddress()
         {
             string ipAddress = "127.0.0.1"; // Default to localhost.
@@ -23,64 +31,65 @@ namespace BSOFT.Infrastructure.Repositories
             return ipAddress;
         }
 
-        public string GetUserBrowserDetails(string userAgent)
+     
+        public string GetUserIPAddress()
         {
-            string os = ExtractOS(userAgent);
-            string systemName = Environment.MachineName; // Get the system/machine name
-            string browserAndVersion = ExtractBrowserAndVersion(userAgent);
-            return $"{os}/{systemName}/{browserAndVersion}";
-
+            return _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "Unknown IP";
         }
 
-        private string ExtractOS(string userAgent)
+        public string GetUserAgent()
         {
-            if (userAgent.Contains("Windows NT")) return "WinNT";
-            if (userAgent.Contains("Mac OS X")) return "MacOS";
+            var httpContext = _httpContextAccessor.HttpContext;            
+            var userAgent = httpContext?.Request.Headers["User-Agent"].ToString();
+            return userAgent != null ? GetBrowser(userAgent) : "Unknown Browser";
+            //return _httpContextAccessor.HttpContext?.Request.Headers["User-Agent"].ToString() ?? "Unknown User-Agent";
+        }
+
+        public string GetCurrentUserId()
+        {
+            return _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value ?? "Anonymous";
+        } 
+
+        public string GetUserId()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(userId, out _) ? userId : "0";
+        }
+
+        public string GetUserName()
+        {
+            var userName = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+            return userName ?? "Anonymous";
+        }
+        public string GetUserOS()
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            var userAgent = httpContext?.Request.Headers["User-Agent"].ToString();
+            return userAgent != null ? GetOperatingSystem(userAgent) : "Unknown OS";
+            
+        }
+        private string GetOperatingSystem(string userAgent)
+        {
+            if (userAgent.Contains("Windows")) return "Windows";
+            if (userAgent.Contains("Mac OS")) return "Mac OS";
             if (userAgent.Contains("Linux")) return "Linux";
             if (userAgent.Contains("Android")) return "Android";
-            if (userAgent.Contains("iPhone") || userAgent.Contains("iPad")) return "iOS";
-            return "UnknownOS";
-        }
-        private string ExtractBrowserAndVersion(string userAgent)
-        {
-         var match = System.Text.RegularExpressions.Regex.Match(userAgent,
-        @"(Chrome|Firefox|Safari|Edge|MSIE|Trident)[/ ]([\d\.]+)");
-
-    if (match.Success)
-    {
-        string browser = match.Groups[1].Value;
-        string version = match.Groups[2].Value;
-
-        // Normalize Trident/IE versions
-        if (browser == "Trident")
-        {
-            browser = "IE";
-            version = "11.0"; // Default for Trident
+            if (userAgent.Contains("iPhone")) return "iOS";
+            return "Unknown OS";
         }
 
-        return $"{browser}/{version}";
-    }
-
-    return "UnknownBrowser/0.0";
-    }
-            // Session Id Creation Based on Below Details
-            // UserId: 123
-            // Device Details: WinNT
-            // IP Address: 192.168.1.100       
-        string IIPAddressService.GenerateSessionId(int userId, string deviceDetails,string ipAddress)
+        private string GetBrowser(string userAgent)
         {
-          string rawData = $"{userId}-{deviceDetails}-{ipAddress}";
-            using (var sha256 = SHA256.Create())
-            {
-            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-            return Convert.ToBase64String(hashBytes).Substring(0, 32);
-            }
+            if (userAgent.Contains("Firefox")) return "Firefox";
+            if (userAgent.Contains("Chrome")) return "Chrome";
+            if (userAgent.Contains("Safari") && !userAgent.Contains("Chrome")) return "Safari";
+            if (userAgent.Contains("Edge")) return "Edge";
+            if (userAgent.Contains("Opera") || userAgent.Contains("OPR")) return "Opera";
+            return "Unknown Browser";
         }
-    }         
     }
     
     
-    
-
+}
 
 
