@@ -6,6 +6,7 @@ using Core.Application.Common;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Entities;
+using Core.Domain.Events;
 using MediatR;
 
 namespace Core.Application.City.Commands.DeleteCity
@@ -14,12 +15,14 @@ namespace Core.Application.City.Commands.DeleteCity
     {
         private readonly ICityCommandRepository _cityRepository;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator; 
         private readonly ICityQueryRepository _cityQueryRepository;
-        public DeleteCityCommandHandler(ICityCommandRepository cityRepository, IMapper mapper, ICityQueryRepository cityQueryRepository)
+        public DeleteCityCommandHandler(ICityCommandRepository cityRepository, IMapper mapper, ICityQueryRepository cityQueryRepository, IMediator mediator)
         {
             _cityRepository = cityRepository;
              _mapper = mapper;
             _cityQueryRepository = cityQueryRepository;
+            _mediator = mediator;
         }
 
         public async Task<Result<CityDto>> Handle(DeleteCityCommand request, CancellationToken cancellationToken)
@@ -35,20 +38,35 @@ namespace Core.Application.City.Commands.DeleteCity
             var cityUpdate = new Cities
             {
                 Id = request.Id,
-                CityCode = city.CityCode, // Preserve original CityCode
-                CityName = city.CityName, // Preserve original CityName
+                CityCode = city.CityCode, 
+                CityName = city.CityName, 
                 StateId = city.StateId,
                 IsActive = 0
             };
-
-            var updateResult = await _cityRepository.DeleteAsync(request.Id, cityUpdate);
-            if (updateResult > 0)
+            try
             {
-               var cityDto = _mapper.Map<CityDto>(cityUpdate);               
-                return Result<CityDto>.Success(cityDto);
-            }
+                var updateResult = await _cityRepository.DeleteAsync(request.Id, cityUpdate);
+                if (updateResult > 0)
+                {
+                    var cityDto = _mapper.Map<CityDto>(cityUpdate);  
+                    //Domain Event  
+                    var domainEvent = new AuditLogsDomainEvent(
+                        actionDetail: "Delete",
+                        actionCode: cityDto.CityCode,
+                        actionName: cityDto.CityName,
+                        details: $"City '{cityDto.CityName}' was created. CityCode: {cityDto.CityCode}",
+                        module:"City"
+                    );               
+                    await _mediator.Publish(domainEvent, cancellationToken);                 
+                    return Result<CityDto>.Success(cityDto);
+                }
 
-            return Result<CityDto>.Failure("City deletion failed.");
+                return Result<CityDto>.Failure("City deletion failed.");
+            }
+            catch (Exception ex)
+            {
+                return Result<CityDto>.Failure($"An error occurred while deleting the City: {ex.Message}");
+            }
         }
     }
 }

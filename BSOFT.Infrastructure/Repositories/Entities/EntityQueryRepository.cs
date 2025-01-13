@@ -45,8 +45,8 @@ namespace BSOFT.Infrastructure.Repositories.Entities
             ORDER BY EntityName";
                 
             // Update the object to use SearchPattern instead of Name
-            var divisions = await _dbConnection.QueryAsync<Entity>(query, new { SearchPattern = $"%{searchPattern}%" });
-            return divisions.ToList();       
+            var entities = await _dbConnection.QueryAsync<Entity>(query, new { SearchPattern = $"%{searchPattern}%" });
+            return entities.ToList();       
         }
 
         

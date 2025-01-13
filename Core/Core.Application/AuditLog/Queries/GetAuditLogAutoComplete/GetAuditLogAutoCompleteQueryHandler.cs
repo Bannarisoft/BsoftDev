@@ -35,15 +35,16 @@ namespace Core.Application.AuditLog.Queries.GetAuditLogBySearchPattern
                 var auditLogDto = auditLogs.Select(log => new AuditLogDto
                 {      
                     Id = log.Id.ToString(),          
-                    UserId = log.UserId,
-                    UserName = log.UserName,
+                    CreatedBy = log.CreatedBy,
+                    CreatedByName = log.CreatedByName,
                     IPAddress = log.IPAddress,
                     OS = log.OS,
                     Browser = log.Browser,
                     Action = log.Action,
                     Details = log.Details,
                     Module = log.Module,
-                    CreatedAt = log.CreatedAt                
+                    CreatedAt = log.CreatedAt ,
+                    MachineName = log.MachineName
                 }).ToList();
 
             return Result<List<AuditLogDto>>.Success(auditLogDto);

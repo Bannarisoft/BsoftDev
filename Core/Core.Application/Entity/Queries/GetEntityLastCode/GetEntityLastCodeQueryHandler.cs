@@ -31,9 +31,9 @@ namespace Core.Application.Entity.Queries.GetEntityLastCode
           var nextCodeNumber = int.Parse(lastCode[(lastCode.IndexOf('-') + 1)..]) + 1;
 
           return $"ENT-{nextCodeNumber:D5}"; */
-        var users = await _entityRepository.GetAllEntityAsync();
-            var userList = _mapper.Map<List<EntityDto>>(users);
-            return userList.ToString();
+        var entities = await _entityRepository.GetAllEntityAsync();
+            var entitiesList = _mapper.Map<List<EntityDto>>(entities);
+            return entitiesList.ToString();
        
        }
 
