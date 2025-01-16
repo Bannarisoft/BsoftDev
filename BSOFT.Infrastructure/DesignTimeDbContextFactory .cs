@@ -26,9 +26,9 @@ namespace BSOFT.Infrastructure
 
             optionsBuilder.UseSqlServer(connectionString);
 
-    
+            IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             // Create a dummy or mock IPAddressService implementation
-            IIPAddressService ipAddressService = new IPAddressService();
+            IIPAddressService ipAddressService = new IPAddressService(httpContextAccessor);
             
             return new ApplicationDbContext(optionsBuilder.Options, ipAddressService);  // Pass both dependencies
             //return new ApplicationDbContext(optionsBuilder.Options);  // Pass both dependencies

@@ -6,17 +6,13 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Core.Domain.Entities
 {
-    public class AuditLogs  : AuditLogEntity
+    public class AuditLogs  : AuditLogBase
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public ObjectId Id { get; set; }
-        public int UserId { get; set; }
-        public string UserName { get; set; }=string.Empty;       
         public string Action { get; set; }=string.Empty;
         public string Details { get; set; }=string.Empty;
-        public string Module { get; set; }=string.Empty;
-        
-        //public byte  IsActive { get; set; }=1;
+        public string Module { get; set; }=string.Empty;     
     }
 }
