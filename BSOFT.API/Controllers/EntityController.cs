@@ -12,7 +12,7 @@ using Core.Application.Entity.Queries.GetEntityAutoComplete;
 using Core.Application.Common.Exceptions;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
-
+using System.Linq;
 
 namespace BSOFT.API.Controllers
 {
@@ -38,11 +38,13 @@ namespace BSOFT.API.Controllers
 [HttpGet]
 public async Task<IActionResult> GetAllEntityAsync()
 {
-    // Fetch all entities
-        var entities = await Mediator.Send(new GetEntityQuery());
+        // Fetch all entities
+        var result  = await Mediator.Send(new GetEntityQuery());
+        // Access the list from the result
+        // Adjust 'Data' based on your actual property name
 
         // Check if the result is empty
-        if (entities == null || !entities.Any())
+        if (result == null || result.Data == null || !result.Data.Any())
         {
             throw new CustomException(
                 "No entities found.",
@@ -55,7 +57,7 @@ public async Task<IActionResult> GetAllEntityAsync()
         return Ok(new
         {
             message = "Entities retrieved successfully.",
-            data = entities,
+            data = result,
             statusCode = StatusCodes.Status200OK
         });
    
@@ -73,25 +75,22 @@ public async Task<IActionResult> GetByIdAsync(int id)
             );
         }
 
-        var entity = await Mediator.Send(new GetEntityByIdQuery { EntityId = id });
-        if (entity == null)
+        var result = await Mediator.Send(new GetEntityByIdQuery { EntityId = id });
+        if (result == null || result.Data == null || !result.Data.Any())
         {
-
-                throw new CustomException(
-                "Entity not found",
-                new[] { $"The entity with ID {id} does not exist." },
-                CustomException.HttpStatus.NotFound
-            );
-   
-            
-        }
+         throw new CustomException(
+        "Entity not found",
+        new[] { $"The entity with ID {id} does not exist." },
+        CustomException.HttpStatus.NotFound
+    );
+        } 
 
         // Return success response
         return Ok(new
         {
             message = "Entity retrieved successfully.",
             statusCode = StatusCodes.Status200OK,
-            data = entity
+            data = result
         });
    
 }
@@ -142,7 +141,7 @@ public async Task<IActionResult> CreateAsync(CreateEntityCommand command)
     // Process the command
     var createdEntityId = await _mediator.Send(command);
 
-    if (createdEntityId <= 0)
+    if (createdEntityId.Data <= 0)
     {
         throw new CustomException(
             "Failed to create entity.",
@@ -194,7 +193,7 @@ public async Task<IActionResult> UpdateAsync(int id, UpdateEntityCommand command
         var updatedEntity = await _mediator.Send(command);
 
         // Check if the entity was updated successfully
-        if (updatedEntity <= 0)
+        if (updatedEntity.Data <= 0)
         {
             throw new CustomException(
                 "Entity not found",
@@ -229,7 +228,7 @@ public async Task<IActionResult> DeleteEntityAsync(int id, DeleteEntityCommand c
         var result = await _mediator.Send(command);
 
         // Check if the entity was found and deleted
-        if (result <= 0) // Assuming 0 or -1 indicates "not found"
+        if (result.Data <= 0) // Assuming 0 or -1 indicates "not found"
         {
              throw new CustomException(
                 "Entity not found",
@@ -263,15 +262,14 @@ public async Task<IActionResult> GetEntity([FromQuery] string searchPattern)
         // Fetch entities based on search pattern
         var entities = await Mediator.Send(new GetEntityAutocompleteQuery { SearchPattern = searchPattern });
 
-        // Check if entities are returned
-        if (entities == null || !entities.Any())
+       if (entities == null || entities.Data == null || !entities.Data.Any())
         {
-            throw new CustomException(
-                "No entities found matching the search pattern.",
-                new[] { $"No entities found for the search pattern: {searchPattern}" },
-                CustomException.HttpStatus.NotFound
-            );
-        }
+         throw new CustomException(
+        "Entity not found",
+        new[] { $"No entities found for the search pattern: {searchPattern}" },
+        CustomException.HttpStatus.NotFound
+    );
+        } 
 
         // Return success response with 200 OK and the entity data
         return Ok(new

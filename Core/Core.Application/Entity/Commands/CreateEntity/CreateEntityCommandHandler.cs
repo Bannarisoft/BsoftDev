@@ -7,11 +7,13 @@ using Core.Application.Common.Interfaces.IEntity;
 using Microsoft.EntityFrameworkCore;
 using Core.Application.Common.Exceptions;
 using Microsoft.Extensions.Logging;
+using Core.Application.Common;
+using Core.Domain.Events;
 
 
 namespace Core.Application.Entity.Commands.CreateEntity
 {
-    public class CreateEntityCommandHandler :  IRequestHandler<CreateEntityCommand, int>
+    public class CreateEntityCommandHandler :  IRequestHandler<CreateEntityCommand, Result<int>>
     {
         private readonly IEntityCommandRepository _IentityRepository;
         private readonly IMapper _Imapper;
@@ -37,7 +39,7 @@ namespace Core.Application.Entity.Commands.CreateEntity
     //        return entityId;
     //     }
 
-  public async Task<int> Handle(CreateEntityCommand request, CancellationToken cancellationToken)
+  public async Task<Result<int>> Handle(CreateEntityCommand request, CancellationToken cancellationToken)
 {
     try
     {
@@ -61,14 +63,21 @@ namespace Core.Application.Entity.Commands.CreateEntity
         // Log that the entity creation process is about to begin
         _ilogger.LogInformation($"Attempting to create a new entity with code {entityCode}.");
 
-        // Create the entity in the repository
-        var entityId = await _IentityRepository.CreateAsync(entity);
 
-        // Log successful creation
-        _ilogger.LogInformation($"Entity with ID {entityId} created successfully.");
+            var result = await _IentityRepository.CreateAsync(entity);
+            //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "Create",
+                actionCode: entity.EntityCode,
+                actionName: entity.EntityName,
+                details: $"Entity '{entity.EntityName}' was created. EntityCode: {entity.Id}",
+                module:"Entity"
+            );
+            await _Imediator.Publish(domainEvent, cancellationToken);
+            return Result<int>.Success(result);
+           
 
-        // Return the created entity ID
-        return entityId;
+      
     }
     catch (CustomException ex)
     {

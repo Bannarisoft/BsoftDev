@@ -1,27 +1,31 @@
 using AutoMapper;
+using Core.Application.Common;
 using Core.Application.Common.Exceptions;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IEntity;
 using Core.Application.Entity.Queries.GetEntity;
+using Core.Domain.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Entity.Commands.UpdateEntity
 {
-    public class UpdateEntityCommandHandler : IRequestHandler<UpdateEntityCommand, int>
+    public class UpdateEntityCommandHandler : IRequestHandler<UpdateEntityCommand, Result<int>>
     {
        private readonly IEntityCommandRepository _Ientityrepository;
         private readonly IMapper _Imapper;
         private readonly ILogger<UpdateEntityCommandHandler> _ilogger;
-       public UpdateEntityCommandHandler(IEntityCommandRepository Ientityrepository,IMapper Imapper, ILogger<UpdateEntityCommandHandler> Ilogger)
+        private readonly IMediator _mediator; 
+       public UpdateEntityCommandHandler(IEntityCommandRepository Ientityrepository,IMapper Imapper, ILogger<UpdateEntityCommandHandler> Ilogger,IMediator mediator)
         {
             _Ientityrepository = Ientityrepository;
             _Imapper = Imapper;
-             _ilogger = Ilogger;
+            _ilogger = Ilogger;
+            _mediator = mediator;
              
         }
 
-       public async Task<int> Handle(UpdateEntityCommand request, CancellationToken cancellationToken)
+       public async Task<Result<int>> Handle(UpdateEntityCommand request, CancellationToken cancellationToken)
         { 
         try
         {   
@@ -34,12 +38,20 @@ namespace Core.Application.Entity.Commands.UpdateEntity
                 "Entity not found",
                 new[] { $"The entity with ID {request.EntityId} does not exist." },
           
-          CustomException.HttpStatus.NotFound
+            CustomException.HttpStatus.NotFound
             );
             }
 
-            return result; // Return the number of affected rows (e.g., 1 for success)
-
+              //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+            actionDetail: "Update",
+            actionCode: entity.Id.ToString(),
+            actionName: entity.EntityName,                            
+            details:$"Entity '{entity.EntityName}' was Updated. EntityCode: {request.EntityId}",
+            module:"Entity"
+            );            
+            await _mediator.Publish(domainEvent, cancellationToken);
+            return Result<int>.Success(result);
         }
         catch (CustomException ex)
         {

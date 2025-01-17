@@ -1,10 +1,11 @@
+using Core.Application.Common;
 using Core.Application.Entity.Queries.GetEntity;
 using MediatR;
 
 
 namespace Core.Application.Entity.Commands.UpdateEntity
 {
-    public class UpdateEntityCommand : IRequest<int>
+    public class UpdateEntityCommand : IRequest<Result<int>>
     {
     public int EntityId { get; set; }
     public string EntityName { get; set; }

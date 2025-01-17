@@ -21,12 +21,12 @@ namespace BSOFT.Infrastructure.Repositories.Entities
         }
 
 
-        public async Task<Entity> GetByIdAsync(int id)
+        public async Task<List<Entity>> GetByIdAsync(int id)
         {
-          
-            const string query = "SELECT * FROM AppData.Entity WHERE Id = @Id";
-            return await _dbConnection.QueryFirstOrDefaultAsync<Entity>(query, new { id });
-        }  
+             const string query = "SELECT * FROM AppData.Entity WHERE Id = @Id";
+             var entityList = await _dbConnection.QueryAsync<Entity>(query, new { id });
+             return entityList?.ToList() ?? new List<Entity>();
+        }
 
         public async Task<string> GenerateEntityCodeAsync()
         {
@@ -58,7 +58,7 @@ namespace BSOFT.Infrastructure.Repositories.Entities
                 
             // Update the object to use SearchPattern instead of Name
             var Entitylist = await _dbConnection.QueryAsync<Entity>(query, new { SearchPattern = $"%{searchPattern}%" });
-            return Entitylist.ToList();       
+             return Entitylist?.ToList() ?? new List<Entity>();     
         }
 
         public async Task<List<Entity>> GetAllEntityAsync()
@@ -66,7 +66,7 @@ namespace BSOFT.Infrastructure.Repositories.Entities
              const string query = @"
               SELECT *
             FROM AppData.Entity";
-            return (await _dbConnection.QueryAsync<Entity>(query)).ToList();
+            return (await _dbConnection.QueryAsync<Entity>(query)).ToList() ?? new List<Entity>();
         }
 
         

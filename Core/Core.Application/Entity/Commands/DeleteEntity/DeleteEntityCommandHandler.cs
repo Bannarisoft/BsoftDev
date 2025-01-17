@@ -1,26 +1,31 @@
 using AutoMapper;
+using Core.Application.Common;
 using Core.Application.Common.Exceptions;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IEntity;
+using Core.Domain.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Entity.Commands.DeleteEntity
 {
-    public class DeleteEntityCommandHandler  : IRequestHandler<DeleteEntityCommand, int>
+    public class DeleteEntityCommandHandler  : IRequestHandler<DeleteEntityCommand,  Result<int>>
     {
         private readonly IEntityCommandRepository _ientityRepository;
         private readonly IMapper _Imapper;
         private readonly ILogger<DeleteEntityCommandHandler> _Ilogger;
 
-        public DeleteEntityCommandHandler(IEntityCommandRepository Ientityrepository,IMapper Imapper,ILogger<DeleteEntityCommandHandler> Ilogger)
+        private readonly IMediator _mediator; 
+
+        public DeleteEntityCommandHandler(IEntityCommandRepository Ientityrepository,IMapper Imapper,ILogger<DeleteEntityCommandHandler> Ilogger,IMediator mediator)
         {
             _ientityRepository = Ientityrepository;
             _Imapper = Imapper;
             _Ilogger = Ilogger;
+            _mediator = mediator;
             
         }
-        public async Task<int> Handle(DeleteEntityCommand request, CancellationToken cancellationToken)
+        public async Task<Result<int>> Handle(DeleteEntityCommand request, CancellationToken cancellationToken)
         {       
         try
         {
@@ -38,8 +43,17 @@ namespace Core.Application.Entity.Commands.DeleteEntity
                 CustomException.HttpStatus.NotFound
             );
         }
+        //Domain Event
+        var domainEvent = new AuditLogsDomainEvent(
+            actionDetail: "Delete",
+            actionCode: entity.Id.ToString(),
+            actionName:"",
+            details:$"EntityCode: {request.EntityId} was Changed to Status Inactive.",
+            module:"Entity"
+        );            
+        await _mediator.Publish(domainEvent, cancellationToken);
 
-        return result; // Return the number of affected rows (e.g., 1 for success)
+         return Result<int>.Success(result); // Return the number of affected rows (e.g., 1 for success)
     }
         catch (CustomException ex)
         {
@@ -52,7 +66,6 @@ namespace Core.Application.Entity.Commands.DeleteEntity
         throw new Exception("An unexpected error occurred while deleting the entity.", ex);
         }
 }
-
          
-    }
+   }
 }

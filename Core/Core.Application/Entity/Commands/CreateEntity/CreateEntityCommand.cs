@@ -1,9 +1,10 @@
+using Core.Application.Common;
 using Core.Application.Entity.Queries.GetEntity;
 using MediatR;
 
 namespace Core.Application.Entity.Commands.CreateEntity
 {
-    public class CreateEntityCommand : IRequest<int>
+    public class CreateEntityCommand :IRequest<Result<int>> 
     {
 
     public string EntityName { get; set; }

@@ -85,6 +85,9 @@ public async Task<int> DeleteEntityAsync(int id, Entity entity)
         // Update the IsActive status to indicate deletion (or soft delete)
         entityToDelete.IsActive = entity.IsActive;
 
+         // Mark the entity as modified
+        _applicationDbContext.Entity.Update(entityToDelete);
+
         // Save changes to the database
         await _applicationDbContext.SaveChangesAsync();
 
