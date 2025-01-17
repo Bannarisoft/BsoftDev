@@ -22,15 +22,13 @@ namespace BSOFT.API.Controllers
     [Route("api/[controller]")]
     public class CompanyController : ApiControllerBase
     {
-        private readonly IFileUploadService _ifileUploadService;
-        // private readonly IValidator<CompanyDTO>  _CreateCompanyCommandvalidator;
+        
         private readonly IValidator<CreateCompanyCommand>  _CreateCompanyCommandvalidator;
         private readonly IValidator<UpdateCompanyCommand> _UpdateCompanyCommandvalidator;
 
-        public CompanyController(ISender mediator, IFileUploadService ifileUploadService, IValidator<CreateCompanyCommand> createCompanyCommandValidator, IValidator<UpdateCompanyCommand> updateCompanyCommandValidator) 
+        public CompanyController(ISender mediator, IValidator<CreateCompanyCommand> createCompanyCommandValidator, IValidator<UpdateCompanyCommand> updateCompanyCommandValidator) 
         : base(mediator)
         {
-            _ifileUploadService = ifileUploadService;
             _CreateCompanyCommandvalidator = createCompanyCommandValidator;
             _UpdateCompanyCommandvalidator = updateCompanyCommandValidator;
         }
@@ -48,26 +46,22 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> CreateAsync([FromForm] CreateCompanyCommand command)
         {
             var validationResult = await _CreateCompanyCommandvalidator.ValidateAsync(command);
-            Console.WriteLine("validationResult");
-            Console.WriteLine(validationResult.IsValid);
             if (!validationResult.IsValid)
             {
                 return BadRequest(validationResult.Errors);
             }
-            if(command.File ==null && command.File.Length ==0)
+            if(command.Company.File ==null && command.Company.File.Length ==0)
             {
                 return BadRequest("Invalid file");
             }
             
-            string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources/AllFiles");
-            var uploadResult = await _ifileUploadService.UploadFileAsync(command.File,  uploadPath);
-            if (!uploadResult.IsSuccess)
-            {
-                return BadRequest(uploadResult.ErrorMessage);
-            }
-            command.Company.Logo =uploadResult.FilePath;
             var createdCompany = await Mediator.Send(command);
-            return Ok(createdCompany);
+            if (createdCompany > 0)
+            {
+                return Ok(createdCompany);
+            }
+            return BadRequest("Error");
+            
         }
          [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
@@ -93,6 +87,7 @@ namespace BSOFT.API.Controllers
             //          ContentType = contentType,
             //          FileName = company.Logo
             //      });
+          
             if (id <= 0)
             {
                 return BadRequest("Invalid company ID");
@@ -107,33 +102,32 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update([FromForm] int id, UpdateCompanyCommand command )
+        public async Task<IActionResult> Update([FromForm]  UpdateCompanyCommand command, int id)
         {
             var validationResult = await _UpdateCompanyCommandvalidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
                 return BadRequest(validationResult.Errors);
             }
-            if(command.File ==null && command.File.Length ==0)
+            if(command.Company.File ==null && command.Company.File.Length ==0)
             {
                 return BadRequest("Invalid file");
             }
             
-            string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources/AllFiles");
-            var uploadResult = await _ifileUploadService.UploadFileAsync(command.File,  uploadPath);
-            if (!uploadResult.IsSuccess)
-            {
-                return BadRequest(uploadResult.ErrorMessage);
-            }
-            command.Company.Logo =uploadResult.FilePath;
 
             if(id != command.Company.Id)
             {
                 return BadRequest();
             }
-            await Mediator.Send(command);
+            
+           var updatedCompany = await Mediator.Send(command);
 
-            return NoContent();
+            if (updatedCompany)
+            {
+                return Ok("Updated Successfully");
+            }
+            
+            return BadRequest("Error");
         }
         [HttpPut("delete/{id}")]
         public async Task<IActionResult> Delete(int id,DeleteCompanyCommand deleteCompanyCommand)

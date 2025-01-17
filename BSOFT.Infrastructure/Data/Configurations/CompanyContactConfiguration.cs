@@ -50,9 +50,9 @@ namespace BSOFT.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.HasOne(cc => cc.Company)
-                .WithMany(cc => cc.CompanyContact)
-                .HasForeignKey(cc => cc.CompanyId);
+            builder.HasOne(c => c.Company)
+                .WithOne(cc => cc.CompanyContact)
+                .HasForeignKey<CompanyContact>(cc => cc.CompanyId);
         }
     }
 }

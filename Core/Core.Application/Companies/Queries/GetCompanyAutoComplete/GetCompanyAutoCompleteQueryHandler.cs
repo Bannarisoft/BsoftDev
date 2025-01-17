@@ -37,7 +37,6 @@ namespace Core.Application.Companies.Queries.GetCompanyAutoComplete
             return company.AsList(); */
 
               var result = await _companyRepository.GetCompany(request.SearchPattern);
-            //return _mapper.Map<List<DivisionDTO>>(result);
             return _mapper.Map<List<CompanyAutoCompleteDTO>>(result);            
 
          } 

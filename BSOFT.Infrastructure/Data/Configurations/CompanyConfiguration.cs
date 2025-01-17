@@ -77,13 +77,13 @@ namespace BSOFT.Infrastructure.Data.Configurations
                     )
                 .IsRequired();
 
-            builder.HasMany(c => c.CompanyAddress)
+            builder.HasOne(c => c.CompanyAddress)
                 .WithOne(ca => ca.Company)
-                .HasForeignKey(ca => ca.CompanyId);
+                .HasForeignKey<CompanyAddress>(ca => ca.CompanyId);
 
-            builder.HasMany(c => c.CompanyContact)
+            builder.HasOne(c => c.CompanyContact)
                 .WithOne(cc => cc.Company)
-                .HasForeignKey(cc => cc.CompanyId);
+                .HasForeignKey<CompanyContact>(cc => cc.CompanyId);
         }
     }
 }

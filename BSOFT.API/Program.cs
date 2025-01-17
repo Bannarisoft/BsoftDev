@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Core.Application;
 using BSOFT.Infrastructure;
 using BSOFT.API.Validation.Common;
-using BSOFT.API.GlobalException;
 using MediatR;
 using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
@@ -54,7 +53,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 
@@ -89,7 +87,6 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
- app.UseExceptionHandler();
 
 app.MapControllers();
 
