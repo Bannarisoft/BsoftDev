@@ -35,15 +35,15 @@ namespace BSOFT.Infrastructure.Repositories.Divisions
             }
             return false;
         }
-         public async Task<int> DeleteAsync(int id,Division division)
+         public async Task<bool> DeleteAsync(int id,Division division)
         {
             var existingDivision = await _applicationDbContext.Divisions.FirstOrDefaultAsync(u => u.Id == id);
             if (existingDivision != null)
             {
                 existingDivision.IsActive = division.IsActive;
-                return await _applicationDbContext.SaveChangesAsync();
+                return await _applicationDbContext.SaveChangesAsync() >0;
             }
-            return 0; // No user found
+            return false; 
         }        
     }
 }

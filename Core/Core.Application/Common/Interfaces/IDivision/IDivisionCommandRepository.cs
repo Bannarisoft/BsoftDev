@@ -11,6 +11,6 @@ namespace Core.Application.Common.Interfaces.IDivision
     {  
         Task<int> CreateAsync(Division division);     
         Task<bool> UpdateAsync(Division division);
-        Task<int> DeleteAsync(int id,Division division);        
+        Task<bool> DeleteAsync(int id,Division division);        
     }
 }

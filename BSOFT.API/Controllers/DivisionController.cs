@@ -34,7 +34,7 @@ namespace BSOFT.API.Controllers
            var divisions = await Mediator.Send(new GetDivisionQuery());
             var activedivisions = divisions.Where(c => c.IsActive == 1).ToList(); 
            
-            return Ok(activedivisions);
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = activedivisions});
         }
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateDivisionCommand command)
@@ -44,22 +44,21 @@ namespace BSOFT.API.Controllers
             
             if (!validationResult.IsValid)
             {
-                var errorMessages = string.Join("; ", validationResult.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
-                throw new BadHttpRequestException(errorMessages, statusCode: StatusCodes.Status400BadRequest);
-                // return BadRequest(validationResult.Errors);
+                return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
             }
             var response = await Mediator.Send(command);
             if(response.IsSuccess)
             {
-                return CreatedAtAction(nameof(GetByIdAsync), new {  id = response.Data }, response);
+                // return CreatedAtAction(nameof(GetByIdAsync), new {  id = response.Data }, response);
+                return Ok(new { StatusCode=StatusCodes.Status201Created, message = response.Message, errors = "", data = response.Data });
             }
-             if (!string.IsNullOrEmpty(response.ErrorCode))
-             {
+             
 
-                 return StatusCode(StatusCodes.Status500InternalServerError, response);
-             }
-
-            return BadRequest(response);
+            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = response.Message, errors = "" }); 
             
         }
          [HttpGet("{id}")]
@@ -71,9 +70,9 @@ namespace BSOFT.API.Controllers
           
              if(division == null)
             {
-                return NotFound();
+                return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"Division ID {id} not found.", errors = "" });
             }
-            return Ok(division);
+            return Ok(new { StatusCode=StatusCodes.Status200OK, data = division});
         }
 
         [HttpPut("update/{id}")]
@@ -93,7 +92,7 @@ namespace BSOFT.API.Controllers
 
              if (divisionExists == null)
              {
-                 return NotFound($"Division with ID {id} not found."); 
+                 return NotFound(new { StatusCode=StatusCodes.Status404NotFound, message = $"Division ID {id} not found.", errors = "" }); 
              }
 
              var response = await Mediator.Send(command);
@@ -101,13 +100,10 @@ namespace BSOFT.API.Controllers
              {
                  return Ok(response);
              }
-             if (!string.IsNullOrEmpty(response.ErrorCode))
-             {
-                 return StatusCode(StatusCodes.Status500InternalServerError, response.Message); 
-             }
+            
            
 
-            return BadRequest(response);
+            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = response.Message, errors = "" }); 
         }
 
 
@@ -121,14 +117,21 @@ namespace BSOFT.API.Controllers
             }
            var updatedDivision = await Mediator.Send(deleteDivisionCommand);
 
-            return Ok(updatedDivision);
+           if(updatedDivision.IsSuccess)
+           {
+            return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedDivision.Message, errors = "" });
+              
+           }
+
+            return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedDivision.Message, errors = "" });
+            
         }
          [HttpGet("GetDivision")]
         public async Task<IActionResult> GetDivision([FromQuery] string searchPattern)
         {
            
             var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = searchPattern});
-            return Ok(divisions);
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = divisions });
         }
       
       

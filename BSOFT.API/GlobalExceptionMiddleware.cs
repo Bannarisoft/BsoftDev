@@ -1,5 +1,4 @@
 using System.Net;
-using Core.Application.Common.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -31,19 +30,19 @@ namespace BSOFT.API
         string message;
         string[] errors;
 
-        if (ex is CustomException customEx)
-        {
-            statusCode = customEx.StatusCode;
-            message = customEx.Message;
-            errors = customEx.ErrorMessages;
-        }
-        else if (ex is ValidationException validationEx)
-        {
-            statusCode = StatusCodes.Status400BadRequest;
-            message = validationEx.Message;
-            errors = validationEx.ErrorMessages;
-        }
-        else if (ex is NullReferenceException)
+        // if (ex is CustomException customEx)
+        // {
+        //     statusCode = customEx.StatusCode;
+        //     message = customEx.Message;
+        //     errors = customEx.ErrorMessages;
+        // }
+        // else if (ex is ValidationException validationEx)
+        // {
+        //     statusCode = StatusCodes.Status400BadRequest;
+        //     message = validationEx.Message;
+        //     errors = validationEx.ErrorMessages;
+        // }
+         if (ex is NullReferenceException)
         {
             statusCode = StatusCodes.Status500InternalServerError;
             message = "A null reference occurred.";

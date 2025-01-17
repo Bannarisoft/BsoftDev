@@ -4,6 +4,7 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.Divisions.Commands.UpdateDivision
 {
@@ -18,8 +19,7 @@ namespace Core.Application.Divisions.Commands.UpdateDivision
         }
           public async Task<ApiResponseDTO<bool>> Handle(UpdateDivisionCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
+            
                  var division  = _imapper.Map<Division>(request);
          
                 var divisionresult = await _divisionRepository.UpdateAsync(division);
@@ -28,12 +28,9 @@ namespace Core.Application.Divisions.Commands.UpdateDivision
                 {
                     return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Division updated successfully.", Data = true};
                 }
+
                 return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Division not updated.", Data = false};
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "An error occurred.", ErrorCode = "ERR_UPDATE_DIVISION"};
-            }
+           
            
             
         }

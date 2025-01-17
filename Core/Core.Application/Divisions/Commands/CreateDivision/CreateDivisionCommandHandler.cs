@@ -24,8 +24,7 @@ namespace Core.Application.Divisions.Commands.CreateDivision
 
         public async Task<ApiResponseDTO<int>> Handle(CreateDivisionCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
+           
                  var division  = _imapper.Map<Division>(request);
 
                 var divisionresult = await _divisionRepository.CreateAsync(division);
@@ -35,12 +34,6 @@ namespace Core.Application.Divisions.Commands.CreateDivision
                 }
                
                     return new ApiResponseDTO<int>{IsSuccess = false, Message = "Division not created"};
-                
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponseDTO<int>{IsSuccess = false, Message = "An error occurred.", ErrorCode = "ERR_CREATE_USER"};
-            }
            
         }
     }
