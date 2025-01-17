@@ -9,6 +9,8 @@ using Serilog;
 using BSOFT.API.Middlewares;using MediatR;
 using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
+using BSOFT.API;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,6 +64,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddProblemDetails();
+
 
 var app = builder.Build();
  
@@ -93,13 +97,16 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage(); 
 }
 
 app.UseHttpsRedirection();
-
+app.UseMiddleware<GlobalExceptionMiddleware>();// Register custom middleware
+app.UseRouting(); // Enable routing
 app.UseAuthentication();
 
 app.UseAuthorization();
+
 
 app.MapControllers();
 

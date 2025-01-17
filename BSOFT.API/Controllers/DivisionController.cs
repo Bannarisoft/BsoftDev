@@ -33,20 +33,36 @@ namespace BSOFT.API.Controllers
         {
            var divisions = await Mediator.Send(new GetDivisionQuery());
             var activedivisions = divisions.Where(c => c.IsActive == 1).ToList(); 
-            return Ok(activedivisions);
+           
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = activedivisions});
         }
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateDivisionCommand command)
         {
+            
             var validationResult = await _createDivisionCommandValidator.ValidateAsync(command);
+            
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors);
+                return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
             }
-            var createdDivision = await Mediator.Send(command);
-            return Ok(createdDivision);
+            var response = await Mediator.Send(command);
+            if(response.IsSuccess)
+            {
+                // return CreatedAtAction(nameof(GetByIdAsync), new {  id = response.Data }, response);
+                return Ok(new { StatusCode=StatusCodes.Status201Created, message = response.Message, errors = "", data = response.Data });
+            }
+             
+
+            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = response.Message, errors = "" }); 
+            
         }
          [HttpGet("{id}")]
+         [ActionName(nameof(GetByIdAsync))]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
            
@@ -54,9 +70,9 @@ namespace BSOFT.API.Controllers
           
              if(division == null)
             {
-                return NotFound();
+                return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"Division ID {id} not found.", errors = "" });
             }
-            return Ok(division);
+            return Ok(new { StatusCode=StatusCodes.Status200OK, data = division});
         }
 
         [HttpPut("update/{id}")]
@@ -69,11 +85,25 @@ namespace BSOFT.API.Controllers
             }
             if(id != command.Id)
             {
-                return BadRequest();
+                return BadRequest("The ID in the URL does not match the ID in the command.");
             }
-           var updatedDivision = await Mediator.Send(command);
 
-            return Ok(updatedDivision);
+             var divisionExists = await Mediator.Send(new GetDivisionByIdQuery { Id = id });
+
+             if (divisionExists == null)
+             {
+                 return NotFound(new { StatusCode=StatusCodes.Status404NotFound, message = $"Division ID {id} not found.", errors = "" }); 
+             }
+
+             var response = await Mediator.Send(command);
+             if(response.IsSuccess)
+             {
+                 return Ok(response);
+             }
+            
+           
+
+            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = response.Message, errors = "" }); 
         }
 
 
@@ -87,14 +117,21 @@ namespace BSOFT.API.Controllers
             }
            var updatedDivision = await Mediator.Send(deleteDivisionCommand);
 
-            return Ok(updatedDivision);
+           if(updatedDivision.IsSuccess)
+           {
+            return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedDivision.Message, errors = "" });
+              
+           }
+
+            return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedDivision.Message, errors = "" });
+            
         }
          [HttpGet("GetDivision")]
         public async Task<IActionResult> GetDivision([FromQuery] string searchPattern)
         {
            
             var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = searchPattern});
-            return Ok(divisions);
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = divisions });
         }
       
       

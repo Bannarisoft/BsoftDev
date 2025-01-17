@@ -1,19 +1,13 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using Core.Domain.Common;
+using Microsoft.AspNetCore.Http;
 
-
-namespace Core.Domain.Entities
+namespace Core.Application.Companies.Queries.GetCompanies
 {
-    
-    public class Company : BaseEntity
+    public class UpdateCompanyDTO
     {
-       
         public int Id { get; set; }
         public string CompanyName { get; set; }
         public string LegalName { get; set; }
@@ -23,12 +17,10 @@ namespace Core.Domain.Entities
         public string CSTNo { get; set; }
         public int YearOfEstablishment { get; set; }
         public string Website { get; set; }
-        public string Logo { get; set; }
         public int EntityId { get; set; }
-        public byte IsActive { get; set; }
-        public  CompanyAddress CompanyAddress { get; set; }
-        public  CompanyContact CompanyContact { get; set; }
-
-          
+        public string LogoPath { get; set; }
+        public IFormFile File { get; set; }
+        public CompanyAddressDTO CompanyAddress { get; set; }
+        public CompanyContactDTO CompanyContact { get; set; }
     }
 }

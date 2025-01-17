@@ -7,10 +7,11 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IDivision;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Divisions.Commands.CreateDivision
 {
-    public class CreateDivisionCommandHandler : IRequestHandler<CreateDivisionCommand, int>
+    public class CreateDivisionCommandHandler : IRequestHandler<CreateDivisionCommand, ApiResponseDTO<int>>
     {
          private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
@@ -21,12 +22,19 @@ namespace Core.Application.Divisions.Commands.CreateDivision
             _imapper = imapper;
         }
 
-        public async Task<int> Handle(CreateDivisionCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<int>> Handle(CreateDivisionCommand request, CancellationToken cancellationToken)
         {
-            var division  = _imapper.Map<Division>(request);
+           
+                 var division  = _imapper.Map<Division>(request);
 
-            var divisionresult = await _divisionRepository.CreateAsync(division);
-            return divisionresult.Id;
+                var divisionresult = await _divisionRepository.CreateAsync(division);
+                if (divisionresult > 0)
+                {
+                    return new ApiResponseDTO<int>{IsSuccess = true, Message = "Division created successfully", Data = divisionresult};
+                }
+               
+                    return new ApiResponseDTO<int>{IsSuccess = false, Message = "Division not created"};
+           
         }
     }
 }

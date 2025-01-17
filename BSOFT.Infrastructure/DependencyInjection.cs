@@ -26,10 +26,6 @@ using BSOFT.Infrastructure.Repositories.UserRoles;
 using Core.Application.Common.Interfaces.IUserRole;
 using BSOFT.Infrastructure.Repositories.Companies;
 using Core.Application.Common.Interfaces.ICompany;
-using BSOFT.Infrastructure.Repositories.CompanyAddresses;
-using Core.Application.Common.Interfaces.ICompanyAddress;
-using BSOFT.Infrastructure.Repositories.CompanyContacts;
-using Core.Application.Common.Interfaces.ICompanyContact;
 using BSOFT.Infrastructure.Repositories.Units;
 using Core.Application.Common.Interfaces.IUnit;
 using BSOFT.Infrastructure.Repositories.Entities;
@@ -120,10 +116,6 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IUserRoleQueryRepository, UserRoleQueryRepository>();
             services.AddScoped<ICompanyCommandRepository, CompanyCommandRepository>();
             services.AddScoped<ICompanyQueryRepository, CompanyQueryRepository>();
-            services.AddScoped<ICompanyAddressCommandRepository, CompanyAddressCommandRepository>();
-            services.AddScoped<ICompanyAddressQueryRepository, CompanyAddressQueryRepository>();
-            services.AddScoped<ICompanyContactCommandRepository, CompanyContactCommandRepository>();
-            services.AddScoped<ICompanyContactQueryRepository, CompanyContactQueryRepository>();
             services.AddScoped<IUnitCommandRepository, UnitCommandRepository>();
             services.AddScoped<IUnitQueryRepository, UnitQueryRepository>();
             services.AddScoped<IEntityCommandRepository, EntityCommandRepository>();
@@ -152,7 +144,12 @@ namespace BSOFT.Infrastructure
                 typeof(UserProfile),
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
-                typeof(CompanyProfile)                
+                typeof(ChangePasswordProfile),             
+                typeof(EntityProfile),
+                typeof(UnitProfile),
+                typeof(UpdateUnitProfile),
+                typeof(CreateUnitProfile),
+                typeof(UpdateUnitProfile)
             );
 
             return services;
