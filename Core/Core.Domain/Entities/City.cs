@@ -13,5 +13,6 @@ namespace Core.Domain.Entities
         public string CityCode { get; set; }=string.Empty;
         public int StateId { get; set; }
         public States States { get; set; } 
+        
     }
 }

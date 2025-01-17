@@ -8,6 +8,7 @@ using BSOFT.API.Validation.Common;
 using MediatR;
 using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
+using BSOFT.API;
 
 
 
@@ -79,10 +80,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage(); 
 }
 
 app.UseHttpsRedirection();
-
+app.UseMiddleware<GlobalExceptionMiddleware>();// Register custom middleware
+app.UseRouting(); // Enable routing
 app.UseAuthentication();
 
 app.UseAuthorization();

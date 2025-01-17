@@ -2,8 +2,13 @@
 
 namespace Core.Application.Common.Exceptions;
 
-public class ValidationException : Exception
+public class ValidationException : CustomException
 {
+    public ValidationException(string message, string[] errorMessages)
+        : base(message, errorMessages, HttpStatus.BadRequest)
+    {
+         
+    }
     public ValidationException()
         : base("One or more validation failures have occurred.")
     {

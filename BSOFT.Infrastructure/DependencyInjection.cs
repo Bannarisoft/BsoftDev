@@ -137,7 +137,12 @@ namespace BSOFT.Infrastructure
                 typeof(UserProfile),
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
-                typeof(CompanyProfile)                
+                typeof(ChangePasswordProfile),             
+                typeof(EntityProfile),
+                typeof(UnitProfile),
+                typeof(UpdateUnitProfile),
+                typeof(CreateUnitProfile),
+                typeof(UpdateUnitProfile)
             );
 
             return services;
