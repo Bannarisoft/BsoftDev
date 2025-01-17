@@ -43,6 +43,7 @@ using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationCom
 using Core.Application.Common.Interfaces.AuditLog;
 using Infrastructure.Data;
 using BSOFT.Infrastructure.Logging;
+using Serilog;
 
 namespace BSOFT.Infrastructure
 {
@@ -96,7 +97,13 @@ namespace BSOFT.Infrastructure
         });
 
             // Configure JWT settings
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));            
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));       
+
+        // Register ILogger<T>
+        services.AddLogging(builder =>
+        {
+            builder.AddSerilog();
+        });     
             
             // Register repositories
              services.AddScoped<IUserQueryRepository, UserQueryRepository>();

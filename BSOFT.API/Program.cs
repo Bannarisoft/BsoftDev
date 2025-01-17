@@ -13,14 +13,15 @@ using Core.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Serilog
-// builder.Host.UseSerilog((context, services, configuration) =>
-// {
-//     configuration
-//         .ReadFrom.Configuration(context.Configuration)
-//         .ReadFrom.Services(services)
-//         .Enrich.FromLogContext();
-// });
+// Configure Serilog for logging to MongoDB and console
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console() // Log to console for debugging
+    .WriteTo.MongoDB("mongodb://localhost:27017/Bannari") // MongoDB connection string (adjust as needed)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog(); // Use Serilog for logging in the app
+
 // Add validation services
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
@@ -72,17 +73,20 @@ app.MapPost("/state", async (
 {
     var result = await mediator.Send(request, cancellationToken);
 
-// Use Global Exception Middleware
-app.UseMiddleware<GlobalExceptionMiddleware>();
-
-// Register LoggingMiddleware
-app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>();     if (!result.IsSuccess)
+    
+if (!result.IsSuccess)
     {
         return Results.BadRequest(result.ErrorMessage);
     }
 
     return Results.Created($"/states/{result.Data.Id}", result.Data);
 });
+
+// Use Global Exception Middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
+// Register LoggingMiddleware
+app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
 
 // Configure the HTTP request pipeline. 
 if (app.Environment.IsDevelopment())

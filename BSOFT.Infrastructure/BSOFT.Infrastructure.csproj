@@ -23,9 +23,11 @@
     <PackageReference Include="MongoDB.EntityFrameworkCore" Version="8.2.1" />
     <PackageReference Include="Dapper" Version="2.1.44" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.MongoDB" Version="7.0.0" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

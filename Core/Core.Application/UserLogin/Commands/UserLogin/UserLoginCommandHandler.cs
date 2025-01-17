@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.Extensions.Logging; // This is where the ILogger interface is defined
 using Core.Application.Common.Interfaces.IUser;
 using Core.Domain.Events;
+using Serilog;
 
 namespace Core.Application.UserLogin.Commands.UserLogin
 {
@@ -58,7 +59,7 @@ namespace Core.Application.UserLogin.Commands.UserLogin
             _logger.LogInformation("User {Username} found. Retrieving roles...", request.Username);
              // Get user roles
             // var roles = await _userQueryRepository.GetUserRolesAsync(user.UserId);
-                        // Fetch user roles
+            // Fetch user roles
             var roles = await _userQueryRepository.GetUserRolesAsync(user.UserId);
             if (roles == null || roles.Count == 0)
             {
@@ -84,6 +85,9 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                     module:"User"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
+
+                // Log login event to MongoDB via Serilog
+            Log.Information("User {UserName} logged in successfully at {Time}. Roles: {Roles}, Token: {Token}", user.UserName, DateTime.UtcNow, string.Join(", ", roles), token);
 
             return new LoginResponse
             {
