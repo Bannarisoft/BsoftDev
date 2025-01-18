@@ -1,6 +1,8 @@
+using Core.Application.Common.Mappings;
+
 namespace Core.Application.Units.Queries.GetUnits
 {
-    public class UnitContactsDto
+    public class UnitContactsDto 
     {
     public string Name { get; set; }
     public string Designation { get; set; }

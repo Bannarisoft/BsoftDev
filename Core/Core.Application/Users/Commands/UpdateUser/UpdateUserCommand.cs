@@ -1,3 +1,4 @@
+using Core.Application.Common.HttpResponse;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Users.Commands.UpdateUser
 {
-    public class UpdateUserCommand : IRequest<int>
+    public class UpdateUserCommand : IRequest<ApiResponseDTO<bool>>
     {
     public int UserId { get; set; }
     public string FirstName { get; set; }

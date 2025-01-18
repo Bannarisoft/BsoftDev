@@ -75,11 +75,11 @@ namespace BSOFT.API.Validation.Entity
                         .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
                         .WithMessage($"{nameof(CreateEntityCommand.Email)} {rule.Error}"); 
                         break;
-                    case "AlphabeticOnly":
-                        RuleFor(x => x.EntityName) 
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                        .WithMessage($"{nameof(CreateEntityCommand.EntityName)} {rule.Error}");   
-                        break;
+                    // case "AlphabeticOnly":
+                    //     RuleFor(x => x.EntityName) 
+                    //     .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
+                    //     .WithMessage($"{nameof(CreateEntityCommand.EntityName)} {rule.Error}");   
+                    //     break;
 
                     case "NumericOnly":
                         RuleFor(x => x.Phone) 

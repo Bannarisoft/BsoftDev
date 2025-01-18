@@ -38,7 +38,7 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<Cities> Cities { get; set; }
         public DbSet<PasswordLog> PasswordLogs { get; set; }
         public DbSet<UserRoleAllocation> UserRoleAllocations { get; set; }
-        public DbSet<UserSession> UserSession { get; set; }
+ 
 
 
 
@@ -65,7 +65,7 @@ namespace BSOFT.Infrastructure.Data
 			modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleAllocationConfigurations());
-            modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
+     
 
 
             

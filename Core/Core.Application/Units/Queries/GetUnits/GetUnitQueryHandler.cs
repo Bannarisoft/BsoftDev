@@ -1,21 +1,27 @@
 using AutoMapper;
+using Core.Application.Common;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.Interfaces.IUnit;
+using Core.Domain.Events;
 using MediatR;
 using System.Data;
 
 namespace Core.Application.Units.Queries.GetUnits
 {
-    public class GetUnitQueryHandler : IRequestHandler<GetUnitQuery,List<UnitDto>>
+    public class GetUnitQueryHandler : IRequestHandler<GetUnitQuery,Result<List<UnitDto>>>
     {
         private readonly IUnitQueryRepository _unitRepository;        
         private readonly IMapper _mapper;
-        public GetUnitQueryHandler( IUnitQueryRepository unitRepository, IMapper mapper)
+
+        private readonly IMediator _mediator;
+        public GetUnitQueryHandler( IUnitQueryRepository unitRepository, IMapper mapper, IMediator mediator)
         {
             _unitRepository = unitRepository;
             _mapper = mapper;
+            _mediator = mediator;
         }
 
-        public async Task<List<UnitDto>> Handle(GetUnitQuery request, CancellationToken cancellationToken)
+        public async Task<Result<List<UnitDto>>> Handle(GetUnitQuery request, CancellationToken cancellationToken)
         {
          /*    var query = @"
                 SELECT 
@@ -65,10 +71,31 @@ namespace Core.Application.Units.Queries.GetUnits
             .Select(g => g.First())
             .ToList(); 
             return units; */
-
+            try
+            {
             var units = await _unitRepository.GetAllUnitsAsync();
             var unitList = _mapper.Map<List<UnitDto>>(units);
-            return unitList;
+            //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "GetUnitQuery",
+                    actionCode: "",        
+                    actionName: "",
+                    details: $"Units details was fetched.",
+                    module:"Unit"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
+                return Result<List<UnitDto>>.Success(unitList);
+            } 
+            catch (Exception ex)
+            {
+             // Throw a generic CustomException for unexpected errors
+            throw new CustomException(
+            "An unexpected error occurred while Fetching the Unit.",
+            new[] { ex.Message },
+            CustomException.HttpStatus.InternalServerError
+            );
+            }
+        
         }
     }
 }

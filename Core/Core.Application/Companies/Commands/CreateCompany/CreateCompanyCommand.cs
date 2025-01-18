@@ -14,9 +14,7 @@ namespace Core.Application.Companies.Commands.CreateCompany
     public class CreateCompanyCommand : IRequest<int>
     {
         public CompanyDTO Company { get; set; }
-        public CompanyAddressDTO CompanyAddresses { get; set; } 
-        public CompanyContactDTO CompanyContacts { get; set; } 
-        public IFormFile File { get; set; }
+        
 
     }
 }

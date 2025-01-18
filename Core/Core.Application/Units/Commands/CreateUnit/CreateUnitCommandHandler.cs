@@ -4,28 +4,34 @@ using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces.IUnit;
+using Core.Application.Common;
+using Core.Domain.Events;
 
 namespace Core.Application.Units.Commands.CreateUnit
 {
 
-    public class CreateUnitCommandHandler : IRequestHandler<CreateUnitCommand, int>
+    public class CreateUnitCommandHandler : IRequestHandler<CreateUnitCommand, Result<int>>
     {
         
         private readonly IUnitCommandRepository _iUnitRepository;
         private readonly IMapper _mapper;
 
+         private readonly IMediator _Imediator;
+
         private readonly ILogger<CreateUnitCommandHandler> _logger;
-        public CreateUnitCommandHandler(IUnitCommandRepository iUnitRepository, IMapper mapper, ILogger<CreateUnitCommandHandler> logger)
+        public CreateUnitCommandHandler(IUnitCommandRepository iUnitRepository, IMapper mapper, ILogger<CreateUnitCommandHandler> logger, IMediator Imediator)
         {
             _iUnitRepository = iUnitRepository;
             _mapper = mapper;
             _logger = logger;
+            _Imediator = Imediator;
 
         }
-        public async Task<int> Handle(CreateUnitCommand request, CancellationToken cancellationToken)
+        public async Task<Result<int>> Handle(CreateUnitCommand request, CancellationToken cancellationToken)
         {
         try
         {
+            
         // Map the request to a Unit object
         var unit = _mapper.Map<Core.Domain.Entities.Unit>(request.UnitDto);
 
@@ -51,35 +57,17 @@ namespace Core.Application.Units.Commands.CreateUnit
             await _iUnitRepository.CreateUnitContactsAsync(contact);
         }
 
-        return unitId;
+         //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "Create",
+                actionCode: unit.Id.ToString(),
+                actionName: unit.UnitName,
+                details: $"Entity '{unit.UnitName}' was created. EntityCode: {unit.Id}",
+                module:"Unit"
+            );
+            await _Imediator.Publish(domainEvent, cancellationToken);
+            return Result<int>.Success(unitId);
 
-
-
-        
-
-
-
-
-        // Map the request to a UnitAddress object
-        // var unitAddress = _mapper.Map<UnitAddress>(request.unitDto);
-
-        // // Set the UnitId property of the unitAddress object
-        // unitAddress.UnitId = unitId;
-
-        // // Create the unit address
-        // await _iUnitRepository.CreateUnitAddressAsync(unitAddress);
-
-        // // Map the request to a UnitContacts object
-        // var unitContacts = _mapper.Map<UnitContacts>(request.unitDto);
-
-        // // Set the UnitId property of the unitContacts object
-        // unitContacts.UnitId = unitId;
-
-        // // Create the unit contacts
-        // await _iUnitRepository.CreateUnitContactsAsync(unitContacts);
-
-        // // Return the unit ID
-        // return unitId;
         }
         catch (Exception ex)
         {

@@ -13,9 +13,9 @@ namespace Core.Application.Common.Interfaces.IEntity
     {
       
     
-      Task<Entity> CreateAsync(Entity entity);
+      Task<int> CreateAsync(Entity entity);
       Task<int> UpdateAsync(int Id,Entity entity);
-      Task<int> DeleteAsync(int Id,Entity entity);
+      Task<int> DeleteEntityAsync(int Id,Entity entity);
          
 
 

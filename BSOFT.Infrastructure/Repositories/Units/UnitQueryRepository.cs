@@ -17,10 +17,10 @@ namespace BSOFT.Infrastructure.Repositories.Units
           _dbConnection = dbConnection;
         }
 
-        public async Task<List<Unit>> GetAllUnitsAsync()
+        public async Task<List<UnitDto>> GetAllUnitsAsync()
         {
-              const string query = @"
-            SELECT 
+            var query = @"
+                SELECT 
                     u.Id,
                     u.UnitName,
                     u.ShortName,
@@ -51,13 +51,28 @@ namespace BSOFT.Infrastructure.Repositories.Units
                 INNER JOIN 
                     AppData.UnitAddress  ua ON u.Id = ua.UnitId
                 INNER JOIN 
-                    AppData.UnitContacts uc ON u.Id = uc.UnitId";
-            return (await _dbConnection.QueryAsync<Unit>(query)).ToList();
+                    AppData.UnitContacts uc ON u.Id = uc.UnitId
+            ";
+
+            var result = await _dbConnection.QueryAsync<UnitDto, UnitAddressDto, UnitContactsDto, UnitDto>(
+            query,
+            (unit, address, contact) =>
+            {
+                unit.UnitAddressDto.Add(address);
+                unit.UnitContactsDto.Add(contact);
+                return unit;
+            },
+            splitOn: "AddressId, ContactId");
+            var units = result.GroupBy(u => u.Id)
+            .Select(g => g.First())
+            .ToList(); 
+            return units;
         }
 
-        public async Task<Unit> GetByIdAsync(int id)
+        public async Task<List<UnitDto>> GetByIdAsync(int id)
         {
-               const string query = @"SELECT 
+                var query = @"
+                SELECT 
                     u.Id,
                     u.UnitName,
                     u.ShortName,
@@ -88,16 +103,31 @@ namespace BSOFT.Infrastructure.Repositories.Units
                 INNER JOIN 
                     AppData.UnitAddress  ua ON u.Id = ua.UnitId
                 INNER JOIN 
-                    AppData.UnitContacts uc ON u.Id = uc.UnitId";
-            return await _dbConnection.QueryFirstOrDefaultAsync<Unit>(query, new { id });
+                    AppData.UnitContacts uc ON u.Id = uc.UnitId
+            ";
+
+            var result = await _dbConnection.QueryAsync<UnitDto, UnitAddressDto, UnitContactsDto, UnitDto>(
+            query,
+            (unit, address, contact) =>
+            {
+            unit.UnitAddressDto.Add(address);
+            unit.UnitContactsDto.Add(contact);
+            return unit;
+            },
+            splitOn: "AddressId, ContactId");
+            var units = result.Where(u => u.Id == id)
+            .GroupBy(u => u.Id)
+            .Select(g => g.First())
+            .ToList();
+            return units; 
         }
 
 
          public async Task<List<UnitDto>> GetUnit(string searchPattern = null)
         {
-                 if (string.IsNullOrWhiteSpace(searchPattern))
+            if (string.IsNullOrWhiteSpace(searchPattern))
             {
-                throw new ArgumentException("DivisionName cannot be null or empty.", nameof(searchPattern));
+                throw new ArgumentException("Unitname cannot be null or empty.", nameof(searchPattern));
             }
 
             const string query = @"

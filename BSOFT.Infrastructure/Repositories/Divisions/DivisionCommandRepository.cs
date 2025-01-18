@@ -14,15 +14,15 @@ namespace BSOFT.Infrastructure.Repositories.Divisions
         {
             _applicationDbContext = applicationDbContext;
         }       
-         public async Task<Division> CreateAsync(Division division)
+         public async Task<int> CreateAsync(Division division)
         {
             await _applicationDbContext.Divisions.AddAsync(division);
             await _applicationDbContext.SaveChangesAsync();
-            return division;
+            return division.Id;
         }
-        public async Task<int> UpdateAsync(int id, Division division)
+        public async Task<bool> UpdateAsync(Division division)
         {
-            var existingDivision = await _applicationDbContext.Divisions.FirstOrDefaultAsync(u => u.Id == id);
+            var existingDivision = await _applicationDbContext.Divisions.FirstOrDefaultAsync(u => u.Id == division.Id);
             if (existingDivision != null)
             {
                 existingDivision.ShortName = division.ShortName;
@@ -31,19 +31,19 @@ namespace BSOFT.Infrastructure.Repositories.Divisions
                 existingDivision.IsActive = division.IsActive;
 
                 _applicationDbContext.Divisions.Update(existingDivision);
-                return await _applicationDbContext.SaveChangesAsync();
+                return await _applicationDbContext.SaveChangesAsync() > 0;
             }
-            return 0; // No user found
+            return false;
         }
-         public async Task<int> DeleteAsync(int id,Division division)
+         public async Task<bool> DeleteAsync(int id,Division division)
         {
             var existingDivision = await _applicationDbContext.Divisions.FirstOrDefaultAsync(u => u.Id == id);
             if (existingDivision != null)
             {
                 existingDivision.IsActive = division.IsActive;
-                return await _applicationDbContext.SaveChangesAsync();
+                return await _applicationDbContext.SaveChangesAsync() >0;
             }
-            return 0; // No user found
+            return false; 
         }        
     }
 }

@@ -10,7 +10,7 @@ namespace Core.Application.Companies.Queries.GetCompanies
 {
     public class CompanyAddressDTO 
     {
-        public int CompanyId { get; set; }
+        // public int CompanyId { get; set; }
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         public string PinCode { get; set; }
@@ -20,9 +20,6 @@ namespace Core.Application.Companies.Queries.GetCompanies
         public string Phone { get; set; }
         public string AlternatePhone { get; set; }
 
-        // public void Mapping(Profile profile)
-        //  {
-        //      profile.CreateMap<CompanyAddressDTO, CompanyAddress>();
-        //  }
+        
     }
 }

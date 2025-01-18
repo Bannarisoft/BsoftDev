@@ -1,3 +1,4 @@
+using Core.Application.Common.HttpResponse;
 using Core.Application.Users.Queries.GetUsers;
 using MediatR;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Users.Commands.CreateUser
 {
-    public class CreateUserCommand : IRequest<UserDto>
+    public class CreateUserCommand : IRequest<ApiResponseDTO<UserDto>>
     {
     public string FirstName { get; set; }
     public string LastName { get; set; }

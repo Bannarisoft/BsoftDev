@@ -9,8 +9,8 @@ namespace Core.Application.Common.Interfaces.ICompany
 {
     public interface ICompanyCommandRepository
     {
-        Task<Company> CreateAsync(Company company);
-        Task<int> UpdateAsync(int id,Company company);
+        Task<int> CreateAsync(Company company);
+        Task<bool> UpdateAsync(int id,Company company);
         Task<int> DeleteAsync(int id,Company company);      
     }
 }
