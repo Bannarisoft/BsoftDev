@@ -8,10 +8,11 @@ using MediatR;
 using System.Text;
 using Core.Application.Divisions.Queries.GetDivisions;
 using Core.Application.Common.Interfaces.IDivision;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Divisions.Queries.GetDivisionById
 {
-    public class GetDivisionByIdQueryHandler : IRequestHandler<GetDivisionByIdQuery,DivisionDTO>
+    public class GetDivisionByIdQueryHandler : IRequestHandler<GetDivisionByIdQuery,ApiResponseDTO<DivisionDTO>>
     {
          private readonly IDivisionQueryRepository _divisionRepository;        
         private readonly IMapper _mapper;
@@ -21,18 +22,12 @@ namespace Core.Application.Divisions.Queries.GetDivisionById
             _divisionRepository = divisionRepository;
             _mapper =mapper;
         } 
-        public async Task<DivisionDTO> Handle(GetDivisionByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<DivisionDTO>> Handle(GetDivisionByIdQuery request, CancellationToken cancellationToken)
         {
-            /* var query = "SELECT * FROM AppData.Division WHERE Id = @Id";
-        var divisionresult = await _dbConnection.QuerySingleOrDefaultAsync<DivisionDTO>(query, new { Id = request.Id });
-
-         if (divisionresult == null)
-        {
-            return null;
-        }
-          return _mapper.Map<DivisionDTO>(divisionresult); */
+            
         var result = await _divisionRepository.GetByIdAsync(request.Id);
-          return _mapper.Map<DivisionDTO>(result);
+        var division = _mapper.Map<DivisionDTO>(result);
+          return new ApiResponseDTO<DivisionDTO> { IsSuccess = true, Message = "Success", Data = division };
 
         }
     }

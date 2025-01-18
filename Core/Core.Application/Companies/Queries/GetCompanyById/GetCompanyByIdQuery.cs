@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using MediatR;
 using System.Text;
 using Core.Application.Companies.Queries.GetCompanies;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Companies.Queries.GetCompanyById
 {
-    public class GetCompanyByIdQuery : IRequest<GetCompanyDTO>
+    public class GetCompanyByIdQuery : IRequest<ApiResponseDTO<GetCompanyDTO>>
     {
         public int CompanyId { get; set; }
     }

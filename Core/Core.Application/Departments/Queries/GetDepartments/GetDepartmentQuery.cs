@@ -1,3 +1,4 @@
+using Core.Application.Common.HttpResponse;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Departments.Queries.GetDepartments
 {
-    public class GetDepartmentQuery : IRequest<List<DepartmentDto>>
+    public class GetDepartmentQuery : IRequest<ApiResponseDTO<List<DepartmentDto>>>
     {
         
     }

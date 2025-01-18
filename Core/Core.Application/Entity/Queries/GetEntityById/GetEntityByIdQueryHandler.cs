@@ -7,10 +7,11 @@ using AutoMapper;
 using Core.Application.Common;
 using Core.Domain.Events;
 using Core.Application.Common.Exceptions;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Entity.Queries.GetEntityById
 {
-    public class GetEntityByIdQueryHandler : IRequestHandler<GetEntityByIdQuery, Result<List<EntityDto>>>
+    public class GetEntityByIdQueryHandler : IRequestHandler<GetEntityByIdQuery, ApiResponseDTO<List<EntityDto>>>
     {
         private readonly IEntityQueryRepository _entityRepository;        
         private readonly IMapper _mapper;
@@ -23,13 +24,17 @@ namespace Core.Application.Entity.Queries.GetEntityById
            _mediator = mediator;
     }
 
-    public async Task<Result<List<EntityDto>>>  Handle(GetEntityByIdQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDTO<List<EntityDto>>>  Handle(GetEntityByIdQuery request, CancellationToken cancellationToken)
     {
  
                 var entitylist = await _entityRepository.GetByIdAsync(request.EntityId);
                 if (entitylist == null || !entitylist.Any())
                 {
-                return Result<List<EntityDto>>.Failure("Entity not found.");
+                     return new ApiResponseDTO<List<EntityDto>>
+                     {
+                         IsSuccess = false,
+                         Message = "Entity not found"
+                     };
                 }
                 var entityDto = _mapper.Map<List<EntityDto>>(entitylist);
                 //Domain Event
@@ -41,7 +46,12 @@ namespace Core.Application.Entity.Queries.GetEntityById
                     module:"Entity"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return Result<List<EntityDto>>.Success(entityDto);
+                return new ApiResponseDTO<List<EntityDto>>
+                {
+                    IsSuccess = true,
+                    Message = "Entity Fetched Successfully",
+                    Data = entityDto
+                };
       
  
      }

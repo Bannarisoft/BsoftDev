@@ -6,10 +6,11 @@ using AutoMapper;
 using Core.Application.Common.Exceptions;
 using Core.Application.Common;
 using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Entity.Queries.GetEntityAutoComplete
 {
-    public class GetEntityAutocompleteQueryHandler : IRequestHandler<GetEntityAutocompleteQuery, Result<List<EntityDto>>>
+    public class GetEntityAutocompleteQueryHandler : IRequestHandler<GetEntityAutocompleteQuery, ApiResponseDTO<List<EntityDto>>>
     {
         private readonly IEntityQueryRepository _entityRepository;        
         private readonly IMapper _mapper;
@@ -22,14 +23,18 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
          _mediator = mediator;
     }
 
-    public async Task<Result<List<EntityDto>>> Handle(GetEntityAutocompleteQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDTO<List<EntityDto>>> Handle(GetEntityAutocompleteQuery request, CancellationToken cancellationToken)
     {
 
               
                 var entities = await _entityRepository.GetByEntityNameAsync(request.SearchPattern);
                 if (entities == null || !entities.Any())
                 {
-                return Result<List<EntityDto>>.Failure("Entity not found.");
+                     return new ApiResponseDTO<List<EntityDto>>
+                     {
+                         IsSuccess = false,
+                         Message = "No entity found"
+                     };
                 }
                 var entityDto = _mapper.Map<List<EntityDto>>(entities);
                 //Domain Event
@@ -41,7 +46,12 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
                     module:"Entity"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return Result<List<EntityDto>>.Success(entityDto);
+                return new ApiResponseDTO<List<EntityDto>>
+                {
+                    IsSuccess = true,
+                    Message = "Success",
+                    Data = entityDto
+                };
            
             }        
 

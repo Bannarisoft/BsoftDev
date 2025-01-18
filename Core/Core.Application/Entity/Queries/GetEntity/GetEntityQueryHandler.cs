@@ -2,6 +2,7 @@ using System.ComponentModel;
 using AutoMapper;
 using Core.Application.Common;
 using Core.Application.Common.Exceptions;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IEntity;
 using Core.Domain.Events;
 using MediatR;
@@ -9,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Entity.Queries.GetEntity
 {
-    public class GetEntityQueryHandler : IRequestHandler<GetEntityQuery, Result<List<EntityDto>>>
+    public class GetEntityQueryHandler : IRequestHandler<GetEntityQuery, ApiResponseDTO<List<EntityDto>>>
     {
          private readonly IEntityQueryRepository _entityRepository;        
         private readonly IMapper _mapper;
@@ -21,11 +22,10 @@ namespace Core.Application.Entity.Queries.GetEntity
             _mapper =mapper;
             _mediator = mediator;
         }
-        public async Task<Result<List<EntityDto>>> Handle(GetEntityQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<EntityDto>>> Handle(GetEntityQuery request, CancellationToken cancellationToken)
         {
           
-                try
-                {
+               
                 var newentity = await _entityRepository.GetAllEntityAsync();
                 var entitylist = _mapper.Map<List<EntityDto>>(newentity);
                 
@@ -38,17 +38,13 @@ namespace Core.Application.Entity.Queries.GetEntity
                     module:"Entity"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return Result<List<EntityDto>>.Success(entitylist);
-                }
-                catch (Exception ex)    
-                {
-                     // Throw a generic CustomException for unexpected errors
-                    throw new CustomException(
-                    "An unexpected error occurred while Fetching the Entity.",
-                    new[] { ex.Message },
-                    CustomException.HttpStatus.InternalServerError
-                    );
-                }
+                return new ApiResponseDTO<List<EntityDto>>
+                { 
+                    IsSuccess = true, 
+                    Message = "Success", 
+                    Data = entitylist 
+                 };
+                
        
 
         }

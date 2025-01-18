@@ -1,6 +1,7 @@
 using AutoMapper;
 using Core.Application.Common;
 using Core.Application.Common.Exceptions;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IEntity;
 using Core.Domain.Events;
@@ -9,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Entity.Commands.DeleteEntity
 {
-    public class DeleteEntityCommandHandler  : IRequestHandler<DeleteEntityCommand,  Result<int>>
+    public class DeleteEntityCommandHandler  : IRequestHandler<DeleteEntityCommand,  ApiResponseDTO<int>>
     {
         private readonly IEntityCommandRepository _ientityRepository;
         private readonly IMapper _Imapper;
@@ -25,23 +26,17 @@ namespace Core.Application.Entity.Commands.DeleteEntity
             _mediator = mediator;
             
         }
-        public async Task<Result<int>> Handle(DeleteEntityCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<int>> Handle(DeleteEntityCommand request, CancellationToken cancellationToken)
         {       
-        try
-        {
-        // Map the command to the Entity
+       
+        
         var entity = _Imapper.Map<Core.Domain.Entities.Entity>(request);
 
-        // Call repository to delete the entity
         var result = await _ientityRepository.DeleteEntityAsync(request.EntityId, entity);
 
-        if (result == -1) // Entity not found
+        if (result == -1) 
         {
-            throw new CustomException(
-                "Entity not found",
-                new[] { $"The entity with ID {request.EntityId} does not exist." },
-                CustomException.HttpStatus.NotFound
-            );
+            return new ApiResponseDTO<int> { IsSuccess = false, Message = "Entity not found."};
         }
         //Domain Event
         var domainEvent = new AuditLogsDomainEvent(
@@ -53,18 +48,13 @@ namespace Core.Application.Entity.Commands.DeleteEntity
         );            
         await _mediator.Publish(domainEvent, cancellationToken);
 
-         return Result<int>.Success(result); // Return the number of affected rows (e.g., 1 for success)
-    }
-        catch (CustomException ex)
-        {
-        _Ilogger.LogWarning(ex, $"CustomException: {ex.Message}");
-        throw; // Re-throw custom exceptions
-        }
-        catch (Exception ex)
-        {
-        _Ilogger.LogError(ex, "Unexpected error occurred while deleting the entity.");
-        throw new Exception("An unexpected error occurred while deleting the entity.", ex);
-        }
+         return new ApiResponseDTO<int>
+         {
+             IsSuccess = true,
+             Message = "Success",
+             Data = result
+         };
+   
 }
          
    }

@@ -66,19 +66,15 @@ namespace BSOFT.Infrastructure.Repositories.Companies
             }
             return false; 
         }
-         public async Task<int> DeleteAsync(int id,Company company)
+         public async Task<bool> DeleteAsync(int id,Company company)
         {
-            Console.WriteLine("Hello Handler");
-            Console.WriteLine(id);
-            Console.WriteLine(company.IsActive);
             var companyToDelete = await _applicationDbContext.Companies.FirstOrDefaultAsync(u => u.Id == id);
             if (companyToDelete != null)
             {
                 companyToDelete.IsActive = company.IsActive;
-                return await _applicationDbContext.SaveChangesAsync();
+                return await _applicationDbContext.SaveChangesAsync() >0;
             }
-            Console.WriteLine(companyToDelete.Id);
-            return 0; // No user found
+            return false; 
         }     
     }
 }

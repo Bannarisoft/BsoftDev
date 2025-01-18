@@ -10,10 +10,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Core.Application.Departments.Queries.GetDepartments;
 using Core.Application.Common.Interfaces.IDepartment;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Departments.Commands.UpdateDepartment
 {
-    public class UpdateDepartmentCommandHandler  : IRequestHandler<UpdateDepartmentCommand ,DepartmentDto>
+    public class UpdateDepartmentCommandHandler  : IRequestHandler<UpdateDepartmentCommand ,ApiResponseDTO<DepartmentDto>>
     {
         public readonly IDepartmentCommandRepository _IDepartmentRepository;
        private readonly IMapper _Imapper;
@@ -27,15 +28,15 @@ namespace Core.Application.Departments.Commands.UpdateDepartment
         }
 
     
-       public async Task<DepartmentDto> Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
+       public async Task<ApiResponseDTO<DepartmentDto>> Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
        {
 
      
             var department = _Imapper.Map<Department>(request);
-            await _IDepartmentRepository.UpdateAsync(request.Id, department);
-            var departmentDto = _Imapper.Map<DepartmentDto>(department);
+            var result = await _IDepartmentRepository.UpdateAsync(request.Id, department);
+            var departmentDto = _Imapper.Map<DepartmentDto>(result);
           
-            return departmentDto;
+            return new ApiResponseDTO<DepartmentDto> { IsSuccess = true, Message = "Department updated successfully", Data = departmentDto };
 
        }
 

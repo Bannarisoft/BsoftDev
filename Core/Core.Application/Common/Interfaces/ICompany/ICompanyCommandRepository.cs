@@ -11,6 +11,6 @@ namespace Core.Application.Common.Interfaces.ICompany
     {
         Task<int> CreateAsync(Company company);
         Task<bool> UpdateAsync(int id,Company company);
-        Task<int> DeleteAsync(int id,Company company);      
+        Task<bool> DeleteAsync(int id,Company company);      
     }
 }

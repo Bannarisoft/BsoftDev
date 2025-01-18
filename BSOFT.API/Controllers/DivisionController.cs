@@ -32,7 +32,7 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetAllDivisionsAsync()
         {
            var divisions = await Mediator.Send(new GetDivisionQuery());
-            var activedivisions = divisions.Where(c => c.IsActive == 1).ToList(); 
+            var activedivisions = divisions.Data.Where(c => c.IsActive == 1).ToList(); 
            
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = activedivisions});
         }
@@ -72,33 +72,30 @@ namespace BSOFT.API.Controllers
             {
                 return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"Division ID {id} not found.", errors = "" });
             }
-            return Ok(new { StatusCode=StatusCodes.Status200OK, data = division});
+            return Ok(new { StatusCode=StatusCodes.Status200OK, data = division.Data});
         }
 
-        [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update(int id, UpdateDivisionCommand command )
+        [HttpPut("update")]
+        public async Task<IActionResult> Update( UpdateDivisionCommand command )
         {
             var validationResult = await _updateDivisionCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
                 return BadRequest(validationResult.Errors);
             }
-            if(id != command.Id)
-            {
-                return BadRequest("The ID in the URL does not match the ID in the command.");
-            }
+          
 
-             var divisionExists = await Mediator.Send(new GetDivisionByIdQuery { Id = id });
+             var divisionExists = await Mediator.Send(new GetDivisionByIdQuery { Id = command.Id });
 
              if (divisionExists == null)
              {
-                 return NotFound(new { StatusCode=StatusCodes.Status404NotFound, message = $"Division ID {id} not found.", errors = "" }); 
+                 return NotFound(new { StatusCode=StatusCodes.Status404NotFound, message = $"Division ID {command.Id} not found.", errors = "" }); 
              }
 
              var response = await Mediator.Send(command);
              if(response.IsSuccess)
              {
-                 return Ok(response);
+                 return Ok(new { StatusCode=StatusCodes.Status200OK, message = response.Message, errors = "" });
              }
             
            
@@ -107,14 +104,11 @@ namespace BSOFT.API.Controllers
         }
 
 
-        [HttpPut("delete/{id}")]
+        [HttpPut("delete")]
         
-        public async Task<IActionResult> Delete(int id,DeleteDivisionCommand deleteDivisionCommand)
+        public async Task<IActionResult> Delete(DeleteDivisionCommand deleteDivisionCommand)
         {
-             if(id != deleteDivisionCommand.Id)
-            {
-                return BadRequest();
-            }
+           
            var updatedDivision = await Mediator.Send(deleteDivisionCommand);
 
            if(updatedDivision.IsSuccess)
@@ -131,7 +125,7 @@ namespace BSOFT.API.Controllers
         {
            
             var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = searchPattern});
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = divisions });
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = divisions.Data });
         }
       
       

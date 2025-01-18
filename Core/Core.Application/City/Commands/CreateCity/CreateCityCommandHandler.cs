@@ -6,10 +6,11 @@ using Core.Application.City.Queries.GetCities;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.City.Commands.CreateCity
 {    
-    public class CreateCityCommandHandler : IRequestHandler<CreateCityCommand, Result<CityDto>>
+    public class CreateCityCommandHandler : IRequestHandler<CreateCityCommand, ApiResponseDTO<CityDto>>
     {
         private readonly IMapper _mapper;
         private readonly ICityCommandRepository _cityRepository;
@@ -23,22 +24,28 @@ namespace Core.Application.City.Commands.CreateCity
             _mediator = mediator;    
         }
 
-        public async Task<Result<CityDto>> Handle(CreateCityCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<CityDto>> Handle(CreateCityCommand request, CancellationToken cancellationToken)
         {
             var stateExists = await _cityRepository.StateExistsAsync(request.StateId);
             if (!stateExists)
             {
-                return Result<CityDto>.Failure("Invalid StateId. The specified state does not exist or is inactive.");
+                 return new ApiResponseDTO<CityDto>{
+                    IsSuccess = false, 
+                    Message = "Invalid StateId. The specified state does not exist or is inactive."
+                    };
+               
             }
             var cityExists = await _cityRepository.GetCityByCodeAsync(request.CityCode, request.StateId);
             if (cityExists)
             {
-            return Result<CityDto>.Failure("CityCode already exists in the specified state.");
+            return new ApiResponseDTO<CityDto>{
+                IsSuccess = false, 
+                Message = "CityCode already exists in the specified state."
+                };
             }
             // Map the CreateCityCommand to the City entity
             var cityEntity = _mapper.Map<Cities>(request);
-            try
-            {  
+            
                 var result = await _cityRepository.CreateAsync(cityEntity);
                 
                  //Domain Event
@@ -52,12 +59,19 @@ namespace Core.Application.City.Commands.CreateCity
                 await _mediator.Publish(domainEvent, cancellationToken);
                 
                 var cityDto = _mapper.Map<CityDto>(result);
-                return Result<CityDto>.Success(cityDto);
-            }
-            catch (Exception ex)
-            {
-                return Result<CityDto>.Failure($"An error occurred while creating the City: {ex.Message}");
-            }
+                if (cityDto.Id > 0)
+                {
+                    return new ApiResponseDTO<CityDto>{
+                        IsSuccess = true, 
+                        Message = "City created successfully.",
+                        Data = cityDto
+                    };
+                }
+                return  new ApiResponseDTO<CityDto>{
+                    IsSuccess = false, 
+                    Message = "City not created."
+                    };
+           
         }
     }
 }

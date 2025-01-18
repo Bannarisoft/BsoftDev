@@ -32,7 +32,12 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetAllCitiesAsync()
         {  
             var cities = await Mediator.Send(new GetCityQuery());            
-            return Ok(cities);
+            return Ok(new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                message = cities.Message,
+                data = cities.Data 
+            });
         }
 
         [HttpGet("{cityId}")]
@@ -40,14 +45,26 @@ namespace BSOFT.API.Controllers
         {
              if (cityId <= 0)
             {
-                return BadRequest("Invalid City ID");
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest,
+                    message = "Invalid City ID" 
+                });
             }
             var result = await Mediator.Send(new GetCityByIdQuery { Id = cityId });            
-            if (!result.IsSuccess)
+            if (result == null )
             {                
-                return NotFound(new { Message = result.ErrorMessage });
+                return NotFound(new 
+                { 
+                    StatusCode=StatusCodes.Status404NotFound,
+                    message = "City not found", 
+                });
             }
-            return Ok(result.Data);   
+            return Ok(new 
+            {
+                StatusCode=StatusCodes.Status200OK,
+                data = result
+            });   
         }
 
     [HttpPost]
@@ -56,55 +73,94 @@ namespace BSOFT.API.Controllers
         var validationResult = await _createCityCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
-            return BadRequest(validationResult.Errors);
+            return BadRequest(new
+             {
+                 StatusCode=StatusCodes.Status400BadRequest,
+                 message = "Validation failed", 
+                 errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+             });
         }        
         var result = await Mediator.Send(command);
         if (result.IsSuccess)
         {
-            return Ok(new { Message = "City created successfully", City = result.Data });
+            return Ok(new 
+            { 
+                StatusCode=StatusCodes.Status201Created,
+                message = result.Message, 
+                data = result.Data.Id 
+            });
         }
-        else
-        {
-            return BadRequest(result.ErrorMessage);
-        }        
+       
+            return BadRequest(new 
+            { 
+                StatusCode=StatusCodes.Status400BadRequest,
+                message = result.Message
+
+            });
+               
     }
-    [HttpPut("{cityId}")]
-    public async Task<IActionResult> UpdateAsync(int cityId, UpdateCityCommand command)
+    [HttpPut("update")]
+    public async Task<IActionResult> UpdateAsync(UpdateCityCommand command)
     {         
         var validationResult = await _updateCityCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
-            return BadRequest(validationResult.Errors);
+            return BadRequest(
+                new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                }
+            );
         }
         if (command.StateId<=0)
         {
-            return BadRequest("Invalid StateID");
+            return BadRequest(
+                new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Invalid StateID"
+                }
+            );
         } 
         var result = await Mediator.Send(command);
         if (result.IsSuccess)
         {
-            return Ok(new { Message = "City Updated successfully", City = result.Data });
+            return Ok(new 
+            {   StatusCode=StatusCodes.Status200OK,
+                message = result.Message, 
+                City = result.Data
+            });
         }
-        else
-        {        
-            return BadRequest(result.ErrorMessage);
-        }       
+               
+            return BadRequest( new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = result.Message
+            });
+             
     }
-    [HttpDelete("{cityId}")]
-    public async Task<IActionResult> DeleteAsync(int cityId,DeleteCityCommand command)
+    [HttpDelete("delete")]
+    public async Task<IActionResult> DeleteAsync(DeleteCityCommand command)
     {
-        if(cityId != command.Id)
-        {
-           return BadRequest("CityID Mismatch"); 
-        }
+        
         var result = await Mediator.Send(command);
         if (result.IsSuccess)
         {
-            return Ok(new { Message = "City Deleted successfully", City = result.Data });
+            return Ok(new 
+            { 
+                StatusCode=StatusCodes.Status200OK,
+                message = result.Message
+            });
         }
         else
         {        
-            return BadRequest(result.ErrorMessage);
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = result.Message
+            });
         }       
     }
 
@@ -112,9 +168,14 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetCity([FromQuery] string searchPattern)
         {           
             var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
-            if (!result.IsSuccess)
+            if (result.IsSuccess)
             {
-                return NotFound(new { Message = result.ErrorMessage });
+                return Ok(new 
+                {
+                    StatusCode=StatusCodes.Status200OK,
+                    message = result.Message,
+                    data = result.Data
+                });
             }
             return Ok(result.Data);
         }
