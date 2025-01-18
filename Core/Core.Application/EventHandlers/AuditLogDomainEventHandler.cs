@@ -30,7 +30,7 @@ namespace Core.Application.EventHandlers
                 Details = notification.Details,             
                 MachineName = Environment.MachineName,
                 OS = _ipAddressService.GetUserOS(),
-                IPAddress = _ipAddressService.GetUserIPAddress(),
+                IPAddress = _ipAddressService.GetSystemIPAddress(),
                 Browser = _ipAddressService.GetUserAgent(),
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy =userId,

@@ -1,47 +1,93 @@
-using Core.Application.Common.Interfaces;
-using Core.Domain.Entities;
 using MediatR;
 using AutoMapper;
-using System.Threading;
-using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IUser;
+using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
+using Microsoft.Extensions.Logging;
+
 
 namespace Core.Application.Users.Commands.UpdateUser
 {
-    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, int>
+    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, ApiResponseDTO<bool>>
     {
         private readonly IUserCommandRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator; 
+        private readonly ILogger<UpdateUserCommandHandler> _logger;
 
-        public UpdateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper)
+
+        public UpdateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator,ILogger<UpdateUserCommandHandler> logger)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _mediator = mediator;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            
         }
 
-        public async Task<int> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<bool>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            // Fetch the existing user
-            var existingUser = await _userRepository.GetByIdAsync(request.UserId);
+             _logger.LogInformation("Starting user update process for UserId: {UserId}", request.UserId);
 
+             // Fetch the existing user
+            var existingUser = await _userRepository.GetByIdAsync(request.UserId);
             if (existingUser == null)
             {
-                throw new KeyNotFoundException("User not found.");
+                _logger.LogWarning("User with UserId: {UserId} not found.", request.UserId);
+                return new ApiResponseDTO<bool>
+                {
+                    IsSuccess = false,
+                    Message = "User not found.",
+                    Data = false
+                };
             }
 
-             _mapper.Map(request, existingUser);
+            var OldUserName = existingUser.UserName;
+            existingUser.UserName = request.UserName;
+            _logger.LogInformation("Updating user details for UserId: {UserId}. Old UserName: {OldUserName}, New UserName: {NewUserName}", 
+                request.UserId, OldUserName, existingUser.UserName);
 
+             _mapper.Map(request, existingUser);
+            
             // Hash the password if it's provided in the request
             if (!string.IsNullOrWhiteSpace(request.PasswordHash))
             {
                 existingUser.SetPassword(request.PasswordHash); // Ensure SetPassword handles hashing
             }
+            //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Update",
+                    actionCode: existingUser.UserName,
+                    actionName: existingUser.FirstName + " " + existingUser.LastName,
+                    details: $"User '{OldUserName}' was updated to '{existingUser.UserName}'.  FirstName: {existingUser.FirstName}",
+                    module:"User"
+                );            
+                await _mediator.Publish(domainEvent, cancellationToken);
+
+
 
             // Update the user in the repository
-            await _userRepository.UpdateAsync(request.UserId,existingUser);
+            var RowsUpdated = await _userRepository.UpdateAsync(request.UserId, existingUser);
+            bool isUpdated = RowsUpdated > 0; 
 
-            // Return the updated user's ID
-            return existingUser.UserId;
+            if (isUpdated)
+            {
+                _logger.LogInformation("User with UserId: {UserId} updated successfully.", request.UserId);
+                return new ApiResponseDTO<bool>
+                {
+                    IsSuccess = true,
+                    Message = "User updated successfully.",
+                    Data = true
+                };
+            }
+
+            _logger.LogWarning("Failed to update user with UserId: {UserId}.", request.UserId);
+            return new ApiResponseDTO<bool>
+            {
+                IsSuccess = false,
+                Message = "User update failed.",
+                Data = false
+            };
 
          }
     }

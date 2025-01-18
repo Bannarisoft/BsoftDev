@@ -9,7 +9,7 @@ namespace Core.Domain.Entities
     public class CompanyAddress
     {
         public int Id { get; set; }
-        public int CompanyId { get; set; }
+        
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         public string PinCode { get; set; }
@@ -18,6 +18,8 @@ namespace Core.Domain.Entities
         public int CityId { get; set; }
         public string Phone { get; set; }
         public string AlternatePhone { get; set; }
+
+        public int CompanyId { get; set; }
         public Company Company { get; set; }
     }
 }

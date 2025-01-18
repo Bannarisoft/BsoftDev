@@ -10,18 +10,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IDepartment;
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
 
 namespace Core.Application.Departments.Commands.CreateDepartment
 {
-    public class CreateDepartmentCommandHandler :IRequestHandler<CreateDepartmentCommand, Result<DepartmentDto>>
+
+    public class CreateDepartmentCommandHandler :IRequestHandler<CreateDepartmentCommand, ApiResponseDTO<DepartmentDto>>
     {
         private readonly IDepartmentCommandRepository _departmentRepository;
         private readonly IMapper _mapper;
           private readonly IMediator _mediator; 
            
-    
-         public CreateDepartmentCommandHandler(IDepartmentCommandRepository departmentRepository,IMapper mapper, IMediator mediator)
+    public CreateDepartmentCommandHandler(IDepartmentCommandRepository departmentRepository,IMapper mapper, IMediator mediator)
         {
              _departmentRepository=departmentRepository;
             _mapper=mapper;
@@ -29,27 +30,24 @@ namespace Core.Application.Departments.Commands.CreateDepartment
 
         }
 
-     
+        
 
-       public async Task<Result<DepartmentDto>>Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
+
+
+       public async Task<ApiResponseDTO<DepartmentDto>> Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
         {
 
-       
-           var departmentEntity = _mapper.Map<Department>(request);
-
-             var result = await _departmentRepository.CreateAsync(departmentEntity);
-            //Domain Event
-            var domainEvent = new AuditLogsDomainEvent(
-                actionDetail: "Create",
-                actionCode: result.Id.ToString(),
-                actionName: result.DeptName,
-                details: $"Country '{result.DeptName}' was created. CountryCode: {result.Id}",
-                module:"Country"
-            );
-            await _mediator.Publish(domainEvent, cancellationToken);
+              var departmentEntity = _mapper.Map<Department>(request);
+            var createdDepartment = await _departmentRepository.CreateAsync(departmentEntity);
             
-            var DeptDto = _mapper.Map<DepartmentDto>(result);
-            return Result<DepartmentDto>.Success(DeptDto);
+
+            if (createdDepartment == null)
+            {
+                return new ApiResponseDTO<DepartmentDto> { IsSuccess = false, Message = "Department not created" };
+            }
+           var departmentDto = _mapper.Map<DepartmentDto>(createdDepartment);
+            
+            return new ApiResponseDTO<DepartmentDto> { IsSuccess = true, Message = "Department created successfully", Data = departmentDto };
         }
     }  
 }

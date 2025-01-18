@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using MediatR;
 using System.Reflection;
 using System.Text;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Divisions.Commands.DeleteDivision
 {
-    public class DeleteDivisionCommand : IRequest<int>
+    public class DeleteDivisionCommand : IRequest<ApiResponseDTO<bool>>
     {
         public int Id { get; set; }
         public byte IsActive { get; set; }

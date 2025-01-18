@@ -1,10 +1,12 @@
+using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Entity.Queries.GetEntity;
 using MediatR;
 
 
 namespace Core.Application.Entity.Queries.GetEntityById
 {
-    public class GetEntityByIdQuery : IRequest<EntityDto>
+    public class GetEntityByIdQuery :IRequest<ApiResponseDTO<List<EntityDto>>>
     {
         public int EntityId { get; set; }
     }

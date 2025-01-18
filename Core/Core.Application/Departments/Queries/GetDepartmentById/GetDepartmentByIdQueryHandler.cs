@@ -12,14 +12,17 @@ using System.Data;
 using Core.Domain.Events;
 using Core.Application.Common.Interfaces.IDepartment;
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Departments.Queries.GetDepartmentById
 {
-    public class GetDepartmentByIdQueryHandler :IRequestHandler<GetDepartmentByIdQuery, Result<DepartmentDto>>
+
+    public class GetDepartmentByIdQueryHandler :IRequestHandler<GetDepartmentByIdQuery,ApiResponseDTO<DepartmentDto>>
     {
           private readonly IDepartmentQueryRepository _departmentRepository;        
         private readonly IMapper _mapper;
          private readonly IMediator _mediator;
+
 
         public GetDepartmentByIdQueryHandler(IDepartmentQueryRepository departmentRepository,IMapper mapper , IMediator mediator)
          {
@@ -27,17 +30,13 @@ namespace Core.Application.Departments.Queries.GetDepartmentById
             _mapper =mapper;
             _mediator = mediator;
         } 
-      public async Task<Result<DepartmentDto>> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
+
+      public async Task<ApiResponseDTO<DepartmentDto>> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
         {
+
                  var department = await _departmentRepository.GetByIdAsync(request.DepartmentId);
-                if (department == null)
-                {
-                    return Result<DepartmentDto>.Failure($"Country with ID {request.DepartmentId} not found.");
-                }
-                
-                var deptDto = _mapper.Map<DepartmentDto>(department);
-                  
-                //Domain Event
+              var deptDto = _mapper.Map<DepartmentDto>(department);
+ //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetById",
                     actionCode: deptDto.Id.ToString(),        
@@ -47,7 +46,9 @@ namespace Core.Application.Departments.Queries.GetDepartmentById
                 );
 
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return Result<DepartmentDto>.Success(deptDto);
+            return new ApiResponseDTO<DepartmentDto> { IsSuccess = true, Message = "Success", Data = deptDto };
+
+               
 
            
         }

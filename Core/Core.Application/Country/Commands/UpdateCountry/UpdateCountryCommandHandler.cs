@@ -5,11 +5,12 @@ using AutoMapper;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
 
 
 namespace Core.Application.Country.Commands.UpdateCountry
 {    
-    public class UpdateCountryCommandHandler : IRequestHandler<UpdateCountryCommand,Result<CountryDto>>    
+    public class UpdateCountryCommandHandler : IRequestHandler<UpdateCountryCommand,ApiResponseDTO<CountryDto>>    
     {
         private readonly ICountryCommandRepository _countryRepository;
         private readonly IMapper _mapper;
@@ -23,26 +24,37 @@ namespace Core.Application.Country.Commands.UpdateCountry
             _countryQueryRepository = countryQueryRepository;
             _mediator = mediator;
         }       
-        public async Task<Result<CountryDto>> Handle(UpdateCountryCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<CountryDto>> Handle(UpdateCountryCommand request, CancellationToken cancellationToken)
         {
             var country = await _countryQueryRepository.GetByIdAsync(request.Id);
             if (country == null)
-                return Result<CountryDto>.Failure("Country not found.");
+                return new ApiResponseDTO<CountryDto>
+                {
+                    IsSuccess = false,
+                    Message = "Country not found"
+                };
 
             var oldCountryName = country.CountryName;
             country.CountryName = request.CountryName;
             if (country == null || country.IsActive != 1)
             {
-                return Result<CountryDto>.Failure("Invalid CountryID. The specified Country does not exist or is inactive.");
+                return new ApiResponseDTO<CountryDto>
+                {
+                    IsSuccess = false,
+                    Message = "Invalid CountryID. The specified Country does not exist or is inactive."
+                };
             }           
             var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryCode);
             if (countryExists)
             {
-                return Result<CountryDto>.Failure("CountryCode already exists");
+                return new ApiResponseDTO<CountryDto>
+                {
+                    IsSuccess = false,
+                    Message = "CountryCode already exists"
+                };
             }
             var updatedCountryEntity = _mapper.Map<Countries>(request);
-            try
-            {
+            
                 var updateResult = await _countryRepository.UpdateAsync(request.Id, updatedCountryEntity);            
                 var updatedCountry = await _countryQueryRepository.GetByIdAsync(request.Id);
                 
@@ -58,17 +70,22 @@ namespace Core.Application.Country.Commands.UpdateCountry
                         module:"State"
                     );            
                     await _mediator.Publish(domainEvent, cancellationToken);
-                    return Result<CountryDto>.Success(countryDto);
+                    return new ApiResponseDTO<CountryDto>
+                    {
+                        IsSuccess = true,
+                        Message = "Country updated successfully",
+                        Data = countryDto
+                    };
                 }
                 else
                 {
-                    return Result<CountryDto>.Failure("Country update failed.");
+                    return new ApiResponseDTO<CountryDto>
+                    {
+                        IsSuccess = false,
+                        Message = "Country update failed"
+                    };
                 }
-            }
-            catch (Exception ex)
-            {
-                return Result<CountryDto>.Failure($"An error occurred while updating the Country: {ex.Message}");
-            }          
+                   
       }
     }
 }

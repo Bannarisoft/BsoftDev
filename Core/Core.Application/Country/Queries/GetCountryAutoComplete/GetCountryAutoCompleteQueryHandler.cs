@@ -4,10 +4,11 @@ using MediatR;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Country.Queries.GetCountryAutoComplete
 {
-    public class GetCountryAutoCompleteQueryHandler : IRequestHandler<GetCountryAutoCompleteQuery, Result<List<CountryDto>>>
+    public class GetCountryAutoCompleteQueryHandler : IRequestHandler<GetCountryAutoCompleteQuery, ApiResponseDTO<List<CountryDto>>>
     {
         private readonly ICountryQueryRepository _countryRepository;
         private readonly IMapper _mapper;
@@ -20,14 +21,17 @@ namespace Core.Application.Country.Queries.GetCountryAutoComplete
             _mediator = mediator;
         }
 
-        public async Task<Result<List<CountryDto>>> Handle(GetCountryAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<CountryDto>>> Handle(GetCountryAutoCompleteQuery request, CancellationToken cancellationToken)
         {   
-            try
-            {         
+                   
                 var result = await _countryRepository.GetByCountryNameAsync(request.SearchPattern);
                 if (!result.IsSuccess || result.Data == null || !result.Data.Any())
                 {
-                    return Result<List<CountryDto>>.Failure("No countries found matching the search pattern.");
+                    return new ApiResponseDTO<List<CountryDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "No countries found matching the search pattern."
+                    };
                 }
                 var countryDto = _mapper.Map<List<CountryDto>>(result.Data);
                 //Domain Event
@@ -39,12 +43,13 @@ namespace Core.Application.Country.Queries.GetCountryAutoComplete
                     module:"Country"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return Result<List<CountryDto>>.Success(countryDto);
-            }
-            catch (Exception ex)
-            {
-                return Result<List<CountryDto>>.Failure($"An error occurred while fetching the Country: {ex.Message}");
-            }            
+                return new ApiResponseDTO<List<CountryDto>>
+                {
+                    IsSuccess = true,
+                    Message = "Countries found successfully.",
+                    Data = countryDto
+                };
+                        
         }
     }
   

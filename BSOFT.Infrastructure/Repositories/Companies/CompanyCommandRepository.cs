@@ -22,21 +22,19 @@ namespace BSOFT.Infrastructure.Repositories.Companies
         }
 
       
-         public async Task<Company> CreateAsync(Company company)
+         public async Task<int> CreateAsync(Company company)
         {
             var entry =_applicationDbContext.Entry(company);
-            Console.WriteLine(entry.State);
             await _applicationDbContext.Companies.AddAsync(company);
             await _applicationDbContext.SaveChangesAsync();
-            return company;
+            return company.Id;
         }      
-           public async Task<int> UpdateAsync(int id, Company company)
+           public async Task<bool> UpdateAsync(int id, Company company)
         {
-            Console.WriteLine("Hello Handler");
-            Console.WriteLine(id);
-            var existingCompany = await _applicationDbContext.Companies.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
-            
-          
+            var existingCompany = await _applicationDbContext.Companies
+            .Include(c => c.CompanyAddress)
+            .Include(c => c.CompanyContact)
+            .AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
             
             if (existingCompany != null)
             {
@@ -51,24 +49,32 @@ namespace BSOFT.Infrastructure.Repositories.Companies
                 existingCompany.Logo = company.Logo;
                 existingCompany.EntityId = company.EntityId;
                 existingCompany.IsActive = company.IsActive;
+                existingCompany.CompanyAddress.AddressLine1 = company.CompanyAddress.AddressLine1;
+                existingCompany.CompanyAddress.AddressLine2 = company.CompanyAddress.AddressLine2;
+                existingCompany.CompanyAddress.PinCode = company.CompanyAddress.PinCode;
+                existingCompany.CompanyAddress.AlternatePhone = company.CompanyAddress.AlternatePhone;
+                existingCompany.CompanyAddress.Phone = company.CompanyAddress.Phone;
+                existingCompany.CompanyAddress.CityId = company.CompanyAddress.CityId;
+                existingCompany.CompanyAddress.StateId = company.CompanyAddress.StateId;
+                existingCompany.CompanyContact.Designation = company.CompanyContact.Designation;
+                existingCompany.CompanyContact.Email = company.CompanyContact.Email;
+                existingCompany.CompanyContact.Name = company.CompanyContact.Name;
+                existingCompany.CompanyContact.Phone = company.CompanyContact.Phone;
+                existingCompany.CompanyContact.Remarks = company.CompanyContact.Remarks;
                 _applicationDbContext.Companies.Update(existingCompany);
-                return await _applicationDbContext.SaveChangesAsync();
+                return await _applicationDbContext.SaveChangesAsync() >0;
             }
-            return 0; // No user found
+            return false; 
         }
-         public async Task<int> DeleteAsync(int id,Company company)
+         public async Task<bool> DeleteAsync(int id,Company company)
         {
-            Console.WriteLine("Hello Handler");
-            Console.WriteLine(id);
-            Console.WriteLine(company.IsActive);
             var companyToDelete = await _applicationDbContext.Companies.FirstOrDefaultAsync(u => u.Id == id);
             if (companyToDelete != null)
             {
                 companyToDelete.IsActive = company.IsActive;
-                return await _applicationDbContext.SaveChangesAsync();
+                return await _applicationDbContext.SaveChangesAsync() >0;
             }
-            Console.WriteLine(companyToDelete.Id);
-            return 0; // No user found
+            return false; 
         }     
     }
 }

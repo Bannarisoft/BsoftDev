@@ -1,31 +1,59 @@
 using AutoMapper;
+using Core.Application.Common;
+using Core.Application.Common.Exceptions;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IEntity;
 using Core.Application.Entity.Queries.GetEntity;
+using Core.Domain.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Entity.Commands.UpdateEntity
 {
-    public class UpdateEntityCommandHandler : IRequestHandler<UpdateEntityCommand, EntityDto>
+    public class UpdateEntityCommandHandler : IRequestHandler<UpdateEntityCommand, ApiResponseDTO<int>>
     {
        private readonly IEntityCommandRepository _Ientityrepository;
         private readonly IMapper _Imapper;
-        private readonly ILogger<UpdateEntityCommandHandler> _logger;
-       public UpdateEntityCommandHandler(IEntityCommandRepository Ientityrepository,IMapper Imapper, ILogger<UpdateEntityCommandHandler> Ilogger)
+        private readonly ILogger<UpdateEntityCommandHandler> _ilogger;
+        private readonly IMediator _mediator; 
+       public UpdateEntityCommandHandler(IEntityCommandRepository Ientityrepository,IMapper Imapper, ILogger<UpdateEntityCommandHandler> Ilogger,IMediator mediator)
         {
             _Ientityrepository = Ientityrepository;
             _Imapper = Imapper;
-            _logger = Ilogger;
+            _ilogger = Ilogger;
+            _mediator = mediator;
+             
         }
 
-       public async Task<EntityDto> Handle(UpdateEntityCommand request, CancellationToken cancellationToken)
-        {
+       public async Task<ApiResponseDTO<int>> Handle(UpdateEntityCommand request, CancellationToken cancellationToken)
+        { 
+         
             var entity = _Imapper.Map<Core.Domain.Entities.Entity>(request);
-            await _Ientityrepository.UpdateAsync (request.EntityId, entity);
-            var entityDto = _Imapper.Map<EntityDto>(entity);
-            return entityDto;
+            var result = await _Ientityrepository.UpdateAsync (request.EntityId, entity);
 
+            if (result == -1) // Entity not found
+            {
+                return new ApiResponseDTO<int> { IsSuccess = false, Message = "Entity not found." };
+            }
+
+              //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+            actionDetail: "Update",
+            actionCode: entity.Id.ToString(),
+            actionName: entity.EntityName,                            
+            details:$"Entity '{entity.EntityName}' was Updated. EntityCode: {request.EntityId}",
+            module:"Entity"
+            );            
+            await _mediator.Publish(domainEvent, cancellationToken);
+            return new ApiResponseDTO<int>
+            {
+                IsSuccess = true,
+                Message = "Success",
+                Data = result
+            };
+        
+        
         }
-    }
+     }
 }

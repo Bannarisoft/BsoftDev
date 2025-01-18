@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IRoleEntitlement;
+using Core.Domain.Events;
 
 namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
 {
@@ -14,11 +15,15 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
     {
      private readonly IRoleEntitlementCommandRepository _repository;
      private readonly IMapper _mapper;
+     private readonly IMediator _mediator; 
 
-    public UpdateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper)
+
+    public UpdateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper, IMediator mediator)
     {
         _repository = repository;
         _mapper = mapper;
+        _mediator = mediator;    
+
     }
 
     public async Task<bool> Handle(UpdateRoleEntitlementCommand request, CancellationToken cancellationToken)
@@ -47,6 +52,15 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
 
         // Update or replace existing entitlements
         await _repository.UpdateRoleEntitlementsAsync(role.Id, updatedEntitlements, cancellationToken);
+                //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Create",
+                    actionCode: role.RoleName,
+                    actionName: role.RoleName,
+                    details: $"RoleEntitlement '{role.RoleName}' was updated. RoleName: {role.RoleName}",
+                    module:"RoleEntitlement"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
 
         return true;
     }

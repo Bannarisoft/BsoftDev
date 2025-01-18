@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.City.Queries.GetCityById
 {
-    public class GetCityByIdQueryHandler : IRequestHandler<GetCityByIdQuery, Result<CityDto>>
+    public class GetCityByIdQueryHandler : IRequestHandler<GetCityByIdQuery, CityDto>
     {
     private readonly ICityQueryRepository _cityRepository;
         private readonly IMapper _mapper;
@@ -23,15 +23,11 @@ namespace Core.Application.City.Queries.GetCityById
             _mediator = mediator;
         }
 
-        public async Task<Result<CityDto>> Handle(GetCityByIdQuery request, CancellationToken cancellationToken)
+        public async Task<CityDto> Handle(GetCityByIdQuery request, CancellationToken cancellationToken)
         {   
-            try
-            {      
+                 
                 var city = await _cityRepository.GetByIdAsync(request.Id);
-                if (city == null)
-                {
-                    return Result<CityDto>.Failure($"City with ID {request.Id} not found.");
-                }
+                
                 
                 var cityDto = _mapper.Map<CityDto>(city);
                  //Domain Event
@@ -44,12 +40,8 @@ namespace Core.Application.City.Queries.GetCityById
                 );
 
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return Result<CityDto>.Success(cityDto);
-            }
-            catch (Exception ex)
-            {                
-                return Result<CityDto>.Failure($"An error occurred while fetching the City: {ex.Message}");
-            }
+                return cityDto;
+           
         }
     }
 }

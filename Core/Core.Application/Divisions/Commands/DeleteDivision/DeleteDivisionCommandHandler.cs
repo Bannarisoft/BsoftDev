@@ -7,10 +7,11 @@ using Core.Domain.Entities;
 using MediatR;
 using AutoMapper;
 using Core.Application.Common.Interfaces.IDivision;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Divisions.Commands.DeleteDivision
 {
-    public class DeleteDivisionCommandHandler : IRequestHandler<DeleteDivisionCommand, int>
+    public class DeleteDivisionCommandHandler : IRequestHandler<DeleteDivisionCommand, ApiResponseDTO<bool>>
     {
         private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
@@ -19,12 +20,17 @@ namespace Core.Application.Divisions.Commands.DeleteDivision
             _divisionRepository = divisionRepository;
             _imapper = imapper;
         }
-         public async Task<int> Handle(DeleteDivisionCommand request, CancellationToken cancellationToken)
+         public async Task<ApiResponseDTO<bool>> Handle(DeleteDivisionCommand request, CancellationToken cancellationToken)
         {
             var division  = _imapper.Map<Division>(request);
             var divisionresult = await _divisionRepository.DeleteAsync(request.Id, division);
           
-            return divisionresult;
+                 if(divisionresult)
+                {
+                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Division updated successfully.", Data = true};
+                }
+
+                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Division not updated.", Data = false};
         }
     }
 }

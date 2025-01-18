@@ -40,6 +40,8 @@ using Core.Application.Users.Commands.UpdateFirstTimeUserPassword;
 using Core.Application.Users.Commands.ChangeUserPassword;
 using Core.Application.PwdComplexityRule.Commands.CreatePasswordComplexityRule;
 using BSOFT.API.Validation.PasswordComplexityrule;
+using Core.Application.UserLogin.Commands.UserLogin;
+using BSOFT.API.Validation.UserLogin;
 using Microsoft.Extensions.DependencyInjection;
 using Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityRule;
 using Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySettings;
@@ -78,7 +80,9 @@ namespace BSOFT.API.Validation.Common
         services.AddScoped<IValidator<UpdateRoleCommand>, UpdateRoleCommandValidator>();
         services.AddScoped<IValidator<FirstTimeUserPasswordCommand>,PasswordChangeCommandValidator>();
         services.AddScoped<IValidator<ChangeUserPasswordCommand>,ExistingUserPasswordChangeCommandValidator>();
+
  		services.AddScoped<IValidator<CreatePasswordComplexityRuleCommand>, CreatePasswordComplexityRuleCommandValidator>();
+        services.AddScoped<IValidator<UserLoginCommand>,UserLoginCommandValidator>();
         services.AddScoped<IValidator<UpdatePasswordComplexityRuleCommand>, UpdatePasswordComplexityRuleCommandValidator>();
         services.AddScoped<IValidator<CreateAdminSecuritySettingsCommand>, CreateAdminSecuritySettingsCommandValidator>(); 
         services.AddScoped<IValidator<UpdateAdminSecuritySettingsCommand> ,UpdateAdminSecuritySettingsCommandValidator>();  

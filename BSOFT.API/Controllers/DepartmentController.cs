@@ -34,7 +34,12 @@ namespace BSOFT.API.Controllers
        public async Task<IActionResult> GetAllDepartmentAsync()
         {          
             var departments =await Mediator.Send(new GetDepartmentQuery());
-            return Ok(departments);
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = departments.Data
+            });
         }
 
         [HttpGet("{id}")]
@@ -43,9 +48,19 @@ namespace BSOFT.API.Controllers
             var  department = await Mediator.Send(new GetDepartmentByIdQuery() {DepartmentId=id});
             if(department ==null)
             {
-                BadRequest("ID in the URL does not match the command Department.");               
+
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "Department Not Found"
+                });               
             }
-            return Ok(department);
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = department.Data
+            });
 
         }
         [HttpPost]
@@ -54,43 +69,123 @@ namespace BSOFT.API.Controllers
         {
 
             var validationResult = await _createDepartmentCommandValidator.ValidateAsync(command);
-        if (!validationResult.IsValid)
-        {
-        return BadRequest(validationResult.Errors);
-        }
-        var createdepartment = await Mediator.Send(command);
-        return Ok("Created Successfully");         
+
+              if (!validationResult.IsValid)
+              {
+              return BadRequest(new
+              {
+                  StatusCode = StatusCodes.Status400BadRequest,
+                  message = "Validation failed",
+                  errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+              });
+              }
+              var createdepartment = await Mediator.Send(command);
+              if(createdepartment.IsSuccess)
+              {
+                  return Ok(new
+                  {
+                      StatusCode = StatusCodes.Status201Created,
+                      message = createdepartment.Message,
+                      data = createdepartment.Data
+                  });
+              }
+              return BadRequest(new
+              {
+                  StatusCode = StatusCodes.Status400BadRequest,
+                  message = createdepartment.Message
+              });
+               
         }
 
 
-      [HttpPut("update/{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, UpdateDepartmentCommand command)
+
+
+      [HttpPut("update")]
+    public async Task<IActionResult> UpdateAsync( UpdateDepartmentCommand command)
     {
+         var department = await Mediator.Send(new  GetDepartmentByIdQuery() {DepartmentId=command.Id});
+            if (department == null)
+            {
+                return NotFound(new 
+                { 
+                    StatusCode=StatusCodes.Status404NotFound,
+                    Message = "Department not found" 
+                });
+            }
+
          var validationResult = await _updateDepartmentCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
-        return BadRequest(validationResult.Errors);
+
+             return BadRequest(new
+             {
+                 StatusCode = StatusCodes.Status400BadRequest,
+                 message = "Validation failed",
+                 errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+             });
         }
-        if (id != command.Id)
-        {
-            return BadRequest("Department Id Mismatch");
-        }
+
+       
 
         var UpdateDepartment = await Mediator.Send(command);
-        return Ok("Updated Successfully");
+        if(UpdateDepartment.IsSuccess)
+        {
+
+            return Ok(new
+            {
+                message = UpdateDepartment.Message,
+                statusCode = StatusCodes.Status200OK,
+                data = UpdateDepartment.Data
+            });
+        }
+        return BadRequest(new
+        {
+            message = UpdateDepartment.Message,
+            statusCode = StatusCodes.Status400BadRequest
+        });
+
+
     }
 
-    [HttpPut("delete/{id}")]        
-        public async Task<IActionResult> Delete(int id,DeleteDepartmentCommand deleteDepartmentCommand)
-        {
-             if(id != deleteDepartmentCommand.Id)
-            {
-                return BadRequest();
-            }
-            await Mediator.Send(deleteDepartmentCommand);
+        
+    [HttpPut("delete")]
+        
 
-            return NoContent();
+        public async Task<IActionResult> Delete(DeleteDepartmentCommand deleteDepartmentCommand)
+        {
+
+            var department = await Mediator.Send(new  GetDepartmentByIdQuery() {DepartmentId=deleteDepartmentCommand.Id});
+            if (department == null)
+            {
+
+                return NotFound(new 
+                { 
+                    StatusCode=StatusCodes.Status404NotFound,
+                    Message = "Department not found" 
+                });
+            }
+
+           
+          var result =  await Mediator.Send(deleteDepartmentCommand);
+
+
+            if(result.IsSuccess)
+            {
+                return Ok(new
+                {
+                    message = result.Message,
+                    statusCode = StatusCodes.Status200OK,
+                    data = result.Data
+                });
+            }
+            return BadRequest(new
+            {
+                message = result.Message,
+                statusCode = StatusCodes.Status400BadRequest
+            });
+          
         }
+
 
 
          [HttpGet("autocomplete")]
@@ -98,12 +193,19 @@ namespace BSOFT.API.Controllers
         {
             var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = searchDept };
             var result = await Mediator.Send(query);
-            return Ok(result);
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = result.Data
+            });
         }
 
    
 
 
     }
+    
+
    
 }

@@ -5,30 +5,35 @@ using System.Data;
 using Core.Domain.Events;
 using Core.Application.Common.Interfaces.IDepartment;
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 
 
 namespace Core.Application.Departments.Queries.GetDepartments
 {
-    public class GetDepartmentQueryHandler :IRequestHandler<GetDepartmentQuery,Result<List<DepartmentDto>>>
+
+    public class GetDepartmentQueryHandler :IRequestHandler<GetDepartmentQuery,ApiResponseDTO<List<DepartmentDto>>>
     {
         private readonly IDepartmentQueryRepository _departmentRepository;
         private readonly IMapper _mapper; 
          private readonly IMediator _mediator; 
 
+
      public GetDepartmentQueryHandler(IDepartmentQueryRepository divisionRepository,IMapper mapper , IMediator mediator)
         {
             _mapper =mapper;
+
             _departmentRepository = divisionRepository; 
               _mediator = mediator;                
         }
 
-        public async Task<Result<List<DepartmentDto>>> Handle(GetDepartmentQuery request ,CancellationToken cancellationToken )
+
+        public async Task<ApiResponseDTO<List<DepartmentDto>>> Handle(GetDepartmentQuery request ,CancellationToken cancellationToken )
         {
 
+           
             var department = await _departmentRepository.GetAllDepartmentAsync();
              var departmentList = _mapper.Map<List<DepartmentDto>>(department);
-              
-                var domainEvent = new AuditLogsDomainEvent(
+  var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetAll",
                     actionCode: "",        
                     actionName: "",
@@ -37,10 +42,8 @@ namespace Core.Application.Departments.Queries.GetDepartments
                 );
 
                   await _mediator.Publish(domainEvent, cancellationToken);
-                return Result<List<DepartmentDto>>.Success(departmentList);
-
-
-          
+              
+                return new ApiResponseDTO<List<DepartmentDto>> { IsSuccess = true, Message = "Success", Data = departmentList };  
            
         }
 

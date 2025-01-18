@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.City.Queries.GetCities;
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Entities;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.City.Commands.DeleteCity
 {
-    public class DeleteCityCommandHandler : IRequestHandler<DeleteCityCommand, Result<CityDto>>
+    public class DeleteCityCommandHandler : IRequestHandler<DeleteCityCommand, ApiResponseDTO<CityDto>>
     {
         private readonly ICityCommandRepository _cityRepository;
         private readonly IMapper _mapper;
@@ -25,13 +26,17 @@ namespace Core.Application.City.Commands.DeleteCity
             _mediator = mediator;
         }
 
-        public async Task<Result<CityDto>> Handle(DeleteCityCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<CityDto>> Handle(DeleteCityCommand request, CancellationToken cancellationToken)
         {
             // Fetch the city to be deleted
             var city = await _cityQueryRepository.GetByIdAsync(request.Id);
             if (city == null || city.IsActive != 1)
             {
-                return Result<CityDto>.Failure("Invalid CityID. The specified City does not exist or is inactive.");
+                return new ApiResponseDTO<CityDto>
+                {
+                    IsSuccess = false,
+                    Message = "Invalid CityID. The specified City does not exist or is inactive."
+                };
             }
 
             // Mark the city as inactive (soft delete)
@@ -43,8 +48,7 @@ namespace Core.Application.City.Commands.DeleteCity
                 StateId = city.StateId,
                 IsActive = 0
             };
-            try
-            {
+           
                 var updateResult = await _cityRepository.DeleteAsync(request.Id, cityUpdate);
                 if (updateResult > 0)
                 {
@@ -58,15 +62,21 @@ namespace Core.Application.City.Commands.DeleteCity
                         module:"City"
                     );               
                     await _mediator.Publish(domainEvent, cancellationToken);                 
-                    return Result<CityDto>.Success(cityDto);
+                    return new ApiResponseDTO<CityDto>
+                    {
+                        IsSuccess = true,
+                        Message = "City deleted successfully.",
+                        Data = cityDto
+                    };
                 }
 
-                return Result<CityDto>.Failure("City deletion failed.");
-            }
-            catch (Exception ex)
-            {
-                return Result<CityDto>.Failure($"An error occurred while deleting the City: {ex.Message}");
-            }
+                return new ApiResponseDTO<CityDto>
+                {
+                    IsSuccess = false,
+                    Message = "City deletion failed."
+                    
+                };
+           
         }
     }
 }

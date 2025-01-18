@@ -1,4 +1,5 @@
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Departments.Queries.GetDepartments;
 using MediatR;
 using System;
@@ -10,7 +11,8 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Departments.Commands.UpdateDepartment
 {
-    public class UpdateDepartmentCommand :  IRequest<Result<int>> 
+
+    public class UpdateDepartmentCommand : IRequest<ApiResponseDTO<DepartmentDto>>
     {
         public int Id { get; set; }       
         public string ShortName { get; set; }

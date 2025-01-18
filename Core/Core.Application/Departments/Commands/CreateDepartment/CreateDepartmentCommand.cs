@@ -1,4 +1,5 @@
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Departments.Queries.GetDepartments;
 using MediatR;
 using System;
@@ -8,7 +9,8 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Departments.Commands.CreateDepartment
 {
-    public class CreateDepartmentCommand : IRequest<Result<DepartmentDto>>
+
+    public class CreateDepartmentCommand : IRequest<ApiResponseDTO<DepartmentDto>>
     {
     //    public int DeptId { get; set; }
         public string ShortName { get; set; }
