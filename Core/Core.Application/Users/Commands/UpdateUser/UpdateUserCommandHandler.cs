@@ -3,6 +3,7 @@ using AutoMapper;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using Microsoft.Extensions.Logging;
 
 
 namespace Core.Application.Users.Commands.UpdateUser
@@ -12,22 +13,27 @@ namespace Core.Application.Users.Commands.UpdateUser
         private readonly IUserCommandRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
+        private readonly ILogger<UpdateUserCommandHandler> _logger;
 
 
-        public UpdateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator)
+        public UpdateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator,ILogger<UpdateUserCommandHandler> logger)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _mediator = mediator;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
+             _logger.LogInformation("Starting user update process for UserId: {UserId}", request.UserId);
+
              // Fetch the existing user
             var existingUser = await _userRepository.GetByIdAsync(request.UserId);
             if (existingUser == null)
             {
+                _logger.LogWarning("User with UserId: {UserId} not found.", request.UserId);
                 return new ApiResponseDTO<bool>
                 {
                     IsSuccess = false,
@@ -38,8 +44,16 @@ namespace Core.Application.Users.Commands.UpdateUser
 
             var OldUserName = existingUser.UserName;
             existingUser.UserName = request.UserName;
+            _logger.LogInformation("Updating user details for UserId: {UserId}. Old UserName: {OldUserName}, New UserName: {NewUserName}", 
+                request.UserId, OldUserName, existingUser.UserName);
 
              _mapper.Map(request, existingUser);
+            
+            // Hash the password if it's provided in the request
+            if (!string.IsNullOrWhiteSpace(request.PasswordHash))
+            {
+                existingUser.SetPassword(request.PasswordHash); // Ensure SetPassword handles hashing
+            }
             //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
@@ -50,11 +64,7 @@ namespace Core.Application.Users.Commands.UpdateUser
                 );            
                 await _mediator.Publish(domainEvent, cancellationToken);
 
-            // Hash the password if it's provided in the request
-            if (!string.IsNullOrWhiteSpace(request.PasswordHash))
-            {
-                existingUser.SetPassword(request.PasswordHash); // Ensure SetPassword handles hashing
-            }
+
 
             // Update the user in the repository
             var RowsUpdated = await _userRepository.UpdateAsync(request.UserId, existingUser);
@@ -62,6 +72,7 @@ namespace Core.Application.Users.Commands.UpdateUser
 
             if (isUpdated)
             {
+                _logger.LogInformation("User with UserId: {UserId} updated successfully.", request.UserId);
                 return new ApiResponseDTO<bool>
                 {
                     IsSuccess = true,
@@ -70,6 +81,7 @@ namespace Core.Application.Users.Commands.UpdateUser
                 };
             }
 
+            _logger.LogWarning("Failed to update user with UserId: {UserId}.", request.UserId);
             return new ApiResponseDTO<bool>
             {
                 IsSuccess = false,
