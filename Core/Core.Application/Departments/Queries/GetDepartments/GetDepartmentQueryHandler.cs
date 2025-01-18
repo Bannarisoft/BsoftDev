@@ -2,30 +2,45 @@ using AutoMapper;
 using Core.Application.Common.Interfaces;
 using MediatR;
 using System.Data;
+using Core.Domain.Events;
 using Core.Application.Common.Interfaces.IDepartment;
+using Core.Application.Common;
 
 
 namespace Core.Application.Departments.Queries.GetDepartments
 {
-    public class GetDepartmentQueryHandler :IRequestHandler<GetDepartmentQuery,List<DepartmentDto>>
+    public class GetDepartmentQueryHandler :IRequestHandler<GetDepartmentQuery,Result<List<DepartmentDto>>>
     {
         private readonly IDepartmentQueryRepository _departmentRepository;
         private readonly IMapper _mapper; 
+         private readonly IMediator _mediator; 
 
-     public GetDepartmentQueryHandler(IDepartmentQueryRepository divisionRepository,IMapper mapper)
+     public GetDepartmentQueryHandler(IDepartmentQueryRepository divisionRepository,IMapper mapper , IMediator mediator)
         {
             _mapper =mapper;
-            _departmentRepository = divisionRepository;                
+            _departmentRepository = divisionRepository; 
+              _mediator = mediator;                
         }
 
-        public async Task<List<DepartmentDto>> Handle(GetDepartmentQuery request ,CancellationToken cancellationToken )
+        public async Task<Result<List<DepartmentDto>>> Handle(GetDepartmentQuery request ,CancellationToken cancellationToken )
         {
-           /*  const string query = @"SELECT  * FROM AppData.Department";
-            var department = await _dbConnection.QueryAsync<DepartmentDto>(query);
-           return department.AsList(); */
-              var result = await _departmentRepository.GetAllDepartmentAsync();
-                //return _mapper.Map<List<DivisionDTO>>(result);
-                return _mapper.Map<List<DepartmentDto>>(result);  
+
+            var department = await _departmentRepository.GetAllDepartmentAsync();
+             var departmentList = _mapper.Map<List<DepartmentDto>>(department);
+              
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "GetAll",
+                    actionCode: "",        
+                    actionName: "",
+                    details: $"Department details was fetched.",
+                    module:"Department"
+                );
+
+                  await _mediator.Publish(domainEvent, cancellationToken);
+                return Result<List<DepartmentDto>>.Success(departmentList);
+
+
+          
            
         }
 

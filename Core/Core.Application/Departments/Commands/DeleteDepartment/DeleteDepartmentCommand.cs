@@ -6,11 +6,12 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Application.Departments.Queries.GetDepartments;
+using Core.Application.Common;
 
 
 namespace Core.Application.Departments.Commands.DeleteDepartment
 {
-    public class DeleteDepartmentCommand :IRequest<int>
+    public class DeleteDepartmentCommand :IRequest <Result<int>>
     {
         public int Id { get; set; }
 

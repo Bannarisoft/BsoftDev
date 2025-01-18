@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings;
 using Core.Application.Common;
 using MediatR;
 
-namespace Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySettings
+namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySettings
 {
-    public class CreateAdminSecuritySettingsCommand : IRequest<Result<Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings.AdminSecuritySettingsDto>>
-    {  public int Id { get; set; }
+    public class UpdateAdminSecuritySettingsCommand :  IRequest<Result<int>> 
+    {
+         public int Id { get; set; }
     public int PasswordHistoryCount { get; set; }
     public int SessionTimeoutMinutes { get; set; }
     public int MaxFailedLoginAttempts { get; set; }
@@ -21,6 +21,5 @@ namespace Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySet
     public byte IsForcePasswordChangeOnFirstLogin { get; set; }
     public int PasswordResetCodeExpiryMinutes { get; set; }
     public byte IsCaptchaEnabledOnLogin { get; set; }
-        
     }
 }

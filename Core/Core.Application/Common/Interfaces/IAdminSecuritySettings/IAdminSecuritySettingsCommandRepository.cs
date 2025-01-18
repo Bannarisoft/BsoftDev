@@ -10,8 +10,9 @@ namespace Core.Application.Common.Interfaces.IAdminSecuritySettings
     {
         Task<Core.Domain.Entities.AdminSecuritySettings> CreateAsync(Core.Domain.Entities.AdminSecuritySettings adminSecuritySettings);
 
-        //  Task<int> UpdateAsync(int id, Core.Domain.Entities.AdminSecuritySettings adminSecuritySettings);
+          Task<int> UpdateAsync(int id, Core.Domain.Entities.AdminSecuritySettings adminSecuritySettings);
         
-        //  Task<int> DeleteAsync(int id,Core.Domain.Entities.AdminSecuritySettings adminSecuritySettings);
+          
+         Task<int> DeleteAsync(int id, Core.Domain.Entities.AdminSecuritySettings adminSecuritySettings); 
     }
 }

@@ -17,7 +17,7 @@ namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySetting
     public byte IsTwoFactorAuthenticationEnabled { get; set; }
     public int MaxConcurrentLogins { get; set; }
     public byte IsForcePasswordChangeOnFirstLogin { get; set; }
-    public int PasswordResetCodeExpiryMinutes { get; set; }
+    public byte PasswordResetCodeExpiryMinutes { get; set; }
     public byte IsCaptchaEnabledOnLogin { get; set; }
 
     }

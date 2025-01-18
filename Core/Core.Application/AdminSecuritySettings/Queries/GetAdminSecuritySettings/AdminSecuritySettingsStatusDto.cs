@@ -5,12 +5,11 @@ using System.Threading.Tasks;
 using Core.Application.Common;
 using MediatR;
 
-
 namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings
 {
-    public class GetAdminSecuritySettingsQuery : IRequest<Result<List<AdminSecuritySettingsDto>>>
+    public class AdminSecuritySettingsStatusDto  :IRequest <Result<int>>
     {
-        
-        
+          public byte IsActive { get; set; }
+
     }
 }

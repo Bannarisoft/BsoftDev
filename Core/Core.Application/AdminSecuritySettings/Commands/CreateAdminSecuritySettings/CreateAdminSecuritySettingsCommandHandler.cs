@@ -4,37 +4,45 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings;
+using Core.Application.Common;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
+using Core.Domain.Events;
 using MediatR;
 
 namespace Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySettings
 {
-    public class CreateAdminSecuritySettingsCommandHandler  :IRequestHandler<CreateAdminSecuritySettingsCommand, AdminSecuritySettingsDto >
+    public class CreateAdminSecuritySettingsCommandHandler  :IRequestHandler<CreateAdminSecuritySettingsCommand, Result<AdminSecuritySettingsDto >>
     {
         private readonly IAdminSecuritySettingsCommandRepository _adminSecuritySettingsCommandRepository;
         private readonly IMapper _mapper;
+             
+          private readonly IMediator _mediator; 
 
-          public CreateAdminSecuritySettingsCommandHandler(IAdminSecuritySettingsCommandRepository adminSecuritySettingsCommandRepository,IMapper mapper)
+          public CreateAdminSecuritySettingsCommandHandler(IAdminSecuritySettingsCommandRepository adminSecuritySettingsCommandRepository,IMapper mapper,IMediator mediator)
         {
              _adminSecuritySettingsCommandRepository=adminSecuritySettingsCommandRepository;
             _mapper=mapper;
+            _mediator=mediator;
         }
 
-        public async Task<AdminSecuritySettingsDto> Handle(CreateAdminSecuritySettingsCommand request, CancellationToken cancellationToken)
-        {
-              var adminSecuritySettings = _mapper.Map<Core.Domain.Entities.AdminSecuritySettings>(request);
-          //  departmentEntity.Id = ID; // Assign the new GUID to the user entity
+        public async Task<Result<AdminSecuritySettingsDto>> Handle(CreateAdminSecuritySettingsCommand request, CancellationToken cancellationToken)
+        {            
+       
+           var adminsettingsEntity = _mapper.Map<Core.Domain.Entities.AdminSecuritySettings>(request);
 
-            // Save the user to the repository
-            var createdAdminSecuritySettings = await _adminSecuritySettingsCommandRepository.CreateAsync(adminSecuritySettings);
+             var result = await _adminSecuritySettingsCommandRepository.CreateAsync(adminsettingsEntity);
+            //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "Create",
+                actionCode: result.Id.ToString(),
+                actionName: "",
+                details: $"New Admin settings  was created. CountryCode: {result.Id}",
+                module:"Admin Security Settings"
+            );
+            await _mediator.Publish(domainEvent, cancellationToken);
             
-            if (createdAdminSecuritySettings == null)
-            {
-                throw new InvalidOperationException("Failed to create user");
-            }
-
-            // Map the created User entity to UserDto
-            return _mapper.Map<AdminSecuritySettingsDto>(createdAdminSecuritySettings);
+            var DeptDto = _mapper.Map<AdminSecuritySettingsDto>(result);
+            return Result<AdminSecuritySettingsDto>.Success(DeptDto);
         }
 
 

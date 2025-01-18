@@ -157,7 +157,8 @@ namespace BSOFT.Infrastructure
                 typeof(ModuleProfile),
                 typeof(CompanyProfile),
                 typeof(PasswordComplexityRuleProfile),
-                typeof(AdminSecuritySettingsProfile)                 
+                typeof(AdminSecuritySettingsProfile),
+                typeof(DepartmentProfile)                 
             );
 
             return services;

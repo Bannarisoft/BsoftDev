@@ -1,3 +1,4 @@
+using Core.Application.Common;
 using Core.Application.Departments.Queries.GetDepartments;
 using MediatR;
 using System;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Departments.Commands.CreateDepartment
 {
-    public class CreateDepartmentCommand : IRequest<DepartmentDto>
+    public class CreateDepartmentCommand : IRequest<Result<DepartmentDto>>
     {
     //    public int DeptId { get; set; }
         public string ShortName { get; set; }

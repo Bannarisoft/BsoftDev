@@ -9,6 +9,9 @@ namespace Core.Application.Common.Interfaces.IPasswordComplexityRule
     {
         
       Task<List<Core.Domain.Entities.PasswordComplexityRule>> GetPasswordComplexityAsync();
+      Task<Core.Domain.Entities.PasswordComplexityRule> GetByIdAsync(int id);  
+
+
       
 
     }

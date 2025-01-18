@@ -28,8 +28,17 @@ namespace BSOFT.Infrastructure.Repositories.Departments
 
     public async Task<Department> GetByIdAsync(int id)
     {
-           const string query = "SELECT * FROM AppData.Department WHERE Id = @Id";
-        return await _dbConnection.QueryFirstOrDefaultAsync<Department>(query, new { id });
+         //  const string query = "SELECT * FROM AppData.Department WHERE Id = @Id";
+      //  return await _dbConnection.QueryFirstOrDefaultAsync<Department>(query, new { id });
+
+
+         const string query = @"SELECT * FROM AppData.Department WHERE Id = @Id AND IsActive = 1";
+            var department = await _dbConnection.QueryFirstOrDefaultAsync<Department>(query, new { id });           
+             if (department == null)
+            {
+                throw new KeyNotFoundException($"Department with ID {id} not found.");
+            }
+            return department;
         }   
     
 

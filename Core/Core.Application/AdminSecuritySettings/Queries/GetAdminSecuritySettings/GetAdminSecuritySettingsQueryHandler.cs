@@ -6,34 +6,49 @@ using AutoMapper;
 using MediatR;
 using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
+using Core.Application.Common;
+using Core.Domain.Events;
 
 namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings
 {
-    public class GetAdminSecuritySettingsQueryHandler :IRequestHandler<GetAdminSecuritySettingsQuery,List<AdminSecuritySettingsDto>>
+    public class GetAdminSecuritySettingsQueryHandler :IRequestHandler<GetAdminSecuritySettingsQuery,Result<List<AdminSecuritySettingsDto>>>
     {
            private readonly IAdminSecuritySettingsQueryRepository   _adminSecuritySettingsQueryRepository;
         private readonly IMapper _mapper; 
+           private readonly IMediator _mediator; 
 
 
-         public GetAdminSecuritySettingsQueryHandler(IAdminSecuritySettingsQueryRepository adminSecuritySettingsQueryRepository,IMapper mapper)
+         public GetAdminSecuritySettingsQueryHandler(IAdminSecuritySettingsQueryRepository adminSecuritySettingsQueryRepository,IMapper mapper, IMediator mediator)
         {
             _mapper =mapper;
-            _adminSecuritySettingsQueryRepository = adminSecuritySettingsQueryRepository;                
+            _adminSecuritySettingsQueryRepository = adminSecuritySettingsQueryRepository;         
+             _mediator = mediator;  
+
         }
 
-         public async Task<List<AdminSecuritySettingsDto>>Handle(GetAdminSecuritySettingsQuery request ,CancellationToken cancellationToken )
+         public async Task<Result<List<AdminSecuritySettingsDto>>>Handle(GetAdminSecuritySettingsQuery request ,CancellationToken cancellationToken )
         {
-           /*  const string query = @"SELECT  * FROM AppData.Department";
-            var department = await _dbConnection.QueryAsync<DepartmentDto>(query);
-           return department.AsList(); */
-          
-              var result = await _adminSecuritySettingsQueryRepository.GetAllAdminSecuritySettingsAsync();
-                Console.WriteLine(result.Count());
-                //return _mapper.Map<List<DivisionDTO>>(result);
-                return _mapper.Map<List<AdminSecuritySettingsDto>>(result);  
-                
+      
+                 var adminSecuritySettings = await _adminSecuritySettingsQueryRepository.GetAllAdminSecuritySettingsAsync();
+             var adminSecuritySettingsList = _mapper.Map<List<AdminSecuritySettingsDto>>(adminSecuritySettings);
+
+                 //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "GetAll",
+                    actionCode: "",        
+                    actionName: "",
+                    details: $"Admin Security Settings details was fetched.",
+                    module:"AdminSecuritySettings"
+                );
+
+                  await _mediator.Publish(domainEvent, cancellationToken);
+                return Result<List<AdminSecuritySettingsDto>>.Success(adminSecuritySettingsList);
+
            
         }
+
+
+        
 
 
 

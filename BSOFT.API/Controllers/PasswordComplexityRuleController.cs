@@ -5,6 +5,7 @@ using Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityR
 using Core.Application.PwdComplexityRule.Commands.CreatePasswordComplexityRule;
 using Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRule;
 using Core.Application.PwdComplexityRule.Queries;
+using Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleById;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,18 @@ namespace BSOFT.API.Controllers
             return Ok(PwdcomplexityRules);
         }
 
+         [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(int id)
+        {
+            var  PwdComplexity = await Mediator.Send(new GetPwdComplexityRuleByIdQuery() {Id=id});
+            if(PwdComplexity ==null)
+            {
+                BadRequest("ID in the URL does not match the command PwdComplexity.");               
+            }
+            return Ok(PwdComplexity);
+
+        }
+
          [HttpPost]
          [Route("Create")]
         public async Task<IActionResult>CreateAsync([FromBody] CreatePasswordComplexityRuleCommand command)
@@ -58,7 +71,7 @@ namespace BSOFT.API.Controllers
         }
         if (id != command.Id)
         {
-            return BadRequest("Department Id Mismatch");
+            return BadRequest("PasswordComplexityRule Id Mismatch");
         }
 
         var UpdateDepartment = await Mediator.Send(command);

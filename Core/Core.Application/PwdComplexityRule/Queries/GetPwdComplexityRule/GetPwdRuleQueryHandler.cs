@@ -26,14 +26,7 @@ namespace Core.Application.PwdComplexityRule.Queries
           var   pwdComplexityRules = await _passwordComplexityRepository.GetPasswordComplexityAsync();
             return _mapper.Map<List<PwdRuleDto>>(pwdComplexityRules);
 
-        //       const string query = @"SELECT  * FROM AppSecurity.PasswordComplexityRule";
-        // var pwdComplexityRules = await _dbConnection.QueryAsync<Core.Domain.Entities.PasswordComplexityRule>(query);
-        // return pwdComplexityRules.Select(rule => new PwdRuleDto
-        // {
-        //     Id = rule.Id,
-        //     PwdComplexityRule = rule.PwdComplexityRule,
-        //     IsActive = rule.IsActive
-        // }).ToList();
+     
 
         }
     }

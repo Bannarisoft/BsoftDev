@@ -1,4 +1,5 @@
 
+using Core.Application.Common;
 using Core.Application.Departments.Queries.GetDepartments;
 using MediatR;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Departments.Queries.GetDepartmentById
 {
-    public class GetDepartmentByIdQuery :IRequest<DepartmentDto>
+    public class GetDepartmentByIdQuery :IRequest<Result<DepartmentDto>>
     {
         
         public int DepartmentId { get; set; }

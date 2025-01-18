@@ -44,6 +44,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityRule;
 using Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySettings;
 using BSOFT.API.Validation.AdminSecuritySettings;
+using Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySettings;
 namespace BSOFT.API.Validation.Common
 {
     public class ValidationService
@@ -79,6 +80,8 @@ namespace BSOFT.API.Validation.Common
         services.AddScoped<IValidator<ChangeUserPasswordCommand>,ExistingUserPasswordChangeCommandValidator>();
  		services.AddScoped<IValidator<CreatePasswordComplexityRuleCommand>, CreatePasswordComplexityRuleCommandValidator>();
         services.AddScoped<IValidator<UpdatePasswordComplexityRuleCommand>, UpdatePasswordComplexityRuleCommandValidator>();
-        services.AddScoped<IValidator<CreateAdminSecuritySettingsCommand>, CreateAdminSecuritySettingsCommandValidator>();    }  
+        services.AddScoped<IValidator<CreateAdminSecuritySettingsCommand>, CreateAdminSecuritySettingsCommandValidator>(); 
+        services.AddScoped<IValidator<UpdateAdminSecuritySettingsCommand> ,UpdateAdminSecuritySettingsCommandValidator>();  
+         }  
     }
 }
