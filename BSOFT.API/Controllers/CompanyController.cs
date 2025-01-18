@@ -37,10 +37,13 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetAllCompaniesAsync()
         {
             var companies = await Mediator.Send(new GetCompanyQuery());
-            var activecompanies = companies.Where(c => c.IsActive == 1).ToList(); 
-            // var companies = await Mediator.Send(new GetCompanyQuery());
-            // return Ok(companies);
-            return Ok(activecompanies);
+            var activecompanies = companies.Data.Where(c => c.IsActive == 1).ToList(); 
+
+            return Ok(new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                data = activecompanies
+            });
         }
          [HttpPost]
         public async Task<IActionResult> CreateAsync([FromForm] CreateCompanyCommand command)
@@ -48,152 +51,138 @@ namespace BSOFT.API.Controllers
             var validationResult = await _CreateCompanyCommandvalidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors);
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest, 
+                    message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
             }
-            if(command.Company.File ==null && command.Company.File.Length ==0)
-            {
-                return BadRequest("Invalid file");
-            }
-            
             var createdCompany = await Mediator.Send(command);
-            if (createdCompany > 0)
+            if (createdCompany.IsSuccess)
             {
-                return Ok(createdCompany);
+                return Ok(new 
+                { 
+                    StatusCode=StatusCodes.Status201Created,
+                    message = createdCompany.Message,  
+                    errors = "", 
+                    data = createdCompany.Data  
+                });
             }
-            return BadRequest("Error");
+            return BadRequest(new 
+            { 
+                StatusCode=StatusCodes.Status400BadRequest, 
+                message = createdCompany.Message, 
+                errors = "" 
+            });
             
         }
          [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            // var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "AllFiles");
-           
-            // var company = await Mediator.Send(new GetCompanyByIdQuery() { CompanyId = id});
-            // if(company == null)
-            // {
-            //     return NotFound();
-            // }
-            //  var filePath = Path.Combine(basePath, company.Logo);
-            //  if (!System.IO.File.Exists(filePath))
-            // {
-            //     return NotFound(new { Message = "File not found" });
-            // }
-            // var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-            // var contentType = GetContentType(filePath);
-            //   return Ok(new
-            //      {
-            //          Company = company,
-            //          FileBytes = fileBytes,
-            //          ContentType = contentType,
-            //          FileName = company.Logo
-            //      });
-          
+            
             if (id <= 0)
             {
-                return BadRequest("Invalid company ID");
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest,
+                    Message = "Invalid Company ID" 
+                });
             }
 
             var company = await Mediator.Send(new GetCompanyByIdQuery() { CompanyId = id });
             if (company == null)
             {
-                return NotFound();
+                return NotFound(new 
+                { 
+                    StatusCode=StatusCodes.Status404NotFound,
+                    Message = "Company not found" 
+                });
             }
-            return Ok(company);
+            return Ok(new 
+            {
+                StatusCode=StatusCodes.Status200OK,
+                data = company.Data
+            });
         }
 
-        [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update([FromForm]  UpdateCompanyCommand command, int id)
+        [HttpPut("update")]
+        public async Task<IActionResult> Update([FromForm]  UpdateCompanyCommand command)
         {
             var validationResult = await _UpdateCompanyCommandvalidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors);
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest,
+                    Message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
             }
-            if(command.Company.File ==null && command.Company.File.Length ==0)
-            {
-                return BadRequest("Invalid file");
-            }
-            
+           
+            var companyExists = await Mediator.Send(new GetCompanyByIdQuery { CompanyId = command.Company.Id });
 
-            if(id != command.Company.Id)
-            {
-                return BadRequest();
-            }
-            
+             if (companyExists == null)
+             {
+                 return NotFound(new 
+                 { 
+                    StatusCode=StatusCodes.Status404NotFound, 
+                    message = $"Company ID {command.Company.Id} not found.", 
+                    errors = "" 
+                }); 
+             }
            var updatedCompany = await Mediator.Send(command);
 
-            if (updatedCompany)
+            if (updatedCompany.IsSuccess)
             {
-                return Ok("Updated Successfully");
+                return Ok(new 
+                {
+                    StatusCode=StatusCodes.Status200OK,
+                    message = updatedCompany.Message,
+                    errors = ""
+                });
             }
             
-            return BadRequest("Error");
+            return BadRequest(new 
+            { 
+                StatusCode=StatusCodes.Status400BadRequest, 
+                message = updatedCompany.Message, 
+                errors = "" 
+            });
         }
-        [HttpPut("delete/{id}")]
-        public async Task<IActionResult> Delete(int id,DeleteCompanyCommand deleteCompanyCommand)
+        [HttpPut("delete")]
+        public async Task<IActionResult> Delete(DeleteCompanyCommand deleteCompanyCommand)
         {
-            Console.WriteLine(id);
-              if(id == 0)
-            {
-                return BadRequest();
-            }
-            await Mediator.Send(deleteCompanyCommand);
+           
+           var updatedCompany = await Mediator.Send(deleteCompanyCommand);
 
-            return NoContent();
+            if(updatedCompany.IsSuccess)
+            {
+                return Ok(new 
+                {
+                    StatusCode=StatusCodes.Status200OK,
+                    message = updatedCompany.Message,
+                    errors = ""
+                });
+            }
+            
+            return BadRequest(new 
+            { 
+                StatusCode=StatusCodes.Status400BadRequest, 
+                message = updatedCompany.Message, 
+                errors = "" 
+            });
         }
          [HttpGet("GetCompany")]
         public async Task<IActionResult> GetCompany([FromQuery] string searchPattern)
         {
            
             var companies = await Mediator.Send(new GetCompanyAutoCompleteQuery {SearchPattern = searchPattern});
-            return Ok(companies);
+            return Ok(new 
+            { StatusCode=StatusCodes.Status200OK, 
+            data = companies.Data 
+            });
         }
-         private string GetContentType(string path)
-         {
-             var ext = Path.GetExtension(path).ToLowerInvariant();
-             return ext switch
-             {
-                 ".jpg" => "image/jpeg",
-                 ".png" => "image/png",
-                 ".gif" => "image/gif",
-                 ".pdf" => "application/pdf",
-                 ".txt" => "text/plain",
-                 ".doc" => "application/msword",
-                 ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                 _ => "application/octet-stream", // Default binary type
-             };
-         }
-        //  private (bool IsSuccess, string FilePath, string ErrorMessage) HandleFileUpload(IFormFile file)
-        //  {
-        //       try
-        //       {
-        //           var folderName = Path.Combine("Resources", "AllFiles");
-        //           var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-
-        //           if (!Directory.Exists(pathToSave))
-        //           {
-        //               Directory.CreateDirectory(pathToSave);
-        //           }
-
-        //           var fileName = file.FileName;
-        //           var fullPath = Path.Combine(pathToSave, fileName);
-
-        //           if (System.IO.File.Exists(fullPath))
-        //           {
-        //               return (false, null, "File already exists");
-        //           }
-
-        //           using (var stream = new FileStream(fullPath, FileMode.Create))
-        //           {
-        //               file.CopyTo(stream);
-        //           }
-
-        //           return (true, fullPath, null); // Success result
-        //       }
-        //       catch (Exception ex)
-        //       {
-        //           return (false, null, $"An error occurred while uploading the file: {ex.Message}");
-        //       }
-        //  }
+     
     }
 }

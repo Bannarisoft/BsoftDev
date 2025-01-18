@@ -1,10 +1,11 @@
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Entity.Queries.GetEntity;
 using MediatR;
 
 namespace Core.Application.Entity.Commands.CreateEntity
 {
-    public class CreateEntityCommand :IRequest<Result<int>> 
+    public class CreateEntityCommand :IRequest<ApiResponseDTO<int>> 
     {
 
     public string EntityName { get; set; }

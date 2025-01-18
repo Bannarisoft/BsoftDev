@@ -38,26 +38,22 @@ namespace BSOFT.API.Controllers
 [HttpGet]
 public async Task<IActionResult> GetAllEntityAsync()
 {
-        // Fetch all entities
+        
         var result  = await Mediator.Send(new GetEntityQuery());
-        // Access the list from the result
-        // Adjust 'Data' based on your actual property name
 
-        // Check if the result is empty
-        if (result == null || result.Data == null || !result.Data.Any())
+        if (result.IsSuccess == false)
         {
-            throw new CustomException(
-                "No entities found.",
-                new[] { "The database does not contain any entities." },
-                CustomException.HttpStatus.NotFound
-            );
+            return NotFound(new
+            {
+                message = result.Message,
+                statusCode = StatusCodes.Status404NotFound
+            });
         }
 
-        // Return success response with 200 OK
         return Ok(new
         {
-            message = "Entities retrieved successfully.",
-            data = result,
+            message = result.Message,
+            data = result.Data,
             statusCode = StatusCodes.Status200OK
         });
    
@@ -68,29 +64,29 @@ public async Task<IActionResult> GetByIdAsync(int id)
 {
         if (id <= 0)
         {
-            throw new CustomException(
-                "Validation failed",
-                new[] { "The provided ID must be greater than zero." },
-                CustomException.HttpStatus.BadRequest
-            );
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = "Invalid Entity ID"
+            });
         }
 
         var result = await Mediator.Send(new GetEntityByIdQuery { EntityId = id });
-        if (result == null || result.Data == null || !result.Data.Any())
-        {
-         throw new CustomException(
-        "Entity not found",
-        new[] { $"The entity with ID {id} does not exist." },
-        CustomException.HttpStatus.NotFound
-    );
-        } 
 
-        // Return success response
-        return Ok(new
+        if (result.IsSuccess)
         {
-            message = "Entity retrieved successfully.",
-            statusCode = StatusCodes.Status200OK,
-            data = result
+              return Ok(new
+             {
+                 message = result.Message,
+                 statusCode = StatusCodes.Status200OK,
+                 data = result.Data
+             }); 
+        }
+
+        return NotFound(new
+        {
+            message = result.Message,
+            statusCode = StatusCodes.Status404NotFound
         });
    
 }
@@ -99,25 +95,23 @@ public async Task<IActionResult> GetByIdAsync(int id)
 public async Task<IActionResult> GenerateEntityCodeAsync()
 {
    
-        // Fetch the last entity code using the mediator
+        
         var lastEntityCode = await Mediator.Send(new GetEntityLastCodeQuery());
 
-        // Check if the result is null or empty
-        if (string.IsNullOrEmpty(lastEntityCode))
+        if (lastEntityCode.IsSuccess)
         {
-            throw new CustomException(
-                "No entity code found in the database.",
-                new[] { "The database does not contain any entity code." },
-                CustomException.HttpStatus.NotFound
-            );
+            return Ok(new
+            {
+                message = lastEntityCode.Message,
+                statusCode = StatusCodes.Status200OK,
+                data = lastEntityCode.Data
+            });
         }
 
-        // Return the last entity code as a response
-        return Ok(new
+        return BadRequest(new
         {
-            message = "Entity code retrieved successfully.",
-            data = lastEntityCode,
-            statusCode = StatusCodes.Status200OK
+            message = lastEntityCode.Message,
+            statusCode = StatusCodes.Status400BadRequest
         });
    
 }
@@ -131,41 +125,37 @@ public async Task<IActionResult> CreateAsync(CreateEntityCommand command)
     if (!validationResult.IsValid)
     {
         
-        // If validation fails, throw ValidationException with detailed error messages
-        throw new Core.Application.Common.Exceptions.ValidationException(
-            "Validation failed",  // General message
-            validationResult.Errors.Select(e => e.ErrorMessage).ToArray()  // Validation errors
-        );
+        return BadRequest(new
+        {
+            StatusCode = StatusCodes.Status400BadRequest,
+            message = "Validation failed",
+            errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+        });
     }
 
     // Process the command
     var createdEntityId = await _mediator.Send(command);
 
-    if (createdEntityId.Data <= 0)
+    if (createdEntityId.IsSuccess)
     {
-        throw new CustomException(
-            "Failed to create entity.",
-            new[] { "Entity creation failed due to an unknown error." },
-            CustomException.HttpStatus.InternalServerError
-        );
+      return Ok(new
+      {
+          StatusCode = StatusCodes.Status201Created,
+          message = createdEntityId.Message,
+          data = createdEntityId
+      });
     }
 
-    // Return success response with 201 Created
-    return CreatedAtAction(
-        nameof(GetByIdAsync),
-        new { id = createdEntityId },
-        new
+      return BadRequest(new
         {
-            message = "Entity created successfully.",
-            data = new { id = createdEntityId },
-            statusCode = StatusCodes.Status201Created
-        }
-    );
+            StatusCode = StatusCodes.Status400BadRequest,
+            message = createdEntityId.Message
+        });
   
 }
 
-[HttpPut("update/{id}")]
-public async Task<IActionResult> UpdateAsync(int id, UpdateEntityCommand command)
+[HttpPut("update")]
+public async Task<IActionResult> UpdateAsync( UpdateEntityCommand command)
 {
   
         // Validate the incoming command
@@ -173,75 +163,53 @@ public async Task<IActionResult> UpdateAsync(int id, UpdateEntityCommand command
         if (!validationResult.IsValid)
         {
            
-              throw new Core.Application.Common.Exceptions.ValidationException(
-            "Validation failed",  // General message
-            validationResult.Errors.Select(e => e.ErrorMessage).ToArray()  // Validation errors
-        );
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = "Validation failed",
+                errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+            });
         }
 
-        // Check for EntityId mismatch
-        if (id != command.EntityId)
-        {
-            throw new CustomException(
-                "EntityId Mismatch",
-                new[] { "The provided EntityId does not match the ID in the request URL." },
-                CustomException.HttpStatus.BadRequest
-            );
-        }
-
-        // Process the command to update the entity
         var updatedEntity = await _mediator.Send(command);
 
-        // Check if the entity was updated successfully
-        if (updatedEntity.Data <= 0)
+        if (updatedEntity.IsSuccess)
         {
-            throw new CustomException(
-                "Entity not found",
-                new[] { $"The entity with ID {id} does not exist." },
-                CustomException.HttpStatus.NotFound
-            );
+           return Ok(new
+            {
+                message = updatedEntity.Message,
+                statusCode = StatusCodes.Status200OK
+            });
         }
 
-        // Return success response with 200 OK
-        return Ok(new
+        return NotFound(new
         {
-            message = "Entity updated successfully.",
-            statusCode = StatusCodes.Status200OK
+            message = updatedEntity.Message,
+            statusCode = StatusCodes.Status404NotFound
         });
-    
 }
 
-[HttpDelete("delete/{id}")]
-public async Task<IActionResult> DeleteEntityAsync(int id, DeleteEntityCommand command)
+[HttpDelete("delete")]
+public async Task<IActionResult> DeleteEntityAsync( DeleteEntityCommand command)
 {
-     // Validate if the EntityId matches the URL id
-        if (id != command.EntityId)
-        {
-            throw new CustomException(
-                "EntityId Mismatch",
-                new[] { "The provided EntityId does not match the ID in the request URL." },
-                CustomException.HttpStatus.BadRequest
-            );
-        }
 
         // Process the delete command
         var result = await _mediator.Send(command);
 
-        // Check if the entity was found and deleted
-        if (result.Data <= 0) // Assuming 0 or -1 indicates "not found"
+      
+        if (result.IsSuccess) 
         {
-             throw new CustomException(
-                "Entity not found",
-                new[] { $"The entity with ID {id} does not exist." },
-                CustomException.HttpStatus.NotFound
-            );
+             return Ok(new
+            {
+                message = result.Message,
+                statusCode = StatusCodes.Status200OK
+            });
+            
         }
-
-        // Return success response
-        return Ok(new
+       return NotFound(new
         {
-            message = "Entity deleted successfully.",
-            statusCode = StatusCodes.Status200OK
+            message = result.Message,
+            statusCode = StatusCodes.Status404NotFound
         });
    
 }
@@ -252,32 +220,32 @@ public async Task<IActionResult> GetEntity([FromQuery] string searchPattern)
       // Check if searchPattern is provided
         if (string.IsNullOrEmpty(searchPattern))
         {
-            throw new CustomException(
-                "Search pattern cannot be empty.",
-                new[] { "Please provide a valid search pattern." },
-                CustomException.HttpStatus.BadRequest
-            );
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = "Search pattern cannot be empty."
+            });
         }
 
         // Fetch entities based on search pattern
         var entities = await Mediator.Send(new GetEntityAutocompleteQuery { SearchPattern = searchPattern });
 
-       if (entities == null || entities.Data == null || !entities.Data.Any())
+       if (entities.IsSuccess)
         {
-         throw new CustomException(
-        "Entity not found",
-        new[] { $"No entities found for the search pattern: {searchPattern}" },
-        CustomException.HttpStatus.NotFound
-    );
+         return Ok(new  
+            {
+                message = entities.Message,
+                statusCode = StatusCodes.Status200OK,
+                data = entities.Data
+            });
         } 
 
-        // Return success response with 200 OK and the entity data
-        return Ok(new
+        return NotFound(new
         {
-            message = "Entities retrieved successfully.",
-            data = entities,
-            statusCode = StatusCodes.Status200OK
+            message = entities.Message,
+            statusCode = StatusCodes.Status404NotFound
         });
+        
     
 }
 }

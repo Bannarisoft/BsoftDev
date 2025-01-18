@@ -3,10 +3,11 @@ using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces.IUnit;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Units.Commands.DeleteUnit
 {
-    public class DeleteUnitCommandHandler : IRequestHandler<DeleteUnitCommand,int>
+    public class DeleteUnitCommandHandler : IRequestHandler<DeleteUnitCommand,ApiResponseDTO<int>>
     {
           private readonly IUnitCommandRepository _iunitRepository;
           private readonly IMapper _Imapper;
@@ -19,24 +20,20 @@ namespace Core.Application.Units.Commands.DeleteUnit
             _Ilogger = Ilogger;
         }
 
-        public async Task<int> Handle(DeleteUnitCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<int>> Handle(DeleteUnitCommand request, CancellationToken cancellationToken)
         {
-        try
-        {
-        var unit = _Imapper.Map<Core.Domain.Entities.Unit>(request.UpdateUnitStatusDto);
-        await _iunitRepository.DeleteUnitAsync(request.UnitId,unit);
-        var unitId = unit.Id;
-        return unitId;
-        }   
-        catch (Exception ex)
-        {
-                // Log the exception
-                _Ilogger.LogError(ex, "Error updating unit");
+       
+              var unit = _Imapper.Map<Core.Domain.Entities.Unit>(request.UpdateUnitStatusDto);
+              await _iunitRepository.DeleteUnitAsync(request.UnitId,unit);
+              var unitId = unit.Id;
+              return new ApiResponseDTO<int> { 
+                IsSuccess = true, 
+                Message = "Unit deleted successfully", 
+                Data = unitId 
+                };
+       
 
-                // Throw a custom exception 
-                throw new Exception("Error updating unit", ex);
         }
-    }
 
     }
 }

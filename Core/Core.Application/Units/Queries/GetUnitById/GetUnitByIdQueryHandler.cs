@@ -1,6 +1,7 @@
 using AutoMapper;
 using Core.Application.Common;
 using Core.Application.Common.Exceptions;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUnit;
 using Core.Application.Units.Queries.GetUnits;
 using Core.Domain.Events;
@@ -10,7 +11,7 @@ using System.Data;
 namespace Core.Application.Units.Queries.GetUnitById
 {
     //public class GetUnitByIdQueryHandler : IRequestHandler<GetUnitByIdQuery,UnitDto>
-    public class GetUnitByIdQueryHandler : IRequestHandler<GetUnitByIdQuery,Result<List<UnitDto>>>
+    public class GetUnitByIdQueryHandler : IRequestHandler<GetUnitByIdQuery,ApiResponseDTO<List<UnitDto>>>
     {
          private readonly IUnitQueryRepository _unitRepository;        
         private readonly IMapper _mapper;
@@ -24,14 +25,19 @@ namespace Core.Application.Units.Queries.GetUnitById
             _mediator = mediator;
         }
 
-         public async Task<Result<List<UnitDto>>> Handle(GetUnitByIdQuery request, CancellationToken cancellationToken)
+         public async Task<ApiResponseDTO<List<UnitDto>>> Handle(GetUnitByIdQuery request, CancellationToken cancellationToken)
         {
           
             var units = await _unitRepository.GetByIdAsync(request.Id);    
 
               if (units == null || !units.Any())
                 {
-                return Result<List<UnitDto>>.Failure("Unit not found.");
+                     return new ApiResponseDTO<List<UnitDto>>
+                     {
+                         IsSuccess = false,
+                         Message = "Unit not found."
+
+                     };
                 }
 
             var unitList = _mapper.Map<List<UnitDto>>(units);
@@ -45,7 +51,12 @@ namespace Core.Application.Units.Queries.GetUnitById
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
 
-            return Result<List<UnitDto>>.Success(unitList);;
+            return new ApiResponseDTO<List<UnitDto>>
+            {
+                IsSuccess = true,
+                Message = "Success",
+                Data = unitList
+            };
      
           
         }

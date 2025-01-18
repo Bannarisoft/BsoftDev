@@ -1,5 +1,6 @@
 using AutoMapper;
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Application.Country.Commands.CreateCountry;
 using Core.Application.Country.Queries.GetCountries;
@@ -7,7 +8,7 @@ using Core.Domain.Entities;
 using Core.Domain.Events;
 using MediatR;
 
-public class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand, Result<CountryDto>>
+public class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand, ApiResponseDTO<CountryDto>>
 {
     private readonly IMapper _mapper;
     private readonly ICountryCommandRepository _countryRepository;    
@@ -21,16 +22,19 @@ public class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand,
         _mediator = mediator;               
     }
 
-    public async Task<Result<CountryDto>> Handle(CreateCountryCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDTO<CountryDto>> Handle(CreateCountryCommand request, CancellationToken cancellationToken)
     {
         var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryCode);
         if (countryExists)
         {
-            return Result<CountryDto>.Failure("CountryCode already exists");
+            return new ApiResponseDTO<CountryDto>
+            {
+                IsSuccess = false,
+                Message = "CountryCode already exists"
+            };
         }
         var countryEntity = _mapper.Map<Countries>(request);    
-        try
-        {    
+         
             var result = await _countryRepository.CreateAsync(countryEntity);
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -43,11 +47,20 @@ public class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand,
             await _mediator.Publish(domainEvent, cancellationToken);
             
             var countryDto = _mapper.Map<CountryDto>(result);
-            return Result<CountryDto>.Success(countryDto);
-        }
-        catch (Exception ex)
-        {
-            return Result<CountryDto>.Failure($"An error occurred while creating the Country: {ex.Message}");
-        }
+            if (countryDto.Id > 0)
+            {
+                return new ApiResponseDTO<CountryDto>
+                {
+                    IsSuccess = true,
+                    Message = "Country created successfully",
+                    Data = countryDto
+                };
+            }
+            return new ApiResponseDTO<CountryDto>
+            {
+                IsSuccess = false,
+                Message = "Country not created"
+            };
+        
     }
 }

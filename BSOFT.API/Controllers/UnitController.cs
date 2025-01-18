@@ -31,20 +31,11 @@ namespace BSOFT.API.Controllers
         {
             var result = await Mediator.Send(new GetUnitQuery());
          
-            if (result == null || result.Data == null || !result.Data.Any())
-        {
-            throw new CustomException(
-                "No Units found.",
-                new[] { "The database does not contain any units." },
-                CustomException.HttpStatus.NotFound
-            );
-        }
-
-        // Return success response with 200 OK
+        
         return Ok(new
         {
             message = "Units retrieved successfully.",
-            data = result,
+            data = result.Data,
             statusCode = StatusCodes.Status200OK
         });
         }
@@ -56,29 +47,29 @@ namespace BSOFT.API.Controllers
         {
              if (id <= 0)
         {
-            throw new CustomException(
-                "Validation failed",
-                new[] { "The provided ID must be greater than zero." },
-                CustomException.HttpStatus.BadRequest
-            );
+            return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message ="Invalid Unit ID"
+                });
         }
             var unit = await Mediator.Send(new GetUnitByIdQuery() { Id = id});
-           if (unit == null || unit.Data == null || !unit.Data.Any())
+           if (unit.IsSuccess)
             {
                
-                throw new CustomException(
-                "Unit not found",
-                new[] { $"The Unit with ID {id} does not exist." },
-                CustomException.HttpStatus.NotFound
-            );
+                return Ok(new
+                {
+                    message = unit.Message,
+                    statusCode = StatusCodes.Status200OK,
+                    data = unit.Data
+                });
             }
-              // Return success response
-        return Ok(new
-        {
-            message = "Unit retrieved successfully.",
-            statusCode = StatusCodes.Status200OK,
-            data = unit
-        });
+           return NotFound(new
+            {
+                message = unit.Message,
+                statusCode = StatusCodes.Status404NotFound
+            });
+        
         }
 
     [HttpPost]
@@ -87,64 +78,89 @@ namespace BSOFT.API.Controllers
         var validationResult = await _createUnitCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
-         // If validation fails, throw ValidationException with detailed error messages
-        throw new Core.Application.Common.Exceptions.ValidationException(
-            "Validation failed",  // General message
-            validationResult.Errors.Select(e => e.ErrorMessage).ToArray()  // Validation errors
-        );
+          return BadRequest(
+            new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = "Validation failed",
+                errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+            }
+          );
         }
         var createdUnit = await Mediator.Send(command);
-         if (createdUnit.Data <= 0)
-    {
-        throw new CustomException(
-            "Failed to create Unit.",
-            new[] { "Unit creation failed due to an unknown error." },
-            CustomException.HttpStatus.InternalServerError
-        );
-    }
-        // Return success response with 201 Created
-        return CreatedAtAction(
-        nameof(GetByIdAsync),
-        new { id = createdUnit },
-        new
+         if(createdUnit.IsSuccess)
+         {
+             return Ok(new
+             {
+                 message = createdUnit.Message,
+                 statusCode = StatusCodes.Status201Created,
+                 data = createdUnit.Data
+             });
+         }
+        
+        return BadRequest(new
         {
-            message = "Unit created successfully.",
-            data = new { id = createdUnit },
-            statusCode = StatusCodes.Status201Created
-        }
-    );
+            message = createdUnit.Message,
+            statusCode = StatusCodes.Status400BadRequest
+        });
        
     }
 
 
-    [HttpPut("update/{id}")]
-    public async Task<IActionResult> UpdateUnitAsync(int id, UpdateUnitCommand command)
+    [HttpPut("update")]
+    public async Task<IActionResult> UpdateUnitAsync( UpdateUnitCommand command)
     {
         var validationResult = await _updateUnitCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
-        return BadRequest(validationResult.Errors);
+             return BadRequest(new
+             {
+                 StatusCode = StatusCodes.Status400BadRequest,
+                 message = "Validation failed",
+                 errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+             });
         }
-        if (id != command.UnitId)
-        {
-            return BadRequest("UnitId Mismatch");
-        }
-        command.UnitId = id;
+       
         var result = await Mediator.Send(command);
-        return Ok("Updated Successfully");
+        if(result.IsSuccess)
+        {
+            return Ok(new
+            {
+                message = result.Message,
+                statusCode = StatusCodes.Status200OK,
+                data = result.Data
+            });
+        }
+        
+        return BadRequest(new
+        {
+            message = result.Message,
+            statusCode = StatusCodes.Status400BadRequest
+        });
     }
 
 
-    [HttpDelete("delete/{id}")]
-    public async Task<IActionResult> DeleteUnitAsync(int id,DeleteUnitCommand command)
+    [HttpDelete("delete")]
+    public async Task<IActionResult> DeleteUnitAsync(DeleteUnitCommand command)
     {
-         if(id != command.UnitId)
-        {
-           return BadRequest("UnitId Mismatch"); 
-        }
-        await Mediator.Send(command);
+        
+       var result = await Mediator.Send(command);
 
-        return Ok("Status Closed Successfully");
+        if (result.IsSuccess)
+        {
+            return Ok(new
+            {
+                message = result.Message,
+                statusCode = StatusCodes.Status200OK,
+                data = result.Data
+            });
+        }
+        
+        return BadRequest(new
+        {
+            message = result.Message,
+            statusCode = StatusCodes.Status400BadRequest
+        });
     }
 
        [HttpGet("GetUnitSearch")]
@@ -153,31 +169,30 @@ namespace BSOFT.API.Controllers
             // Check if searchPattern is provided
         if (string.IsNullOrEmpty(searchPattern))
         {
-            throw new CustomException(
-                "Search pattern cannot be empty.",
-                new[] { "Please provide a valid search pattern." },
-                CustomException.HttpStatus.BadRequest
-            );
+            return BadRequest(new 
+            { 
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = "Search pattern cannot be empty." 
+            });
+          
         }
             var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = searchPattern});
         
-            // Check if Units are returned
-         if (units == null || units.Data == null || !units.Data.Any())
-        {
-            throw new CustomException(
-                "No Units found matching the search pattern.",
-                new[] { $"No entities found for the search pattern: {searchPattern}" },
-                CustomException.HttpStatus.NotFound
-            );
-        }
+            if(units.IsSuccess)
+            {
+                return Ok(new
+                {
+                    message = units.Message,
+                    statusCode = StatusCodes.Status200OK,
+                    data = units.Data
+                });
+            }
 
-        // Return success response with 200 OK and the entity data
-        return Ok(new
-        {
-            message = "Units retrieved successfully.",
-            data = units,
-            statusCode = StatusCodes.Status200OK
-        });
+            return NotFound(new
+            {
+                message = units.Message,
+                statusCode = StatusCodes.Status404NotFound
+            });
           
         }
      

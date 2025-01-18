@@ -3,10 +3,11 @@ using AutoMapper;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Application.Common;
 using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.City.Queries.GetCities
 {
-    public class GetCityQueryHandler : IRequestHandler<GetCityQuery, Result<List<CityDto>>>
+    public class GetCityQueryHandler : IRequestHandler<GetCityQuery, ApiResponseDTO<List<CityDto>>>
     {
         private readonly ICityQueryRepository _cityRepository;
         private readonly IMapper _mapper;
@@ -18,10 +19,9 @@ namespace Core.Application.City.Queries.GetCities
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<Result<List<CityDto>>> Handle(GetCityQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<CityDto>>> Handle(GetCityQuery request, CancellationToken cancellationToken)
         {
-            try
-            { 
+          
                 var cities = await _cityRepository.GetAllCityAsync();
                 var citiesList = _mapper.Map<List<CityDto>>(cities);
                 //Domain Event
@@ -33,12 +33,13 @@ namespace Core.Application.City.Queries.GetCities
                     module:"City"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return Result<List<CityDto>>.Success(citiesList);
-            }
-            catch (Exception ex)
-            {
-                return Result<List<CityDto>>.Failure($"An error occurred while fetching the City: {ex.Message}");
-            }
+                return new ApiResponseDTO<List<CityDto>>
+                {
+                    IsSuccess = true,
+                    Message = "Success",
+                    Data = citiesList
+                };
+            
         }
     }
 }
