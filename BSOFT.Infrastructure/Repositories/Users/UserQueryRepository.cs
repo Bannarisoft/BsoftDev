@@ -1,13 +1,7 @@
 using Dapper;
 using System.Data;
-using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
-using BSOFT.Infrastructure.Repositories;
 using Core.Domain.Entities;
-using System.Linq;
-using System.Text;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IUser;
 
 namespace BSOFT.Infrastructure.Repositories.Users

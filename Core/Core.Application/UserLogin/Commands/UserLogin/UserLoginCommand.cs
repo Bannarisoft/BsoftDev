@@ -1,3 +1,4 @@
+using Core.Application.Common.HttpResponse;
 using Core.Application.Users.Queries.GetUsers;
 using MediatR;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserLogin.Commands.UserLogin
 {
-    public class UserLoginCommand : IRequest<LoginResponse>
+    public class UserLoginCommand : IRequest<ApiResponseDTO<LoginResponse>>
     {
         // public LoginRequest Request { get; set; }
         public string Username { get; set; } = string.Empty;
