@@ -4,10 +4,11 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Country.Queries.GetCountries
 {
-    public class GetCountryQueryHandler : IRequestHandler<GetCountryQuery, Result<List<CountryDto>>>
+    public class GetCountryQueryHandler : IRequestHandler<GetCountryQuery, ApiResponseDTO<List<CountryDto>>>
     {
         private readonly ICountryQueryRepository _countryRepository;
         private readonly IMapper _mapper;
@@ -18,10 +19,9 @@ namespace Core.Application.Country.Queries.GetCountries
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<Result<List<CountryDto>>> Handle(GetCountryQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<CountryDto>>> Handle(GetCountryQuery request, CancellationToken cancellationToken)
         {    
-            try
-            { 
+          
                 var countries = await _countryRepository.GetAllCountriesAsync();
                 var countriesList = _mapper.Map<List<CountryDto>>(countries);
                 
@@ -34,12 +34,13 @@ namespace Core.Application.Country.Queries.GetCountries
                     module:"Country"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return Result<List<CountryDto>>.Success(countriesList);
-            }
-            catch (Exception ex)
-            {
-                return Result<List<CountryDto>>.Failure($"An error occurred while fetching the Country: {ex.Message}");
-            }
+                return new ApiResponseDTO<List<CountryDto>>
+                {
+                    IsSuccess = true,
+                    Message = "Success",
+                    Data = countriesList
+                };
+           
         }
     }
 }

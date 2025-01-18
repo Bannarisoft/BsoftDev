@@ -10,12 +10,13 @@ using Core.Domain.Entities;
 using Core.Application.Divisions.Queries.GetDivisions;
 using System.Data;
 using Core.Application.Common.Interfaces.IDivision;
+using Core.Application.Common.HttpResponse;
 
 
 
 namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
 {
-    public class GetDivisionAutoCompleteQueryHandler : IRequestHandler<GetDivisionAutoCompleteQuery,List<DivisionAutoCompleteDTO>>
+    public class GetDivisionAutoCompleteQueryHandler : IRequestHandler<GetDivisionAutoCompleteQuery,ApiResponseDTO<List<DivisionAutoCompleteDTO>>>
     {
         private readonly IDivisionQueryRepository _divisionRepository;
         private readonly IMapper _mapper;
@@ -24,22 +25,12 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
             _divisionRepository =divisionRepository;
             _mapper =mapper;
          }  
-          public async Task<List<DivisionAutoCompleteDTO>> Handle(GetDivisionAutoCompleteQuery request, CancellationToken cancellationToken)
+          public async Task<ApiResponseDTO<List<DivisionAutoCompleteDTO>>> Handle(GetDivisionAutoCompleteQuery request, CancellationToken cancellationToken)
           {
-             /*    var searchPattern = "%" + request.SearchPattern + "%";
-
-                 const string query = @"
-                 SELECT 
-                Id, 
-                Name
-            FROM AppData.Division where Name like @SearchPattern";
-
-            var division = await _dbConnection.QueryAsync<DivisionAutoCompleteDTO>(query, new { SearchPattern = searchPattern });
-            // Map to the application-specific DTO
-            return division.AsList(); */
+             
             var result = await _divisionRepository.GetDivision(request.SearchPattern);
-            //return _mapper.Map<List<DivisionDTO>>(result);
-            return _mapper.Map<List<DivisionAutoCompleteDTO>>(result);            
+            var division = _mapper.Map<List<DivisionAutoCompleteDTO>>(result);
+            return new ApiResponseDTO<List<DivisionAutoCompleteDTO>> { IsSuccess = true, Message = "Success", Data = division };            
          } 
     }
 }

@@ -1,5 +1,6 @@
 using AutoMapper;
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Application.Country.Queries.GetCountries;
 using Core.Domain.Entities;
@@ -8,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.Country.Commands.DeleteCountry
 {  
-  public class DeleteCountryCommandHandler : IRequestHandler<DeleteCountryCommand, Result<CountryDto>>
+  public class DeleteCountryCommandHandler : IRequestHandler<DeleteCountryCommand, ApiResponseDTO<CountryDto>>
     {
         private readonly ICountryCommandRepository _countryRepository;
         private readonly ICountryQueryRepository _countryQueryRepository;
@@ -22,12 +23,16 @@ namespace Core.Application.Country.Commands.DeleteCountry
             _countryQueryRepository = countryQueryRepository;
             _mediator = mediator;
         }       
-        public async Task<Result<CountryDto>> Handle(DeleteCountryCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<CountryDto>> Handle(DeleteCountryCommand request, CancellationToken cancellationToken)
         {
             var country = await _countryQueryRepository.GetByIdAsync(request.Id);
             if (country == null || country.IsActive != 1)
             {
-                return Result<CountryDto>.Failure("Invalid CountryID. The specified Country does not exist or is inactive.");
+                return new ApiResponseDTO<CountryDto>
+                {
+                    IsSuccess = false,
+                    Message = "Invalid CountryID. The specified Country does not exist or is inactive."
+                };
             }                       
             var countryUpdate = new Countries
             {
@@ -36,8 +41,7 @@ namespace Core.Application.Country.Commands.DeleteCountry
                 CountryName = country.CountryName, 
                 IsActive = 0
             };
-            try
-            {
+            
                 var updateResult = await _countryRepository.DeleteAsync(request.Id, countryUpdate);
                 if (updateResult > 0)
                 {
@@ -51,14 +55,19 @@ namespace Core.Application.Country.Commands.DeleteCountry
                         module:"Country"
                     );               
                     await _mediator.Publish(domainEvent, cancellationToken);              
-                    return Result<CountryDto>.Success(countryDto);
+                    return new ApiResponseDTO<CountryDto>
+                    {
+                        IsSuccess = true,
+                        Message = "Country deleted successfully.",
+                        Data = countryDto
+                    };
                 }
-                return Result<CountryDto>.Failure("Country deletion failed.");
-            }
-            catch (Exception ex)
-            {
-                return Result<CountryDto>.Failure($"An error occurred while deleting the Country: {ex.Message}");
-            }
+                return new ApiResponseDTO<CountryDto>
+                {
+                    IsSuccess = false,
+                    Message = "Country deletion failed."
+                };
+           
         }
     }
 }

@@ -10,10 +10,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using Core.Application.Common.Interfaces.IDepartment;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Departments.Queries.GetDepartmentById
 {
-    public class GetDepartmentByIdQueryHandler :IRequestHandler<GetDepartmentByIdQuery,DepartmentDto>
+    public class GetDepartmentByIdQueryHandler :IRequestHandler<GetDepartmentByIdQuery,ApiResponseDTO<DepartmentDto>>
     {
           private readonly IDepartmentQueryRepository _departmentRepository;        
         private readonly IMapper _mapper;
@@ -23,10 +24,11 @@ namespace Core.Application.Departments.Queries.GetDepartmentById
             _departmentRepository = departmentRepository;
             _mapper =mapper;
         } 
-      public async Task<DepartmentDto> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
+      public async Task<ApiResponseDTO<DepartmentDto>> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
         {
               var user = await _departmentRepository.GetByIdAsync(request.DepartmentId);
-            return _mapper.Map<DepartmentDto>(user);
+              var department = _mapper.Map<DepartmentDto>(user);
+            return new ApiResponseDTO<DepartmentDto> { IsSuccess = true, Message = "Success", Data = department };
 
         }
  

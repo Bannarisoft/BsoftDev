@@ -8,10 +8,11 @@ using MediatR;
 using System.Text;
 using System.Data;
 using Core.Application.Common.Interfaces.IDivision;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Divisions.Queries.GetDivisions
 {
-    public class GetDivisionQueryHandler : IRequestHandler<GetDivisionQuery,List<DivisionDTO>>
+    public class GetDivisionQueryHandler : IRequestHandler<GetDivisionQuery,ApiResponseDTO<List<DivisionDTO>>>
     {
         private readonly IDivisionQueryRepository _divisionRepository;        
         private readonly IMapper _mapper;
@@ -20,11 +21,11 @@ namespace Core.Application.Divisions.Queries.GetDivisions
             _divisionRepository = divisionRepository;
             _mapper =mapper;
         }
-        public async Task<List<DivisionDTO>> Handle(GetDivisionQuery requst, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<DivisionDTO>>> Handle(GetDivisionQuery requst, CancellationToken cancellationToken)
         {
             var users = await _divisionRepository.GetAllDivisionAsync();
             var userList = _mapper.Map<List<DivisionDTO>>(users);
-            return userList;
+            return new ApiResponseDTO<List<DivisionDTO>> { IsSuccess = true, Message = "Success", Data = userList };
         }
     }
 }

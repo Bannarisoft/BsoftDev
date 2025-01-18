@@ -1,8 +1,9 @@
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using MediatR;
 
 namespace Core.Application.Country.Queries.GetCountries
 {   
-   public class GetCountryQuery : IRequest<Result<List<CountryDto>>>;
+   public class GetCountryQuery : IRequest<ApiResponseDTO<List<CountryDto>>>;
           
 }
