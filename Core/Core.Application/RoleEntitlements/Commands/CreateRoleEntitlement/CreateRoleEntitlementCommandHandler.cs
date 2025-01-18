@@ -9,64 +9,77 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IRoleEntitlement;
 using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
-    public class CreateRoleEntitlementCommandHandler : IRequestHandler<CreateRoleEntitlementCommand, int>
+    public class CreateRoleEntitlementCommandHandler : IRequestHandler<CreateRoleEntitlementCommand, ApiResponseDTO<int>>
     {
         private readonly IRoleEntitlementCommandRepository _repository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
+        private readonly ILogger<CreateRoleEntitlementCommandHandler> _logger;
 
 
-        public CreateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper, IMediator mediator)
+
+        public CreateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper, IMediator mediator,ILogger<CreateRoleEntitlementCommandHandler> logger)
         {
             _repository = repository;
             _mapper = mapper;
             _mediator = mediator;    
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         }
 
-        public async Task<int> Handle(CreateRoleEntitlementCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<int>> Handle(CreateRoleEntitlementCommand request, CancellationToken cancellationToken)
         {
-        // Validate the role
-        var role = await _repository.GetRoleByNameAsync(request.RoleName, cancellationToken);
 
-        if (role == null)
-        {
-            throw new InvalidOperationException("Role not found.");
-        }
-            // Validate Modules and Menus
-           foreach (var moduleMenu in request.ModuleMenus)
-    {
-        if (moduleMenu.ModuleId <= 0)
-        {
-            throw new ValidationException("Module ID must be greater than 0.");
-        }
-
-        var moduleExists = await _repository.ModuleExistsAsync(moduleMenu.ModuleId, cancellationToken);
-        if (!moduleExists)
-        {
-            throw new ValidationException($"Module with ID '{moduleMenu.ModuleId}' does not exist.");
-        }
-
-        foreach (var menu in moduleMenu.Menus)
-        {
-            if (menu.MenuId <= 0)
+            if (request == null)
             {
-                throw new ValidationException("Menu ID must be greater than 0.");
+                _logger.LogError("CreateRoleEntitlementCommand request is null.");
+                throw new ArgumentNullException(nameof(request));
             }
 
-            var menuExists = await _repository.MenuExistsAsync(menu.MenuId, cancellationToken);
-            if (!menuExists)
+            _logger.LogInformation("Starting role entitlement creation process for RoleName: {RoleName}", request.RoleName);
+            
+            // Validate the role
+            var role = await _repository.GetRoleByNameAsync(request.RoleName, cancellationToken);
+            if (role == null)
             {
-                throw new ValidationException($"Menu with ID '{menu.MenuId}' does not exist.");
+                throw new ValidationException("Role not found.");
             }
-        }
-        }
+           // Validate Modules and Menus
+            foreach (var moduleMenu in request.ModuleMenus)
+            {
+                if (moduleMenu.ModuleId <= 0)
+                {
+                    throw new ValidationException("Module ID must be greater than 0.");
+                }
+
+                var moduleExists = await _repository.ModuleExistsAsync(moduleMenu.ModuleId, cancellationToken);
+                if (!moduleExists)
+                {
+                    throw new ValidationException($"Module with ID '{moduleMenu.ModuleId}' does not exist.");
+                }
+
+                foreach (var menu in moduleMenu.Menus)
+                {
+                    if (menu.MenuId <= 0)
+                    {
+                        throw new ValidationException("Menu ID must be greater than 0.");
+                    }
+
+                    var menuExists = await _repository.MenuExistsAsync(menu.MenuId, cancellationToken);
+                    if (!menuExists)
+                    {
+                        throw new ValidationException($"Menu with ID '{menu.MenuId}' does not exist.");
+                    }
+                }
+            }
         // Map ModuleMenuPermissionDto to RoleEntitlement
-        var roleEntitlements = request.ModuleMenus
-            .SelectMany(moduleMenu => moduleMenu.Menus
+            var roleEntitlements = request.ModuleMenus
+                .SelectMany(moduleMenu => moduleMenu.Menus
                 .Select(menu => 
                 {
                     var entitlement = _mapper.Map<RoleEntitlement>(menu);
@@ -77,7 +90,7 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
             .ToList();
 
         // Save RoleEntitlements
-        await _repository.AddRoleEntitlementsAsync(roleEntitlements, cancellationToken);
+            await _repository.AddRoleEntitlementsAsync(roleEntitlements, cancellationToken);
         //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Create",
@@ -86,9 +99,15 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
                     details: $"RoleEntitlement '{role.RoleName}' was created. RoleName: {role.RoleName}",
                     module:"RoleEntitlement"
                 );
-                await _mediator.Publish(domainEvent, cancellationToken);
+            await _mediator.Publish(domainEvent, cancellationToken);
+            _logger.LogInformation("Role entitlements successfully created for RoleName: {RoleName}", request.RoleName);
 
-        return roleEntitlements.Count;
+            return new ApiResponseDTO<int>
+            {
+                IsSuccess = true,
+                Message = "Role entitlements created successfully.",
+                Data = roleEntitlements.Count
+            };
         }
 
     }
