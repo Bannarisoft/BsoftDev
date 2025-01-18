@@ -2,11 +2,12 @@ using MediatR;
 using AutoMapper;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
 
 
 namespace Core.Application.Users.Commands.UpdateUser
 {
-    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, int>
+    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, ApiResponseDTO<bool>>
     {
         private readonly IUserCommandRepository _userRepository;
         private readonly IMapper _mapper;
@@ -21,14 +22,18 @@ namespace Core.Application.Users.Commands.UpdateUser
             
         }
 
-        public async Task<int> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<bool>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            // Fetch the existing user
+             // Fetch the existing user
             var existingUser = await _userRepository.GetByIdAsync(request.UserId);
-
             if (existingUser == null)
             {
-                throw new KeyNotFoundException("User not found.");
+                return new ApiResponseDTO<bool>
+                {
+                    IsSuccess = false,
+                    Message = "User not found.",
+                    Data = false
+                };
             }
 
             var OldUserName = existingUser.UserName;
@@ -52,10 +57,25 @@ namespace Core.Application.Users.Commands.UpdateUser
             }
 
             // Update the user in the repository
-            await _userRepository.UpdateAsync(request.UserId,existingUser);
+            var RowsUpdated = await _userRepository.UpdateAsync(request.UserId, existingUser);
+            bool isUpdated = RowsUpdated > 0; 
 
-            // Return the updated user's ID
-            return existingUser.UserId;
+            if (isUpdated)
+            {
+                return new ApiResponseDTO<bool>
+                {
+                    IsSuccess = true,
+                    Message = "User updated successfully.",
+                    Data = true
+                };
+            }
+
+            return new ApiResponseDTO<bool>
+            {
+                IsSuccess = false,
+                Message = "User update failed.",
+                Data = false
+            };
 
          }
     }

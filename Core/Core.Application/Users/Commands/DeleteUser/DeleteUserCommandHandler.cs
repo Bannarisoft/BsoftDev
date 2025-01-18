@@ -1,4 +1,5 @@
 using AutoMapper;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Domain.Entities;
 using Core.Domain.Events;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Users.Commands.DeleteUser
 {
-    public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, int>
+    public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, ApiResponseDTO<bool>>
     {
         private readonly IUserCommandRepository _userRepository;
         private readonly IMapper _mapper;
@@ -21,9 +22,10 @@ namespace Core.Application.Users.Commands.DeleteUser
 
 
         }
-        public async Task<int> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<bool>> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
             var UserDelete = _mapper.Map<User>(request);
+                UserDelete.IsActive = request.IsActive;
             //Domain Event  
                     var domainEvent = new AuditLogsDomainEvent(
                         actionDetail: "Delete",
@@ -34,10 +36,26 @@ namespace Core.Application.Users.Commands.DeleteUser
                         module:"User"
                     );               
                     await _mediator.Publish(domainEvent, cancellationToken);  
+          // Perform the delete operation
+            var RowsDeleted = await _userRepository.DeleteAsync(request.UserId, UserDelete);
+            bool isDeleted = RowsDeleted > 0; 
 
-            UserDelete.IsActive = request.IsActive;
+            if (isDeleted)
+            {
+                return new ApiResponseDTO<bool>
+                {
+                    IsSuccess = true,
+                    Message = "User deleted successfully.",
+                    Data = true
+                };
+            }
 
-            return await _userRepository.DeleteAsync(request.UserId, UserDelete);           
+                return new ApiResponseDTO<bool>
+                {
+                    IsSuccess = false,
+                    Message = "User could not be deleted.",
+                    Data = false
+                };          
 
         }
     }

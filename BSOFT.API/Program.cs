@@ -6,7 +6,7 @@ using Core.Application;
 using BSOFT.Infrastructure;
 using BSOFT.API.Validation.Common;
 using Serilog;
-using BSOFT.API.Middlewares;using MediatR;
+using MediatR;
 using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
 using BSOFT.API;
@@ -86,8 +86,6 @@ if (!result.IsSuccess)
     return Results.Created($"/states/{result.Data.Id}", result.Data);
 });
 
-// Use Global Exception Middleware
-app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Register LoggingMiddleware
 app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
