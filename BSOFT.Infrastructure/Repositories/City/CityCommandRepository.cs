@@ -28,7 +28,7 @@ namespace BSOFT.Infrastructure.Repositories.City
             }
             return 0; // No user found
         }
-        public async Task<bool> UpdateAsync(int id, Cities city)
+        public async Task<int> UpdateAsync(int id, Cities city)
         {
             var existingCity = await _applicationDbContext.Cities.FirstOrDefaultAsync(u => u.Id == id);             
     
@@ -39,9 +39,9 @@ namespace BSOFT.Infrastructure.Repositories.City
                 existingCity.StateId = city.StateId;                
                 
                 _applicationDbContext.Cities.Update(existingCity);
-                return await _applicationDbContext.SaveChangesAsync() > 0;
+                return await _applicationDbContext.SaveChangesAsync();
             }
-           return false; 
+           return 0; 
         }
         public async Task<bool> StateExistsAsync(int stateId)
         {        

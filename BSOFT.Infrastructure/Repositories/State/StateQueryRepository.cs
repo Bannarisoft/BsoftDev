@@ -1,14 +1,11 @@
 using Core.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using BSOFT.Infrastructure.Data;
 using System.Data;
 using Dapper;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces.IState;
 
 namespace BSOFT.Infrastructure.Repositories
-{
-    
+{    
     public class StateQueryRepository : IStateQueryRepository
     {        
         private readonly IDbConnection _dbConnection;
@@ -40,13 +37,12 @@ namespace BSOFT.Infrastructure.Repositories
             return state;
         }
 
-        public async Task<Result<List<States>>> GetByStateNameAsync(string searchPattern)
+        public async Task<List<States>> GetByStateNameAsync(string searchPattern)
         {
             if (string.IsNullOrWhiteSpace(searchPattern))
-            {
-                return Result<List<States>>.Failure("City name cannot be null or empty.");
-            }
-
+            {                
+                throw new ArgumentException("State name cannot be null or empty.", nameof(searchPattern));
+            }           
             const string query = @"
                 SELECT Id, StateCode, StateName,countryId, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
                 ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
@@ -59,13 +55,8 @@ namespace BSOFT.Infrastructure.Repositories
                 query,
                 new { SearchPattern = $"%{searchPattern}%" }
             );
-
-            if (states == null || !states.Any())
-            {
-                return Result<List<States>>.Failure("No States found.");
-            }
-
-            return Result<List<States>>.Success(states.ToList());        
+            var result = await _dbConnection.QueryAsync<States>(query, new { SearchPattern = $"%{searchPattern}%" });
+            return result.ToList();              
         }
    }
 }

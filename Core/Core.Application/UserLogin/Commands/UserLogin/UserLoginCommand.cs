@@ -13,8 +13,8 @@ namespace Core.Application.UserLogin.Commands.UserLogin
     public class UserLoginCommand : IRequest<ApiResponseDTO<LoginResponse>>
     {
         // public LoginRequest Request { get; set; }
-        public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public string? Username { get; set; }
+        public string? Password { get; set; }
 
     }
 

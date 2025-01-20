@@ -1,9 +1,7 @@
 using MediatR;
 using AutoMapper;
-using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
-using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Country.Queries.GetCountries
@@ -20,26 +18,25 @@ namespace Core.Application.Country.Queries.GetCountries
             _mediator = mediator;
         }
         public async Task<ApiResponseDTO<List<CountryDto>>> Handle(GetCountryQuery request, CancellationToken cancellationToken)
-        {    
-          
-                var countries = await _countryRepository.GetAllCountriesAsync();
-                var countriesList = _mapper.Map<List<CountryDto>>(countries);
-                
-                //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetAll",
-                    actionCode: "",        
-                    actionName: "",
-                    details: $"Country details was fetched.",
-                    module:"Country"
-                );
-                await _mediator.Publish(domainEvent, cancellationToken);
-                return new ApiResponseDTO<List<CountryDto>>
-                {
-                    IsSuccess = true,
-                    Message = "Success",
-                    Data = countriesList
-                };
+        {            
+            var countries = await _countryRepository.GetAllCountriesAsync();
+            var countriesList = _mapper.Map<List<CountryDto>>(countries);
+            
+            //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "GetAll",
+                actionCode: "",        
+                actionName: "",
+                details: $"Country details was fetched.",
+                module:"Country"
+            );
+            await _mediator.Publish(domainEvent, cancellationToken);
+            return new ApiResponseDTO<List<CountryDto>>
+            {
+                IsSuccess = true,
+                Message = "Success",
+                Data = countriesList
+            };
            
         }
     }

@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using Dapper;
 using BSOFT.Infrastructure.Data;
 using System.Data;
-using Core.Application.Common.Interfaces.IUserPasswordNotifications;
+using Core.Application.Common.Interfaces.INotifications;
 
-namespace BSOFT.Infrastructure.Repositories.PwdResetNotifications
+namespace BSOFT.Infrastructure.Repositories.Notifications
 {
-    public class PwdResetNotificationsQueryRepository : IUserPwdNotificationsQueryRepository
+    public class NotificationsQueryRepository : INotificationsQueryRepository
     {
         private readonly IDbConnection _dbConnection;
-        public PwdResetNotificationsQueryRepository(IDbConnection dbConnection)
+        public NotificationsQueryRepository(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }
@@ -33,7 +33,7 @@ namespace BSOFT.Infrastructure.Repositories.PwdResetNotifications
 
         public async Task<(int PwdExpiryDays, int PwdExpiryAlertDays)> GetPasswordExpiryDays()
         {
-             var query = @"SELECT PwdExpiryDays, PwdExpiryAlertDays FROM AdminSettings";
+             var query = @"SELECT PasswordExpiryDays, PasswordExpiryAlertDays FROM AppSecurity.AdminSecuritySettings";
              var result = await _dbConnection.QueryFirstOrDefaultAsync<(int PwdExpiryDays, int PwdExpiryAlertDays)>(query);
              return result;
         }

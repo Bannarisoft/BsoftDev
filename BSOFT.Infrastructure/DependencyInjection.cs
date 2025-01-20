@@ -26,7 +26,6 @@ using BSOFT.Infrastructure.Repositories.UserRoles;
 using Core.Application.Common.Interfaces.IUserRole;
 using BSOFT.Infrastructure.Repositories.Companies;
 using Core.Application.Common.Interfaces.ICompany;
-
 using BSOFT.Infrastructure.Repositories.Units;
 using Core.Application.Common.Interfaces.IUnit;
 using BSOFT.Infrastructure.Repositories.Entities;
@@ -37,15 +36,14 @@ using Core.Domain.Entities;
 using Core.Application.Common.Interfaces.IUserRoleAllocation;
 using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationQueryRepository;
 using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationCommandRepository;
-using Core.Application.Common.Interfaces.IPasswordComplexityRule;
-using BSOFT.Infrastructure.Repositories.PasswordComplexityRule;
-using Core.Application.Common.Interfaces.IAdminSecuritySettings;
-using BSOFT.Infrastructure.Repositories.AdminSecuritySettings;
 using Core.Application.Common.Interfaces.AuditLog;
 using Infrastructure.Data;
 using BSOFT.Infrastructure.Logging;
 using Serilog;
-
+using Core.Application.Common.Interfaces.IUserSession;
+using Core.Application.Notification.Queries;
+using Core.Application.Common.Interfaces.INotifications;
+using BSOFT.Infrastructure.Repositories.Notifications;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -98,7 +96,6 @@ namespace BSOFT.Infrastructure
         });
 
             // Configure JWT settings
-
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));       
 
         // Register ILogger<T>
@@ -122,7 +119,6 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IUserRoleQueryRepository, UserRoleQueryRepository>();
             services.AddScoped<ICompanyCommandRepository, CompanyCommandRepository>();
             services.AddScoped<ICompanyQueryRepository, CompanyQueryRepository>();
-
             services.AddScoped<IUnitCommandRepository, UnitCommandRepository>();
             services.AddScoped<IUnitQueryRepository, UnitQueryRepository>();
             services.AddScoped<IEntityCommandRepository, EntityCommandRepository>();
@@ -135,15 +131,14 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IStateQueryRepository, StateQueryRepository>();
             services.AddScoped<ICityCommandRepository, CityCommandRepository>();
             services.AddScoped<ICityQueryRepository, CityQueryRepository>();
-
-            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-            services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
-            services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();    
-            services.AddScoped<IPasswordComplexityRuleQueryRepository,  PasswordComplexityRuleQueryRepository>();
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();    
+            services.AddScoped<IUserSessionRepository, UserSessionRepository>();
+ 			services.AddTransient<NotificationsQueryHandler>();  
+            services.AddTransient<INotificationsQueryRepository, NotificationsQueryRepository>();                             
+			services.AddScoped<IPasswordComplexityRuleQueryRepository,  PasswordComplexityRuleQueryRepository>();
             services.AddScoped<IPasswordComplexityRuleCommandRepository, PasswordComplexityRuleCommandRepository>();
             services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
-            services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();                             
-            services.AddHttpContextAccessor();            
+            services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            services.AddHttpContextAccessor();            
             
 
             // Miscellaneous services
@@ -159,11 +154,11 @@ namespace BSOFT.Infrastructure
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
                 typeof(ChangePasswordProfile),             
-                typeof(PasswordComplexityRuleProfile),
+				typeof(PasswordComplexityRuleProfile),
                 typeof(EntityProfile),
-                typeof(AdminSecuritySettingsProfile),
                 typeof(UnitProfile),
-                typeof(DepartmentProfile),                 
+ 				typeof(AdminSecuritySettingsProfile),
+				typeof(DepartmentProfile),
                 typeof(UpdateUnitProfile),
                 typeof(CreateUnitProfile),
                 typeof(UpdateUnitProfile)

@@ -9,9 +9,6 @@ using Serilog;
 using MediatR;
 using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
-using BSOFT.API;
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +62,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.AllowAnyOrigin();
+            policy.AllowAnyMethod();
+            policy.AllowAnyHeader();
+        });
+});
 
 
 var app = builder.Build();
@@ -80,7 +87,7 @@ app.MapPost("/state", async (
     
 if (!result.IsSuccess)
     {
-        return Results.BadRequest(result.ErrorMessage);
+        return Results.BadRequest(result);
     }
 
     return Results.Created($"/states/{result.Data.Id}", result.Data);
@@ -99,12 +106,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseMiddleware<GlobalExceptionMiddleware>();// Register custom middleware
+
 app.UseRouting(); // Enable routing
 app.UseAuthentication();
 
 app.UseAuthorization();
-
+app.UseCors();
 
 app.MapControllers();
 

@@ -7,6 +7,7 @@ using Core.Application.Common.Exceptions;
 using Core.Application.Common;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Entity.Queries.GetEntityAutoComplete
 {
@@ -16,20 +17,26 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
 
-    public GetEntityAutocompleteQueryHandler(IEntityQueryRepository entityRepository,  IMapper mapper,IMediator mediator)
+        private readonly ILogger<GetEntityAutocompleteQueryHandler> _logger;
+
+
+    public GetEntityAutocompleteQueryHandler(IEntityQueryRepository entityRepository,  IMapper mapper,IMediator mediator,ILogger<GetEntityAutocompleteQueryHandler> logger)
     {
          _entityRepository = entityRepository;
          _mapper =mapper;
          _mediator = mediator;
+         _logger = logger?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<ApiResponseDTO<List<EntityDto>>> Handle(GetEntityAutocompleteQuery request, CancellationToken cancellationToken)
     {
 
-              
+                 _logger.LogInformation("Search pattern started: {SearchPattern}", request.SearchPattern);
                 var entities = await _entityRepository.GetByEntityNameAsync(request.SearchPattern);
-                if (entities == null || !entities.Any())
+
+                if (entities == null || !entities.Any() || entities.Count == 0)
                 {
+                 _logger.LogWarning("No Entity Record {Entity} not found in DB.", request.SearchPattern);
                      return new ApiResponseDTO<List<EntityDto>>
                      {
                          IsSuccess = false,
@@ -40,12 +47,13 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetEntityAutocompleteQuery",
-                    actionCode:"",        
+                    actionCode:"Get Entity Autocomplete",        
                     actionName: request.SearchPattern,                
                     details: $"Entity '{request.SearchPattern}' was searched",
                     module:"Entity"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
+                 _logger.LogInformation("Entity {Entities} Listed successfully.", entities.Count);
                 return new ApiResponseDTO<List<EntityDto>>
                 {
                     IsSuccess = true,
