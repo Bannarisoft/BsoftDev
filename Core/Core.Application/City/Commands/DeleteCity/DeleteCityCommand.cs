@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Application.City.Queries.GetCities;
-using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using MediatR;
 

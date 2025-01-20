@@ -10,5 +10,10 @@ namespace Core.Application.Common.HttpResponse
          public bool IsSuccess { get; set; }
          public string Message { get; set; }
          public T Data { get; set; }
+
+        public object Where(Func<object, object> value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -18,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Configure Serilog for logging to MongoDB and console
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console() // Log to console for debugging
-    .WriteTo.MongoDB("mongodb://localhost:27017/Bannari") // MongoDB connection string (adjust as needed)
+    .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari") // MongoDB connection string (adjust as needed)
     .Enrich.FromLogContext()
     .CreateLogger();
 
@@ -68,7 +68,7 @@ builder.Services.AddProblemDetails();
 
 
 var app = builder.Build();
- 
+/*  
  // Map endpoint to handle CreateStateCommand
 app.MapPost("/state", async (
     CreateStateCommand request,
@@ -80,16 +80,16 @@ app.MapPost("/state", async (
     
 if (!result.IsSuccess)
     {
-        return Results.BadRequest(result.ErrorMessage);
+        return Results.BadRequest(result);
     }
 
     return Results.Created($"/states/{result.Data.Id}", result.Data);
 });
-
+ */
 
 // Register LoggingMiddleware
 app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
-
+//app.UseMiddleware<GlobalExceptionMiddleware>();// Register custom middleware
 // Configure the HTTP request pipeline. 
 if (app.Environment.IsDevelopment())
 {
@@ -99,7 +99,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseMiddleware<GlobalExceptionMiddleware>();// Register custom middleware
+
 app.UseRouting(); // Enable routing
 app.UseAuthentication();
 

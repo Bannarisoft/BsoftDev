@@ -50,8 +50,13 @@ namespace BSOFT.API.Controllers
 
                  var result = await Mediator.Send(new GetAuditLogBySearchPatternQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
                 if (!result.IsSuccess)
-                {
-                    return NotFound(new { Message = result.ErrorMessage });
+                {                    
+                    return Ok(new 
+                    {
+                        StatusCode=StatusCodes.Status200OK,
+                        message = result.Message,
+                        data = result.Data
+                    });
                 }
                 return Ok(result.Data);
             }

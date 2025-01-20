@@ -1,5 +1,4 @@
 using AutoMapper;
-using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Application.Country.Commands.CreateCountry;

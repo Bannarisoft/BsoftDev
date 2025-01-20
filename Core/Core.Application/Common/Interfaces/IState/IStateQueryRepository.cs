@@ -6,6 +6,6 @@ namespace Core.Application.Common.Interfaces.IState
     {
         Task<States>  GetByIdAsync(int stateId);
         Task<List<States>> GetAllStatesAsync();        
-        Task<Result<List<States>>> GetByStateNameAsync(string stateName);           
+        Task<List<States>> GetByStateNameAsync(string stateName);           
     }
 }
