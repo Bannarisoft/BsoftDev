@@ -42,6 +42,7 @@ using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationQue
 using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationCommandRepository;
 using Core.Application.Common.Interfaces.AuditLog;
 using Infrastructure.Data;
+using Core.Application.Common.Interfaces.IUserSession;
 
 
 namespace BSOFT.Infrastructure
@@ -130,6 +131,7 @@ namespace BSOFT.Infrastructure
             services.AddScoped<ICityCommandRepository, CityCommandRepository>();
             services.AddScoped<ICityQueryRepository, CityQueryRepository>();
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();                                 
+            services.AddScoped<IUserSessionRepository, UserSessionRepository>();    
             services.AddHttpContextAccessor();            
             
 

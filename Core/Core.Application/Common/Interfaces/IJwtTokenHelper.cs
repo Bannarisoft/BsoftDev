@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace Core.Application.Common.Interfaces
 {
     public interface IJwtTokenHelper
     {
-        string GenerateToken(string username, IEnumerable<string> roles);
+        string GenerateToken(string username,int userid,int usertype, IEnumerable<string> roles, out string jti);
+        ClaimsPrincipal ValidateToken(string token);
     }
 }

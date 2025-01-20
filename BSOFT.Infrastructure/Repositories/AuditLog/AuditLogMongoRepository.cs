@@ -18,17 +18,13 @@ namespace BSOFT.Infrastructure.Repositories
             
             _httpContextAccessor = httpContextAccessor;
         }
-/* 
         public async Task<AuditLogs> CreateAsync(AuditLogs auditLog)
         {
             if (auditLog == null) throw new ArgumentNullException(nameof(auditLog));
-
-            //AuditLogHelper.UpdateAuditFields(auditLog,  _httpContextAccessor);
-            //await _mongoDbContext.InsertOneAsync(auditLog);
             await _mongoDbContext.GetCollection<dynamic>("AuditLogs").InsertOneAsync(auditLog);
             return auditLog;
         }
- */
+ 
         public async Task<List<AuditLogs>> GetAllAsync()
         {
             return await _mongoDbContext.GetCollection<AuditLogs>("AuditLogs").Find(_ => true).ToListAsync();

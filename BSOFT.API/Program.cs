@@ -8,6 +8,8 @@ using BSOFT.API.Validation.Common;
 using MediatR;
 using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
+using BSOFT.API.Middleware;
+using BSOFT.Infrastructure.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,7 +38,8 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true, // Ensure the signature is valid
         ValidIssuer = jwtSettings.Issuer,
         ValidAudience = jwtSettings.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+        ClockSkew = TimeSpan.Zero
     };
 });
 
@@ -52,12 +55,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddHostedService<SessionCleanupService>();
 var app = builder.Build();
  
- // Map endpoint to handle CreateStateCommand
-app.MapPost("/state", async (
-    CreateStateCommand request,
+/*  // Map endpoint to handle CreateStateCommand
+app.MapPost("/AuditLog", async (
+    CreateAuditLogCommand request,
     IMediator mediator,
     CancellationToken cancellationToken) =>
 {
@@ -68,21 +71,23 @@ app.MapPost("/state", async (
         return Results.BadRequest(result.ErrorMessage);
     }
 
-    return Results.Created($"/states/{result.Data.Id}", result.Data);
+    return Results.Created($"/auditLogs/{result.Data.Id}", result.Data);
 });
-
+ */
 // Configure the HTTP request pipeline. 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseRouting();
+app.UseMiddleware<TokenValidationMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
+
 
 app.MapControllers();
 

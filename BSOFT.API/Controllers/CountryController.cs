@@ -5,8 +5,10 @@ using Core.Application.Country.Commands.UpdateCountry;
 using Core.Application.Country.Queries.GetCountries;
 using Core.Application.Country.Queries.GetCountryAutoComplete;
 using Core.Application.Country.Queries.GetCountryById;
+using Core.Application.UserSession;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
@@ -34,6 +36,7 @@ namespace BSOFT.API.Controllers
             return Ok(countries);
         }
         [HttpGet("{countryId}")]
+        [Authorize]
         public async Task<IActionResult> GetByIdAsync(int countryId)
         {
             if (countryId <= 0)
@@ -47,7 +50,19 @@ namespace BSOFT.API.Controllers
             }
             return Ok(result.Data);
         }
-        
+          [HttpGet("user-session/{userId}")]
+    public async Task<IActionResult> GetUserSession(int userId)
+    {
+        var query = new GetUserSessionQuery { UserId = userId };
+        var session = await Mediator.Send(query);
+
+        if (session == null)
+        {
+            return NotFound("No active session found for the user.");
+        }
+
+        return Ok(session);
+    }
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateCountryCommand  command)
         { 
