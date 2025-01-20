@@ -14,7 +14,7 @@ namespace BSOFT.API.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-         private readonly IValidator<UserLoginCommand> _userLoginCommandValidator;
+    private readonly IValidator<UserLoginCommand> _userLoginCommandValidator;
 
         private readonly ILogger<AuthController> _logger;
         private readonly IUserSessionRepository _userSessionRepository;

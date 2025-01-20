@@ -41,7 +41,9 @@ using Infrastructure.Data;
 using BSOFT.Infrastructure.Logging;
 using Serilog;
 using Core.Application.Common.Interfaces.IUserSession;
-
+using Core.Application.Notification.Queries;
+using Core.Application.Common.Interfaces.INotifications;
+using BSOFT.Infrastructure.Repositories.Notifications;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -130,7 +132,9 @@ namespace BSOFT.Infrastructure
             services.AddScoped<ICityCommandRepository, CityCommandRepository>();
             services.AddScoped<ICityQueryRepository, CityQueryRepository>();
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();    
-            services.AddScoped<IUserSessionRepository, UserSessionRepository>();                             
+            services.AddScoped<IUserSessionRepository, UserSessionRepository>();
+ 			services.AddTransient<NotificationsQueryHandler>();  
+            services.AddTransient<INotificationsQueryRepository, NotificationsQueryRepository>();                             
             services.AddHttpContextAccessor();            
             
 
