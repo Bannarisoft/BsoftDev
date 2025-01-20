@@ -1,9 +1,9 @@
-using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Mappings;
 
 namespace Core.Application.Entity.Queries.GetEntity
 {
-    public class EntityDto :IMapFrom<Result <Core.Domain.Entities.Entity>>
+    public class EntityDto :IMapFrom<ApiResponseDTO <Core.Domain.Entities.Entity>>
     {
     public int Id { get; set; }
     public string EntityCode { get; set; }

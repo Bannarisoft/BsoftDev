@@ -1,7 +1,6 @@
 using AutoMapper;
 using MediatR;
 using Core.Application.City.Queries.GetCities; 
-using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
@@ -23,35 +22,33 @@ namespace Core.Application.City.Queries.GetCityAutoComplete
         }
 
         public async Task<ApiResponseDTO<List<CityDto>>> Handle(GetCityAutoCompleteQuery request, CancellationToken cancellationToken)
-        {
-             
-                var result = await _cityRepository.GetByCityNameAsync(request.SearchPattern);
-                if (!result.IsSuccess || result.Data == null || !result.Data.Any())
-                {
-                    return new ApiResponseDTO<List<CityDto>>
-                    {
-                        IsSuccess = false,
-                        Message = "No Cities found matching the search pattern."
-                    };
-                }
-                var cityDto = _mapper.Map<List<CityDto>>(result.Data);
-                 //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetAutoComplete",
-                    actionCode:"",        
-                    actionName: request.SearchPattern,                
-                    details: $"City '{request.SearchPattern}' was searched",
-                    module:"City"
-                );
-                await _mediator.Publish(domainEvent, cancellationToken);
+        {             
+            var result = await _cityRepository.GetByCityNameAsync(request.SearchPattern);
+            if (result == null || result.Count == 0)
+            {
                 return new ApiResponseDTO<List<CityDto>>
                 {
-                    IsSuccess = true,
-                    Message = "Success",
-                    Data = cityDto
+                    IsSuccess = false,
+                    Message = "No Cities found matching the search pattern."
                 };
-           
+            }
+            var cityDto = _mapper.Map<List<CityDto>>(result);
+            //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "GetAutoComplete",
+                actionCode:"",        
+                actionName: request.SearchPattern,                
+                details: $"City '{request.SearchPattern}' was searched",
+                module:"City"
+            );
+            await _mediator.Publish(domainEvent, cancellationToken);
+            return new ApiResponseDTO<List<CityDto>>
+            {
+                IsSuccess = true,
+                Message = "Success",
+                Data = cityDto
+            };
+          
         }
-    }
-  
+    }  
 }

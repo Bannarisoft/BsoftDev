@@ -3,37 +3,51 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IModule;
 using Core.Domain.Events;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Modules.Queries.GetModules
 {
     public class GetModulesQueryHandler : IRequestHandler<GetModulesQuery, List<ModuleDto>>
     {
-    private readonly IModuleQueryRepository _moduleRepository;
-    private readonly IMapper _mapper;
+        private readonly IModuleQueryRepository _moduleRepository;
+        private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
+        private readonly ILogger<GetModulesQueryHandler> _logger;
 
-
-    public GetModulesQueryHandler(IModuleQueryRepository moduleRepository, IMapper mapper, IMediator mediator)
+    public GetModulesQueryHandler(IModuleQueryRepository moduleRepository, IMapper mapper, IMediator mediator,ILogger<GetModulesQueryHandler> logger)
     {
         _moduleRepository = moduleRepository;
         _mapper = mapper;
         _mediator = mediator;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     }
 
     public async Task<List<ModuleDto>> Handle(GetModulesQuery request, CancellationToken cancellationToken)
     {
-        var modules = await _moduleRepository.GetAllModulesAsync();
-        //Domain Event
+        _logger.LogInformation("Fetching all modules from the repository.");
+        // Fetch all modules from the repository
+            var modules = await _moduleRepository.GetAllModulesAsync();
+            if (modules == null || modules.Count == 0)
+            {
+                _logger.LogWarning("No modules found in the repository.");
+                return new List<ModuleDto>();
+            }
+
+            var moduleList= _mapper.Map<List<ModuleDto>>(modules);
+            _logger.LogInformation("Fetched {ModuleCount} modules from the repository.", modules.Count);
+
+        //Publish Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetAll",
-                    actionCode: "",        
-                    actionName: "",
-                    details: $"Module details was fetched.",
+                    actionDetail: "Fetch",
+                    actionCode: "GetAllModules",        
+                    actionName: "Get Modules",
+                    details: $"Fetched details of {modules.Count} modules.",
                     module:"Module"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-        return _mapper.Map<List<ModuleDto>>(modules);
+                return moduleList;
+
     }
     }
 }

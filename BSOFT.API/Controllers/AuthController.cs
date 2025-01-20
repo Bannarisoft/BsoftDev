@@ -1,9 +1,9 @@
 using Core.Application.UserLogin.Commands.UserLogin;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using FluentValidation;
+using Core.Application.Common.Interfaces.IUserSession;
 
 namespace BSOFT.API.Controllers
 {
@@ -17,13 +17,15 @@ namespace BSOFT.API.Controllers
     private readonly IValidator<UserLoginCommand> _userLoginCommandValidator;
 
         private readonly ILogger<AuthController> _logger;
+        private readonly IUserSessionRepository _userSessionRepository;
 
-        public AuthController(IMediator mediator,IValidator<UserLoginCommand> userLoginCommandValidator, IMapper mapper, ILogger<AuthController> logger)
+        public AuthController(IMediator mediator,IValidator<UserLoginCommand> userLoginCommandValidator, IMapper mapper, ILogger<AuthController> logger,IUserSessionRepository userSessionRepository)
         {
             _mediator = mediator;
             _userLoginCommandValidator = userLoginCommandValidator;
             _mapper = mapper;
             _logger = logger;
+             _userSessionRepository = userSessionRepository;
         }
 
         [HttpPost("login")]
@@ -70,6 +72,61 @@ namespace BSOFT.API.Controllers
             {
                 StatusCode = StatusCodes.Status400BadRequest,
                 Message = response.Message
+            });
+        }
+       // Get session by JWT ID
+        [HttpGet("session/{jwtId}")]
+        
+        public async Task<IActionResult> GetSessionByJwtId(string jwtId)
+        {
+            if (string.IsNullOrEmpty(jwtId))
+            {
+                return BadRequest(new { Message = "JWT ID cannot be null or empty." });
+            }
+
+            var session = await _userSessionRepository.GetSessionByJwtIdAsync(jwtId);
+
+            if (session == null)
+            {
+                return NotFound(new { Message = "Session not found for the provided JWT ID." });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Session retrieved successfully.",
+                Data = session
+            });
+        }
+
+        // Deactivate expired sessions
+        [HttpPost("deactivate-expired")]
+        
+        public async Task<IActionResult> DeactivateExpiredSessions()
+        {
+            await _userSessionRepository.DeactivateExpiredSessionsAsync();
+
+            _logger.LogInformation("Expired sessions have been deactivated.");
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Expired sessions have been deactivated."
+            });
+        }
+      
+                        // Deactivate user sessions by User ID
+        [HttpPost("deactivate-user-session/{userId}")]
+        public async Task<IActionResult> DeactivateUserSessionsAsync(int userId)
+        {
+            await _userSessionRepository.DeactivateUserSessionsAsync(userId);
+
+            _logger.LogInformation("All sessions for user {UserId} have been deactivated.", userId);
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = $"All sessions for user {userId} have been deactivated."
             });
         }
     }

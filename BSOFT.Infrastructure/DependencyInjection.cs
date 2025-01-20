@@ -40,10 +40,10 @@ using Core.Application.Common.Interfaces.AuditLog;
 using Infrastructure.Data;
 using BSOFT.Infrastructure.Logging;
 using Serilog;
+using Core.Application.Common.Interfaces.IUserSession;
 using Core.Application.Notification.Queries;
 using Core.Application.Common.Interfaces.INotifications;
 using BSOFT.Infrastructure.Repositories.Notifications;
-
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -131,7 +131,10 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IStateQueryRepository, StateQueryRepository>();
             services.AddScoped<ICityCommandRepository, CityCommandRepository>();
             services.AddScoped<ICityQueryRepository, CityQueryRepository>();
-            services.AddScoped<IAuditLogRepository, AuditLogRepository>();                                 
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();    
+            services.AddScoped<IUserSessionRepository, UserSessionRepository>();
+ 			services.AddTransient<NotificationsQueryHandler>();  
+            services.AddTransient<INotificationsQueryRepository, NotificationsQueryRepository>();                             
             services.AddHttpContextAccessor();            
             
 
@@ -141,9 +144,6 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
             services.AddScoped<IChangePassword, PasswordChangeRepository>();
-            services.AddTransient<NotificationsQueryHandler>();  
-            services.AddTransient<INotificationsQueryRepository, NotificationsQueryRepository>();  
-
 
             // AutoMapper profiles
             services.AddAutoMapper(

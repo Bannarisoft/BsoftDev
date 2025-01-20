@@ -1156,60 +1156,47 @@ namespace BSOFT.Infrastructure.Migrations
                     b.ToTable("UserRoleAllocation", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.UserSession", b =>
+            modelBuilder.Entity("Core.Domain.Entities.UserSessions", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Browser")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Browser");
+                    b.Property<string>("BrowserInfo")
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("BrowserInfo");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime")
                         .HasColumnName("CreatedAt");
 
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("CreatedIP");
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("ExpiresAt");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("IsActive");
 
-                    b.Property<string>("SessionId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(-1)")
-                        .HasColumnName("SessionId");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
+                    b.Property<string>("JwtId")
                         .HasColumnType("varchar(50)")
-                        .HasColumnName("Status");
+                        .HasColumnName("JwtId");
 
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(-1)")
-                        .HasColumnName("Token");
+                    b.Property<DateTime>("LastActivity")
+                        .HasColumnType("datetime")
+                        .HasColumnName("LastActivity");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("UserId");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("UserName");
-
                     b.HasKey("Id");
 
-                    b.ToTable("UserSession", "AppSecurity");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSessions", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Cities", b =>
@@ -1344,6 +1331,15 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("User");
 
                     b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.UserSessions", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Company", b =>
