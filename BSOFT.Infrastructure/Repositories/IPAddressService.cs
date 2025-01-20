@@ -29,9 +29,60 @@ namespace BSOFT.Infrastructure.Repositories
                 
             }
             return ipAddress;
+        }     
+        public string GetUserBrowserDetails(string userAgent)
+        {
+            string os = ExtractOS(userAgent);
+            string systemName = Environment.MachineName; // Get the system/machine name
+            string browserAndVersion = ExtractBrowserAndVersion(userAgent);
+            string ipAddress = GetSystemIPAddress();            
+            return $"{os}/{systemName}/{browserAndVersion}/{ipAddress}";
         }
+        private string ExtractOS(string userAgent)
+        {
+             if (userAgent.Contains("PostmanRuntime"))
+            {
+                return "PostmanOS"; // Default for Postman requests
+            }
+            if (userAgent.Contains("Windows NT")) return "WinNT";
+            if (userAgent.Contains("Mac OS X")) return "MacOS";
+            if (userAgent.Contains("Linux")) return "Linux";
+            if (userAgent.Contains("Android")) return "Android";
+            if (userAgent.Contains("iPhone") || userAgent.Contains("iPad")) return "iOS";
+            return "UnknownOS";
+        }
+        private string ExtractBrowserAndVersion(string userAgent)
+        {
+            if (userAgent.Contains("PostmanRuntime"))
+            {
+                var versionMatch = System.Text.RegularExpressions.Regex.Match(userAgent, @"PostmanRuntime/([\d\.]+)");
+                if (versionMatch.Success)
+                {
+                    return $"Postman/{versionMatch.Groups[1].Value}";
+                }
+                return "Postman/Unknown";
+            }
+            
+            var match = System.Text.RegularExpressions.Regex.Match(userAgent,
+           @"(Chrome|Firefox|Safari|Edge|MSIE|Trident)[/ ]([\d\.]+)");
 
-     
+            if (match.Success)
+            {
+            string browser = match.Groups[1].Value;
+            string version = match.Groups[2].Value;
+
+            // Normalize Trident/IE versions
+            if (browser == "Trident")
+            {
+            browser = "IE";
+            version = "11.0"; // Default for Trident
+            }
+
+            return $"{browser}/{version}";
+            }
+
+            return "UnknownBrowser/0.0";
+        }        
         public string GetUserIPAddress()
         {
             return _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "Unknown IP";
@@ -47,19 +98,35 @@ namespace BSOFT.Infrastructure.Repositories
 
         public string GetCurrentUserId()
         {
-            return _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value ?? "Anonymous";
+            //return _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value ?? "Anonymous";
+            return (_httpContextAccessor?.HttpContext?.Items["UserId"] as int?).GetValueOrDefault().ToString();
         } 
 
-        public string GetUserId()
+        public int GetUserId()
         {
-            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return int.TryParse(userId, out _) ? userId : "0";
+            //var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //return int.TryParse(userId, out _) ? userId : "0";
+             var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;            
+            if (int.TryParse(userId, out int parsedUserId))
+            {
+                return parsedUserId;
+            }
+            return 0;
         }
-
         public string GetUserName()
         {
+            //var userName = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+            //return userName ?? "Anonymous";
             var userName = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
-            return userName ?? "Anonymous";
+
+            if (string.IsNullOrEmpty(userName))
+            {
+                Console.WriteLine("UserName is not available. Returning 'Anonymous'.");
+                return "Anonymous";
+            }
+
+            Console.WriteLine($"Retrieved UserName: {userName}");
+            return userName;
         }
         public string GetUserOS()
         {
@@ -87,9 +154,7 @@ namespace BSOFT.Infrastructure.Repositories
             if (userAgent.Contains("Opera") || userAgent.Contains("OPR")) return "Opera";
             return "Unknown Browser";
         }
-    }
-    
-    
+    }    
 }
 
 

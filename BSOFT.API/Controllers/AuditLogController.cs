@@ -1,4 +1,3 @@
-using BSOFT.Infrastructure.Data;
 using Core.Application.AuditLog.Queries;
 using Core.Application.AuditLog.Queries.GetAuditLog;
 using FluentValidation;
@@ -10,13 +9,12 @@ namespace BSOFT.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     public class AuditLogController : ApiControllerBase
-    {
-       //private readonly MongoDbContext _dbContext;
+    {       
          
        public AuditLogController(ISender mediator) 
          : base(mediator)
-        {        
-            // _dbContext = dbContext;  
+        {       
+             
              
         }
         [HttpGet]
@@ -26,28 +24,11 @@ namespace BSOFT.API.Controllers
             var auditLogs = await Mediator.Send(new GetAuditLogQuery());
             //var activeCities = auditLogs.Where(c => c.IsActive == 1).ToList(); 
             return Ok(auditLogs);
-        }        
- /*        [HttpPost]
-        public async Task<IActionResult> CreateAsync(CreateAuditLogCommand  command)
-        {       
-            var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
-            return Ok(new { Message = "Log Entry created successfully", City = result.Data });
-            }
-            else
-            {        
-            return BadRequest(result.ErrorMessage);
-            }        
-        } */
+        }              
         [HttpGet("GetAuditLogSearch")]
             public async Task<IActionResult> GetAuditLog([FromQuery] string searchPattern)
             {
             
-             /*    var auditLogs = await Mediator.Send(new GetAuditLogBySearchPatternQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
-                //var activeCities = cities.Where(c => c.IsActive == 1).ToList(); 
-                return Ok(auditLogs); */
-
                  var result = await Mediator.Send(new GetAuditLogBySearchPatternQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
                 if (!result.IsSuccess)
                 {                    

@@ -11,8 +11,8 @@ namespace Core.Application.City.Queries.GetCities
     public class CityDto  : IMapFrom<Cities>
     {
         public int Id { get; set; }
-        public string CityCode { get; set; } = string.Empty;
-        public string CityName { get; set; } = string.Empty;    
+        public string? CityCode { get; set; }
+        public string? CityName { get; set; } 
         public int StateId { get; set; }
         public byte IsActive { get; set; }  
         public int CreatedBy { get; set; }

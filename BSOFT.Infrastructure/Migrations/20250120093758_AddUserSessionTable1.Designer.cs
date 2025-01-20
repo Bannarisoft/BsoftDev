@@ -4,6 +4,7 @@ using BSOFT.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250120093758_AddUserSessionTable1")]
+    partial class AddUserSessionTable1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1165,38 +1168,29 @@ namespace BSOFT.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BrowserInfo")
-                        .HasColumnType("varchar(500)")
-                        .HasColumnName("BrowserInfo");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("CreatedAt");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("ExpiresAt");
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
+                    b.Property<byte>("IsActive")
+                        .HasColumnType("tinyint");
 
                     b.Property<string>("JwtId")
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("JwtId");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("LastActivity")
-                        .HasColumnType("datetime")
-                        .HasColumnName("LastActivity");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserSessions", "AppSecurity");
+                    b.ToTable("UserSession");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Cities", b =>
@@ -1331,15 +1325,6 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("User");
 
                     b.Navigation("UserRole");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.UserSessions", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Company", b =>

@@ -40,6 +40,7 @@ using Core.Application.Common.Interfaces.AuditLog;
 using Infrastructure.Data;
 using BSOFT.Infrastructure.Logging;
 using Serilog;
+using Core.Application.Common.Interfaces.IUserSession;
 
 namespace BSOFT.Infrastructure
 {
@@ -128,7 +129,8 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IStateQueryRepository, StateQueryRepository>();
             services.AddScoped<ICityCommandRepository, CityCommandRepository>();
             services.AddScoped<ICityQueryRepository, CityQueryRepository>();
-            services.AddScoped<IAuditLogRepository, AuditLogRepository>();                                 
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();    
+            services.AddScoped<IUserSessionRepository, UserSessionRepository>();                             
             services.AddHttpContextAccessor();            
             
 

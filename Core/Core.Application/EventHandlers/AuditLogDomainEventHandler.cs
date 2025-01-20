@@ -17,12 +17,7 @@ namespace Core.Application.EventHandlers
 
         public async Task Handle(AuditLogsDomainEvent notification, CancellationToken cancellationToken)
         {          
-            var userIdString = _ipAddressService.GetUserId();
-            if (!int.TryParse(userIdString, out var userId))
-            {
-                Console.WriteLine($"Warning: Invalid User ID '{userIdString}'. Defaulting to 0.");
-                userId = 0; // Default to 0 for unauthenticated or invalid users
-            }
+            var userIdString = _ipAddressService.GetUserId();        
             var auditLog = new
             {
                 Module = notification.Module,   
@@ -33,7 +28,7 @@ namespace Core.Application.EventHandlers
                 IPAddress = _ipAddressService.GetSystemIPAddress(),
                 Browser = _ipAddressService.GetUserAgent(),
                 CreatedAt = DateTime.UtcNow,
-                CreatedBy =userId,
+                CreatedBy =userIdString,
                 CreatedByName=_ipAddressService.GetUserName(),
             };
 

@@ -46,8 +46,6 @@ namespace BSOFT.API.Controllers
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
             _logger = logger;
-
-             
         }
         
         [HttpGet]
