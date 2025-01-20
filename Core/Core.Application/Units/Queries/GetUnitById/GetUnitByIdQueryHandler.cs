@@ -1,77 +1,64 @@
 using AutoMapper;
+using Core.Application.Common;
+using Core.Application.Common.Exceptions;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUnit;
 using Core.Application.Units.Queries.GetUnits;
+using Core.Domain.Events;
 using MediatR;
 using System.Data;
 
 namespace Core.Application.Units.Queries.GetUnitById
 {
     //public class GetUnitByIdQueryHandler : IRequestHandler<GetUnitByIdQuery,UnitDto>
-    public class GetUnitByIdQueryHandler : IRequest<UnitDto>
+    public class GetUnitByIdQueryHandler : IRequestHandler<GetUnitByIdQuery,ApiResponseDTO<List<UnitDto>>>
     {
          private readonly IUnitQueryRepository _unitRepository;        
         private readonly IMapper _mapper;
 
-        public GetUnitByIdQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper)
+        private readonly IMediator _mediator;
+
+        public GetUnitByIdQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper, IMediator mediator)
         {
-             _unitRepository = unitRepository;
+            _unitRepository = unitRepository;
             _mapper = mapper;
+            _mediator = mediator;
         }
 
-        public async Task<UnitDto> Handle(GetUnitByIdQuery request, CancellationToken cancellationToken)
+         public async Task<ApiResponseDTO<List<UnitDto>>> Handle(GetUnitByIdQuery request, CancellationToken cancellationToken)
         {
-            /* var query = @"
-                SELECT 
-                    u.Id,
-                    u.UnitName,
-                    u.ShortName,
-                    u.CompanyId,
-                    u.DivisionId,
-                    u.UnitHeadName,
-                    u.CINNO,
-                    u.IsActive,
-                    ua.Id as AddressId,
-                    ua.UnitId,
-                    ua.CountryId,
-                    ua.StateId,
-                    ua.CityId,
-                    ua.AddressLine1,
-                    ua.AddressLine2,
-                    ua.PinCode,
-                    ua.ContactNumber,
-                    ua.AlternateNumber,
-                    uc.Id as ContactId,
-                    uc.UnitId,
-                    uc.Name,
-                    uc.Designation,
-                    uc.Email,
-                    uc.PhoneNo,
-                    uc.Remarks                   
-                FROM 
-                    AppData.Unit  u
-                INNER JOIN 
-                    AppData.UnitAddress  ua ON u.Id = ua.UnitId
-                INNER JOIN 
-                    AppData.UnitContacts uc ON u.Id = uc.UnitId
-            ";
+          
+            var units = await _unitRepository.GetByIdAsync(request.Id);    
 
-            var result = await _dbConnection.QueryAsync<UnitDto, UnitAddressDto, UnitContactsDto, UnitDto>(
-            query,
-            (unit, address, contact) =>
+              if (units == null || !units.Any())
+                {
+                     return new ApiResponseDTO<List<UnitDto>>
+                     {
+                         IsSuccess = false,
+                         Message = "Unit not found."
+
+                     };
+                }
+
+            var unitList = _mapper.Map<List<UnitDto>>(units);
+            //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "GetUnitByIdQuery",
+                    actionCode: unitList[0].Id.ToString(),        
+                    actionName: unitList[0].UnitName,
+                    details: $"Unit '{unitList[0].UnitName}' was Fetched. UnitId: {unitList[0].Id}",
+                    module:"Unit"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
+
+            return new ApiResponseDTO<List<UnitDto>>
             {
-            unit.UnitAddressDto.Add(address);
-            unit.UnitContactsDto.Add(contact);
-            return unit;
-            },
-            splitOn: "AddressId, ContactId");
-            var units = result.Where(u => u.Id == request.Id)
-            .GroupBy(u => u.Id)
-            .Select(g => g.First())
-            .ToList();
-            return units; */
-
-            var result = await _unitRepository.GetByIdAsync(request.Id);            
-            return _mapper.Map<UnitDto>(result);
+                IsSuccess = true,
+                Message = "Success",
+                Data = unitList
+            };
+     
+          
         }
     }
 }   

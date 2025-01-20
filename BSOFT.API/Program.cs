@@ -5,14 +5,25 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Core.Application;
 using BSOFT.Infrastructure;
 using BSOFT.API.Validation.Common;
+using Serilog;
 using MediatR;
 using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
 using BSOFT.API.Middleware;
-using BSOFT.Infrastructure.Services;
+using BSOFT.Infrastructure.Services;using BSOFT.API;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog for logging to MongoDB and console
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console() // Log to console for debugging
+    .WriteTo.MongoDB("mongodb://localhost:27017/Bannari") // MongoDB connection string (adjust as needed)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog(); // Use Serilog for logging in the app
 
 // Add validation services
 var validationService = new ValidationService();
@@ -38,8 +49,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true, // Ensure the signature is valid
         ValidIssuer = jwtSettings.Issuer,
         ValidAudience = jwtSettings.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
-        ClockSkew = TimeSpan.Zero
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
     };
 });
 
@@ -56,34 +66,43 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHostedService<SessionCleanupService>();
+builder.Services.AddProblemDetails();
+
+
 var app = builder.Build();
  
-/*  // Map endpoint to handle CreateStateCommand
-app.MapPost("/AuditLog", async (
-    CreateAuditLogCommand request,
+ // Map endpoint to handle CreateStateCommand
+app.MapPost("/state", async (
+    CreateStateCommand request,
     IMediator mediator,
     CancellationToken cancellationToken) =>
 {
     var result = await mediator.Send(request, cancellationToken);
 
-    if (!result.IsSuccess)
+    
+if (!result.IsSuccess)
     {
         return Results.BadRequest(result.ErrorMessage);
     }
 
-    return Results.Created($"/auditLogs/{result.Data.Id}", result.Data);
+    return Results.Created($"/states/{result.Data.Id}", result.Data);
 });
- */
+
+
+// Register LoggingMiddleware
+app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
+
 // Configure the HTTP request pipeline. 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage(); 
 }
-app.UseRouting();
-app.UseMiddleware<TokenValidationMiddleware>();
-app.UseHttpsRedirection();
 
+app.UseHttpsRedirection();
+app.UseMiddleware<GlobalExceptionMiddleware>();// Register custom middleware
+app.UseRouting(); // Enable routing
 app.UseAuthentication();
 
 app.UseAuthorization();

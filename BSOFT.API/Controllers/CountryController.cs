@@ -33,7 +33,11 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetAllCountriesAsync()
         {           
             var countries = await Mediator.Send(new GetCountryQuery());          
-            return Ok(countries);
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = countries.Data
+            });
         }
         [HttpGet("{countryId}")]
         [Authorize]
@@ -41,14 +45,26 @@ namespace BSOFT.API.Controllers
         {
             if (countryId <= 0)
             {
-                return BadRequest("Invalid Country ID");
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Invalid Country ID"
+                });
             }            
             var result = await Mediator.Send(new GetCountryByIdQuery { Id = countryId });            
             if (!result.IsSuccess)
             {                
-                return NotFound(new { Message = result.ErrorMessage });
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                });
             }
-            return Ok(result.Data);
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = result.Data
+            });
         }
           [HttpGet("user-session/{userId}")]
     public async Task<IActionResult> GetUserSession(int userId)
@@ -69,55 +85,90 @@ namespace BSOFT.API.Controllers
             var validationResult = await _createCountryCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors);
+                return BadRequest(new
+                {   
+                    StatusCode=StatusCodes.Status400BadRequest,
+                    message = validationResult.Errors
+                });
             }                    
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
-                return Ok(new { Message = "Country created successfully", Country = result.Data });
+                return Ok(new 
+                { 
+                    StatusCode=StatusCodes.Status201Created,
+                    message = "Country created successfully", 
+                    data = result.Data.Id
+                });
             }
-            else
-            {            
-                return BadRequest(result.ErrorMessage);
-            }            
+                      
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest,
+                    message = result.Message 
+                });
+                       
         }
-        [HttpPut("{countryId}")]
-        public async Task<IActionResult> UpdateAsync(int countryId, UpdateCountryCommand command)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateAsync( UpdateCountryCommand command)
         {
             var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors);
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                });
             }
             if (command.Id<=0)
             {
-                return BadRequest("Invalid CountryId");
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Invalid Country ID"
+                });
             }        
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
-                return Ok(new { Message = "Country Updated successfully", Country = result.Data });
+                return Ok(new 
+                { 
+                    StatusCode=StatusCodes.Status200OK,
+                    message = result.Message, 
+                    data = result.Data 
+                });
             }
             else
             {            
-                return BadRequest(result.ErrorMessage);
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest,
+                    message = result.Message 
+                });
             }
         }
-        [HttpDelete("{countryId}")]
-        public async Task<IActionResult> DeleteAsync(int countryId,DeleteCountryCommand command)
+        [HttpDelete("delete")]
+        public async Task<IActionResult> DeleteAsync(DeleteCountryCommand command)
         {
-            if(countryId != command.Id)
-            {
-                return BadRequest("CountryId Mismatch"); 
-            }
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
-                return Ok(new { Message = "Country Deleted successfully", Country = result.Data });
+                return Ok(new 
+                { 
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Country Deleted successfully", 
+                    data = result.Data 
+                });
             }
             else
             {            
-                return BadRequest(result.ErrorMessage);
+                return BadRequest(new 
+                { 
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = result.Message 
+                });
             }
         }
 
@@ -127,9 +178,18 @@ namespace BSOFT.API.Controllers
             var result = await Mediator.Send(new GetCountryAutoCompleteQuery { SearchPattern = searchPattern });
             if (!result.IsSuccess)
             {
-                return NotFound(new { Message = result.ErrorMessage }); 
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                 }); 
             }
-            return Ok(result.Data);
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = result.Message,
+                data = result.Data
+            });
         } 
     }
 }

@@ -1,12 +1,14 @@
 using AutoMapper;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.Divisions.Commands.UpdateDivision
 {
-    public class UpdateDivisionCommandHandler : IRequestHandler<UpdateDivisionCommand, int>
+    public class UpdateDivisionCommandHandler : IRequestHandler<UpdateDivisionCommand, ApiResponseDTO<bool>>
     {
         private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
@@ -15,12 +17,22 @@ namespace Core.Application.Divisions.Commands.UpdateDivision
             _divisionRepository =divisionRepository;
             _imapper =imapper;
         }
-          public async Task<int> Handle(UpdateDivisionCommand request, CancellationToken cancellationToken)
+          public async Task<ApiResponseDTO<bool>> Handle(UpdateDivisionCommand request, CancellationToken cancellationToken)
         {
-            var division  = _imapper.Map<Division>(request);
+            
+                 var division  = _imapper.Map<Division>(request);
          
-            var divisionresult = await _divisionRepository.UpdateAsync(request.Id, division);
-            return divisionresult;
+                var divisionresult = await _divisionRepository.UpdateAsync(division);
+              
+                if(divisionresult)
+                {
+                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Division updated successfully.", Data = true};
+                }
+
+                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Division not updated.", Data = false};
+           
+           
+            
         }
         
     }

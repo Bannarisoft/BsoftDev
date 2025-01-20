@@ -5,10 +5,11 @@ using AutoMapper;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Country.Queries.GetCountryById
 {
-    public class GetCountryByIdQueryHandler : IRequestHandler<GetCountryByIdQuery, Result<CountryDto>>
+    public class GetCountryByIdQueryHandler : IRequestHandler<GetCountryByIdQuery, ApiResponseDTO<CountryDto>>
     {
         private readonly ICountryQueryRepository _countryRepository;
         private readonly IMapper _mapper;
@@ -21,14 +22,17 @@ namespace Core.Application.Country.Queries.GetCountryById
             _mediator = mediator;
         }
 
-        public async Task<Result<CountryDto>> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<CountryDto>> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
         {
-            try
-            {
+           
                 var country = await _countryRepository.GetByIdAsync(request.Id);
                 if (country == null)
                 {
-                    return Result<CountryDto>.Failure($"Country with ID {request.Id} not found.");
+                    return new ApiResponseDTO<CountryDto>
+                    {
+                        IsSuccess = false,
+                        Message = "Country not found"
+                    };
                 }
                 
                 var countryDto = _mapper.Map<CountryDto>(country);
@@ -43,13 +47,13 @@ namespace Core.Application.Country.Queries.GetCountryById
                 );
 
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return Result<CountryDto>.Success(countryDto);
-            }
-            catch (Exception ex)
-            {
-                // Handle any unexpected exceptions
-                return Result<CountryDto>.Failure($"An error occurred while fetching the Country: {ex.Message}");
-            }
+                return new ApiResponseDTO<CountryDto>
+                {
+                    IsSuccess = true,
+                    Message = "Country fetched successfully",
+                    Data = countryDto
+                };
+           
         }
     }
 

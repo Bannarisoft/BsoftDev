@@ -26,8 +26,8 @@ namespace Core.Domain.Entities
         public string Logo { get; set; }
         public int EntityId { get; set; }
         public byte IsActive { get; set; }
-        public  List<CompanyAddress> CompanyAddress { get; set; }
-        public  List<CompanyContact> CompanyContact { get; set; }
+        public  CompanyAddress CompanyAddress { get; set; }
+        public  CompanyContact CompanyContact { get; set; }
 
           
     }

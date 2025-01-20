@@ -38,7 +38,8 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<Cities> Cities { get; set; }
         public DbSet<PasswordLog> PasswordLogs { get; set; }
         public DbSet<UserRoleAllocation> UserRoleAllocations { get; set; }
-        public DbSet<UserSessions> UserSession { get; set; }
+         public DbSet<UserSessions> UserSession { get; set; }
+ 
 
 
 
@@ -65,7 +66,7 @@ namespace BSOFT.Infrastructure.Data
 			modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleAllocationConfigurations());
-            modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
+     
 
 
             
@@ -88,7 +89,7 @@ namespace BSOFT.Infrastructure.Data
         private void UpdateIpFields()
         {
             string currentIp = _ipAddressService.GetSystemIPAddress();
-            int userId = _ipAddressService.GetUserId(); 
+ int userId = _ipAddressService.GetUserId(); 
             string username = _ipAddressService.GetUserName();
             foreach (EntityEntry entry in ChangeTracker.Entries<BaseEntity>())
             {
@@ -96,14 +97,14 @@ namespace BSOFT.Infrastructure.Data
                 {
                     entry.Property("CreatedIP").CurrentValue = currentIp;
                     entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
-                    entry.Property("CreatedBy").CurrentValue = userId;
-                    entry.Property("CreatedByName").CurrentValue = username;
+                  entry.Property("CreatedBy").CurrentValue = userId;
+                    entry.Property("CreatedByName").CurrentValue = username
                 }
                 if (entry.State == EntityState.Modified)
                 {
                     entry.Property("ModifiedIP").CurrentValue = currentIp;
                     entry.Property("ModifiedAt").CurrentValue = DateTime.UtcNow;
-                    entry.Property("ModifiedBy").CurrentValue = userId;
+                entry.Property("ModifiedBy").CurrentValue = userId;
                     entry.Property("ModifiedByName").CurrentValue = username;
                 }
             }

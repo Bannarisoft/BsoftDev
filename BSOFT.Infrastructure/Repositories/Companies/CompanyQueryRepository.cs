@@ -23,67 +23,107 @@ namespace BSOFT.Infrastructure.Repositories.Companies
          public async Task<List<Company>> GetAllCompaniesAsync()
         {
                const string query = @"
-            SELECT 
-                C.Id, 
-                C.CompanyName, 
-                C.LegalName,
-                GstNumber,
-                TIN,
-                TAN,
-                CSTNo,
-                YearOfEstablishment,
-                Website,
-                Logo,
-                EntityId, 
-                IsActive,
-                AddressLine1,
-                AddressLine2,
-                PinCode,
-                CountryId,
-                StateId,
-                CityId,
-                A.Phone AS AddressPhone, 
-                Name,
-                Designation,
-                Email,
-                B.Phone AS ContactPhone,
-                Remark
-            FROM AppData.Company C
-            LEFT JOIN AppData.CompanyAddress A ON A.CompanyId = C.Id
-            LEFT JOIN AppData.CompanyContact B ON B.CompanyId = C.Id";
-            return (await _dbConnection.QueryAsync<Company>(query)).ToList();
+                SELECT 
+                    C.Id, 
+                    C.CompanyName, 
+                    C.LegalName,
+                    C.GstNumber,
+                    C.TIN,
+                    C.TAN,
+                    C.CSTNo,
+                    C.YearOfEstablishment,
+                    C.Website,
+                    C.Logo,
+                    C.EntityId, 
+                    C.IsActive,
+                    A.AddressLine1,
+                    A.AddressLine2,
+                    A.PinCode,
+                    A.CountryId,
+                    A.StateId,
+                    A.CityId,
+                    A.Phone AS AddressPhone, 
+                    B.Name,
+                    B.Designation,
+                    B.Email,
+                    B.Phone AS ContactPhone,
+                    B.Remark AS Remarks 
+                FROM AppData.Company C
+                LEFT JOIN AppData.CompanyAddress A ON A.CompanyId = C.Id
+                LEFT JOIN AppData.CompanyContact B ON B.CompanyId = C.Id";
+            
+            var companyDictionary = new Dictionary<int, Company>();
+            
+            var companies = await _dbConnection.QueryAsync<Company, CompanyAddress, CompanyContact, Company>(
+                query,
+                (company, address, contact) =>
+                {
+                    if (!companyDictionary.TryGetValue(company.Id, out var existingCompany))
+                    {
+                        existingCompany = company;
+                        existingCompany.CompanyAddress = address;
+                        existingCompany.CompanyContact = contact;
+                        companyDictionary.Add(existingCompany.Id, existingCompany);
+                    }
+                    else
+                    {
+                        existingCompany.CompanyAddress = address;
+                        existingCompany.CompanyContact = contact;
+                    }
+            
+                    return existingCompany;
+                },
+                splitOn: "AddressLine1,Name" 
+            );
+            
+            return companies.Distinct().ToList();
+
         }
          public async Task<Company> GetByIdAsync(int id)
         {            
-            const string query = @"  SELECT 
+           const string query = @"
+             SELECT 
                 C.Id, 
-                C.CompanyName, 
-                C.LegalName,
-                GstNumber,
-                TIN,
-                TAN,
-                CSTNo,
-                YearOfEstablishment,
-                Website,
-                Logo,
-                EntityId, 
-                IsActive,
-                AddressLine1,
-                AddressLine2,
-                PinCode,
-                CountryId,
-                StateId,
-                CityId,
-                A.Phone AS AddressPhone, 
-                Name,
-                Designation,
-                Email,
-                B.Phone AS ContactPhone,
-                Remark
-            FROM AppData.Company C
-            LEFT JOIN AppData.CompanyAddress A ON A.CompanyId = C.Id
-            LEFT JOIN AppData.CompanyContact B ON B.CompanyId = C.Id WHERE C.Id = @CompanyId";
-            return await _dbConnection.QueryFirstOrDefaultAsync<Company>(query, new { id });
+            C.CompanyName, 
+            C.LegalName,
+            C.GstNumber,
+            C.TIN,
+            C.TAN,
+            C.CSTNo,
+            C.YearOfEstablishment,
+            C.Website,
+            C.Logo,
+            C.EntityId, 
+            C.IsActive,
+            A.AddressLine1,
+            A.AddressLine2,
+            A.PinCode,
+            A.CountryId,
+            A.StateId,
+            A.CityId,
+            A.Phone,
+            A.AlternatePhone,
+            B.Name,
+                 B.Designation,
+                 B.Email,
+                 B.Phone ,
+                 B.Remark As Remarks 
+             FROM AppData.Company C
+             LEFT JOIN AppData.CompanyAddress A ON A.CompanyId = C.Id
+             LEFT JOIN AppData.CompanyContact B ON B.CompanyId = C.Id
+             WHERE C.Id = @id";
+    var companyResponse = await _dbConnection.QueryAsync<Company,CompanyAddress,CompanyContact,Company>(query, 
+    (company,companyAddress,companyContact) =>
+    {
+        company.CompanyAddress = companyAddress;
+        company.CompanyContact = companyContact;
+        return company;
+        }, 
+    new { id },
+    splitOn: "AddressLine1,Name");
+
+             return companyResponse.FirstOrDefault();
+
         }
         
          public async Task<List<Company>>  GetCompany(string searchPattern = null)

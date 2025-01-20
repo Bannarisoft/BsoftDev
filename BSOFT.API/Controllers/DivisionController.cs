@@ -32,21 +32,37 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetAllDivisionsAsync()
         {
            var divisions = await Mediator.Send(new GetDivisionQuery());
-            var activedivisions = divisions.Where(c => c.IsActive == 1).ToList(); 
-            return Ok(activedivisions);
+            var activedivisions = divisions.Data.Where(c => c.IsActive == 1).ToList(); 
+           
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = activedivisions});
         }
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateDivisionCommand command)
         {
+            
             var validationResult = await _createDivisionCommandValidator.ValidateAsync(command);
+            
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors);
+                return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
             }
-            var createdDivision = await Mediator.Send(command);
-            return Ok(createdDivision);
+            var response = await Mediator.Send(command);
+            if(response.IsSuccess)
+            {
+                // return CreatedAtAction(nameof(GetByIdAsync), new {  id = response.Data }, response);
+                return Ok(new { StatusCode=StatusCodes.Status201Created, message = response.Message, errors = "", data = response.Data });
+            }
+             
+
+            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = response.Message, errors = "" }); 
+            
         }
          [HttpGet("{id}")]
+         [ActionName(nameof(GetByIdAsync))]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
            
@@ -54,47 +70,62 @@ namespace BSOFT.API.Controllers
           
              if(division == null)
             {
-                return NotFound();
+                return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"Division ID {id} not found.", errors = "" });
             }
-            return Ok(division);
+            return Ok(new { StatusCode=StatusCodes.Status200OK, data = division.Data});
         }
 
-        [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update(int id, UpdateDivisionCommand command )
+        [HttpPut("update")]
+        public async Task<IActionResult> Update( UpdateDivisionCommand command )
         {
             var validationResult = await _updateDivisionCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
                 return BadRequest(validationResult.Errors);
             }
-            if(id != command.Id)
-            {
-                return BadRequest();
-            }
-           var updatedDivision = await Mediator.Send(command);
+          
 
-            return Ok(updatedDivision);
+             var divisionExists = await Mediator.Send(new GetDivisionByIdQuery { Id = command.Id });
+
+             if (divisionExists == null)
+             {
+                 return NotFound(new { StatusCode=StatusCodes.Status404NotFound, message = $"Division ID {command.Id} not found.", errors = "" }); 
+             }
+
+             var response = await Mediator.Send(command);
+             if(response.IsSuccess)
+             {
+                 return Ok(new { StatusCode=StatusCodes.Status200OK, message = response.Message, errors = "" });
+             }
+            
+           
+
+            return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = response.Message, errors = "" }); 
         }
 
 
-        [HttpPut("delete/{id}")]
+        [HttpPut("delete")]
         
-        public async Task<IActionResult> Delete(int id,DeleteDivisionCommand deleteDivisionCommand)
+        public async Task<IActionResult> Delete(DeleteDivisionCommand deleteDivisionCommand)
         {
-             if(id != deleteDivisionCommand.Id)
-            {
-                return BadRequest();
-            }
+           
            var updatedDivision = await Mediator.Send(deleteDivisionCommand);
 
-            return Ok(updatedDivision);
+           if(updatedDivision.IsSuccess)
+           {
+            return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedDivision.Message, errors = "" });
+              
+           }
+
+            return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedDivision.Message, errors = "" });
+            
         }
          [HttpGet("GetDivision")]
         public async Task<IActionResult> GetDivision([FromQuery] string searchPattern)
         {
            
             var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = searchPattern});
-            return Ok(divisions);
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = divisions.Data });
         }
       
       

@@ -1,6 +1,8 @@
+using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using MediatR;
 
 namespace Core.Application.Entity.Queries.GetEntity
 {
-    public class GetEntityQuery : IRequest<List<EntityDto>>;  
+    public class GetEntityQuery : IRequest<ApiResponseDTO<List<EntityDto>>>;  
 }

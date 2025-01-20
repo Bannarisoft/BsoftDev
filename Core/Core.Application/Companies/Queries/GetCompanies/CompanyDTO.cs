@@ -12,7 +12,6 @@ namespace Core.Application.Companies.Queries.GetCompanies
 {
     public class CompanyDTO 
     {
-        public int Id { get; set; }
         public string CompanyName { get; set; }
         public string LegalName { get; set; }
         public string GstNumber { get; set; }
@@ -21,8 +20,9 @@ namespace Core.Application.Companies.Queries.GetCompanies
         public string CSTNo { get; set; }
         public int YearOfEstablishment { get; set; }
         public string Website { get; set; }
-        public string Logo { get; set; }
         public int EntityId { get; set; }
-        public byte IsActive { get; set; }
+        public IFormFile File { get; set; }
+        public CompanyAddressDTO CompanyAddress { get; set; }
+        public CompanyContactDTO CompanyContact { get; set; }
     }
 }

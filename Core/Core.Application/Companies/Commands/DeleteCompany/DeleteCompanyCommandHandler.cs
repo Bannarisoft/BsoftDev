@@ -7,10 +7,11 @@ using Core.Domain.Entities;
 using MediatR;
 using AutoMapper;
 using Core.Application.Common.Interfaces.ICompany;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Companies.Commands.DeleteCompany
 {
-    public class DeleteCompanyCommandHandler : IRequestHandler<DeleteCompanyCommand, int>
+    public class DeleteCompanyCommandHandler : IRequestHandler<DeleteCompanyCommand, ApiResponseDTO<bool>>
     {
         private readonly ICompanyCommandRepository _icompanyRepository;
         private readonly IMapper _imapper;
@@ -20,15 +21,15 @@ namespace Core.Application.Companies.Commands.DeleteCompany
             _imapper = imapper;
         }
 
-        public async Task<int> Handle(DeleteCompanyCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<bool>> Handle(DeleteCompanyCommand request, CancellationToken cancellationToken)
         {
             var company  = _imapper.Map<Company>(request.CompanyDelete);
-            //  var Updatecompany = new Company()
-            // {
-            //     Id = request.Id,
-            //     IsActive = request.IsActive 
-            // };
-            return await _icompanyRepository.DeleteAsync(request.Id,company);
+            var result = await _icompanyRepository.DeleteAsync(request.Id,company);
+            if (result)
+            {
+                return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Company deleted successfully"};
+            }
+            return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Company not deleted"};
         }
     }
 }

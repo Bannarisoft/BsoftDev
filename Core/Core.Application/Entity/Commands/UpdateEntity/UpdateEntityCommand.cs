@@ -1,10 +1,12 @@
+using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Entity.Queries.GetEntity;
 using MediatR;
 
 
 namespace Core.Application.Entity.Commands.UpdateEntity
 {
-    public class UpdateEntityCommand : IRequest<EntityDto>
+    public class UpdateEntityCommand : IRequest<ApiResponseDTO<int>>
     {
     public int EntityId { get; set; }
     public string EntityName { get; set; }

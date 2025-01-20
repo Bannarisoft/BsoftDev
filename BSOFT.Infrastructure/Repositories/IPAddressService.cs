@@ -31,7 +31,8 @@ namespace BSOFT.Infrastructure.Repositories
             return ipAddress;
         }
 
-        public string GetUserBrowserDetails(string userAgent)
+     
+public string GetUserBrowserDetails(string userAgent)
         {
             string os = ExtractOS(userAgent);
             string systemName = Environment.MachineName; // Get the system/machine name
@@ -85,8 +86,7 @@ namespace BSOFT.Infrastructure.Repositories
             }
 
             return "UnknownBrowser/0.0";
-        }
-        public string GetUserIPAddress()
+        }        public string GetUserIPAddress()
         {
             return _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "Unknown IP";
         }
@@ -101,22 +101,26 @@ namespace BSOFT.Infrastructure.Repositories
 
         public string GetCurrentUserId()
         {
-            //return _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value ?? "Anonymous";
-              return (_httpContextAccessor?.HttpContext?.Items["UserId"] as int?).GetValueOrDefault().ToString();
+            return _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value ?? "Anonymous";
+ return (_httpContextAccessor?.HttpContext?.Items["UserId"] as int?).GetValueOrDefault().ToString();
         } 
 
         public int GetUserId()
         {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(userId, out _) ? userId : "0";
              var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;            
             if (int.TryParse(userId, out int parsedUserId))
             {
                 return parsedUserId;
             }
-            return 0;           
+            return 0;
         }
 
         public string GetUserName()
         {
+var userName = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+            return userName ?? "Anonymous";
              var userName = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
 
             if (string.IsNullOrEmpty(userName))

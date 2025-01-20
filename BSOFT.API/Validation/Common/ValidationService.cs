@@ -38,6 +38,8 @@ using Core.Application.Companies.Commands.UpdateCompany;
 using BSOFT.API.Validation.Unit.BSOFT.API.Validation.Unit;
 using Core.Application.Users.Commands.UpdateFirstTimeUserPassword;
 using Core.Application.Users.Commands.ChangeUserPassword;
+using Core.Application.UserLogin.Commands.UserLogin;
+using BSOFT.API.Validation.UserLogin;
 
 namespace BSOFT.API.Validation.Common
 {
@@ -72,6 +74,7 @@ namespace BSOFT.API.Validation.Common
         services.AddScoped<IValidator<UpdateRoleCommand>, UpdateRoleCommandValidator>();
         services.AddScoped<IValidator<FirstTimeUserPasswordCommand>,PasswordChangeCommandValidator>();
         services.AddScoped<IValidator<ChangeUserPasswordCommand>,ExistingUserPasswordChangeCommandValidator>();
+        services.AddScoped<IValidator<UserLoginCommand>,UserLoginCommandValidator>();
     }  
     }
 }

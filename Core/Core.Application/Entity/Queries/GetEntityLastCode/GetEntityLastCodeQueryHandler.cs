@@ -3,40 +3,26 @@ using System.Data;
 using Core.Application.Common.Interfaces.IEntity;
 using AutoMapper;
 using Core.Application.Entity.Queries.GetEntity;
-
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Entity.Queries.GetEntityLastCode
 {
-    public class GetEntityLastCodeQueryHandler : IRequestHandler<GetEntityLastCodeQuery,string>
+    public class GetEntityLastCodeQueryHandler : IRequestHandler<GetEntityLastCodeQuery,ApiResponseDTO<string>>
     {
     private readonly IEntityQueryRepository _entityRepository;        
-        private readonly IMapper _mapper;
+    private readonly IMapper _mapper;
 
     public GetEntityLastCodeQueryHandler(IEntityQueryRepository entityRepository,  IMapper mapper)
     {
-             _entityRepository = entityRepository;
+         _entityRepository = entityRepository;
          _mapper =mapper;
-    } 
-       // Last Entity Code Check 
-       public async Task<string> Handle(GetEntityLastCodeQuery request, CancellationToken cancellationToken)
-       {
-         /*  var query = "SELECT TOP 1 EntityCode FROM AppData.Entity ORDER BY Id DESC";
-          var lastCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
+    }
 
-          if (string.IsNullOrEmpty(lastCode))
-          {
-            lastCode = "ENT-00000";
-          }
-
-          var nextCodeNumber = int.Parse(lastCode[(lastCode.IndexOf('-') + 1)..]) + 1;
-
-          return $"ENT-{nextCodeNumber:D5}"; */
-        var entities = await _entityRepository.GetAllEntityAsync();
-            var entitiesList = _mapper.Map<List<EntityDto>>(entities);
-            return entitiesList.ToString();
-       
-       }
-
+        public async Task<ApiResponseDTO<string>> Handle(GetEntityLastCodeQuery request, CancellationToken cancellationToken)
+        {
+           var entityCode = await _entityRepository.GenerateEntityCodeAsync();
+           return new ApiResponseDTO<string> { IsSuccess = true, Message = "Success", Data = entityCode };
+        }       
 
     }
 }

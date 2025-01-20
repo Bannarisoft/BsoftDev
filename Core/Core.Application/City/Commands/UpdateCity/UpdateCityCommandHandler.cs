@@ -6,10 +6,11 @@ using Core.Application.City.Queries.GetCities;
 using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.City.Commands.UpdateCity
 {       
-    public class UpdateCityCommandHandler : IRequestHandler<UpdateCityCommand, Result<CityDto>>
+    public class UpdateCityCommandHandler : IRequestHandler<UpdateCityCommand, ApiResponseDTO<CityDto>>
     {
         private readonly ICityCommandRepository _cityRepository;
         private readonly ICityQueryRepository _cityQueryRepository;
@@ -23,35 +24,50 @@ namespace Core.Application.City.Commands.UpdateCity
             _cityQueryRepository = cityQueryRepository;
             _mediator = mediator;
         }
-    public async Task<Result<CityDto>> Handle(UpdateCityCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDTO<CityDto>> Handle(UpdateCityCommand request, CancellationToken cancellationToken)
     {
         var city = await _cityQueryRepository.GetByIdAsync(request.Id);
         if (city == null)
-            return Result<CityDto>.Failure("City not found.");
+            return new ApiResponseDTO<CityDto>
+            {
+                IsSuccess = false,
+                Message = "City not found"
+            };
 
         var oldCityName = city.CityName;
         city.CityName = request.CityName;
 
         if (city == null || city.IsActive != 1)
         {
-            return Result<CityDto>.Failure("Invalid CityID. The specified City does not exist or is inactive.");
+            return new ApiResponseDTO<CityDto>
+            {
+                IsSuccess = false,
+                Message = "Invalid CityID. The specified City does not exist or is inactive."
+            };
         }
 
         var stateExists = await _cityRepository.StateExistsAsync(request.StateId);
         if (!stateExists)
         {
-            return Result<CityDto>.Failure("Invalid StateId. The specified state does not exist or is inactive.");
+            return new ApiResponseDTO<CityDto>
+            {
+                IsSuccess = false,
+                Message = "Invalid StateId. The specified state does not exist or is inactive."
+            };
         }
 
         var cityExists = await _cityRepository.GetCityByCodeAsync(request.CityCode, request.StateId);
         if (cityExists)
         {
-            return Result<CityDto>.Failure("CityCode already exists in the specified State.");
+            return new ApiResponseDTO<CityDto>
+            {
+                IsSuccess = false,
+                Message = "CityCode already exists in the specified State."
+            };
         }
 
         var updatedCityEntity = _mapper.Map<Cities>(request);   
-        try
-        {     
+            
             var updateResult = await _cityRepository.UpdateAsync(request.Id, updatedCityEntity);            
             var updatedCity =  await _cityQueryRepository.GetByIdAsync(request.Id);            
             if (updatedCity != null)
@@ -66,17 +82,31 @@ namespace Core.Application.City.Commands.UpdateCity
                     module:"State"
                 );            
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return Result<CityDto>.Success(cityDto);
+                if(updateResult)
+                {
+                    return new ApiResponseDTO<CityDto>
+                  {
+                      IsSuccess = true,
+                      Message = "City updated successfully.",
+                      Data = cityDto
+                  };
+                }
+                return new ApiResponseDTO<CityDto>
+                {
+                    IsSuccess = false,
+                    Message = "City not updated."
+                };
+                
             }
             else
             {
-                return Result<CityDto>.Failure("City update failed.");
+                return new ApiResponseDTO<CityDto>{
+                    IsSuccess = false,
+                    Message = "City not found."
+
+                };
             }
-        }
-        catch (Exception ex)
-        {
-            return Result<CityDto>.Failure($"An error occurred while updating the City: {ex.Message}");
-        }    
+         
     }
     }
 }

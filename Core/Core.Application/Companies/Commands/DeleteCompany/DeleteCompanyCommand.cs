@@ -6,10 +6,11 @@ using MediatR;
 using System.Reflection;
 using System.Text;
 using Core.Application.Companies.Queries.GetCompanies;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Companies.Commands.DeleteCompany
 {
-    public class DeleteCompanyCommand : IRequest<int>
+    public class DeleteCompanyCommand : IRequest<ApiResponseDTO<bool>>
     {
         public int Id { get; set; }
         public CompanyDeleteDTO CompanyDelete { get; set; }

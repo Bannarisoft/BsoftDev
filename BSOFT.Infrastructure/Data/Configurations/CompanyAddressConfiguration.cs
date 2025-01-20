@@ -64,8 +64,8 @@ namespace BSOFT.Infrastructure.Data.Configurations
                 .IsRequired();
 
             builder.HasOne(ca => ca.Company)
-                .WithMany(c => c.CompanyAddress)
-                .HasForeignKey(ca => ca.CompanyId);
+                .WithOne(c => c.CompanyAddress)
+                .HasForeignKey<CompanyAddress>(ca => ca.CompanyId);
         }
     }
 }

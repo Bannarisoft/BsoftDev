@@ -4,93 +4,87 @@ using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces.IUnit;
+using Core.Application.Common;
+using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Units.Commands.CreateUnit
 {
 
-    public class CreateUnitCommandHandler : IRequestHandler<CreateUnitCommand, int>
+    public class CreateUnitCommandHandler : IRequestHandler<CreateUnitCommand, ApiResponseDTO<int>>
     {
         
         private readonly IUnitCommandRepository _iUnitRepository;
         private readonly IMapper _mapper;
 
+         private readonly IMediator _Imediator;
+
         private readonly ILogger<CreateUnitCommandHandler> _logger;
-        public CreateUnitCommandHandler(IUnitCommandRepository iUnitRepository, IMapper mapper, ILogger<CreateUnitCommandHandler> logger)
+        public CreateUnitCommandHandler(IUnitCommandRepository iUnitRepository, IMapper mapper, ILogger<CreateUnitCommandHandler> logger, IMediator Imediator)
         {
             _iUnitRepository = iUnitRepository;
             _mapper = mapper;
             _logger = logger;
+            _Imediator = Imediator;
 
         }
-        public async Task<int> Handle(CreateUnitCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<int>> Handle(CreateUnitCommand request, CancellationToken cancellationToken)
         {
-        try
-        {
-        // Map the request to a Unit object
-        var unit = _mapper.Map<Core.Domain.Entities.Unit>(request.UnitDto);
-
-        // Create the unit
-        await _iUnitRepository.CreateUnitAsync(unit);
-
-        // Get the unit ID
-        var unitId = unit.Id;
-
-        foreach (var addressDto in request.UnitDto.UnitAddressDto)
-        {
-            var address = _mapper.Map<UnitAddress>(addressDto);
-            address.UnitId = unitId;
-
-            await _iUnitRepository.CreateUnitAddressAsync(address);
-        }
-
-        foreach (var contactDto in request.UnitDto.UnitContactsDto)
-        {
-            var contact = _mapper.Map<UnitContacts>(contactDto);
-            contact.UnitId = unitId;
-
-            await _iUnitRepository.CreateUnitContactsAsync(contact);
-        }
-
-        return unitId;
-
-
-
+       
+            
         
+              var unit = _mapper.Map<Core.Domain.Entities.Unit>(request.UnitDto);
 
 
+              var result =  await _iUnitRepository.CreateUnitAsync(unit);
 
 
-        // Map the request to a UnitAddress object
-        // var unitAddress = _mapper.Map<UnitAddress>(request.unitDto);
+              var unitId = unit.Id;
 
-        // // Set the UnitId property of the unitAddress object
-        // unitAddress.UnitId = unitId;
+                  foreach (var addressDto in request.UnitDto.UnitAddressDto)
+              {
+                  var address = _mapper.Map<UnitAddress>(addressDto);
+                  address.UnitId = unitId;
 
-        // // Create the unit address
-        // await _iUnitRepository.CreateUnitAddressAsync(unitAddress);
+                      await _iUnitRepository.CreateUnitAddressAsync(address);
+              }
 
-        // // Map the request to a UnitContacts object
-        // var unitContacts = _mapper.Map<UnitContacts>(request.unitDto);
+                  foreach (var contactDto in request.UnitDto.UnitContactsDto)
+              {
+                  var contact = _mapper.Map<UnitContacts>(contactDto);
+                  contact.UnitId = unitId;
 
-        // // Set the UnitId property of the unitContacts object
-        // unitContacts.UnitId = unitId;
+                      await _iUnitRepository.CreateUnitContactsAsync(contact);
+              }
 
-        // // Create the unit contacts
-        // await _iUnitRepository.CreateUnitContactsAsync(unitContacts);
-
-        // // Return the unit ID
-        // return unitId;
+                   //Domain Event
+                  var domainEvent = new AuditLogsDomainEvent(
+                      actionDetail: "Create",
+                      actionCode: unit.Id.ToString(),
+                      actionName: unit.UnitName,
+                      details: $"Entity '{unit.UnitName}' was created. EntityCode: {unit.Id}",
+                      module:"Unit"
+                  );
+                  await _Imediator.Publish(domainEvent, cancellationToken);
+                  if (result > 0)
+                  {
+                          return new ApiResponseDTO<int>
+                       {
+                           IsSuccess = true,
+                           Message = "Unit created successfully",
+                           Data = unitId
+                      };
+                 }
+                  return new ApiResponseDTO<int>
+                  {
+                      IsSuccess = false,
+                      Message = "Unit not created"
+                  };
         }
-        catch (Exception ex)
-        {
-        // Log the exception
-        _logger.LogError(ex, "Error creating unit");
+            
 
-        // Throw a exception
-         throw new Exception("Error creating unit", ex);
-        }     
+          
     }            
 }
 
     
-}

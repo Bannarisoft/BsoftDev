@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IRoleEntitlement;
+using Core.Domain.Events;
 
 namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
@@ -15,17 +16,22 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
     {
         private readonly IRoleEntitlementCommandRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator; 
 
-        public CreateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper)
+
+        public CreateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper, IMediator mediator)
         {
             _repository = repository;
             _mapper = mapper;
+            _mediator = mediator;    
+
         }
 
         public async Task<int> Handle(CreateRoleEntitlementCommand request, CancellationToken cancellationToken)
         {
         // Validate the role
         var role = await _repository.GetRoleByNameAsync(request.RoleName, cancellationToken);
+
         if (role == null)
         {
             throw new InvalidOperationException("Role not found.");
@@ -72,6 +78,15 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 
         // Save RoleEntitlements
         await _repository.AddRoleEntitlementsAsync(roleEntitlements, cancellationToken);
+        //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Create",
+                    actionCode: role.RoleName,
+                    actionName: role.RoleName,
+                    details: $"RoleEntitlement '{role.RoleName}' was created. RoleName: {role.RoleName}",
+                    module:"RoleEntitlement"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
 
         return roleEntitlements.Count;
         }

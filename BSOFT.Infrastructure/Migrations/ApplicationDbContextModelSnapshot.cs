@@ -234,7 +234,8 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
+                    b.HasIndex("CompanyId")
+                        .IsUnique();
 
                     b.ToTable("CompanyAddress", "AppData");
                 });
@@ -279,7 +280,8 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
+                    b.HasIndex("CompanyId")
+                        .IsUnique();
 
                     b.ToTable("CompanyContact", "AppData");
                 });
@@ -1211,8 +1213,8 @@ namespace BSOFT.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.CompanyAddress", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Company", "Company")
-                        .WithMany("CompanyAddress")
-                        .HasForeignKey("CompanyId")
+                        .WithOne("CompanyAddress")
+                        .HasForeignKey("Core.Domain.Entities.CompanyAddress", "CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1222,8 +1224,8 @@ namespace BSOFT.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.CompanyContact", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Company", "Company")
-                        .WithMany("CompanyContact")
-                        .HasForeignKey("CompanyId")
+                        .WithOne("CompanyContact")
+                        .HasForeignKey("Core.Domain.Entities.CompanyContact", "CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1342,9 +1344,11 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Company", b =>
                 {
-                    b.Navigation("CompanyAddress");
+                    b.Navigation("CompanyAddress")
+                        .IsRequired();
 
-                    b.Navigation("CompanyContact");
+                    b.Navigation("CompanyContact")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Countries", b =>

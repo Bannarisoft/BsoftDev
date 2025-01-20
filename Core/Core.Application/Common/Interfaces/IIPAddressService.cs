@@ -9,7 +9,6 @@ namespace Core.Application.Common.Interfaces
         int GetUserId();
         string GetUserName();
         string GetUserOS(); 
-        string GetUserBrowserDetails(string UserAgent);
-        
+               
     }
 }
