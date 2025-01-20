@@ -18,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Configure Serilog for logging to MongoDB and console
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console() // Log to console for debugging
-    .WriteTo.MongoDB("mongodb://localhost:27017/Bannari") // MongoDB connection string (adjust as needed)
+    .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari") // MongoDB connection string (adjust as needed)
     .Enrich.FromLogContext()
     .CreateLogger();
 

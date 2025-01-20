@@ -40,6 +40,9 @@ using Core.Application.Common.Interfaces.AuditLog;
 using Infrastructure.Data;
 using BSOFT.Infrastructure.Logging;
 using Serilog;
+using Core.Application.Notification.Queries;
+using Core.Application.Common.Interfaces.INotifications;
+using BSOFT.Infrastructure.Repositories.Notifications;
 
 namespace BSOFT.Infrastructure
 {
@@ -138,6 +141,9 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
             services.AddScoped<IChangePassword, PasswordChangeRepository>();
+            services.AddTransient<NotificationsQueryHandler>();  
+            services.AddTransient<INotificationsQueryRepository, NotificationsQueryRepository>();  
+
 
             // AutoMapper profiles
             services.AddAutoMapper(
