@@ -11,6 +11,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Companies.Commands.DeleteCompany
 {
+
     public class DeleteCompanyCommandHandler : IRequestHandler<DeleteCompanyCommand, ApiResponseDTO<bool>>
     {
         private readonly ICompanyCommandRepository _icompanyRepository;
@@ -21,9 +22,11 @@ namespace Core.Application.Companies.Commands.DeleteCompany
             _imapper = imapper;
         }
 
+
         public async Task<ApiResponseDTO<bool>> Handle(DeleteCompanyCommand request, CancellationToken cancellationToken)
         {
             var company  = _imapper.Map<Company>(request.CompanyDelete);
+
             var result = await _icompanyRepository.DeleteAsync(request.Id,company);
             if (result)
             {

@@ -10,10 +10,10 @@ namespace Core.Application.Common.Interfaces.IDepartment
     {
         
         Task<List<Department>> GetAllDepartmentAsync();
-        Task<Department> GetByIdAsync(int id);           
-        Task<List<Department>> GetAllDepartmentAutoCompleteAsync();
+        Task<Department> GetByIdAsync(int id);         
+         Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync(string SearchDept);
 
-        Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync(string SearchDept);
+         
         
     }
 }

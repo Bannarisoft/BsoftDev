@@ -24,12 +24,14 @@ namespace Core.Application.Common.Mappings
                 .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.RoleName))
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
-              
-            CreateMap<DeleteRoleCommand, Core.Domain.Entities.UserRole>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UserRoleId)) // Map UserRoleId to Id
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive)); // Map IsActive
+               CreateMap<DeleteRoleCommand, Core.Domain.Entities.UserRole>();
 
-
+               CreateMap<Core.Domain.Entities.UserRole, UserRoleDto>();
+            CreateMap<UserRoleStatusDto, Core.Domain.Entities.UserRole>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+         
         }
+
     }
 }

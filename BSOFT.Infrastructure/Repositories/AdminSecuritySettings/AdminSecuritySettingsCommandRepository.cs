@@ -1,0 +1,73 @@
+using Microsoft.EntityFrameworkCore;
+using BSOFT.Infrastructure.Data;
+using Core.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IAdminSecuritySettings;
+
+namespace BSOFT.Infrastructure.Repositories.AdminSecuritySettings
+{
+    public class AdminSecuritySettingsCommandRepository  : IAdminSecuritySettingsCommandRepository 
+    {
+        private readonly ApplicationDbContext _applicationDbContext;
+
+         public  AdminSecuritySettingsCommandRepository(ApplicationDbContext applicationDbContext)
+    {
+        _applicationDbContext=applicationDbContext;
+    } 
+     public async Task<Core.Domain.Entities.AdminSecuritySettings> CreateAsync(Core.Domain.Entities.AdminSecuritySettings adminSecuritySettings)
+    {
+            await _applicationDbContext.AdminSecuritySettings.AddAsync(adminSecuritySettings);
+            await _applicationDbContext.SaveChangesAsync();
+            return adminSecuritySettings;
+    }    
+     public async Task<int>UpdateAsync(int id, Core.Domain.Entities.AdminSecuritySettings adminSecuritySettings)
+    {
+            var existingadminsettings = await _applicationDbContext.AdminSecuritySettings.FirstOrDefaultAsync(u => u.Id == id);
+            if (existingadminsettings != null)
+            {
+                  existingadminsettings.PasswordHistoryCount=adminSecuritySettings.PasswordHistoryCount;
+                  existingadminsettings.SessionTimeoutMinutes= adminSecuritySettings.SessionTimeoutMinutes;
+                  existingadminsettings.MaxFailedLoginAttempts=adminSecuritySettings.MaxFailedLoginAttempts;
+                  existingadminsettings.AccountAutoUnlockMinutes=adminSecuritySettings.AccountAutoUnlockMinutes;
+                  existingadminsettings.PasswordExpiryDays=adminSecuritySettings.PasswordExpiryDays;
+                  existingadminsettings.PasswordExpiryAlertDays=adminSecuritySettings.PasswordExpiryAlertDays;
+                  existingadminsettings.IsTwoFactorAuthenticationEnabled=adminSecuritySettings.IsTwoFactorAuthenticationEnabled;
+                  existingadminsettings.MaxConcurrentLogins=adminSecuritySettings.MaxConcurrentLogins;
+                  existingadminsettings.IsForcePasswordChangeOnFirstLogin=adminSecuritySettings.IsForcePasswordChangeOnFirstLogin;
+                  existingadminsettings.PasswordResetCodeExpiryMinutes=adminSecuritySettings.PasswordResetCodeExpiryMinutes;
+                  existingadminsettings.PasswordResetCodeExpiryMinutes=adminSecuritySettings.PasswordResetCodeExpiryMinutes;
+                  existingadminsettings.IsCaptchaEnabledOnLogin=adminSecuritySettings.IsCaptchaEnabledOnLogin;
+                
+
+
+                _applicationDbContext.AdminSecuritySettings.Update(existingadminsettings);
+                return await _applicationDbContext.SaveChangesAsync();
+            }
+            return 0; // No user found
+    }
+
+        public async Task<int> DeleteAsync(int id ,Core.Domain.Entities.AdminSecuritySettings adminSecuritySettings )
+    {
+        
+            var adminsettingsToDelete = await _applicationDbContext.AdminSecuritySettings.FirstOrDefaultAsync(u => u.Id == id);
+            if (adminsettingsToDelete != null)
+            {
+                adminsettingsToDelete.IsActive = adminSecuritySettings.IsActive;
+                _applicationDbContext.AdminSecuritySettings.Update(adminsettingsToDelete);
+                 await _applicationDbContext.SaveChangesAsync();
+                 return 1;
+            }
+           return 0;
+    }
+
+
+
+
+    
+
+        
+    }
+}

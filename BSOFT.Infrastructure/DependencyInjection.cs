@@ -44,6 +44,10 @@ using Core.Application.Common.Interfaces.IUserSession;
 using Core.Application.Notification.Queries;
 using Core.Application.Common.Interfaces.INotifications;
 using BSOFT.Infrastructure.Repositories.Notifications;
+using Core.Application.Common.Interfaces.IPasswordComplexityRule;
+using BSOFT.Infrastructure.Repositories.PasswordComplexityRule;
+using Core.Application.Common.Interfaces.IAdminSecuritySettings;
+using BSOFT.Infrastructure.Repositories.AdminSecuritySettings;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -135,6 +139,10 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IUserSessionRepository, UserSessionRepository>();
  			services.AddTransient<NotificationsQueryHandler>();  
             services.AddTransient<INotificationsQueryRepository, NotificationsQueryRepository>();                             
+			services.AddScoped<IPasswordComplexityRuleQueryRepository,  PasswordComplexityRuleQueryRepository>();
+            services.AddScoped<IPasswordComplexityRuleCommandRepository, PasswordComplexityRuleCommandRepository>();
+            services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
+            services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            
             services.AddHttpContextAccessor();            
             
 
@@ -151,8 +159,11 @@ namespace BSOFT.Infrastructure
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
                 typeof(ChangePasswordProfile),             
+				typeof(PasswordComplexityRuleProfile),
                 typeof(EntityProfile),
                 typeof(UnitProfile),
+ 				typeof(AdminSecuritySettingsProfile),
+				typeof(DepartmentProfile),
                 typeof(UpdateUnitProfile),
                 typeof(CreateUnitProfile),
                 typeof(UpdateUnitProfile)
