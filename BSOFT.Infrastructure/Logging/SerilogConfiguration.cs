@@ -13,7 +13,8 @@ namespace BSOFT.Infrastructure.Logging
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+                // .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.MongoDB("mongodb://localhost:27017/Bannari") // MongoDB connection string 
                 .CreateLogger();
 
             // Add Serilog to the .NET Core logging pipeline
