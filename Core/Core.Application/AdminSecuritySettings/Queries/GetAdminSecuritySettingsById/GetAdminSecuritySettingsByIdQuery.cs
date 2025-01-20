@@ -8,10 +8,11 @@ using MediatR;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
 using AutoMapper;
 using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettingsById
 {
-    public class GetAdminSecuritySettingsByIdQuery  :IRequest<Result<AdminSecuritySettingsDto>>
+    public class GetAdminSecuritySettingsByIdQuery  :IRequest<ApiResponseDTO<AdminSecuritySettingsDto>>
     {
        
        

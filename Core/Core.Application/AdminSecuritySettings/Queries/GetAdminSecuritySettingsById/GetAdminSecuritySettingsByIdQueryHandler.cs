@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings;
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
 using Core.Domain.Events;
 using MediatR;
@@ -12,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettingsById
 {
-    public class GetAdminSecuritySettingsByIdQueryHandler :IRequestHandler<GetAdminSecuritySettingsByIdQuery, Result<AdminSecuritySettingsDto>>
+    public class GetAdminSecuritySettingsByIdQueryHandler :IRequestHandler<GetAdminSecuritySettingsByIdQuery, ApiResponseDTO<AdminSecuritySettingsDto>>
     {
 
     
@@ -31,18 +32,24 @@ namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySetting
             _logger = logger;
         } 
 
-           public async Task<Result<AdminSecuritySettingsDto>> Handle(GetAdminSecuritySettingsByIdQuery request, CancellationToken cancellationToken)
+           public async Task<ApiResponseDTO<AdminSecuritySettingsDto>> Handle(GetAdminSecuritySettingsByIdQuery request, CancellationToken cancellationToken)
         {
              _logger.LogInformation("Handling GetAdminSecuritySettingsByIdQuery for ID: {Id}", request.Id);
             // Fetch admin security setting by ID
                 var adminSettings = await _IAdminSecuritySettingsQueryRepository.GetAdminSecuritySettingsByIdAsync(request.Id);
+                 if (adminSettings == null)
+                    {
+                        _logger.LogWarning("Department with ID {DepartmentId} not found.", request.Id);
 
-                if (adminSettings == null )
-                {
-                    _logger.LogWarning("Admin Security Settings with ID {Id} not found.", request.Id);
-                    return Result<AdminSecuritySettingsDto>.Failure($"Admin Security Settings with ID {request.Id} not found.");
-                }
+                        return new ApiResponseDTO<AdminSecuritySettingsDto>
+                        {
+                            IsSuccess = false,
+                            Message = "Department not found.",
+                            Data = null
+                        };
+                    }
 
+        
                 _logger.LogInformation("Admin Security Settings with ID {Id} retrieved successfully. Mapping to DTO.", request.Id);
 
                 // Map to DTO
@@ -57,31 +64,12 @@ namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySetting
                     module: "Admin Security Settings"
                 );
 
-                await _mediator.Publish(domainEvent, cancellationToken);
                 _logger.LogInformation("AuditLogsDomainEvent published for Admin Security Settings with ID {Id}.", request.Id);
 
-                return Result<AdminSecuritySettingsDto>.Success(adminSettingsDto);
+             
+                   await _mediator.Publish(domainEvent, cancellationToken);
+                  return new ApiResponseDTO<AdminSecuritySettingsDto> { IsSuccess = true, Message = "Success", Data = adminSettingsDto };
         
-
-                //   var adminsettings = await _IAdminSecuritySettingsQueryRepository.GetAdminSecuritySettingsByIdAsync(request.Id);
-                // if (adminsettings == null)
-                // {
-                //     return Result<AdminSecuritySettingsDto>.Failure($"Admin Security Settings with ID {request.Id} not found.");
-                // }
-                
-                // var adminsettingDto = _mapper.Map<AdminSecuritySettingsDto>(adminsettings);
-                  
-                // //Domain Event
-                // var domainEvent = new AuditLogsDomainEvent(
-                //     actionDetail: "GetById",
-                //     actionCode: adminsettingDto.Id.ToString(),        
-                //     actionName: adminsettingDto.Id.ToString(),                
-                //     details: $"Admin Settings '{adminsettingDto.Id}' was created.",
-                //     module:"Admin Security Settings"
-                // );
-
-                // await _mediator.Publish(domainEvent, cancellationToken);
-                // return Result<AdminSecuritySettingsDto>.Success(adminsettingDto);
 
           
         }

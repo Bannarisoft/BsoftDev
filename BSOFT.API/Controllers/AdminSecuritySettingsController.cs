@@ -19,6 +19,7 @@ using Core.Domain.Entities;
 using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettingsById;
 
 
+
 namespace BSOFT.API.Controllers
 {
     [Route("[controller]")]

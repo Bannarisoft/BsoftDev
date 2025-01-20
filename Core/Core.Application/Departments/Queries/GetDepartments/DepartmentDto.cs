@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using Core.Domain.Entities;
 using Core.Application.Common.Mappings;
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Departments.Queries.GetDepartments
 {
-    public class DepartmentDto  : IMapFrom<Result<Department>>
+    public class DepartmentDto  : IMapFrom<ApiResponseDTO<Department>>
     {
          public int Id { get; set; }
         public string ShortName { get; set; }
