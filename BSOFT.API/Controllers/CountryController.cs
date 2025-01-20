@@ -7,6 +7,7 @@ using Core.Application.Country.Queries.GetCountryAutoComplete;
 using Core.Application.Country.Queries.GetCountryById;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
@@ -28,6 +29,7 @@ namespace BSOFT.API.Controllers
              
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllCountriesAsync()
         {           
             var countries = await Mediator.Send(new GetCountryQuery());          
@@ -38,6 +40,7 @@ namespace BSOFT.API.Controllers
             });
         }
         [HttpGet("{countryId}")]
+        [Authorize]
         public async Task<IActionResult> GetByIdAsync(int countryId)
         {
             if (countryId <= 0)
@@ -63,8 +66,8 @@ namespace BSOFT.API.Controllers
                 data = result.Data
             });
         }
-        
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateAsync(CreateCountryCommand  command)
         { 
             var validationResult = await _createCountryCommandValidator.ValidateAsync(command);
@@ -95,6 +98,7 @@ namespace BSOFT.API.Controllers
                        
         }
         [HttpPut("update")]
+        [Authorize]
         public async Task<IActionResult> UpdateAsync( UpdateCountryCommand command)
         {
             var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
@@ -135,6 +139,7 @@ namespace BSOFT.API.Controllers
             }
         }
         [HttpDelete("delete")]
+        [Authorize]
         public async Task<IActionResult> DeleteAsync(DeleteCountryCommand command)
         {
             var result = await Mediator.Send(command);
@@ -158,6 +163,7 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpGet("GetCountrySearch")]
+        [Authorize]
         public async Task<IActionResult> GetCountry([FromQuery] string searchPattern)
         {
             var result = await Mediator.Send(new GetCountryAutoCompleteQuery { SearchPattern = searchPattern });

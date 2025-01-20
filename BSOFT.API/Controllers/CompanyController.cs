@@ -34,6 +34,7 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpGet("GetAllCompaniesAsync")]
+        
         public async Task<IActionResult> GetAllCompaniesAsync()
         {
             var companies = await Mediator.Send(new GetCompanyQuery());

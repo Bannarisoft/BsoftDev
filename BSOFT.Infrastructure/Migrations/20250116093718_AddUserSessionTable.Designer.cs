@@ -4,6 +4,7 @@ using BSOFT.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250116093718_AddUserSessionTable")]
+    partial class AddUserSessionTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -234,8 +237,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId")
-                        .IsUnique();
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("CompanyAddress", "AppData");
                 });
@@ -280,8 +282,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId")
-                        .IsUnique();
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("CompanyContact", "AppData");
                 });
@@ -1213,8 +1214,8 @@ namespace BSOFT.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.CompanyAddress", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Company", "Company")
-                        .WithOne("CompanyAddress")
-                        .HasForeignKey("Core.Domain.Entities.CompanyAddress", "CompanyId")
+                        .WithMany("CompanyAddress")
+                        .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1224,8 +1225,8 @@ namespace BSOFT.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.CompanyContact", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Company", "Company")
-                        .WithOne("CompanyContact")
-                        .HasForeignKey("Core.Domain.Entities.CompanyContact", "CompanyId")
+                        .WithMany("CompanyContact")
+                        .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1344,11 +1345,9 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Company", b =>
                 {
-                    b.Navigation("CompanyAddress")
-                        .IsRequired();
+                    b.Navigation("CompanyAddress");
 
-                    b.Navigation("CompanyContact")
-                        .IsRequired();
+                    b.Navigation("CompanyContact");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Countries", b =>

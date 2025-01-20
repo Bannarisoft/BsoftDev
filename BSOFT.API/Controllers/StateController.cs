@@ -8,6 +8,7 @@ using Core.Application.State.Queries.GetStateById;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers
 {
@@ -35,6 +36,7 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpGet("{stateId}")]
+        [Authorize]
         public async Task<IActionResult> GetByIdAsync(int stateId)
         {
              if (stateId <= 0)
@@ -47,6 +49,7 @@ namespace BSOFT.API.Controllers
                 : NotFound(new { Message = result.ErrorMessage });    
             }        
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateAsync(CreateStateCommand  command)
         { 
 
@@ -63,6 +66,7 @@ namespace BSOFT.API.Controllers
             
         }
         [HttpPut("{stateId}")]
+        [Authorize]
         public async Task<IActionResult> UpdateAsync(int stateId, UpdateStateCommand command)
         {   
             if (stateId != command.Id)
@@ -85,6 +89,7 @@ namespace BSOFT.API.Controllers
                 : BadRequest(new { Message = result.ErrorMessage });
         }        
         [HttpDelete("{stateId}")]
+        [Authorize]
         public async Task<IActionResult> DeleteAsync(int stateId,DeleteStateCommand command)
         {
             if(stateId != command.Id)
@@ -102,16 +107,17 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpGet("GetStateSearch")]
-            public async Task<IActionResult> GetState([FromQuery] string searchPattern)
+        [Authorize]
+        public async Task<IActionResult> GetState([FromQuery] string searchPattern)
+        {
+            if (string.IsNullOrWhiteSpace(searchPattern))
             {
-                if (string.IsNullOrWhiteSpace(searchPattern))
-                {
-                    return BadRequest(new { Message = "Search pattern is required" });
-                }
-                var result = await Mediator.Send(new GetStateAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
-                return result.IsSuccess
-                ? Ok(result.Data)
-                : NotFound(new { Message = result.ErrorMessage });
-            }    
+                return BadRequest(new { Message = "Search pattern is required" });
+            }
+            var result = await Mediator.Send(new GetStateAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
+            return result.IsSuccess
+            ? Ok(result.Data)
+            : NotFound(new { Message = result.ErrorMessage });
+        }    
     }
 }

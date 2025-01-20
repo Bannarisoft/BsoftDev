@@ -7,6 +7,6 @@ namespace Core.Application.AuditLog.Queries
 {
     public class GetAuditLogBySearchPatternQuery : IRequest<Result<List<AuditLogDto>>>
     {
-        public string SearchPattern { get; set; } = string.Empty;
+        public string? SearchPattern { get; set; } 
     }
 }
