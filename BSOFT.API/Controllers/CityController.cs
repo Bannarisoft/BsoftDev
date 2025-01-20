@@ -7,6 +7,7 @@ using Core.Application.City.Queries.GetCityAutoComplete;
 using Core.Application.City.Queries.GetCityById;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
@@ -29,6 +30,7 @@ namespace BSOFT.API.Controllers
              
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllCitiesAsync()
         {  
             var cities = await Mediator.Send(new GetCityQuery());            
@@ -41,6 +43,7 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpGet("{cityId}")]
+        [Authorize]
         public async Task<IActionResult> GetByIdAsync(int cityId)
         {
              if (cityId <= 0)
@@ -68,6 +71,7 @@ namespace BSOFT.API.Controllers
         }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> CreateAsync(CreateCityCommand  command)
     { 
         var validationResult = await _createCityCommandValidator.ValidateAsync(command);
@@ -100,6 +104,7 @@ namespace BSOFT.API.Controllers
                
     }
     [HttpPut("update")]
+    [Authorize]
     public async Task<IActionResult> UpdateAsync(UpdateCityCommand command)
     {         
         var validationResult = await _updateCityCommandValidator.ValidateAsync(command);
@@ -142,6 +147,7 @@ namespace BSOFT.API.Controllers
              
     }
     [HttpDelete("delete")]
+    [Authorize]
     public async Task<IActionResult> DeleteAsync(DeleteCityCommand command)
     {
         
@@ -164,21 +170,22 @@ namespace BSOFT.API.Controllers
         }       
     }
 
-       [HttpGet("GetCitySearch")]
-        public async Task<IActionResult> GetCity([FromQuery] string searchPattern)
-        {           
-            var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
-            if (result.IsSuccess)
+    [HttpGet("GetCitySearch")]
+    [Authorize] 
+    public async Task<IActionResult> GetCity([FromQuery] string searchPattern)
+    {           
+        var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
+        if (result.IsSuccess)
+        {
+            return Ok(new 
             {
-                return Ok(new 
-                {
-                    StatusCode=StatusCodes.Status200OK,
-                    message = result.Message,
-                    data = result.Data
-                });
-            }
-            return Ok(result.Data);
+                StatusCode=StatusCodes.Status200OK,
+                message = result.Message,
+                data = result.Data
+            });
         }
+        return Ok(result.Data);
+    }
 
 
      

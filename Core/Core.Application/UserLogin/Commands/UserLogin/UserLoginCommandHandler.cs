@@ -10,6 +10,7 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUserSession;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Core.Domain.Entities;
 namespace Core.Application.UserLogin.Commands.UserLogin
 {
     public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, ApiResponseDTO<LoginResponse>>
@@ -51,18 +52,7 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                     IsSuccess = false,
                     Message = "Username and password are required."
                 };
-            }
-            // var user = await _userQueryRepository.GetByUsernameAsync(request.Username);
-            // Validate request input
-            // if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
-            // {
-            //     _logger.LogWarning("Invalid login attempt with missing credentials.");
-            //     return new LoginResponse
-            //     {
-            //         IsAuthenticated = false,
-            //         Message = "Username and password are required."
-            //     };
-            // }
+            }          
             // Fetch user details
             var user = await _userQueryRepository.GetByUsernameAsync(request.Username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
@@ -74,34 +64,27 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                     Message = "Invalid username or password."
                 };
             }
+          
 
-            // if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            // {
-            //     _logger.LogWarning("Invalid login attempt for Username: {Username}", request.Username);
-            //     return new LoginResponse
-            //     {
-            //         IsAuthenticated = false,
-            //         IsFirstTimeUser = false,
-            //         Message = "Invalid username or password."
-            //     };
-            // }
-// Check if the user already has an active session
-                var activeSession = await _userSessionRepository.GetSessionByUserIdAsync(user.UserId);
-
-                if (activeSession != null)
-                {
-                    // Step 2: Restrict login and notify the user
-                    return new LoginResponse
-                    {
-                        IsAuthenticated = false,
-                        Message = "This username is already logged in on another machine. Please log out first."
-                    };
-                }
             _logger.LogInformation("User {Username} found. Retrieving roles...", request.Username);
-   // Invalidate existing sessions if required (optional)
-            await _userSessionRepository.DeactivateUserSessionsAsync(user.UserId);             // Get user roles
-            // var roles = await _userQueryRepository.GetUserRolesAsync(user.UserId);
-            // Fetch user roles
+
+            // Check if the user already has an active session
+            var activeSession = await _userSessionRepository.GetSessionByUserIdAsync(user.UserId);
+
+            if (activeSession != null)
+            {
+                // Step 2: Restrict login and notify the user
+                return new ApiResponseDTO<LoginResponse>
+                {
+                    IsSuccess = false,
+                    Message = "This username is already logged in on another machine. Please log out first."
+                };
+            }
+        
+        
+           // Invalidate existing sessions if required (optional)
+            await _userSessionRepository.DeactivateUserSessionsAsync(user.UserId);   
+                      // Get user roles            
             var roles = await _userQueryRepository.GetUserRolesAsync(user.UserId);
             if (roles == null || roles.Count == 0)
             {
@@ -111,24 +94,14 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                     IsSuccess = false,
                     Message = "User does not have any assigned roles."
                 };
-            }
-            // var roles = await _userQueryRepository.GetUserRolesAsync(user.UserId);
-            // if (roles == null || roles.Count == 0)
-            // {
-            //     _logger.LogWarning("No roles found for user {UserId}.", user.UserId);
-            //     return new LoginResponse
-            //     {
-            //         IsAuthenticated = false,
-            //         Message = "User does not have any assigned roles."
-            //     };
-            // }
+            }        
+        
 
             _logger.LogInformation("Roles retrieved for user {UserId}: {Roles}", user.UserId, string.Join(", ", roles));
 
-            // Generate JWT token
-            var token = _jwtTokenHelper.GenerateToken(user.UserName, roles);
+            // Generate JWT token            
  			var token = _jwtTokenHelper.GenerateToken(user.UserName,user.UserId,user.UserType, roles, out var jti);
-var httpContext = _httpContextAccessor.HttpContext;
+            var httpContext = _httpContextAccessor.HttpContext;
             var browserInfo = httpContext?.Request.Headers["User-Agent"].ToString();
             string broswerDetails = browserInfo != null ? _ipAddressService.GetUserBrowserDetails(browserInfo) : string.Empty;
             DateTime utcNow = DateTime.UtcNow;
@@ -144,7 +117,8 @@ var httpContext = _httpContextAccessor.HttpContext;
                 CreatedAt = indianTime,
                 LastActivity =indianTime,
                 BrowserInfo=broswerDetails
-            });            _logger.LogInformation("JWT token generated for Username: {Username}", user.UserName);
+            });           
+             _logger.LogInformation("JWT token generated for Username: {Username}", user.UserName);
             
             //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
@@ -172,23 +146,6 @@ var httpContext = _httpContextAccessor.HttpContext;
                     Message = "Login Successful."
                 }
             };
-            // return new LoginResponse
-            // {
-            //     Token = token,
-            //     UserName = user.UserName,
-            //     UserRole = roles,
-            //     IsAuthenticated = true,
-            //     IsFirstTimeUser = user.IsFirstTimeUser,
-            //     Message = "Login Successful."
-            // };
-
-        }
-
-        // private bool VerifyPassword(string password, string storedHash)
-        // {
-        //     using var sha256 = SHA256.Create();
-        //     var hashedPassword = Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(password)));
-        //     return hashedPassword == storedHash;
-        // }
+        }         
     }
 }

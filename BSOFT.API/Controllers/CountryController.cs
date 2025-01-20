@@ -5,7 +5,6 @@ using Core.Application.Country.Commands.UpdateCountry;
 using Core.Application.Country.Queries.GetCountries;
 using Core.Application.Country.Queries.GetCountryAutoComplete;
 using Core.Application.Country.Queries.GetCountryById;
-using Core.Application.UserSession;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -30,6 +29,7 @@ namespace BSOFT.API.Controllers
              
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllCountriesAsync()
         {           
             var countries = await Mediator.Send(new GetCountryQuery());          
@@ -66,20 +66,8 @@ namespace BSOFT.API.Controllers
                 data = result.Data
             });
         }
-          [HttpGet("user-session/{userId}")]
-    public async Task<IActionResult> GetUserSession(int userId)
-    {
-        var query = new GetUserSessionQuery { UserId = userId };
-        var session = await Mediator.Send(query);
-
-        if (session == null)
-        {
-            return NotFound("No active session found for the user.");
-        }
-
-        return Ok(session);
-    }
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateAsync(CreateCountryCommand  command)
         { 
             var validationResult = await _createCountryCommandValidator.ValidateAsync(command);
@@ -110,6 +98,7 @@ namespace BSOFT.API.Controllers
                        
         }
         [HttpPut("update")]
+        [Authorize]
         public async Task<IActionResult> UpdateAsync( UpdateCountryCommand command)
         {
             var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
@@ -150,6 +139,7 @@ namespace BSOFT.API.Controllers
             }
         }
         [HttpDelete("delete")]
+        [Authorize]
         public async Task<IActionResult> DeleteAsync(DeleteCountryCommand command)
         {
             var result = await Mediator.Send(command);
@@ -173,6 +163,7 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpGet("GetCountrySearch")]
+        [Authorize]
         public async Task<IActionResult> GetCountry([FromQuery] string searchPattern)
         {
             var result = await Mediator.Send(new GetCountryAutoCompleteQuery { SearchPattern = searchPattern });
