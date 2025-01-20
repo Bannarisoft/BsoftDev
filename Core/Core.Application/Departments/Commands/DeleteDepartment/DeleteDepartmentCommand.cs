@@ -13,7 +13,7 @@ using Core.Application.Common.HttpResponse;
 namespace Core.Application.Departments.Commands.DeleteDepartment
 {
 
-    public class DeleteDepartmentCommand :IRequest<ApiResponseDTO<int>>
+    public class DeleteDepartmentCommand :IRequest<ApiResponseDTO<int>> 
     {
         public int Id { get; set; }
 

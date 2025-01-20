@@ -15,7 +15,7 @@ namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySetting
     {
        
        
-    public int AdminsettingsId { get; set; }
+    public int Id { get; set; }
 
 
     }

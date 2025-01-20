@@ -6,6 +6,7 @@ using Core.Domain.Events;
 using Core.Application.Common.Interfaces.IDepartment;
 using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
+using Microsoft.Extensions.Logging;
 
 
 namespace Core.Application.Departments.Queries.GetDepartments
@@ -17,23 +18,35 @@ namespace Core.Application.Departments.Queries.GetDepartments
         private readonly IMapper _mapper; 
          private readonly IMediator _mediator; 
 
+         private readonly ILogger<GetDepartmentQueryHandler> _logger;
 
-     public GetDepartmentQueryHandler(IDepartmentQueryRepository divisionRepository,IMapper mapper , IMediator mediator)
+
+     public GetDepartmentQueryHandler(IDepartmentQueryRepository divisionRepository,IMapper mapper , IMediator mediator, ILogger<GetDepartmentQueryHandler> logger)
         {
             _mapper =mapper;
-
             _departmentRepository = divisionRepository; 
-              _mediator = mediator;                
+            _mediator = mediator;     
+            _logger = logger;
+
         }
 
 
         public async Task<ApiResponseDTO<List<DepartmentDto>>> Handle(GetDepartmentQuery request ,CancellationToken cancellationToken )
         {
-
+             _logger.LogInformation("Fetching Department Request started: {request}", request);
            
-            var department = await _departmentRepository.GetAllDepartmentAsync();
+           
+             var department = await _departmentRepository.GetAllDepartmentAsync();
+            
+             if (department == null || !department.Any())
+            {
+               _logger.LogWarning("No department records found in the database. Total count: {Count}", department?.Count ?? 0);
+
+                  return new ApiResponseDTO<List<DepartmentDto>> { IsSuccess = false, Message = "No Record Found" };
+            }
+
              var departmentList = _mapper.Map<List<DepartmentDto>>(department);
-  var domainEvent = new AuditLogsDomainEvent(
+             var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetAll",
                     actionCode: "",        
                     actionName: "",
@@ -43,7 +56,8 @@ namespace Core.Application.Departments.Queries.GetDepartments
 
                   await _mediator.Publish(domainEvent, cancellationToken);
               
-                return new ApiResponseDTO<List<DepartmentDto>> { IsSuccess = true, Message = "Success", Data = departmentList };  
+            _logger.LogInformation("Department {department} Listed successfully.", departmentList.Count);
+            return new ApiResponseDTO<List<DepartmentDto>> { IsSuccess = true, Message = "Success", Data = departmentList };  
            
         }
 

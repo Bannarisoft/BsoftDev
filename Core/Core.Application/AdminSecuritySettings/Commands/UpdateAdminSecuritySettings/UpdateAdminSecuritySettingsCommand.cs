@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings;
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using MediatR;
 
 namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySettings
 {
-    public class UpdateAdminSecuritySettingsCommand :  IRequest<Result<int>> 
+    public class UpdateAdminSecuritySettingsCommand :  IRequest<ApiResponseDTO<AdminSecuritySettingsDto>> 
     {
          public int Id { get; set; }
     public int PasswordHistoryCount { get; set; }

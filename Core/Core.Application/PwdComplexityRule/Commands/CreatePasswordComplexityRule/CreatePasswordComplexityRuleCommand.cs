@@ -1,10 +1,11 @@
 using Core.Application.Common;
+using Core.Application.Common.HttpResponse;
 using Core.Application.PwdComplexityRule.Queries;
 using MediatR;
 
 namespace Core.Application.PwdComplexityRule.Commands.CreatePasswordComplexityRule
 {
-    public class CreatePasswordComplexityRuleCommand : IRequest<Result<PwdRuleDto>>
+    public class CreatePasswordComplexityRuleCommand : IRequest<ApiResponseDTO<PwdRuleDto>>
     {
 
         public int Id { get; set; }

@@ -25,7 +25,7 @@ namespace Core.Application.Departments.Commands.UpdateDepartment
         private readonly ILogger<UpdateDepartmentCommandHandler> _logger;
         private readonly IDepartmentQueryRepository _departmentQueryRepository;
         private readonly IMediator _mediator; 
-
+         
 
         public UpdateDepartmentCommandHandler(IDepartmentCommandRepository iDepartmentcommandRepository,IDepartmentQueryRepository idepartmentQueryRepository, IMapper Imapper, ILogger<UpdateDepartmentCommandHandler> logger ,IMediator mediator  )
         {
@@ -40,31 +40,88 @@ namespace Core.Application.Departments.Commands.UpdateDepartment
     
 
        public async Task<ApiResponseDTO<DepartmentDto>> Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
-       {
+       {            
+            _logger.LogInformation("Starting UpdateDepartmentCommandHandler for request: {@Request}", request);
 
-            
-     
-             var department = await _departmentQueryRepository.GetByIdAsync(request.Id);
+            // Fetch the department by ID
+            var department = await _departmentQueryRepository.GetByIdAsync(request.Id);
+            if (department == null)
+            {
+                _logger.LogWarning("Department with ID {DepartmentId} not found.", request.Id);
+                return new ApiResponseDTO<DepartmentDto>
+                {
+                    IsSuccess = false,
+                    Message = "Department not found"
+                };
+            }
 
-			 department.DeptName = request.DeptName; // Update properties based on the request
-    department.CompanyId= request.CompanyId;
-    department.IsActive= request.IsActive;
+            _logger.LogInformation("Department with ID {DepartmentId} retrieved successfully.", request.Id);
 
+            // Update department properties
+            department.DeptName = request.DeptName;
+            department.ShortName = request.ShortName;
+            department.CompanyId = request.CompanyId;
+            department.IsActive = request.IsActive;
+
+            // Save updates to the repository
             var result = await _IDepartmentCommandRepository.UpdateAsync(request.Id, department);
-            
-            var departmentDto = _Imapper.Map<DepartmentDto>(result);
 
- // Publish a domain event for audit logs
-    var domainEvent = new AuditLogsDomainEvent(
-        actionDetail: "Update",
-        actionCode: department.Id.ToString(),
-        actionName: department.DeptName,
-        details: $"Department '{department.DeptName}' was updated. Department ID: {request.Id}",
-        module: "Department"
-    );
-    await _mediator.Publish(domainEvent, cancellationToken);
+            if (result == null)
+            {
+                _logger.LogWarning("Failed to update Department with ID {DepartmentId}.", request.Id);
+                return new ApiResponseDTO<DepartmentDto>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to update department"
+                };
+            }
+
+            _logger.LogInformation("Department with ID {DepartmentId} updated successfully.", request.Id);
+
+            // Map the updated entity to DTO
+            var dept = await _departmentQueryRepository.GetByIdAsync(request.Id);
+            var departmentDto = _Imapper.Map<DepartmentDto>(dept);
+           // var departmentDto = _Imapper.Map<DepartmentDto>(result);
+
+            // Publish domain event for audit logs
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "Update",
+                actionCode: department.Id.ToString(),
+                actionName: department.DeptName,
+                details: $"Department '{department.DeptName}' was updated. Department ID: {request.Id}",
+                module: "Department"
+            );
+
+            await _mediator.Publish(domainEvent, cancellationToken);
+            _logger.LogInformation("AuditLogsDomainEvent published for Department ID {DepartmentId}.", department.Id);
+
+            return new ApiResponseDTO<DepartmentDto>
+            {
+                IsSuccess = true,
+                Message = "Department updated successfully"
+               
+            };
+//              var department = await _departmentQueryRepository.GetByIdAsync(request.Id);
+
+// 			 department.DeptName = request.DeptName; // Update properties based on the request
+//             department.CompanyId= request.CompanyId;
+//             department.IsActive= request.IsActive;
+
+//             var result = await _IDepartmentCommandRepository.UpdateAsync(request.Id, department);
+            
+//             var departmentDto = _Imapper.Map<DepartmentDto>(result);
+
+//  // Publish a domain event for audit logs
+//     var domainEvent = new AuditLogsDomainEvent(
+//         actionDetail: "Update",
+//         actionCode: department.Id.ToString(),
+//         actionName: department.DeptName,
+//         details: $"Department '{department.DeptName}' was updated. Department ID: {request.Id}",
+//         module: "Department"
+//     );
+//     await _mediator.Publish(domainEvent, cancellationToken);
           
-            return new ApiResponseDTO<DepartmentDto> { IsSuccess = true, Message = "Department updated successfully", Data = departmentDto };
+//             return new ApiResponseDTO<DepartmentDto> { IsSuccess = true, Message = "Department updated successfully", Data = departmentDto };
 
   
 

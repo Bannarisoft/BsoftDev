@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.HttpResponse;
 using MediatR;
 
 namespace Core.Application.PwdComplexityRule.Queries
 {
-    public class GetPwdRuleQuery : IRequest<List<PwdRuleDto>>
+    public class GetPwdRuleQuery : IRequest<ApiResponseDTO<List<PwdRuleDto>> >
     {
         
     }

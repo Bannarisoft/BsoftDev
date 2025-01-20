@@ -44,17 +44,19 @@ namespace BSOFT.Infrastructure.Repositories.Departments
 
 
 
-    public async Task<List<Department>>  GetAllDepartmentAutoCompleteSearchAsync(string SearchDept = null)
+    public async Task<List<Department>>  GetAllDepartmentAutoCompleteSearchAsync(string SearchDept)
         {
             if (string.IsNullOrWhiteSpace(SearchDept))
             {
                 throw new ArgumentException("DepartmentName cannot be null or empty.", nameof(SearchDept));
             }
+
+            
            const string query = @"
             select Id,CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
-            WHERE DeptName LIKE @SearchDept OR Id LIKE @SearchDept and IsActive =1
+            WHERE (DeptName LIKE @SearchDept OR Id LIKE @SearchDept) and IsActive =1
             ORDER BY DeptName";
-            // Update the object to use SearchPattern instead of Name
+           
           var departments = await _dbConnection.QueryAsync<Department>(query, new { SearchDept = $"%{SearchDept}%" });
             return departments.ToList();
         }

@@ -10,47 +10,74 @@ using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 using Core.Application.Common;
 using Core.Domain.Events;
+using Microsoft.Extensions.Logging;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.PwdComplexityRule.Commands.CreatePasswordComplexityRule
 {
-    public class CreatePasswordComplexityRuleCommandHandler  :IRequestHandler<CreatePasswordComplexityRuleCommand , Result<PwdRuleDto>>
+    public class CreatePasswordComplexityRuleCommandHandler  :IRequestHandler<CreatePasswordComplexityRuleCommand , ApiResponseDTO<PwdRuleDto>>
 
     {
           private readonly IPasswordComplexityRuleCommandRepository _passwordComplexityRepository;
            private readonly IMapper _mapper;
            private readonly IMediator _mediator; 
-           public CreatePasswordComplexityRuleCommandHandler(IPasswordComplexityRuleCommandRepository passwordComplexityRepository ,IMapper mapper,IMediator mediator )
+           private readonly ILogger<CreatePasswordComplexityRuleCommandHandler> _logger;
+           public CreatePasswordComplexityRuleCommandHandler(IPasswordComplexityRuleCommandRepository passwordComplexityRepository ,IMapper mapper,IMediator mediator,ILogger<CreatePasswordComplexityRuleCommandHandler> logger)
         {
              _passwordComplexityRepository=passwordComplexityRepository;
                _mapper=mapper;
                _mediator=mediator;
+               _logger=logger;
          
         }
+         public async Task<ApiResponseDTO<PwdRuleDto>> Handle(CreatePasswordComplexityRuleCommand request, CancellationToken cancellationToken)
+        {         
+          _logger.LogInformation("Handling CreatePasswordComplexityRuleCommand for Password Complexity Rule: {PwdComplexityRule}", request.PwdComplexityRule);
 
-         public async Task<Result<PwdRuleDto>> Handle(CreatePasswordComplexityRuleCommand request, CancellationToken cancellationToken)
-        {
-         
-             var passwordcomplexityruleEntity = _mapper.Map<Core.Domain.Entities.PasswordComplexityRule>(request);
+ 
+                var passwordComplexityRuleEntity = _mapper.Map<Core.Domain.Entities.PasswordComplexityRule>(request);
+                _logger.LogInformation("Mapped CreatePasswordComplexityRuleCommand to PasswordComplexityRule entity.");
 
-             var result = await _passwordComplexityRepository.CreateAsync(passwordcomplexityruleEntity);
-            //Domain Event
-            var domainEvent = new AuditLogsDomainEvent(
-                actionDetail: "Create",
-                actionCode: result.Id.ToString(),
-                actionName: result.PwdComplexityRule,
-                details: $"Country '{result.PwdComplexityRule}' was created. CountryCode: {result.Id}",
-                module:"Country"
-            );
-            await _mediator.Publish(domainEvent, cancellationToken);
+               
+                var result = await _passwordComplexityRepository.CreateAsync(passwordComplexityRuleEntity);
+
+                if (result == null)
+            {
+                _logger.LogWarning("Failed to create Password Complexity Rule. Password Complexity Rule entity: {@passwordComplexityRuleEntity}", passwordComplexityRuleEntity);
+                return new ApiResponseDTO<PwdRuleDto>
+                {
+                    IsSuccess = false,
+                    Message = "Password Complexity Rule not created"
+                };
+            }
+
+                _logger.LogInformation("Password Complexity Rule created successfully with ID: {Id}", result.Id);
+
             
-            var PwdDto = _mapper.Map<PwdRuleDto>(result);
-            return Result<PwdRuleDto>.Success(PwdDto);
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Create",
+                    actionCode: result.Id.ToString(),
+                    actionName: result.PwdComplexityRule,
+                    details: $"Password Complexity Rule '{result.PwdComplexityRule}' was created. Rule ID: {result.Id}",
+                    module: "PasswordComplexityRule"
+                );
 
 
-        }
+                  await _mediator.Publish(domainEvent, cancellationToken);
+            _logger.LogInformation("AuditLogsDomainEvent published for Department ID: {Id}", result.Id);
 
         
+            var ruleDto = _mapper.Map<PwdRuleDto>(result);
 
+            _logger.LogInformation("Returning success response for Department ID: {Id}", result.Id);
+
+            return new ApiResponseDTO<PwdRuleDto>
+            {
+                IsSuccess = true,
+                Message = "Password Complexity Rule created successfully",
+                Data = ruleDto
+            };
+        }
 
     }
 }

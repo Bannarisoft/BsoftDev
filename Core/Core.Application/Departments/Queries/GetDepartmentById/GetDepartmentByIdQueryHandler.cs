@@ -13,6 +13,7 @@ using Core.Domain.Events;
 using Core.Application.Common.Interfaces.IDepartment;
 using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Departments.Queries.GetDepartmentById
 {
@@ -22,19 +23,39 @@ namespace Core.Application.Departments.Queries.GetDepartmentById
           private readonly IDepartmentQueryRepository _departmentRepository;        
         private readonly IMapper _mapper;
          private readonly IMediator _mediator;
+           private readonly ILogger<GetDepartmentByIdQueryHandler> _logger;
 
 
-        public GetDepartmentByIdQueryHandler(IDepartmentQueryRepository departmentRepository,IMapper mapper , IMediator mediator)
+
+        public GetDepartmentByIdQueryHandler(IDepartmentQueryRepository departmentRepository,IMapper mapper , IMediator mediator, ILogger<GetDepartmentByIdQueryHandler> logger)
          {
             _departmentRepository = departmentRepository;
             _mapper =mapper;
             _mediator = mediator;
+            _logger = logger;
         } 
 
       public async Task<ApiResponseDTO<DepartmentDto>> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
         {
+            
+                _logger.LogInformation("Fetching Department Request started: {Request}", request);
 
-                 var department = await _departmentRepository.GetByIdAsync(request.DepartmentId);
+                    // Fetch department by ID
+                    var department = await _departmentRepository.GetByIdAsync(request.DepartmentId);
+                    
+                    if (department == null)
+                    {
+                        _logger.LogWarning("Department with ID {DepartmentId} not found.", request.DepartmentId);
+
+                        return new ApiResponseDTO<DepartmentDto>
+                        {
+                            IsSuccess = false,
+                            Message = "Department not found.",
+                            Data = null
+                        };
+                    }
+            
+
               var deptDto = _mapper.Map<DepartmentDto>(department);
  //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(

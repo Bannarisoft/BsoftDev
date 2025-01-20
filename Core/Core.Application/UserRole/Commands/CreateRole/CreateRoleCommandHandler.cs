@@ -8,42 +8,79 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IUserRole;
+using Core.Application.Common.HttpResponse;
+using Core.Domain.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Application.UserRole.Commands.CreateRole
 {
-    public class CreateRoleCommandHandler :IRequestHandler<CreateRoleCommand, UserRoleDto>
+    public class CreateRoleCommandHandler :IRequestHandler<CreateRoleCommand,  ApiResponseDTO<UserRoleDto>>
     {
         
         private readonly IUserRoleCommandRepository _roleRepository;
         private readonly IMapper _mapper;
+        
+        private readonly IMediator _mediator; 
+        
+          private readonly ILogger<CreateRoleCommandHandler> _logger;
 
-        public CreateRoleCommandHandler(IUserRoleCommandRepository roleRepository,IMapper mapper)
+        public CreateRoleCommandHandler(IUserRoleCommandRepository roleRepository,IMapper mapper,IMediator mediator,ILogger<CreateRoleCommandHandler> logger)
         {
              _roleRepository=roleRepository;
             _mapper=mapper;
+            _mediator=mediator;
+            _logger=logger;
         }
 
-        public async Task<UserRoleDto>Handle(CreateRoleCommand request,CancellationToken cancellationToken)
-        {          
-            // Validate input
-            if (string.IsNullOrWhiteSpace(request.RoleName))
-            {
-                throw new ArgumentException("RoleName cannot be null or empty.");
-            }
+        public async Task<ApiResponseDTO<UserRoleDto>>Handle(CreateRoleCommand request,CancellationToken cancellationToken)
+         {          
 
-            // Map to domain entity
-            var roleEntity = _mapper.Map<Core.Domain.Entities.UserRole>(request);
+            _logger.LogInformation("Starting CreateUserRoleCommandHandler for request: {@Request}", request);
 
-            // Save to repository
-            var createdUserRole = await _roleRepository.CreateAsync(roleEntity);
+            // Map the request to the entity
+            var userRoleEntity = _mapper.Map<Core.Domain.Entities.UserRole>(request);
+            _logger.LogInformation("Mapped CreateUserRoleCommand to userRole entity:{@userRoleEntity}", userRoleEntity);
+
+            // Save the department
+            var createdUserRole = await _roleRepository.CreateAsync(userRoleEntity);
 
             if (createdUserRole == null)
             {
-                throw new InvalidOperationException("Failed to create the role.");
+                _logger.LogWarning("Failed to create department. UserRole entity: {@userRoleEntity}", userRoleEntity);
+                return new ApiResponseDTO<UserRoleDto>
+                {
+                    IsSuccess = false,
+                    Message = "UserRole not created"
+                };
             }
 
-            // Map to DTO
-            return _mapper.Map<UserRoleDto>(createdUserRole);
+            _logger.LogInformation("UserRole successfully created with ID: {Id}", createdUserRole.Id);
+
+            // Publish the domain event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "Create",
+                actionCode: createdUserRole.Id.ToString(),
+                actionName: createdUserRole.RoleName,
+                details: $"UserRole '{createdUserRole.RoleName}' was created. ID: {createdUserRole.Id}",
+                module: "UserRole"
+            );
+
+            await _mediator.Publish(domainEvent, cancellationToken);
+            _logger.LogInformation("AuditLogsDomainEvent published for UserRole ID: {Id}", createdUserRole.Id);
+
+            // Map the result to DTO
+            var userrolrDto = _mapper.Map<UserRoleDto>(createdUserRole);
+
+            _logger.LogInformation("Returning success response for UserRole ID: {Id}", createdUserRole.Id);
+
+            return new ApiResponseDTO<UserRoleDto>
+            {
+                IsSuccess = true,
+                Message = "UserRole created successfully",
+                Data = userrolrDto
+            };
+           
+       
 
 
          }

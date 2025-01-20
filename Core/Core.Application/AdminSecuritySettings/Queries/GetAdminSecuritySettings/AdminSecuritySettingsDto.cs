@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings
 {
-    public class AdminSecuritySettingsDto
+    public class AdminSecuritySettingsDto 
     {
          public int Id { get; set; }
     public int PasswordHistoryCount { get; set; }

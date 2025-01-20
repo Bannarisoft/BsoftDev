@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using Core.Application.Common;
 using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings;
 using MediatR;
+using Core.Application.Common.HttpResponse;
 
 
 namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySettings
 {
-    public class DeleteAdminSecuritySettingsCommand : IRequest<Result<int>>
+    public class DeleteAdminSecuritySettingsCommand : IRequest<ApiResponseDTO<int>> 
     {
 
          public int Id { get; set; }

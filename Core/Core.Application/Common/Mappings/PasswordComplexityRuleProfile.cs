@@ -27,11 +27,12 @@ namespace Core.Application.Common.Mappings
           .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ));
 
+             CreateMap<Core.Domain.Entities.PasswordComplexityRule, PwdRuleDto>();
+            CreateMap<PwdRuleStatusDto, Core.Domain.Entities.PasswordComplexityRule>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
-
-
-
-
+            CreateMap<Core.Domain.Entities.PasswordComplexityRule, PwdRuleDto>();
 
            
         }
