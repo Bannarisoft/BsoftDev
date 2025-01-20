@@ -23,38 +23,33 @@ namespace Core.Application.Country.Queries.GetCountryById
         }
 
         public async Task<ApiResponseDTO<CountryDto>> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
-        {
-           
-                var country = await _countryRepository.GetByIdAsync(request.Id);
-                if (country == null)
-                {
-                    return new ApiResponseDTO<CountryDto>
-                    {
-                        IsSuccess = false,
-                        Message = "Country not found"
-                    };
-                }
-                
-                var countryDto = _mapper.Map<CountryDto>(country);
-                  
-                //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetById",
-                    actionCode: countryDto.CountryCode,        
-                    actionName: countryDto.CountryName,                
-                    details: $"Country '{countryDto.CountryName}' was created. CountryCode: {countryDto.CountryCode}",
-                    module:"Country"
-                );
-
-                await _mediator.Publish(domainEvent, cancellationToken);
+        {           
+            var country = await _countryRepository.GetByIdAsync(request.Id);
+            if (country == null)
+            {
                 return new ApiResponseDTO<CountryDto>
                 {
-                    IsSuccess = true,
-                    Message = "Country fetched successfully",
-                    Data = countryDto
+                    IsSuccess = false,
+                    Message = "Country not found"
                 };
-           
+            }            
+            var countryDto = _mapper.Map<CountryDto>(country);
+                
+            //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "GetById",
+                actionCode: countryDto.CountryCode,        
+                actionName: countryDto.CountryName,                
+                details: $"Country '{countryDto.CountryName}' was created. CountryCode: {countryDto.CountryCode}",
+                module:"Country"
+            );
+            await _mediator.Publish(domainEvent, cancellationToken);
+            return new ApiResponseDTO<CountryDto>
+            {
+                IsSuccess = true,
+                Message = "Country fetched successfully",
+                Data = countryDto
+            };           
         }
     }
-
 }

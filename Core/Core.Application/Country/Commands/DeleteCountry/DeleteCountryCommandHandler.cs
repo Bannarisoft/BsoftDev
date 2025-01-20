@@ -1,5 +1,4 @@
 using AutoMapper;
-using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Application.Country.Queries.GetCountries;
@@ -42,32 +41,31 @@ namespace Core.Application.Country.Commands.DeleteCountry
                 IsActive = 0
             };
             
-                var updateResult = await _countryRepository.DeleteAsync(request.Id, countryUpdate);
-                if (updateResult > 0)
-                {
-                    var countryDto = _mapper.Map<CountryDto>(countryUpdate); 
-                    //Domain Event  
-                    var domainEvent = new AuditLogsDomainEvent(
-                        actionDetail: "Delete",
-                        actionCode: countryDto.CountryCode,
-                        actionName: countryDto.CountryName,
-                        details: $"Country '{countryDto.CountryName}' was created. CountryCode: {countryDto.CountryCode}",
-                        module:"Country"
-                    );               
-                    await _mediator.Publish(domainEvent, cancellationToken);              
-                    return new ApiResponseDTO<CountryDto>
-                    {
-                        IsSuccess = true,
-                        Message = "Country deleted successfully.",
-                        Data = countryDto
-                    };
-                }
+            var updateResult = await _countryRepository.DeleteAsync(request.Id, countryUpdate);
+            if (updateResult > 0)
+            {
+                var countryDto = _mapper.Map<CountryDto>(countryUpdate); 
+                //Domain Event  
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Delete",
+                    actionCode: countryDto.CountryCode,
+                    actionName: countryDto.CountryName,
+                    details: $"Country '{countryDto.CountryName}' was created. CountryCode: {countryDto.CountryCode}",
+                    module:"Country"
+                );               
+                await _mediator.Publish(domainEvent, cancellationToken);              
                 return new ApiResponseDTO<CountryDto>
                 {
-                    IsSuccess = false,
-                    Message = "Country deletion failed."
+                    IsSuccess = true,
+                    Message = "Country deleted successfully.",
+                    Data = countryDto
                 };
-           
+            }
+            return new ApiResponseDTO<CountryDto>
+            {
+                IsSuccess = false,
+                Message = "Country deletion failed."
+            };          
         }
     }
 }

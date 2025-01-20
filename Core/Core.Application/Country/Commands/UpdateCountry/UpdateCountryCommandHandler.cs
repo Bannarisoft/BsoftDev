@@ -2,7 +2,6 @@ using MediatR;
 using Core.Domain.Entities;
 using Core.Application.Country.Queries.GetCountries;
 using AutoMapper;
-using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
@@ -55,21 +54,23 @@ namespace Core.Application.Country.Commands.UpdateCountry
             }
             var updatedCountryEntity = _mapper.Map<Countries>(request);
             
-                var updateResult = await _countryRepository.UpdateAsync(request.Id, updatedCountryEntity);            
-                var updatedCountry = await _countryQueryRepository.GetByIdAsync(request.Id);
-                
-                if (updatedCountry != null)
+            var updateResult = await _countryRepository.UpdateAsync(request.Id, updatedCountryEntity);            
+            var updatedCountry = await _countryQueryRepository.GetByIdAsync(request.Id);
+            
+            if (updatedCountry != null)
+            {
+                var countryDto = _mapper.Map<CountryDto>(updatedCountry);
+                //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Update",
+                    actionCode: countryDto.CountryCode,
+                    actionName: countryDto.CountryName,                            
+                    details: $"State '{oldCountryName}' was updated to '{countryDto.CountryName}'.  StateCode: {countryDto.CountryCode}",
+                    module:"State"
+                );            
+                await _mediator.Publish(domainEvent, cancellationToken);
+                if(updateResult>0)
                 {
-                    var countryDto = _mapper.Map<CountryDto>(updatedCountry);
-                    //Domain Event
-                    var domainEvent = new AuditLogsDomainEvent(
-                        actionDetail: "Update",
-                        actionCode: countryDto.CountryCode,
-                        actionName: countryDto.CountryName,                            
-                        details: $"State '{oldCountryName}' was updated to '{countryDto.CountryName}'.  StateCode: {countryDto.CountryCode}",
-                        module:"State"
-                    );            
-                    await _mediator.Publish(domainEvent, cancellationToken);
                     return new ApiResponseDTO<CountryDto>
                     {
                         IsSuccess = true,
@@ -77,15 +78,20 @@ namespace Core.Application.Country.Commands.UpdateCountry
                         Data = countryDto
                     };
                 }
-                else
+                return new ApiResponseDTO<CountryDto>
                 {
-                    return new ApiResponseDTO<CountryDto>
-                    {
-                        IsSuccess = false,
-                        Message = "Country update failed"
-                    };
-                }
-                   
-      }
+                    IsSuccess = false,
+                    Message = "Country not updated."
+                }; 
+            }
+            else
+            {
+                return new ApiResponseDTO<CountryDto>
+                {
+                    IsSuccess = false,
+                    Message = "Country update failed"
+                };
+            }                   
+        }
     }
 }

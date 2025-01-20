@@ -49,6 +49,7 @@ namespace BSOFT.Infrastructure.Repositories.Country
         {
                return await _applicationDbContext.Countries
             .AnyAsync(c => c.CountryCode == countryCode ); // Checks both CityCode and StateId
-        }      
+        }
+
     }
 }

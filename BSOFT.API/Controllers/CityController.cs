@@ -148,10 +148,17 @@ namespace BSOFT.API.Controllers
     }
     [HttpDelete("delete")]
     [Authorize]
-    public async Task<IActionResult> DeleteAsync(DeleteCityCommand command)
+    public async Task<IActionResult> DeleteAsync(int cityId,DeleteCityCommand command)
     {
         
-        var result = await Mediator.Send(command);
+if(cityId != command.Id)
+        {
+        return BadRequest("CityId Mismatch"); 
+        }
+        if (cityId <= 0)
+        {
+            return BadRequest(new { Message = "Invalid City ID" });
+        }           var result = await Mediator.Send(command);
         if (result.IsSuccess)
         {
             return Ok(new 
@@ -173,18 +180,26 @@ namespace BSOFT.API.Controllers
     [HttpGet("GetCitySearch")]
     [Authorize] 
     public async Task<IActionResult> GetCity([FromQuery] string searchPattern)
-    {           
-        var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
-        if (result.IsSuccess)
-        {
-            return Ok(new 
+    {    
+   if (string.IsNullOrWhiteSpace(searchPattern))
             {
-                StatusCode=StatusCodes.Status200OK,
+                return BadRequest(new { Message = "Search pattern is required" });
+            }       
+        var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
+        if (!result.IsSuccess)
+            {
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                 }); 
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
                 message = result.Message,
                 data = result.Data
             });
-        }
-        return Ok(result.Data);
     }
 
 

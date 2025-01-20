@@ -87,7 +87,7 @@ app.MapPost("/state", async (
     
 if (!result.IsSuccess)
     {
-        return Results.BadRequest(result.ErrorMessage);
+        return Results.BadRequest(result);
     }
 
     return Results.Created($"/states/{result.Data.Id}", result.Data);
@@ -106,6 +106,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseRouting(); // Enable routing
 app.UseAuthentication();
 
