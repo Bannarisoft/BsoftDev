@@ -14,11 +14,11 @@ namespace BSOFT.Infrastructure.Repositories.Divisions
         {
             _applicationDbContext = applicationDbContext;
         }       
-         public async Task<int> CreateAsync(Division division)
+         public async Task<Division> CreateAsync(Division division)
         {
             await _applicationDbContext.Divisions.AddAsync(division);
             await _applicationDbContext.SaveChangesAsync();
-            return division.Id;
+            return division;
         }
         public async Task<bool> UpdateAsync(Division division)
         {

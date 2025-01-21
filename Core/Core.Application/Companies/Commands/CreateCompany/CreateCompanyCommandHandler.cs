@@ -4,6 +4,7 @@ using AutoMapper;
 using MediatR;
 using Core.Application.Common.Interfaces.ICompany;
 using Core.Application.Common.HttpResponse;
+using Core.Domain.Events;
 
 namespace Core.Application.Companies.Commands.CreateCompany
 {
@@ -12,12 +13,14 @@ namespace Core.Application.Companies.Commands.CreateCompany
          private readonly ICompanyCommandRepository _icompanyRepository;
          private readonly IFileUploadService _ifileUploadService;
         private readonly IMapper _imapper;
+        private readonly IMediator _mediator;
 
-        public CreateCompanyCommandHandler(ICompanyCommandRepository icompanyRepository, IMapper imapper, IFileUploadService ifileUploadService)
+        public CreateCompanyCommandHandler(ICompanyCommandRepository icompanyRepository, IMapper imapper, IFileUploadService ifileUploadService, IMediator mediator)
         {
             _icompanyRepository = icompanyRepository;
             _imapper = imapper;
             _ifileUploadService = ifileUploadService;
+            _mediator = mediator;
         }
 
         public async Task<ApiResponseDTO<int>> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
@@ -33,6 +36,16 @@ namespace Core.Application.Companies.Commands.CreateCompany
              company.Logo =uploadResult.FilePath;
             
              var CompanyId = await _icompanyRepository.CreateAsync(company);
+
+              //Domain Event
+                 var domainEvent = new AuditLogsDomainEvent(
+                     actionDetail: "Create",
+                     actionCode: "",
+                     actionName: "",
+                     details: $"Company '{CompanyId}' was created.",
+                     module:"Company"
+                 );
+                 await _mediator.Publish(domainEvent, cancellationToken);
 
                 if (CompanyId > 0)
                 {

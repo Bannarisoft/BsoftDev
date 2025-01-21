@@ -9,7 +9,7 @@ namespace Core.Application.Common.Interfaces.IDivision
 {
     public interface IDivisionCommandRepository
     {  
-        Task<int> CreateAsync(Division division);     
+        Task<Division> CreateAsync(Division division);     
         Task<bool> UpdateAsync(Division division);
         Task<bool> DeleteAsync(int id,Division division);        
     }
