@@ -6,9 +6,10 @@ namespace Core.Application.Common.Interfaces
  		string GetUserIPAddress();    
         string GetUserAgent();
         string GetCurrentUserId();
-        string GetUserId();
+        int GetUserId();
         string GetUserName();
         string GetUserOS(); 
+        string GetUserBrowserDetails(string userAgent);
                
     }
 }

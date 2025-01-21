@@ -8,35 +8,54 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IRoleEntitlement;
 using Core.Domain.Events;
+using Core.Application.Common.HttpResponse;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
 {
-    public class UpdateRoleEntitlementCommandHandler : IRequestHandler<UpdateRoleEntitlementCommand, bool>
+    public class UpdateRoleEntitlementCommandHandler : IRequestHandler<UpdateRoleEntitlementCommand, ApiResponseDTO<bool>>
     {
      private readonly IRoleEntitlementCommandRepository _repository;
      private readonly IMapper _mapper;
      private readonly IMediator _mediator; 
+    private readonly ILogger<UpdateRoleEntitlementCommandHandler> _logger;
 
 
-    public UpdateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper, IMediator mediator)
+    public UpdateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper, IMediator mediator,ILogger<UpdateRoleEntitlementCommandHandler> logger)
     {
         _repository = repository;
         _mapper = mapper;
         _mediator = mediator;    
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     }
 
-    public async Task<bool> Handle(UpdateRoleEntitlementCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDTO<bool>> Handle(UpdateRoleEntitlementCommand request, CancellationToken cancellationToken)
     {
+        if (request == null)
+        {
+            _logger.LogError("UpdateRoleEntitlementCommand request is null.");
+            throw new ArgumentNullException(nameof(request));
+        }
+         _logger.LogInformation("Starting role entitlement update process for RoleName: {RoleName}", request.RoleName);
+
         // Validate role existence
         var role = await _repository.GetRoleByNameAsync(request.RoleName, cancellationToken);
         if (role == null)
         {
-            throw new InvalidOperationException("Role not found.");
+            _logger.LogWarning("Role not found: {RoleName}", request.RoleName);
+            return new ApiResponseDTO<bool>
+            {
+                IsSuccess = false,
+                Message = "Role not found."
+            };
         }
-
         // Fetch existing role entitlements
-        var existingEntitlements = await _repository.GetRoleEntitlementsByRoleNameAsync(request.RoleName, cancellationToken);
+            var existingEntitlements = await _repository.GetRoleEntitlementsByRoleNameAsync(request.RoleName, cancellationToken);
+            if (existingEntitlements == null || !existingEntitlements.Any())
+            {
+                _logger.LogWarning("No existing role entitlements found for RoleName: {RoleName}", request.RoleName);
+            }
 
         // Map the new entitlements
         var updatedEntitlements = request.ModuleMenus
@@ -54,15 +73,22 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
         await _repository.UpdateRoleEntitlementsAsync(role.Id, updatedEntitlements, cancellationToken);
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "Create",
+                    actionDetail: "Update",
                     actionCode: role.RoleName,
                     actionName: role.RoleName,
-                    details: $"RoleEntitlement '{role.RoleName}' was updated. RoleName: {role.RoleName}",
+                    details: $"RoleEntitlements for Role '{role.RoleName}' were updated.",
                     module:"RoleEntitlement"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
 
-        return true;
+            _logger.LogInformation("Successfully updated role entitlements for RoleName: {RoleName}", request.RoleName);
+
+            return new ApiResponseDTO<bool>
+            {
+                IsSuccess = true,
+                Message = "Role entitlements updated successfully.",
+                Data = true
+            };
     }
     }
 }

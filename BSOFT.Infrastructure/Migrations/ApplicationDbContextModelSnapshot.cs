@@ -22,6 +22,93 @@ namespace BSOFT.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Core.Domain.Entities.AdminSecuritySettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountAutoUnlockMinutes")
+                        .HasColumnType("int")
+                        .HasColumnName("AccountAutoUnlockMinutes");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte>("IsActive")
+                        .HasColumnType("tinyint");
+
+                    b.Property<bool>("IsCaptchaEnabledOnLogin")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsCaptchaEnabledOnLogin");
+
+                    b.Property<bool>("IsForcePasswordChangeOnFirstLogin")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsForcePasswordChangeOnFirstLogin");
+
+                    b.Property<bool>("IsTwoFactorAuthenticationEnabled")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsTwoFactorAuthenticationEnabled");
+
+                    b.Property<int>("MaxConcurrentLogins")
+                        .HasColumnType("int")
+                        .HasColumnName("MaxConcurrentLogins");
+
+                    b.Property<int>("MaxFailedLoginAttempts")
+                        .HasColumnType("int")
+                        .HasColumnName("MaxFailedLoginAttempts");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PasswordExpiryAlertDays")
+                        .HasColumnType("int")
+                        .HasColumnName("PasswordExpiryAlertDays");
+
+                    b.Property<int>("PasswordExpiryDays")
+                        .HasColumnType("int")
+                        .HasColumnName("PasswordExpiryDays");
+
+                    b.Property<int>("PasswordHistoryCount")
+                        .HasColumnType("int")
+                        .HasColumnName("PasswordHistoryCount");
+
+                    b.Property<int>("PasswordResetCodeExpiryMinutes")
+                        .HasColumnType("int")
+                        .HasColumnName("PasswordResetCodeExpiryMinutes");
+
+                    b.Property<int>("SessionTimeoutMinutes")
+                        .HasColumnType("int")
+                        .HasColumnName("SessionTimeoutMinutes");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdminSecuritySettings", "AppSecurity");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Cities", b =>
                 {
                     b.Property<int>("Id")
@@ -577,6 +664,54 @@ namespace BSOFT.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Modules", "AppData");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.PasswordComplexityRule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PwdComplexityRule")
+                        .IsRequired()
+                        .HasColumnType("varchar(150)")
+                        .HasColumnName("PwdComplexityRule");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PasswordComplexityRule", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PasswordLog", b =>
@@ -1156,60 +1291,47 @@ namespace BSOFT.Infrastructure.Migrations
                     b.ToTable("UserRoleAllocation", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.UserSession", b =>
+            modelBuilder.Entity("Core.Domain.Entities.UserSessions", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Browser")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Browser");
+                    b.Property<string>("BrowserInfo")
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("BrowserInfo");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime")
                         .HasColumnName("CreatedAt");
 
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("CreatedIP");
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("ExpiresAt");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("IsActive");
 
-                    b.Property<string>("SessionId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(-1)")
-                        .HasColumnName("SessionId");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
+                    b.Property<string>("JwtId")
                         .HasColumnType("varchar(50)")
-                        .HasColumnName("Status");
+                        .HasColumnName("JwtId");
 
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(-1)")
-                        .HasColumnName("Token");
+                    b.Property<DateTime>("LastActivity")
+                        .HasColumnType("datetime")
+                        .HasColumnName("LastActivity");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("UserId");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("UserName");
-
                     b.HasKey("Id");
 
-                    b.ToTable("UserSession", "AppSecurity");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSessions", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Cities", b =>
@@ -1344,6 +1466,15 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("User");
 
                     b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.UserSessions", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Company", b =>

@@ -21,50 +21,42 @@ namespace BSOFT.Infrastructure.Repositories.Departments
     public async Task<List<Department>>GetAllDepartmentAsync()
     {
         
-        const string query = @"
-           SELECT  * FROM AppData.Department";
+        const string query = @"SELECT  * FROM AppData.Department";
             return (await _dbConnection.QueryAsync<Department>(query)).ToList();
         
     }
 
     public async Task<Department> GetByIdAsync(int id)
     {
-           const string query = "SELECT * FROM AppData.Department WHERE Id = @Id";
-        return await _dbConnection.QueryFirstOrDefaultAsync<Department>(query, new { id });
-        }
+         //  const string query = "SELECT * FROM AppData.Department WHERE Id = @Id";
+      //  return await _dbConnection.QueryFirstOrDefaultAsync<Department>(query, new { id });
+
+
+         const string query = @"SELECT * FROM AppData.Department WHERE Id = @Id AND IsActive = 1";
+            var department = await _dbConnection.QueryFirstOrDefaultAsync<Department>(query, new { id });           
+             if (department == null)
+            {
+                throw new KeyNotFoundException($"Department with ID {id} not found.");
+            }
+            return department;
+        }   
     
-         
 
-  
-       public async Task<List<Department>>GetAllDepartmentAutoCompleteAsync()
-    {
-         const string query = @"
-           select CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
-            --WHERE DeptName LIKE @SearchDept OR Id LIKE @SearchDept
-            ORDER BY DeptName";
-            return (await _dbConnection.QueryAsync<Department>(query)).ToList();
 
-        
-        
-    }
 
-//   public async Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync()
-//         {
-//             return await _applicationDbContext.Department.ToListAsync();
-//         }
-
-    public async Task<List<Department>>  GetAllDepartmentAutoCompleteSearchAsync(string SearchDept = null)
+    public async Task<List<Department>>  GetAllDepartmentAutoCompleteSearchAsync(string SearchDept)
         {
             if (string.IsNullOrWhiteSpace(SearchDept))
             {
                 throw new ArgumentException("DepartmentName cannot be null or empty.", nameof(SearchDept));
             }
 
+            
            const string query = @"
             select Id,CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
-            WHERE DeptName LIKE @SearchDept OR Id LIKE @SearchDept and IsActive =1
+            WHERE (DeptName LIKE @SearchDept OR Id LIKE @SearchDept) and IsActive =1
             ORDER BY DeptName";
-            // Update the object to use SearchPattern instead of Name
+           
           var departments = await _dbConnection.QueryAsync<Department>(query, new { SearchDept = $"%{SearchDept}%" });
             return departments.ToList();
         }

@@ -41,11 +41,7 @@ namespace BSOFT.Infrastructure.Repositories.Entities
         // If the entity does not exist, throw a CustomException
         if (existingEntity == null)
         {
-            throw new CustomException(
-                "Entity not found.",
-                new[] { $"No entity found with ID {id}." },
-                CustomException.HttpStatus.NotFound
-            );
+            return -1; //indicate failure
         }
 
         // Update the existing entity's properties
@@ -75,18 +71,14 @@ public async Task<int> DeleteEntityAsync(int id, Entity entity)
         // If the entity does not exist, throw a CustomException
         if (entityToDelete == null)
         {
-            throw new CustomException(
-                "Entity not found.",
-                new[] { $"No entity found with ID {id}." },
-                CustomException.HttpStatus.NotFound
-            );
+            return -1; //indicate failure
         }
 
         // Update the IsActive status to indicate deletion (or soft delete)
         entityToDelete.IsActive = entity.IsActive;
 
-         // Mark the entity as modified
-        _applicationDbContext.Entity.Update(entityToDelete);
+        //  // Mark the entity as modified
+        // _applicationDbContext.Entity.Update(entityToDelete);
 
         // Save changes to the database
         await _applicationDbContext.SaveChangesAsync();

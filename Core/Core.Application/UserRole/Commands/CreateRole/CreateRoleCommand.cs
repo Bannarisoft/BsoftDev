@@ -1,3 +1,4 @@
+using Core.Application.Common.HttpResponse;
 using Core.Application.UserRole.Queries.GetRole;
 using MediatR;
 using System;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Commands.CreateRole
 {
-    public class CreateRoleCommand  : IRequest<UserRoleDto>
+    public class CreateRoleCommand  : IRequest<ApiResponseDTO<UserRoleDto>>
     {
         
  

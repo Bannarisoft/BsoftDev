@@ -12,6 +12,7 @@ using Core.Domain.Events;
 
 namespace Core.Application.Companies.Commands.DeleteCompany
 {
+
     public class DeleteCompanyCommandHandler : IRequestHandler<DeleteCompanyCommand, ApiResponseDTO<bool>>
     {
         private readonly ICompanyCommandRepository _icompanyRepository;
@@ -24,9 +25,11 @@ namespace Core.Application.Companies.Commands.DeleteCompany
             _mediator = mediator;
         }
 
+
         public async Task<ApiResponseDTO<bool>> Handle(DeleteCompanyCommand request, CancellationToken cancellationToken)
         {
             var company  = _imapper.Map<Company>(request.CompanyDelete);
+
             var result = await _icompanyRepository.DeleteAsync(request.Id,company);
 
             

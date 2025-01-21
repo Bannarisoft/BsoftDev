@@ -1,3 +1,4 @@
+using Core.Application.Common.HttpResponse;
 using Core.Application.UserRole.Queries.GetRole;
 using MediatR;
 using System;
@@ -8,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 {
-    public class GetRolesAutocompleteQuery : IRequest<List<UserRoleDto>>
+    public class GetRolesAutocompleteQuery : IRequest<ApiResponseDTO<List<UserRoleDto>>> 
     {
-        public string SearchPattern { get; set; }
+        public string SearchTerm { get; set; }
     }
 }

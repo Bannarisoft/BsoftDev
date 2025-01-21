@@ -1,3 +1,4 @@
+using Core.Application.Common.HttpResponse;
 using Core.Application.UserRole.Queries.GetRole;
 using MediatR;
 using System;
@@ -7,10 +8,13 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Commands.DeleteRole
 {
-    public class DeleteRoleCommand : IRequest<int>
+    public class DeleteRoleCommand :IRequest<ApiResponseDTO<int>> 
+    
     {
-        public int UserRoleId { get; set; }  
+        public int UserRoleId { get; set; } 
 
-        public byte IsActive { get; set; } 
+          public UserRoleStatusDto userRoleStatusDto { get; set; } 
+
+        
     }
 }

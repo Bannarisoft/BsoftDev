@@ -1,16 +1,12 @@
 using Core.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using BSOFT.Infrastructure.Data;
 using System.Data;
 using Dapper;
-using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICountry;
 
 namespace BSOFT.Infrastructure.Repositories.Country
 {    
     public class CountryQueryRepository : ICountryQueryRepository
-    {
-        
+    {        
         private readonly IDbConnection _dbConnection;
         
         public CountryQueryRepository(IDbConnection dbConnection)
@@ -41,13 +37,12 @@ namespace BSOFT.Infrastructure.Repositories.Country
             }
             return country;
         }
-        public async Task<Result<List<Countries>>> GetByCountryNameAsync(string countryName)
+        public async Task<List<Countries>> GetByCountryNameAsync(string searchPattern)
         {
-            if (string.IsNullOrWhiteSpace(countryName))
-            {
-                return Result<List<Countries>>.Failure("Country name cannot be null or empty.");
+            if (string.IsNullOrWhiteSpace(searchPattern))
+            {                
+                throw new ArgumentException("Country name cannot be null or empty.", nameof(searchPattern));
             }
-
             const string query = @"
                 SELECT Id, countryCode, countryName, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
                 ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
@@ -58,14 +53,10 @@ namespace BSOFT.Infrastructure.Repositories.Country
 
             var countries = await _dbConnection.QueryAsync<Countries>(
                 query,
-                new { SearchPattern = $"%{countryName}%" }
+                new { SearchPattern = $"%{searchPattern}%" }
             );
-
-            if (countries == null || !countries.Any())
-            {
-                return Result<List<Countries>>.Failure("No countries found.");
-            }
-            return Result<List<Countries>>.Success(countries.ToList());
+            var result = await _dbConnection.QueryAsync<Countries>(query, new { SearchPattern = $"%{searchPattern}%" });
+            return result.ToList();
         }
     }
 }

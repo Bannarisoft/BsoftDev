@@ -1,3 +1,4 @@
+using Core.Application.Common.HttpResponse;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Queries.GetRole
 {
-    public class GetRoleQuery : IRequest<List<UserRoleDto>>
+    public class GetRoleQuery : IRequest<ApiResponseDTO<List<UserRoleDto>>>
     {
         
     }

@@ -20,7 +20,7 @@ namespace BSOFT.Infrastructure.Repositories.Units
         _applicationDbContext.Unit.Add(unit);
         await _applicationDbContext.SaveChangesAsync();
         return unit.Id;
-    }
+      }
 
        public async Task<UnitAddress> CreateUnitAddressAsync(UnitAddress unitAddress)
        {
@@ -68,34 +68,44 @@ namespace BSOFT.Infrastructure.Repositories.Units
             }
         }
 
-        public async Task UpdateUnitAsync(int Id, Unit unit)
-        {
-       var existingUnit = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.Id == Id);
-        if (existingUnit != null)
-        {
-        existingUnit.UnitName = unit.UnitName;
-        existingUnit.ShortName = unit.ShortName;
-        existingUnit.CompanyId = unit.CompanyId;
-        existingUnit.DivisionId = unit.DivisionId;
-        existingUnit.UnitHeadName = unit.UnitHeadName;
-        existingUnit.CINNO = unit.CINNO;
-        existingUnit.IsActive = unit.IsActive;
-        await _applicationDbContext.SaveChangesAsync();
-        }
-        }
+    public async Task<int> UpdateUnitAsync(int Id, Unit unit)
+{
+    // Try to find the existing unit by ID
+    var existingUnit = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.Id == Id);
 
-        public async Task DeleteUnitAsync(int Id, Unit unit)
+    // If no unit is found, return -1 (indicating failure)
+    if (existingUnit == null)
+    {
+        return -1;
+    }
+
+    // Update the existing unit with the new data
+    existingUnit.UnitName = unit.UnitName;
+    existingUnit.ShortName = unit.ShortName;
+    existingUnit.CompanyId = unit.CompanyId;
+    existingUnit.DivisionId = unit.DivisionId;
+    existingUnit.UnitHeadName = unit.UnitHeadName;
+    existingUnit.CINNO = unit.CINNO;
+    existingUnit.IsActive = unit.IsActive;
+
+    // Save the changes to the database
+    await _applicationDbContext.SaveChangesAsync();
+    
+    // Return the ID of the updated unit (indicating success)
+     return existingUnit.Id;
+}
+
+       public async Task<int> DeleteUnitAsync(int Id, Unit unit)
         {
             var unitToDelete = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.Id == Id);
-            if (unitToDelete != null)
+            // If the Unit does not exist, throw a CustomException
+            if (unitToDelete == null)
             {
+                return -1;
+            }
                 unitToDelete.IsActive = unit.IsActive;
                 await _applicationDbContext.SaveChangesAsync();
-               
-            }
-          
-        
-           
+                return unitToDelete.Id;                        
         }
 
 

@@ -7,6 +7,7 @@ using Core.Application.City.Queries.GetCityAutoComplete;
 using Core.Application.City.Queries.GetCityById;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
@@ -29,6 +30,7 @@ namespace BSOFT.API.Controllers
              
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllCitiesAsync()
         {  
             var cities = await Mediator.Send(new GetCityQuery());            
@@ -41,6 +43,7 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpGet("{cityId}")]
+        [Authorize]
         public async Task<IActionResult> GetByIdAsync(int cityId)
         {
              if (cityId <= 0)
@@ -68,6 +71,7 @@ namespace BSOFT.API.Controllers
         }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> CreateAsync(CreateCityCommand  command)
     { 
         var validationResult = await _createCityCommandValidator.ValidateAsync(command);
@@ -100,6 +104,7 @@ namespace BSOFT.API.Controllers
                
     }
     [HttpPut("update")]
+    [Authorize]
     public async Task<IActionResult> UpdateAsync(UpdateCityCommand command)
     {         
         var validationResult = await _updateCityCommandValidator.ValidateAsync(command);
@@ -142,10 +147,18 @@ namespace BSOFT.API.Controllers
              
     }
     [HttpDelete("delete")]
-    public async Task<IActionResult> DeleteAsync(DeleteCityCommand command)
+    [Authorize]
+    public async Task<IActionResult> DeleteAsync(int cityId,DeleteCityCommand command)
     {
         
-        var result = await Mediator.Send(command);
+if(cityId != command.Id)
+        {
+        return BadRequest("CityId Mismatch"); 
+        }
+        if (cityId <= 0)
+        {
+            return BadRequest(new { Message = "Invalid City ID" });
+        }           var result = await Mediator.Send(command);
         if (result.IsSuccess)
         {
             return Ok(new 
@@ -164,21 +177,30 @@ namespace BSOFT.API.Controllers
         }       
     }
 
-       [HttpGet("GetCitySearch")]
-        public async Task<IActionResult> GetCity([FromQuery] string searchPattern)
-        {           
-            var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
-            if (result.IsSuccess)
+    [HttpGet("GetCitySearch")]
+    [Authorize] 
+    public async Task<IActionResult> GetCity([FromQuery] string searchPattern)
+    {    
+   if (string.IsNullOrWhiteSpace(searchPattern))
             {
-                return Ok(new 
-                {
-                    StatusCode=StatusCodes.Status200OK,
-                    message = result.Message,
-                    data = result.Data
-                });
+                return BadRequest(new { Message = "Search pattern is required" });
+            }       
+        var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
+        if (!result.IsSuccess)
+            {
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                 }); 
             }
-            return Ok(result.Data);
-        }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = result.Message,
+                data = result.Data
+            });
+    }
 
 
      
