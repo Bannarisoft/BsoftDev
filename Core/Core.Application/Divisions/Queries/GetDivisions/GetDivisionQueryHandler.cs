@@ -9,6 +9,7 @@ using System.Text;
 using System.Data;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Application.Common.HttpResponse;
+using Core.Domain.Events;
 
 namespace Core.Application.Divisions.Queries.GetDivisions
 {
@@ -16,16 +17,28 @@ namespace Core.Application.Divisions.Queries.GetDivisions
     {
         private readonly IDivisionQueryRepository _divisionRepository;        
         private readonly IMapper _mapper;
-        public GetDivisionQueryHandler(IDivisionQueryRepository divisionRepository, IMapper mapper)
+        private readonly IMediator _mediator;
+        public GetDivisionQueryHandler(IDivisionQueryRepository divisionRepository, IMapper mapper, IMediator mediator)
         {
             _divisionRepository = divisionRepository;
             _mapper =mapper;
+            _mediator = mediator;
         }
         public async Task<ApiResponseDTO<List<DivisionDTO>>> Handle(GetDivisionQuery requst, CancellationToken cancellationToken)
         {
-            var users = await _divisionRepository.GetAllDivisionAsync();
-            var userList = _mapper.Map<List<DivisionDTO>>(users);
-            return new ApiResponseDTO<List<DivisionDTO>> { IsSuccess = true, Message = "Success", Data = userList };
+            var divisions = await _divisionRepository.GetAllDivisionAsync();
+            var divisionList = _mapper.Map<List<DivisionDTO>>(divisions);
+
+             //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "GetDivisions",
+                    actionCode: "",        
+                    actionName: "",
+                    details: $"Division details was fetched.",
+                    module:"Division"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
+            return new ApiResponseDTO<List<DivisionDTO>> { IsSuccess = true, Message = "Success", Data = divisionList };
         }
     }
 }

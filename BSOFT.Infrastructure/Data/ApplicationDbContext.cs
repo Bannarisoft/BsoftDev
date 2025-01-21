@@ -40,9 +40,8 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<UserRoleAllocation> UserRoleAllocations { get; set; }
          public DbSet<UserSessions> UserSession { get; set; }
  
-
-
-
+        public DbSet<PasswordComplexityRule> PasswordComplexityRule { get; set; }
+        public DbSet<AdminSecuritySettings> AdminSecuritySettings { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -68,7 +67,8 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UserRoleAllocationConfigurations());
             modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
      
-
+			modelBuilder.ApplyConfiguration(new PwdComplexityRuleConfiguration());
+            modelBuilder.ApplyConfiguration(new AdminSecuritySettingsConfiguration());
 
             
             modelBuilder.ApplyConfiguration(new PasswordLogConfiguration());

@@ -48,7 +48,7 @@ namespace BSOFT.Infrastructure.Repositories.UserRoles
         .ToListAsync(); */
           if (string.IsNullOrWhiteSpace(searchTerm))
             {
-                throw new ArgumentException("DivisionName cannot be null or empty.", nameof(searchTerm));
+                throw new ArgumentException("UserRole cannot be null or empty.", nameof(searchTerm));
             }
 
             const string query = @"
@@ -57,7 +57,7 @@ namespace BSOFT.Infrastructure.Repositories.UserRoles
             ORDER BY RoleName";
                 
             // Update the object to use SearchPattern instead of Name
-            var result = await _dbConnection.QueryAsync<UserRole>(query, new { SearchPattern = $"%{searchTerm}%" });
+            var result = await _dbConnection.QueryAsync<UserRole>(query, new { SearchTerm = $"%{searchTerm}%" });
             return result.ToList();
     }
     }

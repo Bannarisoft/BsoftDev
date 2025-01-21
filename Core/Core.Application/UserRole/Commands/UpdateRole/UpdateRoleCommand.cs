@@ -1,3 +1,4 @@
+using Core.Application.Common.HttpResponse;
 using Core.Application.UserRole.Queries.GetRole;
 using MediatR;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace Core.Application.UserRole.Commands.UpdateRole
 {  
    
-    public class UpdateRoleCommand : IRequest<UserRoleDto>
+    public class UpdateRoleCommand : IRequest<ApiResponseDTO<UserRoleDto>>
     {
          public int Id { get; set; }
         public string RoleName { get; set; }

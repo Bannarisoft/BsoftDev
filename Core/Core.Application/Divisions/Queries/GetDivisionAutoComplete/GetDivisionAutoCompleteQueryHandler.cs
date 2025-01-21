@@ -11,6 +11,7 @@ using Core.Application.Divisions.Queries.GetDivisions;
 using System.Data;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Application.Common.HttpResponse;
+using Core.Domain.Events;
 
 
 
@@ -20,16 +21,27 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
     {
         private readonly IDivisionQueryRepository _divisionRepository;
         private readonly IMapper _mapper;
-         public GetDivisionAutoCompleteQueryHandler(IDivisionQueryRepository divisionRepository, IMapper mapper)
+        private readonly IMediator _mediator;
+         public GetDivisionAutoCompleteQueryHandler(IDivisionQueryRepository divisionRepository, IMapper mapper, IMediator mediator)
          {
             _divisionRepository =divisionRepository;
             _mapper =mapper;
+            _mediator = mediator;
          }  
           public async Task<ApiResponseDTO<List<DivisionAutoCompleteDTO>>> Handle(GetDivisionAutoCompleteQuery request, CancellationToken cancellationToken)
           {
              
             var result = await _divisionRepository.GetDivision(request.SearchPattern);
             var division = _mapper.Map<List<DivisionAutoCompleteDTO>>(result);
+             //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "GetAll",
+                    actionCode: "",        
+                    actionName: "",
+                    details: $"Division details was fetched.",
+                    module:"Division"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
             return new ApiResponseDTO<List<DivisionAutoCompleteDTO>> { IsSuccess = true, Message = "Success", Data = division };            
          } 
     }
