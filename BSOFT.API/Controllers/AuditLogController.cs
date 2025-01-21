@@ -2,12 +2,14 @@ using Core.Application.AuditLog.Queries;
 using Core.Application.AuditLog.Queries.GetAuditLog;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    
     public class AuditLogController : ApiControllerBase
     {       
          

@@ -6,8 +6,8 @@ namespace Core.Application.Country.Commands.CreateCountry
 {     
      public class CreateCountryCommand :  IRequest<ApiResponseDTO<CountryDto>>  
      {
-          public string CountryCode { get; set; }=string.Empty;
-          public string CountryName { get; set; }  =string.Empty;                  
+          public string? CountryCode { get; set; }
+          public string? CountryName { get; set; } 
      }         
 
 }

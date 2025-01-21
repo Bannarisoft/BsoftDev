@@ -10,11 +10,13 @@ using Core.Application.UserRole.Queries.GetRolesAutocomplete;
 using Core.Application.Common.Interfaces;
 using FluentValidation;
 using BSOFT.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    
     public class UserRoleController : ApiControllerBase
     {
          private readonly IValidator<CreateRoleCommand> _createRoleCommandValidator;

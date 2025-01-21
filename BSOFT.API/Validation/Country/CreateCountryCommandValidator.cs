@@ -16,7 +16,7 @@ namespace BSOFT.API.Validation.Country
         public CreateCountryCommandValidator(MaxLengthProvider maxLengthProvider)
         {
             // Get max lengths dynamically using MaxLengthProvider
-            var countryCodeMaxLength = maxLengthProvider.GetMaxLength<Countries>("CountryCode") ?? 6;
+            var countryCodeMaxLength = maxLengthProvider.GetMaxLength<Countries>("CountryCode") ?? 5;
             var countryNameMaxLength = maxLengthProvider.GetMaxLength<Countries>("CountryName") ?? 50;
 
             // Load validation rules from JSON or another source
@@ -39,8 +39,7 @@ namespace BSOFT.API.Validation.Country
                         RuleFor(x => x.CountryCode)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateCountryCommand.CountryCode)} {rule.Error}");
-                        break;
-
+                            break;
                     case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values
                         RuleFor(x => x.CountryName)
@@ -49,7 +48,7 @@ namespace BSOFT.API.Validation.Country
                         RuleFor(x => x.CountryCode)
                             .MaximumLength(countryCodeMaxLength) // Dynamic value from MaxLengthProvider
                             .WithMessage($"{nameof(CreateCountryCommand.CountryCode)} {rule.Error} {countryCodeMaxLength}");
-                        break;                 
+                            break;                 
                     default:
                         // Handle unknown rule (log or throw)
                         Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");

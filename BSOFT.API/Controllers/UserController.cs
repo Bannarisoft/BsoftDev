@@ -12,12 +12,13 @@ using Core.Application.Users.Commands.DeleteUser;
 using Core.Application.Users.Queries.GetUserAutoComplete;
 using Core.Application.Users.Commands.UpdateFirstTimeUserPassword;
 using Core.Application.Users.Commands.ChangeUserPassword;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-
+    
     public class UserController : ApiControllerBase
     {
         // public UserController(ISender mediator) : base(mediator)

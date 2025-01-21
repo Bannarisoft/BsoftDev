@@ -17,6 +17,7 @@ namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    
     public class DepartmentController : ApiControllerBase
     {
 

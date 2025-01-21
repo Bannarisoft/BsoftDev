@@ -5,9 +5,7 @@ namespace Core.Application.AuditLog.Queries.GetAuditLog
 {
     public class AuditLogDto : IMapFrom<AuditLogs>
     { 
-        public string? Id { get; set; } // Use string for ObjectId     
-        //public int UserId { get; set; }
-        //public string UserName { get; set; }=string.Empty;
+        public string? Id { get; set; } // Use string for ObjectId        
         public string? MachineName { get; set; }
         public string? IPAddress { get; set; }
         public string? OS { get; set; }

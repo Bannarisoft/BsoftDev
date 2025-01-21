@@ -13,11 +13,13 @@ using Core.Application.Common.Exceptions;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    
     public class EntityController : ApiControllerBase
     {
         private readonly IValidator<CreateEntityCommand> _createEntityCommandValidator;

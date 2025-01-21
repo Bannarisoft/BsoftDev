@@ -16,7 +16,7 @@ namespace BSOFT.API.Validation.City
         public CreateCityCommandValidator(MaxLengthProvider maxLengthProvider)
         {
             // Get max lengths dynamically using MaxLengthProvider
-            var cityCodeMaxLength = maxLengthProvider.GetMaxLength<Cities>("CityCode") ?? 6;
+            var cityCodeMaxLength = maxLengthProvider.GetMaxLength<Cities>("CityCode") ?? 5;
             var cityNameMaxLength = maxLengthProvider.GetMaxLength<Cities>("CityName") ?? 50;
 
             // Load validation rules from JSON or another source

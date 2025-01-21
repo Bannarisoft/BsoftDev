@@ -7,8 +7,8 @@ namespace Core.Application.State.Commands.UpdateState
        public class UpdateStateCommand : IRequest<ApiResponseDTO<StateDto>>
        {
               public int Id { get; set; }
-              public string StateCode { get; set; }=string.Empty;
-              public string StateName { get; set; }=string.Empty;       
+              public string? StateCode { get; set; }
+              public string? StateName { get; set; }
               public int CountryId { get; set; }         
          }
   

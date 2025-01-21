@@ -6,6 +6,6 @@ namespace Core.Application.State.Queries.GetStateAutoComplete
 {
     public class GetStateAutoCompleteQuery : IRequest<ApiResponseDTO<List<StateDto>>>
     {
-        public string SearchPattern { get; set; }=string.Empty;     
+        public string? SearchPattern { get; set; }
     }
 }
