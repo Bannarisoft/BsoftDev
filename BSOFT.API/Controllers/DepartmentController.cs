@@ -12,11 +12,13 @@ using Core.Application.Common.Interfaces;
 using System.Data.Common;
 using BSOFT.Infrastructure.Data;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    
     public class DepartmentController : ApiControllerBase
     {
 

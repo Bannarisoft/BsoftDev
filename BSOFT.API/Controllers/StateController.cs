@@ -8,24 +8,26 @@ using Core.Application.State.Queries.GetStateById;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    
     public class StateController : ApiControllerBase
     {
          private readonly IValidator<CreateStateCommand> _createStateCommandValidator;
          private readonly IValidator<UpdateStateCommand> _updateStateCommandValidator;         
          
-       public StateController(ISender mediator, 
-                             IValidator<CreateStateCommand> createStateCommandValidator, 
-                             IValidator<UpdateStateCommand> updateStateCommandValidator) 
-         : base(mediator)
+        public StateController(ISender mediator, 
+                                IValidator<CreateStateCommand> createStateCommandValidator, 
+                                IValidator<UpdateStateCommand> updateStateCommandValidator) 
+            : base(mediator)
         {        
             _createStateCommandValidator = createStateCommandValidator;    
             _updateStateCommandValidator = updateStateCommandValidator;     
-             
+            
         }
         [HttpGet]
         public async Task<IActionResult> GetAllStatesAsync()
@@ -42,7 +44,7 @@ namespace BSOFT.API.Controllers
         [HttpGet("{stateId}")]
         public async Task<IActionResult> GetByIdAsync(int stateId)
         {
-             if (stateId <= 0)
+            if (stateId <= 0)
             {                
                 return BadRequest(new 
                 { 
@@ -53,7 +55,7 @@ namespace BSOFT.API.Controllers
             var result = await Mediator.Send(new GetStateByIdQuery { Id = stateId });                         
             if(result == null)
             {                
-                 return NotFound(new 
+                return NotFound(new 
                 { 
                     StatusCode=StatusCodes.Status404NotFound,
                     message = "StateID {stateId} not found", 
@@ -82,7 +84,7 @@ namespace BSOFT.API.Controllers
             {                
                 return Ok(new { StatusCode=StatusCodes.Status201Created, message = result.Message, errors = "", data = result.Data });
             }
-             
+            
 
             return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
             
@@ -98,7 +100,7 @@ namespace BSOFT.API.Controllers
 
             if (!validationResult.IsValid)
             {                
-                 return BadRequest(
+                return BadRequest(
                     new
                     {
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -120,13 +122,13 @@ namespace BSOFT.API.Controllers
 
             var result = await Mediator.Send(command);
             if(result.IsSuccess)
-             {                 
-                 return Ok(new 
+            {                 
+                return Ok(new 
                 {   StatusCode=StatusCodes.Status200OK,
                     message = result.Message, 
                     City = result.Data
                 });
-             }
+            }
             return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
         }        
         [HttpDelete("{stateId}")]
@@ -156,7 +158,7 @@ namespace BSOFT.API.Controllers
                     return BadRequest(new { Message = "Search pattern is required" });
                 }
                 var result = await Mediator.Send(new GetStateAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
-                 if (result.IsSuccess)
+                if (result.IsSuccess)
                 {
                     return Ok(new 
                     {

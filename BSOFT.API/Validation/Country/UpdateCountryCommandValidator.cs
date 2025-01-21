@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FluentValidation;
 using Core.Application.Country.Commands.CreateCountry;
 using Core.Domain.Entities;
@@ -16,7 +13,7 @@ namespace BSOFT.API.Validation.Country
         public UpdateCountryCommandValidator(MaxLengthProvider maxLengthProvider)
         {
             // Get max lengths dynamically using MaxLengthProvider
-            var countryCodeMaxLength = maxLengthProvider.GetMaxLength<Countries>("CountryCode") ?? 6;
+            var countryCodeMaxLength = maxLengthProvider.GetMaxLength<Countries>("CountryCode") ?? 5;
             var countryNameMaxLength = maxLengthProvider.GetMaxLength<Countries>("CountryName") ?? 50;
 
             // Load validation rules from JSON or another source

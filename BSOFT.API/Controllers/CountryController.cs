@@ -14,6 +14,7 @@ namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    
     public class CountryController : ApiControllerBase
     {
          private readonly IValidator<CreateCountryCommand> _createCountryCommandValidator;
@@ -28,8 +29,7 @@ namespace BSOFT.API.Controllers
             _updateCountryCommandValidator = updateCountryCommandValidator;    
              
         }
-        [HttpGet]
-        [Authorize]
+        [HttpGet]        
         public async Task<IActionResult> GetAllCountriesAsync()
         {           
             var countries = await Mediator.Send(new GetCountryQuery());          
@@ -39,8 +39,7 @@ namespace BSOFT.API.Controllers
                 data = countries.Data
             });
         }
-        [HttpGet("{countryId}")]
-        [Authorize]
+        [HttpGet("{countryId}")]        
         public async Task<IActionResult> GetByIdAsync(int countryId)
         {
             if (countryId <= 0)
@@ -66,8 +65,7 @@ namespace BSOFT.API.Controllers
                 data = result.Data
             });
         }
-        [HttpPost]
-        [Authorize]
+        [HttpPost]        
         public async Task<IActionResult> CreateAsync(CreateCountryCommand  command)
         { 
             var validationResult = await _createCountryCommandValidator.ValidateAsync(command);
@@ -76,7 +74,8 @@ namespace BSOFT.API.Controllers
                 return BadRequest(new
                 {   
                     StatusCode=StatusCodes.Status400BadRequest,
-                    message = validationResult.Errors
+                    message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
                 });
             }                    
             var result = await Mediator.Send(command);
@@ -85,20 +84,18 @@ namespace BSOFT.API.Controllers
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = "Country created successfully", 
-                    data = result.Data.Id
+                    message = result.Message, 
+                    data = result.Data
                 });
-            }
-                      
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = result.Message 
-                });
+            }                      
+            return BadRequest(new 
+            { 
+                StatusCode=StatusCodes.Status400BadRequest,
+                message = result.Message 
+            });
                        
         }
-        [HttpPut("update")]
-        [Authorize]
+        [HttpPut("update")]        
         public async Task<IActionResult> UpdateAsync( UpdateCountryCommand command)
         {
             var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
@@ -124,7 +121,7 @@ namespace BSOFT.API.Controllers
             {
                 return Ok(new 
                 { 
-                    StatusCode=StatusCodes.Status200OK,
+                    StatusCode=StatusCodes.Status201Created,
                     message = result.Message, 
                     data = result.Data 
                 });
@@ -138,8 +135,7 @@ namespace BSOFT.API.Controllers
                 });
             }
         }
-        [HttpDelete("delete")]
-        [Authorize]
+        [HttpDelete("delete")]        
         public async Task<IActionResult> DeleteAsync(DeleteCountryCommand command)
         {
             var result = await Mediator.Send(command);
@@ -162,8 +158,7 @@ namespace BSOFT.API.Controllers
             }
         }
 
-        [HttpGet("GetCountrySearch")]
-        [Authorize]
+        [HttpGet("GetCountrySearch")]        
         public async Task<IActionResult> GetCountry([FromQuery] string searchPattern)
         {
             var result = await Mediator.Send(new GetCountryAutoCompleteQuery { SearchPattern = searchPattern });

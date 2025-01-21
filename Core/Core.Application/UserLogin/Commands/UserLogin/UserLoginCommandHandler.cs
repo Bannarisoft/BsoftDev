@@ -64,10 +64,7 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                     Message = "Invalid username or password."
                 };
             }
-          
-
             _logger.LogInformation("User {Username} found. Retrieving roles...", request.Username);
-
             // Check if the user already has an active session
             var activeSession = await _userSessionRepository.GetSessionByUserIdAsync(user.UserId);
 

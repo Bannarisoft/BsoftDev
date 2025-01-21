@@ -9,11 +9,11 @@ namespace Core.Domain.Entities
     public class States : BaseEntity
     {
         public int Id { get; set; }
-        public string StateCode { get; set; }=string.Empty;
-        public string StateName { get; set; }=String.Empty;      
+        public string? StateCode { get; set; }
+        public string? StateName { get; set; }
         public int CountryId { get; set; }
 
-        public Countries Countries { get; set; }  
+        public Countries? Countries { get; set; }  
         public ICollection<Cities> Cities { get; set; } = new List<Cities>(); 
     }
 }

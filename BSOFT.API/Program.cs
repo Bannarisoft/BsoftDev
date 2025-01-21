@@ -9,6 +9,10 @@ using Serilog;
 using MediatR;
 using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
+using Microsoft.OpenApi.Models;
+using BSOFT.API.Middleware;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,26 +33,22 @@ validationService.AddValidationServices(builder.Services);
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 // Add Authentication and configure JWT Bearer
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
     var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
     options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true, // Ensure the token's `iss` matches
-        ValidateAudience = true, // Ensure the token's `aud` matches
-        ValidateLifetime = true, // Ensure the token hasn't expired
-        ValidateIssuerSigningKey = true, // Ensure the signature is valid
-        ValidIssuer = jwtSettings.Issuer,
-        ValidAudience = jwtSettings.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
-    };
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtSettings.Audience,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+            ClockSkew = TimeSpan.Zero
+        };
 });
-
 
 //Add layer dependency 
 builder.Services.AddApplicationServices();
@@ -56,10 +56,40 @@ builder.Services.AddInfrastructureServices(builder.Configuration,builder.Service
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers();
-   
+// Add controllers with a global authorization policy
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' followed by your token."
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+}); 
+
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 builder.Services.AddCors(options =>
@@ -76,6 +106,19 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
  
+
+
+// Register LoggingMiddleware
+app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
+
+// Configure the HTTP request pipeline. 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage(); 
+}
+
  // Map endpoint to handle CreateStateCommand
 app.MapPost("/state", async (
     CreateStateCommand request,
@@ -94,25 +137,12 @@ if (!result.IsSuccess)
 });
 
 
-// Register LoggingMiddleware
-app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
-
-// Configure the HTTP request pipeline. 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage(); 
-}
-
 app.UseHttpsRedirection();
-
 app.UseRouting(); // Enable routing
-app.UseAuthentication();
-
-app.UseAuthorization();
 app.UseCors();
-
+app.UseAuthentication();
+app.UseMiddleware<TokenValidationMiddleware>();
+app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
+

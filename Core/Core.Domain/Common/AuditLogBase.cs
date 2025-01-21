@@ -7,10 +7,10 @@ namespace Core.Domain.Common
 {
     public abstract class AuditLogBase
     {
-        public string MachineName { get; set; }=string.Empty;
-        public string IPAddress { get; set; }=string.Empty;
-        public string OS { get; set; }=string.Empty;
-        public string Browser { get; set; }=string.Empty;
+        public string? MachineName { get; set; }
+        public string? IPAddress { get; set; }
+        public string? OS { get; set; }
+        public string? Browser { get; set; }
         public DateTime CreatedAt { get; set; }   
         public int CreatedBy { get; set; }
         public String? CreatedByName { get; set; }

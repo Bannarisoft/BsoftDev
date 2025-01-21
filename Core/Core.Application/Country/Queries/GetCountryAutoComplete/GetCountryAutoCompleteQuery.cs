@@ -6,6 +6,6 @@ namespace Core.Application.Country.Queries.GetCountryAutoComplete
 {
     public class GetCountryAutoCompleteQuery : IRequest<ApiResponseDTO<List<CountryDto>>>
     {
-        public string SearchPattern { get; set; }=string.Empty;
+        public string? SearchPattern { get; set; }
     }
 }

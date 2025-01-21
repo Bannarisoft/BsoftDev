@@ -9,11 +9,13 @@ using Core.Application.Units.Queries.GetUnitAutoComplete;
 using FluentValidation;
 using BSOFT.Infrastructure.Data;
 using Core.Application.Common.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    
     public class UnitController : ApiControllerBase
     {
         private readonly IValidator<CreateUnitCommand> _createUnitCommandValidator;

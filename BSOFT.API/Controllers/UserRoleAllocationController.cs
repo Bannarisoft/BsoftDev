@@ -3,6 +3,7 @@ using Core.Application.UserRoleAllocation.Commands.CreateUserRoleAllocation;
 using Core.Application.UserRoleAllocation.Queries.GetUserRoleAllocation;
 using Core.Application.UserRoleAllocation.Queries.GetUserRoleAllocationById;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -11,6 +12,7 @@ namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    
     public class UserRoleAllocationController : ApiControllerBase
     {
         public UserRoleAllocationController(ISender mediator) : base(mediator)
