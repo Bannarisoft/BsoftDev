@@ -1,4 +1,5 @@
 
+using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Departments.Queries.GetDepartments;
 using MediatR;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Departments.Queries.GetDepartmentById
 {
+
     public class GetDepartmentByIdQuery :IRequest<ApiResponseDTO<DepartmentDto>>
     {
         

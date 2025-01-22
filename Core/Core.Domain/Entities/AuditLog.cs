@@ -11,8 +11,8 @@ namespace Core.Domain.Entities
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public ObjectId Id { get; set; }
-        public string Action { get; set; }=string.Empty;
-        public string Details { get; set; }=string.Empty;
-        public string Module { get; set; }=string.Empty;     
+        public string? Action { get; set; }
+        public string? Details { get; set; }
+        public string? Module { get; set; }
     }
 }

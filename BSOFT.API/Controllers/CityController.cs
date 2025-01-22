@@ -7,12 +7,14 @@ using Core.Application.City.Queries.GetCityAutoComplete;
 using Core.Application.City.Queries.GetCityById;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    
     public class CityController : ApiControllerBase
     {
          private readonly IValidator<CreateCityCommand> _createCityCommandValidator;
@@ -28,7 +30,7 @@ namespace BSOFT.API.Controllers
             _updateCityCommandValidator = updateCityCommandValidator;    
              
         }
-        [HttpGet]
+        [HttpGet]                
         public async Task<IActionResult> GetAllCitiesAsync()
         {  
             var cities = await Mediator.Send(new GetCityQuery());            
@@ -40,7 +42,7 @@ namespace BSOFT.API.Controllers
             });
         }
 
-        [HttpGet("{cityId}")]
+        [HttpGet("{cityId}")]        
         public async Task<IActionResult> GetByIdAsync(int cityId)
         {
              if (cityId <= 0)
@@ -57,130 +59,159 @@ namespace BSOFT.API.Controllers
                 return NotFound(new 
                 { 
                     StatusCode=StatusCodes.Status404NotFound,
-                    message = "City not found", 
+                    message = "CityId {id} not found", 
                 });
             }
             return Ok(new 
             {
                 StatusCode=StatusCodes.Status200OK,
-                data = result
+                data = result.Data
             });   
         }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateAsync(CreateCityCommand  command)
-    { 
-        var validationResult = await _createCityCommandValidator.ValidateAsync(command);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(new
-             {
-                 StatusCode=StatusCodes.Status400BadRequest,
-                 message = "Validation failed", 
-                 errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-             });
-        }        
-        var result = await Mediator.Send(command);
-        if (result.IsSuccess)
-        {
-            return Ok(new 
-            { 
-                StatusCode=StatusCodes.Status201Created,
-                message = result.Message, 
-                data = result.Data.Id 
-            });
-        }
-       
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest,
-                message = result.Message
-
-            });
-               
-    }
-    [HttpPut("update")]
-    public async Task<IActionResult> UpdateAsync(UpdateCityCommand command)
-    {         
-        var validationResult = await _updateCityCommandValidator.ValidateAsync(command);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(
-                new
+        [HttpPost]        
+        public async Task<IActionResult> CreateAsync(CreateCityCommand  command)
+        { 
+            var validationResult = await _createCityCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
                 {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
+                    StatusCode=StatusCodes.Status400BadRequest,
+                    message = "Validation failed", 
                     errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                }
-            );
-        }
-        if (command.StateId<=0)
-        {
-            return BadRequest(
-                new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Invalid StateID"
-                }
-            );
-        } 
-        var result = await Mediator.Send(command);
-        if (result.IsSuccess)
-        {
-            return Ok(new 
-            {   StatusCode=StatusCodes.Status200OK,
-                message = result.Message, 
-                City = result.Data
-            });
-        }
-               
-            return BadRequest( new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = result.Message
-            });
-             
-    }
-    [HttpDelete("delete")]
-    public async Task<IActionResult> DeleteAsync(DeleteCityCommand command)
-    {
-        
-        var result = await Mediator.Send(command);
-        if (result.IsSuccess)
-        {
-            return Ok(new 
-            { 
-                StatusCode=StatusCodes.Status200OK,
-                message = result.Message
-            });
-        }
-        else
-        {        
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = result.Message
-            });
-        }       
-    }
-
-       [HttpGet("GetCitySearch")]
-        public async Task<IActionResult> GetCity([FromQuery] string searchPattern)
-        {           
-            var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
+                });
+            }        
+            var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
                 return Ok(new 
-                {
-                    StatusCode=StatusCodes.Status200OK,
-                    message = result.Message,
+                { 
+                    StatusCode=StatusCodes.Status201Created,
+                    message = result.Message, 
                     data = result.Data
                 });
+            }  
+            else
+            {      
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest,
+                    message = result.Message
+                });
+            } 
+        }
+        [HttpPut("update")]        
+        public async Task<IActionResult> UpdateAsync(UpdateCityCommand command)
+        {         
+            var validationResult = await _updateCityCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(
+                    new
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        message = "Validation failed",
+                        errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                    }
+                );
             }
-            return Ok(result.Data);
+            if (command.StateId<=0)
+            {
+                return BadRequest(
+                    new
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        message = "Invalid StateID"
+                    }
+                );
+            } 
+            var result = await Mediator.Send(command);
+            if (result.IsSuccess)
+            {
+                return Ok(new 
+                {   StatusCode=StatusCodes.Status200OK,
+                    message = result.Message, 
+                    City = result.Data
+                });
+            }
+                
+                return BadRequest( new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = result.Message
+                });
+                
+        }
+        [HttpDelete("delete")]        
+        public async Task<IActionResult> DeleteAsync(int cityId,DeleteCityCommand command)
+        {
+            
+            if(cityId != command.Id)
+            {
+                 return BadRequest(
+                    new
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        message = "CityId Mismatch"
+                    }
+                );                
+            }
+            if (cityId <= 0)
+            {
+                return BadRequest(
+                    new
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        message = "Invalid City ID"
+                    }
+                );               
+            }           
+            var result = await Mediator.Send(command);
+            if (result.IsSuccess)
+            {
+                return Ok(new 
+                { 
+                    StatusCode=StatusCodes.Status200OK,
+                    message = result.Message
+                });
+            }
+            else
+            {        
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = result.Message
+                });
+            }       
         }
 
-
-     
+        [HttpGet("GetCitySearch")]        
+        public async Task<IActionResult> GetCity([FromQuery] string searchPattern)
+        {    
+            if (string.IsNullOrWhiteSpace(searchPattern))
+            {
+                 return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Search pattern is required"
+                });                
+            }       
+            var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
+            if (!result.IsSuccess)
+            {
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                }); 
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = result.Message,
+                data = result.Data
+            });
+        }     
     }
 }

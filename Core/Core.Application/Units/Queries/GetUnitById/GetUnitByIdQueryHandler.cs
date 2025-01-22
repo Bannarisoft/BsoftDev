@@ -6,6 +6,7 @@ using Core.Application.Common.Interfaces.IUnit;
 using Core.Application.Units.Queries.GetUnits;
 using Core.Domain.Events;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System.Data;
 
 namespace Core.Application.Units.Queries.GetUnitById
@@ -18,20 +19,24 @@ namespace Core.Application.Units.Queries.GetUnitById
 
         private readonly IMediator _mediator;
 
-        public GetUnitByIdQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper, IMediator mediator)
+         private readonly ILogger<GetUnitByIdQueryHandler> _logger;
+
+        public GetUnitByIdQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper, IMediator mediator,ILogger<GetUnitByIdQueryHandler> logger)
         {
             _unitRepository = unitRepository;
             _mapper = mapper;
             _mediator = mediator;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
          public async Task<ApiResponseDTO<List<UnitDto>>> Handle(GetUnitByIdQuery request, CancellationToken cancellationToken)
         {
-          
+            _logger.LogInformation("Fetching Unit Request started: {request}", request.Id);
             var units = await _unitRepository.GetByIdAsync(request.Id);    
 
               if (units == null || !units.Any())
                 {
+                    _logger.LogWarning("No Unit Record {Unit} not found in DB.", request.Id);
                      return new ApiResponseDTO<List<UnitDto>>
                      {
                          IsSuccess = false,
@@ -50,7 +55,7 @@ namespace Core.Application.Units.Queries.GetUnitById
                     module:"Unit"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-
+            _logger.LogInformation("Fetching Unit Request Completed: {request}", request.Id);
             return new ApiResponseDTO<List<UnitDto>>
             {
                 IsSuccess = true,

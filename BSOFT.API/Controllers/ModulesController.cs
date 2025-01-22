@@ -11,11 +11,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BSOFT.Application.Modules.Commands.DeleteModule;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers
 {
 [ApiController]
 [Route("api/[controller]")]
+
     public class ModulesController : ApiControllerBase
     {
     // public ModulesController(ISender mediator) : base(mediator)

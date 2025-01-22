@@ -7,6 +7,7 @@ using Core.Application.Common;
 using Core.Domain.Events;
 using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Units.Queries.GetUnitAutoComplete
 {
@@ -17,20 +18,24 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
 
         private readonly IMediator _mediator; 
 
+        private readonly ILogger<GetUnitAutoCompleteQueryHandler> _logger;
 
-        public GetUnitAutoCompleteQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper, IMediator mediator)
+
+        public GetUnitAutoCompleteQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper, IMediator mediator,ILogger<GetUnitAutoCompleteQueryHandler> logger)
         {
              _unitRepository = unitRepository;
             _mapper = mapper;
             _mediator = mediator;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<ApiResponseDTO<List<UnitDto>>> Handle(GetUnitAutoCompleteQuery request, CancellationToken cancellationToken)
         {     
-           
+           _logger.LogInformation("Search pattern started: {SearchPattern}", request.SearchPattern);
             var result = await _unitRepository.GetUnit(request.SearchPattern);
-              if (result == null || !result.Any())
+              if (result == null || !result.Any() || result.Count == 0) 
                 {
+                      _logger.LogWarning("No Unit Record {Unit} not found in DB.", request.SearchPattern);
                      return new ApiResponseDTO<List<UnitDto>>
                      {
                          IsSuccess = false,
@@ -50,6 +55,7 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
+            _logger.LogInformation("Unit {Unit} Listed successfully.", result.Count);
             return new ApiResponseDTO<List<UnitDto>>
             {
                 IsSuccess = true,

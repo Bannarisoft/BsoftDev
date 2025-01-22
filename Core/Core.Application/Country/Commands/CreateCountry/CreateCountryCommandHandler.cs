@@ -1,5 +1,4 @@
 using AutoMapper;
-using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Application.Country.Commands.CreateCountry;
@@ -35,13 +34,15 @@ public class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand,
         }
         var countryEntity = _mapper.Map<Countries>(request);    
          
-            var result = await _countryRepository.CreateAsync(countryEntity);
+        var result = await _countryRepository.CreateAsync(countryEntity);
+        if (result != null)
+        {
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
-                actionCode: result.CountryCode,
-                actionName: result.CountryName,
-                details: $"Country '{result.CountryName}' was created. CountryCode: {result.CountryCode}",
+                actionCode: result?.CountryCode ?? string.Empty,
+                actionName: result?.CountryName ?? string.Empty,
+                details: $"Country '{result?.CountryName}' was created. CountryCode: {result?.CountryCode}",
                 module:"Country"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
@@ -56,11 +57,12 @@ public class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand,
                     Data = countryDto
                 };
             }
-            return new ApiResponseDTO<CountryDto>
-            {
-                IsSuccess = false,
-                Message = "Country not created"
-            };
+        }
+        return new ApiResponseDTO<CountryDto>
+        {
+            IsSuccess = false,
+            Message = "Country not created"
+        };
         
     }
 }

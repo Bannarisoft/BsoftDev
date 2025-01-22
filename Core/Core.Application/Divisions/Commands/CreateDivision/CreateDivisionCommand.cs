@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.Divisions.Commands.CreateDivision
 {
-    public class CreateDivisionCommand : IRequest<ApiResponseDTO<int>>
+    public class CreateDivisionCommand : IRequest<ApiResponseDTO<DivisionDTO>>
     {
         public int Id { get; set; }
         public string ShortName { get; set; }

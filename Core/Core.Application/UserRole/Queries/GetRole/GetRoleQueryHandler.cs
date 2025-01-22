@@ -10,33 +10,75 @@ using System.Threading.Tasks;
 using Core.Domain.Entities;
 using System.Data;
 using Core.Application.Common.Interfaces.IUserRole;
+using Core.Application.Common.HttpResponse;
+using Core.Domain.Events;
+using Microsoft.Extensions.Logging;
 
 
 namespace Core.Application.UserRole.Queries.GetRole
 {
-    public class GetRoleQueryHandler :IRequestHandler<GetRoleQuery,List<UserRoleDto>>
+    public class GetRoleQueryHandler :IRequestHandler<GetRoleQuery,ApiResponseDTO<List<UserRoleDto>>>
     {
        
      private readonly IUserRoleQueryRepository _userRoleRepository;
      private readonly IMapper _mapper;
+     
+       private readonly IMediator _mediator; 
+         private readonly ILogger<GetRoleQueryHandler> _logger;
    
 
 
-       public GetRoleQueryHandler(IUserRoleQueryRepository userRoleRepository, IMapper mapper)
+       public GetRoleQueryHandler(IUserRoleQueryRepository userRoleRepository, IMapper mapper, IMediator mediator, ILogger<GetRoleQueryHandler> logger)
         {
             _userRoleRepository = userRoleRepository;
             _mapper =mapper;
+            _mediator = mediator;
+            _logger = logger;
         }
 
-        public async Task<List<UserRoleDto>> Handle(GetRoleQuery request ,CancellationToken cancellationToken )
+        public async Task<ApiResponseDTO<List<UserRoleDto>>> Handle(GetRoleQuery request ,CancellationToken cancellationToken )
         {
-        /*     const string query = @"SELECT  * FROM AppSecurity.UserRole";
-             var department = await _dbConnection.QueryAsync<UserRoleDto>(query);
-           return department.AsList();
- */
-           var users = await _userRoleRepository.GetAllRoleAsync();
-            var userList = _mapper.Map<List<UserRoleDto>>(users);
-            return userList;
+
+            _logger.LogInformation("Starting GetRoleQueryHandler.");
+
+        //     _logger.LogInformation("Fetching user roles from repository.");
+                var roles = await _userRoleRepository.GetAllRoleAsync();
+
+                if (roles == null || roles.Count == 0)
+                {
+                    _logger.LogWarning("No user roles found.");
+                    return new ApiResponseDTO<List<UserRoleDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "No roles found",
+                        Data = null
+                    };
+                }
+
+                _logger.LogInformation("Mapping user roles to DTO.");
+                var roleList = _mapper.Map<List<UserRoleDto>>(roles);
+
+                // Publish domain event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "GetAll",
+                    actionCode: "",
+                    actionName: "",
+                    details: "UserRole details were fetched.",
+                    module: "UserRole"
+                );
+
+                _logger.LogInformation("Publishing AuditLogsDomainEvent.");
+                await _mediator.Publish(domainEvent, cancellationToken);
+
+                _logger.LogInformation("Returning success response with fetched user roles.");
+                return new ApiResponseDTO<List<UserRoleDto>>
+                {
+                    IsSuccess = true,
+                    Message = "Success",
+                    Data = roleList
+                };
+       
+       
         }
 
 

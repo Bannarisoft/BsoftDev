@@ -8,29 +8,44 @@ using MediatR;
 using AutoMapper;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Application.Common.HttpResponse;
+using Core.Domain.Events;
+using Core.Application.Divisions.Queries.GetDivisions;
 
 namespace Core.Application.Divisions.Commands.DeleteDivision
 {
-    public class DeleteDivisionCommandHandler : IRequestHandler<DeleteDivisionCommand, ApiResponseDTO<bool>>
+    public class DeleteDivisionCommandHandler : IRequestHandler<DeleteDivisionCommand, ApiResponseDTO<DivisionDTO>>
     {
         private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
-        public DeleteDivisionCommandHandler(IDivisionCommandRepository divisionRepository, IMapper imapper)
+        private readonly IMediator _mediator;
+        public DeleteDivisionCommandHandler(IDivisionCommandRepository divisionRepository, IMapper imapper , IMediator mediator)
         {
             _divisionRepository = divisionRepository;
             _imapper = imapper;
+            _mediator = mediator;
         }
-         public async Task<ApiResponseDTO<bool>> Handle(DeleteDivisionCommand request, CancellationToken cancellationToken)
+         public async Task<ApiResponseDTO<DivisionDTO>> Handle(DeleteDivisionCommand request, CancellationToken cancellationToken)
         {
             var division  = _imapper.Map<Division>(request);
             var divisionresult = await _divisionRepository.DeleteAsync(request.Id, division);
-          
+
+
+                  //Domain Event  
+                    var domainEvent = new AuditLogsDomainEvent(
+                        actionDetail: "Delete",
+                        actionCode: division.Id.ToString(),
+                        actionName: division.Id.ToString(),
+                        details: $"Division '{division.Id}' was deleted.",
+                        module:"Division"
+                    );               
+                    await _mediator.Publish(domainEvent, cancellationToken);  
+
                  if(divisionresult)
                 {
-                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Division updated successfully.", Data = true};
+                    return new ApiResponseDTO<DivisionDTO>{IsSuccess = true, Message = "Division updated successfully."};
                 }
 
-                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Division not updated.", Data = false};
+                return new ApiResponseDTO<DivisionDTO>{IsSuccess = false, Message = "Division not updated."};
         }
     }
 }

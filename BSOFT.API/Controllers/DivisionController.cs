@@ -13,11 +13,13 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using Core.Application.Divisions.Queries.GetDivisionAutoComplete;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    
     public class DivisionController : ApiControllerBase
     {
         private readonly IValidator<CreateDivisionCommand> _createDivisionCommandValidator;

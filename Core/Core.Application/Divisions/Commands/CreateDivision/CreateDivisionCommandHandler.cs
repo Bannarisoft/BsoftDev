@@ -8,32 +8,47 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Application.Common.HttpResponse;
+using Core.Domain.Events;
 
 namespace Core.Application.Divisions.Commands.CreateDivision
 {
-    public class CreateDivisionCommandHandler : IRequestHandler<CreateDivisionCommand, ApiResponseDTO<int>>
+    public class CreateDivisionCommandHandler : IRequestHandler<CreateDivisionCommand, ApiResponseDTO<DivisionDTO>>
     {
          private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
+        private readonly IMediator _mediator;
 
-        public CreateDivisionCommandHandler(IDivisionCommandRepository divisionRepository, IMapper imapper)
+        public CreateDivisionCommandHandler(IDivisionCommandRepository divisionRepository, IMapper imapper, IMediator mediator)
         {
             _divisionRepository = divisionRepository;
             _imapper = imapper;
+            _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateDivisionCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<DivisionDTO>> Handle(CreateDivisionCommand request, CancellationToken cancellationToken)
         {
            
                  var division  = _imapper.Map<Division>(request);
 
                 var divisionresult = await _divisionRepository.CreateAsync(division);
-                if (divisionresult > 0)
+
+                //Domain Event
+                 var domainEvent = new AuditLogsDomainEvent(
+                     actionDetail: "Create",
+                     actionCode: divisionresult.ShortName,
+                     actionName: divisionresult.Name,
+                     details: $"Division '{divisionresult.Name}' was created. Shortname: {divisionresult.ShortName}",
+                     module:"Division"
+                 );
+                 await _mediator.Publish(domainEvent, cancellationToken);
+
+                var divisionMap = _imapper.Map<DivisionDTO>(divisionresult);
+                if (divisionresult.Id > 0)
                 {
-                    return new ApiResponseDTO<int>{IsSuccess = true, Message = "Division created successfully", Data = divisionresult};
+                    return new ApiResponseDTO<DivisionDTO>{IsSuccess = true, Message = "Division created successfully", Data = divisionMap};
                 }
                
-                    return new ApiResponseDTO<int>{IsSuccess = false, Message = "Division not created"};
+                    return new ApiResponseDTO<DivisionDTO>{IsSuccess = false, Message = "Division not created"};
            
         }
     }

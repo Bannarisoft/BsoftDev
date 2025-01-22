@@ -1,7 +1,6 @@
 using Core.Domain.Entities;
 using System.Data;
 using Dapper;
-using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICity;
 
 namespace BSOFT.Infrastructure.Repositories.City
@@ -11,7 +10,7 @@ namespace BSOFT.Infrastructure.Repositories.City
         private readonly IDbConnection _dbConnection;
         public CityQueryRepository(IDbConnection dbConnection)
         {
-                 _dbConnection = dbConnection;
+            _dbConnection = dbConnection;
         }     
         public async Task<List<Cities>> GetAllCityAsync()
         {
@@ -31,34 +30,23 @@ namespace BSOFT.Infrastructure.Repositories.City
             {
                 throw new KeyNotFoundException($"City with ID {id} not found.");
             }
-
             return city;
         }
-        public async Task<Result<List<Cities>>> GetByCityNameAsync(string searchPattern)
+        public async Task<List<Cities>> GetByCityNameAsync(string searchPattern)
         {
            if (string.IsNullOrWhiteSpace(searchPattern))
-            {
-                return Result<List<Cities>>.Failure("City name cannot be null or empty.");
+            {                
+                throw new ArgumentException("City name cannot be null or empty.", nameof(searchPattern));
             }
-
             const string query = @"
                 SELECT Id, CityCode, cityName,stateId, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
                 ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
                 FROM AppData.City WITH (NOLOCK)
                 WHERE (cityName LIKE @SearchPattern OR cityName LIKE @SearchPattern) 
                 AND IsActive = 1
-                ORDER BY cityName";
-
-            var cities = await _dbConnection.QueryAsync<Cities>(
-                query,
-                new { SearchPattern = $"%{searchPattern}%" }
-            );
-
-            if (cities == null || !cities.Any())
-            {
-                return Result<List<Cities>>.Failure("No Cities found.");
-            }
-            return Result<List<Cities>>.Success(cities.ToList());
+                ORDER BY cityName";            
+            var result = await _dbConnection.QueryAsync<Cities>(query, new { SearchPattern = $"%{searchPattern}%" });
+            return result.ToList();
         }
     }
 }

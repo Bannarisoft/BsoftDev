@@ -41,7 +41,14 @@ using Infrastructure.Data;
 using BSOFT.Infrastructure.Logging;
 using Serilog;
 using BSOFT.Infrastructure.Resilience;
-
+using Core.Application.Common.Interfaces.IUserSession;
+using Core.Application.Notification.Queries;
+using Core.Application.Common.Interfaces.INotifications;
+using BSOFT.Infrastructure.Repositories.Notifications;
+using Core.Application.Common.Interfaces.IPasswordComplexityRule;
+using BSOFT.Infrastructure.Repositories.PasswordComplexityRule;
+using Core.Application.Common.Interfaces.IAdminSecuritySettings;
+using BSOFT.Infrastructure.Repositories.AdminSecuritySettings;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -65,48 +72,47 @@ namespace BSOFT.Infrastructure
     
     
              // MongoDB Context
-            services.AddSingleton<IMongoClient>(sp =>
+        services.AddSingleton<IMongoClient>(sp =>
+        {
+            var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
+            if (string.IsNullOrWhiteSpace(mongoConnectionString))
             {
-                var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
-                if (string.IsNullOrWhiteSpace(mongoConnectionString))
-                {
-                    throw new InvalidOperationException("MongoDB connection string is missing or empty.");
-                }
-                return new MongoClient(mongoConnectionString);
-            });
+                throw new InvalidOperationException("MongoDB connection string is missing or empty.");
+            }
+            return new MongoClient(mongoConnectionString);
+        });
 
-            services.AddSingleton<IMongoDbContext>(sp =>
+        services.AddSingleton<IMongoDbContext>(sp =>
+        {
+            var client = sp.GetRequiredService<IMongoClient>();
+            var databaseName = configuration["MongoDb:DatabaseName"];
+            if (string.IsNullOrWhiteSpace(databaseName))
             {
-                var client = sp.GetRequiredService<IMongoClient>();
-                var databaseName = configuration["MongoDb:DatabaseName"];
-                if (string.IsNullOrWhiteSpace(databaseName))
-                {
-                    throw new InvalidOperationException("MongoDB database name is missing or empty.");
-                }
-                return new MongoDbContext(client, databaseName);
-            });
+                throw new InvalidOperationException("MongoDB database name is missing or empty.");
+            }
+            return new MongoDbContext(client, databaseName);
+        });
 
-        // Optional: Register IMongoDatabase if needed directly
-            services.AddSingleton(sp =>
-            {
-                var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
-                return mongoDbContext.GetDatabase();
-            });
+      // Optional: Register IMongoDatabase if needed directly
+        services.AddSingleton(sp =>
+        {
+            var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
+            return mongoDbContext.GetDatabase();
+        });
 
-                // Configure JWT settings
-                services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));       
+            // Configure JWT settings
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));       
 
-            // Register ILogger<T>
-            services.AddLogging(builder =>
-            {
-                builder.AddSerilog();
-            }); 
-
-        // Configure Polly for HttpClient
-            services.AddPollyPolicies();    
-                
+        // Register ILogger<T>
+        services.AddLogging(builder =>
+        {
+            builder.AddSerilog();
+        });     
+            
+   // Configure Polly for HttpClient
+            services.AddPollyPolicies(); 
             // Register repositories
-            services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+             services.AddScoped<IUserQueryRepository, UserQueryRepository>();
             services.AddScoped<IUserCommandRepository, UserCommandRepository>();
             services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
             services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
@@ -132,7 +138,14 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IStateQueryRepository, StateQueryRepository>();
             services.AddScoped<ICityCommandRepository, CityCommandRepository>();
             services.AddScoped<ICityQueryRepository, CityQueryRepository>();
-            services.AddScoped<IAuditLogRepository, AuditLogRepository>();                                 
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();    
+            services.AddScoped<IUserSessionRepository, UserSessionRepository>();
+ 			services.AddTransient<NotificationsQueryHandler>();  
+            services.AddTransient<INotificationsQueryRepository, NotificationsQueryRepository>();                             
+			services.AddScoped<IPasswordComplexityRuleQueryRepository,  PasswordComplexityRuleQueryRepository>();
+            services.AddScoped<IPasswordComplexityRuleCommandRepository, PasswordComplexityRuleCommandRepository>();
+            services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
+            services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            
             services.AddHttpContextAccessor();            
             
 
@@ -149,8 +162,11 @@ namespace BSOFT.Infrastructure
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
                 typeof(ChangePasswordProfile),             
+				typeof(PasswordComplexityRuleProfile),
                 typeof(EntityProfile),
                 typeof(UnitProfile),
+ 				typeof(AdminSecuritySettingsProfile),
+				typeof(DepartmentProfile),
                 typeof(UpdateUnitProfile),
                 typeof(CreateUnitProfile),
                 typeof(UpdateUnitProfile)

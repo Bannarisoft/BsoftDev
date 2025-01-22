@@ -7,6 +7,7 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ICompany;
 using Core.Domain.Entities;
+using Core.Domain.Events;
 using MediatR;
 
 namespace Core.Application.Companies.Commands.UpdateCompany
@@ -17,13 +18,15 @@ namespace Core.Application.Companies.Commands.UpdateCompany
         private readonly IFileUploadService _ifileUploadService;
         private readonly IMapper _imapper;
         private readonly ICompanyQueryRepository _companyQueryRepository;
+        private readonly IMediator _mediator;
 
-        public UpdateCompanyCommandHandler(ICompanyCommandRepository icompanyRepository, IMapper imapper, IFileUploadService ifileUploadService, ICompanyQueryRepository companyQueryRepository)
+        public UpdateCompanyCommandHandler(ICompanyCommandRepository icompanyRepository, IMapper imapper, IFileUploadService ifileUploadService, ICompanyQueryRepository companyQueryRepository, IMediator mediator)
         {
             _icompanyRepository = icompanyRepository;
             _imapper = imapper;
             _ifileUploadService = ifileUploadService;
             _companyQueryRepository = companyQueryRepository;
+            _mediator = mediator;
         }
 
           public async Task<ApiResponseDTO<bool>> Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
@@ -53,6 +56,15 @@ namespace Core.Application.Companies.Commands.UpdateCompany
            
            if (CompanyId)
            {
+             //Domain Event
+                 var domainEvent = new AuditLogsDomainEvent(
+                     actionDetail: "Update",
+                     actionCode: "",
+                     actionName: "",
+                     details: $"Company '{company.Id}' was updated.",
+                     module:"Company"
+                 );
+                 await _mediator.Publish(domainEvent, cancellationToken);
                return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Company updated successfully"};
            }
             return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Company not updated"};

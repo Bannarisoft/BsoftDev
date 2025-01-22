@@ -8,6 +8,7 @@
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
@@ -21,7 +22,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.Application\Core.Application.csproj" />
     <ProjectReference Include="..\BSOFT.Infrastructure\BSOFT.Infrastructure.csproj" />
-
+ <None Update="web.config">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
         
   </ItemGroup>
 </Project>

@@ -6,10 +6,11 @@ using MediatR;
 using System.Reflection;
 using System.Text;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Divisions.Queries.GetDivisions;
 
 namespace Core.Application.Divisions.Commands.DeleteDivision
 {
-    public class DeleteDivisionCommand : IRequest<ApiResponseDTO<bool>>
+    public class DeleteDivisionCommand : IRequest<ApiResponseDTO<DivisionDTO>>
     {
         public int Id { get; set; }
         public byte IsActive { get; set; }

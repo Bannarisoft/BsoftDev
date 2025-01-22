@@ -15,11 +15,13 @@ using Core.Application.Companies.Queries.GetCompanyAutoComplete;
 using Core.Application.Common.Interfaces;
 using System.Text.Json;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [AllowAnonymous]
     public class CompanyController : ApiControllerBase
     {
         
@@ -34,6 +36,7 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpGet("GetAllCompaniesAsync")]
+        
         public async Task<IActionResult> GetAllCompaniesAsync()
         {
             var companies = await Mediator.Send(new GetCompanyQuery());

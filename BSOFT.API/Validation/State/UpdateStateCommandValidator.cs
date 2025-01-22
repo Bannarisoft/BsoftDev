@@ -16,7 +16,7 @@ namespace BSOFT.API.Validation.State
         public UpdateStateCommandValidator(MaxLengthProvider maxLengthProvider)
         { 
             // Get max lengths dynamically using MaxLengthProvider
-            var stateCodeMaxLength = maxLengthProvider.GetMaxLength<States>("StateCode") ?? 6;
+            var stateCodeMaxLength = maxLengthProvider.GetMaxLength<States>("StateCode") ?? 5;
             var stateNameMaxLength = maxLengthProvider.GetMaxLength<States>("StateName") ?? 50;
 
             // Load validation rules from JSON or another source

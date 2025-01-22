@@ -9,50 +9,77 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.Application.UserRole.Queries.GetRole;
 using Core.Application.Common.Interfaces.IUserRole;
+using Core.Application.Common.HttpResponse;
+using Core.Domain.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 {
-    public class GetRolesAutocompleteQueryHandler : IRequestHandler<GetRolesAutocompleteQuery, List<UserRoleDto>>
+    public class GetRolesAutocompleteQueryHandler : IRequestHandler<GetRolesAutocompleteQuery, ApiResponseDTO<List<UserRoleDto>>>
     {
         private readonly IUserRoleQueryRepository _userRoleRepository;
      private readonly IMapper _mapper;
-        public GetRolesAutocompleteQueryHandler(IUserRoleQueryRepository userRoleRepository, IMapper mapper)
+       private readonly ILogger<GetRolesAutocompleteQueryHandler> _logger;
+     private readonly IMediator _mediator;
+
+        public GetRolesAutocompleteQueryHandler(IUserRoleQueryRepository userRoleRepository, IMapper mapper, IMediator mediator,ILogger<GetRolesAutocompleteQueryHandler> logger)
         {
            _userRoleRepository = userRoleRepository;
             _mapper =mapper;
+
+            _mediator=mediator;
+
+            _logger = logger;
+
+
         }
 
-        public async Task<List<UserRoleDto>> Handle(GetRolesAutocompleteQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<UserRoleDto>>> Handle(GetRolesAutocompleteQuery request, CancellationToken cancellationToken)
         {
 
-             /*  var query = @"
-            select Id,RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole 
-            WHERE RoleName LIKE @SearchPattern OR Id LIKE @SearchPattern and IsActive =1
-            ORDER BY RoleName";
-       // Execute the query and map the result to a list of CountryDto
-        var userrole = await _dbConnection.QueryAsync<UserRoleDto>(
-            query, 
-            new { SearchPattern = $"%{request.SearchPattern}%" }  // Use the search pattern with wildcards
-        );
-        if (userrole == null || !userrole.Any())
-        {
-            return new List<UserRoleDto>(); // Return empty list if no matches are found
-        }
+                  _logger.LogInformation("Handling GetDepartmentAutoCompleteSearchQuery with search pattern: {SearchPattern}", request.SearchTerm);
 
-        // Map the results to DTOs
-        return userrole.Select(UserRole => new UserRoleDto
-        {
-            UserRoleId = UserRole.UserRoleId,           
-            RoleName = UserRole.RoleName,
-            Description =UserRole.Description,
-            CompanyId=UserRole.CompanyId,
-            IsActive=UserRole.IsActive
-            
-        }).ToList();
-            */
-             var result = await _userRoleRepository.GetRolesAsync(request.SearchPattern);
-            //return _mapper.Map<List<DivisionDTO>>(result);
-            return _mapper.Map<List<UserRoleDto>>(result);        
+             // Fetch departments matching the search pattern
+                var result = await _userRoleRepository.GetRolesAsync(request.SearchTerm);
+                if (result == null || !result.Any())
+                {
+                    _logger.LogWarning("No departments found for search pattern: {SearchPattern}", request.SearchTerm);
+                    return new ApiResponseDTO<List<UserRoleDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "No matching departments found",
+                        Data = new List<UserRoleDto>()
+                    };
+                }
+
+                _logger.LogInformation("Departments found for search pattern: {SearchPattern}. Mapping results to DTO.", request.SearchTerm);
+
+                // Map the result to DTO
+                var userRoleDto = _mapper.Map<List<UserRoleDto>>(result);
+
+                // Publish domain event for audit logs
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "GetAutoComplete",
+                    actionCode: "",
+                    actionName: request.SearchTerm,
+                    details: $"User Role '{request.SearchTerm}' was searched",
+                    module: "User Role"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
+
+                _logger.LogInformation("Domain event published for search pattern: {SearchPattern}", request.SearchTerm);
+
+                return new ApiResponseDTO<List<UserRoleDto>>
+                {
+                    IsSuccess = true,
+                    Message = "Success",
+                    Data = userRoleDto
+                };
+
+               
+
+
+    
         }
         
     }

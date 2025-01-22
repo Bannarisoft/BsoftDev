@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FluentValidation;
 using Core.Domain.Entities;
 using BSOFT.API.Validation.Common;
@@ -16,7 +13,7 @@ namespace BSOFT.API.Validation.Country
         public UpdateCityCommandValidator(MaxLengthProvider maxLengthProvider)
         {
             // Get max lengths dynamically using MaxLengthProvider
-            var cityCodeMaxLength = maxLengthProvider.GetMaxLength<Cities>("CityCode") ?? 6;
+            var cityCodeMaxLength = maxLengthProvider.GetMaxLength<Cities>("CityCode") ?? 5;
             var cityNameMaxLength = maxLengthProvider.GetMaxLength<Cities>("CityName") ?? 50;
 
             // Load validation rules from JSON or another source

@@ -1,7 +1,6 @@
 using Core.Application.Country.Queries.GetCountries;
 using AutoMapper;
 using MediatR;
-using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
@@ -24,32 +23,31 @@ namespace Core.Application.Country.Queries.GetCountryAutoComplete
         public async Task<ApiResponseDTO<List<CountryDto>>> Handle(GetCountryAutoCompleteQuery request, CancellationToken cancellationToken)
         {   
                    
-                var result = await _countryRepository.GetByCountryNameAsync(request.SearchPattern);
-                if (!result.IsSuccess || result.Data == null || !result.Data.Any())
-                {
-                    return new ApiResponseDTO<List<CountryDto>>
-                    {
-                        IsSuccess = false,
-                        Message = "No countries found matching the search pattern."
-                    };
-                }
-                var countryDto = _mapper.Map<List<CountryDto>>(result.Data);
-                //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetAutoComplete",
-                    actionCode:"",        
-                    actionName: request.SearchPattern,                
-                    details: $"Country '{request.SearchPattern}' was searched",
-                    module:"Country"
-                );
-                await _mediator.Publish(domainEvent, cancellationToken);
+            var result = await _countryRepository.GetByCountryNameAsync(request.SearchPattern);
+            if (result == null || result.Count == 0)
+            {
                 return new ApiResponseDTO<List<CountryDto>>
                 {
-                    IsSuccess = true,
-                    Message = "Countries found successfully.",
-                    Data = countryDto
+                    IsSuccess = false,
+                    Message = "No countries found matching the search pattern."
                 };
-                        
+            }
+            var countryDto = _mapper.Map<List<CountryDto>>(result);
+            //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "GetAutoComplete",
+                actionCode:"",        
+                actionName: request.SearchPattern,                
+                details: $"Country '{request.SearchPattern}' was searched",
+                module:"Country"
+            );
+            await _mediator.Publish(domainEvent, cancellationToken);
+            return new ApiResponseDTO<List<CountryDto>>
+            {
+                IsSuccess = true,
+                Message = "Countries found successfully.",
+                Data = countryDto
+            };                        
         }
     }
   

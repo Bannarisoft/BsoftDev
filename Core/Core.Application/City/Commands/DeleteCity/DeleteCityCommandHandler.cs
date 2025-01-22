@@ -49,33 +49,32 @@ namespace Core.Application.City.Commands.DeleteCity
                 IsActive = 0
             };
            
-                var updateResult = await _cityRepository.DeleteAsync(request.Id, cityUpdate);
-                if (updateResult > 0)
-                {
-                    var cityDto = _mapper.Map<CityDto>(cityUpdate);  
-                    //Domain Event  
-                    var domainEvent = new AuditLogsDomainEvent(
-                        actionDetail: "Delete",
-                        actionCode: cityDto.CityCode,
-                        actionName: cityDto.CityName,
-                        details: $"City '{cityDto.CityName}' was created. CityCode: {cityDto.CityCode}",
-                        module:"City"
-                    );               
-                    await _mediator.Publish(domainEvent, cancellationToken);                 
-                    return new ApiResponseDTO<CityDto>
-                    {
-                        IsSuccess = true,
-                        Message = "City deleted successfully.",
-                        Data = cityDto
-                    };
-                }
-
+            var updateResult = await _cityRepository.DeleteAsync(request.Id, cityUpdate);
+            if (updateResult > 0)
+            {
+                var cityDto = _mapper.Map<CityDto>(cityUpdate);  
+                //Domain Event  
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Delete",
+                    actionCode: cityDto.CityCode,
+                    actionName: cityDto.CityName,
+                    details: $"City '{cityDto.CityName}' was created. CityCode: {cityDto.CityCode}",
+                    module:"City"
+                );               
+                await _mediator.Publish(domainEvent, cancellationToken);                 
                 return new ApiResponseDTO<CityDto>
                 {
-                    IsSuccess = false,
-                    Message = "City deletion failed."
-                    
+                    IsSuccess = true,
+                    Message = "City deleted successfully.",
+                    Data = cityDto
                 };
+            }
+
+            return new ApiResponseDTO<CityDto>
+            {
+                IsSuccess = false,
+                Message = "City deletion failed."                
+            };
            
         }
     }

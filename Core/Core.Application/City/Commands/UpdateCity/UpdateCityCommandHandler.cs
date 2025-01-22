@@ -24,52 +24,52 @@ namespace Core.Application.City.Commands.UpdateCity
             _cityQueryRepository = cityQueryRepository;
             _mediator = mediator;
         }
-    public async Task<ApiResponseDTO<CityDto>> Handle(UpdateCityCommand request, CancellationToken cancellationToken)
-    {
-        var city = await _cityQueryRepository.GetByIdAsync(request.Id);
-        if (city == null)
-            return new ApiResponseDTO<CityDto>
-            {
-                IsSuccess = false,
-                Message = "City not found"
-            };
-
-        var oldCityName = city.CityName;
-        city.CityName = request.CityName;
-
-        if (city == null || city.IsActive != 1)
+        public async Task<ApiResponseDTO<CityDto>> Handle(UpdateCityCommand request, CancellationToken cancellationToken)
         {
-            return new ApiResponseDTO<CityDto>
-            {
-                IsSuccess = false,
-                Message = "Invalid CityID. The specified City does not exist or is inactive."
-            };
-        }
+            var city = await _cityQueryRepository.GetByIdAsync(request.Id);
+            if (city == null)
+                return new ApiResponseDTO<CityDto>
+                {
+                    IsSuccess = false,
+                    Message = "City not found"
+                };
 
-        var stateExists = await _cityRepository.StateExistsAsync(request.StateId);
-        if (!stateExists)
-        {
-            return new ApiResponseDTO<CityDto>
-            {
-                IsSuccess = false,
-                Message = "Invalid StateId. The specified state does not exist or is inactive."
-            };
-        }
+            var oldCityName = city.CityName;
+            city.CityName = request.CityName;
 
-        var cityExists = await _cityRepository.GetCityByCodeAsync(request.CityCode, request.StateId);
-        if (cityExists)
-        {
-            return new ApiResponseDTO<CityDto>
+            if (city == null || city.IsActive != 1)
             {
-                IsSuccess = false,
-                Message = "CityCode already exists in the specified State."
-            };
-        }
+                return new ApiResponseDTO<CityDto>
+                {
+                    IsSuccess = false,
+                    Message = "Invalid CityID. The specified City does not exist or is inactive."
+                };
+            }
 
-        var updatedCityEntity = _mapper.Map<Cities>(request);   
-            
+            var stateExists = await _cityRepository.StateExistsAsync(request.StateId);
+            if (!stateExists)
+            {
+                return new ApiResponseDTO<CityDto>
+                {
+                    IsSuccess = false,
+                    Message = "Invalid StateId. The specified state does not exist or is inactive."
+                };
+            }
+
+            var cityExists = await _cityRepository.GetCityByCodeAsync(request.CityCode, request.StateId);
+            if (cityExists)
+            {
+                return new ApiResponseDTO<CityDto>
+                {
+                    IsSuccess = false,
+                    Message = "CityCode already exists in the specified State."
+                };
+            }
+
+            var updatedCityEntity = _mapper.Map<Cities>(request);                   
             var updateResult = await _cityRepository.UpdateAsync(request.Id, updatedCityEntity);            
-            var updatedCity =  await _cityQueryRepository.GetByIdAsync(request.Id);            
+
+            var updatedCity =  await _cityQueryRepository.GetByIdAsync(request.Id);    
             if (updatedCity != null)
             {
                 var cityDto = _mapper.Map<CityDto>(updatedCity);
@@ -82,31 +82,29 @@ namespace Core.Application.City.Commands.UpdateCity
                     module:"State"
                 );            
                 await _mediator.Publish(domainEvent, cancellationToken);
-                if(updateResult)
+                if(updateResult>0)
                 {
                     return new ApiResponseDTO<CityDto>
-                  {
-                      IsSuccess = true,
-                      Message = "City updated successfully.",
-                      Data = cityDto
-                  };
+                    {
+                        IsSuccess = true,
+                        Message = "City updated successfully.",
+                        Data = cityDto
+                    };
                 }
                 return new ApiResponseDTO<CityDto>
                 {
                     IsSuccess = false,
                     Message = "City not updated."
-                };
-                
+                };                
             }
             else
             {
                 return new ApiResponseDTO<CityDto>{
                     IsSuccess = false,
                     Message = "City not found."
-
                 };
             }
-         
-    }
+            
+        }
     }
 }
