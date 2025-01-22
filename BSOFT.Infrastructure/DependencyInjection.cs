@@ -40,6 +40,7 @@ using Core.Application.Common.Interfaces.AuditLog;
 using Infrastructure.Data;
 using BSOFT.Infrastructure.Logging;
 using Serilog;
+using BSOFT.Infrastructure.Resilience;
 
 namespace BSOFT.Infrastructure
 {
@@ -64,45 +65,48 @@ namespace BSOFT.Infrastructure
     
     
              // MongoDB Context
-        services.AddSingleton<IMongoClient>(sp =>
-        {
-            var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
-            if (string.IsNullOrWhiteSpace(mongoConnectionString))
+            services.AddSingleton<IMongoClient>(sp =>
             {
-                throw new InvalidOperationException("MongoDB connection string is missing or empty.");
-            }
-            return new MongoClient(mongoConnectionString);
-        });
+                var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
+                if (string.IsNullOrWhiteSpace(mongoConnectionString))
+                {
+                    throw new InvalidOperationException("MongoDB connection string is missing or empty.");
+                }
+                return new MongoClient(mongoConnectionString);
+            });
 
-        services.AddSingleton<IMongoDbContext>(sp =>
-        {
-            var client = sp.GetRequiredService<IMongoClient>();
-            var databaseName = configuration["MongoDb:DatabaseName"];
-            if (string.IsNullOrWhiteSpace(databaseName))
+            services.AddSingleton<IMongoDbContext>(sp =>
             {
-                throw new InvalidOperationException("MongoDB database name is missing or empty.");
-            }
-            return new MongoDbContext(client, databaseName);
-        });
+                var client = sp.GetRequiredService<IMongoClient>();
+                var databaseName = configuration["MongoDb:DatabaseName"];
+                if (string.IsNullOrWhiteSpace(databaseName))
+                {
+                    throw new InvalidOperationException("MongoDB database name is missing or empty.");
+                }
+                return new MongoDbContext(client, databaseName);
+            });
 
-      // Optional: Register IMongoDatabase if needed directly
-        services.AddSingleton(sp =>
-        {
-            var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
-            return mongoDbContext.GetDatabase();
-        });
+        // Optional: Register IMongoDatabase if needed directly
+            services.AddSingleton(sp =>
+            {
+                var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
+                return mongoDbContext.GetDatabase();
+            });
 
-            // Configure JWT settings
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));       
+                // Configure JWT settings
+                services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));       
 
-        // Register ILogger<T>
-        services.AddLogging(builder =>
-        {
-            builder.AddSerilog();
-        });     
-            
+            // Register ILogger<T>
+            services.AddLogging(builder =>
+            {
+                builder.AddSerilog();
+            }); 
+
+        // Configure Polly for HttpClient
+            services.AddPollyPolicies();    
+                
             // Register repositories
-             services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+            services.AddScoped<IUserQueryRepository, UserQueryRepository>();
             services.AddScoped<IUserCommandRepository, UserCommandRepository>();
             services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
             services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();

@@ -10,6 +10,7 @@ using MediatR;
 using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
 using BSOFT.API;
+using BSOFT.Infrastructure.Resilience;
 
 
 
@@ -66,6 +67,16 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
+// Configure Polly for HttpClient
+builder.Services.AddHttpClient("ExternalAPI", client =>
+{
+    client.BaseAddress = new Uri("https://api.example.com/");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+})
+.AddPolicyHandler(PollyPolicies.GetRetryPolicy())
+.AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy())
+.AddPolicyHandler(PollyPolicies.GetTimeoutPolicy())
+.AddPolicyHandler(PollyPolicies.GetFallbackPolicy());
 
 var app = builder.Build();
  
