@@ -48,6 +48,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
             ClockSkew = TimeSpan.Zero
         };
+         options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("Token validated successfully");
+                return Task.CompletedTask;
+            }
+         };
 });
 
 //Add layer dependency 
@@ -72,7 +85,6 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Enter 'Bearer' followed by your token."
     });
-
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -112,12 +124,12 @@ var app = builder.Build();
 app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
 
 // Configure the HTTP request pipeline. 
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseDeveloperExceptionPage(); 
-}
+//}
 
  // Map endpoint to handle CreateStateCommand
 app.MapPost("/state", async (
@@ -139,6 +151,7 @@ if (!result.IsSuccess)
 
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
+// Enable CORS
 app.UseCors();
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
