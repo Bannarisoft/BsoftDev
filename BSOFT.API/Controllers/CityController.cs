@@ -30,8 +30,7 @@ namespace BSOFT.API.Controllers
             _updateCityCommandValidator = updateCityCommandValidator;    
              
         }
-        [HttpGet]        
-        [Authorize]
+        [HttpGet]                
         public async Task<IActionResult> GetAllCitiesAsync()
         {  
             var cities = await Mediator.Send(new GetCityQuery());            

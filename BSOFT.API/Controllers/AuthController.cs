@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using FluentValidation;
 using Core.Application.Common.Interfaces.IUserSession;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers
 {
@@ -29,6 +30,7 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {  
                   // Map the incoming request to a UserLoginCommand
@@ -76,7 +78,7 @@ namespace BSOFT.API.Controllers
         }
        // Get session by JWT ID
         [HttpGet("session/{jwtId}")]
-        
+        [AllowAnonymous]
         public async Task<IActionResult> GetSessionByJwtId(string jwtId)
         {
             if (string.IsNullOrEmpty(jwtId))
@@ -101,7 +103,7 @@ namespace BSOFT.API.Controllers
 
         // Deactivate expired sessions
         [HttpPost("deactivate-expired")]
-        
+        [AllowAnonymous]
         public async Task<IActionResult> DeactivateExpiredSessions()
         {
             await _userSessionRepository.DeactivateExpiredSessionsAsync();
@@ -117,6 +119,7 @@ namespace BSOFT.API.Controllers
       
                         // Deactivate user sessions by User ID
         [HttpPost("deactivate-user-session/{userId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> DeactivateUserSessionsAsync(int userId)
         {
             await _userSessionRepository.DeactivateUserSessionsAsync(userId);

@@ -4,29 +4,27 @@ using System.Text.Json;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IUserSession;
 using Core.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace BSOFT.API.Middleware
-{
+{   
     public class TokenValidationMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly JwtSettings _jwtSettings;
-        
+
         public TokenValidationMiddleware(RequestDelegate next, IOptions<JwtSettings> jwtSettings)
         {
             _next = next;
-            _jwtSettings = jwtSettings.Value; 
+            _jwtSettings = jwtSettings.Value;
         }
 
         public async Task Invoke(HttpContext context, IJwtTokenHelper jwtTokenHelper, IUserSessionRepository sessionRepository)
         {
-            var path = context.Request.Path.Value;
-
-            // Skip token validation for specific endpoints
-            if (
-                path.StartsWith("/api/Auth/")
-                )
+            // Skip validation for endpoints marked with [AllowAnonymous]
+            var endpoint = context.GetEndpoint();
+            if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
             {
                 await _next(context);
                 return;
@@ -44,6 +42,8 @@ namespace BSOFT.API.Middleware
             {
                 // Validate the token
                 var principal = jwtTokenHelper.ValidateToken(token);
+
+                // Extract the JWT ID (jti) and validate it
                 var jti = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
                 if (string.IsNullOrEmpty(jti))
                 {
@@ -51,49 +51,23 @@ namespace BSOFT.API.Middleware
                     return;
                 }
 
-                // Retrieve browser information from User-Agent header
-                var browserInfo = context.Request.Headers["User-Agent"].ToString();
-
                 // Check session in the database
                 var session = await sessionRepository.GetSessionByJwtIdAsync(jti);
-                DateTime utcNow = DateTime.UtcNow;
-
-                // Define the IST timezone
-                TimeZoneInfo indianZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
-                DateTime indianTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, indianZone);
-
-                if (session == null)
-                {
-                    await WriteErrorResponse(context, StatusCodes.Status401Unauthorized, "Session not found.");
-                    return;
-                }
-
-                if (session.IsActive == 0 || session.ExpiresAt <= indianTime)
+                if (session == null || session.IsActive == 0 || session.ExpiresAt <= DateTime.UtcNow)
                 {
                     await WriteErrorResponse(context, StatusCodes.Status401Unauthorized, "Session is invalid or expired.");
                     return;
                 }
 
-                // Extract UserId from claims
-                var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-                if (userIdClaim != null)
-                {
-                    context.Items["UserId"] = int.Parse(userIdClaim.Value); // Attach UserId to HttpContext
-                }
+                // Attach UserId and UserName to HttpContext for further use
+                context.Items["UserId"] = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                context.Items["UserName"] = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value;
 
-                // Retrieve Username
-                var userNameClaim = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name);
-                if (userNameClaim != null)
-                {
-                    context.Items["UserName"] = userNameClaim.Value; // Attach Username to HttpContext
-                }
-
-                // Update the session's last activity
+                // Update session's last activity
                 session.LastActivity = DateTime.UtcNow;
-                session.BrowserInfo = browserInfo;
                 await sessionRepository.UpdateSessionAsync(session);
 
-                // Set user context for the current request
+                // Set the User principal
                 context.User = principal;
             }
             catch (Exception ex)
