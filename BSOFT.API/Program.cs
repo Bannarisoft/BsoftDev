@@ -14,13 +14,17 @@ using BSOFT.API.Middleware;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using BSOFT.Infrastructure.Resilience;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Serilog for logging to MongoDB and console
 Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .WriteTo.Console() // Log to console for debugging
-    .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari") // MongoDB connection string (adjust as needed)
+    // .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari") // MongoDB connection string (adjust as needed)
+    .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari", collectionName: "ApplicationLogs", restrictedToMinimumLevel: LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .CreateLogger();
 
@@ -115,23 +119,14 @@ builder.Services.AddCors(options =>
             policy.AllowAnyHeader();
         });
 });
-
-// Configure Polly for HttpClient
-builder.Services.AddHttpClient("ExternalAPI", client =>
-{
-    client.BaseAddress = new Uri("https://api.example.com/");
-    client.DefaultRequestHeaders.Add("Accept", "application/json");
-})
-.AddPolicyHandler(PollyPolicies.GetRetryPolicy())
-.AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy())
-.AddPolicyHandler(PollyPolicies.GetTimeoutPolicy())
-.AddPolicyHandler(PollyPolicies.GetFallbackPolicy());
+  // Add Polly policies
+builder.Services.AddPollyPolicies(builder.Configuration);
 
 var app = builder.Build();
  
 
 
-// Register LoggingMiddleware
+// Register SeriLoggingMiddleware
 app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
 
 // Configure the HTTP request pipeline. 

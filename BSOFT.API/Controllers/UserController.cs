@@ -31,6 +31,7 @@ namespace BSOFT.API.Controllers
          private readonly IValidator<FirstTimeUserPasswordCommand> _firstTimeUserPasswordCommandValidator;
          private readonly IValidator<ChangeUserPasswordCommand> _changeUserPasswordCommandValidator;
          private readonly ILogger<UserController> _logger;
+         private readonly IHttpClientFactory _httpClientFactory;
          
        public UserController(ISender mediator, 
                              IValidator<CreateUserCommand> createUserCommandValidator, 
@@ -38,7 +39,8 @@ namespace BSOFT.API.Controllers
                              ApplicationDbContext dbContext, 
                              IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator, 
                              IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
-                             ILogger<UserController> logger) 
+                             ILogger<UserController> logger,
+                             IHttpClientFactory httpClientFactory) 
          : base(mediator)
         {        
             _createUserCommandValidator = createUserCommandValidator;
@@ -47,6 +49,7 @@ namespace BSOFT.API.Controllers
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
             _logger = logger;
+            _httpClientFactory = httpClientFactory;
         }
         
         [HttpGet]
@@ -62,17 +65,35 @@ namespace BSOFT.API.Controllers
         [HttpGet("{userid}")]
         public async Task<IActionResult> GetByIdAsync(int userid)
         {
+            var client = _httpClientFactory.CreateClient("ResilientHttpClient");
+
+        try
+        {
+            var response = await client.GetAsync("https://httpstat.us/500");
+            response.EnsureSuccessStatusCode();
+
+            var user = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation("Retrieved user: {User}", user);
+
+            return Ok(new { StatusCode = 200, Data = user });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving user with ID {UserId}.", userid);
+            return StatusCode(500, "An error occurred while processing your request.");
+        }
+    
             
-            var user = await Mediator.Send(new GetUserByIdQuery { UserId = userid });
+            // var user = await Mediator.Send(new GetUserByIdQuery { UserId = userid });
 
-            if (user == null)
-            {
-                _logger.LogWarning("User Not Found for ID : {UserId}", userid);
+            // if (user == null)
+            // {
+            //     _logger.LogWarning("User Not Found for ID : {UserId}", userid);
 
-                return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"User ID {userid} not found." });
-            }
-                _logger.LogWarning("User Listed successfully: {Username}", user);
-                return Ok(new { StatusCode = StatusCodes.Status200OK, data = user });
+            //     return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"User ID {userid} not found." });
+            // }
+            //     _logger.LogWarning("User Listed successfully: {Username}", user);
+            //     return Ok(new { StatusCode = StatusCodes.Status200OK, data = user });
         }
 
         [HttpPost]

@@ -108,9 +108,7 @@ namespace BSOFT.Infrastructure
         {
             builder.AddSerilog();
         });     
-            
-   // Configure Polly for HttpClient
-            services.AddPollyPolicies(); 
+
             // Register repositories
              services.AddScoped<IUserQueryRepository, UserQueryRepository>();
             services.AddScoped<IUserCommandRepository, UserCommandRepository>();
