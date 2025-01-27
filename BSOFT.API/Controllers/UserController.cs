@@ -13,6 +13,7 @@ using Core.Application.Users.Queries.GetUserAutoComplete;
 using Core.Application.Users.Commands.UpdateFirstTimeUserPassword;
 using Core.Application.Users.Commands.ChangeUserPassword;
 using Microsoft.AspNetCore.Authorization;
+using Core.Application.Users.Commands.ForgotUserPassword;
 
 namespace BSOFT.API.Controllers
 {
@@ -228,6 +229,20 @@ namespace BSOFT.API.Controllers
         //    var response = await Mediator.Send(command);
         //     return Ok(new { Message = response });
         }
+
+
+        [HttpPost]
+        [Route("ForgotPassword")]
+        public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand command)
+        {       
+        var response = await Mediator.Send(command);
+        if (response[0].IsSuccess)
+        {
+        return Ok(new { StatusCode = StatusCodes.Status200OK, message = response[0].Message });
+        }
+
+        return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response[0].Message });
+}
 
         // [HttpPut("{userid}")]
         // public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
