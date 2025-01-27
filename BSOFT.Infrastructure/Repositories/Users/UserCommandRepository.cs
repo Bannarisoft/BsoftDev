@@ -26,7 +26,7 @@ namespace BSOFT.Infrastructure.Repositories
         }
 
         public async Task<User> CreateAsync(User user)
-        {
+        {            
             await _applicationDbContext.User.AddAsync(user);
             await _applicationDbContext.SaveChangesAsync();
             return user;

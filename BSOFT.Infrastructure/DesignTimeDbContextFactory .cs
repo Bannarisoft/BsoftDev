@@ -23,6 +23,7 @@ namespace BSOFT.Infrastructure
                 .Build();
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
 
             optionsBuilder.UseSqlServer(connectionString);
 

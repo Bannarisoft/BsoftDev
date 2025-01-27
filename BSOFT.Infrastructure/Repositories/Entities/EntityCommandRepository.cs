@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Core.Domain.Entities;
 using Core.Application.Common.Interfaces.IEntity;
-using Core.Application.Common.Exceptions;
 
 
 namespace BSOFT.Infrastructure.Repositories.Entities
