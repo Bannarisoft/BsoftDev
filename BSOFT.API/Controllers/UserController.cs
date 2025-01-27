@@ -86,7 +86,6 @@ namespace BSOFT.API.Controllers
             var validationResult = await _createUserCommandValidator.ValidateAsync(command);
                 _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
 
-
             if (!validationResult.IsValid)
             {
                 return BadRequest(new
@@ -123,9 +122,9 @@ namespace BSOFT.API.Controllers
 
                 return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
             }
-                _logger.LogWarning("User creation failed for user: {Username}", command.UserName);
+            _logger.LogWarning("User creation failed for user: {Username}", command.UserName);
 
-                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
+            return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
         }        
         [HttpPut]
         [Route("Update")]
