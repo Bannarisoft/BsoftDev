@@ -8,7 +8,6 @@ using Core.Application.Units.Commands.UpdateUnit;
 using Core.Application.Units.Queries.GetUnitAutoComplete;
 using FluentValidation;
 using BSOFT.Infrastructure.Data;
-using Core.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BSOFT.API.Controllers

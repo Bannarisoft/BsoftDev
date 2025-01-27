@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Data.SqlClient;
 
 namespace BSOFT.Infrastructure.Logging.Middleware
 {
@@ -22,6 +23,7 @@ namespace BSOFT.Infrastructure.Logging.Middleware
 
         public async Task Invoke(HttpContext context)
         {
+            var traceId = context.TraceIdentifier; // Generate a unique trace ID for each request            
             context.Request.EnableBuffering();
 
             try
@@ -30,16 +32,16 @@ namespace BSOFT.Infrastructure.Logging.Middleware
                 if (context.Request.Method == HttpMethods.Post || context.Request.Method == HttpMethods.Put)
                 {
                     var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
-                    _logger.LogInformation("Request Path: {Path}, Method: {Method}, Body: {Body}", 
-                        context.Request.Path, context.Request.Method, requestBody);
+                    _logger.LogInformation("TraceId: {TraceId}, Request Path: {Path}, Method: {Method}, Body: {Body}", 
+                        traceId, context.Request.Path, context.Request.Method, requestBody);
                     context.Request.Body.Position = 0; // Reset stream position
                 }
 
                 await _next(context); // Call the next middleware
 
                 // Log response status
-                _logger.LogInformation("Response StatusCode: {StatusCode}, Path: {Path}", 
-                    context.Response.StatusCode, context.Request.Path);
+                _logger.LogInformation("TraceId: {TraceId}, Response StatusCode: {StatusCode}, Path: {Path}", 
+                    traceId, context.Response.StatusCode, context.Request.Path);
             }
             catch (Exception ex)
             {
@@ -52,42 +54,51 @@ namespace BSOFT.Infrastructure.Logging.Middleware
             int statusCode;
             string message;
 
-            // Determine error details
-            if (exception is NullReferenceException)
+            // Determine error details based on exception type
+            switch (exception)
             {
-                statusCode = StatusCodes.Status500InternalServerError;
-                message = "A null reference occurred.";
-                _logger.LogError(exception, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
-                    statusCode, message, context.Request.Path);
-            }
-            else if (exception is DbUpdateException)
-            {
-                statusCode = StatusCodes.Status500InternalServerError;
-                message = "A database update error occurred.";
-                _logger.LogError(exception, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
-                    statusCode, message, context.Request.Path);
-            }
-            else
-            {
-                statusCode = StatusCodes.Status500InternalServerError;
-                message = "An unexpected error occurred.";
-                _logger.LogError(exception, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
-                    statusCode, message, context.Request.Path);
+                case DbUpdateException dbUpdateException:
+                    statusCode = StatusCodes.Status500InternalServerError;
+                    message = "A database update error occurred.";
+                    _logger.LogError(dbUpdateException, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
+                        statusCode, message, context.Request.Path);
+                    break;
+
+                case SqlException sqlException:
+                    statusCode = StatusCodes.Status503ServiceUnavailable; // Indicate service unavailability
+                    message = "Unable to connect to the database. Please try again later.";
+                    _logger.LogError(sqlException, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
+                        statusCode, message, context.Request.Path);
+                    break;
+
+                case NullReferenceException nullReferenceException:
+                    statusCode = StatusCodes.Status500InternalServerError;
+                    message = "A null reference occurred.";
+                    _logger.LogError(nullReferenceException, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
+                        statusCode, message, context.Request.Path);
+                    break;
+
+                default:
+                    statusCode = StatusCodes.Status500InternalServerError;
+                    message = "An unexpected error occurred.";
+                    _logger.LogError(exception, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
+                        statusCode, message, context.Request.Path);
+                    break;
             }
 
             // Set the response
-            var response = context.Response;
-            response.ContentType = "application/json";
-            response.StatusCode = statusCode;
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = statusCode;
 
             var errorResponse = new
             {
+                TraceId = context.TraceIdentifier,
                 StatusCode = statusCode,
-                Message = message,
-                Detailed = exception.Message // Optional: Hide in production
+                Title = message,
+                Detail = exception.Message // Optional: Mask this in production
             };
 
-            await response.WriteAsync(JsonSerializer.Serialize(errorResponse));
+            await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
         }
     }
 }

@@ -13,6 +13,7 @@ using Core.Application.Users.Queries.GetUserAutoComplete;
 using Core.Application.Users.Commands.UpdateFirstTimeUserPassword;
 using Core.Application.Users.Commands.ChangeUserPassword;
 using Microsoft.AspNetCore.Authorization;
+using BSOFT.Infrastructure.Services;
 
 namespace BSOFT.API.Controllers
 {
@@ -31,6 +32,7 @@ namespace BSOFT.API.Controllers
          private readonly IValidator<FirstTimeUserPasswordCommand> _firstTimeUserPasswordCommandValidator;
          private readonly IValidator<ChangeUserPasswordCommand> _changeUserPasswordCommandValidator;
          private readonly ILogger<UserController> _logger;
+         private readonly EmailService _emailService;
          
        public UserController(ISender mediator, 
                              IValidator<CreateUserCommand> createUserCommandValidator, 
@@ -38,7 +40,7 @@ namespace BSOFT.API.Controllers
                              ApplicationDbContext dbContext, 
                              IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator, 
                              IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
-                             ILogger<UserController> logger) 
+                             ILogger<UserController> logger,EmailService emailService) 
          : base(mediator)
         {        
             _createUserCommandValidator = createUserCommandValidator;
@@ -47,6 +49,7 @@ namespace BSOFT.API.Controllers
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
             _logger = logger;
+            _emailService = emailService;
         }
         
         [HttpGet]
@@ -97,6 +100,25 @@ namespace BSOFT.API.Controllers
             if (response.IsSuccess)
             {
                 _logger.LogInformation("User {Username} created successfully.", command.UserName);
+
+                   
+                // Send email notification after successful login
+                //var userEmail = "us.profile.123@gmail.com"; // Gmail
+                //var userEmail = "ushadevi@bannarimills.co.in"; // Zimbra             
+                bool emailSent = false;
+                emailSent = await _emailService.SendEmailAsync(
+                command.EmailId,
+                "Login Credentials",                
+                $"Dear {command.UserName},<br/><br/>We are pleased to inform you that your login was created successfully.<br/><br/>Please use the below login credentials to access your account: <br/><strong>Username:</strong>  {command.UserName} <br/><strong>Password:</strong>  {command.Password} <br/><br/><p>Regards, <br/>Bannari Mills Team </p>"
+                );
+                if (emailSent)
+                {
+                    _logger.LogInformation("Login notification email sent to {Email}.", command.EmailId);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to send login notification email to {Email}.", command.EmailId);
+                }
 
                 return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
             }
@@ -192,14 +214,7 @@ namespace BSOFT.API.Controllers
             var response = await Mediator.Send(command);
             _logger.LogInformation("First Time User and Password changed successfully.", command.UserName);
 
-            return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });
-        //     var validationResult = await _firstTimeUserPasswordCommandValidator.ValidateAsync(command);
-        //     if (!validationResult.IsValid)
-        //     {
-        //         return BadRequest(validationResult.Errors);
-        //     }
-        //    var response = await Mediator.Send(command);
-        //     return Ok(new { Message = response });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });     
         }
         [HttpPut]
         [Route("ChangePassword")]
@@ -220,46 +235,6 @@ namespace BSOFT.API.Controllers
             _logger.LogInformation("User and Password changed successfully.", command.UserName);
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });
-        //     var validationResult = await _changeUserPasswordCommandValidator.ValidateAsync(command);
-        //     if (!validationResult.IsValid)
-        //     {
-        //         return BadRequest(validationResult.Errors);
-        //     }
-        //    var response = await Mediator.Send(command);
-        //     return Ok(new { Message = response });
-        }
-
-        // [HttpPut("{userid}")]
-        // public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
-        // {
-        //     if (userid <= 0)
-        //     {
-        //         return BadRequest("Invalid user ID");
-        //     }
-
-        //     if (userid != command.UserId)
-        //     {
-        //         return BadRequest();
-        //     }
-        //     await Mediator.Send(command);
-        //     return NoContent();
-        // }
-
-        // [HttpDelete("{userid}")]
-        // public async Task<IActionResult> DeleteAsync(int userid, DeleteUserCommand command)
-        // {
-        //     if (userid <= 0)
-        //     {
-        //         return BadRequest("Invalid user ID");
-        //     }
-
-        //     if (userid != command.UserId)
-        //     {
-        //         return BadRequest();
-        //     }
-        //     await Mediator.Send(command);
-
-        //     return NoContent();
-        // }
+      }
     }
 }
