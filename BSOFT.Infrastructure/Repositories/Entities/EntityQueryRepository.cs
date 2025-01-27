@@ -5,7 +5,6 @@ using Core.Application.Common.Interfaces.IEntity;
 using System.Data;
 using Dapper;
 using Core.Application.Entity.Queries.GetEntityLastCode;
-using Core.Application.Common.Exceptions;
 using Microsoft.Data.SqlClient;
 
 

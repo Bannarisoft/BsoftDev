@@ -5,7 +5,6 @@ using AutoMapper;
 using MediatR;
 using Core.Application.Common.Interfaces.IEntity;
 using Microsoft.EntityFrameworkCore;
-using Core.Application.Common.Exceptions;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common;
 using Core.Domain.Events;
