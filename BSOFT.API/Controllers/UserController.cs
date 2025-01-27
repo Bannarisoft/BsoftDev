@@ -236,6 +236,7 @@ namespace BSOFT.API.Controllers
             _logger.LogInformation("User and Password changed successfully.", command.UserName);
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });
+        }
         [HttpPost]
         [Route("ForgotPassword")]
         public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand command)
