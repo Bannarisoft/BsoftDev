@@ -126,7 +126,7 @@ namespace BSOFT.API.Controllers
 
                 if (remainingAttempts > 0)
                 {
-                    return BadRequest(new
+                    return Unauthorized(new
                     {
                         StatusCode = StatusCodes.Status400BadRequest,
                         Message = $"Invalid login attempt. You have {remainingAttempts} attempts remaining."
@@ -143,7 +143,7 @@ namespace BSOFT.API.Controllers
 
                     _logger.LogWarning("User {Username} is locked due to too many invalid login attempts.", username);
 
-                    return BadRequest(new
+                    return Unauthorized(new
                     {
                         StatusCode = StatusCodes.Status400BadRequest,
                         Message = $"User is locked due to too many invalid attempts. Try again in {AutoLockMinutes} minutes."
@@ -181,14 +181,24 @@ namespace BSOFT.API.Controllers
         {
             if (string.IsNullOrEmpty(jwtId))
             {
-                return BadRequest(new { Message = "JWT ID cannot be null or empty." });
+              //  return BadRequest(new { Message = "JWT ID cannot be null or empty." });
+                 return Unauthorized(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "JWT ID cannot be null or empty."
+                }); 
             }
 
             var session = await _userSessionRepository.GetSessionByJwtIdAsync(jwtId);
 
             if (session == null)
             {
-                return NotFound(new { Message = "Session not found for the provided JWT ID." });
+                //return NotFound(new { Message = "Session not found for the provided JWT ID." });
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "JWT ID cannot be null or empty."
+                }); 
             }
 
             return Ok(new
