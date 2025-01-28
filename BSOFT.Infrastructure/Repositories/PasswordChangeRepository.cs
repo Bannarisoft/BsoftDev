@@ -93,5 +93,14 @@ namespace BSOFT.Infrastructure.Repositories
             return Task.FromResult(passwordHash);
         }
 
+      public async Task<string> GenerateVerificationCode(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            var verificationCode = await Task.Run(() => new string(Enumerable.Repeat(chars, length)
+                                    .Select(s => s[random.Next(s.Length)]).ToArray()));
+            return verificationCode;
+        }       
+       
     }
 }
