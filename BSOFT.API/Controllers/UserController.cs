@@ -15,6 +15,7 @@ using Core.Application.Users.Commands.ChangeUserPassword;
 using Microsoft.AspNetCore.Authorization;
 using Core.Application.Users.Commands.ForgotUserPassword;
 using BSOFT.Infrastructure.Services;
+using Core.Application.Users.Commands.ResetUserPassword;
 
 namespace BSOFT.API.Controllers
 {
@@ -240,13 +241,49 @@ namespace BSOFT.API.Controllers
         [Route("ForgotPassword")]
         public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand command)
         {       
-        var response = await Mediator.Send(command);
-        if (response[0].IsSuccess)
+            var response = await Mediator.Send(command);
+            if (response[0].IsSuccess)
+            {
+                _logger.LogInformation("User {Username} fetched successfully.", command.UserName);
+                bool emailSent = false;
+                emailSent = await _emailService.SendEmailAsync(
+                response[0].Data.Email,
+                "Password Reset Verification Code",                
+                $"Dear {command.UserName},<br/><br/>We have received a request to reset your password.<br/><br/>To proceed with resetting your password, please use the verification code below: <br/><strong>Username:</strong>{command.UserName} <br/><strong>Verification Code:</strong>  {response[0].Data.VerificationCode} <br/><br/><br/><strong>Note:Verification Code will expire in {response[0].Data.PasswordResetCodeExpiryMinutes} minutes</strong> <br/><br/><p>Regards,<br/>Bannari Mills Team </p>"
+                );
+                if (emailSent)
+                {
+                    _logger.LogInformation("Verification Code email sent to {Email}.", response[0].Data.Email);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to send Verification Code notification email to {Email}.", response[0].Data.Email);
+                }
+         _logger.LogInformation("Verification Code sent successfully.", command.UserName);
+        return Ok(new
         {
-        return Ok(new { StatusCode = StatusCodes.Status200OK, message = response[0].Message });
-        }
+            StatusCode = StatusCodes.Status200OK,
+            Message = response[0].Data.Message, // Correctly access the message
+            
+        });
+    }
+    _logger.LogWarning("Invalid username/ Email and Mobile number Does not exists.", command.UserName);
+    return BadRequest(new
+    {
+        StatusCode = StatusCodes.Status400BadRequest,
+        Message = response[0].Message // Access the message for error
+    });
+}
 
-        return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response[0].Message });
-      }
+        [HttpPut]
+        [Route("ResetUserPassword")]
+        public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand command)
+        {
+            
+            var response = await Mediator.Send(command);
+            _logger.LogInformation("Password changed successfully.", command.UserName);
+
+            return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });     
+        }
     }
 }
