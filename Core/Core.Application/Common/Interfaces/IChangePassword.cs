@@ -11,6 +11,9 @@ namespace Core.Application.Common.Interfaces
         Task<string> FirstTimeUserChangePassword(int userId,PasswordLog passwordLog);
         Task<string> PasswordEncode(string password);
         Task<string> ChangePassword(int userId,string password,PasswordLog passwordLog);
+        Task<string> GenerateVerificationCode(int length);
+
+
         
     }
 }

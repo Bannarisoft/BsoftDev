@@ -9,7 +9,6 @@ using Core.Application.Entity.Commands.DeleteEntity;
 using FluentValidation;
 using BSOFT.Infrastructure.Data;
 using Core.Application.Entity.Queries.GetEntityAutoComplete;
-using Core.Application.Common.Exceptions;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;

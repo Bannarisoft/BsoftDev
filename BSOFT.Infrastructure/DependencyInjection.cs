@@ -49,6 +49,12 @@ using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 using BSOFT.Infrastructure.Repositories.PasswordComplexityRule;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
 using BSOFT.Infrastructure.Repositories.AdminSecuritySettings;
+using Hangfire;
+using Hangfire.SqlServer;
+using BSOFT.Infrastructure.Services;
+using Core.Domain.Common;
+using Core.Application.Common.Interfaces.ICompanySettings;
+using BSOFT.Infrastructure.Repositories.CompanySettings;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -57,15 +63,28 @@ namespace BSOFT.Infrastructure
             (this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
             {
                 var connectionString = configuration.GetConnectionString("DefaultConnection");
+                var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
 
                 if (string.IsNullOrWhiteSpace(connectionString))
                 {
                     throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
+                } 
+                if (string.IsNullOrWhiteSpace(HangfireConnectionString))
+                {
+                    throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
                 }
 
             // Register ApplicationDbContext with SQL Server
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+           /*  services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString)); */
+                services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5, // Number of retry attempts
+                    maxRetryDelay: TimeSpan.FromSeconds(30), // Delay between retries
+                    errorNumbersToAdd: null); // Add specific SQL error numbers to retry on (optional)
+            }));
 
                 // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
@@ -102,6 +121,26 @@ namespace BSOFT.Infrastructure
 
             // Configure JWT settings
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));       
+
+          // Register Hangfire services
+            services.AddHangfire(config =>
+            {
+                config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                      .UseSimpleAssemblyNameTypeSerializer()
+                      .UseDefaultTypeSerializer()
+                      .UseSqlServerStorage(HangfireConnectionString, new SqlServerStorageOptions
+                      {
+                          CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                          SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                          QueuePollInterval = TimeSpan.Zero,
+                          UseRecommendedIsolationLevel = true,
+                          UsePageLocksOnDequeue = true,
+                          DisableGlobalLocks = true
+                      });
+            });
+
+            // Add the Hangfire server
+            services.AddHangfireServer();
 
         // Register ILogger<T>
         services.AddLogging(builder =>
@@ -148,15 +187,22 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
             services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            
             services.AddHttpContextAccessor();            
-            
+            services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();   
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();            
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
-            services.AddScoped<IChangePassword, PasswordChangeRepository>();
-
+            services.AddScoped<IChangePassword, PasswordChangeRepository>();            
+            
+            services.Configure<EmailJobSettings>(configuration.GetSection("EmailJobSettings"));
+            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+            services.AddSingleton<EmailService>();
+            /* services.AddHostedService<EmailJobService>();     */          
+            services.Configure<EmailSettings>(configuration.GetSection("EmailSettingsGmail"));         
+            /* services.Configure<EmailSettings>(configuration.GetSection("EmailSettingsZimbra"));   */                   
+            
             // AutoMapper profiles
             services.AddAutoMapper(
                 typeof(UserProfile),

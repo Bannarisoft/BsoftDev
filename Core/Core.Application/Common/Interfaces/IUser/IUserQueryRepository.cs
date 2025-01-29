@@ -13,6 +13,7 @@ namespace Core.Application.Common.Interfaces.IUser
         Task<User?> GetByIdAsync(int userId);      
         Task<User?> GetByUsernameAsync(string username);
         Task<List<string>> GetUserRolesAsync(int userId);
+  
     }
 
 }

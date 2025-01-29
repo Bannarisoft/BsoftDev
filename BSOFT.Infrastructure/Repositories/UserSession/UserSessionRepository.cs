@@ -9,12 +9,19 @@ namespace BSOFT.Infrastructure.Repositories
     public class UserSessionRepository : IUserSessionRepository
     {
         private readonly ApplicationDbContext _applicationDbContext;    
+        private readonly TimeZoneInfo _indianZone;
 
         public UserSessionRepository(ApplicationDbContext applicationDbContext)
         {
-            _applicationDbContext = applicationDbContext;        
+            _applicationDbContext = applicationDbContext;      
+             _indianZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");         
         }
-
+         private DateTime GetIndianTime()
+        {
+            // Convert UTC to Indian Standard Time
+            DateTime utcNow = DateTime.UtcNow;
+            return TimeZoneInfo.ConvertTimeFromUtc(utcNow, _indianZone);
+        }
         public async Task AddSessionAsync(UserSessions session)
         {
             _applicationDbContext.UserSession.Add(session);
@@ -44,8 +51,9 @@ namespace BSOFT.Infrastructure.Repositories
         }
         public async Task<UserSessions> GetSessionByUserIdAsync(int userId)
         {
+            var indianTime = GetIndianTime();
             return await _applicationDbContext.UserSession
-                .FirstOrDefaultAsync(s => s.UserId == userId && s.IsActive == 1);
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.IsActive == 1 && s.ExpiresAt > indianTime) ;
         }
         public async Task ExpireTokenAsync(string jwtId)
         {
@@ -57,10 +65,8 @@ namespace BSOFT.Infrastructure.Repositories
             }
         }
         public async Task DeactivateExpiredSessionsAsync()
-        {
-            DateTime utcNow = DateTime.UtcNow;
-            TimeZoneInfo indianZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");            
-            DateTime indianTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, indianZone);
+        {           
+            var indianTime = GetIndianTime();
             var expiredSessions = await _applicationDbContext.UserSession
                 .Where(s => s.ExpiresAt <= indianTime && s.IsActive==1)
                 .ToListAsync();

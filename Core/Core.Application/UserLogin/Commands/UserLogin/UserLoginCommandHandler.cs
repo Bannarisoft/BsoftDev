@@ -24,7 +24,7 @@ namespace Core.Application.UserLogin.Commands.UserLogin
          private readonly JwtSettings _jwtSettings;
         private readonly ILogger<UserLoginCommandHandler> _logger;
         private readonly IMediator _mediator; 
-
+        private readonly TimeZoneInfo _indianZone;
 
         public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository, IMediator mediator,ILogger<UserLoginCommandHandler> logger,IUserSessionRepository userSessionRepository, IHttpContextAccessor httpContextAccessor, IIPAddressService ipAddressService, IOptions<JwtSettings> jwtSettings)
         {
@@ -37,7 +37,13 @@ namespace Core.Application.UserLogin.Commands.UserLogin
             _jwtSettings = jwtSettings.Value;
              _mediator = mediator; 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            
+            _indianZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"); 
+        }
+        private DateTime GetIndianTime()
+        {
+            // Convert UTC to Indian Standard Time
+            DateTime utcNow = DateTime.UtcNow;
+            return TimeZoneInfo.ConvertTimeFromUtc(utcNow, _indianZone);
         }
 
        public async Task<ApiResponseDTO<LoginResponse>> Handle(UserLoginCommand request, CancellationToken cancellationToken)
@@ -55,15 +61,29 @@ namespace Core.Application.UserLogin.Commands.UserLogin
             }          
             // Fetch user details
             var user = await _userQueryRepository.GetByUsernameAsync(request.Username);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            if (user == null )
             {
                 _logger.LogWarning("Invalid login attempt for Username: {Username}", request.Username);
+                
+                return new ApiResponseDTO<LoginResponse>
+                {
+                    IsSuccess = false,
+                    Message = "User does not exist."
+                };
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            {
+                _logger.LogWarning("Invalid login attempt for Username: {Username}", request.Username);
+                
                 return new ApiResponseDTO<LoginResponse>
                 {
                     IsSuccess = false,
                     Message = "Invalid username or password."
                 };
             }
+
+
             _logger.LogInformation("User {Username} found. Retrieving roles...", request.Username);
             // Check if the user already has an active session
             var activeSession = await _userSessionRepository.GetSessionByUserIdAsync(user.UserId);
@@ -101,9 +121,7 @@ namespace Core.Application.UserLogin.Commands.UserLogin
             var httpContext = _httpContextAccessor.HttpContext;
             var browserInfo = httpContext?.Request.Headers["User-Agent"].ToString();
             string broswerDetails = browserInfo != null ? _ipAddressService.GetUserBrowserDetails(browserInfo) : string.Empty;
-            DateTime utcNow = DateTime.UtcNow;
-            TimeZoneInfo indianZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");            
-            DateTime indianTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, indianZone);
+            var indianTime = GetIndianTime();
             DateTime expirationTime = indianTime.AddMinutes(_jwtSettings.ExpiryMinutes);
             await _userSessionRepository.AddSessionAsync(new UserSessions
             {
@@ -118,14 +136,14 @@ namespace Core.Application.UserLogin.Commands.UserLogin
              _logger.LogInformation("JWT token generated for Username: {Username}", user.UserName);
             
             //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "Login",
-                    actionCode: user.UserName,
-                    actionName: "User logged in",
-                    details: $"User '{user.UserName}' logged in successfully with roles: {token}, Roles: {roles}",
-                    module:"UserLogin"
-                );
-                await _mediator.Publish(domainEvent, cancellationToken);
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "Login",
+                actionCode: user.UserName,
+                actionName: "User logged in",
+                details: $"User '{user.UserName}' logged in successfully with roles: {token}, Roles: {roles}",
+                module:"UserLogin"
+            );
+            await _mediator.Publish(domainEvent, cancellationToken);
             
             //Log login event via Serilog
             Log.Information("User {UserName} logged in successfully at {Time}. Roles: {Roles}", user.UserName, DateTime.UtcNow, string.Join(", ", roles));
@@ -140,7 +158,8 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                     UserRole = roles,
                     IsAuthenticated = true,
                     IsFirstTimeUser = user.IsFirstTimeUser,
-                    Message = "Login Successful."
+                    Message = "Login Successful.",
+                    CompanyId = user.CompanyId 
                 }
             };
         }         

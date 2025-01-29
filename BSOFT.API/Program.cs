@@ -1,5 +1,4 @@
 using System.Text;
-using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Core.Application;
@@ -11,8 +10,9 @@ using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
 using Microsoft.OpenApi.Models;
 using BSOFT.API.Middleware;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
+using Hangfire;
+using BSOFT.API.Filters;
+using Microsoft.IdentityModel.Logging;
 using BSOFT.Infrastructure.Resilience;
 using Serilog.Events;
 
@@ -23,10 +23,11 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     // .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .WriteTo.Console() // Log to console for debugging
+    .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari") // MongoDB connection string (adjust as needed)
     // .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari") // MongoDB connection string (adjust as needed)
     .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari", collectionName: "ApplicationLogs", restrictedToMinimumLevel: LogEventLevel.Warning)
     .Enrich.FromLogContext()
-    .CreateLogger();
+    .CreateLogger();;
 
 builder.Host.UseSerilog(); // Use Serilog for logging in the app
 
@@ -36,6 +37,7 @@ validationService.AddValidationServices(builder.Services);
 
 // Configure JWT settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
 
 // Add Authentication and configure JWT Bearer
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -67,7 +69,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
          };
 });
-
+IdentityModelEventSource.ShowPII = true;
 //Add layer dependency 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration,builder.Services);
@@ -120,9 +122,22 @@ builder.Services.AddCors(options =>
         });
 });
 
+
 var app = builder.Build();
  
+// Enable Hangfire Dashboard
+app.MapHangfireDashboard();
+//app.UseHangfireDashboard("/hangfire");
+app.UseHangfireDashboard("/hangfire",new DashboardOptions()
+{
+    DashboardTitle = "BSOFT Hangfire Dashboard",
+   Authorization = new[]
+    {
+        new HangfireAuthorizationFilter("admin", "basml@1234") // Set your username and password here
+    }
+}
 
+);
 
 // Register SeriLoggingMiddleware
 app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
@@ -162,4 +177,3 @@ app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
-

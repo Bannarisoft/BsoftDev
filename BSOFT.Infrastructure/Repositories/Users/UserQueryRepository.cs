@@ -5,14 +5,14 @@ using Core.Domain.Entities;
 using Core.Application.Common.Interfaces.IUser;
 using Polly;
 using Polly.Timeout;
-using Serilog;
+using Serilog;using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace BSOFT.Infrastructure.Repositories.Users
 {
     public class UserQueryRepository : IUserQueryRepository
     {
         private readonly ApplicationDbContext _applicationDbContext;
-        private readonly IDbConnection _dbConnection;
+         private readonly IDbConnection _dbConnection;
         private readonly IAsyncPolicy _retryPolicy;
         private readonly IAsyncPolicy _circuitBreakerPolicy;
         private readonly IAsyncPolicy _timeoutPolicy;
@@ -22,7 +22,7 @@ namespace BSOFT.Infrastructure.Repositories.Users
         {
             _applicationDbContext = applicationDbContext;
              _dbConnection = dbConnection;
-             // Define Polly policies
+// Define Polly policies
 
             // Retry policy: Retry 3 times with an exponential backoff strategy
             _retryPolicy = Policy
@@ -51,7 +51,9 @@ namespace BSOFT.Infrastructure.Repositories.Users
         }
         public async Task<List<User>> GetAllUsersAsync()
         {
-              const string query = "SELECT * FROM AppSecurity.Users";
+        const string query = "SELECT * FROM AppSecurity.Users";
+        return (await _dbConnection.QueryAsync<User>(query)).ToList();
+const string query = "SELECT * FROM AppSecurity.Users";
 
             var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
 
@@ -82,12 +84,13 @@ namespace BSOFT.Infrastructure.Repositories.Users
    
         public async Task<User?> GetByUsernameAsync(string username)
         {
-            if (string.IsNullOrWhiteSpace(username))
+             if (string.IsNullOrWhiteSpace(username))
             {
                 throw new ArgumentException("Username cannot be null or empty.", nameof(username));
             }
 
             const string query = "SELECT * FROM AppSecurity.Users WHERE UserName = @Username";
+            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { Username = username });
 
             var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
 
@@ -104,6 +107,7 @@ namespace BSOFT.Infrastructure.Repositories.Users
             // const string query = "SELECT * FROM AppSecurity.Users WHERE UserName = @Username";
             // return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { Username = username });
         }
+
         // public async Task<User?> GetByUsernameAsync(string username)
         // {
         //     if (string.IsNullOrWhiteSpace(username))
@@ -131,26 +135,18 @@ namespace BSOFT.Infrastructure.Repositories.Users
         //     return result.FirstOrDefault();
         // }
 
-                public async Task<List<string>> GetUserRolesAsync(int userId)
+        public async Task<List<string>> GetUserRolesAsync(int userId)
         {
-            const string query = "SELECT 'Admin' as RoleName FROM AppSecurity.Users u WHERE u.UserId = @UserId";
-
-            var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
-
-            return await policyWrap.ExecuteAsync(async () =>
-            {
-                // Execute the Dapper query with Polly policies
-                return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
-            });
-            //     // const string query = @"
-            //     // SELECT ur.RoleName
-            //     // FROM AppSecurity.UserRole ur
-            //     // INNER JOIN AppSecurity.Users u ON ur.Id = u.UserRoleId
-            //     // WHERE u.UserId = @UserId";
-            //     const string query = @"
-            //     SELECT 'Admin' as RoleName FROM AppSecurity.Users u 
-            //     WHERE u.UserId = @UserId";
-            // return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
+                const string query = @"
+                SELECT ur.RoleName
+                FROM AppSecurity.UserRole ur
+                INNER JOIN AppSecurity.UserRoleAllocation ura ON   ur.Id = ura.UserRoleId
+                INNER JOIN AppSecurity.Users u ON u.UserId = ura.UserId
+                WHERE u.UserId = @UserId and ura.IsActive = 1";
+                // const string query = @"
+                // SELECT 'Admin' as RoleName FROM AppSecurity.Users u 
+                // WHERE u.UserId = @UserId";
+            return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
 
         }
         

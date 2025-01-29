@@ -20,7 +20,8 @@ namespace BSOFT.Infrastructure.Repositories
     {
         private readonly ApplicationDbContext _applicationDbContext;
          private readonly IDbConnection _dbConnection;
-        private readonly IAsyncPolicy _retryPolicy;
+
+private readonly IAsyncPolicy _retryPolicy;
         private readonly IAsyncPolicy _circuitBreakerPolicy;
         private readonly IAsyncPolicy _timeoutPolicy;
         private readonly IAsyncPolicy _fallbackPolicy;
@@ -30,7 +31,7 @@ namespace BSOFT.Infrastructure.Repositories
         {
             _applicationDbContext = applicationDbContext;
              _dbConnection = dbConnection;
-             // Create an HttpClient using IHttpClientFactory and the registered "ResilientHttpClient"
+// Create an HttpClient using IHttpClientFactory and the registered "ResilientHttpClient"
             _httpClient = httpClientFactory.CreateClient("ResilientHttpClient");
               // Define Polly policies
 
@@ -66,49 +67,54 @@ namespace BSOFT.Infrastructure.Repositories
         }
 
         public async Task<User> CreateAsync(User user)
-        {
-             var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+       var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
+return await policyWrap.ExecuteAsync(async () =>
+            {       
+            await _applicationDbContext.User.AddAsync(user);
+            await _applicationDbContext.SaveChangesAsync();
+            return user;
+});
+        }
 
+        public async Task<int> DeleteAsync(int userId,User user)
+        {
+            var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (existingUser != null)
             return await policyWrap.ExecuteAsync(async () =>
             {
+                existingUser.IsActive = user.IsActive;
+                return await _applicationDbContext.SaveChangesAsync();
+            }
+            return 0; // No user found
                 await _applicationDbContext.User.AddAsync(user);
                 await _applicationDbContext.SaveChangesAsync();
                 return user;
             });
             // await _applicationDbContext.User.AddAsync(user);
             // await _applicationDbContext.SaveChangesAsync();
-            // return user;
+            // return user;        }
+
+        public async Task<List<User>> GetAllUsersAsync()
+        {
+        const string query = "SELECT * FROM AppSecurity.Users";
+        return (await _dbConnection.QueryAsync<User>(query)).ToList();
         }
 
-        public async Task<int> DeleteAsync(int userId,User user)
+        public async Task<User?> GetByIdAsync(int userId)
         {
-            var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
-
-            return await policyWrap.ExecuteAsync(async () =>
-            {
-                var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
-                if (existingUser != null)
-                {
-                    existingUser.IsActive = user.IsActive;
-                    return await _applicationDbContext.SaveChangesAsync();
-                }
-                return 0; // No user found
-            });
-            // var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
-            // if (existingUser != null)
-            // {
-            //     existingUser.IsActive = user.IsActive;
-            //     return await _applicationDbContext.SaveChangesAsync();
-            // }
-            // return 0; // No user found
+            const string query = "SELECT * FROM AppSecurity.Users WHERE UserId = @UserId";
+            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { userId });
         }
 
         public async Task<int> UpdateAsync(int userId, User user)
         {
-            var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+             var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
             return await policyWrap.ExecuteAsync(async () =>
             {
-            var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
+            var existingUser = await _applicationDbContext.User
+            .Include(uc => uc.UserCompanies)
+            .Include(ur => ur.UserRoleAllocations)
+            .FirstOrDefaultAsync(u => u.UserId == userId);
             if (existingUser != null)
             {
                 existingUser.UserId = user.UserId;
@@ -125,11 +131,64 @@ namespace BSOFT.Infrastructure.Repositories
                 // existingUser.UserRoleId = user.UserRoleId;
                 existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
 
+                 var updatedCompanyIds = user.UserCompanies.Select(uc => uc.CompanyId).ToList();
+                 foreach (var existingCompany in existingUser.UserCompanies)
+                 {
+                     existingCompany.IsActive = updatedCompanyIds.Contains(existingCompany.CompanyId) ? (byte)1 : (byte)0;
+                 }
+                
+                var newCompanyIds = updatedCompanyIds
+                 .Where(id => !existingUser.UserCompanies.Any(uc => uc.CompanyId == id))
+                 .ToList();
+                 foreach (var newCompanyId in newCompanyIds)
+                 {
+                     existingUser.UserCompanies.Add(new UserCompany
+                     {
+                         UserId = existingUser.UserId,
+                         CompanyId = newCompanyId,
+                         IsActive = 1
+                     });
+                 }
+
+                  var updatedRoleIds = user.UserRoleAllocations.Select(ur => ur.UserRoleId).ToList();
+                  foreach (var existingRole in existingUser.UserRoleAllocations)
+                  {
+                      existingRole.IsActive = updatedRoleIds.Contains(existingRole.UserRoleId) ? (byte)1 : (byte)0;
+                  }
+
+                  var newRoleIds = updatedRoleIds
+                      .Where(id => !existingUser.UserRoleAllocations.Any(ur => ur.UserRoleId == id))
+                      .ToList();
+
+                  foreach (var newRoleId in newRoleIds)
+                  {
+                      existingUser.UserRoleAllocations.Add(new Core.Domain.Entities.UserRoleAllocation
+                      {
+                          UserId = existingUser.UserId,
+                          UserRoleId = newRoleId,
+                          IsActive = 1
+                      });
+                  }
+                // _applicationDbContext.UserCompanies.RemoveRange(existingUser.UserCompanies);
+                // _applicationDbContext.UserRoleAllocations.RemoveRange(existingUser.UserRoleAllocations);
+
+                //  existingUser.UserCompanies = user.UserCompanies.Select(uc => new UserCompany
+                //    {
+                //        UserId = existingUser.UserId,
+                //        CompanyId = uc.CompanyId
+                //    }).ToList();
+
+                //    existingUser.UserRoleAllocations = user.UserRoleAllocations.Select(ur => new Core.Domain.Entities.UserRoleAllocation
+                //    {
+                //        UserId = existingUser.UserId,
+                //        UserRoleId = ur.UserRoleId
+                //    }).ToList();
+
                 _applicationDbContext.User.Update(existingUser);
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
-            });
+   });
         }
 
     }

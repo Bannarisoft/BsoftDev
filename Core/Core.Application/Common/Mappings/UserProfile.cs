@@ -10,13 +10,27 @@ public class UserProfile : Profile
 {
     public UserProfile()
     {
-        CreateMap<CreateUserCommand, User>();
+        CreateMap<CreateUserCommand, User>()
+        .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
+        .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations));
+
+        CreateMap<UserCompanyDTO, UserCompany>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.UserId, opt => opt.Ignore())
+            .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.CompanyId));
+
+        CreateMap<UserRoleAllocationDTO, UserRoleAllocation>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.UserId, opt => opt.Ignore())
+            .ForMember(dest => dest.UserRoleId, opt => opt.MapFrom(src => src.UserRoleId));
 
         CreateMap<User, UserDto>()
             .ForMember(dest => dest.UserId, opt => opt.Ignore()) // UserId is auto-generated
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<UpdateUserCommand, User>();
+        CreateMap<UpdateUserCommand, User>()
+        .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
+        .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations));
 
         CreateMap<DeleteUserCommand, User>()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId)) // Map UserRoleId to Id
