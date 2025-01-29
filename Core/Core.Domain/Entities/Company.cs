@@ -28,6 +28,7 @@ namespace Core.Domain.Entities
         public byte IsActive { get; set; }
         public  CompanyAddress CompanyAddress { get; set; }
         public  CompanyContact CompanyContact { get; set; }
+        public IList<UserCompany> UserCompanies { get; set; }
 
           
     }

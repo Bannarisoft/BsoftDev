@@ -52,6 +52,8 @@ using Hangfire;
 using Hangfire.SqlServer;
 using BSOFT.Infrastructure.Services;
 using Core.Domain.Common;
+using Core.Application.Common.Interfaces.ICompanySettings;
+using BSOFT.Infrastructure.Repositories.CompanySettings;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -181,7 +183,7 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
             services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            
             services.AddHttpContextAccessor();            
-            
+            services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();   
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();            

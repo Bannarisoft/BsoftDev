@@ -8,7 +8,7 @@ namespace BSOFT.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<UserRoleAllocation> builder)
         {
-            builder.ToTable("UserRoleAllocation");
+            builder.ToTable("UserRoleAllocation", "AppSecurity");
 
             builder.HasKey(ura => ura.Id)
                 .HasName("PK_UserRoleAllocations_Id")
@@ -28,6 +28,15 @@ namespace BSOFT.Infrastructure.Data.Configurations
             builder.Property(ura => ura.UserId)
                 .HasColumnName("UserId")
                 .HasColumnType("int")
+                .IsRequired();
+
+            builder.Property(u => u.IsActive)
+                .HasColumnName("IsActive")
+                .HasColumnType("bit")
+                .HasConversion(
+                    v => v == 1, 
+                    v => v ? (byte)1 : (byte)0 
+                )
                 .IsRequired();
 
             builder.HasOne(ura => ura.UserRole)
