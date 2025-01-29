@@ -210,7 +210,8 @@ namespace BSOFT.Infrastructure
 				typeof(DepartmentProfile),
                 typeof(UpdateUnitProfile),
                 typeof(CreateUnitProfile),
-                typeof(UpdateUnitProfile)
+                typeof(UpdateUnitProfile),
+                typeof(CurrencyProfile)
             );
 
             return services;
