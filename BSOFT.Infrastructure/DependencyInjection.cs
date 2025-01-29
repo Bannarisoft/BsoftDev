@@ -107,7 +107,10 @@ namespace BSOFT.Infrastructure
         services.AddLogging(builder =>
         {
             builder.AddSerilog();
-        });     
+        }); 
+        // Register Polly Policies
+        services.AddPollyPolicies(configuration);
+            
 
             // Register repositories
              services.AddScoped<IUserQueryRepository, UserQueryRepository>();

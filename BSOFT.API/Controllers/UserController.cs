@@ -65,35 +65,35 @@ namespace BSOFT.API.Controllers
         [HttpGet("{userid}")]
         public async Task<IActionResult> GetByIdAsync(int userid)
         {
-            var client = _httpClientFactory.CreateClient("ResilientHttpClient");
+        //     var client = _httpClientFactory.CreateClient("ResilientHttpClient");
 
-        try
-        {
-            var response = await client.GetAsync("https://httpstat.us/500");
-            response.EnsureSuccessStatusCode();
+        // try
+        // {
+        //     var response = await client.GetAsync("https://httpstat.us/500");
+        //     response.EnsureSuccessStatusCode();
 
-            var user = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation("Retrieved user: {User}", user);
+        //     var user = await response.Content.ReadAsStringAsync();
+        //     _logger.LogInformation("Retrieved user: {User}", user);
 
-            return Ok(new { StatusCode = 200, Data = user });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving user with ID {UserId}.", userid);
-            return StatusCode(500, "An error occurred while processing your request.");
-        }
+        //     return Ok(new { StatusCode = 200, Data = user });
+        // }
+        // catch (Exception ex)
+        // {
+        //     _logger.LogError(ex, "Error retrieving user with ID {UserId}.", userid);
+        //     return StatusCode(500, "An error occurred while processing your request.");
+        // }
     
             
-            // var user = await Mediator.Send(new GetUserByIdQuery { UserId = userid });
+            var user = await Mediator.Send(new GetUserByIdQuery { UserId = userid });
 
-            // if (user == null)
-            // {
-            //     _logger.LogWarning("User Not Found for ID : {UserId}", userid);
+            if (user == null)
+            {
+                _logger.LogWarning("User Not Found for ID : {UserId}", userid);
 
-            //     return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"User ID {userid} not found." });
-            // }
-            //     _logger.LogWarning("User Listed successfully: {Username}", user);
-            //     return Ok(new { StatusCode = StatusCodes.Status200OK, data = user });
+                return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"User ID {userid} not found." });
+            }
+                _logger.LogWarning("User Listed successfully: {Username}", user);
+                return Ok(new { StatusCode = StatusCodes.Status200OK, data = user });
         }
 
         [HttpPost]

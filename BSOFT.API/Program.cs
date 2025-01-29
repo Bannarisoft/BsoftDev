@@ -21,7 +21,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Configure Serilog for logging to MongoDB and console
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    // .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .WriteTo.Console() // Log to console for debugging
     // .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari") // MongoDB connection string (adjust as needed)
     .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari", collectionName: "ApplicationLogs", restrictedToMinimumLevel: LogEventLevel.Warning)
@@ -119,8 +119,6 @@ builder.Services.AddCors(options =>
             policy.AllowAnyHeader();
         });
 });
-  // Add Polly policies
-builder.Services.AddPollyPolicies(builder.Configuration);
 
 var app = builder.Build();
  
