@@ -10,6 +10,7 @@ namespace Core.Application.Common.Interfaces.IRoleEntitlement
     {        
         Task AddRoleEntitlementsAsync(IEnumerable<RoleEntitlement> roleEntitlements, CancellationToken cancellationToken);     
         Task UpdateRoleEntitlementsAsync(int roleId, List<RoleEntitlement> roleEntitlements, CancellationToken cancellationToken);
+         Task<int>  DeleteAsync(int roleId,RoleEntitlement RoleEntitlement);
                // Add these new method definitions
         Task<bool> ModuleExistsAsync(int moduleId, CancellationToken cancellationToken);
         Task<bool> MenuExistsAsync(int menuId, CancellationToken cancellationToken);

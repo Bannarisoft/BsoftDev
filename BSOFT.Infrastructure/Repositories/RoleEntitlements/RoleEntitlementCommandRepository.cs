@@ -36,7 +36,16 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
         await _applicationDbContext.RoleEntitlements.AddRangeAsync(roleEntitlements, cancellationToken);
         await _applicationDbContext.SaveChangesAsync(cancellationToken);
     }
-
+    public async Task<int> DeleteAsync(int id, RoleEntitlement roleEntitlement)
+    {
+        var RoleEntitlementToDelete = await _applicationDbContext.RoleEntitlements.FirstOrDefaultAsync(u => u.Id == id);
+            if (RoleEntitlementToDelete != null)
+            {
+                RoleEntitlementToDelete.IsActive = roleEntitlement.IsActive;
+                return await _applicationDbContext.SaveChangesAsync();
+            }
+            return 0; // No user found
+    }
         // New validation methods
     public async Task<bool> ModuleExistsAsync(int moduleId, CancellationToken cancellationToken)
     {
@@ -61,5 +70,6 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
             .Include(re => re.Menu)
             .ToListAsync(cancellationToken);
     }
+
     }
 }
