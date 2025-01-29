@@ -26,7 +26,7 @@ namespace BSOFT.Infrastructure.Repositories
         }
 
         public async Task<User> CreateAsync(User user)
-        {
+        {            
             await _applicationDbContext.User.AddAsync(user);
             await _applicationDbContext.SaveChangesAsync();
             return user;
@@ -57,7 +57,10 @@ namespace BSOFT.Infrastructure.Repositories
 
         public async Task<int> UpdateAsync(int userId, User user)
         {
-            var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
+            var existingUser = await _applicationDbContext.User
+            .Include(uc => uc.UserCompanies)
+            .Include(ur => ur.UserRoleAllocations)
+            .FirstOrDefaultAsync(u => u.UserId == userId);
             if (existingUser != null)
             {
                 existingUser.UserId = user.UserId;
@@ -73,6 +76,59 @@ namespace BSOFT.Infrastructure.Repositories
                 existingUser.UnitId = user.UnitId;
                 // existingUser.UserRoleId = user.UserRoleId;
                 existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
+
+                 var updatedCompanyIds = user.UserCompanies.Select(uc => uc.CompanyId).ToList();
+                 foreach (var existingCompany in existingUser.UserCompanies)
+                 {
+                     existingCompany.IsActive = updatedCompanyIds.Contains(existingCompany.CompanyId) ? (byte)1 : (byte)0;
+                 }
+                
+                var newCompanyIds = updatedCompanyIds
+                 .Where(id => !existingUser.UserCompanies.Any(uc => uc.CompanyId == id))
+                 .ToList();
+                 foreach (var newCompanyId in newCompanyIds)
+                 {
+                     existingUser.UserCompanies.Add(new UserCompany
+                     {
+                         UserId = existingUser.UserId,
+                         CompanyId = newCompanyId,
+                         IsActive = 1
+                     });
+                 }
+
+                  var updatedRoleIds = user.UserRoleAllocations.Select(ur => ur.UserRoleId).ToList();
+                  foreach (var existingRole in existingUser.UserRoleAllocations)
+                  {
+                      existingRole.IsActive = updatedRoleIds.Contains(existingRole.UserRoleId) ? (byte)1 : (byte)0;
+                  }
+
+                  var newRoleIds = updatedRoleIds
+                      .Where(id => !existingUser.UserRoleAllocations.Any(ur => ur.UserRoleId == id))
+                      .ToList();
+
+                  foreach (var newRoleId in newRoleIds)
+                  {
+                      existingUser.UserRoleAllocations.Add(new Core.Domain.Entities.UserRoleAllocation
+                      {
+                          UserId = existingUser.UserId,
+                          UserRoleId = newRoleId,
+                          IsActive = 1
+                      });
+                  }
+                // _applicationDbContext.UserCompanies.RemoveRange(existingUser.UserCompanies);
+                // _applicationDbContext.UserRoleAllocations.RemoveRange(existingUser.UserRoleAllocations);
+
+                //  existingUser.UserCompanies = user.UserCompanies.Select(uc => new UserCompany
+                //    {
+                //        UserId = existingUser.UserId,
+                //        CompanyId = uc.CompanyId
+                //    }).ToList();
+
+                //    existingUser.UserRoleAllocations = user.UserRoleAllocations.Select(ur => new Core.Domain.Entities.UserRoleAllocation
+                //    {
+                //        UserId = existingUser.UserId,
+                //        UserRoleId = ur.UserRoleId
+                //    }).ToList();
 
                 _applicationDbContext.User.Update(existingUser);
                 return await _applicationDbContext.SaveChangesAsync();

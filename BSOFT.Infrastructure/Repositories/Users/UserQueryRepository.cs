@@ -3,6 +3,7 @@ using System.Data;
 using BSOFT.Infrastructure.Data;
 using Core.Domain.Entities;
 using Core.Application.Common.Interfaces.IUser;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace BSOFT.Infrastructure.Repositories.Users
 {
@@ -39,6 +40,7 @@ namespace BSOFT.Infrastructure.Repositories.Users
             const string query = "SELECT * FROM AppSecurity.Users WHERE UserName = @Username";
             return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { Username = username });
         }
+
         // public async Task<User?> GetByUsernameAsync(string username)
         // {
         //     if (string.IsNullOrWhiteSpace(username))
@@ -66,16 +68,17 @@ namespace BSOFT.Infrastructure.Repositories.Users
         //     return result.FirstOrDefault();
         // }
 
-                public async Task<List<string>> GetUserRolesAsync(int userId)
+        public async Task<List<string>> GetUserRolesAsync(int userId)
         {
-                // const string query = @"
-                // SELECT ur.RoleName
-                // FROM AppSecurity.UserRole ur
-                // INNER JOIN AppSecurity.Users u ON ur.Id = u.UserRoleId
-                // WHERE u.UserId = @UserId";
                 const string query = @"
-                SELECT 'Admin' as RoleName FROM AppSecurity.Users u 
-                WHERE u.UserId = @UserId";
+                SELECT ur.RoleName
+                FROM AppSecurity.UserRole ur
+                INNER JOIN AppSecurity.UserRoleAllocation ura ON   ur.Id = ura.UserRoleId
+                INNER JOIN AppSecurity.Users u ON u.UserId = ura.UserId
+                WHERE u.UserId = @UserId and ura.IsActive = 1";
+                // const string query = @"
+                // SELECT 'Admin' as RoleName FROM AppSecurity.Users u 
+                // WHERE u.UserId = @UserId";
             return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
 
         }

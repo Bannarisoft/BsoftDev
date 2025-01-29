@@ -373,6 +373,110 @@ namespace BSOFT.Infrastructure.Migrations
                     b.ToTable("CompanyContact", "AppData");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.CompanySettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AutoReleaseTime")
+                        .HasColumnType("int")
+                        .HasColumnName("AutoReleaseTime");
+
+                    b.Property<bool>("CaptchaOnLogin")
+                        .HasColumnType("bit")
+                        .HasColumnName("CaptchaOnLogin");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int")
+                        .HasColumnName("CompanyId");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Currency")
+                        .HasColumnType("int")
+                        .HasColumnName("Currency");
+
+                    b.Property<int>("FailedLoginAttempts")
+                        .HasColumnType("int")
+                        .HasColumnName("FailedLoginAttempts");
+
+                    b.Property<int>("FinancialYear")
+                        .HasColumnType("int")
+                        .HasColumnName("FinancialYear");
+
+                    b.Property<int>("ForgotPasswordCodeExpiry")
+                        .HasColumnType("int")
+                        .HasColumnName("ForgotPasswordCodeExpiry");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<int>("Language")
+                        .HasColumnType("int")
+                        .HasColumnName("Language");
+
+                    b.Property<int>("MaxConcurrentLogins")
+                        .HasColumnType("int")
+                        .HasColumnName("MaxConcurrentLogins");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PasswordExpiryAlert")
+                        .HasColumnType("int")
+                        .HasColumnName("PasswordExpiryAlert");
+
+                    b.Property<int>("PasswordExpiryDays")
+                        .HasColumnType("int")
+                        .HasColumnName("PasswordExpiryDays");
+
+                    b.Property<int>("PasswordHistoryCount")
+                        .HasColumnType("int")
+                        .HasColumnName("PasswordHistoryCount");
+
+                    b.Property<int>("SessionTimeout")
+                        .HasColumnType("int")
+                        .HasColumnName("SessionTimeout");
+
+                    b.Property<int>("TimeZone")
+                        .HasColumnType("int")
+                        .HasColumnName("TimeZone");
+
+                    b.Property<bool>("TwoFactorAuth")
+                        .HasColumnType("bit")
+                        .HasColumnName("TwoFactorAuth");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CompanySetting", "AppData");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Countries", b =>
                 {
                     b.Property<int>("Id")
@@ -1245,6 +1349,36 @@ namespace BSOFT.Infrastructure.Migrations
                     b.ToTable("Users", "AppSecurity");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.UserCompany", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int")
+                        .HasColumnName("CompanyId");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserCompany", "AppSecurity");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
                 {
                     b.Property<int>("Id")
@@ -1312,34 +1446,9 @@ namespace BSOFT.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte>("IsActive")
-                        .HasColumnType("tinyint");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int")
@@ -1358,7 +1467,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasIndex("UserRoleId");
 
-                    b.ToTable("UserRoleAllocation", (string)null);
+                    b.ToTable("UserRoleAllocation", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserSessions", b =>
@@ -1519,6 +1628,25 @@ namespace BSOFT.Infrastructure.Migrations
                     b.Navigation("Unit");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.UserCompany", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Company", "company")
+                        .WithMany("UserCompanies")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.User", "user")
+                        .WithMany("UserCompanies")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("company");
+
+                    b.Navigation("user");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.UserRoleAllocation", b =>
                 {
                     b.HasOne("Core.Domain.Entities.User", "User")
@@ -1554,6 +1682,8 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Navigation("CompanyContact")
                         .IsRequired();
+
+                    b.Navigation("UserCompanies");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Countries", b =>
@@ -1588,6 +1718,8 @@ namespace BSOFT.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.User", b =>
                 {
                     b.Navigation("Passwords");
+
+                    b.Navigation("UserCompanies");
 
                     b.Navigation("UserRoleAllocations");
                 });

@@ -19,6 +19,7 @@ namespace Core.Application.UserLogin.Commands.UserLogin
         public bool IsAuthenticated { get; set; }
         public bool IsFirstTimeUser { get; set; }
 
-        public string? Message { get; set; }       
+        public string? Message { get; set; }   
+        public int CompanyId { get; set; }     
     }
 }

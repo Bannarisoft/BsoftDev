@@ -10,6 +10,7 @@ namespace Core.Application.Common.Interfaces.INotifications
     {
          Task<DateTime?> GetLastPasswordChangeDate (string username);
          Task<(int PwdExpiryDays, int PwdExpiryAlertDays)> GetPasswordExpiryDays();
+         Task<int> GetResetCodeExpiryMinutes();
 
     }
 }

@@ -1,5 +1,4 @@
 using System.Text;
-using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Core.Application;
@@ -11,8 +10,9 @@ using Core.Application.State.Commands.CreateState;
 using Core.Domain.Entities;
 using Microsoft.OpenApi.Models;
 using BSOFT.API.Middleware;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
+using Hangfire;
+using BSOFT.API.Filters;
+using Microsoft.IdentityModel.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +31,7 @@ validationService.AddValidationServices(builder.Services);
 
 // Configure JWT settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
 
 // Add Authentication and configure JWT Bearer
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -62,7 +63,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
          };
 });
-
+IdentityModelEventSource.ShowPII = true;
 //Add layer dependency 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration,builder.Services);
@@ -118,6 +119,19 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
  
+// Enable Hangfire Dashboard
+app.MapHangfireDashboard();
+//app.UseHangfireDashboard("/hangfire");
+app.UseHangfireDashboard("/hangfire",new DashboardOptions()
+{
+    DashboardTitle = "BSOFT Hangfire Dashboard",
+   Authorization = new[]
+    {
+        new HangfireAuthorizationFilter("admin", "basml@1234") // Set your username and password here
+    }
+}
+
+);
 
 
 // Register LoggingMiddleware
@@ -158,4 +172,3 @@ app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
-

@@ -26,9 +26,11 @@ namespace Core.Domain.Entities
     public int CompanyId { get; set; }
     public int UnitId { get; set; }
     public int DivisionId { get; set; }
-    public ICollection<UserRoleAllocation> UserRoleAllocations { get; set; }
+    
+    public IList<UserRoleAllocation> UserRoleAllocations { get; set; }
 
      public ICollection<PasswordLog> Passwords { get; set; }
+     public IList<UserCompany> UserCompanies { get; set; }
 
     public void SetPassword(string password)
     {

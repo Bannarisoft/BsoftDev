@@ -1,6 +1,6 @@
 using AutoMapper;
 using Core.Application.Common;
-using Core.Application.Common.Exceptions;
+
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUnit;
 using Core.Application.Units.Queries.GetUnits;

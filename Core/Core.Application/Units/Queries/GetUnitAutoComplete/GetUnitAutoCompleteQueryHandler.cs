@@ -5,7 +5,7 @@ using Core.Application.Common.Interfaces.IUnit;
 using AutoMapper;
 using Core.Application.Common;
 using Core.Domain.Events;
-using Core.Application.Common.Exceptions;
+
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
 

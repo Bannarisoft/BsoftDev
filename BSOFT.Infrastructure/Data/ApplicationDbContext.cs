@@ -42,6 +42,8 @@ namespace BSOFT.Infrastructure.Data
  
         public DbSet<PasswordComplexityRule> PasswordComplexityRule { get; set; }
         public DbSet<AdminSecuritySettings> AdminSecuritySettings { get; set; }
+        public DbSet<UserCompany> UserCompanies { get; set; }
+        public DbSet<CompanySettings> CompanySettings { get; set; } 
 
         public DbSet<FinancialYear> FinancialYear { get; set;}
 
@@ -67,13 +69,17 @@ namespace BSOFT.Infrastructure.Data
 			modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleAllocationConfigurations());
+
             modelBuilder.ApplyConfiguration(new UserSessionConfiguration());     
 			modelBuilder.ApplyConfiguration(new PwdComplexityRuleConfiguration());
             modelBuilder.ApplyConfiguration(new AdminSecuritySettingsConfiguration());
                      
             modelBuilder.ApplyConfiguration(new PasswordLogConfiguration());
 
+
             modelBuilder.ApplyConfiguration(new FinancialYearConfiguration()); 
+            modelBuilder.ApplyConfiguration(new UserCompanyConfiguration());
+            modelBuilder.ApplyConfiguration(new CompanySettingsConfiguration());
                
             base.OnModelCreating(modelBuilder);
         }

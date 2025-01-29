@@ -13,6 +13,9 @@ using Core.Application.Users.Queries.GetUserAutoComplete;
 using Core.Application.Users.Commands.UpdateFirstTimeUserPassword;
 using Core.Application.Users.Commands.ChangeUserPassword;
 using Microsoft.AspNetCore.Authorization;
+using Core.Application.Users.Commands.ForgotUserPassword;
+using BSOFT.Infrastructure.Services;
+using Core.Application.Users.Commands.ResetUserPassword;
 
 namespace BSOFT.API.Controllers
 {
@@ -31,6 +34,7 @@ namespace BSOFT.API.Controllers
          private readonly IValidator<FirstTimeUserPasswordCommand> _firstTimeUserPasswordCommandValidator;
          private readonly IValidator<ChangeUserPasswordCommand> _changeUserPasswordCommandValidator;
          private readonly ILogger<UserController> _logger;
+         private readonly EmailService _emailService;
          
        public UserController(ISender mediator, 
                              IValidator<CreateUserCommand> createUserCommandValidator, 
@@ -38,7 +42,7 @@ namespace BSOFT.API.Controllers
                              ApplicationDbContext dbContext, 
                              IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator, 
                              IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
-                             ILogger<UserController> logger) 
+                             ILogger<UserController> logger,EmailService emailService) 
          : base(mediator)
         {        
             _createUserCommandValidator = createUserCommandValidator;
@@ -47,6 +51,7 @@ namespace BSOFT.API.Controllers
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
             _logger = logger;
+            _emailService = emailService;
         }
         
         [HttpGet]
@@ -82,7 +87,6 @@ namespace BSOFT.API.Controllers
             var validationResult = await _createUserCommandValidator.ValidateAsync(command);
                 _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
 
-
             if (!validationResult.IsValid)
             {
                 return BadRequest(new
@@ -98,11 +102,30 @@ namespace BSOFT.API.Controllers
             {
                 _logger.LogInformation("User {Username} created successfully.", command.UserName);
 
+                   
+                // Send email notification after successful login
+                //var userEmail = "us.profile.123@gmail.com"; // Gmail
+                //var userEmail = "ushadevi@bannarimills.co.in"; // Zimbra             
+                bool emailSent = false;
+                emailSent = await _emailService.SendEmailAsync(
+                command.EmailId,
+                "Login Credentials",                
+                $"Dear {command.UserName},<br/><br/>We are pleased to inform you that your login was created successfully.<br/><br/>Please use the below login credentials to access your account: <br/><strong>Username:</strong>  {command.UserName} <br/><strong>Password:</strong>  {command.Password} <br/><br/><p>Regards, <br/>Bannari Mills Team </p>"
+                );
+                if (emailSent)
+                {
+                    _logger.LogInformation("Login notification email sent to {Email}.", command.EmailId);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to send login notification email to {Email}.", command.EmailId);
+                }
+
                 return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
             }
-                _logger.LogWarning("User creation failed for user: {Username}", command.UserName);
+            _logger.LogWarning("User creation failed for user: {Username}", command.UserName);
 
-                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
+            return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
         }        
         [HttpPut]
         [Route("Update")]
@@ -192,14 +215,7 @@ namespace BSOFT.API.Controllers
             var response = await Mediator.Send(command);
             _logger.LogInformation("First Time User and Password changed successfully.", command.UserName);
 
-            return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });
-        //     var validationResult = await _firstTimeUserPasswordCommandValidator.ValidateAsync(command);
-        //     if (!validationResult.IsValid)
-        //     {
-        //         return BadRequest(validationResult.Errors);
-        //     }
-        //    var response = await Mediator.Send(command);
-        //     return Ok(new { Message = response });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });     
         }
         [HttpPut]
         [Route("ChangePassword")]
@@ -220,46 +236,54 @@ namespace BSOFT.API.Controllers
             _logger.LogInformation("User and Password changed successfully.", command.UserName);
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });
-        //     var validationResult = await _changeUserPasswordCommandValidator.ValidateAsync(command);
-        //     if (!validationResult.IsValid)
-        //     {
-        //         return BadRequest(validationResult.Errors);
-        //     }
-        //    var response = await Mediator.Send(command);
-        //     return Ok(new { Message = response });
         }
+        [HttpPost]
+        [Route("ForgotPassword")]
+        public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand command)
+        {       
+            var response = await Mediator.Send(command);
+            if (response[0].IsSuccess)
+            {
+                _logger.LogInformation("User {Username} fetched successfully.", command.UserName);
+                bool emailSent = false;
+                emailSent = await _emailService.SendEmailAsync(
+                response[0].Data.Email,
+                "Password Reset Verification Code",                
+                $"Dear {command.UserName},<br/><br/>We have received a request to reset your password.<br/><br/>To proceed with resetting your password, please use the verification code below: <br/><strong>Username:</strong>{command.UserName} <br/><strong>Verification Code:</strong>  {response[0].Data.VerificationCode} <br/><br/><br/><strong>Note:Verification Code will expire in {response[0].Data.PasswordResetCodeExpiryMinutes} minutes</strong> <br/><br/><p>Regards,<br/>Bannari Mills Team </p>"
+                );
+                if (emailSent)
+                {
+                    _logger.LogInformation("Verification Code email sent to {Email}.", response[0].Data.Email);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to send Verification Code notification email to {Email}.", response[0].Data.Email);
+                }
+         _logger.LogInformation("Verification Code sent successfully.", command.UserName);
+        return Ok(new
+        {
+            StatusCode = StatusCodes.Status200OK,
+            Message = response[0].Data.Message, // Correctly access the message
+            
+        });
+    }
+    _logger.LogWarning("Invalid username/ Email and Mobile number Does not exists.", command.UserName);
+    return BadRequest(new
+    {
+        StatusCode = StatusCodes.Status400BadRequest,
+        Message = response[0].Message // Access the message for error
+    });
+}
 
-        // [HttpPut("{userid}")]
-        // public async Task<IActionResult> UpdateAsync(int userid, UpdateUserCommand command)
-        // {
-        //     if (userid <= 0)
-        //     {
-        //         return BadRequest("Invalid user ID");
-        //     }
+        [HttpPut]
+        [Route("ResetUserPassword")]
+        public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand command)
+        {
+            
+            var response = await Mediator.Send(command);
+            _logger.LogInformation("Password changed successfully.", command.UserName);
 
-        //     if (userid != command.UserId)
-        //     {
-        //         return BadRequest();
-        //     }
-        //     await Mediator.Send(command);
-        //     return NoContent();
-        // }
-
-        // [HttpDelete("{userid}")]
-        // public async Task<IActionResult> DeleteAsync(int userid, DeleteUserCommand command)
-        // {
-        //     if (userid <= 0)
-        //     {
-        //         return BadRequest("Invalid user ID");
-        //     }
-
-        //     if (userid != command.UserId)
-        //     {
-        //         return BadRequest();
-        //     }
-        //     await Mediator.Send(command);
-
-        //     return NoContent();
-        // }
+            return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });     
+        }
     }
 }
