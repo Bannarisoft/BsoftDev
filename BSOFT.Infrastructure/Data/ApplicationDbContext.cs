@@ -43,6 +43,7 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<PasswordComplexityRule> PasswordComplexityRule { get; set; }
         public DbSet<AdminSecuritySettings> AdminSecuritySettings { get; set; }
         public DbSet<UserCompany> UserCompanies { get; set; }
+        public DbSet<CompanySettings> CompanySettings { get; set; } 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -74,6 +75,7 @@ namespace BSOFT.Infrastructure.Data
             
             modelBuilder.ApplyConfiguration(new PasswordLogConfiguration());
             modelBuilder.ApplyConfiguration(new UserCompanyConfiguration());
+            modelBuilder.ApplyConfiguration(new CompanySettingsConfiguration());
                
             base.OnModelCreating(modelBuilder);
         }
