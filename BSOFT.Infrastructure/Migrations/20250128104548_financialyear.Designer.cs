@@ -4,6 +4,7 @@ using BSOFT.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250128104548_financialyear")]
+    partial class Financialyear
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -618,76 +621,6 @@ namespace BSOFT.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Entity", "AppData");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.FinancialYear", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("CreatedAt");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("CreatedBy");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("CreatedByName");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("CreatedIP");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("EndDate");
-
-                    b.Property<string>("FinYearName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("FinYearName");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("ModifiedAt");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("ModifiedBy");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("ModifiedByName");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("ModifiedIP");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("StartDate");
-
-                    b.Property<string>("StartYear")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("StartYear");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FinancialYear", "AppData");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>

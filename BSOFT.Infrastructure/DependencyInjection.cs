@@ -48,6 +48,9 @@ using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 using BSOFT.Infrastructure.Repositories.PasswordComplexityRule;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
 using BSOFT.Infrastructure.Repositories.AdminSecuritySettings;
+using Core.Application.Common.Interfaces.IFinancialYear;
+using Core.Application.FinancialYear.Queries.GetFinancialYear;
+using BSOFT.Infrastructure.Repositories.FinancialYear;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -142,7 +145,9 @@ namespace BSOFT.Infrastructure
 			services.AddScoped<IPasswordComplexityRuleQueryRepository,  PasswordComplexityRuleQueryRepository>();
             services.AddScoped<IPasswordComplexityRuleCommandRepository, PasswordComplexityRuleCommandRepository>();
             services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
-            services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            
+            services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>(); 
+            services.AddScoped<IFinancialYearQueryRepository, GetFinancialYearQueryRepository>();
+                     
             services.AddHttpContextAccessor();            
             
 
@@ -166,7 +171,8 @@ namespace BSOFT.Infrastructure
 				typeof(DepartmentProfile),
                 typeof(UpdateUnitProfile),
                 typeof(CreateUnitProfile),
-                typeof(UpdateUnitProfile)
+                typeof(UpdateUnitProfile),
+                typeof(FinancialYearProfile)
             );
 
             return services;
