@@ -19,9 +19,8 @@ namespace BSOFT.Infrastructure.Repositories
      public class UserCommandRepository : IUserCommandRepository
     {
         private readonly ApplicationDbContext _applicationDbContext;
-         private readonly IDbConnection _dbConnection;
-
-private readonly IAsyncPolicy _retryPolicy;
+        private readonly IDbConnection _dbConnection;
+        private readonly IAsyncPolicy _retryPolicy;
         private readonly IAsyncPolicy _circuitBreakerPolicy;
         private readonly IAsyncPolicy _timeoutPolicy;
         private readonly IAsyncPolicy _fallbackPolicy;
@@ -30,12 +29,12 @@ private readonly IAsyncPolicy _retryPolicy;
 		public UserCommandRepository(ApplicationDbContext applicationDbContext,IDbConnection dbConnection, IHttpClientFactory httpClientFactory)
         {
             _applicationDbContext = applicationDbContext;
-             _dbConnection = dbConnection;
-// Create an HttpClient using IHttpClientFactory and the registered "ResilientHttpClient"
+            _dbConnection = dbConnection;
+        // Create an HttpClient using IHttpClientFactory and the registered "ResilientHttpClient"
             _httpClient = httpClientFactory.CreateClient("ResilientHttpClient");
-              // Define Polly policies
+        // Define Polly policies
 
-            // Retry policy: Retry 3 times with an exponential backoff strategy
+        // Retry policy: Retry 3 times with an exponential backoff strategy
               _retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryAsync(3,
@@ -45,11 +44,11 @@ private readonly IAsyncPolicy _retryPolicy;
                         Log.Warning($"Retry {retryCount} after {timeSpan.TotalSeconds}s due to {exception.GetType().Name}: {exception.Message}");
                     });
 
-            // Circuit Breaker policy: Break after 2 consecutive failures for 30 seconds
+        // Circuit Breaker policy: Break after 2 consecutive failures for 30 seconds
             _circuitBreakerPolicy = Policy.Handle<Exception>()
                 .CircuitBreakerAsync(2, TimeSpan.FromSeconds(30));
 
-            // Timeout policy: 5 seconds timeout for the queries
+        // Timeout policy: 5 seconds timeout for the queries
              _timeoutPolicy = Policy.TimeoutAsync(5, TimeoutStrategy.Pessimistic, onTimeoutAsync: (context, timespan, task) =>
             {
                 Log.Error($"Timeout after {timespan.TotalSeconds}s.");
@@ -57,7 +56,7 @@ private readonly IAsyncPolicy _retryPolicy;
             });
 
 
-            // Fallback policy: Return 0 or a default value in case of failure
+        // Fallback policy: Return 0 or a default value in case of failure
             //   _fallbackPolicy = Policy
             //     .Handle<Exception>()
             //     .FallbackAsync(async (cancellationToken) =>
@@ -67,48 +66,35 @@ private readonly IAsyncPolicy _retryPolicy;
         }
 
         public async Task<User> CreateAsync(User user)
-       var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
-return await policyWrap.ExecuteAsync(async () =>
-            {       
-            await _applicationDbContext.User.AddAsync(user);
-            await _applicationDbContext.SaveChangesAsync();
-            return user;
-});
-        }
-
-        public async Task<int> DeleteAsync(int userId,User user)
         {
-            var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
-            if (existingUser != null)
+            var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
             return await policyWrap.ExecuteAsync(async () =>
-            {
-                existingUser.IsActive = user.IsActive;
-                return await _applicationDbContext.SaveChangesAsync();
-            }
-            return 0; // No user found
+            {       
                 await _applicationDbContext.User.AddAsync(user);
                 await _applicationDbContext.SaveChangesAsync();
                 return user;
             });
-            // await _applicationDbContext.User.AddAsync(user);
-            // await _applicationDbContext.SaveChangesAsync();
-            // return user;        }
-
-        public async Task<List<User>> GetAllUsersAsync()
-        {
-        const string query = "SELECT * FROM AppSecurity.Users";
-        return (await _dbConnection.QueryAsync<User>(query)).ToList();
         }
 
-        public async Task<User?> GetByIdAsync(int userId)
+        public async Task<int> DeleteAsync(int userId,User user)
         {
-            const string query = "SELECT * FROM AppSecurity.Users WHERE UserId = @UserId";
-            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { userId });
+            var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);         
+            return await policyWrap.ExecuteAsync(async () =>
+            {
+                var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
+                if (existingUser != null)
+                {
+                    existingUser.IsActive = user.IsActive;
+                    return await _applicationDbContext.SaveChangesAsync();
+                }
+                
+                 return 0; // No user found
+            });
+      
         }
-
         public async Task<int> UpdateAsync(int userId, User user)
         {
-             var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+            var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
             return await policyWrap.ExecuteAsync(async () =>
             {
             var existingUser = await _applicationDbContext.User

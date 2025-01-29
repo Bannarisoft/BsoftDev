@@ -5,7 +5,7 @@ using Serilog;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 
-namespace BSOFT.Infrastructure.Resilience
+namespace BSOFT.Infrastructure.PollyResilience
 {
     public static class PollyPolicies
     {
