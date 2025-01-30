@@ -7,6 +7,7 @@ using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Serilog;
 using Microsoft.Extensions.Logging;
+using Core.Application.Common.Interfaces;
 
 
 
@@ -19,15 +20,19 @@ namespace Core.Application.Users.Commands.CreateUser
         private readonly IMediator _mediator; 
         private readonly ILogger<CreateUserCommandHandler> _logger;
         private readonly IUserQueryRepository _userQueryRepository;
+        private readonly IEmailService _emailService;
+        private readonly ISmsService _smsService;
 
 
-        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator,ILogger<CreateUserCommandHandler> logger,IUserQueryRepository userQueryRepository)
+        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator,ILogger<CreateUserCommandHandler> logger,IEmailService emailService,ISmsService smsService,IUserQueryRepository userQueryRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _mediator = mediator;    
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _userQueryRepository = userQueryRepository;
+            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            _smsService = smsService ?? throw new ArgumentNullException(nameof(smsService));
 
         }
 
@@ -68,7 +73,31 @@ namespace Core.Application.Users.Commands.CreateUser
                 };
             }                
             _logger.LogInformation("User successfully created for Username: {Username}", createdUser.UserName);
-                
+                  // Attempt to send the email notification
+           bool emailSent = false;
+            try
+            {
+                emailSent = await _emailService.SendEmailAsync(
+                    createdUser.EmailId,
+                    "Login Credentials",
+                    $"Dear {createdUser.UserName},<br/><br/>We are pleased to inform you that your login was created successfully.<br/><br/>Please use the below login credentials to access your account: <br/><strong>Username:</strong> {createdUser.UserName}"
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("An error occurred while sending the email: {ErrorMessage}", ex.Message);
+            }
+
+            if (emailSent)
+            {
+                _logger.LogInformation("Login notification email sent to {Email}.", createdUser.EmailId);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to send login notification email to {Email}.", createdUser.EmailId);
+            } 
+
+          
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",

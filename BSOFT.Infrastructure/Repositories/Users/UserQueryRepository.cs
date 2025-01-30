@@ -3,6 +3,10 @@ using System.Data;
 using BSOFT.Infrastructure.Data;
 using Core.Domain.Entities;
 using Core.Application.Common.Interfaces.IUser;
+
+using Polly;
+using Polly.Timeout;
+using Serilog;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace BSOFT.Infrastructure.Repositories.Users
@@ -11,14 +15,46 @@ namespace BSOFT.Infrastructure.Repositories.Users
     {
         private readonly ApplicationDbContext _applicationDbContext;
          private readonly IDbConnection _dbConnection;
+        private readonly IAsyncPolicy _retryPolicy;
+        private readonly IAsyncPolicy _circuitBreakerPolicy;
+        private readonly IAsyncPolicy _timeoutPolicy;
+        private readonly IAsyncPolicy _fallbackPolicy;
 
         public UserQueryRepository(ApplicationDbContext applicationDbContext,IDbConnection dbConnection)
         {
             _applicationDbContext = applicationDbContext;
-             _dbConnection = dbConnection;
+
+            _dbConnection = dbConnection;
+        // Define Polly policies
+
+        // Retry policy: Retry 3 times with an exponential backoff strategy
+            _retryPolicy = Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(3,
+                    retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                    (exception, timeSpan, retryCount, context) =>
+                    {
+                        Log.Warning($"Retry {retryCount} after {timeSpan.TotalSeconds}s due to {exception.GetType().Name}: {exception.Message}");
+                    });
+
+        // Circuit Breaker policy: Break after 2 consecutive failures for 30 seconds
+            _circuitBreakerPolicy = Policy.Handle<Exception>()
+                .CircuitBreakerAsync(2, TimeSpan.FromSeconds(30));
+
+        // Timeout policy: 5 seconds timeout for the queries
+          _timeoutPolicy = Policy.TimeoutAsync(5, TimeoutStrategy.Pessimistic, onTimeoutAsync: (context, timespan, task) =>
+            {
+                Log.Error($"Timeout after {timespan.TotalSeconds}s.");
+                return Task.CompletedTask;
+            });
+
+        // Fallback policy: Return an empty list in case of an error
+            // _fallbackPolicy = Policy<List<User>>.Handle<Exception>()
+            //     .FallbackAsync(new List<User>());
         }
         public async Task<List<User>> GetAllUsersAsync()
         {
+
            
         const string query = @"SELECT ur.Id,
         ur.UserId,
@@ -67,12 +103,16 @@ namespace BSOFT.Infrastructure.Repositories.Users
              },
              splitOn: "UserRoleId,CompanyId"  
          );
-
+ var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+ return await policyWrap.ExecuteAsync(async () =>
+            {
           return users.Distinct().ToList();
+ });
         }
 
         public async Task<User?> GetByIdAsync(int userId)
         {
+
              const string query = @"
              SELECT ur.Id,
                     ur.UserId,
@@ -105,15 +145,23 @@ namespace BSOFT.Infrastructure.Repositories.Users
           new { userId },
           splitOn: "UserRoleId,CompanyId");
 
+var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+ return await policyWrap.ExecuteAsync(async () =>
+            {
              return userResponse.FirstOrDefault();
+});
             // const string query = "SELECT * FROM AppSecurity.Users WHERE UserId = @UserId";
             // return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { userId });
         }
 
-   
         public async Task<User?> GetByUsernameAsync(string username, int? id = null)
         {
-             ArgumentException.ThrowIfNullOrWhiteSpace(username, nameof(username));
+            }
+             if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new ArgumentException("Username cannot be null or empty.", nameof(username));
+            }
+
 
              var query = """
                  SELECT * FROM AppSecurity.Users 
@@ -128,36 +176,23 @@ namespace BSOFT.Infrastructure.Repositories.Users
                  parameters.Add("Id", id);
              }
 
-             return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, parameters);
+            
+        
+
+            var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+            return await policyWrap.ExecuteAsync(async () =>
+            {
+                // Execute the Dapper query with Polly policies
+                return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, parameters);
+            });
+            // if (string.IsNullOrWhiteSpace(username))
+            // {
+            //     throw new ArgumentException("Username cannot be null or empty.", nameof(username));
+            // }
+
+            // const string query = "SELECT * FROM AppSecurity.Users WHERE UserName = @Username";
+            // return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { Username = username });
         }
-
-        // public async Task<User?> GetByUsernameAsync(string username)
-        // {
-        //     if (string.IsNullOrWhiteSpace(username))
-        //     {
-        //         throw new ArgumentException("Username cannot be null or empty.", nameof(username));
-        //     }
-
-        //     const string query = @"
-        //         SELECT u.*, ur.*
-        //         FROM AppSecurity.Users u
-        //         LEFT JOIN AppSecurity.UserRoles ur ON u.RoleId = ur.Id
-        //         WHERE u.UserName = @Username";
-
-        //     var result = await _dbConnection.QueryAsync<User, UserRole, User>(
-        //         query,
-        //         (user, userRole) =>
-        //         {
-        //             user.UserRoles = new List<UserRole> { userRole }; // Map the UserRole to the User entity
-        //             return user;
-        //         },
-        //         new { Username = username },
-        //         splitOn: "Id"
-        //     );
-
-        //     return result.FirstOrDefault();
-        // }
-
         public async Task<List<string>> GetUserRolesAsync(int userId)
         {
                 const string query = @"
@@ -165,11 +200,18 @@ namespace BSOFT.Infrastructure.Repositories.Users
                 FROM AppSecurity.UserRole ur
                 INNER JOIN AppSecurity.UserRoleAllocation ura ON   ur.Id = ura.UserRoleId
                 INNER JOIN AppSecurity.Users u ON u.UserId = ura.UserId
+
                 WHERE u.UserId = @UserId and u.IsDeleted = 0";
                 // const string query = @"
                 // SELECT 'Admin' as RoleName FROM AppSecurity.Users u 
                 // WHERE u.UserId = @UserId";
-            return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
+
+                
+                var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+                return await policyWrap.ExecuteAsync(async () =>
+                {
+                return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
+                });
 
         }
         

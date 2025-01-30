@@ -13,13 +13,18 @@ using BSOFT.API.Middleware;
 using Hangfire;
 using BSOFT.API.Filters;
 using Microsoft.IdentityModel.Logging;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Serilog for logging to MongoDB and console
 Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    // .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .WriteTo.Console() // Log to console for debugging
     .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari") // MongoDB connection string (adjust as needed)
+    // .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari") // MongoDB connection string (adjust as needed)
+    .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari", collectionName: "ApplicationLogs", restrictedToMinimumLevel: LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .CreateLogger();
 
@@ -133,8 +138,7 @@ app.UseHangfireDashboard("/hangfire",new DashboardOptions()
 
 );
 
-
-// Register LoggingMiddleware
+// Register SeriLoggingMiddleware
 app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
 
 // Configure the HTTP request pipeline. 

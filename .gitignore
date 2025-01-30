@@ -16,3 +16,5 @@
 /__azurite_db_blob_extent__.json
 /__blobstorage__
 /__queuestorage__
+# Ignore archived migrations
+BSOFT.Infrastructure/Migrations/Archive/

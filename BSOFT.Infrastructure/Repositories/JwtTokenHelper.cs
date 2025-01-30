@@ -80,7 +80,7 @@ namespace BSOFT.Infrastructure.Repositories
                 Issuer = _jwtSettings.Issuer,
                 Audience = _jwtSettings.Audience
             }; */
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
             var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
 
             // Decode Base64 EncryptionKey
@@ -105,7 +105,8 @@ namespace BSOFT.Infrastructure.Repositories
             var tokenHandler = new JwtSecurityTokenHandler();
             var encryptedToken = tokenHandler.CreateToken(tokenDescriptor);
 
-            return tokenHandler.WriteToken(encryptedToken);
+            return tokenHandler.WriteToken(encryptedToken);        
+
         }
 
         

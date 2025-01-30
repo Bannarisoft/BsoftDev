@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Core.Application.RoleEntitlements.Commands.DeleteRoleEntitlement;
+using Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById;
 
 namespace BSOFT.API.Controllers
 {
@@ -42,6 +44,32 @@ public class RoleEntitlementsController : ApiControllerBase
             _updateRoleEntitlementCommandValidator = updateRoleEntitlementCommandValidator;    
             _dbContext = dbContext;  
             _logger = logger;
+        }
+        [HttpGet("get-by-id/{roleEntitlementId}")]        
+        public async Task<IActionResult> GetByIdAsync(int roleEntitlementId)
+        {
+            if (roleEntitlementId <= 0)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Invalid Country ID"
+                });
+            }            
+            var result = await Mediator.Send(new GetRoleEntitlementByIdQuery { Id = roleEntitlementId });            
+            if (!result.IsSuccess)
+            {                
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = result.Data
+            });
         }
 
     [HttpPost]
@@ -122,8 +150,29 @@ public class RoleEntitlementsController : ApiControllerBase
         //     return StatusCode(500, new { Message = "An unexpected error occurred.", Details = ex.Message });
         // }
     }
-
-    [HttpGet("{roleName}")]
+    [HttpDelete("delete")]        
+        public async Task<IActionResult> DeleteAsync(DeleteRoleEntitlementCommand command)
+        {
+            var result = await Mediator.Send(command);
+            if (result.IsSuccess)
+            {
+                return Ok(new 
+                { 
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "RoleEntitlement Deleted successfully", 
+                    data = result.Data 
+                });
+            }
+            else
+            {            
+                return BadRequest(new 
+                { 
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = result.Message 
+                });
+            }
+        }
+    [HttpGet("get-by-role-name/{roleName}")]
     public async Task<IActionResult> GetRoleEntitlements(string roleName)
     {
         var query = new GetRoleEntitlementsQuery { RoleName = roleName };
