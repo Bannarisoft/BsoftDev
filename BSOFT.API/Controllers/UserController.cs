@@ -34,8 +34,7 @@ namespace BSOFT.API.Controllers
          private readonly IValidator<FirstTimeUserPasswordCommand> _firstTimeUserPasswordCommandValidator;
          private readonly IValidator<ChangeUserPasswordCommand> _changeUserPasswordCommandValidator;
          private readonly ILogger<UserController> _logger;
- private readonly IHttpClientFactory _httpClientFactory;
-         private readonly EmailService _emailService;
+        private readonly IHttpClientFactory _httpClientFactory;
          
        public UserController(ISender mediator, 
                              IValidator<CreateUserCommand> createUserCommandValidator, 
@@ -43,7 +42,7 @@ namespace BSOFT.API.Controllers
                              ApplicationDbContext dbContext, 
                              IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator, 
                              IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
-                             ILogger<UserController> logger,EmailService emailService,IHttpClientFactory httpClientFactory) 
+                             ILogger<UserController> logger,IHttpClientFactory httpClientFactory) 
          : base(mediator)
         {        
             _createUserCommandValidator = createUserCommandValidator;
@@ -52,8 +51,7 @@ namespace BSOFT.API.Controllers
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
             _logger = logger;
-_httpClientFactory = httpClientFactory;
-            _emailService = emailService;
+            _httpClientFactory = httpClientFactory;
         }
         
         [HttpGet]
