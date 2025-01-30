@@ -27,7 +27,7 @@ namespace BSOFT.API.Controllers
         private readonly TimeZoneInfo _indianZone;
         private readonly IUserQueryRepository _userQueryRepository;
 
-        public AuthController(IMediator mediator,IValidator<UserLoginCommand> userLoginCommandValidator, IMapper mapper, ILogger<AuthController> logger,IUserSessionRepository userSessionRepository,EmailService emailService, IUserQueryRepository userQueryRepository)
+        public AuthController(IMediator mediator,IValidator<UserLoginCommand> userLoginCommandValidator, IMapper mapper, ILogger<AuthController> logger,IUserSessionRepository userSessionRepository, IUserQueryRepository userQueryRepository)
         {
             _mediator = mediator;
             _userLoginCommandValidator = userLoginCommandValidator;

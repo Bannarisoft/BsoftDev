@@ -5,7 +5,7 @@
     },
     {
         "rule": "Email",      
-        "pattern": "^[\\w-\\.]+@[\\w-]+\\.[a-zA-Z]{2,}$", 
+        "pattern": "^[\\w-\\.]+@(gmail\\.com|yahoo\\.com|[\\w-]+\\.co\\.in)$", 
         "error": "Invalid email address format."
     } , 
     {

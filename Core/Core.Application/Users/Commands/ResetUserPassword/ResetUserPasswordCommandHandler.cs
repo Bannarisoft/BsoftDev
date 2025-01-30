@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IUser;
+using Core.Application.Common.Utilities;
 using Core.Domain.Entities;
 using MediatR;
 
@@ -13,48 +12,74 @@ namespace Core.Application.Users.Commands.ResetUserPassword
 {
     public class ResetUserPasswordCommandHandler : IRequestHandler<ResetUserPasswordCommand, string>
     {
-        private readonly IMapper _imapper;
-        private readonly IChangePassword _ichangePassword;
+        private readonly IMapper _mapper;
+        private readonly IChangePassword _changePassword;
         private readonly IUserQueryRepository _userQueryRepository;
-        public ResetUserPasswordCommandHandler(IMapper imapper, IChangePassword ichangePassword, IUserQueryRepository userRepository)
+
+        public ResetUserPasswordCommandHandler(
+            IMapper mapper,
+            IChangePassword changePassword,
+            IUserQueryRepository userRepository)
         {
-            _imapper = imapper;
-            _ichangePassword = ichangePassword;
+            _mapper = mapper;
+            _changePassword = changePassword;
             _userQueryRepository = userRepository;
-            
         }
 
         public async Task<string> Handle(ResetUserPasswordCommand request, CancellationToken cancellationToken)
         {
-            //  try
-            //   {
-                
-                var user = await _userQueryRepository.GetByIdAsync(request.UserId);
-                
-                 if ( !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-                 {
-                       
-                      var passwordLog = _imapper.Map<PasswordLog>(request);
-                      
-                      passwordLog.PasswordHash = await _ichangePassword.PasswordEncode(request.Password);
-                      
-                      var changedPasswordLog = await _ichangePassword.FirstTimeUserChangePassword(request.UserId,passwordLog);
+            // Check if the verification code exists in ForgotPasswordCache
+            if (!ForgotPasswordCache.CodeStorage.TryGetValue(request.UserName, out var verificationCodeDetails))
+            {
+                return "Verification code is invalid or has expired.";
+            }
 
-                      if (changedPasswordLog != null)
-                      {
-                          return changedPasswordLog;
-                      }
+            // Validate the provided code
+            if (verificationCodeDetails.Code != request.VerificationCode)
+            {
+                return "Invalid verification code.";
+            }
 
-                     return "Password change failed."; 
-                 }
-                 
-                 return "Your input password should not match the default password. Please try a different password.";    
-            //    }
-            // catch (Exception ex)
-            // {
+            // Check if the verification code has expired
+            if (verificationCodeDetails.ExpiryTime < DateTime.UtcNow)
+            {
+                // Remove expired code from the cache
+                ForgotPasswordCache.CodeStorage.Remove(request.UserName);
+                return "Verification code has expired.";
+            }
 
-            //     return $"Password change failed: {ex.Message}";
-            // }
+            // Fetch the user from the database
+            var user = await _userQueryRepository.GetByUsernameAsync(request.UserName);
+            if (user == null)
+            {
+                return "User not found.";
+            }
+
+            // Ensure the new password does not match the old password
+            if (BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            {
+                return "Your new password cannot be the same as the old password. Please choose a different password.";
+            }
+
+            // Update the user's password
+            var passwordLog = new PasswordLog
+            {
+                UserId = user.UserId,
+                PasswordHash = await _changePassword.PasswordEncode(request.Password),
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var result = await _changePassword.FirstTimeUserChangePassword(user.UserId, passwordLog);
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                // Remove the verification code after successful password reset
+                ForgotPasswordCache.CodeStorage.Remove(request.UserName);
+
+                return "Password reset successfully.";
+            }
+
+            return "Failed to reset the password. Please try again.";
         }
     }
 }

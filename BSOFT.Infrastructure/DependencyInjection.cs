@@ -190,13 +190,15 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
             services.AddScoped<IChangePassword, PasswordChangeRepository>();            
             
-            services.Configure<EmailJobSettings>(configuration.GetSection("EmailJobSettings"));
+            /*services.Configure<EmailJobSettings>(configuration.GetSection("EmailJobSettings"));
+            services.Configure<EmailJobSettings>(configuration.GetSection("EmailSettings"));            
+             services.AddHostedService<EmailJobService>();     */          
+            services.AddHttpClient(); 
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
-            services.AddSingleton<EmailService>();
-            /* services.AddHostedService<EmailJobService>();     */          
-            services.Configure<EmailSettings>(configuration.GetSection("EmailSettingsGmail"));         
-            /* services.Configure<EmailSettings>(configuration.GetSection("EmailSettingsZimbra"));   */                   
-            
+            services.Configure<SmsSettings>(configuration.GetSection("SmsSettings"));
+            services.AddScoped<IEmailService,EmailService>();            
+            services.AddScoped<ISmsService, SmsService>();
+
             // AutoMapper profiles
             services.AddAutoMapper(
                 typeof(UserProfile),
