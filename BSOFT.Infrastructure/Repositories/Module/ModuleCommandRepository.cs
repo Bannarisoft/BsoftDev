@@ -21,7 +21,16 @@ namespace BSOFT.Infrastructure.Repositories.Module
 
     public async Task AddModuleAsync(Modules module)
     {
-        await _applicationDbContext.Modules.AddAsync(module);
+       // Check for existing module name before adding
+            bool moduleExists = await _applicationDbContext.Modules
+                .AnyAsync(m => m.ModuleName == module.ModuleName && !m.IsDeleted);
+
+            if (moduleExists)
+            {
+                throw new InvalidOperationException($"A module with the name '{module.ModuleName}' already exists.");
+            }
+
+            await _applicationDbContext.Modules.AddAsync(module);
     }
 
     public async Task SaveChangesAsync()

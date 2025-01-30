@@ -11,14 +11,16 @@ namespace Core.Application.Users.Commands.UpdateUser
     public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, ApiResponseDTO<bool>>
     {
         private readonly IUserCommandRepository _userRepository;
+        private readonly IUserQueryRepository _userQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
         private readonly ILogger<UpdateUserCommandHandler> _logger;
 
 
-        public UpdateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator,ILogger<UpdateUserCommandHandler> logger)
+        public UpdateUserCommandHandler(IUserCommandRepository userRepository, IUserQueryRepository userQueryRepository,IMapper mapper, IMediator mediator,ILogger<UpdateUserCommandHandler> logger)
         {
             _userRepository = userRepository;
+            _userQueryRepository = userQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -30,7 +32,7 @@ namespace Core.Application.Users.Commands.UpdateUser
              _logger.LogInformation("Starting user update process for UserId: {UserId}", request.UserId);
 
              // Fetch the existing user
-            var existingUser = await _userRepository.GetByIdAsync(request.UserId);
+            var existingUser = await _userQueryRepository.GetByIdAsync(request.UserId);
             if (existingUser == null)
             {
                 _logger.LogWarning("User with UserId: {UserId} not found.", request.UserId);

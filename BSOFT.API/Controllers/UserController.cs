@@ -34,6 +34,7 @@ namespace BSOFT.API.Controllers
          private readonly IValidator<FirstTimeUserPasswordCommand> _firstTimeUserPasswordCommandValidator;
          private readonly IValidator<ChangeUserPasswordCommand> _changeUserPasswordCommandValidator;
          private readonly ILogger<UserController> _logger;
+ private readonly IHttpClientFactory _httpClientFactory;
          private readonly EmailService _emailService;
          
        public UserController(ISender mediator, 
@@ -42,7 +43,7 @@ namespace BSOFT.API.Controllers
                              ApplicationDbContext dbContext, 
                              IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator, 
                              IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
-                             ILogger<UserController> logger) 
+                             ILogger<UserController> logger,EmailService emailService,IHttpClientFactory httpClientFactory) 
          : base(mediator)
         {        
             _createUserCommandValidator = createUserCommandValidator;
@@ -50,7 +51,9 @@ namespace BSOFT.API.Controllers
             _dbContext = dbContext;  
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
-            _logger = logger;            
+            _logger = logger;
+_httpClientFactory = httpClientFactory;
+            _emailService = emailService;
         }
         
         [HttpGet]
@@ -100,7 +103,9 @@ namespace BSOFT.API.Controllers
             if (response.IsSuccess)
             {
                 _logger.LogInformation("User {Username} created successfully.", command.UserName);
-                return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
+
+                   
+                                return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
             }
             _logger.LogWarning("User creation failed for user: {Username}", command.UserName);
 
@@ -224,13 +229,13 @@ namespace BSOFT.API.Controllers
             if (response[0].IsSuccess)
             {
                 _logger.LogInformation("User {Username} fetched successfully.", command.UserName);
-               
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = response[0].Data.Message, // Correctly access the message
-                    
-                });
+                
+        return Ok(new
+        {
+            StatusCode = StatusCodes.Status200OK,
+            Message = response[0].Data.Message, // Correctly access the message
+            
+        });
     }
     _logger.LogWarning("Invalid username/ Email and Mobile number Does not exists.", command.UserName);
     return BadRequest(new
