@@ -54,6 +54,7 @@ using BSOFT.Infrastructure.Services;
 using Core.Domain.Common;
 using Core.Application.Common.Interfaces.ICompanySettings;
 using BSOFT.Infrastructure.Repositories.CompanySettings;
+using BSOFT.Infrastructure.PollyResilience;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -145,8 +146,11 @@ namespace BSOFT.Infrastructure
         services.AddLogging(builder =>
         {
             builder.AddSerilog();
-        });     
+        }); 
+        // Register Polly Policies
+        services.AddPollyPolicies(configuration);
             
+
             // Register repositories
              services.AddScoped<IUserQueryRepository, UserQueryRepository>();
             services.AddScoped<IUserCommandRepository, UserCommandRepository>();
@@ -184,7 +188,7 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            
             services.AddHttpContextAccessor();            
             services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();   
-
+            services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();            
             services.AddTransient<IFileUploadService, FileUploadRepository>();
