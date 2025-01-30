@@ -57,6 +57,8 @@ using BSOFT.Infrastructure.Services;
 using Core.Domain.Common;
 using Core.Application.Common.Interfaces.ICompanySettings;
 using BSOFT.Infrastructure.Repositories.CompanySettings;
+using FluentValidation;
+using Core.Application.FinancialYear.Command.CreateFinancialYear;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -188,9 +190,13 @@ namespace BSOFT.Infrastructure
 
             services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>(); 
             services.AddScoped<IFinancialYearQueryRepository, GetFinancialYearQueryRepository>();
+            services.AddScoped<IFinancialYearCommandRepository , GetFinancialYearCommandRepository>();
+
+          
                      
             services.AddHttpContextAccessor();            
-            services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();   
+            services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();
+            services.AddScoped<ICompanyQuerySettings ,  CompanySettingsQueryRepository>(); 
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();            
@@ -198,7 +204,8 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
 
-            services.AddScoped<IChangePassword, PasswordChangeRepository>();            
+            services.AddScoped<IChangePassword, PasswordChangeRepository>();
+                   
             
             services.Configure<EmailJobSettings>(configuration.GetSection("EmailJobSettings"));
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
@@ -220,7 +227,7 @@ namespace BSOFT.Infrastructure
 				typeof(DepartmentProfile),
                 typeof(UpdateUnitProfile),
                 typeof(CreateUnitProfile),
-
+                typeof(CompanySettingsProfile),
                 typeof(UpdateUnitProfile),
                 typeof(FinancialYearProfile)
             );

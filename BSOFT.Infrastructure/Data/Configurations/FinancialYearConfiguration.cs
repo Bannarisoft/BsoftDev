@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
+using Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -44,13 +45,21 @@ namespace BSOFT.Infrastructure.Data.Configurations
             .HasColumnType("varchar(50)")
             .IsRequired();
 
-             builder.Property(u => u.IsActive)                   
-             .HasConversion(
-                v => v == 1, // convert byte to bool
-                v => v ? (byte)1 : (byte)0 // convert bool to byte
-            ) 
+            builder.Property(u => u.IsActive)
+            .HasColumnName("IsActive")
             .HasColumnType("bit")
-            .HasColumnName("IsActive")     
+            .HasConversion(
+             v => v == FinancialYearEnum.FinancialYearStatus.Active, // convert enum to bool
+             v => v ? FinancialYearEnum.FinancialYearStatus.Active : FinancialYearEnum.FinancialYearStatus.Inactive // convert bool to enum
+             )
+            .IsRequired();
+        builder.Property(u => u.IsDeleted)
+            .HasColumnName("IsDeleted")
+            .HasColumnType("bit")
+            .HasConversion(
+             v => v == FinancialYearEnum.FinancialYearDelete.Deleted, // convert enum to bool
+             v => v ? FinancialYearEnum.FinancialYearDelete.Deleted : FinancialYearEnum.FinancialYearDelete.NotDeleted // convert bool to enum
+             )
             .IsRequired();
             
 

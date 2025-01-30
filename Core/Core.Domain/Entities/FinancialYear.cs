@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Domain.Common;
+using static Core.Domain.Enums.FinancialYearEnum;
 
 namespace Core.Domain.Entities
 {
@@ -15,6 +16,8 @@ namespace Core.Domain.Entities
 
         public string FinYearName { get; set; }
 
-        public  byte IsActive  { get; set; }
+        public  FinancialYearStatus IsActive  { get; set; }
+
+        public  FinancialYearDelete IsDeleted { get; set; }
     }
 }

@@ -23,11 +23,13 @@ namespace BSOFT.API.Controllers
           private readonly ApplicationDbContext _dbContext;
           private readonly ILogger<FinancialYearController> _logger;
           private readonly IValidator<CreateFinancialYearCommand> _createFinancialYearCommandValidator;
+   
 
-        public FinancialYearController(ISender mediator ,ApplicationDbContext dbContext , ILogger<FinancialYearController> logger) : base(mediator)
+        public FinancialYearController(ISender mediator ,ApplicationDbContext dbContext , ILogger<FinancialYearController> logger , IValidator<CreateFinancialYearCommand> createFinancialYearCommandValidator) : base(mediator)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _createFinancialYearCommandValidator = createFinancialYearCommandValidator;
 
         }
         [HttpGet]
@@ -100,7 +102,7 @@ namespace BSOFT.API.Controllers
             var createFinancialYear = await Mediator.Send(command);
             if (createFinancialYear.IsSuccess)
             {
-                _logger.LogInformation("Create Financial Year request succeeded. Financial Year created with ID: {FYId}", createFinancialYear.Data.Id);
+                _logger.LogInformation("Create Financial Year request succeeded. Financial Year created with ID: {FYId}", createFinancialYear.Data);
 
                 return Ok(new
                 {

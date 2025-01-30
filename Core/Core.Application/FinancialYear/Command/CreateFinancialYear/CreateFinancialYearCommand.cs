@@ -5,10 +5,14 @@ using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
 using MediatR;
 using Core.Domain.Entities;
+using Core.Domain.Enums;
+using Core.Application.FinancialYear.Queries.GetFinancialYear;
+using System.Text.Json.Serialization;
+using static Core.Domain.Enums.FinancialYearEnum;
 
 namespace Core.Application.FinancialYear.Command.CreateFinancialYear
 {
-    public class CreateFinancialYearCommand : IRequest<ApiResponseDTO<Core.Domain.Entities.FinancialYear>>
+    public class CreateFinancialYearCommand : IRequest<ApiResponseDTO<int>>
     {
 
         public int Id { get; set; }
@@ -17,8 +21,13 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
         public DateTime EndDate { get; set; } 
 
         public string FinYearName { get; set; }
+        
+          [JsonConverter(typeof(JsonStringEnumConverter))]
+        public FinancialYearStatus IsActive { get; set; }
+          [JsonConverter(typeof(JsonStringEnumConverter))]
+         public FinancialYearDelete IsDeleted { get; set; }
 
-        public  byte IsActive  { get; set; }
+
         
     }
 }

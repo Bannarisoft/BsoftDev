@@ -8,7 +8,7 @@ namespace Core.Application.Common.Interfaces.IFinancialYear
     public interface IFinancialYearCommandRepository
     {
 
-        Task< Core.Domain.Entities.FinancialYear> CreateAsync(Core.Domain.Entities.FinancialYear department);
+        Task<Core.Domain.Entities.FinancialYear> CreateAsync(Core.Domain.Entities.FinancialYear department);
         
     }
 }

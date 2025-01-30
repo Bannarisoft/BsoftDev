@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities;
+using Core.Domain.Enums;
 
 
 namespace Core.Application.FinancialYear.Queries.GetFinancialYear
@@ -18,6 +19,12 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYear
 
         public string FinYearName { get; set; }
 
-        public  byte IsActive  { get; set; }
+        public  FinancialYearEnum IsActive  { get; set; }
+
+        public FinancialYearEnum  IsDeleted { get; set; }
+
+        
+
+
     }
 }

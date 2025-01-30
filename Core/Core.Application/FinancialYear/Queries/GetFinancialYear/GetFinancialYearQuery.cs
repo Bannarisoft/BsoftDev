@@ -10,8 +10,5 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYear
     public class GetFinancialYearQuery  : IRequest<ApiResponseDTO<List<FinancialYearDto>>>
     {
        
-        
-
-
     }
 }
