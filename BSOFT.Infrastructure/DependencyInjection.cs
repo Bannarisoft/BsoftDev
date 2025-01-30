@@ -183,7 +183,8 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
             services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            
             services.AddHttpContextAccessor();            
-            services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();   
+            services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();
+            services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();   
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();            
@@ -212,7 +213,8 @@ namespace BSOFT.Infrastructure
 				typeof(DepartmentProfile),
                 typeof(UpdateUnitProfile),
                 typeof(CreateUnitProfile),
-                typeof(UpdateUnitProfile)
+                typeof(UpdateUnitProfile),
+                typeof(CompanySettingsProfile)
             );
 
             return services;

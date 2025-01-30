@@ -5,6 +5,7 @@ using Core.Application.Users.Commands.UpdateUser;
 using Core.Application.Users.Commands.DeleteUser;
 
 using Core.Domain.Entities;
+using static Core.Domain.Enums.Common.Enums;
 
 public class UserProfile : Profile
 {
@@ -12,29 +13,46 @@ public class UserProfile : Profile
     {
         CreateMap<CreateUserCommand, User>()
         .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
-        .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations));
+        .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations))
+        .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+        .ForMember(dest => dest.IsFirstTimeUser, opt => opt.MapFrom(src => FirstTimeUserStatus.Yes))
+        .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
+        .ForMember(dest => dest.CompanyId, opt => opt.Ignore());
 
         CreateMap<UserCompanyDTO, UserCompany>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.UserId, opt => opt.Ignore())
-            .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.CompanyId));
+            .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.CompanyId))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
 
         CreateMap<UserRoleAllocationDTO, UserRoleAllocation>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.UserId, opt => opt.Ignore())
-            .ForMember(dest => dest.UserRoleId, opt => opt.MapFrom(src => src.UserRoleId));
+            .ForMember(dest => dest.UserRoleId, opt => opt.MapFrom(src => src.UserRoleId))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
 
         CreateMap<User, UserDto>()
             .ForMember(dest => dest.UserId, opt => opt.Ignore()) // UserId is auto-generated
-            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id));
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
+            .ForMember(dest => dest.userRoleAllocations, opt => opt.MapFrom(src => src.UserRoleAllocations));
 
         CreateMap<UpdateUserCommand, User>()
         .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
-        .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations));
+        .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations))
+        .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
+        .ForMember(dest => dest.IsFirstTimeUser, opt => opt.Ignore())
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
 
         CreateMap<DeleteUserCommand, User>()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId)) // Map UserRoleId to Id
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive)); // Map IsActive
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
+
+             CreateMap<UserCompany, UserCompanyDTO>()
+            .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.CompanyId));
+
+        CreateMap<UserRoleAllocation, UserRoleAllocationDTO>()
+            .ForMember(dest => dest.UserRoleId, opt => opt.MapFrom(src => src.UserRoleId));
             
     }
 }

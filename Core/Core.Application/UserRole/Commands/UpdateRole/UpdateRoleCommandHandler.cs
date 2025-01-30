@@ -11,6 +11,7 @@ using Core.Application.Common.Interfaces.IUserRole;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
+using Core.Domain.Enums.Common;
 
 namespace Core.Application.UserRole.Commands.UpdateRole
 {
@@ -56,7 +57,7 @@ namespace Core.Application.UserRole.Commands.UpdateRole
             department.RoleName = request.RoleName;
             department.Description = request.Description;
             department.CompanyId = request.CompanyId;
-            department.IsActive = request.IsActive;
+            department.IsActive = request.IsActive == 1 ? Enums.Status.Active : Enums.Status.Inactive;
 
             // Save updates to the repository
             var result = await _IUserRoleRepository.UpdateAsync(request.Id, department);

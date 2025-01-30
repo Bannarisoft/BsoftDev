@@ -25,7 +25,7 @@ namespace Core.Application.CompanySettings.Commands.CreateCompanySettings
         {
             var companySettings = _imapper.Map<Core.Domain.Entities.CompanySettings>(request);
             
-            companySettings.IsActive = 1;
+            
             var CompanySettingsId =  await _icompanyCommandSettings.CreateAsync(companySettings);
             if (CompanySettingsId > 0)
             {

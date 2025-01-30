@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Core.Domain.Entities;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace BSOFT.Infrastructure.Data.Configurations
 {
@@ -8,6 +10,18 @@ namespace BSOFT.Infrastructure.Data.Configurations
     {
          public void Configure(EntityTypeBuilder<UserRole> builder)
         {
+            var isActiveConverter = new ValueConverter<Status, bool>
+               (
+                    v => v == Status.Active,  
+                    v => v ? Status.Active : Status.Inactive 
+                );
+
+                var isDeletedConverter = new ValueConverter<IsDelete, bool>
+                (
+                 v => v == IsDelete.Deleted,  
+                 v => v ? IsDelete.Deleted : IsDelete.NotDeleted 
+                );
+
                builder.ToTable("UserRole", "AppSecurity");
 
             builder.HasKey(u => u.Id);
@@ -32,14 +46,31 @@ namespace BSOFT.Infrastructure.Data.Configurations
             .HasColumnType("int")
             .IsRequired();
 
-            builder.Property(u => u.IsActive)                   
-            .HasConversion(
-                v => v == 1, // convert byte to bool
-                v => v ? (byte)1 : (byte)0 // convert bool to byte
-            )
+             builder.Property(u => u.IsActive)
+                .HasColumnName("IsActive")
+                .HasColumnType("bit")
+                .HasConversion(isActiveConverter)
+                .IsRequired();
+
+                 builder.Property(u => u.IsDeleted)
+            .HasColumnName("IsDeleted")
             .HasColumnType("bit")
-            .HasColumnName("IsActive")     
+            .HasConversion(isDeletedConverter)
             .IsRequired();
+
+            builder.Property(b => b.CreatedByName)
+            .IsRequired()
+            .HasColumnType("varchar(50)");
+
+             builder.Property(b => b.CreatedIP)
+            .IsRequired()
+            .HasColumnType("varchar(255)");
+
+            builder.Property(b => b.ModifiedByName)
+            .HasColumnType("varchar(50)");
+
+            builder.Property(b => b.ModifiedIP)
+            .HasColumnType("varchar(255)");
 
             builder.HasMany(ur => ur.UserRoleAllocations)
                 .WithOne(ura => ura.UserRole)

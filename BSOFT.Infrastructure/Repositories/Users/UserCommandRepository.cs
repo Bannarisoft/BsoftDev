@@ -37,7 +37,7 @@ namespace BSOFT.Infrastructure.Repositories
             var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
             if (existingUser != null)
             {
-                existingUser.IsActive = user.IsActive;
+                existingUser.IsDeleted = user.IsDeleted;
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
@@ -76,6 +76,7 @@ namespace BSOFT.Infrastructure.Repositories
                 existingUser.UnitId = user.UnitId;
                 // existingUser.UserRoleId = user.UserRoleId;
                 existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
+                existingUser.IsActive = user.IsActive;
 
                  var updatedCompanyIds = user.UserCompanies.Select(uc => uc.CompanyId).ToList();
                  foreach (var existingCompany in existingUser.UserCompanies)

@@ -63,7 +63,7 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
             }
             };
         }
-            else if(user.IsActive==false)
+            else if(user.IsActive==0)
             {
                 _logger.LogWarning("Current Username is inactive contact admin ." + request.UserName);
                 return new List<ApiResponseDTO<ForgotPasswordResponse>>

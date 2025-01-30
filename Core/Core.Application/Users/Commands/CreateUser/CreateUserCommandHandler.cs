@@ -18,21 +18,33 @@ namespace Core.Application.Users.Commands.CreateUser
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
         private readonly ILogger<CreateUserCommandHandler> _logger;
+        private readonly IUserQueryRepository _userQueryRepository;
 
 
-        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator,ILogger<CreateUserCommandHandler> logger)
+        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator,ILogger<CreateUserCommandHandler> logger,IUserQueryRepository userQueryRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _mediator = mediator;    
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _userQueryRepository = userQueryRepository;
 
         }
 
         public async Task<ApiResponseDTO<UserDto>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Starting user creation process for Username: {Username}", request.UserName);
-
+            
+           var existingUser = await _userQueryRepository.GetByUsernameAsync(request.UserName);
+            if (existingUser != null)
+            {
+                return new ApiResponseDTO<UserDto>
+                {
+                    IsSuccess = false,
+                    Message = "User already exists."
+                    
+                };
+            }
              // Generate a new GUID for the user
             var userId = Guid.NewGuid();
 

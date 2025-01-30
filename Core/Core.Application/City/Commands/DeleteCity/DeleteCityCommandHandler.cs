@@ -7,6 +7,7 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Entities;
+using Core.Domain.Enums.Common;
 using Core.Domain.Events;
 using MediatR;
 
@@ -30,7 +31,7 @@ namespace Core.Application.City.Commands.DeleteCity
         {
             // Fetch the city to be deleted
             var city = await _cityQueryRepository.GetByIdAsync(request.Id);
-            if (city == null || city.IsActive != 1)
+            if (city == null || city.IsDeleted != Enums.IsDelete.Deleted)
             {
                 return new ApiResponseDTO<CityDto>
                 {

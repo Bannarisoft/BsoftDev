@@ -8,6 +8,7 @@ using Core.Application.Common;
 using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.HttpResponse;
+using Core.Domain.Enums.Common;
 
 
 namespace Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityRule
@@ -52,7 +53,7 @@ namespace Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplex
 
                     // Update the properties
                     pwdComplexity.PwdComplexityRule = request.PwdComplexityRule;
-                    pwdComplexity.IsActive = request.IsActive;
+                    pwdComplexity.IsActive = request.IsActive ==1 ? Enums.Status.Active : Enums.Status.Inactive;
 
                     // Save the updates
                     var result = await _IPasswordComplexityRepository.UpdateAsync(request.Id, pwdComplexity);
