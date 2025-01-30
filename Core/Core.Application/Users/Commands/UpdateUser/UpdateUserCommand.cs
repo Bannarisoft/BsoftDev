@@ -1,4 +1,5 @@
 using Core.Application.Common.HttpResponse;
+using Core.Application.Users.Queries.GetUsers;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -21,10 +22,12 @@ namespace Core.Application.Users.Commands.UpdateUser
     public int UserType { get; set; }
     public string Mobile { get; set; }
     public string EmailId { get; set; }
-    public int CompanyId { get; set; }
+    // public int CompanyId { get; set; }
     public int UnitId { get; set; }
     public int DivisionId { get; set; }
-    public int UserRoleId { get; set; }
+    // public int UserRoleId { get; set; }
+    public List<UserCompanyDTO> UserCompanies  { get; set; }
+    public List<UserRoleAllocationDTO> userRoleAllocations { get; set; }
 
     }
 }
