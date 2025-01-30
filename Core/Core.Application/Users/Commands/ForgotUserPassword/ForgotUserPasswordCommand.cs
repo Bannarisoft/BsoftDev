@@ -11,6 +11,8 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
     public class ForgotUserPasswordCommand : IRequest<List<ApiResponseDTO<ForgotPasswordResponse>>>
     {
          public string UserName { get; set; }
+         public string Email { get; set; }
+         public string Mobile { get; set; }
       
     }
 }
