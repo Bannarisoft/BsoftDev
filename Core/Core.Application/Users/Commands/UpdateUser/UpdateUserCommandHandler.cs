@@ -15,11 +15,10 @@ namespace Core.Application.Users.Commands.UpdateUser
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
         private readonly ILogger<UpdateUserCommandHandler> _logger;
-        private readonly IUserQueryRepository _userQueryRepository;
 
 
 
-        public UpdateUserCommandHandler(IUserCommandRepository userRepository, IUserQueryRepository userQueryRepository,IMapper mapper, IMediator mediator,ILogger<UpdateUserCommandHandler> logger,IUserQueryRepository userQueryRepository)
+        public UpdateUserCommandHandler(IUserCommandRepository userRepository, IUserQueryRepository userQueryRepository,IMapper mapper, IMediator mediator,ILogger<UpdateUserCommandHandler> logger)
         {
             _userRepository = userRepository;
             _userQueryRepository = userQueryRepository;
