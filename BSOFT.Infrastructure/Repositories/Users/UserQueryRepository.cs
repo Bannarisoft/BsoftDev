@@ -56,27 +56,27 @@ namespace BSOFT.Infrastructure.Repositories.Users
         {
 
            
-        const string query = @"SELECT ur.Id,
-        ur.UserId,
-                    ur.DivisionId,
-                    ur.FirstName,
-                    ur.LastName,
-                    ur.UserName,
-                    ur.IsActive,
-                    ur.PasswordHash,
-                    ur.UserType,
-                    ur.Mobile,
-                    ur.EmailId,
-                    ur.UnitId,
-                    ur.UserId,
-                    ur.IsFirstTimeUser,
-                    ur.IsDeleted,
-                    ura.UserRoleId,
-                    uc.CompanyId 
-                    FROM AppSecurity.Users ur
-                Left JOIN AppSecurity.UserRoleAllocation ura ON   ur.UserId = ura.UserId and ura.IsActive = 1
-                Left JOIN AppSecurity.UserCompany uc ON uc.UserId = ur.UserId and uc.IsActive = 1
-                WHERE  ur.IsDeleted = 0";
+             const string query = @"SELECT ur.Id,
+             ur.UserId,
+                         ur.DivisionId,
+                         ur.FirstName,
+                         ur.LastName,
+                         ur.UserName,
+                         ur.IsActive,
+                         ur.PasswordHash,
+                         ur.UserType,
+                         ur.Mobile,
+                         ur.EmailId,
+                         ur.UnitId,
+                         ur.UserId,
+                         ur.IsFirstTimeUser,
+                         ur.IsDeleted,
+                         ura.UserRoleId,
+                         uc.CompanyId 
+                         FROM AppSecurity.Users ur
+                     Left JOIN AppSecurity.UserRoleAllocation ura ON   ur.UserId = ura.UserId and ura.IsActive = 1
+                     Left JOIN AppSecurity.UserCompany uc ON uc.UserId = ur.UserId and uc.IsActive = 1
+                     WHERE  ur.IsDeleted = 0";
 
 
 
@@ -102,12 +102,12 @@ namespace BSOFT.Infrastructure.Repositories.Users
                  return existingUser;
              },
              splitOn: "UserRoleId,CompanyId"  
-         );
- var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
- return await policyWrap.ExecuteAsync(async () =>
+             );
+            var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+            return await policyWrap.ExecuteAsync(async () =>
             {
-          return users.Distinct().ToList();
- });
+                 return users.Distinct().ToList();
+            });
         }
 
         public async Task<User?> GetByIdAsync(int userId)
@@ -156,7 +156,7 @@ var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeout
 
         public async Task<User?> GetByUsernameAsync(string username, int? id = null)
         {
-            }
+            
              if (string.IsNullOrWhiteSpace(username))
             {
                 throw new ArgumentException("Username cannot be null or empty.", nameof(username));
