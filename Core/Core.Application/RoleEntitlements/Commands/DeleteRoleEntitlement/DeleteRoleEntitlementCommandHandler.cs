@@ -50,10 +50,10 @@ namespace Core.Application.RoleEntitlements.Commands.DeleteRoleEntitlement
             }
 
             // Soft Delete by setting IsActive = 0
-            roleEntitlement.IsActive = 0;
-
+            // roleEntitlement.IsActive = Enums.Status.Inactive;
+            var roleEntitlementdata = _mapper.Map<RoleEntitlement>(roleEntitlement);
             // Update the entity in the database
-            var updateResult = await _roleEntitlementCommandRepository.DeleteAsync(roleEntitlement.Id, roleEntitlement);
+            var updateResult = await _roleEntitlementCommandRepository.DeleteAsync(roleEntitlement.Id, roleEntitlementdata);
             if (updateResult > 0)
             {
                 var roleEntitlementDto = _mapper.Map<RoleEntitlementDto>(roleEntitlement);
