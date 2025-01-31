@@ -1,12 +1,26 @@
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using static Core.Domain.Enums.Common.Enums;
 namespace BSOFT.Infrastructure.Data.Configurations
 {
     public class StateConfiguration : IEntityTypeConfiguration<States>
     {
         public void Configure(EntityTypeBuilder<States> builder)
         {
+            var isActiveConverter = new ValueConverter<Status, bool>
+               (
+                    v => v == Status.Active,  
+                    v => v ? Status.Active : Status.Inactive 
+                );
+
+                var isDeletedConverter = new ValueConverter<IsDelete, bool>
+                (
+                 v => v == IsDelete.Deleted,  
+                 v => v ? IsDelete.Deleted : IsDelete.NotDeleted 
+                );
+
             builder.ToTable("State", "AppData");
             builder.HasKey(u => u.Id);
             //builder.HasKey(u => new { u.Id, u.StateCode });
@@ -31,14 +45,11 @@ namespace BSOFT.Infrastructure.Data.Configurations
             .HasColumnType("int")
             .IsRequired();
 
-            builder.Property(u => u.IsActive)                   
-            .HasConversion(
-                v => v == 1, // convert byte to bool
-                v => v ? (byte)1 : (byte)0 // convert bool to byte
-            )
-            .HasColumnType("bit")
-            .HasColumnName("IsActive")     
-            .IsRequired();
+            builder.Property(u => u.IsActive)
+                .HasColumnName("IsActive")
+                .HasColumnType("bit")
+                .HasConversion(isActiveConverter)
+                .IsRequired();
             
 
             builder.Property(u => u.CreatedBy)
@@ -73,6 +84,12 @@ namespace BSOFT.Infrastructure.Data.Configurations
             builder.Property(u => u.ModifiedIP)
             .HasColumnName("ModifiedIP")
             .HasColumnType("varchar(25)"); 
+
+            builder.Property(u => u.IsDeleted)
+            .HasColumnName("IsDeleted")
+            .HasColumnType("bit")
+            .HasConversion(isDeletedConverter)
+            .IsRequired();
             
   // Configure the foreign key relationship
         builder.HasOne(s => s.Countries)

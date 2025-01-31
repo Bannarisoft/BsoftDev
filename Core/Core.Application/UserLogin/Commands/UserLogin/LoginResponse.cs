@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.UserLogin.Commands.UserLogin
 {
@@ -17,7 +18,7 @@ namespace Core.Application.UserLogin.Commands.UserLogin
         // public List<string> UserRole { get; set; }
         public IEnumerable<string> UserRole { get; set; } = new List<string>();
         public bool IsAuthenticated { get; set; }
-        public bool IsFirstTimeUser { get; set; }
+        public FirstTimeUserStatus IsFirstTimeUser { get; set; }
 
         public string? Message { get; set; }   
         public int CompanyId { get; set; }     

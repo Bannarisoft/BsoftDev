@@ -19,6 +19,7 @@ namespace BSOFT.Infrastructure.Repositories
      public class UserCommandRepository : IUserCommandRepository
     {
         private readonly ApplicationDbContext _applicationDbContext;
+
         private readonly IDbConnection _dbConnection;
         private readonly IAsyncPolicy _retryPolicy;
         private readonly IAsyncPolicy _circuitBreakerPolicy;
@@ -26,14 +27,23 @@ namespace BSOFT.Infrastructure.Repositories
         private readonly IAsyncPolicy _fallbackPolicy;
         private readonly HttpClient _httpClient;
         
+
 		public UserCommandRepository(ApplicationDbContext applicationDbContext,IDbConnection dbConnection, IHttpClientFactory httpClientFactory)
         {
             _applicationDbContext = applicationDbContext;
+
             _dbConnection = dbConnection;
         // Create an HttpClient using IHttpClientFactory and the registered "ResilientHttpClient"
             _httpClient = httpClientFactory.CreateClient("ResilientHttpClient");
         // Define Polly policies
 
+             var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
+            return await policyWrap.ExecuteAsync(async () =>
+            {       
+                await _applicationDbContext.User.AddAsync(user);
+                await _applicationDbContext.SaveChangesAsync();
+                return user;
+            });
         // Retry policy: Retry 3 times with an exponential backoff strategy
               _retryPolicy = Policy
                 .Handle<Exception>()
@@ -51,6 +61,7 @@ namespace BSOFT.Infrastructure.Repositories
         // Timeout policy: 5 seconds timeout for the queries
              _timeoutPolicy = Policy.TimeoutAsync(5, TimeoutStrategy.Pessimistic, onTimeoutAsync: (context, timespan, task) =>
             {
+ 				existingUser.IsDeleted = user.IsDeleted;
                 Log.Error($"Timeout after {timespan.TotalSeconds}s.");
                 return Task.CompletedTask;
             });
@@ -65,19 +76,20 @@ namespace BSOFT.Infrastructure.Repositories
             //     });
         }
 
-        public async Task<User> CreateAsync(User user)
+          public async Task<List<User>> GetAllUsersAsync()
         {
-            var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
-            return await policyWrap.ExecuteAsync(async () =>
-            {       
-                await _applicationDbContext.User.AddAsync(user);
-                await _applicationDbContext.SaveChangesAsync();
-                return user;
-            });
+        const string query = "SELECT * FROM AppSecurity.Users";
+        return (await _dbConnection.QueryAsync<User>(query)).ToList();
         }
+     
 
+{
+const string query = "SELECT * FROM AppSecurity.Users WHERE UserId = @UserId";
+            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { userId });
+}
         public async Task<int> DeleteAsync(int userId,User user)
         {
+
             var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);         
             return await policyWrap.ExecuteAsync(async () =>
             {
@@ -116,6 +128,7 @@ namespace BSOFT.Infrastructure.Repositories
                 existingUser.UnitId = user.UnitId;
                 // existingUser.UserRoleId = user.UserRoleId;
                 existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
+                existingUser.IsActive = user.IsActive;
 
                  var updatedCompanyIds = user.UserCompanies.Select(uc => uc.CompanyId).ToList();
                  foreach (var existingCompany in existingUser.UserCompanies)

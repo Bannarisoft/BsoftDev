@@ -12,6 +12,5 @@ namespace Core.Application.Users.Commands.DeleteUser
     public class DeleteUserCommand : IRequest<ApiResponseDTO<bool>>
     {
         public int UserId { get; set; }
-        public bool IsActive { get; set; }
     }
 }

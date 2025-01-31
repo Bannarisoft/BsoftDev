@@ -146,6 +146,7 @@ namespace BSOFT.Infrastructure
         services.AddLogging(builder =>
         {
             builder.AddSerilog();
+
         }); 
         // Register Polly Policies
         services.AddPollyPolicies(configuration);
@@ -187,8 +188,10 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
             services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            
             services.AddHttpContextAccessor();            
-            services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();   
-            services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();
+
+            services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();
+            services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();   
+
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();            
             services.AddTransient<IFileUploadService, FileUploadRepository>();
@@ -196,13 +199,16 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
             services.AddScoped<IChangePassword, PasswordChangeRepository>();            
             
-            services.Configure<EmailJobSettings>(configuration.GetSection("EmailJobSettings"));
+
+            /*services.Configure<EmailJobSettings>(configuration.GetSection("EmailJobSettings"));
+            services.Configure<EmailJobSettings>(configuration.GetSection("EmailSettings"));            
+             services.AddHostedService<EmailJobService>();     */          
+            services.AddHttpClient(); 
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
-            services.AddSingleton<EmailService>();
-            /* services.AddHostedService<EmailJobService>();     */          
-            services.Configure<EmailSettings>(configuration.GetSection("EmailSettingsGmail"));         
-            /* services.Configure<EmailSettings>(configuration.GetSection("EmailSettingsZimbra"));   */                   
-            
+            services.Configure<SmsSettings>(configuration.GetSection("SmsSettings"));
+            services.AddScoped<IEmailService,EmailService>();            
+            services.AddScoped<ISmsService, SmsService>();
+
             // AutoMapper profiles
             services.AddAutoMapper(
                 typeof(UserProfile),
@@ -216,7 +222,9 @@ namespace BSOFT.Infrastructure
 				typeof(DepartmentProfile),
                 typeof(UpdateUnitProfile),
                 typeof(CreateUnitProfile),
-                typeof(UpdateUnitProfile)
+
+                typeof(UpdateUnitProfile),
+                typeof(CompanySettingsProfile)
             );
 
             return services;

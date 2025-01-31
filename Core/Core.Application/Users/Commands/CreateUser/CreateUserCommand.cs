@@ -16,8 +16,8 @@ namespace Core.Application.Users.Commands.CreateUser
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string UserName { get; set; }
-    public bool IsActive { get; set; }
-    public bool IsFirstTimeUser { get; set; } = false;
+    // public UserStatus IsActive { get; set; }
+    // public FirstTimeUserStatus IsFirstTimeUser { get; set; } 
     public string Password { get; set; }
     public int UserType { get; set; }
     public string Mobile { get; set; }
@@ -26,6 +26,7 @@ namespace Core.Application.Users.Commands.CreateUser
     public int UnitId { get; set; }
     public int DivisionId { get; set; }
     // public int UserRoleId { get; set; }
+    // public UserDelete IsDeleted { get; set; }
     public List<UserCompanyDTO> UserCompanies  { get; set; }
     public List<UserRoleAllocationDTO> userRoleAllocations { get; set; }
     }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.CompanySettings.Commands.CreateCompanySettings;
 using Core.Application.CompanySettings.Commands.UpdateCompanySettings;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Common.Mappings
 {
@@ -12,7 +13,8 @@ namespace Core.Application.Common.Mappings
     {
         public CompanySettingsProfile()
         {
-            CreateMap<CreateCompanySettingsCommand, Core.Domain.Entities.CompanySettings>();
+            CreateMap<CreateCompanySettingsCommand, Core.Domain.Entities.CompanySettings>()
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active));
             CreateMap<UpdateCompanySettingsCommand, Core.Domain.Entities.CompanySettings>();
         }
     }

@@ -13,6 +13,6 @@ namespace Core.Domain.Entities
         public int CompanyId { get; set; }
         public Company company { get; set; }
 
-        public new byte IsActive { get; set; }
+        public byte IsActive { get; set; }
     }
 }

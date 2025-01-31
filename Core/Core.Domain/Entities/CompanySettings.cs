@@ -24,6 +24,5 @@ namespace Core.Domain.Entities
         public int Language { get; set; }
         public int TimeZone { get; set; }
         public int FinancialYear { get; set; }
-        public byte IsActive { get; set; }
     }
 }

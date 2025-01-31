@@ -17,7 +17,7 @@ namespace BSOFT.Infrastructure.Repositories.City
             const string query = @"
                 SELECT 
                 Id,CityCode,CityName,IsActive,StateId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
-                FROM AppData.City with (nolock) where IsActive=1 order by CityName";
+                FROM AppData.City with (nolock) where IsActive=1 order by Id desc";
              return (await _dbConnection.QueryAsync<Cities>(query)).ToList();     
         }
         public async Task<Cities> GetByIdAsync(int id)
@@ -44,7 +44,7 @@ namespace BSOFT.Infrastructure.Repositories.City
                 FROM AppData.City WITH (NOLOCK)
                 WHERE (cityName LIKE @SearchPattern OR cityName LIKE @SearchPattern) 
                 AND IsActive = 1
-                ORDER BY cityName";            
+                ORDER BY Id desc";            
             var result = await _dbConnection.QueryAsync<Cities>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();
         }

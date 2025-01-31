@@ -34,8 +34,7 @@ namespace BSOFT.API.Controllers
          private readonly IValidator<FirstTimeUserPasswordCommand> _firstTimeUserPasswordCommandValidator;
          private readonly IValidator<ChangeUserPasswordCommand> _changeUserPasswordCommandValidator;
          private readonly ILogger<UserController> _logger;
- private readonly IHttpClientFactory _httpClientFactory;
-         private readonly EmailService _emailService;
+        private readonly IHttpClientFactory _httpClientFactory;
          
        public UserController(ISender mediator, 
                              IValidator<CreateUserCommand> createUserCommandValidator, 
@@ -43,7 +42,7 @@ namespace BSOFT.API.Controllers
                              ApplicationDbContext dbContext, 
                              IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator, 
                              IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
-                             ILogger<UserController> logger,EmailService emailService,IHttpClientFactory httpClientFactory) 
+                             ILogger<UserController> logger,IHttpClientFactory httpClientFactory) 
          : base(mediator)
         {        
             _createUserCommandValidator = createUserCommandValidator;
@@ -52,15 +51,14 @@ namespace BSOFT.API.Controllers
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
             _logger = logger;
-_httpClientFactory = httpClientFactory;
-            _emailService = emailService;
+            _httpClientFactory = httpClientFactory;
         }
         
         [HttpGet]
         public async Task<IActionResult> GetAllUsersAsync()
         {
             var users = await Mediator.Send(new GetUserQuery());
-            var activeUsers = users.Where(c => c.IsActive).ToList();
+            var activeUsers = users.ToList();
             _logger.LogInformation("Users Listed successfully.", activeUsers.Count);
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, data = activeUsers });
@@ -105,25 +103,7 @@ _httpClientFactory = httpClientFactory;
                 _logger.LogInformation("User {Username} created successfully.", command.UserName);
 
                    
-                // Send email notification after successful login
-                //var userEmail = "us.profile.123@gmail.com"; // Gmail
-                //var userEmail = "ushadevi@bannarimills.co.in"; // Zimbra             
-                bool emailSent = false;
-                emailSent = await _emailService.SendEmailAsync(
-                command.EmailId,
-                "Login Credentials",                
-                $"Dear {command.UserName},<br/><br/>We are pleased to inform you that your login was created successfully.<br/><br/>Please use the below login credentials to access your account: <br/><strong>Username:</strong>  {command.UserName} <br/><strong>Password:</strong>  {command.Password} <br/><br/><p>Regards, <br/>Bannari Mills Team </p>"
-                );
-                if (emailSent)
-                {
-                    _logger.LogInformation("Login notification email sent to {Email}.", command.EmailId);
-                }
-                else
-                {
-                    _logger.LogWarning("Failed to send login notification email to {Email}.", command.EmailId);
-                }
-
-                return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
+                                return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
             }
             _logger.LogWarning("User creation failed for user: {Username}", command.UserName);
 
@@ -167,13 +147,10 @@ _httpClientFactory = httpClientFactory;
         }      
 
         [HttpDelete]
-        [Route("Delete/{userid}")]
-        public async Task<IActionResult> DeleteAsync(int userId,DeleteUserCommand deleteUserCommand)
+        [Route("Delete")]
+        public async Task<IActionResult> DeleteAsync(DeleteUserCommand deleteUserCommand)
         {
-            if(userId != deleteUserCommand.UserId)
-            {
-                return BadRequest();
-            }
+           
 
             var deleteUser = await Mediator.Send(deleteUserCommand);
 
@@ -247,21 +224,7 @@ _httpClientFactory = httpClientFactory;
             if (response[0].IsSuccess)
             {
                 _logger.LogInformation("User {Username} fetched successfully.", command.UserName);
-                bool emailSent = false;
-                emailSent = await _emailService.SendEmailAsync(
-                response[0].Data.Email,
-                "Password Reset Verification Code",                
-                $"Dear {command.UserName},<br/><br/>We have received a request to reset your password.<br/><br/>To proceed with resetting your password, please use the verification code below: <br/><strong>Username:</strong>{command.UserName} <br/><strong>Verification Code:</strong>  {response[0].Data.VerificationCode} <br/><br/><br/><strong>Note:Verification Code will expire in {response[0].Data.PasswordResetCodeExpiryMinutes} minutes</strong> <br/><br/><p>Regards,<br/>Bannari Mills Team </p>"
-                );
-                if (emailSent)
-                {
-                    _logger.LogInformation("Verification Code email sent to {Email}.", response[0].Data.Email);
-                }
-                else
-                {
-                    _logger.LogWarning("Failed to send Verification Code notification email to {Email}.", response[0].Data.Email);
-                }
-         _logger.LogInformation("Verification Code sent successfully.", command.UserName);
+                
         return Ok(new
         {
             StatusCode = StatusCodes.Status200OK,

@@ -27,7 +27,7 @@ namespace Core.Application.State.Commands.DeleteState
         public async Task<ApiResponseDTO<StateDto>> Handle(DeleteStateCommand request, CancellationToken cancellationToken)
         {
             var state = await _stateQueryRepository.GetByIdAsync(request.Id);
-            if (state == null || state.IsActive != 1)
+            if (state == null || state.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
             {
                  return new ApiResponseDTO<StateDto>
                 {

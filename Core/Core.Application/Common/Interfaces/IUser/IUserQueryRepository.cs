@@ -11,7 +11,7 @@ namespace Core.Application.Common.Interfaces.IUser
     {
         Task<List<User>> GetAllUsersAsync();
         Task<User?> GetByIdAsync(int userId);      
-        Task<User?> GetByUsernameAsync(string username);
+        Task<User?> GetByUsernameAsync(string username,int? id = null);
         Task<List<string>> GetUserRolesAsync(int userId);
   
     }
