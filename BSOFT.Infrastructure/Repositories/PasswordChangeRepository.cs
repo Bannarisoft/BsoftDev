@@ -6,6 +6,7 @@ using BSOFT.Infrastructure.Data;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace BSOFT.Infrastructure.Repositories
 {
@@ -24,9 +25,12 @@ namespace BSOFT.Infrastructure.Repositories
 
          public async Task<string> ChangePassword(int userId,string password, PasswordLog passwordLog)
          {
-            
-                if (await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId) is not { IsFirstTimeUser: true } existingUser)
-                   return "User not found or is not a existing user.";
+            var existingUser = await _applicationDbContext.User
+             .FirstOrDefaultAsync(u => u.UserId == userId);
+                if (existingUser == null || existingUser.IsFirstTimeUser == FirstTimeUserStatus.Yes)
+                {
+                    return "User not found or is a first-time user.";
+                }
 
                 
                 var sortBy = "Id descending";
@@ -57,10 +61,10 @@ namespace BSOFT.Infrastructure.Repositories
         {
            
             var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
-            if (existingUser != null && existingUser.IsFirstTimeUser == false)
+            if (existingUser != null && existingUser.IsFirstTimeUser == FirstTimeUserStatus.Yes)
             {
                 existingUser.PasswordHash = passwordLog.PasswordHash;
-                existingUser.IsFirstTimeUser =true;
+                existingUser.IsFirstTimeUser =FirstTimeUserStatus.No;
                 _applicationDbContext.User.Update(existingUser);
                 await _applicationDbContext.SaveChangesAsync();
 

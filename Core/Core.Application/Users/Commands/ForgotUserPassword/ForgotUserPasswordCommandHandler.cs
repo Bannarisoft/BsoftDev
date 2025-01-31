@@ -1,129 +1,177 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
-using Core.Application.Common.HttpResponse;
 using AutoMapper;
-using Core.Application.Common.Interfaces.IUser;
-using Core.Application.Users.Queries.GetUsers;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
-using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces.INotifications;
+using Core.Application.Common.Interfaces.IUser;
+using Core.Application.Common.Utilities;
+using Core.Application.Users.Commands.ForgotUserPassword;
 using Core.Domain.Events;
-
+using Core.Domain.Entities;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Core.Application.Users.Queries.GetUsers;
+using Core.Domain.Enums.Common;
 
 namespace Core.Application.Users.Commands.ForgotUserPassword
 {
     public class ForgotUserPasswordCommandHandler : IRequestHandler<ForgotUserPasswordCommand, List<ApiResponseDTO<ForgotPasswordResponse>>>
     {
-         private readonly IMapper _imapper;
-         private readonly IUserQueryRepository _userQueryRepository;
-         private readonly IChangePassword _ichangePassword;
-         private readonly IMediator _Imediator;
-         private readonly INotificationsQueryRepository _INotificationsQueryRepository;
-
-         
+        private readonly IMapper _mapper;
+        private readonly IUserQueryRepository _userQueryRepository;
+        private readonly IChangePassword _changePasswordService;
+        private readonly IMediator _mediator;
+        private readonly INotificationsQueryRepository _notificationsQueryRepository;
         private readonly ILogger<ForgotUserPasswordCommandHandler> _logger;
+           private readonly IEmailService _emailService;
+        private readonly ISmsService _smsService;
 
-        public ForgotUserPasswordCommandHandler(IUserQueryRepository userQueryRepository, IMapper imapper, IChangePassword ichangePassword,ILogger<ForgotUserPasswordCommandHandler> logger,INotificationsQueryRepository INotificationsQueryRepository,IMediator Imediator)
+        public ForgotUserPasswordCommandHandler(
+            IUserQueryRepository userQueryRepository,
+            IMapper mapper,
+            IChangePassword changePasswordService,
+            ILogger<ForgotUserPasswordCommandHandler> logger,
+            INotificationsQueryRepository notificationsQueryRepository,
+            IMediator mediator,IEmailService emailService,ISmsService smsService)
         {
             _userQueryRepository = userQueryRepository;
-            _imapper = imapper;
-            _ichangePassword = ichangePassword;
+            _mapper = mapper;
+            _changePasswordService = changePasswordService;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _INotificationsQueryRepository = INotificationsQueryRepository;
-            _Imediator = Imediator;
+            _notificationsQueryRepository = notificationsQueryRepository;
+            _mediator = mediator;
+            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            _smsService = smsService ?? throw new ArgumentNullException(nameof(smsService));
         }
 
-        public async Task<List<ApiResponseDTO<ForgotPasswordResponse>>> Handle(ForgotUserPasswordCommand request, CancellationToken cancellationToken) 
+        public async Task<List<ApiResponseDTO<ForgotPasswordResponse>>> Handle(ForgotUserPasswordCommand request, CancellationToken cancellationToken)
         {
-           if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrEmpty(request.UserName) || string.IsNullOrEmpty(request.UserName.Trim()))
+            // Validate input
+            if (string.IsNullOrWhiteSpace(request.UserName))
             {
-            _logger.LogWarning("Username required." + request.UserName);   
-            return new List<ApiResponseDTO<ForgotPasswordResponse>>
-            {
-            new ApiResponseDTO<ForgotPasswordResponse>
-            {
-                IsSuccess = false,
-                Message = "Username required.",
+                _logger.LogWarning("Username is required.");
+                return CreateErrorResponse("Username is required.");
             }
-            };
-            }
+
+            // Fetch user details
             var user = await _userQueryRepository.GetByUsernameAsync(request.UserName);
             if (user == null)
             {
-            _logger.LogWarning("Username does not exists." + request.UserName);
+                _logger.LogWarning($"Username '{request.UserName}' does not exist.");
+                return CreateErrorResponse("Username does not exist.");
+            }
+
+            if (user.IsDeleted != Enums.IsDelete.Deleted)
+            {
+                _logger.LogWarning($"Username '{request.UserName}' is inactive. Contact admin.");
+                return CreateErrorResponse("The account is inactive. Contact admin.");
+            }
+
+            if (string.IsNullOrEmpty(user.Mobile) || string.IsNullOrEmpty(user.EmailId))
+            {
+                _logger.LogWarning($"Username '{request.UserName}' does not have a registered email or mobile.");
+                return CreateErrorResponse("Mobile number and email address are required for verification code.");
+            }
+
+            // Generate verification code
+            string verificationCode = await _changePasswordService.GenerateVerificationCode(6);
+            int expiryMinutes = await _notificationsQueryRepository.GetResetCodeExpiryMinutes();
+
+            // Store verification code in memory
+            ForgotPasswordCache.CodeStorage[user.UserName] = new VerificationCodeDetails
+            {
+                Code = verificationCode,
+                ExpiryTime = DateTime.UtcNow.AddMinutes(expiryMinutes)
+            };
+
+            // Schedule Hangfire job to remove the code after expiry
+            Hangfire.BackgroundJob.Schedule(
+            () => ForgotPasswordCache.RemoveVerificationCode(user.UserName), 
+            TimeSpan.FromMinutes(expiryMinutes)
+            );
+
+            //Email
+            bool emailSent = false;
+            emailSent = await _emailService.SendEmailAsync(
+            request.Email,
+            "Password Reset Verification Code",                
+            $"Dear {request.UserName},<br/><br/>We have received a request to reset your password.<br/><br/>To proceed with resetting your password, please use the verification code below: <br/><strong>Username:</strong>{request.UserName} <br/><strong>Verification Code:</strong>  {verificationCode} <br/><br/><br/><strong>Note:Verification Code will expire in {expiryMinutes} minutes</strong> <br/><br/><p>Regards,<br/>Bannari Mills Team </p>",
+            "Gmail"
+            );
+            if (emailSent)
+            {
+                _logger.LogInformation("Verification Code email sent to {Email}.", request.Email);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to send Verification Code notification email to {Email}.", request.Email);
+            }
+            _logger.LogInformation("Verification Code sent successfully.", request.UserName);
+
+            //SMS
+            bool smsSent = false;
+            try
+            {
+                smsSent = await _smsService.SendSmsAsync(
+                    request.Mobile,                     
+                    $"Dear {request.UserName}, We received a request to reset your password. Use the verification code below to proceed:Code:{verificationCode}, This code is valid for {expiryMinutes} minutes."
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("An error occurred while sending the SMS: {ErrorMessage}", ex.Message);
+            }
+
+            if (smsSent)
+            {
+                _logger.LogInformation("Login notification SMS sent to {Mobile}.", request.Mobile);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to send login notification SMS to {Mobile}.", request.Mobile);
+            } 
+            
+            // Publish domain event for logging purposes
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "ResetUserPassword",
+                actionCode: verificationCode,
+                actionName: request.UserName,
+                details: $"Username '{request.UserName}' requested a password reset. Verification Code: {verificationCode}",
+                module: "ResetUserPassword"
+            );
+            await _mediator.Publish(domainEvent, cancellationToken);
+
+            // Create response
+            var userDto = _mapper.Map<UserDto>(user);
+            var responseDto = new ForgotPasswordResponse
+            {
+                Message = $"Verification code sent to your registered email address {userDto.EmailId} and mobile number {userDto.Mobile}.",
+                Email = userDto.EmailId,
+                Mobile = userDto.Mobile,
+                VerificationCode = verificationCode,
+                PasswordResetCodeExpiryMinutes = expiryMinutes
+            };
+
+            _logger.LogInformation($"Verification code sent successfully for username '{userDto.UserName}'.");
             return new List<ApiResponseDTO<ForgotPasswordResponse>>
             {
-            new ApiResponseDTO<ForgotPasswordResponse>
-            {
-                IsSuccess = false,
-                Message = "Username does not exists.",
-            }
+                ApiResponseDTO<ForgotPasswordResponse>.Success(responseDto)
             };
         }
-            else if(user.IsActive==false)
-            {
-                _logger.LogWarning("Current Username is inactive contact admin ." + request.UserName);
-                return new List<ApiResponseDTO<ForgotPasswordResponse>>
-            {
-            new ApiResponseDTO<ForgotPasswordResponse>
-            {
-                IsSuccess = false,
-                Message = "Current Username is inactive contact admin .",
-                
-            }
-        };
-    }
-    else if(user.Mobile==null || user.EmailId==null)
-    {
-        _logger.LogWarning("For Verfication Code Sending Mobile Number and Email Id is Required for Username." + request.UserName);
-        return new List<ApiResponseDTO<ForgotPasswordResponse>>
+
+        private static List<ApiResponseDTO<ForgotPasswordResponse>> CreateErrorResponse(string message)
         {
-            new ApiResponseDTO<ForgotPasswordResponse>
+            return new List<ApiResponseDTO<ForgotPasswordResponse>>
             {
-                IsSuccess = false,
-                Message = "For Verfication Code Sending Mobile Number and Email Id is Required for Username.",
-            }
-        };
-    }
-    else
-    {
-
-        var userDto = _imapper.Map<UserDto>(user);
-        var verificationCode = await _ichangePassword.GenerateVerificationCode(6);
-        var PasswordResetCodeExpiryMinutes= await _INotificationsQueryRepository.GetResetCodeExpiryMinutes();
-
-          //Domain Event
-                  var domainEvent = new AuditLogsDomainEvent(
-                      actionDetail: "ResetUserPassword",
-                      actionCode: verificationCode,
-                      actionName: request.UserName,
-                      details: $"UserName '{request.UserName}' has requested for password reset. Verfication Code Generated: {verificationCode}",
-                      module:"ResetUserPassword"
-                  );
-                  await _Imediator.Publish(domainEvent, cancellationToken);
-        
-          // Create the response DTO
-    var responseDto = new ForgotPasswordResponse
-    {
-
-        Message = $"Verification code sent to your registered email address {userDto.EmailId} and mobile number {userDto.Mobile}.",
-        Email = userDto.EmailId,
-        Mobile = userDto.Mobile,
-        VerificationCode = verificationCode,
-        PasswordResetCodeExpiryMinutes=PasswordResetCodeExpiryMinutes
-    };
-
-     _logger.LogInformation("Verification Code sent successfully." + userDto.UserName);
-     return new List<ApiResponseDTO<ForgotPasswordResponse>>
-    {
-        ApiResponseDTO<ForgotPasswordResponse>.Success(responseDto)
-    };
-       
-    }
-}        
+                new ApiResponseDTO<ForgotPasswordResponse>
+                {
+                    IsSuccess = false,
+                    Message = message
+                }
+            };
+        }
     }
 }
-

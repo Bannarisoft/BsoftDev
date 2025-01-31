@@ -9,6 +9,6 @@ namespace Core.Domain.Entities
      public UserRole UserRole { get; set; }
     public int UserId { get; set; }     // Foreign Key
     public User User { get; set; }
-    public new byte IsActive { get; set; }
+    public byte IsActive { get; set; }
     }
 }

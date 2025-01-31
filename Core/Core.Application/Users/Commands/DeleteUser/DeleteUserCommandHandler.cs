@@ -30,7 +30,7 @@ namespace Core.Application.Users.Commands.DeleteUser
              _logger.LogInformation("Starting user deletion process for UserId: {UserId}", request.UserId);
 
             var userToDelete = _mapper.Map<User>(request);
-                userToDelete.IsActive = request.IsActive;
+                // userToDelete.IsActive = request.IsActive;
             //Log Domain Event  
                     var domainEvent = new AuditLogsDomainEvent(
                         actionDetail: "Delete",

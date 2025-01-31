@@ -37,7 +37,7 @@ namespace Core.Application.City.Commands.UpdateCity
             var oldCityName = city.CityName;
             city.CityName = request.CityName;
 
-            if (city == null || city.IsActive != 1)
+            if (city == null || city.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
             {
                 return new ApiResponseDTO<CityDto>
                 {
