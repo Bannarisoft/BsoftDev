@@ -7,6 +7,7 @@ using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using Core.Domain.Enums.Common;
 
 namespace Core.Application.City.Commands.UpdateCity
 {       
@@ -31,18 +32,18 @@ namespace Core.Application.City.Commands.UpdateCity
                 return new ApiResponseDTO<CityDto>
                 {
                     IsSuccess = false,
-                    Message = "City not found"
+                    Message = "Invalid CityID. The specified City does not exist or is inactive."
                 };
 
             var oldCityName = city.CityName;
             city.CityName = request.CityName;
 
-            if (city == null || city.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
+            if (city == null || city.IsDeleted == Enums.IsDelete.Deleted )
             {
                 return new ApiResponseDTO<CityDto>
                 {
                     IsSuccess = false,
-                    Message = "Invalid CityID. The specified City does not exist or is inactive."
+                    Message = "Invalid CityID. The specified City does not exist or is deleted."
                 };
             }
 
@@ -55,17 +56,16 @@ namespace Core.Application.City.Commands.UpdateCity
                     Message = "Invalid StateId. The specified state does not exist or is inactive."
                 };
             }
-
-            var cityExists = await _cityRepository.GetCityByCodeAsync(request.CityCode, request.StateId);
-            if (cityExists)
+ 
+            // Check if the city name already exists in the same state
+            var cityExistsByName = await _cityRepository.GetCityByNameAsync(request.CityName,request.CityCode, request.StateId);
+            if (cityExistsByName)
             {
-                return new ApiResponseDTO<CityDto>
-                {
-                    IsSuccess = false,
-                    Message = "CityCode already exists in the specified State."
+                return new ApiResponseDTO<CityDto> {
+                    IsSuccess = false, 
+                    Message = "City with the same name & code already exists in the specified state."
                 };
-            }
-
+            }    
             var updatedCityEntity = _mapper.Map<Cities>(request);                   
             var updateResult = await _cityRepository.UpdateAsync(request.Id, updatedCityEntity);            
 

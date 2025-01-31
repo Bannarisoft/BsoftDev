@@ -18,7 +18,7 @@ namespace BSOFT.Infrastructure.Repositories.Country
         {
             const string query = @"
             SELECT Id,CountryCode, CountryName, IsActive ,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
-            FROM AppData.Country with (nolock) where isActive=1";
+            FROM AppData.Country with (nolock) where isdeleted=0 order by Id desc";
             return (await _dbConnection.QueryAsync<Countries>(query)).ToList();
         }
 
@@ -29,7 +29,7 @@ namespace BSOFT.Infrastructure.Repositories.Country
             SELECT Id, countryCode, countryName, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
             ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
             FROM AppData.Country WITH (NOLOCK)
-            WHERE Id = @id AND IsActive = 1";
+            WHERE Id = @id AND isdeleted = 0";
             var country = await _dbConnection.QueryFirstOrDefaultAsync<Countries>(query, new { id });           
              if (country == null)
             {
@@ -48,8 +48,8 @@ namespace BSOFT.Infrastructure.Repositories.Country
                 ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
                 FROM AppData.Country WITH (NOLOCK)
                 WHERE (countryName LIKE @SearchPattern OR countryCode LIKE @SearchPattern) 
-                AND IsActive = 1
-                ORDER BY countryName";
+                AND isdeleted = 0
+                ORDER BY id desc";
 
             var countries = await _dbConnection.QueryAsync<Countries>(
                 query,

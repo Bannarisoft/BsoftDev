@@ -1,4 +1,3 @@
-using BSOFT.Infrastructure.Data;
 using Core.Application.City.Commands.CreateCity;
 using Core.Application.City.Commands.DeleteCity;
 using Core.Application.City.Commands.UpdateCity;
@@ -7,7 +6,6 @@ using Core.Application.City.Queries.GetCityAutoComplete;
 using Core.Application.City.Queries.GetCityById;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
@@ -33,7 +31,15 @@ namespace BSOFT.API.Controllers
         [HttpGet]                
         public async Task<IActionResult> GetAllCitiesAsync()
         {  
-            var cities = await Mediator.Send(new GetCityQuery());            
+            var cities = await Mediator.Send(new GetCityQuery());    
+             if (cities == null )
+            {                
+                return NotFound(new 
+                { 
+                    StatusCode=StatusCodes.Status404NotFound,
+                    message = "City details not found", 
+                });
+            }        
             return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 

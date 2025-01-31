@@ -5,6 +5,7 @@ using AutoMapper;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using Core.Domain.Enums.Common;
 
 
 namespace Core.Application.Country.Commands.UpdateCountry
@@ -35,7 +36,7 @@ namespace Core.Application.Country.Commands.UpdateCountry
 
             var oldCountryName = country.CountryName;
             country.CountryName = request.CountryName;
-            if (country == null || country.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
+            if (country == null || country.IsDeleted == Enums.IsDelete.Deleted)
             {
                 return new ApiResponseDTO<CountryDto>
                 {
@@ -43,15 +44,29 @@ namespace Core.Application.Country.Commands.UpdateCountry
                     Message = "Invalid CountryID. The specified Country does not exist or is inactive."
                 };
             }           
-            var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryCode);
-            if (countryExists)
+            var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryName,request.CountryCode);
+            if (countryExists != null)
             {
+                  // Handle the case where the country exists
+                if ((byte)countryExists.IsActive == (byte)Enums.Status.Inactive)
+                {
+                    // Reactivate the country or handle it differently
+                    countryExists.IsActive = Enums.Status.Active;
+                    await _countryRepository.UpdateAsync(countryExists.Id, countryExists);
+
+                    return new ApiResponseDTO<CountryDto>
+                    {
+                        IsSuccess = false,
+                        Message = "CountryCode already exists but was inactive. It has now been reactivated."
+                    };
+                }
+
                 return new ApiResponseDTO<CountryDto>
                 {
                     IsSuccess = false,
-                    Message = "CountryCode already exists"
+                    Message = "CountryCode already exists and is active."
                 };
-            }
+            }            
             var updatedCountryEntity = _mapper.Map<Countries>(request);
             
             var updateResult = await _countryRepository.UpdateAsync(request.Id, updatedCountryEntity);            

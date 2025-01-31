@@ -20,7 +20,7 @@ namespace BSOFT.Infrastructure.Repositories
              const string query = @"
                 SELECT 
                 Id,StateCode,StateName,IsActive,CountryId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
-                FROM AppData.State with (nolock) where IsActive=1 order by StateName";
+                FROM AppData.State with (nolock) where isdeleted=0 order by Id desc";
              return (await _dbConnection.QueryAsync<States>(query)).ToList();     
         }
 
@@ -28,7 +28,7 @@ namespace BSOFT.Infrastructure.Repositories
         {
             const string query = @"
             SELECT Id, StateCode, StateName, IsActive,countryId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP 
-            FROM AppData.State with(nolock) WHERE Id = @Id and IsActive=1";
+            FROM AppData.State with(nolock) WHERE Id = @Id and isdeleted=0";
             var state = await _dbConnection.QueryFirstOrDefaultAsync<States>(query, new { id });           
             if (state == null)
             {
@@ -48,8 +48,8 @@ namespace BSOFT.Infrastructure.Repositories
                 ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
                 FROM AppData.State WITH (NOLOCK)
                 WHERE (StateName LIKE @SearchPattern OR StateCode LIKE @SearchPattern) 
-                AND IsActive = 1
-                ORDER BY StateName";
+                AND isdeleted = 0
+                order by Id desc";
 
             var states = await _dbConnection.QueryAsync<States>(
                 query,

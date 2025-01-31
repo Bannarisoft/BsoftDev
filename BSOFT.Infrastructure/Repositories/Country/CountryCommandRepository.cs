@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 
 using Core.Application.Common.Interfaces.ICountry;
+using Core.Domain.Enums.Common;
 
 namespace BSOFT.Infrastructure.Repositories.Country
 {    
@@ -26,7 +27,7 @@ namespace BSOFT.Infrastructure.Repositories.Country
              var CountryToDelete = await _applicationDbContext.Countries.FirstOrDefaultAsync(u => u.Id == id);
             if (CountryToDelete != null)
             {
-                CountryToDelete.IsActive = country.IsActive;
+                CountryToDelete.IsDeleted = country.IsDeleted;                 
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
@@ -38,17 +39,20 @@ namespace BSOFT.Infrastructure.Repositories.Country
             {
                 existingCountry.CountryName = country.CountryName;
                 existingCountry.CountryCode = country.CountryCode;                
-                
+                existingCountry.IsActive = country.IsActive;
                 _applicationDbContext.Countries.Update(existingCountry);
                 return await _applicationDbContext.SaveChangesAsync();
             }
            return 0; // No user found
         }
 
-        public async Task<bool> GetCountryByCodeAsync(string countryCode)
+        public async Task<Countries> GetCountryByCodeAsync(string countryName,string countryCode)
         {
-               return await _applicationDbContext.Countries
-            .AnyAsync(c => c.CountryCode == countryCode ); // Checks both CityCode and StateId
+               var country = await _applicationDbContext.Countries
+            .FirstOrDefaultAsync(c => c.CountryName == countryName && c.CountryCode == countryCode);
+
+            return country;
+            
         }
 
     }

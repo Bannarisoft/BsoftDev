@@ -42,8 +42,7 @@ namespace BSOFT.Infrastructure.Repositories.State
                 existingState.StateName = state.StateName;
                 existingState.StateCode = state.StateCode;                
                 existingState.CountryId = state.CountryId;
-                existingState.IsActive = state.IsActive;
-                
+                existingState.IsActive = state.IsActive;                
                 _applicationDbContext.States.Update(existingState);
                 return await _applicationDbContext.SaveChangesAsync();
             }
@@ -52,12 +51,26 @@ namespace BSOFT.Infrastructure.Repositories.State
         public async Task<bool> CountryExistsAsync(int countryId)
         {
         //return await _applicationDbContext.States.AnyAsync(c => c.Id == stateId);
-            return await _applicationDbContext.Countries.AnyAsync(s => s.Id == countryId && s.IsDeleted == Enums.IsDelete.Deleted);
+            return await _applicationDbContext.Countries.AnyAsync(s => s.Id == countryId && s.IsDeleted == Enums.IsDelete.Deleted && s.IsActive == Enums.Status.Active);
         }
-        public async Task<bool> GetStateByCodeAsync(string stateCode, int countryId)
+        public async Task<bool> GetStateByCodeAsync(string stateName,string stateCode, int countryId)
         {
-            return await _applicationDbContext.States
-            .AnyAsync(c => c.StateCode == stateCode && c.CountryId == countryId); // Checks both CityCode and StateId
+                var state = await _applicationDbContext.States
+                    .FirstOrDefaultAsync(s => s.StateCode == stateCode 
+                                  && s.StateName == stateName && s.CountryId == countryId);
+
+                if (state != null)
+                {                    
+                    if ((byte)state.IsActive == (byte)Enums.Status.Inactive)
+                    {                        
+                        return false;  // You can adjust this to return a message indicating it's inactive
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                return false;
         }
     }
 }

@@ -7,7 +7,6 @@ using Core.Application.Country.Queries.GetCountryAutoComplete;
 using Core.Application.Country.Queries.GetCountryById;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
@@ -36,6 +35,7 @@ namespace BSOFT.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
+                message = countries.Message,
                 data = countries.Data
             });
         }

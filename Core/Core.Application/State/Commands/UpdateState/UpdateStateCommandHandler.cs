@@ -51,13 +51,13 @@ namespace Core.Application.State.Commands.UpdateState
                     Message = "Invalid CountryID. The specified Country does not exist or is inactive."
                 };
             }
-            var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateCode, request.CountryId);
+            var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName,request.StateCode, request.CountryId);
             if (stateExists)
             {                
                 return new ApiResponseDTO<StateDto>
                 {
                     IsSuccess = false,
-                    Message = "StateCode already exists in the specified Country."
+                    Message = "StateCode & Name already exists in the specified Country."
                 };
             }
             var updatedStateEntity = _mapper.Map<States>(request);          
@@ -88,7 +88,7 @@ namespace Core.Application.State.Commands.UpdateState
                 return new ApiResponseDTO<StateDto>
                 {
                     IsSuccess = false,
-                    Message = "City not updated."
+                    Message = "State not updated."
                 };
             }
             else

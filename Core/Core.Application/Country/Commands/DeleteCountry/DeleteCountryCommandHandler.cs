@@ -3,6 +3,7 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Application.Country.Queries.GetCountries;
 using Core.Domain.Entities;
+using Core.Domain.Enums.Common;
 using Core.Domain.Events;
 using MediatR;
 
@@ -25,26 +26,21 @@ namespace Core.Application.Country.Commands.DeleteCountry
         public async Task<ApiResponseDTO<CountryDto>> Handle(DeleteCountryCommand request, CancellationToken cancellationToken)
         {
             var country = await _countryQueryRepository.GetByIdAsync(request.Id);
-            if (country == null || country.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
+            if (country == null || country.IsDeleted == Enums.IsDelete.Deleted)
             {
                 return new ApiResponseDTO<CountryDto>
                 {
                     IsSuccess = false,
                     Message = "Invalid CountryID. The specified Country does not exist or is inactive."
                 };
-            }                       
-            var countryUpdate = new Countries
-            {
-                Id = request.Id,
-                CountryCode = country.CountryCode, 
-                CountryName = country.CountryName, 
-                IsActive = 0
-            };
-            
-            var updateResult = await _countryRepository.DeleteAsync(request.Id, countryUpdate);
+            }         
+             var countryDelete = _mapper.Map<Countries>(request);   
+
+          
+            var updateResult = await _countryRepository.DeleteAsync(request.Id, countryDelete);
             if (updateResult > 0)
             {
-                var countryDto = _mapper.Map<CountryDto>(countryUpdate); 
+                var countryDto = _mapper.Map<CountryDto>(countryDelete); 
                 //Domain Event  
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Delete",

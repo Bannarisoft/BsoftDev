@@ -17,14 +17,14 @@ namespace BSOFT.Infrastructure.Repositories.City
             const string query = @"
                 SELECT 
                 Id,CityCode,CityName,IsActive,StateId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
-                FROM AppData.City with (nolock) where IsActive=1 order by Id desc";
+                FROM AppData.City with (nolock) where  isdeleted=0 order by Id desc";
              return (await _dbConnection.QueryAsync<Cities>(query)).ToList();     
         }
         public async Task<Cities> GetByIdAsync(int id)
         { 
             const string query = @"
                 SELECT Id, CityCode, CityName, IsActive,StateId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP 
-                FROM AppData.City  with(nolock) WHERE Id = @Id and IsActive=1";
+                FROM AppData.City  with(nolock) WHERE Id = @Id and isdeleted=0";
             var city = await _dbConnection.QueryFirstOrDefaultAsync<Cities>(query, new { id });           
             if (city == null)
             {
@@ -43,7 +43,7 @@ namespace BSOFT.Infrastructure.Repositories.City
                 ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
                 FROM AppData.City WITH (NOLOCK)
                 WHERE (cityName LIKE @SearchPattern OR cityName LIKE @SearchPattern) 
-                AND IsActive = 1
+                AND IsActive = 1 and isdeleted=0
                 ORDER BY Id desc";            
             var result = await _dbConnection.QueryAsync<Cities>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();
