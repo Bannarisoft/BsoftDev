@@ -15,15 +15,17 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
 {
     public class UpdateRoleEntitlementCommandHandler : IRequestHandler<UpdateRoleEntitlementCommand, ApiResponseDTO<bool>>
     {
-     private readonly IRoleEntitlementCommandRepository _repository;
+     private readonly IRoleEntitlementCommandRepository _roleEntitlementCommanderepository;
+     private readonly IRoleEntitlementQueryRepository _roleEntitlementQueryrepository;
      private readonly IMapper _mapper;
      private readonly IMediator _mediator; 
     private readonly ILogger<UpdateRoleEntitlementCommandHandler> _logger;
 
 
-    public UpdateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper, IMediator mediator,ILogger<UpdateRoleEntitlementCommandHandler> logger)
+    public UpdateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository roleEntitlementCommanderepository, IRoleEntitlementQueryRepository roleEntitlementQueryrepository,IMapper mapper, IMediator mediator,ILogger<UpdateRoleEntitlementCommandHandler> logger)
     {
-        _repository = repository;
+        _roleEntitlementCommanderepository = roleEntitlementCommanderepository;
+        _roleEntitlementQueryrepository = roleEntitlementQueryrepository;
         _mapper = mapper;
         _mediator = mediator;    
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -40,7 +42,7 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
          _logger.LogInformation("Starting role entitlement update process for RoleName: {RoleName}", request.RoleName);
 
         // Validate role existence
-        var role = await _repository.GetRoleByNameAsync(request.RoleName, cancellationToken);
+        var role = await _roleEntitlementQueryrepository.GetRoleByNameAsync(request.RoleName, cancellationToken);
         if (role == null)
         {
             _logger.LogWarning("Role not found: {RoleName}", request.RoleName);
@@ -51,7 +53,7 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
             };
         }
         // Fetch existing role entitlements
-            var existingEntitlements = await _repository.GetRoleEntitlementsByRoleNameAsync(request.RoleName, cancellationToken);
+            var existingEntitlements = await _roleEntitlementQueryrepository.GetRoleEntitlementsByRoleNameAsync(request.RoleName, cancellationToken);
             if (existingEntitlements == null || !existingEntitlements.Any())
             {
                 _logger.LogWarning("No existing role entitlements found for RoleName: {RoleName}", request.RoleName);
@@ -70,7 +72,7 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
             .ToList();
 
         // Update or replace existing entitlements
-        await _repository.UpdateRoleEntitlementsAsync(role.Id, updatedEntitlements, cancellationToken);
+        await _roleEntitlementCommanderepository.UpdateRoleEntitlementsAsync(role.Id, updatedEntitlements, cancellationToken);
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",

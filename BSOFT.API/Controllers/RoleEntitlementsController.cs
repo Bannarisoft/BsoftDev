@@ -104,51 +104,94 @@ public class RoleEntitlementsController : ApiControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateRoleEntitlement(UpdateRoleEntitlementCommand command)
     {
-        var validationResult = await _updateRoleEntitlementCommandValidator.ValidateAsync(command);
-        _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
-
-
-        if (!validationResult.IsValid)
+        if (command == null)
         {
+            _logger.LogError("UpdateRoleEntitlementCommand is null.");
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
-                message = "Validation failed",
-                errors = validationResult.Errors.Select(e => e.ErrorMessage)
+                Message = "Invalid request. Command cannot be null."
             });
         }
-        // var userExists = await Mediator.Send(new RoleEntitlementDto { RoleName = command.RoleName });
-        // if (userExists == null)
-        // {
-        //     _logger.LogInformation("User {RoleName} not found for update.", command.RoleName);
 
-        //     return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"RoleName {command.RoleName} not found." });
-        // }
+        //  Validate request
+        var validationResult = await _updateRoleEntitlementCommandValidator.ValidateAsync(command);
 
-            var response = await Mediator.Send(command);
-            if (response.IsSuccess)
+        if (!validationResult.IsValid)
+        {
+            _logger.LogWarning("Validation failed: {ErrorDetails}", string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)));
+
+            return BadRequest(new
             {
-                _logger.LogInformation("RoleEntitlement {RoleName} updated successfully.", command.RoleName);
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = "Validation failed",
+                Errors = validationResult.Errors.Select(e => e.ErrorMessage)
+            });
+        }
 
-                return Ok(new { StatusCode = StatusCodes.Status200OK, message = response.Message });
+        try
+        {
+            _logger.LogInformation("Processing UpdateRoleEntitlementCommand for Role: {RoleName}", command.RoleName);
+            
+            var response = await Mediator.Send(command);
+
+            if (response == null)
+            {
+                _logger.LogWarning("RoleEntitlement update failed: No response received for RoleName: {RoleName}", command.RoleName);
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Unexpected error: No response from service."
+                });
             }
+
+            if (!response.IsSuccess)
+            {
+                if (response.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.LogWarning("RoleEntitlement update failed: RoleName {RoleName} not found.", command.RoleName);
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = response.Message
+                    });
+                }
+
                 _logger.LogWarning("RoleEntitlement update failed for RoleName: {RoleName}", command.RoleName);
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = response.Message
+                });
+            }
 
-                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
-
-        // try
-        // {
-        //     var result = await Mediator.Send(command);
-        //     return Ok(new { Message = "Role Entitlement updated successfully.", Updated = result });
-        // }
-        // catch (ValidationException ex)
-        // {
-        //     return BadRequest(new { Message = ex.Message });
-        // }
-        // catch (Exception ex)
-        // {
-        //     return StatusCode(500, new { Message = "An unexpected error occurred.", Details = ex.Message });
-        // }
+            _logger.LogInformation("RoleEntitlement {RoleName} updated successfully.", command.RoleName);
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = response.Message
+            });
+        }
+        catch (ValidationException ex)
+        {
+            _logger.LogError(ex, "Validation error while updating RoleEntitlement for RoleName: {RoleName}", command.RoleName);
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = "Validation error",
+                Details = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while updating RoleEntitlement for RoleName: {RoleName}", command.RoleName);
+            return StatusCode(StatusCodes.Status500InternalServerError, new
+            {
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = "An unexpected error occurred.",
+                Details = ex.Message
+            });
+        }
     }
     [HttpDelete("delete")]        
         public async Task<IActionResult> DeleteAsync(DeleteRoleEntitlementCommand command)

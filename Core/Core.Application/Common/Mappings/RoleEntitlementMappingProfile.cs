@@ -20,7 +20,8 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.CanAdd, opt => opt.MapFrom(src => src.CanAdd))
             .ForMember(dest => dest.CanUpdate, opt => opt.MapFrom(src => src.CanUpdate))
             .ForMember(dest => dest.CanDelete, opt => opt.MapFrom(src => src.CanDelete))
-            .ForMember(dest => dest.CanExport, opt => opt.MapFrom(src => src.CanExport));
+            .ForMember(dest => dest.CanExport, opt => opt.MapFrom(src => src.CanExport))
+            .ForMember(dest => dest.CanApprove, opt => opt.MapFrom(src => src.CanApprove));
 
         CreateMap<ModuleMenuPermissionDto, RoleEntitlement>()
             .ForMember(dest => dest.ModuleId, opt => opt.MapFrom(src => src.ModuleId));

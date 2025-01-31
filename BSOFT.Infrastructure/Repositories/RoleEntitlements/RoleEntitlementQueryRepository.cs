@@ -32,7 +32,7 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
             }
 
             const string query = @"
-                SELECT re.Id, re.IsActive,m.Id as ModuleId, m.ModuleName,mn.Id as MenuId,mn.MenuName,ur.RoleName,CanAdd,CanDelete,CanExport,CanUpdate,CanView
+                SELECT re.Id, re.IsActive,m.Id as ModuleId, m.ModuleName,mn.Id as MenuId,mn.MenuName,ur.RoleName,CanAdd,CanDelete,CanExport,CanUpdate,CanView,CanApprove
             FROM AppSecurity.RoleEntitlements re WITH (NOLOCK)
 			INNER JOIN AppSecurity.UserRole ur on re.UserRoleId=ur.Id
 			INNER JOIN AppData.Modules m on re.ModuleId=m.Id
@@ -51,13 +51,41 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
             return roleEntitlement;
         }
 
+        public async Task<List<RoleEntitlement>> GetExistingRoleEntitlementsAsync(List<int> userRoleIds, List<int> moduleIds, List<int> menuIds, CancellationToken cancellationToken)
+        {
+            if (!userRoleIds.Any() || !moduleIds.Any() || !menuIds.Any())
+            {
+                return new List<RoleEntitlement>(); // Return empty list if any input list is empty
+            }
+           const string query = @"
+                SELECT UserRoleId, ModuleId, MenuId 
+                FROM AppSecurity.RoleEntitlements
+                WHERE UserRoleId IN @UserRoleIds 
+                AND ModuleId IN @ModuleIds 
+                AND MenuId IN @MenuIds";
+
+            var parameters = new
+            {
+                UserRoleIds = userRoleIds,
+                ModuleIds = moduleIds,
+                MenuIds = menuIds
+            };
+
+            var existingEntitlements = await _dbConnection.QueryAsync<RoleEntitlement>(query, parameters);
+            return existingEntitlements.ToList();
+            // return await _applicationDbContext.RoleEntitlements
+            // .Where(re => userRoleIds.Contains(re.UserRoleId) && moduleIds.Contains(re.ModuleId) && menuIds.Contains(re.MenuId))
+            // .ToListAsync(cancellationToken);
+
+        }
+
         public async Task<UserRole> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken)
         {
         // return await _applicationDbContext.UserRole.FirstOrDefaultAsync(r => r.RoleName == roleName, cancellationToken) ?? new UserRole();
             const string query = @"
         SELECT Id, RoleName, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
                ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
-        FROM AppSecurity.UserRoles WITH (NOLOCK)
+        FROM AppSecurity.UserRole WITH (NOLOCK)
         WHERE RoleName = @RoleName";
 
         var userRole = await _dbConnection.QueryFirstOrDefaultAsync<UserRole>(query, new { RoleName = roleName });

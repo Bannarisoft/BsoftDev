@@ -90,25 +90,25 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
         return await _applicationDbContext.Menus.AnyAsync(m => m.Id == menuId, cancellationToken);
     }
 
- public async Task<UserRole> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken)
-    {
-        return await _applicationDbContext.UserRole.FirstOrDefaultAsync(r => r.RoleName == roleName, cancellationToken) ?? new UserRole();
-    }
+//  public async Task<UserRole> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken)
+//     {
+//         return await _applicationDbContext.UserRole.FirstOrDefaultAsync(r => r.RoleName == roleName, cancellationToken) ?? new UserRole();
+//     }
 
-    public async Task<List<RoleEntitlement>> GetRoleEntitlementsByRoleNameAsync(string roleName, CancellationToken cancellationToken)
-    {
-        return await _applicationDbContext.RoleEntitlements
-            .Where(re => re.UserRole.RoleName == roleName)
-            .Include(re => re.Module)
-            .Include(re => re.Menu)
-            .ToListAsync(cancellationToken);
-    }
+//     public async Task<List<RoleEntitlement>> GetRoleEntitlementsByRoleNameAsync(string roleName, CancellationToken cancellationToken)
+//     {
+//         return await _applicationDbContext.RoleEntitlements
+//             .Where(re => re.UserRole.RoleName == roleName)
+//             .Include(re => re.Module)
+//             .Include(re => re.Menu)
+//             .ToListAsync(cancellationToken);
+//     }
 
-        public async Task<List<RoleEntitlement>> GetExistingRoleEntitlementsAsync(List<int> userRoleIds, List<int> moduleIds, List<int> menuIds, CancellationToken cancellationToken)
-        {
-            return await _applicationDbContext.RoleEntitlements
-            .Where(re => userRoleIds.Contains(re.UserRoleId) && moduleIds.Contains(re.ModuleId) && menuIds.Contains(re.MenuId))
-            .ToListAsync(cancellationToken);
-        }
+//         public async Task<List<RoleEntitlement>> GetExistingRoleEntitlementsAsync(List<int> userRoleIds, List<int> moduleIds, List<int> menuIds, CancellationToken cancellationToken)
+//         {
+//             return await _applicationDbContext.RoleEntitlements
+//             .Where(re => userRoleIds.Contains(re.UserRoleId) && moduleIds.Contains(re.ModuleId) && menuIds.Contains(re.MenuId))
+//             .ToListAsync(cancellationToken);
+//         }
     }
 }
