@@ -74,7 +74,7 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
         var RoleEntitlementToDelete = await _applicationDbContext.RoleEntitlements.FirstOrDefaultAsync(u => u.Id == id);
             if (RoleEntitlementToDelete != null)
             {
-                RoleEntitlementToDelete.IsActive = roleEntitlement.IsActive;
+                RoleEntitlementToDelete.IsDeleted = roleEntitlement.IsDeleted;
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found

@@ -37,7 +37,7 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
 			INNER JOIN AppSecurity.UserRole ur on re.UserRoleId=ur.Id
 			INNER JOIN AppData.Modules m on re.ModuleId=m.Id
 			INNER JOIN AppData.Menus mn on re.MenuId=mn.Id
-            WHERE re.Id = @RoleEntitlementId  AND re.IsActive = 1";
+            WHERE re.Id = @RoleEntitlementId  AND re.IsDeleted= 0";
                   
             var roleEntitlement = await _dbConnection.QuerySingleOrDefaultAsync<RoleEntitlement>(query, new { RoleEntitlementId = roleEntitlementId });
 
@@ -110,7 +110,7 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
         INNER JOIN AppSecurity.UserRole ur ON re.UserRoleId = ur.Id
         LEFT JOIN AppData.Modules m ON re.ModuleId = m.Id
         LEFT JOIN AppData.Menus mn ON re.MenuId = mn.Id
-        WHERE ur.RoleName = @RoleName";
+        WHERE ur.RoleName = @RoleName AND re.IsDeleted = 0";
 
     var roleEntitlements = await _dbConnection.QueryAsync<RoleEntitlement, UserRole, Modules, Menu, RoleEntitlement>(
         query,

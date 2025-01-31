@@ -58,13 +58,13 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
             {
                 _logger.LogWarning("No existing role entitlements found for RoleName: {RoleName}", request.RoleName);
             }
-
+// var roleEntitlement  = _mapper.Map<RoleEntitlement>(request);
         // Map the new entitlements
         var updatedEntitlements = request.ModuleMenus
             .SelectMany(moduleMenu => moduleMenu.Menus
                 .Select(menu => 
                 {
-                    var entitlement = _mapper.Map<RoleEntitlement>(menu);
+                    var entitlement = _mapper.Map<RoleEntitlement>(menu);;
                     entitlement.UserRoleId = role.Id;
                     entitlement.ModuleId = moduleMenu.ModuleId;
                     return entitlement;
