@@ -163,6 +163,8 @@ namespace BSOFT.API.Controllers
                 });
             }
 
+          
+
             // Update the department
             var updateResult = await Mediator.Send(command);
             if (updateResult.IsSuccess)

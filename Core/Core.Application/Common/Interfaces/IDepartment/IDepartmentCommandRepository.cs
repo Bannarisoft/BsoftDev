@@ -12,6 +12,8 @@ namespace Core.Application.Common.Interfaces.IDepartment
 
          Task<int> UpdateAsync(int id, Department department);
         
-         Task<int> DeleteAsync(int id,Department department);        
+         Task<int> DeleteAsync(int id,Department department);     
+               Task<bool> ExistsByCodeAsync(string Department);
+   
     }
 }

@@ -51,5 +51,12 @@ namespace BSOFT.Infrastructure.Repositories.Departments
             }
             return 0; // No user found
     }
+
+        public Task<bool> ExistsByCodeAsync(string Department)
+        {
+        
+            return _applicationDbContext.Department.AnyAsync(c => c.DeptName == Department);
+            
+        }
     }
 }

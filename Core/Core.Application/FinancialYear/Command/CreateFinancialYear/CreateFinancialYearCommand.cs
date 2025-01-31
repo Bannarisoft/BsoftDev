@@ -21,11 +21,10 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
         public DateTime EndDate { get; set; } 
 
         public string FinYearName { get; set; }
-        
-          [JsonConverter(typeof(JsonStringEnumConverter))]
-        public FinancialYearStatus IsActive { get; set; }
-          [JsonConverter(typeof(JsonStringEnumConverter))]
-         public FinancialYearDelete IsDeleted { get; set; }
+
+        public  FinancialYearEnum.FinancialYearStatus IsActive  { get; set; }
+
+        public FinancialYearEnum.FinancialYearDelete  IsDeleted { get; set; }
 
 
         

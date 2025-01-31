@@ -10,6 +10,8 @@ using Core.Application.FinancialYear.Command.CreateFinancialYear;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Core.Domain.Events;
+using Microsoft.EntityFrameworkCore;
+
 
 
 namespace Core.Application.FinancialYear.Command.CreateFinancialYear
@@ -19,124 +21,99 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
 
 
      private readonly IFinancialYearCommandRepository  _financialYearCommandRepository;
+
+     private readonly IFinancialYearQueryRepository _financialYearQueryRepository;
         private readonly IMapper _mapper;
           private readonly IMediator _mediator; 
           private readonly ILogger<CreateFinancialYearCommandHandler> _logger;
+           
 
-           public CreateFinancialYearCommandHandler(IFinancialYearCommandRepository financialYearCommandRepository,IMapper mapper, IMediator mediator ,ILogger<CreateFinancialYearCommandHandler> logger)
+           public CreateFinancialYearCommandHandler(IFinancialYearCommandRepository financialYearCommandRepository,IMapper mapper, IMediator mediator ,ILogger<CreateFinancialYearCommandHandler> logger,IFinancialYearQueryRepository financialYearQueryRepository)
         {
              _financialYearCommandRepository=financialYearCommandRepository;
+            _financialYearQueryRepository=financialYearQueryRepository;
             _mapper=mapper;
             _mediator=mediator;
             _logger=logger;
+            
 
-        }   
-public async Task<ApiResponseDTO<int>> Handle(CreateFinancialYearCommand request, CancellationToken cancellationToken)
-{
-    _logger.LogInformation("Starting CreateFinancialYearCommandHandler for request: {@Request}", request);
+        } 
 
-    // Check if repository is null
-    if (_financialYearCommandRepository == null)
-    {
-        _logger.LogError("FinancialYearCommandRepository is null. Ensure dependency injection is configured.");
-        throw new InvalidOperationException("FinancialYearCommandRepository is not initialized.");
-    }
+        // public async Task<Core.Domain.Entities.FinancialYear> GetFinancialYearByDateRangeAsync(DateTime startDate, DateTime endDate)
+        //     {
+        //         return await _dbContext.FinancialYear
+        //             .Where(fy => (fy.StartDate <= startDate && fy.EndDate >= startDate) ||
+        //                         (fy.StartDate <= endDate && fy.EndDate >= endDate) ||
+        //                         (fy.StartDate >= startDate && fy.EndDate <= endDate))
+        //             .FirstOrDefaultAsync();
+        //     }  
 
-    // Map request to entity
-    var financialYearEntity = _mapper.Map<Core.Domain.Entities.FinancialYear>(request);
-    _logger.LogInformation("Mapped Create FinancialYear Command to FinancialYear entity: {@FinancialYearEntity}", financialYearEntity);
-
-    // Save FinancialYear
-    var createdfinancialYear = await _financialYearCommandRepository.CreateAsync(financialYearEntity);
-
-    if (createdfinancialYear == null)
-    {
-        _logger.LogWarning("Failed to create financial year. Entity is null.");
-        return new ApiResponseDTO<int> { IsSuccess = false, Message = "FinancialYear not created" };
-    }
-
-    _logger.LogInformation("FinancialYear successfully created with ID: {FYId}", createdfinancialYear.Id);
-
-    // Publish Domain Event
-    var domainEvent = new AuditLogsDomainEvent(
-        actionDetail: "Create",
-        actionCode: createdfinancialYear.Id.ToString(),
-        actionName: createdfinancialYear.StartYear,
-        details: $"FinancialYear '{createdfinancialYear.StartYear}' was created. FinancialYearID: {createdfinancialYear.Id}",
-        module: "FinancialYear"
-    );
-
-    await _mediator.Publish(domainEvent, cancellationToken);
-    _logger.LogInformation("AuditLogsDomainEvent published for FinancialYear ID: {FYId}", createdfinancialYear.Id);
-
-    // Map result to DTO
-    var deptDto = _mapper.Map<FinancialYearDto>(createdfinancialYear);
-    if (deptDto == null)
-    {
-        _logger.LogError("Failed to map created FinancialYear to DTO.");
-        return new ApiResponseDTO<int> { IsSuccess = false, Message = "Error mapping FinancialYear" };
-    }
-
-    _logger.LogInformation("Returning success response for FinancialYear ID: {FYId}", createdfinancialYear.Id);
-
-    return new ApiResponseDTO<int>
-    {
-        IsSuccess = true,
-        Message = "FinancialYear created successfully",
-        Data = createdfinancialYear.Id
-    };
-}
-        // public async Task<ApiResponseDTO<int>> Handle(CreateFinancialYearCommand request, CancellationToken cancellationToken)
-        // {
-
-        //     _logger.LogInformation("Starting CreateDepartmentCommandHandler for request: {@Request}", request);
-
-        //                 // Map the request to the entity
-        //                 var  financialYearEntity = _mapper.Map<Core.Domain.Entities.FinancialYear>(request);
-        //                 _logger.LogInformation("Mapped Create FinancialYear Command to Department entity: {@DepartmentEntity}", financialYearEntity);
-
-        //                 // Save the department
-        //                 var createdfinancialYear = await _financialYearCommandRepository.CreateAsync(financialYearEntity);
-
-        //                 if (createdfinancialYear == null)
-        //                 {
-        //                     _logger.LogWarning("Failed to create department. FinancialYear entity: {@financialYearEntity}", financialYearEntity);
-        //                     return new ApiResponseDTO<int> {IsSuccess = false, Message = "FinancialYear not created" };
-        //                 }
-
-        //                 _logger.LogInformation("FinancialYear successfully created with ID: {FYId}", createdfinancialYear.Id);
-
-        //                 // Publish the domain event
-        //                 var domainEvent = new AuditLogsDomainEvent(
-        //                     actionDetail: "Create",
-        //                     actionCode: createdfinancialYear.Id.ToString(),
-        //                     actionName: createdfinancialYear.StartYear,
-        //                     details: $"FinancialYear '{createdfinancialYear.StartYear}' was created. FinancialYearID: {createdfinancialYear.Id}",
-        //                     module: "FinancialYear"
-        //                 );
-
-        //                 await _mediator.Publish(domainEvent, cancellationToken);
-        //                 _logger.LogInformation("AuditLogsDomainEvent published for FinancialYear ID: {FYId}", createdfinancialYear.Id);
-
-        //                 // Map the result to DTO
-        //                 var deptDto = _mapper.Map<FinancialYearDto>(createdfinancialYear);
-        //                     if (deptDto == null)
-        //                     {
-        //                         _logger.LogError("Failed to map created FinancialYear to DTO.");
-        //                         return new ApiResponseDTO<int> { IsSuccess = false, Message = "Error mapping FinancialYear" };
-        //                     }
-        //                 _logger.LogInformation("Returning success response for FinancialYear ID: {FYId}", createdfinancialYear.Id);
-
-        //                 return new ApiResponseDTO<int>
-        //                 {
-        //                     IsSuccess = true,
-        //                     Message = "FinancialYear created successfully",
-        //                     Data = createdfinancialYear.Id
-        //                 };
+                   
+        public async Task<ApiResponseDTO<int>> Handle(CreateFinancialYearCommand request, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Starting CreateFinancialYearCommandHandler for request: {@Request}", request);
+           
+             var financialYears = await _financialYearQueryRepository.GetAllFinancialYearAsync();
+                //  var existingFinancialYear = await _financialYearQueryRepository.GetFinancialYearByDateRangeAsync(request.StartDate, request.EndDate);
 
 
-        // }
+             var existingFinancialYear = financialYears.FirstOrDefault(fy => fy.StartDate == request.StartDate && fy.EndDate == request.EndDate);
 
+            if (existingFinancialYear != null)
+            {
+                _logger.LogWarning("FinancialYear with start year {StartYear} already exists.", request.StartYear);
+                return new ApiResponseDTO<int>
+                {
+                    IsSuccess = false,
+                    Message = "FinancialYear with start year already exists."
+                };
+            }
+            // Map request to entity
+            var financialYearEntity = _mapper.Map<Core.Domain.Entities.FinancialYear>(request);
+            _logger.LogInformation("Mapped Create FinancialYear Command to FinancialYear entity: {@FinancialYearEntity}", financialYearEntity);
+
+            // Save FinancialYear
+            var createdfinancialYear = await _financialYearCommandRepository.CreateAsync(financialYearEntity);
+
+          
+             if (createdfinancialYear == null)
+            {
+                _logger.LogWarning("Failed to create department. Department entity: {@DepartmentEntity}", financialYearEntity);
+                return new ApiResponseDTO<int>
+                {
+                    IsSuccess = false,
+                    Message = "FinancialYear not created"
+                };
+            }
+            _logger.LogInformation("FinancialYear successfully created with ID: {FYId}", financialYearEntity.Id);
+
+            // Publish Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "Create",
+                actionCode: financialYearEntity.Id.ToString(),
+                actionName: financialYearEntity.StartYear,
+                details: $"FinancialYear '{financialYearEntity.StartYear}' was created. FinancialYearID: {financialYearEntity.Id}",
+                module: "FinancialYear"
+            );
+
+            await _mediator.Publish(domainEvent, cancellationToken);
+            _logger.LogInformation("AuditLogsDomainEvent published for FinancialYear ID: {FYId}", financialYearEntity.Id);
+
+            // Map result to DTO
+            var financialYearDto = _mapper.Map<FinancialYearDto>(createdfinancialYear);
+          
+
+            _logger.LogInformation("Returning success response for FinancialYear ID: {FYId}", financialYearEntity.Id);
+
+            return new ApiResponseDTO<int>
+            {
+                IsSuccess = true,
+                Message = "FinancialYear created successfully",
+                Data = financialYearDto.Id
+        };
+        }
+
+         
         
     }
 }

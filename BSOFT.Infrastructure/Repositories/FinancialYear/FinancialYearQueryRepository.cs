@@ -8,12 +8,11 @@ using Dapper;
 
 namespace BSOFT.Infrastructure.Repositories.FinancialYear
 {
-    public class GetFinancialYearQueryRepository : IFinancialYearQueryRepository
-    {
-        
+    public class FinancialYearQueryRepository : IFinancialYearQueryRepository
+    {        
           private readonly IDbConnection _dbConnection; 
 
-    public  GetFinancialYearQueryRepository(IDbConnection dbConnection)
+    public  FinancialYearQueryRepository(IDbConnection dbConnection)
     {
          _dbConnection = dbConnection;
     }
@@ -21,7 +20,7 @@ namespace BSOFT.Infrastructure.Repositories.FinancialYear
      public async Task<List<Core.Domain.Entities.FinancialYear>>GetAllFinancialYearAsync()
     {
         
-        const string query = @"SELECT  * FROM AppData.Department";
+        const string query = @"SELECT  * FROM AppData.FinancialYear WHERE IsActive = 1 order by CreatedAt desc";
             return (await _dbConnection.QueryAsync<Core.Domain.Entities.FinancialYear>(query)).ToList();
         
     }
@@ -29,7 +28,7 @@ namespace BSOFT.Infrastructure.Repositories.FinancialYear
     {
                
 
-             const string query = @"SELECT * FROM AppSecurity.FinancialYear WHERE Id = @Id AND IsActive = 1";
+             const string query = @"SELECT * FROM AppData.FinancialYear WHERE Id = @Id AND IsActive = 1  order by CreatedAt desc";
             var financialyear = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.FinancialYear>(query, new { id });           
              if (financialyear == null)
             {
@@ -37,7 +36,9 @@ namespace BSOFT.Infrastructure.Repositories.FinancialYear
             }
             return financialyear;
             
-        } 
+    } 
+
+
 
 
     }

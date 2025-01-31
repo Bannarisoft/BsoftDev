@@ -49,7 +49,6 @@ using BSOFT.Infrastructure.Repositories.PasswordComplexityRule;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
 using BSOFT.Infrastructure.Repositories.AdminSecuritySettings;
 using Core.Application.Common.Interfaces.IFinancialYear;
-using Core.Application.FinancialYear.Queries.GetFinancialYear;
 using BSOFT.Infrastructure.Repositories.FinancialYear;
 using Hangfire;
 using Hangfire.SqlServer;
@@ -189,8 +188,8 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
 
             services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>(); 
-            services.AddScoped<IFinancialYearQueryRepository, GetFinancialYearQueryRepository>();
-            services.AddScoped<IFinancialYearCommandRepository , GetFinancialYearCommandRepository>();
+            services.AddScoped<IFinancialYearQueryRepository,  FinancialYearQueryRepository>();
+            services.AddScoped<IFinancialYearCommandRepository , FinancialYearCommandRepository>();
 
           
                      

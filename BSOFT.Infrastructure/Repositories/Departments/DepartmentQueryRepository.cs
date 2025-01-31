@@ -39,7 +39,7 @@ namespace BSOFT.Infrastructure.Repositories.Departments
                 throw new KeyNotFoundException($"Department with ID {id} not found.");
             }
             return department;
-        }   
+        }                  
     
 
 
@@ -61,5 +61,6 @@ namespace BSOFT.Infrastructure.Repositories.Departments
             return departments.ToList();
         }
 
+       
     }
 }

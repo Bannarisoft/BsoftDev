@@ -46,6 +46,7 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<CompanySettings> CompanySettings { get; set; } 
 
         public DbSet<FinancialYear> FinancialYear { get; set;}
+        
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

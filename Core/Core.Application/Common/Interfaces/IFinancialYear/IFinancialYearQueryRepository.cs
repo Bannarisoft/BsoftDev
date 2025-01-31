@@ -11,7 +11,10 @@ namespace Core.Application.Common.Interfaces.IFinancialYear
     {
          Task<List<Core.Domain.Entities.FinancialYear>> GetAllFinancialYearAsync();
 
-        Task<Core.Domain.Entities.FinancialYear> GetByIdAsync(int id);         
+        Task<Core.Domain.Entities.FinancialYear> GetByIdAsync(int id);  
+
+    
+        
     
     }
 }

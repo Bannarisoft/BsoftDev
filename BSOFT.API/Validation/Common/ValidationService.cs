@@ -51,6 +51,7 @@ using Core.Application.CompanySettings.Commands.CreateCompanySettings;
 using BSOFT.API.Validation.CompanySettings;
 using Core.Application.FinancialYear.Command.CreateFinancialYear;
 using BSOFT.API.Validation.FinancialYear;
+using Core.Application.FinancialYear.Command.UpdateFinancialYear;
 namespace BSOFT.API.Validation.Common
 {
     public class ValidationService
@@ -93,6 +94,7 @@ namespace BSOFT.API.Validation.Common
         services.AddScoped<IValidator<FirstTimeUserPasswordCommand>,PasswordChangeCommandValidator>();
         services.AddScoped<IValidator<CreateCompanySettingsCommand>, CreateCompanySettingsCommandValidator>();
         services.AddScoped<IValidator<CreateFinancialYearCommand>, CreateFinancialYearCommandValidator>();
+        services.AddScoped<IValidator<UpdateFinancialYearCommand>, UpdateFinancialYearCommandValidator>();
         
          }  
     }

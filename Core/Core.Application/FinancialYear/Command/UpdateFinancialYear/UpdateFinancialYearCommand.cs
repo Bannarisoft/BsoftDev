@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Mappings;
-using Core.Domain.Entities;
 using Core.Domain.Enums;
+using MediatR;
 
-
-namespace Core.Application.FinancialYear.Queries.GetFinancialYear
+namespace Core.Application.FinancialYear.Command.UpdateFinancialYear
 {
-    public class FinancialYearDto  : IMapFrom<ApiResponseDTO<Core.Domain.Entities.FinancialYear>>
+    public class UpdateFinancialYearCommand : IRequest<ApiResponseDTO<int>>
     {
+
          public int Id { get; set; }
         public string StartYear { get; set; }
         public DateTime StartDate { get; set; }
@@ -19,12 +18,9 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYear
 
         public string FinYearName { get; set; }
 
-        public  FinancialYearEnum.FinancialYearStatus IsActive  { get; set; }
-
-        public FinancialYearEnum.FinancialYearDelete  IsDeleted { get; set; }
-
+       // public  byte IsActive  { get; set; }
+       
+        public FinancialYearEnum.FinancialYearStatus  IsActive { get; set; }
         
-
-
     }
 }
