@@ -16,16 +16,19 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
     public class CreateRoleEntitlementCommandHandler : IRequestHandler<CreateRoleEntitlementCommand, ApiResponseDTO<int>>
     {
-        private readonly IRoleEntitlementCommandRepository _repository;
+        private readonly IRoleEntitlementCommandRepository _roleEntitlementCommandrepository;
+        private readonly IRoleEntitlementQueryRepository _roleEntitlementQueryrepository;
+
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
         private readonly ILogger<CreateRoleEntitlementCommandHandler> _logger;
 
 
 
-        public CreateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository repository, IMapper mapper, IMediator mediator,ILogger<CreateRoleEntitlementCommandHandler> logger)
+        public CreateRoleEntitlementCommandHandler(IRoleEntitlementCommandRepository roleEntitlementCommandrepository,IRoleEntitlementQueryRepository roleEntitlementQueryrepository, IMapper mapper, IMediator mediator,ILogger<CreateRoleEntitlementCommandHandler> logger)
         {
-            _repository = repository;
+            _roleEntitlementCommandrepository = roleEntitlementCommandrepository;
+            _roleEntitlementQueryrepository = roleEntitlementQueryrepository;
             _mapper = mapper;
             _mediator = mediator;    
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -44,7 +47,7 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
                 _logger.LogInformation("Starting role entitlement creation process for RoleName: {RoleName}", request.RoleName);
                 
                 // Validate the role
-                var role = await _repository.GetRoleByNameAsync(request.RoleName, cancellationToken);
+                var role = await _roleEntitlementQueryrepository.GetRoleByNameAsync(request.RoleName, cancellationToken);
                 if (role == null)
                 {
                     throw new ValidationException("Role not found.");
@@ -58,7 +61,7 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
                         throw new ValidationException("Module ID must be greater than 0.");
                     }
 
-                    var moduleExists = await _repository.ModuleExistsAsync(moduleMenu.ModuleId, cancellationToken);
+                    var moduleExists = await _roleEntitlementCommandrepository.ModuleExistsAsync(moduleMenu.ModuleId, cancellationToken);
                     if (!moduleExists)
                     {
                         throw new ValidationException($"Module with ID '{moduleMenu.ModuleId}' does not exist.");
@@ -71,7 +74,7 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
                             throw new ValidationException("Menu ID must be greater than 0.");
                         }
 
-                        var menuExists = await _repository.MenuExistsAsync(menu.MenuId, cancellationToken);
+                        var menuExists = await _roleEntitlementCommandrepository.MenuExistsAsync(menu.MenuId, cancellationToken);
                         if (!menuExists)
                         {
                             throw new ValidationException($"Menu with ID '{menu.MenuId}' does not exist.");
@@ -92,7 +95,7 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
                 .ToList();
 
                 // Fetch Existing RoleEntitlements to Prevent Duplicates
-                var existingEntitlements = await _repository.GetExistingRoleEntitlementsAsync(
+                var existingEntitlements = await _roleEntitlementQueryrepository.GetExistingRoleEntitlementsAsync(
                     roleEntitlements.Select(e => e.UserRoleId).Distinct().ToList(),
                     roleEntitlements.Select(e => e.ModuleId).Distinct().ToList(),
                     roleEntitlements.Select(e => e.MenuId).Distinct().ToList(),
@@ -111,7 +114,7 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 
                 if (newEntitlements.Any())
                 {
-                    await _repository.AddRoleEntitlementsAsync(newEntitlements, cancellationToken);
+                    await _roleEntitlementCommandrepository.AddRoleEntitlementsAsync(newEntitlements, cancellationToken);
 
                     // Domain Event for Audit Logs
                     var domainEvent = new AuditLogsDomainEvent(
