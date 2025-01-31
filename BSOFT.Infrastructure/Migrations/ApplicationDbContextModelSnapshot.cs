@@ -571,6 +571,10 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsActive");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
@@ -1074,10 +1078,8 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("varchar(20)")
-                        .HasColumnName("Code")
-                        .HasDefaultValueSql("CONCAT('TZ-', LEFT(NEWID(), 8))");
+                        .HasColumnName("Code");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -1097,6 +1099,15 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsActive");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("Location");
+
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
@@ -1113,6 +1124,11 @@ namespace BSOFT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("Name");
+
+                    b.Property<string>("Offset")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("Offset");
 
                     b.HasKey("Id");
 
@@ -1240,7 +1256,8 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitId")
+                        .IsUnique();
 
                     b.ToTable("UnitAddress", "AppData");
                 });
@@ -1284,7 +1301,8 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitId")
+                        .IsUnique();
 
                     b.ToTable("UnitContacts", "AppData");
                 });
@@ -1649,8 +1667,8 @@ namespace BSOFT.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.UnitAddress", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Unit", "Unit")
-                        .WithMany("UnitAddress")
-                        .HasForeignKey("UnitId")
+                        .WithOne("UnitAddress")
+                        .HasForeignKey("Core.Domain.Entities.UnitAddress", "UnitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1660,8 +1678,8 @@ namespace BSOFT.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.UnitContacts", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Unit", "Unit")
-                        .WithMany("UnitContacts")
-                        .HasForeignKey("UnitId")
+                        .WithOne("UnitContacts")
+                        .HasForeignKey("Core.Domain.Entities.UnitContacts", "UnitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1750,9 +1768,11 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Unit", b =>
                 {
-                    b.Navigation("UnitAddress");
+                    b.Navigation("UnitAddress")
+                        .IsRequired();
 
-                    b.Navigation("UnitContacts");
+                    b.Navigation("UnitContacts")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.User", b =>

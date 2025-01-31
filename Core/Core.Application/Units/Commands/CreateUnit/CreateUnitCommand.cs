@@ -8,7 +8,7 @@ namespace Core.Application.Units.Commands.CreateUnit
 {
     public class CreateUnitCommand : IRequest<ApiResponseDTO<int>> 
     {
-         public UnitDto UnitDto { get; set; }
+         public UnitsDto UnitDto { get; set; }
          
     }
 

@@ -45,11 +45,10 @@ namespace BSOFT.Infrastructure.Data.Configurations
         builder.Property(uc => uc.Remarks)
             .HasColumnName("Remarks")
             .HasColumnType("varchar(250)");
-          
 
         builder.HasOne(uc => uc.Unit)
-            .WithMany(u => u.UnitContacts)
-            .HasForeignKey(uc => uc.UnitId);
+            .WithOne(u => u.UnitContacts)
+            .HasForeignKey<UnitContacts>(uc => uc.UnitId);
         }
     }
 }

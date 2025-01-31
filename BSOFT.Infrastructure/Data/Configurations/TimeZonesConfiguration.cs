@@ -1,4 +1,5 @@
 using Core.Domain.Entities;
+using Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace BSOFT.Infrastructure.Data.Configurations
@@ -20,23 +21,39 @@ namespace BSOFT.Infrastructure.Data.Configurations
             builder.Property(u => u.Code)
                 .HasColumnName("Code")
                 .HasColumnType("varchar(20)") // Adjust length as per requirements
-                .IsRequired()
-                .HasDefaultValueSql("CONCAT('TZ-', LEFT(NEWID(), 8))") // Generate unique alphanumeric Code
-                .ValueGeneratedOnAdd(); 
+                .IsRequired();
 
         builder.Property(u => u.Name)
             .HasColumnName("Name")
             .HasColumnType("varchar(50)")
             .IsRequired();
 
+        builder.Property(u => u.Offset)
+            .HasColumnName("Offset")
+            .HasColumnType("varchar(20)")
+            .IsRequired();
+
+        builder.Property(u => u.Location)
+            .HasColumnName("Location")
+            .HasColumnType("varchar(100)")
+            .IsRequired();
+
          builder.Property(u => u.IsActive)
             .HasColumnName("IsActive")
             .HasColumnType("bit")
             .HasConversion(
-        v => v == 1, // convert byte to bool
-        v => v ? (byte)1 : (byte)0 // convert bool to byte
-    )
-    .IsRequired();
+             v => v == TimeZonesEnum.TimeZonesStatus.Active, // convert enum to bool
+             v => v ? TimeZonesEnum.TimeZonesStatus.Active : TimeZonesEnum.TimeZonesStatus.Inactive // convert bool to enum
+             )
+            .IsRequired();
+        builder.Property(u => u.IsDeleted)
+            .HasColumnName("IsDeleted")
+            .HasColumnType("bit")
+            .HasConversion(
+             v => v == TimeZonesEnum.TimeZonesDelete.Deleted, // convert enum to bool
+             v => v ? TimeZonesEnum.TimeZonesDelete.Deleted : TimeZonesEnum.TimeZonesDelete.NotDeleted // convert bool to enum
+             )
+            .IsRequired();
         }
     }
 }

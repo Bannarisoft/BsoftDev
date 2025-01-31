@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.Units.Queries.GetUnitById
 {
-    public class GetUnitByIdQuery :  IRequest<ApiResponseDTO<List<UnitDto>>>
+    public class GetUnitByIdQuery :  IRequest<ApiResponseDTO<List<GetUnitsDTO>>>
     { 
         public int Id { get; set; }
     }

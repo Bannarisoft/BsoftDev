@@ -1,5 +1,6 @@
 using Core.Domain.Common;
 
+
 namespace Core.Domain.Entities
 {
 
@@ -15,8 +16,8 @@ public int DivisionId { get; set; }
 public string UnitHeadName { get; set; }
 public string CINNO {get; set;}
 public new byte IsActive { get; set; }
-public List<UnitAddress> UnitAddress { get; set; }=new List<UnitAddress>();
-public List<UnitContacts> UnitContacts { get; set; }=new List<UnitContacts>();
+public  UnitAddress UnitAddress { get; set; }
+public  UnitContacts UnitContacts { get; set; }
        
 }
 }

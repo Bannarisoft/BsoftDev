@@ -18,7 +18,7 @@ namespace BSOFT.Infrastructure.Repositories.Currency
 
         public async Task<List<Core.Domain.Entities.Currency>> GetByIdAsync(int id)
         {
-             const string query = "SELECT * FROM AppData.Currency WHERE Id = @Id";
+             const string query = "SELECT * FROM AppData.Currency WHERE Id = @Id and IsActive = 1";
              var currencyList = await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query, new { id });
              return currencyList?.ToList() ?? new List<Core.Domain.Entities.Currency>();
         }
@@ -33,7 +33,7 @@ namespace BSOFT.Infrastructure.Repositories.Currency
                  SELECT *
             FROM AppData.Currency
             WHERE Name LIKE @SearchPattern OR Code LIKE @SearchPattern and IsActive = 1
-            ORDER BY Name";
+            ORDER BY CreatedAt DESC";
                 
             // Update the object to use SearchPattern instead of Name
             var Currencylist = await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query, new { SearchPattern = $"%{searchPattern}%" });
@@ -44,7 +44,7 @@ namespace BSOFT.Infrastructure.Repositories.Currency
         {          
              const string query = @"
               SELECT *
-            FROM AppData.Currency";
+            FROM AppData.Currency WHERE IsActive = 1 ORDER BY CreatedAt DESC";
             return (await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query)).ToList() ?? new List<Core.Domain.Entities.Currency>();
         }
 

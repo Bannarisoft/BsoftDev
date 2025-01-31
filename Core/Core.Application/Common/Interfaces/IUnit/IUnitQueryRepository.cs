@@ -7,11 +7,10 @@ namespace Core.Application.Common.Interfaces.IUnit
 {
     public interface IUnitQueryRepository
     {
-       Task<List<UnitDto>> GetAllUnitsAsync();
-       Task<List<UnitDto>> GetByIdAsync(int Id);     
-       Task<List<UnitDto>> GetUnit(string searchPattern);              
+       Task<List<Unit>> GetAllUnitsAsync();
+       Task<List<Unit>> GetByIdAsync(int Id);     
+       Task<List<Unit>> GetUnit(string searchPattern);              
     }
     
-
    
 }

@@ -33,6 +33,18 @@ namespace Core.Application.Units.Commands.CreateUnit
        
             
             _logger.LogInformation("Starting creation process for Unit: {UnitName}", request.UnitDto.UnitName);
+             // Check if Unit Name already exists
+            var exists = await _iUnitRepository.ExistsByCodeAsync(request.UnitDto.UnitName);
+            if (exists)
+            {
+                 _logger.LogWarning("Unit Name {Name} already exists.", request.UnitDto.UnitName);
+                 return new ApiResponseDTO<int>
+            {
+            IsSuccess = false,
+            Message = "Unit Name already exists.",
+            Data = 0
+            };
+            }
               var unit = _mapper.Map<Core.Domain.Entities.Unit>(request.UnitDto);
               var result =  await _iUnitRepository.CreateUnitAsync(unit);
             _logger.LogInformation("Completed creation process for Unit: {UnitName}", request.UnitDto.UnitName);
@@ -40,24 +52,6 @@ namespace Core.Application.Units.Commands.CreateUnit
 
               var unitId = unit.Id;
               _logger.LogInformation("Unit {UnitId} created successfully", unitId);
-
-                foreach (var addressDto in request.UnitDto.UnitAddressDto)
-              {
-                 _logger.LogInformation("Starting creation process for UnitAddress: {UnitId}", unitId);
-                  var address = _mapper.Map<UnitAddress>(addressDto);
-                  address.UnitId = unitId;
-                  await _iUnitRepository.CreateUnitAddressAsync(address);
-                  _logger.LogInformation("Completed creation process for UnitAddress: {UnitId}", unitId);
-              }
-
-                foreach (var contactDto in request.UnitDto.UnitContactsDto)
-                {   
-                _logger.LogInformation("Starting creation process for UnitContacts: {UnitId}", unitId);
-                  var contact = _mapper.Map<UnitContacts>(contactDto);
-                  contact.UnitId = unitId;
-                  await _iUnitRepository.CreateUnitContactsAsync(contact);
-                 _logger.LogInformation("Completed creation process for UnitContacts: {UnitId}", unitId);
-                }
 
                    //Domain Event
                   var domainEvent = new AuditLogsDomainEvent(

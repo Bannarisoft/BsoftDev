@@ -1,4 +1,5 @@
 using Core.Domain.Entities;
+using Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -28,13 +29,21 @@ namespace BSOFT.Infrastructure.Data.Configurations
             .IsRequired();
 
          builder.Property(u => u.IsActive)
-    .HasColumnName("IsActive")
-    .HasColumnType("bit")
-    .HasConversion(
-        v => v == 1, // convert byte to bool
-        v => v ? (byte)1 : (byte)0 // convert bool to byte
-    )
-    .IsRequired();
+            .HasColumnName("IsActive")
+            .HasColumnType("bit")
+            .HasConversion(
+             v => v == CurrencyEnum.CurrencyStatus.Active, // convert enum to bool
+             v => v ? CurrencyEnum.CurrencyStatus.Active : CurrencyEnum.CurrencyStatus.Inactive // convert bool to enum
+             )
+            .IsRequired();
+        builder.Property(u => u.IsDeleted)
+            .HasColumnName("IsDeleted")
+            .HasColumnType("bit")
+            .HasConversion(
+             v => v == CurrencyEnum.CurrencyDelete.Deleted, // convert enum to bool
+             v => v ? CurrencyEnum.CurrencyDelete.Deleted : CurrencyEnum.CurrencyDelete.NotDeleted // convert bool to enum
+             )
+            .IsRequired();
         }
     }
 }

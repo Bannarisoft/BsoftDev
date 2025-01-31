@@ -215,7 +215,7 @@ public async Task<IActionResult> DeleteEntityAsync( DeleteEntityCommand command)
 
         if (result.IsSuccess) 
         {
-            _logger.LogInformation("Entity {EntityName} deleted successfully.", command.EntityId);
+            _logger.LogInformation("Currency {Code} deleted successfully.", command.EntityId);
              return Ok(new
             {
                 message = result.Message,

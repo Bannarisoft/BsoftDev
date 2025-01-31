@@ -12,7 +12,7 @@ using System.Data;
 namespace Core.Application.Units.Queries.GetUnitById
 {
     //public class GetUnitByIdQueryHandler : IRequestHandler<GetUnitByIdQuery,UnitDto>
-    public class GetUnitByIdQueryHandler : IRequestHandler<GetUnitByIdQuery,ApiResponseDTO<List<UnitDto>>>
+    public class GetUnitByIdQueryHandler : IRequestHandler<GetUnitByIdQuery,ApiResponseDTO<List<GetUnitsDTO>>>
     {
          private readonly IUnitQueryRepository _unitRepository;        
         private readonly IMapper _mapper;
@@ -29,7 +29,7 @@ namespace Core.Application.Units.Queries.GetUnitById
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-         public async Task<ApiResponseDTO<List<UnitDto>>> Handle(GetUnitByIdQuery request, CancellationToken cancellationToken)
+         public async Task<ApiResponseDTO<List<GetUnitsDTO>>> Handle(GetUnitByIdQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Fetching Unit Request started: {request}", request.Id);
             var units = await _unitRepository.GetByIdAsync(request.Id);    
@@ -37,7 +37,7 @@ namespace Core.Application.Units.Queries.GetUnitById
               if (units == null || !units.Any())
                 {
                     _logger.LogWarning("No Unit Record {Unit} not found in DB.", request.Id);
-                     return new ApiResponseDTO<List<UnitDto>>
+                     return new ApiResponseDTO<List<GetUnitsDTO>>
                      {
                          IsSuccess = false,
                          Message = "Unit not found."
@@ -45,7 +45,7 @@ namespace Core.Application.Units.Queries.GetUnitById
                      };
                 }
 
-            var unitList = _mapper.Map<List<UnitDto>>(units);
+            var unitList = _mapper.Map<List<GetUnitsDTO>>(units);
             //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetUnitByIdQuery",
@@ -56,7 +56,7 @@ namespace Core.Application.Units.Queries.GetUnitById
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation("Fetching Unit Request Completed: {request}", request.Id);
-            return new ApiResponseDTO<List<UnitDto>>
+            return new ApiResponseDTO<List<GetUnitsDTO>>
             {
                 IsSuccess = true,
                 Message = "Success",

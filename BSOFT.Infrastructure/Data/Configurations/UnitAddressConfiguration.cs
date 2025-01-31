@@ -64,8 +64,10 @@ namespace BSOFT.Infrastructure.Data.Configurations
       
 
         builder.HasOne(ua => ua.Unit)
-            .WithMany(u => u.UnitAddress)
-            .HasForeignKey(ua => ua.UnitId);
+            .WithOne(u =>u.UnitAddress) 
+           .HasForeignKey<UnitAddress>(ua => ua.UnitId);
+
+   
         }
     }
 }

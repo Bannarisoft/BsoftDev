@@ -1,8 +1,11 @@
-using Core.Application.Common.Mappings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Core.Application.Units.Queries.GetUnits
 {
-    public class UnitDto :IMapFrom<Core.Domain.Entities.Unit>
+    public class GetUnitsDTO
     {
     public int Id { get; set; }
     public string UnitName { get; set; }
@@ -12,8 +15,7 @@ namespace Core.Application.Units.Queries.GetUnits
     public string UnitHeadName { get; set; }
     public string CINNO { get; set; }
     public byte IsActive { get; set; }
-    public List<UnitAddressDto> UnitAddressDto { get; set; } = new List<UnitAddressDto>();
-    public List<UnitContactsDto> UnitContactsDto { get; set;} = new List<UnitContactsDto>();
+    public UnitAddressDto UnitAddressDto { get; set; } 
+    public UnitContactsDto UnitContactsDto { get; set;} 
     }
-    
 }

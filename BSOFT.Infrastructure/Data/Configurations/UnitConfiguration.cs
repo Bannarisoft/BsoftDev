@@ -1,4 +1,5 @@
 using Core.Domain.Entities;
+using Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -47,22 +48,22 @@ namespace BSOFT.Infrastructure.Data.Configurations
             .HasColumnType("varchar(50)")
             .IsRequired();
 
-
-         builder.Property(u => u.IsActive)
-    .HasColumnName("IsActive")
-    .HasColumnType("bit")
-    .HasConversion(
-        v => v == 1, // convert byte to bool
-        v => v ? (byte)1 : (byte)0 // convert bool to byte
-    )
-    .IsRequired();
-        builder.HasMany(u => u.UnitAddress)
+           builder.Property(c => c.IsActive)
+                .HasColumnName("IsActive")
+                .HasColumnType("bit")
+                .HasConversion(
+                        v => v == 1, // convert byte to bool
+                        v => v ? (byte)1 : (byte)0 // convert bool to byte
+                    )
+                .IsRequired();
+       
+        builder.HasOne(u => u.UnitAddress)
             .WithOne(ua => ua.Unit)
-            .HasForeignKey(ua => ua.UnitId);
+            .HasForeignKey<UnitAddress>(ua => ua.UnitId);
 
-        builder.HasMany(u => u.UnitContacts)
+        builder.HasOne(u => u.UnitContacts)
             .WithOne(uc => uc.Unit)
-            .HasForeignKey(uc => uc.UnitId);
+            .HasForeignKey<UnitContacts>(uc => uc.UnitId);
         }
     }
 }

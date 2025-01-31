@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Units.Queries.GetUnitAutoComplete
 {
-    public class GetUnitAutoCompleteQueryHandler : IRequestHandler<GetUnitAutoCompleteQuery, ApiResponseDTO<List<UnitDto>>>
+    public class GetUnitAutoCompleteQueryHandler : IRequestHandler<GetUnitAutoCompleteQuery, ApiResponseDTO<List<GetUnitsDTO>>>
     {
          private readonly IUnitQueryRepository _unitRepository;        
         private readonly IMapper _mapper;
@@ -29,21 +29,21 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<ApiResponseDTO<List<UnitDto>>> Handle(GetUnitAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<GetUnitsDTO>>> Handle(GetUnitAutoCompleteQuery request, CancellationToken cancellationToken)
         {     
            _logger.LogInformation("Search pattern started: {SearchPattern}", request.SearchPattern);
             var result = await _unitRepository.GetUnit(request.SearchPattern);
               if (result == null || !result.Any() || result.Count == 0) 
                 {
                       _logger.LogWarning("No Unit Record {Unit} not found in DB.", request.SearchPattern);
-                     return new ApiResponseDTO<List<UnitDto>>
+                     return new ApiResponseDTO<List<GetUnitsDTO>>
                      {
                          IsSuccess = false,
                          Message = "Unit not found."
                      };
                 }
 
-            var unitDto = _mapper.Map<List<UnitDto>>(result);
+            var unitDto = _mapper.Map<List<GetUnitsDTO>>(result);
 
             //Domain Event            
             var domainEvent = new AuditLogsDomainEvent(
@@ -56,7 +56,7 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
             await _mediator.Publish(domainEvent, cancellationToken);
 
             _logger.LogInformation("Unit {Unit} Listed successfully.", result.Count);
-            return new ApiResponseDTO<List<UnitDto>>
+            return new ApiResponseDTO<List<GetUnitsDTO>>
             {
                 IsSuccess = true,
                 Message = "Success",

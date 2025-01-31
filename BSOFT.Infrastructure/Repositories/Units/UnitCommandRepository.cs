@@ -17,61 +17,23 @@ namespace BSOFT.Infrastructure.Repositories.Units
 
        public async Task<int> CreateUnitAsync(Unit unit)
        {
-        _applicationDbContext.Unit.Add(unit);
+        var entry =_applicationDbContext.Entry(unit);
+        await _applicationDbContext.Unit.AddAsync(unit);
         await _applicationDbContext.SaveChangesAsync();
         return unit.Id;
       }
 
-       public async Task<UnitAddress> CreateUnitAddressAsync(UnitAddress unitAddress)
-       {
-        _applicationDbContext.UnitAddress.Add(unitAddress);
-        await _applicationDbContext.SaveChangesAsync();
-        return unitAddress;
-       }
 
-        public async Task<UnitContacts> CreateUnitContactsAsync(UnitContacts unitContacts)
-        {
-        _applicationDbContext.UnitContacts.Add(unitContacts);
-        await _applicationDbContext.SaveChangesAsync();
-        return unitContacts;
-        }
-
-      
-        public async Task UpdateUnitAddressAsync(int Id, UnitAddress unitAddress)
-        {
-            var existingUnitAddress = await _applicationDbContext.UnitAddress.FirstOrDefaultAsync(u => u.UnitId == Id);
-            if (existingUnitAddress != null)
-            {
-                existingUnitAddress.CountryId = unitAddress.CountryId;
-                existingUnitAddress.StateId = unitAddress.StateId;
-                existingUnitAddress.CityId = unitAddress.CityId;
-                existingUnitAddress.AddressLine1 = unitAddress.AddressLine1;
-                existingUnitAddress.AddressLine2 = unitAddress.AddressLine2;
-                existingUnitAddress.PinCode = unitAddress.PinCode;
-                existingUnitAddress.ContactNumber = unitAddress.ContactNumber;
-                existingUnitAddress.AlternateNumber = unitAddress.AlternateNumber;
-                await _applicationDbContext.SaveChangesAsync();
-            }
-        }
-
-        public async Task UpdateUnitContactsAsync(int Id, UnitContacts unitContacts)
-        {
-             var existingUnitContacts = await _applicationDbContext.UnitContacts.FirstOrDefaultAsync(u => u.UnitId == Id);
-            if (existingUnitContacts != null)
-            {
-                existingUnitContacts.Name = unitContacts.Name;
-                existingUnitContacts.Designation = unitContacts.Designation;
-                existingUnitContacts.Email = unitContacts.Email;
-                existingUnitContacts.PhoneNo = unitContacts.PhoneNo;
-                existingUnitContacts.Remarks = unitContacts.Remarks;
-                await _applicationDbContext.SaveChangesAsync();
-            }
-        }
 
     public async Task<int> UpdateUnitAsync(int Id, Unit unit)
 {
-    // Try to find the existing unit by ID
-    var existingUnit = await _applicationDbContext.Unit.FirstOrDefaultAsync(u => u.Id == Id);
+     // Try to find the existing unit by ID
+    var existingUnit = await _applicationDbContext.Unit
+            .Include(c => c.UnitAddress)
+            .Include(c => c.UnitContacts)
+            .AsNoTracking().FirstOrDefaultAsync(u => u.Id == Id);
+   
+    
 
     // If no unit is found, return -1 (indicating failure)
     if (existingUnit == null)
@@ -87,6 +49,25 @@ namespace BSOFT.Infrastructure.Repositories.Units
     existingUnit.UnitHeadName = unit.UnitHeadName;
     existingUnit.CINNO = unit.CINNO;
     existingUnit.IsActive = unit.IsActive;
+
+    // Update the UnitAddress
+    existingUnit.UnitAddress.CountryId = unit.UnitAddress.CountryId;
+    existingUnit.UnitAddress.StateId = unit.UnitAddress.StateId;
+    existingUnit.UnitAddress.CityId = unit.UnitAddress.CityId;
+    existingUnit.UnitAddress.AddressLine1 = unit.UnitAddress.AddressLine1;
+    existingUnit.UnitAddress.AddressLine2 = unit.UnitAddress.AddressLine2;
+    existingUnit.UnitAddress.PinCode = unit.UnitAddress.PinCode;
+    existingUnit.UnitAddress.ContactNumber = unit.UnitAddress.ContactNumber;
+    existingUnit.UnitAddress.AlternateNumber = unit.UnitAddress.AlternateNumber;
+
+    // Update the UnitContacts
+    existingUnit.UnitContacts.Name = unit.UnitContacts.Name;    
+    existingUnit.UnitContacts.Designation = unit.UnitContacts.Designation;
+    existingUnit.UnitContacts.Email = unit.UnitContacts.Email;
+    existingUnit.UnitContacts.PhoneNo = unit.UnitContacts.PhoneNo;
+    existingUnit.UnitContacts.Remarks = unit.UnitContacts.Remarks;
+
+    _applicationDbContext.Unit.Update(existingUnit);
 
     // Save the changes to the database
     await _applicationDbContext.SaveChangesAsync();
@@ -108,7 +89,10 @@ namespace BSOFT.Infrastructure.Repositories.Units
                 return unitToDelete.Id;                        
         }
 
-
+    public async Task<bool> ExistsByCodeAsync(string code)
+    {
+        return await _applicationDbContext.Unit.AnyAsync(c => c.UnitName == code);
+    }
         
     }
 }

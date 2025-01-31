@@ -85,6 +85,11 @@ public async Task<int> DeleteEntityAsync(int id, Entity entity)
         return 1; // Indicate success
    
 }
+
+    public async Task<bool> ExistsByCodeAsync(string entity)
+    {
+        return await _applicationDbContext.Entity.AnyAsync(c => c.EntityName == entity);
+    }
     
     }
 }
