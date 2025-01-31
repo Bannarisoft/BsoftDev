@@ -4,6 +4,7 @@ using Core.Application.Divisions.Commands.DeleteDivision;
 using Core.Application.Divisions.Commands.UpdateDivision;
 using Core.Application.Divisions.Queries.GetDivisions;
 using Core.Domain.Entities;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Common.Mappings
 {
@@ -11,9 +12,13 @@ namespace Core.Application.Common.Mappings
     {
         public DivisionProfile()
         {
-            CreateMap<CreateDivisionCommand, Division>();
-            CreateMap<UpdateDivisionCommand, Division>();
-            CreateMap<DeleteDivisionCommand, Division>();
+            CreateMap<CreateDivisionCommand, Division>()
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+            CreateMap<UpdateDivisionCommand, Division>()
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
+            CreateMap<DeleteDivisionCommand, Division>()
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
             CreateMap<Division, DivisionDTO>();            
             CreateMap<Division, DivisionAutoCompleteDTO>();
         }

@@ -71,7 +71,7 @@ namespace BSOFT.Infrastructure.Repositories.Companies
             var companyToDelete = await _applicationDbContext.Companies.FirstOrDefaultAsync(u => u.Id == id);
             if (companyToDelete != null)
             {
-                companyToDelete.IsActive = company.IsActive;
+                companyToDelete.IsDeleted = company.IsDeleted;
                 return await _applicationDbContext.SaveChangesAsync() >0;
             }
             return false; 

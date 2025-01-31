@@ -49,9 +49,9 @@ namespace Core.Application.Companies.Commands.CreateCompany
 
                 if (CompanyId > 0)
                 {
-                    return new ApiResponseDTO<int>{IsSuccess = true, Message = "Division created successfully", Data = CompanyId};
+                    return new ApiResponseDTO<int>{IsSuccess = true, Message = "Company created successfully", Data = CompanyId};
                 }
-                return new ApiResponseDTO<int>{IsSuccess = false, Message = "Division not created"};
+                return new ApiResponseDTO<int>{IsSuccess = false, Message = "Company not created"};
         }
     }
 }

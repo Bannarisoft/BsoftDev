@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Companies.Queries.GetCompanies
 {
@@ -18,7 +19,8 @@ namespace Core.Application.Companies.Queries.GetCompanies
         public string Website { get; set; }
         public string Logo { get; set; }
         public int EntityId { get; set; }
-        public byte IsActive { get; set; }
+        public Status IsActive { get; set; }
+        public IsDelete IsDeleted { get; set; }
 
          public CompanyAddressDTO CompanyAddress { get; set; }
         public CompanyContactDTO CompanyContact { get; set; }
