@@ -21,7 +21,7 @@ namespace BSOFT.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [AllowAnonymous]
+    
     public class CompanyController : ApiControllerBase
     {
         

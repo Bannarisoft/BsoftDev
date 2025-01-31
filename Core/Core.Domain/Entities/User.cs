@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Domain.Entities
 {
@@ -17,8 +18,7 @@ namespace Core.Domain.Entities
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string UserName { get; set; }
-    public  bool IsActive { get; set; }
-    public bool IsFirstTimeUser { get; set; } = false;
+    public FirstTimeUserStatus IsFirstTimeUser { get; set; } 
     public string PasswordHash { get; set; }
     public int UserType { get; set; }
     public string Mobile { get; set; }

@@ -15,7 +15,8 @@ public int CompanyId { get; set; }
 public int DivisionId { get; set; }
 public string UnitHeadName { get; set; }
 public string CINNO {get; set;}
-public new byte IsActive { get; set; }
+
+
 public  UnitAddress UnitAddress { get; set; }
 public  UnitContacts UnitContacts { get; set; }
        

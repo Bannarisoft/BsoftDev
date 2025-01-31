@@ -46,6 +46,8 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<TimeZones> TimeZones { get; set; }
         public DbSet<UserCompany> UserCompanies { get; set; }
         public DbSet<CompanySettings> CompanySettings { get; set; } 
+        public DbSet<Language> Languages { get; set; }
+        
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -80,6 +82,8 @@ namespace BSOFT.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new TimeZonesConfiguration());
             modelBuilder.ApplyConfiguration(new UserCompanyConfiguration());
             modelBuilder.ApplyConfiguration(new CompanySettingsConfiguration());
+            modelBuilder.ApplyConfiguration(new LanguageConfiguration());
+            
                
             base.OnModelCreating(modelBuilder);
         }

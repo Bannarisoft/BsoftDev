@@ -19,7 +19,6 @@ namespace Core.Domain.Entities
         public string ShortName { get; set; }
         public string DeptName { get; set; }
         public int CompanyId { get; set; }
-        public new byte  IsActive { get; set; }
                   
 
     }
