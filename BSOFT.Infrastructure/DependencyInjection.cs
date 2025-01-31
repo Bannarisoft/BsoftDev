@@ -231,7 +231,7 @@ namespace BSOFT.Infrastructure
 				typeof(DepartmentProfile),
 
                 typeof(CurrencyProfile),
-                typeof(UnitsProfile)
+                typeof(UnitsProfile),
 				typeof(CompanySettingsProfile)
             );
 
