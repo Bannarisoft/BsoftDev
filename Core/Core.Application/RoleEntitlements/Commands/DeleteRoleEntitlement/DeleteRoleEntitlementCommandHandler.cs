@@ -6,6 +6,7 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IRoleEntitlement;
 using Core.Application.RoleEntitlements.Queries.GetRoleEntitlements;
 using Core.Domain.Entities;
+using Core.Domain.Enums.Common;
 using Core.Domain.Events;
 using MediatR;
 
@@ -39,7 +40,7 @@ namespace Core.Application.RoleEntitlements.Commands.DeleteRoleEntitlement
 
             // Fetch role entitlement by ID
             var roleEntitlement = await _roleEntitlementQueryRepository.GetByIdAsync(request.Id);
-            if (roleEntitlement == null || roleEntitlement.IsActive != 1)
+            if (roleEntitlement == null || roleEntitlement.IsActive != Enums.Status.Active)
             {
                 return new ApiResponseDTO<RoleEntitlementDto>
                 {

@@ -33,18 +33,13 @@ namespace BSOFT.Infrastructure.Repositories
             _applicationDbContext = applicationDbContext;
 
             _dbConnection = dbConnection;
+
+        
         // Create an HttpClient using IHttpClientFactory and the registered "ResilientHttpClient"
             _httpClient = httpClientFactory.CreateClient("ResilientHttpClient");
         // Define Polly policies
 
-             var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
-            return await policyWrap.ExecuteAsync(async () =>
-            {       
-                await _applicationDbContext.User.AddAsync(user);
-                await _applicationDbContext.SaveChangesAsync();
-                return user;
-            });
-        // Retry policy: Retry 3 times with an exponential backoff strategy
+          // Retry policy: Retry 3 times with an exponential backoff strategy
               _retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryAsync(3,
@@ -61,7 +56,6 @@ namespace BSOFT.Infrastructure.Repositories
         // Timeout policy: 5 seconds timeout for the queries
              _timeoutPolicy = Policy.TimeoutAsync(5, TimeoutStrategy.Pessimistic, onTimeoutAsync: (context, timespan, task) =>
             {
- 				existingUser.IsDeleted = user.IsDeleted;
                 Log.Error($"Timeout after {timespan.TotalSeconds}s.");
                 return Task.CompletedTask;
             });
@@ -76,17 +70,25 @@ namespace BSOFT.Infrastructure.Repositories
             //     });
         }
 
-          public async Task<List<User>> GetAllUsersAsync()
-        {
-        const string query = "SELECT * FROM AppSecurity.Users";
-        return (await _dbConnection.QueryAsync<User>(query)).ToList();
-        }
-     
+          public async Task<User> CreateAsync(User user)
+            {
+                   var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
+                  return await policyWrap.ExecuteAsync(async () =>
+                  {       
+                      await _applicationDbContext.User.AddAsync(user);
+                      await _applicationDbContext.SaveChangesAsync();
+                      return user;
+                  });
 
-{
-const string query = "SELECT * FROM AppSecurity.Users WHERE UserId = @UserId";
-            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { userId });
-}
+            }
+        
+
+          public async Task<List<User>> GetAllUsersAsync()
+         {
+              const string query = "SELECT * FROM AppSecurity.Users";
+              return (await _dbConnection.QueryAsync<User>(query)).ToList();
+         }
+     
         public async Task<int> DeleteAsync(int userId,User user)
         {
 
@@ -109,85 +111,85 @@ const string query = "SELECT * FROM AppSecurity.Users WHERE UserId = @UserId";
             var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
             return await policyWrap.ExecuteAsync(async () =>
             {
-            var existingUser = await _applicationDbContext.User
-            .Include(uc => uc.UserCompanies)
-            .Include(ur => ur.UserRoleAllocations)
-            .FirstOrDefaultAsync(u => u.UserId == userId);
-            if (existingUser != null)
-            {
-                existingUser.UserId = user.UserId;
-                existingUser.FirstName = user.FirstName;
-                existingUser.LastName = user.LastName;
-                existingUser.UserName = user.UserName;
-                existingUser.PasswordHash = user.PasswordHash;
-                existingUser.UserType = user.UserType;
-                existingUser.Mobile = user.Mobile;
-                existingUser.EmailId = user.EmailId;
-                existingUser.CompanyId = user.CompanyId;
-                existingUser.DivisionId = user.DivisionId;
-                existingUser.UnitId = user.UnitId;
-                // existingUser.UserRoleId = user.UserRoleId;
-                existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
-                existingUser.IsActive = user.IsActive;
+                var existingUser = await _applicationDbContext.User
+                    .Include(uc => uc.UserCompanies)
+                    .Include(ur => ur.UserRoleAllocations)
+                    .FirstOrDefaultAsync(u => u.UserId == userId);
+                    if (existingUser != null)
+                    {
+                        existingUser.UserId = user.UserId;
+                        existingUser.FirstName = user.FirstName;
+                        existingUser.LastName = user.LastName;
+                        existingUser.UserName = user.UserName;
+                        existingUser.PasswordHash = user.PasswordHash;
+                        existingUser.UserType = user.UserType;
+                        existingUser.Mobile = user.Mobile;
+                        existingUser.EmailId = user.EmailId;
+                        existingUser.CompanyId = user.CompanyId;
+                        existingUser.DivisionId = user.DivisionId;
+                        existingUser.UnitId = user.UnitId;
+                        // existingUser.UserRoleId = user.UserRoleId;
+                        existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
+                        existingUser.IsActive = user.IsActive;
 
-                 var updatedCompanyIds = user.UserCompanies.Select(uc => uc.CompanyId).ToList();
-                 foreach (var existingCompany in existingUser.UserCompanies)
-                 {
-                     existingCompany.IsActive = updatedCompanyIds.Contains(existingCompany.CompanyId) ? (byte)1 : (byte)0;
+                         var updatedCompanyIds = user.UserCompanies.Select(uc => uc.CompanyId).ToList();
+                         foreach (var existingCompany in existingUser.UserCompanies)
+                         {
+                             existingCompany.IsActive = updatedCompanyIds.Contains(existingCompany.CompanyId) ? (byte)1 : (byte)0;
+                         }
+
+                        var newCompanyIds = updatedCompanyIds
+                         .Where(id => !existingUser.UserCompanies.Any(uc => uc.CompanyId == id))
+                         .ToList();
+                         foreach (var newCompanyId in newCompanyIds)
+                         {
+                             existingUser.UserCompanies.Add(new UserCompany
+                             {
+                                 UserId = existingUser.UserId,
+                                 CompanyId = newCompanyId,
+                                 IsActive = 1
+                             });
+                         }
+
+                          var updatedRoleIds = user.UserRoleAllocations.Select(ur => ur.UserRoleId).ToList();
+                          foreach (var existingRole in existingUser.UserRoleAllocations)
+                          {
+                              existingRole.IsActive = updatedRoleIds.Contains(existingRole.UserRoleId) ? (byte)1 : (byte)0;
+                          }
+
+                          var newRoleIds = updatedRoleIds
+                              .Where(id => !existingUser.UserRoleAllocations.Any(ur => ur.UserRoleId == id))
+                              .ToList();
+
+                          foreach (var newRoleId in newRoleIds)
+                          {
+                              existingUser.UserRoleAllocations.Add(new Core.Domain.Entities.UserRoleAllocation
+                              {
+                                  UserId = existingUser.UserId,
+                                  UserRoleId = newRoleId,
+                                  IsActive = 1
+                              });
+                          }
+                        // _applicationDbContext.UserCompanies.RemoveRange(existingUser.UserCompanies);
+                        // _applicationDbContext.UserRoleAllocations.RemoveRange(existingUser.UserRoleAllocations);
+
+                        //  existingUser.UserCompanies = user.UserCompanies.Select(uc => new UserCompany
+                        //    {
+                        //        UserId = existingUser.UserId,
+                        //        CompanyId = uc.CompanyId
+                        //    }).ToList();
+
+                        //    existingUser.UserRoleAllocations = user.UserRoleAllocations.Select(ur => new Core.Domain.Entities.UserRoleAllocation
+                        //    {
+                        //        UserId = existingUser.UserId,
+                        //        UserRoleId = ur.UserRoleId
+                        //    }).ToList();
+
+                        _applicationDbContext.User.Update(existingUser);
+                    return await _applicationDbContext.SaveChangesAsync();
                  }
-                
-                var newCompanyIds = updatedCompanyIds
-                 .Where(id => !existingUser.UserCompanies.Any(uc => uc.CompanyId == id))
-                 .ToList();
-                 foreach (var newCompanyId in newCompanyIds)
-                 {
-                     existingUser.UserCompanies.Add(new UserCompany
-                     {
-                         UserId = existingUser.UserId,
-                         CompanyId = newCompanyId,
-                         IsActive = 1
-                     });
-                 }
-
-                  var updatedRoleIds = user.UserRoleAllocations.Select(ur => ur.UserRoleId).ToList();
-                  foreach (var existingRole in existingUser.UserRoleAllocations)
-                  {
-                      existingRole.IsActive = updatedRoleIds.Contains(existingRole.UserRoleId) ? (byte)1 : (byte)0;
-                  }
-
-                  var newRoleIds = updatedRoleIds
-                      .Where(id => !existingUser.UserRoleAllocations.Any(ur => ur.UserRoleId == id))
-                      .ToList();
-
-                  foreach (var newRoleId in newRoleIds)
-                  {
-                      existingUser.UserRoleAllocations.Add(new Core.Domain.Entities.UserRoleAllocation
-                      {
-                          UserId = existingUser.UserId,
-                          UserRoleId = newRoleId,
-                          IsActive = 1
-                      });
-                  }
-                // _applicationDbContext.UserCompanies.RemoveRange(existingUser.UserCompanies);
-                // _applicationDbContext.UserRoleAllocations.RemoveRange(existingUser.UserRoleAllocations);
-
-                //  existingUser.UserCompanies = user.UserCompanies.Select(uc => new UserCompany
-                //    {
-                //        UserId = existingUser.UserId,
-                //        CompanyId = uc.CompanyId
-                //    }).ToList();
-
-                //    existingUser.UserRoleAllocations = user.UserRoleAllocations.Select(ur => new Core.Domain.Entities.UserRoleAllocation
-                //    {
-                //        UserId = existingUser.UserId,
-                //        UserRoleId = ur.UserRoleId
-                //    }).ToList();
-
-                _applicationDbContext.User.Update(existingUser);
-                return await _applicationDbContext.SaveChangesAsync();
-            }
-            return 0; // No user found
-   });
+                 return 0; // No user found
+            });
         }
 
     }
