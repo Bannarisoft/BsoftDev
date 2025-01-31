@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace BSOFT.Infrastructure.Data.Configurations
 {
@@ -12,6 +14,18 @@ namespace BSOFT.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<CompanySettings> builder)
         {
+             var isActiveConverter = new ValueConverter<Status, bool>
+               (
+                    v => v == Status.Active,  
+                    v => v ? Status.Active : Status.Inactive 
+                );
+
+                var isDeletedConverter = new ValueConverter<IsDelete, bool>
+                (
+                 v => v == IsDelete.Deleted,  
+                 v => v ? IsDelete.Deleted : IsDelete.NotDeleted 
+                );
+                
             builder.ToTable("CompanySetting", "AppData");
             builder.HasKey(m => m.Id);
 
@@ -104,14 +118,17 @@ namespace BSOFT.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(u => u.IsActive)
+           builder.Property(u => u.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
-                .HasConversion(
-                    v => v == 1, 
-                    v => v ? (byte)1 : (byte)0 
-                )
+                .HasConversion(isActiveConverter)
                 .IsRequired();
+
+            builder.Property(u => u.IsDeleted)
+            .HasColumnName("IsDeleted")
+            .HasColumnType("bit")
+            .HasConversion(isDeletedConverter)
+            .IsRequired();
         }
     }
 }

@@ -19,6 +19,8 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
 {
     public class ForgotUserPasswordCommandHandler : IRequestHandler<ForgotUserPasswordCommand, List<ApiResponseDTO<ForgotPasswordResponse>>>
     {
+
+         
         private readonly IMapper _mapper;
         private readonly IUserQueryRepository _userQueryRepository;
         private readonly IChangePassword _changePasswordService;
@@ -27,6 +29,7 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
         private readonly ILogger<ForgotUserPasswordCommandHandler> _logger;
            private readonly IEmailService _emailService;
         private readonly ISmsService _smsService;
+
 
         public ForgotUserPasswordCommandHandler(
             IUserQueryRepository userQueryRepository,
@@ -37,19 +40,22 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
             IMediator mediator,IEmailService emailService,ISmsService smsService)
         {
             _userQueryRepository = userQueryRepository;
+
             _mapper = mapper;
             _changePasswordService = changePasswordService;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _Imediator = Imediator;
             _notificationsQueryRepository = notificationsQueryRepository;
             _mediator = mediator;
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _smsService = smsService ?? throw new ArgumentNullException(nameof(smsService));
         }
 
+
         public async Task<List<ApiResponseDTO<ForgotPasswordResponse>>> Handle(ForgotUserPasswordCommand request, CancellationToken cancellationToken)
         {
             // Validate input
-            if (string.IsNullOrWhiteSpace(request.UserName))
+
             {
                 _logger.LogWarning("Username is required.");
                 return CreateErrorResponse("Username is required.");

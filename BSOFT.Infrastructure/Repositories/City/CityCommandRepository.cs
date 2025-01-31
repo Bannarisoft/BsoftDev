@@ -2,6 +2,7 @@ using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Core.Application.Common.Interfaces.ICity;
+using Core.Domain.Enums.Common;
 
 namespace BSOFT.Infrastructure.Repositories.City
 {
@@ -45,7 +46,7 @@ namespace BSOFT.Infrastructure.Repositories.City
         }
         public async Task<bool> StateExistsAsync(int stateId)
         {        
-            return await _applicationDbContext.States.AnyAsync(s => s.Id == stateId && s.IsActive == 1);
+            return await _applicationDbContext.States.AnyAsync(s => s.Id == stateId && s.IsDeleted == Enums.IsDelete.Deleted);
         }
         public async Task<bool> GetCityByCodeAsync(string cityCode, int stateId)
         {

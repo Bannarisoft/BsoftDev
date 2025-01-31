@@ -2,6 +2,7 @@ using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using BSOFT.Infrastructure.Data;
 using Core.Application.Common.Interfaces.IState;
+using Core.Domain.Enums.Common;
 
 namespace BSOFT.Infrastructure.Repositories.State
 {    
@@ -51,7 +52,7 @@ namespace BSOFT.Infrastructure.Repositories.State
         public async Task<bool> CountryExistsAsync(int countryId)
         {
         //return await _applicationDbContext.States.AnyAsync(c => c.Id == stateId);
-            return await _applicationDbContext.Countries.AnyAsync(s => s.Id == countryId && s.IsActive == 1);
+            return await _applicationDbContext.Countries.AnyAsync(s => s.Id == countryId && s.IsDeleted == Enums.IsDelete.Deleted);
         }
         public async Task<bool> GetStateByCodeAsync(string stateCode, int countryId)
         {

@@ -12,6 +12,7 @@ using Core.Application.Common.Interfaces.IDepartment;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common;
+using Core.Domain.Enums.Common;
 
 
 namespace Core.Application.Departments.Commands.UpdateDepartment
@@ -61,7 +62,7 @@ namespace Core.Application.Departments.Commands.UpdateDepartment
             department.DeptName = request.DeptName;
             department.ShortName = request.ShortName;
             department.CompanyId = request.CompanyId;
-            department.IsActive = request.IsActive;
+            department.IsActive = request.IsActive == 1 ? Enums.Status.Active : Enums.Status.Inactive;
 
             // Save updates to the repository
             var result = await _IDepartmentCommandRepository.UpdateAsync(request.Id, department);

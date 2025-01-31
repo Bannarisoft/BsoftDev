@@ -16,8 +16,8 @@ namespace Core.Application.Users.Commands.UpdateUser
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string UserName { get; set; }
-    public bool IsActive { get; set; }
-    public bool IsFirstTimeUser { get; set; } = false;
+    public byte IsActive { get; set; }
+    // public FirstTimeUserStatus IsFirstTimeUser { get; set; }
     public string PasswordHash { get; set; }
     public int UserType { get; set; }
     public string Mobile { get; set; }

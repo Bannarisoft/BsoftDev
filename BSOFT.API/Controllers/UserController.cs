@@ -58,7 +58,7 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetAllUsersAsync()
         {
             var users = await Mediator.Send(new GetUserQuery());
-            var activeUsers = users.Where(c => c.IsActive).ToList();
+            var activeUsers = users.ToList();
             _logger.LogInformation("Users Listed successfully.", activeUsers.Count);
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, data = activeUsers });
@@ -147,13 +147,10 @@ namespace BSOFT.API.Controllers
         }      
 
         [HttpDelete]
-        [Route("Delete/{userid}")]
-        public async Task<IActionResult> DeleteAsync(int userId,DeleteUserCommand deleteUserCommand)
+        [Route("Delete")]
+        public async Task<IActionResult> DeleteAsync(DeleteUserCommand deleteUserCommand)
         {
-            if(userId != deleteUserCommand.UserId)
-            {
-                return BadRequest();
-            }
+           
 
             var deleteUser = await Mediator.Send(deleteUserCommand);
 

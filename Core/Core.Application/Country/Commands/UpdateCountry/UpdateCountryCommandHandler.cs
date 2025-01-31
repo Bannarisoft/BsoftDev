@@ -35,7 +35,7 @@ namespace Core.Application.Country.Commands.UpdateCountry
 
             var oldCountryName = country.CountryName;
             country.CountryName = request.CountryName;
-            if (country == null || country.IsActive != 1)
+            if (country == null || country.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
             {
                 return new ApiResponseDTO<CountryDto>
                 {

@@ -34,7 +34,7 @@ namespace Core.Application.State.Commands.UpdateState
 
             var oldStateName = state.StateName;
             state.StateName = request.StateName;
-            if (state == null || state.IsActive != 1)
+            if (state == null || state.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
             {                
                 return new ApiResponseDTO<StateDto>
                 {
