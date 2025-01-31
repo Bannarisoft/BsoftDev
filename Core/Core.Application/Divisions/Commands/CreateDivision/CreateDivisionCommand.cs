@@ -11,10 +11,9 @@ namespace Core.Application.Divisions.Commands.CreateDivision
 {
     public class CreateDivisionCommand : IRequest<ApiResponseDTO<DivisionDTO>>
     {
-        public int Id { get; set; }
+        
         public string ShortName { get; set; }
         public string Name { get; set; }
         public int CompanyId { get; set; }
-        public byte IsActive { get; set; }
     }
 }

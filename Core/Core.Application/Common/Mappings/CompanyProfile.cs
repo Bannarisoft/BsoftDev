@@ -7,6 +7,7 @@ using Core.Application.Companies.Commands.CreateCompany;
 using Core.Application.Companies.Commands.DeleteCompany;
 using Core.Application.Companies.Queries.GetCompanies;
 using Core.Domain.Entities;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Common.Mappings
 {
@@ -18,13 +19,15 @@ namespace Core.Application.Common.Mappings
                 
                  .ForMember(dest => dest.CompanyAddress, opt => opt.MapFrom(src => src.CompanyAddress))
                  .ForMember(dest => dest.CompanyContact, opt => opt.MapFrom(src => src.CompanyContact))
-                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
+                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
                  .ForMember(dest => dest.Logo, opt => opt.Ignore());
 
                  CreateMap<UpdateCompanyDTO, Company>()
                 
                  .ForMember(dest => dest.CompanyAddress, opt => opt.MapFrom(src => src.CompanyAddress))
                  .ForMember(dest => dest.CompanyContact, opt => opt.MapFrom(src => src.CompanyContact))
+                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive))
                  .ForMember(dest => dest.Logo, opt => opt.Ignore());
                  
               CreateMap<CompanyAddressDTO, CompanyAddress>()
@@ -48,8 +51,8 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.Remarks, opt => opt.MapFrom(src => src.Remarks))
             .ReverseMap();
 
-            CreateMap<CompanyDeleteDTO, Company>()
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+            CreateMap<DeleteCompanyCommand, Company>()
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
 
             CreateMap<Company, GetCompanyDTO>()
             .ForMember(dest => dest.CompanyAddress, opt => opt.MapFrom(src => src.CompanyAddress))

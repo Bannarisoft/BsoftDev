@@ -40,7 +40,7 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetAllCompaniesAsync()
         {
             var companies = await Mediator.Send(new GetCompanyQuery());
-            var activecompanies = companies.Data.Where(c => c.IsActive == 1).ToList(); 
+            var activecompanies = companies.Data.ToList(); 
 
             return Ok(new 
             { 
