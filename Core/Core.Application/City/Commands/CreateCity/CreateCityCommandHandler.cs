@@ -35,8 +35,8 @@ namespace Core.Application.City.Commands.CreateCity
                     };               
             }      
             // Check if the city name already exists in the same state
-            var cityExistsByName = await _cityRepository.GetCityByNameAsync(request.CityName,request.CityCode, request.StateId);
-            if (cityExistsByName)
+            var cityExistsByName = await _cityRepository.GetCityByNameAsync(request.CityName ?? string.Empty,request.CityCode ?? string.Empty, request.StateId) ;
+            if (cityExistsByName!= null)
             {
                 return new ApiResponseDTO<CityDto> {
                     IsSuccess = false, 
@@ -49,8 +49,8 @@ namespace Core.Application.City.Commands.CreateCity
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
-                actionCode: result.CityCode,
-                actionName: result.CityName,
+                actionCode: result.CityCode ?? string.Empty,
+                actionName: result.CityName ?? string.Empty,
                 details: $"City '{result.CityName}' was created. CityCode: {result.CityCode}",
                 module:"City"
             );

@@ -48,25 +48,13 @@ namespace BSOFT.Infrastructure.Repositories.City
         {        
             return await _applicationDbContext.States.AnyAsync(s => s.Id == stateId  && s.IsDeleted == Enums.IsDelete.NotDeleted && s.IsActive == Enums.Status.Active);
         }
-        public async Task<bool> GetCityByNameAsync(string cityName,string cityCode, int stateId)
-        {
-                var city = await _applicationDbContext.Cities
+        public async Task<Cities> GetCityByNameAsync(string cityName,string cityCode, int stateId)
+        {           
+            var city = await _applicationDbContext.Cities
                 .FirstOrDefaultAsync(s => s.CityCode == cityCode 
-                                && s.CityName == cityName && s.StateId == stateId);
-
-                if (city != null)
-                {                    
-                    if ((byte)city.IsActive == (byte)Enums.Status.Inactive)
-                    {                        
-                        return false;  // You can adjust this to return a message indicating it's inactive
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
-                return false;
-
+                            && s.CityName == cityName && s.StateId == stateId);
+                return city;                
         }
+
     }
 }

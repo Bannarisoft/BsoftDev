@@ -23,7 +23,7 @@ namespace Core.Application.City.Queries.GetCityAutoComplete
 
         public async Task<ApiResponseDTO<List<CityDto>>> Handle(GetCityAutoCompleteQuery request, CancellationToken cancellationToken)
         {             
-            var result = await _cityRepository.GetByCityNameAsync(request.SearchPattern);
+            var result = await _cityRepository.GetByCityNameAsync(request.SearchPattern ?? string.Empty);
             if (result == null || result.Count == 0)
             {
                 return new ApiResponseDTO<List<CityDto>>
@@ -37,7 +37,7 @@ namespace Core.Application.City.Queries.GetCityAutoComplete
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetAutoComplete",
                 actionCode:"",        
-                actionName: request.SearchPattern,                
+                actionName: request.SearchPattern ?? string.Empty,                
                 details: $"City '{request.SearchPattern}' was searched",
                 module:"City"
             );

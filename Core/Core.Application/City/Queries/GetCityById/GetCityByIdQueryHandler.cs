@@ -34,8 +34,8 @@ namespace Core.Application.City.Queries.GetCityById
                 //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetById",
-                actionCode: cityDto.CityCode,        
-                actionName: cityDto.CityName,                
+                actionCode: cityDto.CityCode ?? string.Empty,        
+                actionName: cityDto.CityName ?? string.Empty,                
                 details: $"City '{cityDto.CityName}' was created. CityCode: {cityDto.CityCode}",
                 module:"City"
             );

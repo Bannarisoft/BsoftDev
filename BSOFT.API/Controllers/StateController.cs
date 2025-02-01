@@ -41,10 +41,10 @@ namespace BSOFT.API.Controllers
             });
         }
 
-        [HttpGet("{stateId}")]
-        public async Task<IActionResult> GetByIdAsync(int stateId)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            if (stateId <= 0)
+            if (id <= 0)
             {                
                 return BadRequest(new 
                 { 
@@ -52,8 +52,8 @@ namespace BSOFT.API.Controllers
                     message = "Invalid State ID" 
                 });
             }
-            var result = await Mediator.Send(new GetStateByIdQuery { Id = stateId });                         
-            if(result == null)
+            var result = await Mediator.Send(new GetStateByIdQuery { Id = id });                         
+            if(result is null)
             {                
                 return NotFound(new 
                 { 
@@ -67,7 +67,7 @@ namespace BSOFT.API.Controllers
                 data = result
             });   
         }        
-        [HttpPost]
+        [HttpPost("create")]   
         public async Task<IActionResult> CreateAsync(CreateStateCommand  command)
         { 
             var validationResult = await _createStateCommandValidator.ValidateAsync(command);
@@ -89,7 +89,7 @@ namespace BSOFT.API.Controllers
             return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
             
         }
-        [HttpPut("{stateId}")]
+        [HttpPut("update")]
         public async Task<IActionResult> UpdateAsync(int stateId, UpdateStateCommand command)
         {   
             if (stateId != command.Id)
@@ -131,7 +131,7 @@ namespace BSOFT.API.Controllers
             }
             return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
         }        
-        [HttpDelete("{stateId}")]
+        [HttpDelete("delete{id}")]   
         public async Task<IActionResult> DeleteAsync(int stateId,DeleteStateCommand command)
         {
             if(stateId != command.Id)
@@ -150,29 +150,29 @@ namespace BSOFT.API.Controllers
             return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" });
         }
 
-        [HttpGet("GetStateSearch")]
-            public async Task<IActionResult> GetState([FromQuery] string searchPattern)
+        [HttpGet("by-name{name}")]  
+        public async Task<IActionResult> GetState([FromQuery] string searchPattern)
+        {
+            if (string.IsNullOrWhiteSpace(searchPattern))
             {
-                if (string.IsNullOrWhiteSpace(searchPattern))
+                return BadRequest(new { Message = "Search pattern is required" });
+            }
+            var result = await Mediator.Send(new GetStateAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
+            if (result.IsSuccess)
+            {
+                return Ok(new 
                 {
-                    return BadRequest(new { Message = "Search pattern is required" });
-                }
-                var result = await Mediator.Send(new GetStateAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
-                if (result.IsSuccess)
-                {
-                    return Ok(new 
-                    {
-                        StatusCode=StatusCodes.Status200OK,
-                        message = result.Message,
-                        data = result.Data
-                    });
-                }
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
+                    StatusCode=StatusCodes.Status200OK,
                     message = result.Message,
                     data = result.Data
                 });
-            }    
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = result.Message,
+                data = result.Data
+            });
+        }    
     }
 }

@@ -38,8 +38,8 @@ namespace Core.Application.Country.Queries.GetCountryById
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetById",
-                actionCode: countryDto.CountryCode,        
-                actionName: countryDto.CountryName,                
+                actionCode: countryDto.CountryCode ?? string.Empty,        
+                actionName: countryDto.CountryName ?? string.Empty,                
                 details: $"Country '{countryDto.CountryName}' was created. CountryCode: {countryDto.CountryCode}",
                 module:"Country"
             );

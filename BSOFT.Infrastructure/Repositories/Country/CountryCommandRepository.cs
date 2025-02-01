@@ -51,7 +51,7 @@ namespace BSOFT.Infrastructure.Repositories.Country
                var country = await _applicationDbContext.Countries
             .FirstOrDefaultAsync(c => c.CountryName == countryName && c.CountryCode == countryCode);
 
-            return country;
+            return country; //?? throw new Exception("Country not found");
             
         }
 

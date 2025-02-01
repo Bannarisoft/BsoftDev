@@ -32,8 +32,10 @@ namespace Core.Application.State.Commands.CreateState
                     Message = "Invalid CountryId. The specified country does not exist or is inactive."
                     };                     
             }
-            var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName,request.StateCode, request.CountryId);
-            if (stateExists)
+            //var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName,request.StateCode, request.CountryId);
+            var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName ?? string.Empty, 
+                request.StateCode ?? string.Empty,      request.CountryId ) ;
+            if (stateExists!= null)
             {
                 return new ApiResponseDTO<StateDto>{
                 IsSuccess = false, 
@@ -43,16 +45,19 @@ namespace Core.Application.State.Commands.CreateState
             var stateEntity = _mapper.Map<States>(request);
             var result = await _stateRepository.CreateAsync(stateEntity);
             //Domain Event
-            var domainEvent = new AuditLogsDomainEvent(
-                actionDetail: "Create",
-                actionCode: result.StateCode,
-                actionName: result.StateName,
-                details: $"State '{result.StateName}' was created. StateCode: {result.StateCode}",
-                module:"State"
-            );
-
-            //var domainEvent = new StateDomainEvent(result.Id, result.StateName);
-            await _mediator.Publish(domainEvent, cancellationToken);
+            if (result != null)
+            {       
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Create",
+                    actionCode: result.StateCode ?? string.Empty,
+                    actionName: result.StateName ?? string.Empty,
+                    details: $"State '{result.StateName}' was created. StateCode: {result.StateCode}",
+                    module:"State"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
+            }
+            
+            
             var stateDto = _mapper.Map<StateDto>(result);
             if (stateDto.Id > 0)
             {

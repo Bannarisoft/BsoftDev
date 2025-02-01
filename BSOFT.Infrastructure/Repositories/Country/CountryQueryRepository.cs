@@ -18,7 +18,7 @@ namespace BSOFT.Infrastructure.Repositories.Country
         {
             const string query = @"
             SELECT Id,CountryCode, CountryName, IsActive ,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
-            FROM AppData.Country with (nolock) where isdeleted=0 order by Id desc";
+            FROM AppData.Country  where IsDeleted=0 ORDER BY ID desc";
             return (await _dbConnection.QueryAsync<Countries>(query)).ToList();
         }
 
@@ -26,10 +26,10 @@ namespace BSOFT.Infrastructure.Repositories.Country
         {          
 
             const string query = @"
-            SELECT Id, countryCode, countryName, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
+            SELECT Id, CountryCode, CountryName, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
             ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
-            FROM AppData.Country WITH (NOLOCK)
-            WHERE Id = @id AND isdeleted = 0";
+            FROM AppData.Country
+            WHERE Id = @id AND IsDeleted = 0";
             var country = await _dbConnection.QueryFirstOrDefaultAsync<Countries>(query, new { id });           
              if (country == null)
             {
@@ -46,11 +46,10 @@ namespace BSOFT.Infrastructure.Repositories.Country
             const string query = @"
                 SELECT Id, countryCode, countryName, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
                 ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
-                FROM AppData.Country WITH (NOLOCK)
-                WHERE (countryName LIKE @SearchPattern OR countryCode LIKE @SearchPattern) 
-                AND isdeleted = 0
-                ORDER BY id desc";
-
+                FROM AppData.Country
+                WHERE (CountryName LIKE @SearchPattern OR CountryCode LIKE @SearchPattern) 
+                AND IsDeleted = 0
+                ORDER BY ID DESC";
             var countries = await _dbConnection.QueryAsync<Countries>(
                 query,
                 new { SearchPattern = $"%{searchPattern}%" }

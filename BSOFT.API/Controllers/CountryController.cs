@@ -39,10 +39,10 @@ namespace BSOFT.API.Controllers
                 data = countries.Data
             });
         }
-        [HttpGet("{countryId}")]        
-        public async Task<IActionResult> GetByIdAsync(int countryId)
+        [HttpGet("{id}")]     
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            if (countryId <= 0)
+            if (id <= 0)
             {
                 return BadRequest(new
                 {
@@ -50,7 +50,7 @@ namespace BSOFT.API.Controllers
                     message = "Invalid Country ID"
                 });
             }            
-            var result = await Mediator.Send(new GetCountryByIdQuery { Id = countryId });            
+            var result = await Mediator.Send(new GetCountryByIdQuery { Id = id });            
             if (!result.IsSuccess)
             {                
                 return NotFound(new 
@@ -65,7 +65,7 @@ namespace BSOFT.API.Controllers
                 data = result.Data
             });
         }
-        [HttpPost]        
+        [HttpPost("create")]          
         public async Task<IActionResult> CreateAsync(CreateCountryCommand  command)
         { 
             var validationResult = await _createCountryCommandValidator.ValidateAsync(command);
@@ -95,7 +95,7 @@ namespace BSOFT.API.Controllers
             });
                        
         }
-        [HttpPut("update")]        
+        [HttpPut("update")]      
         public async Task<IActionResult> UpdateAsync( UpdateCountryCommand command)
         {
             var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
@@ -135,7 +135,7 @@ namespace BSOFT.API.Controllers
                 });
             }
         }
-        [HttpDelete("delete")]        
+        [HttpDelete("delete{id}")]   
         public async Task<IActionResult> DeleteAsync(DeleteCountryCommand command)
         {
             var result = await Mediator.Send(command);
@@ -158,10 +158,10 @@ namespace BSOFT.API.Controllers
             }
         }
 
-        [HttpGet("GetCountrySearch")]        
-        public async Task<IActionResult> GetCountry([FromQuery] string searchPattern)
+        [HttpGet("by-name{name}")]     
+        public async Task<IActionResult> GetCountry(string name)
         {
-            var result = await Mediator.Send(new GetCountryAutoCompleteQuery { SearchPattern = searchPattern });
+            var result = await Mediator.Send(new GetCountryAutoCompleteQuery { SearchPattern = name });
             if (!result.IsSuccess)
             {
                 return NotFound(new 

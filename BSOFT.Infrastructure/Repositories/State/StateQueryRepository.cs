@@ -20,7 +20,7 @@ namespace BSOFT.Infrastructure.Repositories
              const string query = @"
                 SELECT 
                 Id,StateCode,StateName,IsActive,CountryId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
-                FROM AppData.State with (nolock) where isdeleted=0 order by Id desc";
+                FROM AppData.State  where IsDeleted=0 ORDER BY ID DESC";
              return (await _dbConnection.QueryAsync<States>(query)).ToList();     
         }
 
@@ -28,7 +28,7 @@ namespace BSOFT.Infrastructure.Repositories
         {
             const string query = @"
             SELECT Id, StateCode, StateName, IsActive,countryId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP 
-            FROM AppData.State with(nolock) WHERE Id = @Id and isdeleted=0";
+            FROM AppData.State with(nolock) WHERE Id = @Id and IsDeleted=0";
             var state = await _dbConnection.QueryFirstOrDefaultAsync<States>(query, new { id });           
             if (state == null)
             {
@@ -46,10 +46,10 @@ namespace BSOFT.Infrastructure.Repositories
             const string query = @"
                 SELECT Id, StateCode, StateName,countryId, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
                 ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
-                FROM AppData.State WITH (NOLOCK)
+                FROM AppData.State 
                 WHERE (StateName LIKE @SearchPattern OR StateCode LIKE @SearchPattern) 
-                AND isdeleted = 0
-                order by Id desc";
+                AND IsDeleted = 0
+                ORDER BY ID DESC";
 
             var states = await _dbConnection.QueryAsync<States>(
                 query,

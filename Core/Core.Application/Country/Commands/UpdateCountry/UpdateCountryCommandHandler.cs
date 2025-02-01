@@ -44,28 +44,46 @@ namespace Core.Application.Country.Commands.UpdateCountry
                     Message = "Invalid CountryID. The specified Country does not exist or is inactive."
                 };
             }           
-            var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryName,request.CountryCode);
+            var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryName ?? string.Empty,request.CountryCode ?? string.Empty);
             if (countryExists != null)
             {
                   // Handle the case where the country exists
-                if ((byte)countryExists.IsActive == (byte)Enums.Status.Inactive)
+                if ((byte)countryExists.IsActive == request.IsActive)
+                {
+                    if ((byte)countryExists.IsActive==0)
+                    {
+                    //    await _countryRepository.UpdateAsync(countryExists.Id, countryExists); 
+                        return new ApiResponseDTO<CountryDto>
+                        {
+                            IsSuccess = false,
+                            Message = $"CountryCode already exists and is {(Enums.Status) request.IsActive}."
+                        };
+                    }                    
+                }
+                
+                if ((byte)countryExists.IsActive != request.IsActive)
                 {
                     // Reactivate the country or handle it differently
-                    countryExists.IsActive = Enums.Status.Active;
+                    countryExists.IsActive =  (Enums.Status)request.IsActive;
+                    countryExists.CountryName =  request.CountryName;
+                    countryExists.CountryCode =  request.CountryCode;
                     await _countryRepository.UpdateAsync(countryExists.Id, countryExists);
-
-                    return new ApiResponseDTO<CountryDto>
+                    if (request.IsActive==0)
                     {
-                        IsSuccess = false,
-                        Message = "CountryCode already exists but was inactive. It has now been reactivated."
-                    };
-                }
-
-                return new ApiResponseDTO<CountryDto>
-                {
-                    IsSuccess = false,
-                    Message = "CountryCode already exists and is active."
-                };
+                        return new ApiResponseDTO<CountryDto>
+                        {
+                            IsSuccess = false,
+                            Message = "CountryCode DeActivated."
+                        };
+                        }
+                        else{
+                            return new ApiResponseDTO<CountryDto>
+                        {
+                            IsSuccess = false,
+                            Message = "CountryCode Activated."
+                        }; 
+                    }                    
+                }               
             }            
             var updatedCountryEntity = _mapper.Map<Countries>(request);
             
@@ -78,8 +96,8 @@ namespace Core.Application.Country.Commands.UpdateCountry
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: countryDto.CountryCode,
-                    actionName: countryDto.CountryName,                            
+                    actionCode: countryDto.CountryCode ?? string.Empty,
+                    actionName: countryDto.CountryName ?? string.Empty,                            
                     details: $"State '{oldCountryName}' was updated to '{countryDto.CountryName}'.  StateCode: {countryDto.CountryCode}",
                     module:"State"
                 );            

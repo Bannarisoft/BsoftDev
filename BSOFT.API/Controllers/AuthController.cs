@@ -64,23 +64,7 @@ namespace BSOFT.API.Controllers
 
 
             // Map the incoming request to a UserLoginCommand
-            var command = _mapper.Map<UserLoginCommand>(request);            
-           
-           /*  // Validate the command
-            var validationResult = await _userLoginCommandValidator.ValidateAsync(command);
-
-            if (!validationResult.IsValid)
-            {
-                _logger.LogWarning("Validation failed for login request: {Errors}", 
-                    string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                });
-            } */
-
+            var command = _mapper.Map<UserLoginCommand>(request);         
             // Process the command using Mediator
             var response = await _mediator.Send(command);   
         

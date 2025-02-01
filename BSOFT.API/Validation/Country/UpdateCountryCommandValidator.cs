@@ -18,7 +18,7 @@ namespace BSOFT.API.Validation.Country
 
             // Load validation rules from JSON or another source
             _validationRules = ValidationRuleLoader.LoadValidationRules();
-            if (_validationRules == null || !_validationRules.Any())
+            if (_validationRules is null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
             }

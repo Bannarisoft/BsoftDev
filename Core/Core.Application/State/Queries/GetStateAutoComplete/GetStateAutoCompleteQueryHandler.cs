@@ -20,7 +20,7 @@ namespace Core.Application.State.Queries.GetStateAutoComplete
         }
         public async Task<ApiResponseDTO<List<StateDto>>> Handle(GetStateAutoCompleteQuery request, CancellationToken cancellationToken)
         {          
-            var result = await _stateRepository.GetByStateNameAsync(request.SearchPattern);
+            var result = await _stateRepository.GetByStateNameAsync(request.SearchPattern ?? string.Empty);
             if (result == null || result.Count == 0)
             {
                  return new ApiResponseDTO<List<StateDto>>
@@ -34,7 +34,7 @@ namespace Core.Application.State.Queries.GetStateAutoComplete
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetAutoComplete",
                 actionCode:"",        
-                actionName: request.SearchPattern,                
+                actionName: request.SearchPattern ?? string.Empty,                
                 details: $"State '{request.SearchPattern}' was searched",
                 module:"State"
             );

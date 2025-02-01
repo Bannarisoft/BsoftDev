@@ -34,8 +34,8 @@ namespace Core.Application.State.Queries.GetStateById
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetById",
-                actionCode: stateDto.StateCode,        
-                actionName: stateDto.StateName,                
+                actionCode: stateDto.StateCode ?? string.Empty,        
+                actionName: stateDto.StateName ?? string.Empty,                
                 details: $"State '{stateDto.StateName}' was created. StateCode: {stateDto.StateCode}",
                 module:"State"
             );

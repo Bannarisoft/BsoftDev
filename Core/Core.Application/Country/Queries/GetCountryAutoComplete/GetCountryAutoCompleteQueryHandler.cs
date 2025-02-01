@@ -23,7 +23,7 @@ namespace Core.Application.Country.Queries.GetCountryAutoComplete
         public async Task<ApiResponseDTO<List<CountryDto>>> Handle(GetCountryAutoCompleteQuery request, CancellationToken cancellationToken)
         {   
                    
-            var result = await _countryRepository.GetByCountryNameAsync(request.SearchPattern);
+            var result = await _countryRepository.GetByCountryNameAsync(request.SearchPattern ?? string.Empty);
             if (result == null || result.Count == 0)
             {
                 return new ApiResponseDTO<List<CountryDto>>
@@ -37,7 +37,7 @@ namespace Core.Application.Country.Queries.GetCountryAutoComplete
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetAutoComplete",
                 actionCode:"",        
-                actionName: request.SearchPattern,                
+                actionName: request.SearchPattern ?? string.Empty,                
                 details: $"Country '{request.SearchPattern}' was searched",
                 module:"Country"
             );

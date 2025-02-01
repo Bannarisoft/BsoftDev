@@ -48,8 +48,8 @@ namespace Core.Application.City.Commands.DeleteCity
                 //Domain Event  
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Delete",
-                    actionCode: cityDto.CityCode,
-                    actionName: cityDto.CityName,
+                    actionCode: cityDto.CityCode ?? string.Empty,
+                    actionName: cityDto.CityName ?? string.Empty,
                     details: $"City '{cityDto.CityName}' was created. CityCode: {cityDto.CityCode}",
                     module:"City"
                 );               

@@ -32,7 +32,7 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetAllCitiesAsync()
         {  
             var cities = await Mediator.Send(new GetCityQuery());    
-             if (cities == null )
+             if (cities is null )
             {                
                 return NotFound(new 
                 { 
@@ -48,10 +48,10 @@ namespace BSOFT.API.Controllers
             });
         }
 
-        [HttpGet("{cityId}")]        
-        public async Task<IActionResult> GetByIdAsync(int cityId)
+        [HttpGet("{id}")]        
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-             if (cityId <= 0)
+             if (id <= 0)
             {
                 return BadRequest(new 
                 { 
@@ -59,8 +59,8 @@ namespace BSOFT.API.Controllers
                     message = "Invalid City ID" 
                 });
             }
-            var result = await Mediator.Send(new GetCityByIdQuery { Id = cityId });            
-            if (result == null )
+            var result = await Mediator.Send(new GetCityByIdQuery { Id = id });            
+            if (result is null )
             {                
                 return NotFound(new 
                 { 
@@ -75,7 +75,7 @@ namespace BSOFT.API.Controllers
             });   
         }
 
-        [HttpPost]        
+        [HttpPost("create")]               
         public async Task<IActionResult> CreateAsync(CreateCityCommand  command)
         { 
             var validationResult = await _createCityCommandValidator.ValidateAsync(command);
@@ -149,7 +149,7 @@ namespace BSOFT.API.Controllers
                 });
                 
         }
-        [HttpDelete("delete")]        
+        [HttpDelete("delete{id}")]        
         public async Task<IActionResult> DeleteAsync(int cityId,DeleteCityCommand command)
         {
             
@@ -191,11 +191,11 @@ namespace BSOFT.API.Controllers
                 });
             }       
         }
-
-        [HttpGet("GetCitySearch")]        
-        public async Task<IActionResult> GetCity([FromQuery] string searchPattern)
+             
+        [HttpGet("by-name{name}")]  
+        public async Task<IActionResult> GetCity([FromQuery] string searchCity)
         {    
-            if (string.IsNullOrWhiteSpace(searchPattern))
+            if (string.IsNullOrWhiteSpace(searchCity))
             {
                  return BadRequest(new
                 {
@@ -203,7 +203,7 @@ namespace BSOFT.API.Controllers
                     message = "Search pattern is required"
                 });                
             }       
-            var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
+            var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchCity}); // Pass `searchPattern` to the constructor
             if (!result.IsSuccess)
             {
                 return NotFound(new 
