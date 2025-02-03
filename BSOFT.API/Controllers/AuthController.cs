@@ -85,7 +85,7 @@ namespace BSOFT.API.Controllers
             _logger.LogWarning("Authentication failed for user: {Username}. Reason: {Message}", 
                 command.Username, response.Message);
 
-            if (response.Message == "Invalid username or password.")
+            if (response.Message is "Invalid username or password.")
             {
                // Track invalid login attempts
                 if (!_userLockoutInfo.ContainsKey(username))
@@ -175,7 +175,7 @@ namespace BSOFT.API.Controllers
 
             var session = await _userSessionRepository.GetSessionByJwtIdAsync(jwtId);
 
-            if (session == null)
+            if (session is null)
             {
                 //return NotFound(new { Message = "Session not found for the provided JWT ID." });
                 return NotFound(new

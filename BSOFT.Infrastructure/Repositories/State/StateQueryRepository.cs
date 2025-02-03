@@ -28,9 +28,9 @@ namespace BSOFT.Infrastructure.Repositories
         {
             const string query = @"
             SELECT Id, StateCode, StateName, IsActive,countryId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP 
-            FROM AppData.State with(nolock) WHERE Id = @Id and IsDeleted=0";
+            FROM AppData.State WHERE Id = @Id and IsDeleted=0";
             var state = await _dbConnection.QueryFirstOrDefaultAsync<States>(query, new { id });           
-            if (state == null)
+            if (state is null)
             {
                 throw new KeyNotFoundException($"State with ID {id} not found.");
             }
@@ -51,12 +51,24 @@ namespace BSOFT.Infrastructure.Repositories
                 AND IsDeleted = 0
                 ORDER BY ID DESC";
 
-            var states = await _dbConnection.QueryAsync<States>(
+       /*      var states = await _dbConnection.QueryAsync<States>(
                 query,
                 new { SearchPattern = $"%{searchPattern}%" }
-            );
+            ); */
             var result = await _dbConnection.QueryAsync<States>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();              
+        }
+        public async Task<List<States>> GetStateByCountryIdAsync(int countryId )
+        {
+           const string query = @"
+            SELECT Id, StateCode, StateName, IsActive,countryId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP 
+            FROM AppData.State WHERE CountryId = @CountryId  AND IsDeleted=0";
+            var state = await _dbConnection.QueryAsync<States>(query, new { countryId });           
+            if (state is null)
+            {
+                throw new KeyNotFoundException($"State with ID {countryId} not found.");
+            }
+            return state.ToList();
         }
    }
 }

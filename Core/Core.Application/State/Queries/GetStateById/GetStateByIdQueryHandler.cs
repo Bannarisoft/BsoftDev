@@ -23,7 +23,7 @@ namespace Core.Application.State.Queries.GetStateById
         {            
             var state = await _stateRepository.GetByIdAsync(request.Id);
             var stateDto = _mapper.Map<StateDto>(state);
-            if (state == null)
+            if (state is null)
             {                
                 return new ApiResponseDTO<StateDto>
                 {
@@ -35,8 +35,8 @@ namespace Core.Application.State.Queries.GetStateById
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetById",
                 actionCode: stateDto.StateCode ?? string.Empty,        
-                actionName: stateDto.StateName ?? string.Empty,                
-                details: $"State '{stateDto.StateName}' was created. StateCode: {stateDto.StateCode}",
+                actionName: stateDto.StateName ?? string.Empty,                                
+                details: $"Get StateId: {request.Id}. details was fetched.",
                 module:"State"
             );
             await _mediator.Publish(domainEvent, cancellationToken);            

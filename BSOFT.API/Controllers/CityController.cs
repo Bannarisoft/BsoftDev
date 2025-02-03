@@ -4,6 +4,7 @@ using Core.Application.City.Commands.UpdateCity;
 using Core.Application.City.Queries.GetCities;
 using Core.Application.City.Queries.GetCityAutoComplete;
 using Core.Application.City.Queries.GetCityById;
+using Core.Application.City.Queries.GetCityByStateId;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -150,52 +151,36 @@ namespace BSOFT.API.Controllers
                 
         }
         [HttpDelete("delete{id}")]        
-        public async Task<IActionResult> DeleteAsync(int cityId,DeleteCityCommand command)
-        {
-            
-            if(cityId != command.Id)
+        public async Task<IActionResult> DeleteAsync(int id)
+        {             
+            if (id <= 0)
             {
-                 return BadRequest(
-                    new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "CityId Mismatch"
-                    }
-                );                
-            }
-            if (cityId <= 0)
-            {
-                return BadRequest(
-                    new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "Invalid City ID"
-                    }
-                );               
-            }           
-            var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
-                return Ok(new 
-                { 
-                    StatusCode=StatusCodes.Status200OK,
-                    message = result.Message
-                });
-            }
-            else
-            {        
                 return BadRequest(new
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Invalid Country ID"
+                });
+            }            
+              var result = await Mediator.Send(new DeleteCityCommand { Id = id });                 
+            if (!result.IsSuccess)
+            {                
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
                     message = result.Message
                 });
-            }       
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data =$"City ID {id} Deleted" 
+            });
         }
              
         [HttpGet("by-name{name}")]  
-        public async Task<IActionResult> GetCity([FromQuery] string searchCity)
+        public async Task<IActionResult> GetCity(string name)
         {    
-            if (string.IsNullOrWhiteSpace(searchCity))
+            if (string.IsNullOrWhiteSpace(name))
             {
                  return BadRequest(new
                 {
@@ -203,7 +188,7 @@ namespace BSOFT.API.Controllers
                     message = "Search pattern is required"
                 });                
             }       
-            var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = searchCity}); // Pass `searchPattern` to the constructor
+            var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
             if (!result.IsSuccess)
             {
                 return NotFound(new 
@@ -218,6 +203,32 @@ namespace BSOFT.API.Controllers
                 message = result.Message,
                 data = result.Data
             });
-        }     
+        }    
+        [HttpGet("by-state/{stateid}")]
+        public async Task<IActionResult> GetStateByCountryId(int stateid)
+        {
+            if (stateid <= 0)
+            {                
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest,
+                    message = "Invalid State ID" 
+                });
+            }
+            var result = await Mediator.Send(new GetCityByStateIdQuery { Id = stateid });                         
+            if(result is null)
+            {                
+                return NotFound(new 
+                { 
+                    StatusCode=StatusCodes.Status404NotFound,
+                    message = "StateID {stateId} not found", 
+                });
+            }
+            return Ok(new 
+            {
+                StatusCode=StatusCodes.Status200OK,
+                data = result
+            });   
+        }    
     }
 }

@@ -23,7 +23,7 @@ namespace Core.Application.City.Queries.GetCityById
         {                    
             var city = await _cityRepository.GetByIdAsync(request.Id);                
             var cityDto = _mapper.Map<CityDto>(city);
-            if (city == null)
+            if (city is null)
             {                
                 return new ApiResponseDTO<CityDto>
                 {

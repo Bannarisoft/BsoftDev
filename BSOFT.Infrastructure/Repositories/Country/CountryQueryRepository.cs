@@ -31,7 +31,7 @@ namespace BSOFT.Infrastructure.Repositories.Country
             FROM AppData.Country
             WHERE Id = @id AND IsDeleted = 0";
             var country = await _dbConnection.QueryFirstOrDefaultAsync<Countries>(query, new { id });           
-             if (country == null)
+             if (country is null)
             {
                 throw new KeyNotFoundException($"Country with ID {id} not found.");
             }

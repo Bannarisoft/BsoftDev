@@ -28,7 +28,7 @@ namespace Core.Application.City.Commands.UpdateCity
         public async Task<ApiResponseDTO<CityDto>> Handle(UpdateCityCommand request, CancellationToken cancellationToken)
         {
             var city = await _cityQueryRepository.GetByIdAsync(request.Id);
-            if (city == null)
+            if (city is null)
                 return new ApiResponseDTO<CityDto>
                 {
                     IsSuccess = false,
@@ -38,7 +38,7 @@ namespace Core.Application.City.Commands.UpdateCity
             var oldCityName = city.CityName;
             city.CityName = request.CityName;
 
-            if (city == null || city.IsDeleted == Enums.IsDelete.Deleted )
+            if (city is null || city.IsDeleted is Enums.IsDelete.Deleted )
             {
                 return new ApiResponseDTO<CityDto>
                 {
@@ -56,53 +56,39 @@ namespace Core.Application.City.Commands.UpdateCity
                     Message = "Invalid StateId. The specified state does not exist or is inactive."
                 };
             }
- 
+            if ((byte)city.IsActive != request.IsActive)
+            {    
+                 city.IsActive =  (Enums.Status)request.IsActive;             
+                await _cityRepository.UpdateAsync(city.Id, city);
+                if (request.IsActive is 0)
+                {
+                    return new ApiResponseDTO<CityDto>
+                    {
+                        IsSuccess = false,
+                        Message = "CityCode DeActivated."
+                    };
+                }
+                else{
+                    return new ApiResponseDTO<CityDto>
+                    {
+                        IsSuccess = false,
+                        Message = "CityCode Activated."
+                    }; 
+                }                                     
+            }
             // Check if the city name already exists in the same state
-            var cityExistsByName = await _cityRepository.GetCityByNameAsync(request.CityName ?? string.Empty,request.CityCode ?? string.Empty, request.StateId);
-           /*  if (cityExistsByName)
-            {
-                return new ApiResponseDTO<CityDto> {
-                    IsSuccess = false, 
-                    Message = "City with the same name & code already exists in the specified state."
-                };
-            }   */
+            var cityExistsByName = await _cityRepository.GetCityByNameAsync(request.CityName ?? string.Empty,request.CityCode ?? string.Empty, request.StateId);           
             if (cityExistsByName!= null)
             {  
                 if ((byte)cityExistsByName.IsActive == request.IsActive)
-                {     
-                    if ((byte)cityExistsByName.IsActive==0)
-                    {                
-                        return new ApiResponseDTO<CityDto>
-                        {
-                            IsSuccess = false,
-                            Message = $"CityCode already exists and is {(Enums.Status) request.IsActive}."
-                        };
-                    }
-                }
-                if ((byte)cityExistsByName.IsActive != request.IsActive)
-                {
-                    // Reactivate the country or handle it differently
-                    cityExistsByName.IsActive =  (Enums.Status)request.IsActive;                    
-                    cityExistsByName.StateId =  request.StateId;
-                    cityExistsByName.CityCode =  request.CityCode;
-                    cityExistsByName.CityName =  request.CityName;
-                    await _cityRepository.UpdateAsync(cityExistsByName.Id, cityExistsByName);
-                    if (request.IsActive==0)
+                {                     
+                    return new ApiResponseDTO<CityDto>
                     {
-                        return new ApiResponseDTO<CityDto>
-                        {
-                            IsSuccess = false,
-                            Message = "CityCode DeActivated."
-                        };
-                        }
-                        else{
-                            return new ApiResponseDTO<CityDto>
-                        {
-                            IsSuccess = false,
-                            Message = "CityCode Activated."
-                        }; 
-                    }                    
-                }
+                        IsSuccess = false,
+                        Message = $"CityCode already exists and is {(Enums.Status) request.IsActive}."
+                    };
+                    
+                }               
             }
             var updatedCityEntity = _mapper.Map<Cities>(request);                   
             var updateResult = await _cityRepository.UpdateAsync(request.Id, updatedCityEntity);            

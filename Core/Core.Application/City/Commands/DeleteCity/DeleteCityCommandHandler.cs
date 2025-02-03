@@ -31,7 +31,7 @@ namespace Core.Application.City.Commands.DeleteCity
         {
             // Fetch the city to be deleted
             var city = await _cityQueryRepository.GetByIdAsync(request.Id);
-            if (city == null || city.IsDeleted == Enums.IsDelete.Deleted )
+            if (city is null || city.IsDeleted is Enums.IsDelete.Deleted )
             {
                 return new ApiResponseDTO<CityDto>
                 {

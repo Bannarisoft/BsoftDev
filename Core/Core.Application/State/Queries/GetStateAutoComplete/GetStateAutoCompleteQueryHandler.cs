@@ -21,7 +21,7 @@ namespace Core.Application.State.Queries.GetStateAutoComplete
         public async Task<ApiResponseDTO<List<StateDto>>> Handle(GetStateAutoCompleteQuery request, CancellationToken cancellationToken)
         {          
             var result = await _stateRepository.GetByStateNameAsync(request.SearchPattern ?? string.Empty);
-            if (result == null || result.Count == 0)
+            if (result is null || result.Count is 0)
             {
                  return new ApiResponseDTO<List<StateDto>>
                 {

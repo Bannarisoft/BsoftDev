@@ -26,7 +26,7 @@ namespace Core.Application.State.Commands.UpdateState
         public async Task<ApiResponseDTO<StateDto>> Handle(UpdateStateCommand request, CancellationToken cancellationToken)
         {
             var state = await _stateQueryRepository.GetByIdAsync(request.Id);
-             if (state == null)                
+             if (state is null)                
                 return new ApiResponseDTO<StateDto>
                 {
                     IsSuccess = false,
@@ -35,7 +35,7 @@ namespace Core.Application.State.Commands.UpdateState
 
             var oldStateName = state.StateName;
             state.StateName = request.StateName;
-            if (state == null || state.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
+            if (state is null || state.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
             {                
                 return new ApiResponseDTO<StateDto>
                 {
@@ -52,45 +52,37 @@ namespace Core.Application.State.Commands.UpdateState
                     Message = "Invalid CountryID. The specified Country does not exist or is inactive."
                 };
             }
+            if ((byte)state.IsActive != request.IsActive)
+            {    
+                 state.IsActive =  (Enums.Status)request.IsActive;             
+                await _stateRepository.UpdateAsync(state.Id, state);
+                if (request.IsActive is 0)
+                {
+                    return new ApiResponseDTO<StateDto>
+                    {
+                        IsSuccess = false,
+                        Message = "StateCode DeActivated."
+                    };
+                }
+                else{
+                    return new ApiResponseDTO<StateDto>
+                    {
+                        IsSuccess = false,
+                        Message = "StateCode Activated."
+                    }; 
+                }                                     
+            }
             var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName ?? string.Empty,request.StateCode ??string.Empty, request.CountryId);
             if (stateExists!= null)
             {              
                 if ((byte)stateExists.IsActive == request.IsActive)
-                {
-                    if ((byte)stateExists.IsActive==0)
-                    {  
-                        // Reactivate the country or handle it differently
-                        return new ApiResponseDTO<StateDto>
-                        {
-                            IsSuccess = false,
-                            Message = $"StateCode already exists and is {(Enums.Status) request.IsActive}."
-                        };  
-                    }                  
-                }
-                if ((byte)stateExists.IsActive != request.IsActive)
-                {
-                    // Reactivate the country or handle it differently
-                    stateExists.IsActive =  (Enums.Status)request.IsActive;
-                    stateExists.CountryId =  request.CountryId;
-                    stateExists.StateCode =  request.StateCode;
-                    stateExists.StateName =  request.StateName;
-                    await _stateRepository.UpdateAsync(stateExists.Id, stateExists);
-                    if (request.IsActive==0)
+                {                    
+                    return new ApiResponseDTO<StateDto>
                     {
-                        return new ApiResponseDTO<StateDto>
-                        {
-                            IsSuccess = false,
-                            Message = "StateCode DeActivated."
-                        };
-                        }
-                        else{
-                            return new ApiResponseDTO<StateDto>
-                        {
-                            IsSuccess = false,
-                            Message = "StateCode Activated."
-                        }; 
-                    }                    
-                }        
+                        IsSuccess = false,
+                        Message = $"StateCode already exists and is {(Enums.Status) request.IsActive}."
+                    };                                 
+                }               
             }
             var updatedStateEntity = _mapper.Map<States>(request);          
             var updateResult = await _stateRepository.UpdateAsync(request.Id, updatedStateEntity);            

@@ -25,7 +25,7 @@ namespace Core.Application.Country.Queries.GetCountryById
         public async Task<ApiResponseDTO<CountryDto>> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
         {           
             var country = await _countryRepository.GetByIdAsync(request.Id);
-            if (country == null)
+            if (country is null)
             {
                 return new ApiResponseDTO<CountryDto>
                 {

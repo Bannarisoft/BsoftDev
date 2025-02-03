@@ -26,7 +26,7 @@ namespace Core.Application.Country.Commands.DeleteCountry
         public async Task<ApiResponseDTO<CountryDto>> Handle(DeleteCountryCommand request, CancellationToken cancellationToken)
         {
             var country = await _countryQueryRepository.GetByIdAsync(request.Id);
-            if (country == null || country.IsDeleted == Enums.IsDelete.Deleted)
+            if (country is null || country.IsDeleted is Enums.IsDelete.Deleted)
             {
                 return new ApiResponseDTO<CountryDto>
                 {

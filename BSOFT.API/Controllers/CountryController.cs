@@ -136,26 +136,30 @@ namespace BSOFT.API.Controllers
             }
         }
         [HttpDelete("delete{id}")]   
-        public async Task<IActionResult> DeleteAsync(DeleteCountryCommand command)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            var result = await Mediator.Send(command);
-            if (result.IsSuccess)
+            if (id <= 0)
             {
-                return Ok(new 
-                { 
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Country Deleted successfully", 
-                    data = result.Data 
-                });
-            }
-            else
-            {            
-                return BadRequest(new 
-                { 
+                return BadRequest(new
+                {
                     StatusCode = StatusCodes.Status400BadRequest,
-                    message = result.Message 
+                    message = "Invalid Country ID"
+                });
+            }            
+              var result = await Mediator.Send(new DeleteCountryCommand { Id = id });                 
+            if (!result.IsSuccess)
+            {                
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
                 });
             }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data =$"Country ID {id} Deleted" 
+            });
         }
 
         [HttpGet("by-name{name}")]     

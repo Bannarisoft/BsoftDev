@@ -26,7 +26,7 @@ namespace BSOFT.Infrastructure.Repositories.State
              var StateToDelete = await _applicationDbContext.States.FirstOrDefaultAsync(u => u.Id == id);
             if (StateToDelete != null)
             {
-                StateToDelete.IsActive = states.IsActive;
+                StateToDelete.IsDeleted = states.IsDeleted;
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; 

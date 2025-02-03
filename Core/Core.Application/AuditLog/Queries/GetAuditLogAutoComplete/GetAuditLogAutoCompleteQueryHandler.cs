@@ -22,7 +22,7 @@ namespace Core.Application.AuditLog.Queries.GetAuditLogBySearchPattern
                 Builders<AuditLogs>.Filter.Regex("Details", new MongoDB.Bson.BsonRegularExpression(request.SearchPattern, "i"))
             );
             var auditLogs = await _auditLogCollection.Find(filter).ToListAsync(cancellationToken);         
-            if (auditLogs == null || auditLogs.Count == 0)
+            if (auditLogs is null || auditLogs.Count is 0)
             {                    
                 return new ApiResponseDTO<List<AuditLogDto>>
                 {
