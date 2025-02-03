@@ -38,9 +38,9 @@ namespace BSOFT.API.Validation.Entity
                         RuleFor(x => x.EntityName)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateEntityCommand.EntityName)} {rule.Error}");
-                        RuleFor(x => x.EntityDescription)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateEntityCommand.EntityDescription)} {rule.Error}");
+                        // RuleFor(x => x.EntityDescription)
+                        //     .NotEmpty()
+                        //     .WithMessage($"{nameof(UpdateEntityCommand.EntityDescription)} {rule.Error}");
                         RuleFor(x => x.Address)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateEntityCommand.Address)} {rule.Error}");

@@ -3,15 +3,14 @@ using Core.Application.Common.Mappings;
 
 namespace Core.Application.Entity.Queries.GetEntity
 {
-    public class EntityDto :IMapFrom<ApiResponseDTO <Core.Domain.Entities.Entity>>
+    public class EntityDto 
     {
     public int Id { get; set; }
-    public string EntityCode { get; set; }
-    public string EntityName { get; set; }
-    public string EntityDescription { get; set; }
-    public string Address { get; set; }
-    public string Phone  { get; set; }
-    public string Email { get; set; }
-    public byte IsActive { get; set; }
+    public string? EntityCode { get; set; }
+    public string? EntityName { get; set; }
+    public string? EntityDescription { get; set; }
+    public string? Address { get; set; }
+    public string? Phone  { get; set; }
+    public string? Email { get; set; }
     }
 }

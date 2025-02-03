@@ -8,6 +8,6 @@ namespace Core.Application.Entity.Commands.DeleteEntity
     public class DeleteEntityCommand : IRequest<ApiResponseDTO<int>> 
     {
         public int EntityId { get; set; }
-        public EntityStatusDto UpdateEntityStatusDto { get; set; }
+    
     }
 }

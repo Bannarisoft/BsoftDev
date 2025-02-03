@@ -49,6 +49,9 @@ using BSOFT.API.Validation.AdminSecuritySettings;
 using Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySettings;
 using Core.Application.CompanySettings.Commands.CreateCompanySettings;
 using BSOFT.API.Validation.CompanySettings;
+using Core.Application.Currency.Commands.CreateCurrency;
+using BSOFT.API.Validation.Currency;
+using Core.Application.Currency.Commands.UpdateCurrency;
 namespace BSOFT.API.Validation.Common
 {
     public class ValidationService
@@ -82,7 +85,6 @@ namespace BSOFT.API.Validation.Common
         services.AddScoped<IValidator<UpdateRoleCommand>, UpdateRoleCommandValidator>();
         services.AddScoped<IValidator<FirstTimeUserPasswordCommand>,PasswordChangeCommandValidator>();
         services.AddScoped<IValidator<ChangeUserPasswordCommand>,ExistingUserPasswordChangeCommandValidator>();
-
  		services.AddScoped<IValidator<CreatePasswordComplexityRuleCommand>, CreatePasswordComplexityRuleCommandValidator>();
         services.AddScoped<IValidator<UserLoginCommand>,UserLoginCommandValidator>();
         services.AddScoped<IValidator<UpdatePasswordComplexityRuleCommand>, UpdatePasswordComplexityRuleCommandValidator>();
@@ -90,6 +92,8 @@ namespace BSOFT.API.Validation.Common
         services.AddScoped<IValidator<UpdateAdminSecuritySettingsCommand> ,UpdateAdminSecuritySettingsCommandValidator>();  
         services.AddScoped<IValidator<FirstTimeUserPasswordCommand>,PasswordChangeCommandValidator>();
         services.AddScoped<IValidator<CreateCompanySettingsCommand>, CreateCompanySettingsCommandValidator>();
-         }  
+        services.AddScoped<IValidator<CreateCurrencyCommand>, CreateCurrencyCommandValidator>();
+        services.AddScoped<IValidator<UpdateCurrencyCommand>, UpdateCurrencyCommandValidator>();
+        }  
     }
 }
