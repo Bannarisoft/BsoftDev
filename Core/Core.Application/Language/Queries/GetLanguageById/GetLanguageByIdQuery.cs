@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Language.Queries.GetLanguages;
 using MediatR;
 
-namespace Core.Application.Language.Commands.DeleteLanguage
+namespace Core.Application.Language.Queries.GetLanguageById
 {
-    public class DeleteLanguageCommand : IRequest<ApiResponseDTO<bool>>
+    public class GetLanguageByIdQuery : IRequest<ApiResponseDTO<LanguageDTO>>
     {
         public int Id { get; set; }
     }

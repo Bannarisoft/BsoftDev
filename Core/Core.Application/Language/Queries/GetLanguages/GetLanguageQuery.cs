@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
 using MediatR;
 
-namespace Core.Application.Language.Commands.DeleteLanguage
+namespace Core.Application.Language.Queries.GetLanguages
 {
-    public class DeleteLanguageCommand : IRequest<ApiResponseDTO<bool>>
+    public class GetLanguageQuery : IRequest<ApiResponseDTO<List<LanguageDTO>>>
     {
-        public int Id { get; set; }
+        
     }
 }
