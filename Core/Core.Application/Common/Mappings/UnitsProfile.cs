@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Units.Commands.CreateUnit;
+using Core.Application.Units.Commands.DeleteUnit;
 using Core.Application.Units.Queries.GetUnits;
 using Core.Domain.Entities;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Common.Mappings
 {
@@ -13,9 +16,19 @@ namespace Core.Application.Common.Mappings
         public UnitsProfile()
         {
                CreateMap<UnitsDto, Unit>()
+                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.UnitAddress, opt => opt.MapFrom(src => src.UnitAddressDto))
                 .ForMember(dest => dest.UnitContacts, opt => opt.MapFrom(src => src.UnitContactsDto))
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+
+                CreateMap<CreateUnitCommand, Unit>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UnitAddress, opt => opt.MapFrom(src => src.UnitAddressDto))
+                .ForMember(dest => dest.UnitContacts, opt => opt.MapFrom(src => src.UnitContactsDto))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+
 
              CreateMap<UnitAddressDto, UnitAddress>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -56,22 +69,27 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.Remarks, opt => opt.MapFrom(src => src.Remarks));
 
             CreateMap<Unit, UnitsDto>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => src.UnitName));
             
             CreateMap<UpdateUnitsDto, Unit>()
                  .ForMember(dest => dest.UnitAddress, opt => opt.MapFrom(src => src.UnitAddressDto))
-                 .ForMember(dest => dest.UnitContacts, opt => opt.MapFrom(src => src.UnitContactsDto));
+                 .ForMember(dest => dest.UnitContacts, opt => opt.MapFrom(src => src.UnitContactsDto))
+                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
 
             CreateMap<Unit, GetUnitsDTO>()
             .ForMember(dest => dest.UnitAddressDto, opt => opt.MapFrom(src => src.UnitAddress))
             .ForMember(dest => dest.UnitContactsDto, opt => opt.MapFrom(src => src.UnitContacts));
 
-                 // Mapping from UnitStatus to UnitStatusDto
+            CreateMap<DeleteUnitCommand, Unit>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UnitId)) 
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
 
-              CreateMap<UnitStatusDto, Unit>()
-    .ForMember(dest => dest.Id, opt => opt.Ignore())
-    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+
+
+
+
+    
 
                  
         }

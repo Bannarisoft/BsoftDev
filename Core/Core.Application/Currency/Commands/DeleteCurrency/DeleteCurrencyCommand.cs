@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Currency.Commands.DeleteCurrency
 {
-    public class DeleteCurrencyCommand : IRequest<ApiResponseDTO<bool>>
+    public class DeleteCurrencyCommand : IRequest<ApiResponseDTO<int>>
     {
          public int Id { get; set; }
     }

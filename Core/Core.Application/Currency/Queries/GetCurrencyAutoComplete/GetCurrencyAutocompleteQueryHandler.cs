@@ -32,11 +32,11 @@ namespace Core.Application.Currency.Queries.GetCurrencyAutoComplete
         public async Task<ApiResponseDTO<List<CurrencyDto>>> Handle(GetCurrencyAutocompleteQuery request, CancellationToken cancellationToken)
         {
 
-            _logger.LogInformation("Fetching Currency Request started: {request}", request.SearchPattern);
+            _logger.LogInformation($"Fetching Currency Request started: {request.SearchPattern}");
             var newcurrency = await _currencyQueryRepository.GetByCurrencyNameAsync(request.SearchPattern);
-            if (newcurrency == null || !newcurrency.Any() || newcurrency.Count == 0)
+            if (newcurrency is null || !newcurrency.Any() || newcurrency.Count == 0)
             {
-                _logger.LogWarning("No Currency Record {Currency} not found in DB.", newcurrency.Count);
+                _logger.LogWarning($"No Currency Record {newcurrency.Count} not found in DB.");
                 return new ApiResponseDTO<List<CurrencyDto>>
                 {
                     IsSuccess = false,
@@ -44,7 +44,7 @@ namespace Core.Application.Currency.Queries.GetCurrencyAutoComplete
                 };
             }
             var currencylist = _mapper.Map<List<CurrencyDto>>(newcurrency);
-            _logger.LogInformation("Fetching Currency Request Completed: {request}", currencylist.Count);
+            _logger.LogInformation($"Fetching Currency Request Completed: {currencylist.Count}");
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetCurrencyAutocompleteQuery",
@@ -53,7 +53,7 @@ namespace Core.Application.Currency.Queries.GetCurrencyAutoComplete
                 details: $"Currency details was fetched.",
                 module:"Currency");
             await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("Currency {Currencies} Listed successfully.", currencylist.Count);
+            _logger.LogInformation($"Currency {currencylist.Count} Listed successfully.");
             return new ApiResponseDTO<List<CurrencyDto>>
             {
                 IsSuccess = true,

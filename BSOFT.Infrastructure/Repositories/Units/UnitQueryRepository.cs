@@ -54,6 +54,7 @@ namespace BSOFT.Infrastructure.Repositories.Units
                     AppData.UnitAddress  ua ON u.Id = ua.UnitId
                 INNER JOIN 
                     AppData.UnitContacts uc ON u.Id = uc.UnitId
+                WHERE  U.IsDeleted = 0
                 ORDER BY 
                     u.CreatedAt DESC
             ";
@@ -122,6 +123,7 @@ namespace BSOFT.Infrastructure.Repositories.Units
                 INNER JOIN 
                     AppData.UnitContacts uc ON u.Id = uc.UnitId
                 WHERE u.Id = @id
+                AND U.IsDeleted = 0
                 ORDER BY 
                     u.CreatedAt DESC
             ";
@@ -196,7 +198,7 @@ namespace BSOFT.Infrastructure.Repositories.Units
                 INNER JOIN 
                     AppData.UnitContacts uc ON u.Id = uc.UnitId
 				WHERE U.UnitName LIKE @SearchPattern OR U.Id LIKE @SearchPattern
-                AND U.IsActive = 1
+                AND U.IsDeleted = 0
                 ORDER BY 
                     u.CreatedAt DESC";
 

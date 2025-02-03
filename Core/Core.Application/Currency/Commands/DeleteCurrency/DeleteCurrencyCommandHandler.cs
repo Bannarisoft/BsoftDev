@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Currency.Commands.DeleteCurrency
 {
-    public class DeleteCurrencyCommandHandler : IRequestHandler<DeleteCurrencyCommand, ApiResponseDTO<bool>>
+    public class DeleteCurrencyCommandHandler : IRequestHandler<DeleteCurrencyCommand, ApiResponseDTO<int>>
     {
         private readonly ICurrencyCommandRepository _currencyCommandRepository ;
 
@@ -29,52 +29,52 @@ namespace Core.Application.Currency.Commands.DeleteCurrency
             this.currencyQueryRepository = currencyQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<bool>> Handle(DeleteCurrencyCommand request, CancellationToken cancellationToken)
-        {
-         _logger.LogInformation($"Soft Deleting Currency with ID: {request.Id}");
+    public async Task<ApiResponseDTO<int>> Handle(DeleteCurrencyCommand request, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation($"Soft Deleting Currency with ID: {request.Id}");
 
-         var currency = await currencyQueryRepository.GetByIdAsync(request.Id);
-
-         if (currency == null)
+        var currency = await currencyQueryRepository.GetByIdAsync(request.Id);
+        if (currency is null)
         {
-             _logger.LogWarning($"Soft Deleting Currency Failed with ID: {request.Id}");
-            return new ApiResponseDTO<bool>
+            _logger.LogWarning($"Soft Deleting Currency Failed: Currency with ID {request.Id} not found.");
+            return new ApiResponseDTO<int>
             {
                 IsSuccess = false,
                 Message = "Currency not found.",
-                Data = false
+                
             };
         }
+        var currencydelete = _Imapper.Map<Core.Domain.Entities.Currency>(request);
 
-        var result = await _currencyCommandRepository.SoftDeleteAsync(request.Id);
-
-        if (result)
+        var result = await _currencyCommandRepository.DeletecurrencyAsync(request.Id, currencydelete);
+        if (result==- 1)
         {
-             //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "Delete",
-                    actionCode: request.Id.ToString(),
-                    actionName: "DeleteCurrencyCommand",
-                    details: $"Currency '{request.Id}' was Deleted.",
-                    module: "Currency"
-                    );    
-                await _Imediator.Publish(domainEvent, cancellationToken);
-             _logger.LogInformation($"Soft Deleting Currency Successfully Completed with ID: {request.Id}");
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = true,
-                Message = "Currency successfully soft deleted.",
-                Data = result
-            };
-            
-        }        
-        _logger.LogWarning($"Soft Deleting Currency Failed with ID: {request.Id}");
-        return new ApiResponseDTO<bool>
+       _logger.LogWarning($"Soft Deleting Currency Failed with ID: {request.Id}");
+        return new ApiResponseDTO<int>
         {
             IsSuccess = false,
             Message = "Currency not found.",
-            Data = result
+            Data = request.Id
         };
         }
+            // Publish domain event for audit logs
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "Delete",
+                actionCode: request.Id.ToString(),
+                actionName: "DeleteCurrencyCommand",
+                details: $"Currency '{request.Id}' was Deleted.",
+                module: "Currency"
+            );
+            await _Imediator.Publish(domainEvent, cancellationToken);
+
+            _logger.LogInformation($"Soft Deleting Currency Successfully Completed with ID: {request.Id}");
+            return new ApiResponseDTO<int>
+            {
+                IsSuccess = true,
+                Message = "Currency successfully soft deleted.",
+                Data = request.Id
+            };
+        
+    }
     }
 }

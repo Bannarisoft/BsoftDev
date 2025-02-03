@@ -10,9 +10,8 @@ namespace Core.Application.Currency.Commands.CreateCurrency
 {
     public class CreateCurrencyCommand :IRequest<ApiResponseDTO<int>>
     { 
-        public string Code { get; set; }
-        public string Name { get; set; }
-        public CurrencyEnum.CurrencyStatus IsActive { get; set; }
-        public CurrencyEnum.CurrencyDelete IsDeleted { get; set; }
+        public string? Code { get; set; }
+        public string? Name { get; set; }
+
     }
 }

@@ -11,9 +11,9 @@ namespace Core.Application.Currency.Commands.UpdateCurrency
     public class UpdateCurrencyCommand  : IRequest<ApiResponseDTO<int>>
     {
         public int Id { get; set; }
-        public string Code { get; set; }
-        public string Name { get; set; }
-        public CurrencyEnum.CurrencyStatus IsActive { get; set; }
-       // public CurrencyEnum.CurrencyDelete IsDeleted { get; set; }
+       // public string? Code { get; set; }
+        public string? Name { get; set; }
+        public byte IsActive { get; set; }
+       
     }
 }

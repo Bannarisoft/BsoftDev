@@ -29,9 +29,9 @@ namespace BSOFT.API.Validation.Currency
                 {
                     case "NotEmpty":
                         // Apply NotEmpty validation
-                        RuleFor(x => x.Code)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateCurrencyCommand.Code)} {rule.Error}");
+                        // RuleFor(x => x.Code)
+                        //     .NotEmpty()
+                        //     .WithMessage($"{nameof(UpdateCurrencyCommand.Code)} {rule.Error}");
                         RuleFor(x => x.Name)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateCurrencyCommand.Name)} {rule.Error}");
@@ -41,26 +41,26 @@ namespace BSOFT.API.Validation.Currency
                         RuleFor(x => x.Name)
                             .MaximumLength(currencyNameMaxLength) // Dynamic value from MaxLengthProvider
                             .WithMessage($"{nameof(UpdateCurrencyCommand.Name)} {rule.Error} {currencyNameMaxLength}");
-                        RuleFor(x => x.Code)
-                            .MaximumLength(currencyCodeMaxLength) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(UpdateCurrencyCommand.Code)} {rule.Error} {currencyCodeMaxLength}");
-                            break;  
+                        // RuleFor(x => x.Code)
+                        //     .MaximumLength(currencyCodeMaxLength) // Dynamic value from MaxLengthProvider
+                        //     .WithMessage($"{nameof(UpdateCurrencyCommand.Code)} {rule.Error} {currencyCodeMaxLength}");
+                             break;  
                      case "AlphabeticOnly":
                         // Apply AlphabeticOnly validation
-                        RuleFor(x => x.Code)
-                            .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                            .WithMessage($"{nameof(UpdateCurrencyCommand.Code)} {rule.Error}");   
+                        // RuleFor(x => x.Code)
+                        //     .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
+                        //     .WithMessage($"{nameof(UpdateCurrencyCommand.Code)} {rule.Error}");   
                           
                         RuleFor(x => x.Name)
                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
                             .WithMessage($"{nameof(UpdateCurrencyCommand.Name)} {rule.Error}");
                             break;
-                    case "MinLength":
-                        // Apply MinLength validation
-                        RuleFor(x => x.Code)
-                            .MinimumLength(currencyNameMinLength) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(UpdateCurrencyCommand.Code)} {rule.Error} {currencyNameMinLength}");
-                            break;
+                    // case "MinLength":
+                    //     // Apply MinLength validation
+                    //     RuleFor(x => x.Code)
+                    //         .MinimumLength(currencyNameMinLength) // Dynamic value from MaxLengthProvider
+                    //         .WithMessage($"{nameof(UpdateCurrencyCommand.Code)} {rule.Error} {currencyNameMinLength}");
+                    //         break;
                     default:
                         // Handle unknown rule (log or throw)
                         Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");

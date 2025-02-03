@@ -30,11 +30,11 @@ namespace Core.Application.Currency.Queries.GetCurrency
 
         public async Task<ApiResponseDTO<List<CurrencyDto>>> Handle(GetCurrencyQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Fetching Currency Request started: {request}", request);
+            _logger.LogInformation($"Fetching Currency Request started: {request}");
             var newcurrency = await _currencyQueryRepository.GetAllCurrencyAsync();
-            if (newcurrency == null || !newcurrency.Any() || newcurrency.Count == 0)
+            if (newcurrency is null || !newcurrency.Any() || newcurrency.Count == 0)
             {
-                _logger.LogWarning("No Currency Record {Currency} not found in DB.", newcurrency.Count);
+                _logger.LogWarning($"No Currency Record {newcurrency.Count} not found in DB.");
                 return new ApiResponseDTO<List<CurrencyDto>>
                 {
                     IsSuccess = false,
@@ -42,7 +42,7 @@ namespace Core.Application.Currency.Queries.GetCurrency
                 };
             }
             var currencylist = _mapper.Map<List<CurrencyDto>>(newcurrency);
-            _logger.LogInformation("Fetching Currency Request Completed: {request}", currencylist.Count);
+            _logger.LogInformation($"Fetching Currency Request Completed: {currencylist.Count}");
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetCurrencyQuery",
@@ -51,7 +51,7 @@ namespace Core.Application.Currency.Queries.GetCurrency
                 details: $"Currency details was fetched.",
                 module:"Currency");
             await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("Currency {Currencies} Listed successfully.", currencylist.Count);
+            _logger.LogInformation($"Currency {currencylist.Count} Listed successfully.");
             return new ApiResponseDTO<List<CurrencyDto>>
             { 
                 IsSuccess = true, 

@@ -17,7 +17,11 @@ namespace BSOFT.Infrastructure.Repositories.TimeZones
         }
         public async Task<List<Core.Domain.Entities.TimeZones>> GetByIdAsync(int id)
         {
-             const string query = "SELECT * FROM AppData.Timezones WHERE Id = @Id and IsActive = 1";
+             const string query = @"
+                SELECT * 
+                FROM AppData.Timezones 
+                WHERE Id = @Id and IsDeleted = 0
+                ORDER BY CreatedAt DESC";
              var timeszoneList =await _dbConnection.QueryAsync<Core.Domain.Entities.TimeZones>(query, new { id });
              return timeszoneList?.ToList() ?? new List<Core.Domain.Entities.TimeZones>();
         }
@@ -26,7 +30,8 @@ namespace BSOFT.Infrastructure.Repositories.TimeZones
         {
              const string query = @"
               SELECT *
-            FROM AppData.Timezones Where IsActive = 1 ORDER BY CreatedAt DESC";
+              FROM AppData.Timezones Where IsDeleted = 0 
+              ORDER BY CreatedAt DESC";
             return (await _dbConnection.QueryAsync<Core.Domain.Entities.TimeZones>(query)).ToList() ?? new List<Core.Domain.Entities.TimeZones>();
         }
 
@@ -39,9 +44,9 @@ namespace BSOFT.Infrastructure.Repositories.TimeZones
 
             const string query = @"
                  SELECT *
-            FROM AppData.Timezones
-            WHERE Name LIKE @SearchPattern OR Code LIKE @SearchPattern and IsActive = 1
-            ORDER BY CreatedAt DESC";
+                 FROM AppData.Timezones
+                 WHERE Name LIKE @SearchPattern OR Code LIKE @SearchPattern and IsDeleted = 0
+                 ORDER BY CreatedAt DESC";
                 
             // Update the object to use SearchPattern instead of Name
             var timeszoneList = await _dbConnection.QueryAsync<Core.Domain.Entities.TimeZones>(query, new { SearchPattern = $"%{searchPattern}%" });

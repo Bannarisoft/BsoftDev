@@ -10,6 +10,7 @@ using Core.Application.TimeZones.Queries.GetTimeZonesAutoComplete;
 using Core.Application.TimeZones.Queries.GetTimeZonesById;
 using BSOFT.Infrastructure.Data;
 using MediatR;
+using Polly.Caching;
 
 namespace BSOFT.API.Controllers
 {
@@ -33,9 +34,9 @@ namespace BSOFT.API.Controllers
         {
         
         var result  = await Mediator.Send(new GetTimeZonesQuery());
-        if (result == null || result.Data == null || !result.Data.Any())
+        if (result is null || result.Data is null || !result.Data.Any())
         {
-            _logger.LogWarning("No TimeZone Record {TimeZone} not found in DB.", result.Data);
+            _logger.LogWarning($"No TimeZone Record {result.Data} not found in DB.");
             return NotFound(new
             {
                 message = result.Message,
@@ -43,7 +44,7 @@ namespace BSOFT.API.Controllers
               
             });
         }
-        _logger.LogInformation("TimeZone {TimeZones} Listed successfully.", result.Data.Count);
+        _logger.LogInformation($"TimeZone {result.Data.Count} Active Listed successfully.");
         return Ok(new
         {
             
@@ -60,7 +61,7 @@ namespace BSOFT.API.Controllers
         
         if (id <= 0)
         {
-            _logger.LogWarning("TimeZone {TimeZoneId} not found.", id);
+            _logger.LogWarning($"TimeZoneId {id} not found.");
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
@@ -72,7 +73,7 @@ namespace BSOFT.API.Controllers
 
         if (result.IsSuccess)
         {
-              _logger.LogInformation("TimeZone {TimeZoneId} Listed successfully.", result.Data);
+              _logger.LogInformation($"TimeZoneId {result.Data} Listed successfully.");
               return Ok(new
              {
                  message = result.Message,
@@ -80,7 +81,7 @@ namespace BSOFT.API.Controllers
                  data = result.Data
              }); 
         }
-        _logger.LogWarning("TimeZone {TimeZoneId} Not found.", result.Data);
+        _logger.LogWarning($"TimeZoneId {result.Data} Not found.");
         return NotFound(new
         {
             message = result.Message,
@@ -88,13 +89,13 @@ namespace BSOFT.API.Controllers
         });
    
 }
-       [HttpGet("GetTimeZonessearch")]
-        public async Task<IActionResult> GetTimeZones([FromQuery] string searchPattern)
+       [HttpGet("timezones/by-name/{name}")]
+        public async Task<IActionResult> GetTimeZones([FromRoute] string name)
         {       
       // Check if searchPattern is provided
-        if (string.IsNullOrEmpty(searchPattern))
+        if (string.IsNullOrEmpty(name))
         {
-            _logger.LogInformation("Search pattern cannot be empty.");
+            _logger.LogInformation($"Search pattern cannot be empty.");
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
@@ -103,11 +104,11 @@ namespace BSOFT.API.Controllers
         }
 
         // Fetch entities based on search pattern
-        var result = await Mediator.Send(new GetTimeZonesAutocompleteQuery { SearchPattern = searchPattern });
-        _logger.LogInformation("Search pattern: {SearchPattern}", searchPattern);
+        var result = await Mediator.Send(new GetTimeZonesAutocompleteQuery { SearchPattern = name });
+       _logger.LogInformation($"Search pattern {name} cannot be empty.");
        if (result.IsSuccess)
         {
-        _logger.LogInformation("TimeZone {TimeZones} Listed successfully.", result.Data.Count);
+        _logger.LogInformation($"TimeZone {result.Data.Count} Listed successfully.");
          return Ok(new  
             {
                 message = result.Message,
@@ -115,7 +116,7 @@ namespace BSOFT.API.Controllers
                 data = result.Data
             });
         }
-        _logger.LogInformation("No TimeZone Record {TimeZone} not found in DB.", result.Data);
+        _logger.LogInformation($"No TimeZone Record in search of {name} not found in DB.");
         return NotFound(new
         {
             message = result.Message,

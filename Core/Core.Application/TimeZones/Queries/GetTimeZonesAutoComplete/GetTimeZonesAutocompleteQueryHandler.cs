@@ -29,11 +29,11 @@ namespace Core.Application.TimeZones.Queries.GetTimeZonesAutoComplete
 
         public async Task<ApiResponseDTO<List<TimeZonesDto>>> Handle(GetTimeZonesAutocompleteQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Fetching TimeZones Request started: {request}", request); 
+            _logger.LogInformation($"Fetching TimeZones Request started: {request}"); 
             var newTimeZones = await _timeZonesQueryRepository.GetByTimeZonesNameAsync(request.SearchPattern);
-            if (newTimeZones == null || !newTimeZones.Any() || newTimeZones.Count == 0)
+            if (newTimeZones is null || !newTimeZones.Any() || newTimeZones.Count == 0)
             {
-                _logger.LogWarning("No TimeZones Record {TimeZones} not found in DB.", newTimeZones.Count);
+                _logger.LogWarning($"No TimeZones Record {newTimeZones.Count} not found in DB.", newTimeZones.Count);
                 return new ApiResponseDTO<List<TimeZonesDto>>
                 {
                     IsSuccess = false,
@@ -43,7 +43,7 @@ namespace Core.Application.TimeZones.Queries.GetTimeZonesAutoComplete
             else
             {
                 var newTimeZonesDto = _mapper.Map<List<TimeZonesDto>>(newTimeZones);
-                _logger.LogInformation("Fetching TimeZones Request Completed: {request}", newTimeZonesDto.Count);
+                _logger.LogInformation($"Fetching TimeZones Request Completed: {newTimeZonesDto.Count}");
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetTimeZonesAutocompleteQuery",
@@ -52,7 +52,7 @@ namespace Core.Application.TimeZones.Queries.GetTimeZonesAutoComplete
                     details: $"TimeZones details was fetched.",
                     module:"TimeZones");
                 await _mediator.Publish(domainEvent);
-                _logger.LogInformation("TimeZones {TimeZones} Listed successfully.", newTimeZonesDto.Count);
+                _logger.LogInformation($"TimeZones {newTimeZonesDto.Count} Listed successfully.");
                 return new ApiResponseDTO<List<TimeZonesDto>>
                 {
                     IsSuccess = true,

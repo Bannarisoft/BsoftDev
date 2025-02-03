@@ -8,6 +8,6 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
 {
     public class GetUnitAutoCompleteQuery : IRequest<ApiResponseDTO<List<GetUnitsDTO>>>
     {
-        public string SearchPattern { get; set; }
+        public string? SearchPattern { get; set; }
     }
 }

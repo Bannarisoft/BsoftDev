@@ -84,7 +84,7 @@ namespace BSOFT.Infrastructure.Repositories.Units
             {
                 return -1;
             }
-                unitToDelete.IsActive = unit.IsActive;
+                unitToDelete.IsDeleted = unit.IsDeleted;
                 await _applicationDbContext.SaveChangesAsync();
                 return unitToDelete.Id;                        
         }
@@ -93,6 +93,12 @@ namespace BSOFT.Infrastructure.Repositories.Units
     {
         return await _applicationDbContext.Unit.AnyAsync(c => c.UnitName == code);
     }
+
+    public async Task<bool> ExistsByNameupdateAsync(string name, int id)
+    {
+        return await _applicationDbContext.Unit.AnyAsync(c => c.UnitName == name && c.Id != id);
+    }
+
         
     }
 }

@@ -41,20 +41,20 @@ namespace Core.Application.Entity.Commands.CreateEntity
         var exists = await _IentityRepository.ExistsByCodeAsync(request.EntityName);
             if (exists)
             {
-                 _logger.LogWarning("Entity Name {EntityName} already exists.", request.EntityName);
+                 _logger.LogWarning($"Entity Name {request.EntityName} already exists.");
                  return new ApiResponseDTO<int>
             {
             IsSuccess = false,
             Message = "Entity Name already exists."
             };
             }
-        _logger.LogInformation("Starting creation process for EntityCode: {Entitycode}", request);
+        _logger.LogInformation($"Starting creation process for EntityCode: {request}");
         var entityCode = await _Imediator.Send(new GetEntityLastCodeQuery(), cancellationToken);
-        _logger.LogInformation("Completed creation process for EntityCode: {Entitycode}", entityCode.Data);
+        _logger.LogInformation($"Completed creation process for EntityCode: {entityCode.Data}");
 
-        if (entityCode.Data == null || string.IsNullOrEmpty(entityCode.Data))
+        if (entityCode.Data is null || string.IsNullOrEmpty(entityCode.Data))
         { 
-            _logger.LogError("Failed to create user for EntityCode: {EntityCode}", entityCode.Data);
+            _logger.LogError($"Failed to create user for EntityCode: {entityCode.Data}");
             return new ApiResponseDTO<int> 
             { 
                 IsSuccess = false, 
@@ -67,7 +67,7 @@ namespace Core.Application.Entity.Commands.CreateEntity
         entity.EntityCode = entityCode.Data;
 
         // Log that the entity creation process is about to begin
-        _logger.LogInformation("Starting Entity creation process for EntityCode: {EntityCode}", entity.EntityCode);
+        _logger.LogInformation($"Starting Entity creation process for EntityCode: {entity.EntityCode}");
 
 
             var result = await _IentityRepository.CreateAsync(entity);
@@ -80,7 +80,7 @@ namespace Core.Application.Entity.Commands.CreateEntity
                 module:"Entity"
             );
             await _Imediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("Entity creation process completed for EntityCode: {EntityCode}", entity.EntityCode);
+            _logger.LogInformation($"Entity creation process completed for EntityCode: {entity.EntityCode}");
             var entityDto = _Imapper.Map<EntityDto>(entity);
 
              if (result > 0)

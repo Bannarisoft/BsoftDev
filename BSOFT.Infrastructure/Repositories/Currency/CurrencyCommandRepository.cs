@@ -6,6 +6,7 @@ using BSOFT.Infrastructure.Data;
 using Core.Application.Common.Interfaces.ICurrency;
 using Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace BSOFT.Infrastructure.Repositories.Currency
 {
@@ -29,50 +30,52 @@ namespace BSOFT.Infrastructure.Repositories.Currency
         // Return the ID of the created currency
         return currency.Id;
     }
-      public async Task<int> UpdateAsync(int id, Core.Domain.Entities.Currency  currency)
-    {   
-    
-        var existingcurrency = await _applicationDbContext.Currency.FirstOrDefaultAsync(u => u.Id == id);
+    public async Task<int> UpdateAsync(int id, Core.Domain.Entities.Currency currency)
+{
+    var existingCurrency = await _applicationDbContext.Currency.FirstOrDefaultAsync(u => u.Id == id);
 
-        // If the currency does not exist, throw a CustomException
-        if (existingcurrency == null)
-        {
-            return -1; //indicate failure
-        }
+    // If the entity does not exist, return -1 (failure)
+    if (existingCurrency == null)
+    {
+        return -1;
+    }
 
-        // Update the existing currency's properties
-        existingcurrency.Code = currency.Code;
-        existingcurrency.Name = currency.Name;
-        existingcurrency.IsActive = currency.IsActive;
-  
+    // Update the properties
+    existingCurrency.Name = currency.Name;
+    existingCurrency.IsActive = currency.IsActive;
 
+    // Mark the entity as modified (Ensure you are updating Currency, not Entity)
+    _applicationDbContext.Currency.Update(existingCurrency);
 
-        // Mark the currency as modified
-        _applicationDbContext.Currency.Update(existingcurrency);
+    // Save changes to the database
+    await _applicationDbContext.SaveChangesAsync();
 
-        // Save changes to the database
-        await _applicationDbContext.SaveChangesAsync();
-
-        return 1; // Indicate success
-    
+    return 1; // Indicate success
 }
-
 
     public async Task<bool> ExistsByCodeAsync(string code)
     {
-        return await _applicationDbContext.Currency.AnyAsync(c => c.Code == code);
+        return await _applicationDbContext.Currency.AnyAsync(c => c.Name == code);
     }
 
-    public async Task<bool> SoftDeleteAsync(int id)
+    public async Task<int> DeletecurrencyAsync(int Id, Core.Domain.Entities.Currency currency)
     {
-        var currency = await _applicationDbContext.Currency.FirstOrDefaultAsync(c => c.Id == id);
-        if (currency == null)
-        return false;
-        currency.IsDeleted = CurrencyEnum.CurrencyDelete.Deleted; // Mark as Deleted
-        _applicationDbContext.Currency.Update(currency);
-        await _applicationDbContext.SaveChangesAsync();
-        return true;
-    }
+            var existingcurrencydelete = await _applicationDbContext.Currency.FirstOrDefaultAsync(u => u.Id == Id);
+             // If the currency does not exist, throw a CustomException
+        if (existingcurrencydelete == null)
+        {
+            return -1; //indicate failure
+        }
+            existingcurrencydelete.IsDeleted = currency.IsDeleted;
+            _applicationDbContext.Currency.Update(existingcurrencydelete);
+            await _applicationDbContext.SaveChangesAsync();
+            return 1; // Indicate success
+       
+        }
 
+        public async Task<bool> ExistsByNameupdateAsync(string name, int id)
+        {
+            return await _applicationDbContext.Currency.AnyAsync(c => c.Name == name && c.Id != id);
+        }
     }
 }

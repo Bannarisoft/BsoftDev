@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.Entity.Queries.GetEntityAutoComplete
 {
-    public class GetEntityAutocompleteQuery : IRequest<ApiResponseDTO<List<EntityDto>>>
+    public class GetEntityAutocompleteQuery : IRequest<ApiResponseDTO<List<GetEntityDTO>>>
     {
         public string SearchPattern { get; set; }
     }

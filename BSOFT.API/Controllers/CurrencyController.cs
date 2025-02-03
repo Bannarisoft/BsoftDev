@@ -46,9 +46,9 @@ namespace BSOFT.API.Controllers
         {
         
         var result  = await Mediator.Send(new GetCurrencyQuery());
-        if (result == null || result.Data == null || !result.Data.Any())
+        if (result is null  || result.Data is null || !result.Data.Any())
         {
-            _logger.LogWarning("No Currency Record {Currency} not found in DB.", result.Data);
+            _logger.LogWarning($"No Currency Record {result.Data} not found in DB.");
             return NotFound(new
             {
                 message = result.Message,
@@ -56,7 +56,7 @@ namespace BSOFT.API.Controllers
               
             });
         }
-        _logger.LogInformation("Currency {Currencies} Listed successfully.", result.Data.Count);
+        _logger.LogInformation($"Total {result.Data.Count} active Currencies Listed successfully.");
         return Ok(new
         {
             
@@ -73,7 +73,7 @@ namespace BSOFT.API.Controllers
         
         if (id <= 0)
         {
-            _logger.LogWarning("Currency {CurrencyId} not found.", id);
+            _logger.LogWarning($"CurrencyId {id} not found.");
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
@@ -85,7 +85,7 @@ namespace BSOFT.API.Controllers
 
         if (result.IsSuccess)
         {
-              _logger.LogInformation("Currency {CurrencyId} Listed successfully.", result.Data);
+              _logger.LogInformation($"CurrencyId {result.Data} Listed successfully.");
               return Ok(new
              {
                  message = result.Message,
@@ -93,7 +93,7 @@ namespace BSOFT.API.Controllers
                  data = result.Data
              }); 
         }
-        _logger.LogWarning("Currency {CurrencyId} Not found.", result.Data);
+        _logger.LogWarning($"CurrencyId {result.Data} Not found.");
         return NotFound(new
         {
             message = result.Message,
@@ -101,13 +101,13 @@ namespace BSOFT.API.Controllers
         });
    
 }
-       [HttpGet("GetCurrencysearch")]
-        public async Task<IActionResult> GetCurrency([FromQuery] string searchPattern)
+       [HttpGet("currency/by-name/{name}")]
+        public async Task<IActionResult> GetCurrency([FromRoute] string name)
         {       
       // Check if searchPattern is provided
-        if (string.IsNullOrEmpty(searchPattern))
+        if (string.IsNullOrEmpty(name))
         {
-            _logger.LogInformation("Search pattern cannot be empty.");
+           _logger.LogInformation($"Search pattern {name} cannot be empty.");
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
@@ -116,11 +116,11 @@ namespace BSOFT.API.Controllers
         }
 
         // Fetch entities based on search pattern
-        var result = await Mediator.Send(new GetCurrencyAutocompleteQuery { SearchPattern = searchPattern });
-        _logger.LogInformation("Search pattern: {SearchPattern}", searchPattern);
+        var result = await Mediator.Send(new GetCurrencyAutocompleteQuery { SearchPattern = name });
+        _logger.LogInformation($"Search pattern: {name}");
        if (result.IsSuccess)
         {
-        _logger.LogInformation("Currency {Currencies} Listed successfully.", result.Data.Count);
+        _logger.LogInformation($"Currency {result.Data.Count} Listed successfully.");
          return Ok(new  
             {
                 message = result.Message,
@@ -128,7 +128,7 @@ namespace BSOFT.API.Controllers
                 data = result.Data
             });
         }
-        _logger.LogInformation("No Currency Record {Currency} not found in DB.", result.Data);
+        _logger.LogInformation($"No Currency Record {name} of {result.Data} not found in DB.");
         return NotFound(new
         {
             message = result.Message,
@@ -136,12 +136,12 @@ namespace BSOFT.API.Controllers
         });                  
 }
 [HttpPost]
-public async Task<IActionResult> CreateAsync(CreateCurrencyCommand command)
+public async Task<IActionResult> CreateAsync(CreateCurrencyCommand createCurrencyCommand)
 {
     
     // Validate the incoming command
-   var validationResult = await _createCurrencyCommandValidator.ValidateAsync(command);
-    _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
+   var validationResult = await _createCurrencyCommandValidator.ValidateAsync(createCurrencyCommand);
+    _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
     if (!validationResult.IsValid)
     {
         
@@ -149,16 +149,16 @@ public async Task<IActionResult> CreateAsync(CreateCurrencyCommand command)
         {
             StatusCode = StatusCodes.Status400BadRequest,
             message = "Validation failed",
-            errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+            errors = validationResult.Errors.Select(e => e.ErrorMessage)
         });
     }
 
     // Process the command
-    var createdcurrencyId = await _mediator.Send(command);
+    var createdcurrencyId = await _mediator.Send(createCurrencyCommand);
 
     if (createdcurrencyId.IsSuccess)
     {
-     _logger.LogInformation("Currency {Code} created successfully.", command.Code);
+     _logger.LogInformation($"Currency {createCurrencyCommand.Code} created successfully.");
       return Ok(new
       {
           StatusCode = StatusCodes.Status201Created,
@@ -166,7 +166,7 @@ public async Task<IActionResult> CreateAsync(CreateCurrencyCommand command)
           data = createdcurrencyId.Data
       });
     }
-     _logger.LogWarning("Currency {Code} Creation failed.", command.Code);
+     _logger.LogWarning($"Currency {createCurrencyCommand.Code} Creation failed.");
       return BadRequest(new
         {
             StatusCode = StatusCodes.Status400BadRequest,
@@ -174,13 +174,13 @@ public async Task<IActionResult> CreateAsync(CreateCurrencyCommand command)
         });
   
 }
-[HttpPut("update")]
-public async Task<IActionResult> UpdateAsync( UpdateCurrencyCommand command)
+[HttpPut]
+public async Task<IActionResult> UpdateAsync( UpdateCurrencyCommand updateCurrencyCommand)
 {
   
         // Validate the incoming command
-        var validationResult = await _updateCurrencyCommandValidator.ValidateAsync(command);
-        _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
+        var validationResult = await _updateCurrencyCommandValidator.ValidateAsync(updateCurrencyCommand);
+        _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
         if (!validationResult.IsValid)
         {
            
@@ -188,40 +188,42 @@ public async Task<IActionResult> UpdateAsync( UpdateCurrencyCommand command)
             {
                 StatusCode = StatusCodes.Status400BadRequest,
                 message = "Validation failed",
-                errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                errors = validationResult.Errors.Select(e => e.ErrorMessage)
             });
         }
 
-        var updatedcurrency = await _mediator.Send(command);
+        var updatedcurrency = await _mediator.Send(updateCurrencyCommand);
 
         if (updatedcurrency.IsSuccess)
         {
-            _logger.LogInformation("Currency {Code} updated successfully.", command.Code);
+            _logger.LogInformation($"Currency {updateCurrencyCommand.Name} updated successfully.");
            return Ok(new
             {
                 message = updatedcurrency.Message,
                 statusCode = StatusCodes.Status200OK
             });
         }
-        _logger.LogWarning("Currency {Code} Update failed.", command.Code);
+
+  
+        _logger.LogWarning($"Currency {updateCurrencyCommand.Name} Update failed.");
         return NotFound(new
         {
-            message ="Currency not found",
+            message =updatedcurrency.Message,
             statusCode = StatusCodes.Status404NotFound
         });
 
         
 } 
 
-[HttpDelete("delete")]
-public async Task<IActionResult> DeleteCurrencyAsync( DeleteCurrencyCommand command)
+[HttpDelete]
+public async Task<IActionResult> DeleteCurrencyAsync( DeleteCurrencyCommand deleteCurrencyCommand)
 {
         // Process the delete command
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(deleteCurrencyCommand);
 
         if (result.IsSuccess) 
         {
-            _logger.LogInformation("Currency {Code} deleted successfully.", command.Id);
+            _logger.LogInformation($"CurrencyId {deleteCurrencyCommand.Id} deleted successfully.");
              return Ok(new
             {
                 message = result.Message,
@@ -229,7 +231,7 @@ public async Task<IActionResult> DeleteCurrencyAsync( DeleteCurrencyCommand comm
             });
             
         }
-        _logger.LogWarning("Currency {Code} Not Found or Invalid EntityId.", command.Id);
+        _logger.LogWarning($"CurrencyId {deleteCurrencyCommand.Id} Not Found or Invalid CurrencyId.");
         return NotFound(new
         {
             message = result.Message,

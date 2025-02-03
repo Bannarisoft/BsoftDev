@@ -29,12 +29,12 @@ namespace Core.Application.Currency.Commands.CreateCurrency
 
         public async Task<ApiResponseDTO<int>> Handle(CreateCurrencyCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Starting creation process for Currency: {Currency}", request);
+            _logger.LogInformation($"Starting creation process for Currency: {request}");
             // Check if currency code already exists
             var exists = await _currencyCommandRepository.ExistsByCodeAsync(request.Code);
             if (exists)
             {
-                 _logger.LogWarning("Currency Code {CurrencyCode} already exists.", request.Code.Trim());
+                 _logger.LogWarning($"Currency Code {request.Code} already exists.");
                  return new ApiResponseDTO<int>
             {
             IsSuccess = false,
@@ -54,13 +54,13 @@ namespace Core.Application.Currency.Commands.CreateCurrency
                 actionName: currency.Name, 
                 details: $"Currency details was created",
                 module:"Currency");
-            await _Imediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("Currency {Currency} Created successfully.", currency.Name);
+                await _Imediator.Publish(domainEvent, cancellationToken);
+            _logger.LogInformation($"Currency {currency.Name} Created successfully.");
              var currencyDtoDto = _Imapper.Map<CurrencyDto>(currency);
 
              if (result > 0)
                   {
-                     _logger.LogInformation("Currency {Currency} created successfully", result);
+                     _logger.LogInformation($"Currency {result} created successfully");
                         return new ApiResponseDTO<int>
                        {
                            IsSuccess = true,

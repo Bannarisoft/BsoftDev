@@ -28,11 +28,11 @@ namespace Core.Application.Units.Queries.GetUnits
         public async Task<ApiResponseDTO<List<GetUnitsDTO>>> Handle(GetUnitQuery request, CancellationToken cancellationToken)
         {
         
-             _logger.LogInformation("Fetching Unit Request started: {request}", request);
+             _logger.LogInformation($"Fetching Unit Request started: {request}");
             var units = await _unitRepository.GetAllUnitsAsync();
-             if (units == null || !units.Any() || units.Count == 0)
+             if (units is null || !units.Any() || units.Count == 0)
                 {
-                 _logger.LogWarning("No Unit Record {Unit} not found in DB.", units.Count);
+                 _logger.LogWarning($"No Unit Record {units.Count} not found in DB.");
                      return new ApiResponseDTO<List<GetUnitsDTO>>
                      {
                          IsSuccess = false,
@@ -40,7 +40,7 @@ namespace Core.Application.Units.Queries.GetUnits
                      };
                 }
             var unitList = _mapper.Map<List<GetUnitsDTO>>(units);
-            _logger.LogInformation("Fetching Unit Request Completed: {request}", units.Count);
+            _logger.LogInformation($"Fetching Unit Request Completed: {units.Count}" );
             //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetUnitQuery",
@@ -50,7 +50,7 @@ namespace Core.Application.Units.Queries.GetUnits
                     module:"Unit"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                _logger.LogInformation("Unit {Unit} Listed successfully.", units.Count);
+                _logger.LogInformation($"Unit {units.Count} Listed successfully.");
                 return new ApiResponseDTO<List<GetUnitsDTO>>
                 {
                     IsSuccess = true,

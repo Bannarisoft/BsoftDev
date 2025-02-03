@@ -31,12 +31,12 @@ namespace Core.Application.Units.Queries.GetUnitById
 
          public async Task<ApiResponseDTO<List<GetUnitsDTO>>> Handle(GetUnitByIdQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Fetching Unit Request started: {request}", request.Id);
+            _logger.LogInformation($"Fetching Unit Request started: {request.Id}");
             var units = await _unitRepository.GetByIdAsync(request.Id);    
 
-              if (units == null || !units.Any())
+              if (units is null || !units.Any())
                 {
-                    _logger.LogWarning("No Unit Record {Unit} not found in DB.", request.Id);
+                    _logger.LogWarning($"No Unit Record {request.Id} not found in DB.");
                      return new ApiResponseDTO<List<GetUnitsDTO>>
                      {
                          IsSuccess = false,
@@ -55,7 +55,7 @@ namespace Core.Application.Units.Queries.GetUnitById
                     module:"Unit"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("Fetching Unit Request Completed: {request}", request.Id);
+            _logger.LogInformation($"Fetching Unit Request Completed: {request.Id}");
             return new ApiResponseDTO<List<GetUnitsDTO>>
             {
                 IsSuccess = true,

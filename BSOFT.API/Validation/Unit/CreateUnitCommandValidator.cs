@@ -23,132 +23,132 @@ namespace BSOFT.API.Validation.Unit
                 {
                     case "NotEmpty":
                         // Apply NotEmpty validation
-                        RuleFor(x => x.UnitDto.UnitName)
+                        RuleFor(x => x.UnitName)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.UnitName)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.ShortName)
+                            .WithMessage($"{nameof(CreateUnitCommand.UnitName)} {rule.Error}");
+                        RuleFor(x => x.ShortName)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.ShortName)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.CompanyId)
+                            .WithMessage($"{nameof(CreateUnitCommand.ShortName)} {rule.Error}");
+                        RuleFor(x => x.CompanyId)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.CompanyId)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.DivisionId)
+                            .WithMessage($"{nameof(CreateUnitCommand.CompanyId)} {rule.Error}");
+                        RuleFor(x => x.DivisionId)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.DivisionId)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.UnitHeadName)
+                            .WithMessage($"{nameof(CreateUnitCommand.DivisionId)} {rule.Error}");
+                        RuleFor(x => x.UnitHeadName)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.UnitHeadName)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.CINNO)
+                            .WithMessage($"{nameof(CreateUnitCommand.UnitHeadName)} {rule.Error}");
+                        RuleFor(x => x.CINNO)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.CINNO)} {rule.Error}");
-                         RuleFor(x => x.UnitDto.UnitAddressDto.CountryId.ToString())
+                            .WithMessage($"{nameof(CreateUnitCommand.CINNO)} {rule.Error}");
+                         RuleFor(x => x.UnitAddressDto.CountryId.ToString())
                             .NotEmpty()
                             .WithMessage($"{nameof(UnitAddressDto.CountryId)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.StateId.ToString())
+                        RuleFor(x => x.UnitAddressDto.StateId.ToString())
                             .NotEmpty()
                             .WithMessage($"{nameof(UnitAddressDto.StateId)} {rule.Error}");
-                            RuleFor(x => x.UnitDto.UnitAddressDto.CityId.ToString())
+                            RuleFor(x => x.UnitAddressDto.CityId.ToString())
                             .NotEmpty()
                             .WithMessage($"{nameof(UnitAddressDto.CityId)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.AddressLine1)
+                        RuleFor(x => x.UnitAddressDto.AddressLine1)
                             .NotEmpty()
                             .WithMessage($"{nameof(UnitAddressDto.AddressLine1)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.PinCode.ToString())
+                        RuleFor(x => x.UnitAddressDto.PinCode.ToString())
                             .NotEmpty()
                             .WithMessage($"{nameof(UnitAddressDto.PinCode)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.ContactNumber)
+                        RuleFor(x => x.UnitAddressDto.ContactNumber)
                             .NotEmpty()
                             .WithMessage($"{nameof(UnitAddressDto.ContactNumber)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.UnitContactsDto.Name)
+                        RuleFor(x => x.UnitContactsDto.Name)
                             .NotEmpty()     
                             .WithMessage($"{nameof(UnitContactsDto.Name)} {rule.Error}");    
-                        RuleFor(x => x.UnitDto.UnitContactsDto.Designation)
+                        RuleFor(x => x.UnitContactsDto.Designation)
                             .NotEmpty()
                             .WithMessage($"{nameof(UnitContactsDto.Designation)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.UnitContactsDto.Email)
+                        RuleFor(x => x.UnitContactsDto.Email)
                             .NotEmpty()
                             .WithMessage($"{nameof(UnitContactsDto.Email)} {rule.Error}");
-                        RuleFor(x => x.UnitDto.UnitContactsDto.PhoneNo)
+                        RuleFor(x => x.UnitContactsDto.PhoneNo)
                             .NotEmpty()
                             .WithMessage($"{nameof(UnitContactsDto.PhoneNo)} {rule.Error}");
                         break;
                     case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values
-                        RuleFor(x => x.UnitDto.UnitName)
+                        RuleFor(x => x.UnitName)
                             .MaximumLength(50) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.UnitName)} {rule.Error} {50}");
-                        RuleFor(x => x.UnitDto.ShortName)
+                            .WithMessage($"{nameof(CreateUnitCommand.UnitName)} {rule.Error} {50}");
+                        RuleFor(x => x.ShortName)
                             .MaximumLength(10) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.ShortName)} {rule.Error} {10}");
-                        RuleFor(x => x.UnitDto.CompanyId.ToString())
+                            .WithMessage($"{nameof(CreateUnitCommand.ShortName)} {rule.Error} {10}");
+                        RuleFor(x => x.CompanyId.ToString())
                             .MaximumLength(4) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.CompanyId)} {rule.Error} {4}");
-                        RuleFor(x => x.UnitDto.DivisionId.ToString())
+                            .WithMessage($"{nameof(CreateUnitCommand.CompanyId)} {rule.Error} {4}");
+                        RuleFor(x => x.DivisionId.ToString())
                             .MaximumLength(4) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.DivisionId)} {rule.Error} {4}");
-                        RuleFor(x => x.UnitDto.UnitHeadName)
+                            .WithMessage($"{nameof(CreateUnitCommand.DivisionId)} {rule.Error} {4}");
+                        RuleFor(x => x.UnitHeadName)
                             .MaximumLength(50) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.UnitHeadName)} {rule.Error} {50}");
-                        RuleFor(x => x.UnitDto.CINNO)
+                            .WithMessage($"{nameof(CreateUnitCommand.UnitHeadName)} {rule.Error} {50}");
+                        RuleFor(x => x.CINNO)
                             .MaximumLength(50) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateUnitCommand.UnitDto.CINNO)} {rule.Error} {50}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.AddressLine1)
+                            .WithMessage($"{nameof(CreateUnitCommand.CINNO)} {rule.Error} {50}");
+                        RuleFor(x => x.UnitAddressDto.AddressLine1)
                             .MaximumLength(250)
                             .WithMessage($"{nameof(UnitAddressDto.AddressLine1)} {rule.Error} {250}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.AddressLine2)
+                        RuleFor(x => x.UnitAddressDto.AddressLine2)
                             .MaximumLength(250)
                             .WithMessage($"{nameof(UnitAddressDto.AddressLine2)} {rule.Error} {250}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.CountryId.ToString())
+                        RuleFor(x => x.UnitAddressDto.CountryId.ToString())
                             .MaximumLength(4)
                             .WithMessage($"{nameof(UnitAddressDto.CountryId)} {rule.Error} {4}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.StateId.ToString())
+                        RuleFor(x => x.UnitAddressDto.StateId.ToString())
                             .MaximumLength(4)
                     .       WithMessage($"{nameof(UnitAddressDto.StateId)} {rule.Error} {4}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.CityId.ToString())
+                        RuleFor(x => x.UnitAddressDto.CityId.ToString())
                             .MaximumLength(4)
                     .       WithMessage($"{nameof(UnitAddressDto.CityId)} {rule.Error} {4}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.PinCode.ToString())
+                        RuleFor(x => x.UnitAddressDto.PinCode.ToString())
                             .MaximumLength(10)
                             .WithMessage($"{nameof(UnitAddressDto.PinCode)} {rule.Error} {10}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.ContactNumber)
+                        RuleFor(x => x.UnitAddressDto.ContactNumber)
                             .MaximumLength(40)
                             .WithMessage($"{nameof(UnitAddressDto.ContactNumber)} {rule.Error} {40}");
-                        RuleFor(x => x.UnitDto.UnitAddressDto.AlternateNumber)
+                        RuleFor(x => x.UnitAddressDto.AlternateNumber)
                             .MaximumLength(40)
                             .WithMessage($"{nameof(UnitAddressDto.AlternateNumber)} {rule.Error} {40}"); 
 
-                        RuleFor(x => x.UnitDto.UnitContactsDto.Name)
+                        RuleFor(x => x.UnitContactsDto.Name)
                             .MaximumLength(50) 
                             .WithMessage($"{nameof(UnitContactsDto.Name)} {rule.Error} {50}"); 
-                        RuleFor(x => x.UnitDto.UnitContactsDto.Designation)
+                        RuleFor(x => x.UnitContactsDto.Designation)
                             .MaximumLength(50)
                             .WithMessage($"{nameof(UnitContactsDto.Designation)} {rule.Error} {50}");
-                        RuleFor(x => x.UnitDto.UnitContactsDto.Email)
+                        RuleFor(x => x.UnitContactsDto.Email)
                             .MaximumLength(200)
                             .WithMessage($"{nameof(UnitContactsDto.Email)} {rule.Error} {200}");
-                        RuleFor(x => x.UnitDto.UnitContactsDto.PhoneNo)
+                        RuleFor(x => x.UnitContactsDto.PhoneNo)
                             .MaximumLength(40)
                             .WithMessage($"{nameof(UnitContactsDto.PhoneNo)} {rule.Error} {40}");
-                        RuleFor(x => x.UnitDto.UnitContactsDto.Remarks)
+                        RuleFor(x => x.UnitContactsDto.Remarks)
                             .MaximumLength(250)
-                            .When(x => !string.IsNullOrEmpty(x.UnitDto.UnitContactsDto.Remarks))
+                            .When(x => !string.IsNullOrEmpty(x.UnitContactsDto.Remarks))
                             .WithMessage($"{nameof(UnitContactsDto.Remarks)} {rule.Error} {250}");
                         break;
 
                     case "MobileNumber": 
-                        RuleFor(x => x.UnitDto.UnitAddressDto.ContactNumber) 
+                        RuleFor(x => x.UnitAddressDto.ContactNumber) 
                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
                             .WithMessage($"{nameof(UnitAddressDto.ContactNumber)} {rule.Error}"); 
-                        RuleFor(x => x.UnitDto.UnitAddressDto.AlternateNumber)
+                        RuleFor(x => x.UnitAddressDto.AlternateNumber)
                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                            .When(x => !string.IsNullOrEmpty(x.UnitDto.UnitAddressDto.AlternateNumber))
+                            .When(x => !string.IsNullOrEmpty(x.UnitAddressDto.AlternateNumber))
                             .WithMessage($"{nameof(UnitAddressDto.AlternateNumber)} {rule.Error}"); 
-                        RuleFor(x => x.UnitDto.UnitContactsDto.PhoneNo) 
+                        RuleFor(x => x.UnitContactsDto.PhoneNo) 
                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
                             .WithMessage($"{nameof(UnitContactsDto.PhoneNo)} {rule.Error}"); 
                      break;
                      case "Email":
-                RuleFor(x => x.UnitDto.UnitContactsDto.Email) 
+                RuleFor(x => x.UnitContactsDto.Email) 
                     .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
                     .WithMessage($"{nameof(UnitContactsDto.Email)} {rule.Error}");
                      break;

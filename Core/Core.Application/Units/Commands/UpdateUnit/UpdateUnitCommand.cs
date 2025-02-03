@@ -7,6 +7,6 @@ namespace Core.Application.Units.Commands.UpdateUnit
     public class UpdateUnitCommand : IRequest<ApiResponseDTO<int>>
     {    
     //public int UnitId  { get; set; }
-    public UpdateUnitsDto UpdateUnitDto { get; set; }  
+    public UpdateUnitsDto? UpdateUnitDto { get; set; }  
     }
 }

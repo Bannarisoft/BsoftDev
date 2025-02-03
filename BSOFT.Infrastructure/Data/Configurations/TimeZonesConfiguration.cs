@@ -2,12 +2,25 @@ using Core.Domain.Entities;
 using Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using static Core.Domain.Enums.Common.Enums;
 namespace BSOFT.Infrastructure.Data.Configurations
 {
     public class TimeZonesConfiguration : IEntityTypeConfiguration<TimeZones>
     {
         public void Configure(EntityTypeBuilder<TimeZones> builder)
         {
+            var isActiveConverter = new ValueConverter<Status, bool>
+               (
+                    v => v == Status.Active,  
+                    v => v ? Status.Active : Status.Inactive 
+                );
+
+                var isDeletedConverter = new ValueConverter<IsDelete, bool>
+                (
+                 v => v == IsDelete.Deleted,  
+                 v => v ? IsDelete.Deleted : IsDelete.NotDeleted 
+                );
             builder.ToTable("TimeZones", "AppData");
 
         builder.HasKey(u => u.Id);
@@ -39,21 +52,30 @@ namespace BSOFT.Infrastructure.Data.Configurations
             .IsRequired();
 
          builder.Property(u => u.IsActive)
-            .HasColumnName("IsActive")
-            .HasColumnType("bit")
-            .HasConversion(
-             v => v == TimeZonesEnum.TimeZonesStatus.Active, // convert enum to bool
-             v => v ? TimeZonesEnum.TimeZonesStatus.Active : TimeZonesEnum.TimeZonesStatus.Inactive // convert bool to enum
-             )
-            .IsRequired();
-        builder.Property(u => u.IsDeleted)
+                .HasColumnName("IsActive")
+                .HasColumnType("bit")
+                .HasConversion(isActiveConverter)
+                .IsRequired();
+
+                 builder.Property(u => u.IsDeleted)
             .HasColumnName("IsDeleted")
             .HasColumnType("bit")
-            .HasConversion(
-             v => v == TimeZonesEnum.TimeZonesDelete.Deleted, // convert enum to bool
-             v => v ? TimeZonesEnum.TimeZonesDelete.Deleted : TimeZonesEnum.TimeZonesDelete.NotDeleted // convert bool to enum
-             )
+            .HasConversion(isDeletedConverter)
             .IsRequired();
+
+            builder.Property(b => b.CreatedByName)
+            .IsRequired()
+            .HasColumnType("varchar(50)");
+
+             builder.Property(b => b.CreatedIP)
+            .IsRequired()
+            .HasColumnType("varchar(255)");
+
+            builder.Property(b => b.ModifiedByName)
+            .HasColumnType("varchar(50)");
+
+            builder.Property(b => b.ModifiedIP)
+            .HasColumnType("varchar(255)");
         }
     }
 }

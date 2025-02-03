@@ -18,7 +18,11 @@ namespace BSOFT.Infrastructure.Repositories.Currency
 
         public async Task<List<Core.Domain.Entities.Currency>> GetByIdAsync(int id)
         {
-             const string query = "SELECT * FROM AppData.Currency WHERE Id = @Id and IsActive = 1";
+             const string query = @"
+               SELECT * 
+               FROM AppData.Currency 
+               WHERE Id = @Id and IsDeleted = 0
+               ORDER BY CreatedAt DESC";
              var currencyList = await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query, new { id });
              return currencyList?.ToList() ?? new List<Core.Domain.Entities.Currency>();
         }
@@ -31,9 +35,9 @@ namespace BSOFT.Infrastructure.Repositories.Currency
 
             const string query = @"
                  SELECT *
-            FROM AppData.Currency
-            WHERE Name LIKE @SearchPattern OR Code LIKE @SearchPattern and IsActive = 1
-            ORDER BY CreatedAt DESC";
+                 FROM AppData.Currency
+                 WHERE Name LIKE @SearchPattern OR Code LIKE @SearchPattern and IsDeleted = 0
+                 ORDER BY CreatedAt DESC";
                 
             // Update the object to use SearchPattern instead of Name
             var Currencylist = await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query, new { SearchPattern = $"%{searchPattern}%" });
@@ -42,9 +46,11 @@ namespace BSOFT.Infrastructure.Repositories.Currency
 
         public async Task<List<Core.Domain.Entities.Currency>> GetAllCurrencyAsync()
         {          
-             const string query = @"
-              SELECT *
-            FROM AppData.Currency WHERE IsActive = 1 ORDER BY CreatedAt DESC";
+            const string query = @"
+             SELECT * 
+             FROM AppData.Currency 
+             WHERE IsDeleted = 0 
+             ORDER BY CreatedAt DESC";
             return (await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query)).ToList() ?? new List<Core.Domain.Entities.Currency>();
         }
 

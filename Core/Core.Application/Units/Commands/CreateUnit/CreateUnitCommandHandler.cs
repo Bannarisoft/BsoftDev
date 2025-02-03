@@ -32,26 +32,26 @@ namespace Core.Application.Units.Commands.CreateUnit
         {
        
             
-            _logger.LogInformation("Starting creation process for Unit: {UnitName}", request.UnitDto.UnitName);
+            _logger.LogInformation($"Starting creation process for Unit: {request.UnitName}");
              // Check if Unit Name already exists
-            var exists = await _iUnitRepository.ExistsByCodeAsync(request.UnitDto.UnitName);
+            var exists = await _iUnitRepository.ExistsByCodeAsync(request.UnitName);
             if (exists)
             {
-                 _logger.LogWarning("Unit Name {Name} already exists.", request.UnitDto.UnitName);
+                 _logger.LogWarning($"Unit Name {request.UnitName} already exists.");
                  return new ApiResponseDTO<int>
             {
             IsSuccess = false,
-            Message = "Unit Name already exists.",
-            Data = 0
+            Message = "Unit Name already exists."
+        
             };
             }
-              var unit = _mapper.Map<Core.Domain.Entities.Unit>(request.UnitDto);
+              var unit = _mapper.Map<Core.Domain.Entities.Unit>(request);
               var result =  await _iUnitRepository.CreateUnitAsync(unit);
-            _logger.LogInformation("Completed creation process for Unit: {UnitName}", request.UnitDto.UnitName);
+            _logger.LogInformation($"Completed creation process for Unit: {request.UnitName}");
             
 
               var unitId = unit.Id;
-              _logger.LogInformation("Unit {UnitId} created successfully", unitId);
+              _logger.LogInformation($"Unit {unitId} created successfully");
 
                    //Domain Event
                   var domainEvent = new AuditLogsDomainEvent(
@@ -64,7 +64,7 @@ namespace Core.Application.Units.Commands.CreateUnit
                   await _Imediator.Publish(domainEvent, cancellationToken);
                   if (result > 0)
                   {
-                     _logger.LogInformation("Unit {UnitId} created successfully", unitId);
+                     _logger.LogInformation($"Unit {unitId} created successfully");
                         return new ApiResponseDTO<int>
                        {
                            IsSuccess = true,
@@ -72,7 +72,7 @@ namespace Core.Application.Units.Commands.CreateUnit
                            Data = unitId
                       };
                  }
-                 _logger.LogWarning("Unit {UnitId} Creation Failed", unitId);
+                 _logger.LogWarning($"Unit {unitId} Creation Failed" );
                   return new ApiResponseDTO<int>
                   {
                       IsSuccess = false,

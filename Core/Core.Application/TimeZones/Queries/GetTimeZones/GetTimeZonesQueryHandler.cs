@@ -30,11 +30,11 @@ namespace Core.Application.TimeZones.Queries.GetTimeZones
 
         public async Task<ApiResponseDTO<List<TimeZonesDto>>> Handle(GetTimeZonesQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Fetching TimeZones Request started: {request}", request);
+            _logger.LogInformation($"Fetching TimeZones Request started: {request}");
             var newTimeZones = await _timeZonesQueryRepository.GetAllTimeZonesAsync();
-            if (newTimeZones == null || !newTimeZones.Any() || newTimeZones.Count == 0)
+            if (newTimeZones is null || !newTimeZones.Any() || newTimeZones.Count == 0)
             {
-                _logger.LogWarning("No TimeZones Record {TimeZones} not found in DB.", newTimeZones.Count);
+                _logger.LogWarning($"No TimeZones Record {newTimeZones.Count} not found in DB.");
                 return new ApiResponseDTO<List<TimeZonesDto>>
                 {
                     IsSuccess = false,
@@ -42,7 +42,7 @@ namespace Core.Application.TimeZones.Queries.GetTimeZones
                 };
             }
             var TimeZoneslist = _mapper.Map<List<TimeZonesDto>>(newTimeZones);
-            _logger.LogInformation("Fetching TimeZones Request Completed: {request}", TimeZoneslist.Count);
+            _logger.LogInformation($"Fetching TimeZones Request Completed: {TimeZoneslist.Count}");
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetTimeZonesQuery",
@@ -51,7 +51,7 @@ namespace Core.Application.TimeZones.Queries.GetTimeZones
                 details: $"TimeZones details was fetched.",
                 module:"TimeZones");            
             await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("TimeZones {TimeZones} Listed successfully.", TimeZoneslist.Count);
+            _logger.LogInformation($"TimeZones {TimeZoneslist.Count} Listed successfully.");
             return new ApiResponseDTO<List<TimeZonesDto>>
             {   
                 IsSuccess = true,                

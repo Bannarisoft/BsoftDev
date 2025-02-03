@@ -29,11 +29,11 @@ namespace Core.Application.Currency.Queries.GetCurrencyById
 
         public async Task<ApiResponseDTO<List<CurrencyDto>>> Handle(GetCurrencyByIdQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Fetching Currency Request started: {request}", request.CurrencyId);
+            _logger.LogInformation($"Fetching Currency Request started: {request.CurrencyId}");
             var newcurrency = await _currencyQueryRepository.GetByIdAsync(request.CurrencyId);
-            if (newcurrency == null || !newcurrency.Any() || newcurrency.Count == 0)
+            if (newcurrency is null || !newcurrency.Any() || newcurrency.Count == 0)
             {
-                _logger.LogWarning("No Currency Record {Currency} not found in DB.", newcurrency.Count);
+                _logger.LogWarning($"No Currency Record {newcurrency.Count} not found in DB.");
                 return new ApiResponseDTO<List<CurrencyDto>>
                 {
                     IsSuccess = false,
@@ -41,7 +41,7 @@ namespace Core.Application.Currency.Queries.GetCurrencyById
                 };
             }
             var currencylist = _mapper.Map<List<CurrencyDto>>(newcurrency);
-            _logger.LogInformation("Fetching Currency Request Completed: {request}", currencylist.Count);
+            _logger.LogInformation($"Fetching Currency Request Completed: {currencylist.Count}");
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetCurrencyByIdQuery",
@@ -50,7 +50,7 @@ namespace Core.Application.Currency.Queries.GetCurrencyById
                 details: $"Currency details was fetched.",
                 module:"Currency");
             await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("Currency {Currencies} Listed successfully.", currencylist.Count);
+            _logger.LogInformation($"Currency {currencylist.Count} Listed successfully.");
             return new ApiResponseDTO<List<CurrencyDto>>
             {                
                 IsSuccess = true,
