@@ -30,62 +30,61 @@ namespace Core.Application.Modules.Commands.UpdateModule
 
     public async Task<ApiResponseDTO<bool>> Handle(UpdateModuleCommand request, CancellationToken cancellationToken)
     {
-            if (request == null)
-            {
-                _logger.LogError("UpdateModuleCommand request is null.");
-                throw new ArgumentNullException(nameof(request));
-            }
-        _logger.LogInformation("Starting module update process for ModuleId: {ModuleId}", request.ModuleId);
+           if (request == null)
+    {
+        _logger.LogError("UpdateModuleCommand request is null.");
+        throw new ArgumentNullException(nameof(request));
+    }
 
+    _logger.LogInformation("Starting module update process for ModuleId: {ModuleId}", request.ModuleId);
 
-        var module = await _moduleQueryRepository.GetModuleByIdAsync(request.ModuleId);
-        if (module == null || module.IsDeleted)
+    var module = await _moduleQueryRepository.GetModuleByIdAsync(request.ModuleId);
+    if (module == null || module.IsDeleted)
+    {
+        _logger.LogWarning("Module with ID {ModuleId} not found or has been deleted.", request.ModuleId);
+        return new ApiResponseDTO<bool>
         {
-                _logger.LogWarning("Module with ID {ModuleId} not found or has been deleted.", request.ModuleId);
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "Module not found or has been deleted."
-                };
-        }
+            IsSuccess = false,
+            Message = "Module not found or has been deleted."
+        };
+    }
 
-        // Update module name
-        module.ModuleName = request.ModuleName;
+    var oldModuleName = module.ModuleName; // Store the old name
+    module.ModuleName = request.ModuleName; // Update name
 
-        // Update menus
-        var existingMenus = module.Menus.Select(m => m.MenuName).ToList();
-        var menusToAdd = request.Menus.Except(existingMenus).ToList();
-        var menusToRemove = existingMenus.Except(request.Menus).ToList();
+    // Update menus
+    var existingMenus = module.Menus.Select(m => m.MenuName).ToList();
+    var menusToAdd = request.Menus.Except(existingMenus).ToList();
+    var menusToRemove = existingMenus.Except(request.Menus).ToList();
 
-        foreach (var menuName in menusToAdd)
-        {
-            module.Menus.Add(new Menu { MenuName = menuName });
-        }
+    module.Menus.ToList().RemoveAll(m => menusToRemove.Contains(m.MenuName)); // Remove unwanted menus
+    foreach (var menuName in menusToAdd)
+    {
+        module.Menus.Add(new Menu { MenuName = menuName }); // Add new menus
+    }
 
-        module.Menus = module.Menus.Where(m => !menusToRemove.Contains(m.MenuName)).ToList();
+    // Publish Domain Event
+    var domainEvent = new AuditLogsDomainEvent(
+        actionDetail: "Update",
+        actionCode: oldModuleName,
+        actionName: module.ModuleName,
+        details: $"Module '{oldModuleName}' was updated to '{module.ModuleName}'. Added menus: {string.Join(", ", menusToAdd)}. Removed menus: {string.Join(", ", menusToRemove)}.",
+        module: "Module"
+    );
 
-        var OldModuleName = module.ModuleName;
-        module.ModuleName = request.ModuleName;
-    
-        //Publish Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "Update",
-                    actionCode: OldModuleName,
-                    actionName: module.ModuleName,
-                    details: $"Module '{OldModuleName}' was updated to '{module.ModuleName}'. Added menus: {string.Join(", ", menusToAdd)}. Removed menus: {string.Join(", ", menusToRemove)}.",
-                    module:"Module"
-                );            
-                await _mediator.Publish(domainEvent, cancellationToken);
+    await _mediator.Publish(domainEvent, cancellationToken);
 
-                await _moduleRepository.SaveChangesAsync();
-          _logger.LogInformation("Module with ID {ModuleId} successfully updated.", request.ModuleId);
+    _moduleRepository.UpdateModuleAsync(module); // Ensure EF Core tracks changes
+    await _moduleRepository.SaveChangesAsync();
 
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = true,
-                Message = "Module updated successfully.",
-                Data = true
-            };
+    _logger.LogInformation("Module with ID {ModuleId} successfully updated.", request.ModuleId);
+
+    return new ApiResponseDTO<bool>
+    {
+        IsSuccess = true,
+        Message = "Module updated successfully.",
+        Data = true
+    };
     }
 }
 }

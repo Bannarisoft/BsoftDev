@@ -59,33 +59,33 @@ namespace BSOFT.API.Controllers
         {
             var users = await Mediator.Send(new GetUserQuery());
             var activeUsers = users.ToList();
-            _logger.LogInformation("Users Listed successfully.", activeUsers.Count);
+            _logger.LogInformation($"Total {activeUsers.Count} active users listed successfully.");
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, data = activeUsers });
         }
 
-        [HttpGet("{userid}")]
-        public async Task<IActionResult> GetByIdAsync(int userid)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
             
-            var user = await Mediator.Send(new GetUserByIdQuery { UserId = userid });
+            var user = await Mediator.Send(new GetUserByIdQuery { UserId = id });
 
-            if (user == null)
+            if (user is null)
             {
-                _logger.LogWarning("User Not Found for ID : {UserId}", userid);
+                _logger.LogWarning($"User not found for ID {id}.");
 
-                return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"User ID {userid} not found." });
+                return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"User ID {id} not found." });
             }
                 _logger.LogWarning("User Listed successfully: {Username}", user);
+
                 return Ok(new { StatusCode = StatusCodes.Status200OK, data = user });
         }
 
         [HttpPost]
-        [Route("Create")]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateUserCommand command)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateUserCommand createUserCommand)
         {
-            var validationResult = await _createUserCommandValidator.ValidateAsync(command);
-                _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
+            var validationResult = await _createUserCommandValidator.ValidateAsync(createUserCommand);
+                _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
 
             if (!validationResult.IsValid)
             {
@@ -97,24 +97,21 @@ namespace BSOFT.API.Controllers
                 });
             }
 
-            var response = await Mediator.Send(command);
+            var response = await Mediator.Send(createUserCommand);
             if (response.IsSuccess)
             {
-                _logger.LogInformation("User {Username} created successfully.", command.UserName);
-
-                   
-                                return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
+                _logger.LogInformation($"User {createUserCommand.UserName} created successfully.");
+                return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
             }
-            _logger.LogWarning("User creation failed for user: {Username}", command.UserName);
+                _logger.LogWarning($"Failed to create user {createUserCommand.UserName}.");
 
-            return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
+                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
         }        
         [HttpPut]
-        [Route("Update")]
-        public async Task<IActionResult> UpdateAsync([FromBody] UpdateUserCommand command)
+        public async Task<IActionResult> UpdateAsync([FromBody] UpdateUserCommand updateUserCommand)
         {
-            var validationResult = await _updateUserCommandValidator.ValidateAsync(command);
-                _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
+            var validationResult = await _updateUserCommandValidator.ValidateAsync(updateUserCommand);
+                _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
 
             if (!validationResult.IsValid)
             {
@@ -126,28 +123,25 @@ namespace BSOFT.API.Controllers
                 });
             }
 
-            var userExists = await Mediator.Send(new GetUserByIdQuery { UserId = command.UserId });
-            if (userExists == null)
+            var userExists = await Mediator.Send(new GetUserByIdQuery { UserId = updateUserCommand.UserId });
+            if (userExists is null)
             {
-                _logger.LogInformation("User {Username} not found for update.", command.UserId);
-
-                return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"User ID {command.UserId} not found." });
+                _logger.LogInformation($"User with ID {updateUserCommand.UserId} not found for update.");
+                return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"User ID {updateUserCommand.UserId} not found." });
             }
 
-            var response = await Mediator.Send(command);
+            var response = await Mediator.Send(updateUserCommand);
             if (response.IsSuccess)
             {
-                _logger.LogInformation("User {Username} updated successfully.", command.UserName);
-
+                _logger.LogInformation($"User {updateUserCommand.UserName} updated successfully.");
                 return Ok(new { StatusCode = StatusCodes.Status200OK, message = response.Message });
             }
-                _logger.LogWarning("User update failed for user: {Username}", command.UserName);
+                _logger.LogWarning($"Failed to update user {updateUserCommand.UserName}.");
 
                 return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
         }      
 
         [HttpDelete]
-        [Route("Delete")]
         public async Task<IActionResult> DeleteAsync(DeleteUserCommand deleteUserCommand)
         {
            
@@ -156,31 +150,27 @@ namespace BSOFT.API.Controllers
 
             if(deleteUser.IsSuccess)
             {
-                _logger.LogInformation("User {UserId} deleted successfully.", deleteUserCommand.UserId);
-
+                _logger.LogInformation($"User {deleteUserCommand.UserId} deleted successfully.");
                 return Ok(new { StatusCode=StatusCodes.Status200OK, message = deleteUser.Message, errors = "" });
               
             }
-                _logger.LogInformation("User {UserId} failed to delete.", deleteUserCommand.UserId);
-
+                _logger.LogInformation($"Failed to delete user with ID {deleteUserCommand.UserId}.");
                 return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = deleteUser.Message, errors = "" });
         }
 
         [HttpGet]
-        [Route("GetUsersByName")]
-        public async Task<IActionResult> GetByUsernameAsync([FromQuery] string searchPattern)
+        [Route("by-name/{name}")]
+        public async Task<IActionResult> GetByUsernameAsync(string name)
         {
            
-            var users = await Mediator.Send(new GetUserAutoCompleteQuery {SearchPattern = searchPattern});
-            _logger.LogWarning("User Listed successfully: {Username}", users);
-
+            var users = await Mediator.Send(new GetUserAutoCompleteQuery {SearchPattern = name});
+            _logger.LogWarning($"Users listed successfully: {string.Join(", ", users)}");
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = users });
         }
-        [HttpPut]
-        [Route("FirstTimeUserChangePassword")]
-        public async Task<IActionResult> FirstTimeUserChangePassword([FromBody] FirstTimeUserPasswordCommand command)
+        [HttpPut("password/first-time")]
+        public async Task<IActionResult> FirstTimeUserChangePassword([FromBody] FirstTimeUserPasswordCommand firstTimeUserPasswordCommand)
         {
-            var validationResult = await _firstTimeUserPasswordCommandValidator.ValidateAsync(command);
+            var validationResult = await _firstTimeUserPasswordCommandValidator.ValidateAsync(firstTimeUserPasswordCommand);
             if (!validationResult.IsValid)
             {
                 return BadRequest(new
@@ -191,16 +181,14 @@ namespace BSOFT.API.Controllers
                 });
             }
 
-            var response = await Mediator.Send(command);
-            _logger.LogInformation("First Time User and Password changed successfully.", command.UserName);
-
+            var response = await Mediator.Send(firstTimeUserPasswordCommand);
+            _logger.LogInformation($"First Time User {firstTimeUserPasswordCommand.UserName} and Password changed successfully.");
             return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });     
         }
-        [HttpPut]
-        [Route("ChangePassword")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangeUserPasswordCommand command)
+        [HttpPut("password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangeUserPasswordCommand changeUserPasswordCommand)
         {
-            var validationResult = await _changeUserPasswordCommandValidator.ValidateAsync(command);
+            var validationResult = await _changeUserPasswordCommandValidator.ValidateAsync(changeUserPasswordCommand);
             if (!validationResult.IsValid)
             {
                 return BadRequest(new
@@ -211,19 +199,18 @@ namespace BSOFT.API.Controllers
                 });
             }
 
-            var response = await Mediator.Send(command);
-            _logger.LogInformation("User and Password changed successfully.", command.UserName);
+            var response = await Mediator.Send(changeUserPasswordCommand);
+            _logger.LogInformation($"User {changeUserPasswordCommand.UserName} and password changed successfully.");
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });
         }
-        [HttpPost]
-        [Route("ForgotPassword")]
-        public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand command)
+        [HttpPost("password/reset-request")]
+        public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand forgotUserPasswordCommand)
         {       
-            var response = await Mediator.Send(command);
+            var response = await Mediator.Send(forgotUserPasswordCommand);
             if (response[0].IsSuccess)
             {
-                _logger.LogInformation("User {Username} fetched successfully.", command.UserName);
+                _logger.LogInformation($"User {forgotUserPasswordCommand.UserName} fetched successfully.");
                 
         return Ok(new
         {
@@ -232,7 +219,8 @@ namespace BSOFT.API.Controllers
             
         });
     }
-    _logger.LogWarning("Invalid username/ Email and Mobile number Does not exists.", command.UserName);
+    _logger.LogWarning($"Invalid username, email, or mobile number: {forgotUserPasswordCommand.UserName}.");
+
     return BadRequest(new
     {
         StatusCode = StatusCodes.Status400BadRequest,
@@ -240,13 +228,12 @@ namespace BSOFT.API.Controllers
     });
 }
 
-        [HttpPut]
-        [Route("ResetUserPassword")]
-        public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand command)
+        [HttpPut("password/reset")]
+        public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand resetUserPasswordCommand)
         {
             
-            var response = await Mediator.Send(command);
-            _logger.LogInformation("Password changed successfully.", command.UserName);
+            var response = await Mediator.Send(resetUserPasswordCommand);
+            _logger.LogInformation($"Password changed successfully for user {resetUserPasswordCommand.UserName}.");
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });     
         }
