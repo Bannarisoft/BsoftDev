@@ -6,6 +6,6 @@ namespace Core.Application.Common.Interfaces.ICountry
     {
         Task<Countries> GetByIdAsync(int countryId);
         Task<List<Countries>> GetAllCountriesAsync();
-        Task<List<Countries>> GetByCountryNameAsync(string countryName);
+        Task<List<Countries>> GetByCountryNameAsync(string countryName);        
     }
 }

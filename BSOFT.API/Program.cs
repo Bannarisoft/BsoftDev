@@ -173,6 +173,7 @@ app.UseRouting(); // Enable routing
 app.UseCors();
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
+app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

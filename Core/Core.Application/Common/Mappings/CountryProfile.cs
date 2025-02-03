@@ -4,6 +4,7 @@ using Core.Application.Country.Queries.GetCountries;
 using Core.Domain.Entities;
 using Core.Application.Country.Commands.UpdateCountry;
 using Core.Application.Country.Commands.DeleteCountry;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Common.Mappings
 {    
@@ -11,14 +12,18 @@ namespace Core.Application.Common.Mappings
     {        
         public CountryProfile()
         {
-            CreateMap<CreateCountryCommand, Countries>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore()) // Ignore the ID if it's auto-generated
-            .ForMember(dest => dest.CountryName, opt => opt.MapFrom(src => src.CountryName))
-            .ForMember(dest => dest.CountryCode, opt => opt.MapFrom(src => src.CountryCode))
-            .ForMember(dest => dest.States, opt => opt.Ignore()); // Ignore States if not provided in the command          
-            CreateMap<UpdateCountryCommand, Countries>();
-            CreateMap<DeleteCountryCommand, CountryDto>();  
-            CreateMap<States, CountryDto>();         
+            CreateMap<DeleteCountryCommand, Countries>()            
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));            
+                  
+             CreateMap<CreateCountryCommand, Countries>()
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))            
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted)); 
+
+            CreateMap<UpdateCountryCommand, Countries>()
+            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));      
+              //CreateMap<Countries, CountryDto>();   
+
         }
     }
 }    

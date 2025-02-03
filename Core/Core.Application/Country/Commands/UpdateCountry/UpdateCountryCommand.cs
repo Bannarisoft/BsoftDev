@@ -9,6 +9,7 @@ namespace Core.Application.Country.Commands.UpdateCountry
               public int Id { get; set; }
               public string? CountryCode { get; set; }
               public string? CountryName { get; set; }
+              public byte IsActive { get; set; } 
          }
   
 }
