@@ -104,10 +104,10 @@ namespace BSOFT.API.Controllers
 
         [HttpPut("delete/{id}")]
         
-        public async Task<IActionResult> Delete(int id,DeleteLanguageCommand deleteLanguageCommand)
+        public async Task<IActionResult> Delete(int id)
         {
-           deleteLanguageCommand.Id = id;
-           var updatedLanguage = await Mediator.Send(deleteLanguageCommand);
+           
+           var updatedLanguage = await Mediator.Send(new DeleteLanguageCommand { Id = id });
 
            if(updatedLanguage.IsSuccess)
            {
