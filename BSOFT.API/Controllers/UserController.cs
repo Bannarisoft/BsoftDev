@@ -141,21 +141,46 @@ namespace BSOFT.API.Controllers
                 return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
         }      
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteAsync(DeleteUserCommand deleteUserCommand)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(int id)
         {
            
-
-            var deleteUser = await Mediator.Send(deleteUserCommand);
-
-            if(deleteUser.IsSuccess)
+            if (id <= 0)
             {
-                _logger.LogInformation($"User {deleteUserCommand.UserId} deleted successfully.");
-                return Ok(new { StatusCode=StatusCodes.Status200OK, message = deleteUser.Message, errors = "" });
-              
+                return BadRequest(new
+            {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Invalid User ID"
+                });
             }
-                _logger.LogInformation($"Failed to delete user with ID {deleteUserCommand.UserId}.");
-                return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = deleteUser.Message, errors = "" });
+            var result = await Mediator.Send(new DeleteUserCommand { UserId= id });                 
+            if (!result.IsSuccess)
+            {          
+                 _logger.LogWarning($"Deletion failed for User {id}: {result?.Message ?? "Unknown error"}.");
+    
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                });
+            }
+            _logger.LogInformation($"User {id} deleted successfully.");
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data =$"User ID {id} Deleted" 
+            });
+            // var deleteUser = await Mediator.Send(deleteUserCommand);
+
+            // if(deleteUser.IsSuccess)
+            // {
+            //     _logger.LogInformation($"User {deleteUserCommand.UserId} deleted successfully.");
+            //     return Ok(new { StatusCode=StatusCodes.Status200OK, message = deleteUser.Message, errors = "" });
+              
+            // }
+            //     _logger.LogInformation($"Failed to delete user with ID {deleteUserCommand.UserId}.");
+            //     return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = deleteUser.Message, errors = "" });
         }
 
         [HttpGet]
@@ -212,23 +237,23 @@ namespace BSOFT.API.Controllers
             {
                 _logger.LogInformation($"User {forgotUserPasswordCommand.UserName} fetched successfully.");
                 
-        return Ok(new
-        {
-            StatusCode = StatusCodes.Status200OK,
-            Message = response[0].Data.Message, // Correctly access the message
-            
-        });
-    }
-    _logger.LogWarning($"Invalid username, email, or mobile number: {forgotUserPasswordCommand.UserName}.");
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = response[0].Data.Message, // Correctly access the message
+                    
+                });
+            }
+            _logger.LogWarning($"Invalid username, email, or mobile number: {forgotUserPasswordCommand.UserName}.");
 
-    return BadRequest(new
-    {
-        StatusCode = StatusCodes.Status400BadRequest,
-        Message = response[0].Message // Access the message for error
-    });
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = response[0].Message // Access the message for error
+            });
 }
 
-        [HttpPut("password/reset")]
+       [HttpPut("password/reset")]
         public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand resetUserPasswordCommand)
         {
             

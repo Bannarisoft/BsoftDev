@@ -38,7 +38,7 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
 			INNER JOIN AppData.Modules m on re.ModuleId=m.Id
 			INNER JOIN AppData.Menus mn on re.MenuId=mn.Id
             WHERE re.Id = @RoleEntitlementId  AND re.IsDeleted= 0
-            OREDER BY re.Id";
+            ORDER BY re.Id";
                   
             var roleEntitlement = await _dbConnection.QuerySingleOrDefaultAsync<RoleEntitlement>(query, new { RoleEntitlementId = roleEntitlementId });
 

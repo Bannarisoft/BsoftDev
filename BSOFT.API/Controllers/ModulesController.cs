@@ -126,16 +126,34 @@ namespace BSOFT.API.Controllers
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteModule(DeleteModuleCommand deleteModuleCommand)
+    public async Task<IActionResult> DeleteModule(int id)
     {
-        var deletedModule = await Mediator.Send(deleteModuleCommand);
-        if(deletedModule.IsSuccess)
+        if (id <= 0)
         {
-            _logger.LogInformation($"Module {deleteModuleCommand.ModuleId} deleted successfully.");
-            return Ok(new { StatusCode=StatusCodes.Status200OK, message = deletedModule.Message, errors = "" });
+            return BadRequest(new
+           {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = "Invalid Module ID"
+            });
         }
-            _logger.LogWarning($"Deletion failed for module {deleteModuleCommand.ModuleId}: {deletedModule?.Message ?? "Unknown error"}.");
-            return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = deletedModule.Message, errors = "" });
+        var result = await Mediator.Send(new DeleteModuleCommand { ModuleId= id });                 
+            if (!result.IsSuccess)
+            {          
+                 _logger.LogWarning($"Deletion failed for module {id}: {result?.Message ?? "Unknown error"}.");
+    
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                });
+            }
+            _logger.LogInformation($"Module {id} deleted successfully.");
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data =$"Module ID {id} Deleted" 
+            });
     }
 
 

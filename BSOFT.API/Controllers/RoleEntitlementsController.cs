@@ -193,36 +193,36 @@ public class RoleEntitlementsController : ApiControllerBase
             });
         }
     }
-    [HttpDelete]        
-        public async Task<IActionResult> DeleteAsync(DeleteRoleEntitlementCommand command)
+    [HttpDelete("{id}")]        
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            var deletedRoleEntitlement = await Mediator.Send(command);
+            if (id <= 0)
+            {
+                return BadRequest(new
+            {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Invalid RoleEntitlement ID"
+                });
+            }
+            var result = await Mediator.Send(new DeleteRoleEntitlementCommand { Id= id });                 
+            if (!result.IsSuccess)
+            {          
+                 _logger.LogWarning($"Deletion failed for RoleEntitlement {id}: {result?.Message ?? "Unknown error"}.");
+    
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                });
+            }
+            _logger.LogInformation($"RoleEntitlement {id} deleted successfully.");
 
-           if(deletedRoleEntitlement.IsSuccess)
-           {
-            return Ok(new { StatusCode=StatusCodes.Status200OK, message = deletedRoleEntitlement.Message, errors = "" });
-              
-           }
-
-            return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = deletedRoleEntitlement.Message, errors = "" });
-            // var result = await Mediator.Send(command);
-            // if (result.IsSuccess)
-            // {
-            //     return Ok(new 
-            //     { 
-            //         StatusCode = StatusCodes.Status200OK,
-            //         Message = "RoleEntitlement Deleted successfully", 
-            //         data = result.Data 
-            //     });
-            // }
-            // else
-            // {            
-            //     return BadRequest(new 
-            //     { 
-            //         StatusCode = StatusCodes.Status400BadRequest,
-            //         message = result.Message 
-            //     });
-            // }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data =$"RoleEntitlement ID {id} Deleted" 
+            });
+ 
         }
     [HttpGet("by-name/{name}")]
     public async Task<IActionResult> GetRoleEntitlements(string name)
