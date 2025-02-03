@@ -14,6 +14,7 @@ namespace Core.Application.Common.Interfaces.IUserRole
         Task<UserRole?> GetByIdAsync(int id);
         Task<List<UserRole>> GetRolesAsync(string searchTerm); 
         
+        
          
       
     }

@@ -8,11 +8,11 @@ namespace Core.Application.PwdComplexityRule.Commands.CreatePasswordComplexityRu
     public class CreatePasswordComplexityRuleCommand : IRequest<ApiResponseDTO<PwdRuleDto>>
     {
 
-        public int Id { get; set; }
+    
        
-        public string PwdComplexityRule  { get; set; }
+        public string? PwdComplexityRule  { get; set; }
 
-        public byte IsActive { get; set; }
+   
         
     }
 }

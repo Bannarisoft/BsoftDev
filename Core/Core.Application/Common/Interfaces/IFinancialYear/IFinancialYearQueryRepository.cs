@@ -9,7 +9,8 @@ namespace Core.Application.Common.Interfaces.IFinancialYear
 {
     public interface IFinancialYearQueryRepository
     {
-         Task<List<Core.Domain.Entities.FinancialYear>> GetAllFinancialYearAsync();
+        
+        Task<List<Core.Domain.Entities.FinancialYear>> GetAllFinancialYearAsync();
 
         Task<Core.Domain.Entities.FinancialYear> GetByIdAsync(int id);  
 

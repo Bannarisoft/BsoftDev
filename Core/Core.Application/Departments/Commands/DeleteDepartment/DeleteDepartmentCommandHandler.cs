@@ -41,24 +41,8 @@ namespace Core.Application.Departments.Commands.DeleteDepartment
       {       
 
                   _logger.LogInformation("DeleteDepartmentCommandHandler started for Department ID: {DepartmentId}", request.Id);
-
-            // Check if department exists
-            var department = await _IdepartmentQueryRepository.GetByIdAsync(request.Id);
-            if (department == null)
-            {
-                _logger.LogWarning("Department with ID {DepartmentId} not found.", request.Id);
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Department not found",
-                    Data = 0
-                };
-            }
-
-            _logger.LogInformation("Department with ID {DepartmentId} found. Proceeding with deletion.", request.Id);
-
             // Map request to entity and delete
-            var updatedDepartment = _Imapper.Map<Department>(request.departmentStatusDto);
+            var updatedDepartment = _Imapper.Map<Department>(request);
             var result = await _IdepartmentCommandRepository.DeleteAsync(request.Id, updatedDepartment);
 
             if (result <= 0)
@@ -92,21 +76,7 @@ namespace Core.Application.Departments.Commands.DeleteDepartment
                 Message = "Department deleted successfully",
                 Data = result
             };  
-//           var updatedDepartment = _Imapper.Map<Department>(request.departmentStatusDto);
-          
-//           var result = await _IdepartmentCommandRepository.DeleteAsync(request.Id, updatedDepartment);     
 
-//  //Domain Event
-//         var domainEvent = new AuditLogsDomainEvent(
-//             actionDetail: "Delete",
-//             actionCode: updatedDepartment.Id.ToString(),
-//             actionName:"",
-//             details:$"Department Id: {request.Id} was Changed to Status Inactive.",
-//             module:"Department"
-//         );
-//         await _mediator.Publish(domainEvent, cancellationToken);
-
-//             return new ApiResponseDTO<int> { IsSuccess = true, Message = "Department deleted successfully", Data = result };
       }
 
     }

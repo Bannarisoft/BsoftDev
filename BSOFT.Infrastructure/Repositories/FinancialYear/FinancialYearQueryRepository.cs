@@ -20,22 +20,14 @@ namespace BSOFT.Infrastructure.Repositories.FinancialYear
      public async Task<List<Core.Domain.Entities.FinancialYear>>GetAllFinancialYearAsync()
     {
         
-        const string query = @"SELECT  * FROM AppData.FinancialYear WHERE IsActive = 1 order by CreatedAt desc";
-            return (await _dbConnection.QueryAsync<Core.Domain.Entities.FinancialYear>(query)).ToList();
+        const string query = @"SELECT  * FROM AppData.FinancialYear WHERE   IsDeleted = 0 order by CreatedAt desc";
+        return (await _dbConnection.QueryAsync<Core.Domain.Entities.FinancialYear>(query)).ToList();
         
     }
        public async Task<Core.Domain.Entities.FinancialYear>GetByIdAsync(int id)
-    {
-               
-
-             const string query = @"SELECT * FROM AppData.FinancialYear WHERE Id = @Id AND IsActive = 1  order by CreatedAt desc";
-            var financialyear = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.FinancialYear>(query, new { id });           
-             if (financialyear == null)
-            {
-                throw new KeyNotFoundException($"FinancialYear with ID {id} not found.");
-            }
-            return financialyear;
-            
+    {               
+             const string query = @"SELECT * FROM AppData.FinancialYear WHERE Id = @Id AND   IsDeleted = 0  order by CreatedAt DESC";
+            return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.FinancialYear>(query, new { id });
     } 
 
 

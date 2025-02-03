@@ -2,15 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Mappings;
-using Core.Domain.Entities;
-using Core.Domain.Enums;
-
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.FinancialYear.Queries.GetFinancialYear
 {
-    public class FinancialYearDto  : IMapFrom<ApiResponseDTO<Core.Domain.Entities.FinancialYear>>
+    public class GetFinancialYearDto
     {
          public int Id { get; set; }
         public string StartYear { get; set; }
@@ -19,9 +15,7 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYear
 
         public string FinYearName { get; set; }
 
-
-        
-
-
+        public Status  IsActive { get; set; }
+        public IsDelete IsDeleted { get; set; }
     }
 }

@@ -18,11 +18,11 @@ namespace BSOFT.Infrastructure.Repositories.FinancialYear
             _applicationDbContext = applicationDbContext;
 
         }
-        public async Task<int> CreateAsync(Core.Domain.Entities.FinancialYear financialYear)
+        public async Task<Core.Domain.Entities.FinancialYear> CreateAsync(Core.Domain.Entities.FinancialYear financialYear)
          {
             await _applicationDbContext.FinancialYear.AddAsync(financialYear);
             await _applicationDbContext.SaveChangesAsync();
-            return financialYear.Id;
+            return financialYear;
         }
 
           public async Task<int> UpdateAsync(int id, Core.Domain.Entities.FinancialYear financialYear)
@@ -45,5 +45,25 @@ namespace BSOFT.Infrastructure.Repositories.FinancialYear
                    await _applicationDbContext.SaveChangesAsync();             
                    return 1; // Indicate success
             }
+
+              public async Task<int> DeleteAsync(int id ,Core.Domain.Entities.FinancialYear financialYear )
+    {
+        
+            var financialYearToDelete = await _applicationDbContext.FinancialYear.FirstOrDefaultAsync(u => u.Id == id);
+            if (financialYearToDelete != null)
+            {
+               
+                financialYearToDelete.IsDeleted = financialYear.IsDeleted;
+                return await _applicationDbContext.SaveChangesAsync();
+            }
+            return 0; // No user found
+    }
+   
+
+        // public async Task<bool> ExistsByStartAndEndDateAsync(DateTime startDate, DateTime endDate)
+        // {
+        //     return await _applicationDbContext.FinancialYear
+        //         .AnyAsync(fy => fy.StartDate == startDate && fy.EndDate == endDate );
+        // }
     }
 }

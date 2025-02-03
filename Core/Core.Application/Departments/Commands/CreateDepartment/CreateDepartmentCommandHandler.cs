@@ -35,22 +35,19 @@ namespace Core.Application.Departments.Commands.CreateDepartment
 
        public async Task<ApiResponseDTO<DepartmentDto>> Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
         {
-
                 _logger.LogInformation("Starting CreateDepartmentCommandHandler for request: {@Request}", request);
       
            // ✅ Check if DeptName already exists
                     var exists = await _departmentRepository.ExistsByCodeAsync(request.DeptName);
                     if (exists)
                     {
-                        _logger.LogWarning("Entity Name {EntityName} already exists.", request.DeptName);
+                        _logger.LogWarning("Department Name {DeptName} already exists.", request.DeptName);
                         return new ApiResponseDTO<DepartmentDto>
                     {
                     IsSuccess = false,
                     Message = "Department Name already exists."
                     };
                     }
-
-
             // Map the request to the entity
             var departmentEntity = _mapper.Map<Department>(request);
             _logger.LogInformation("Mapped CreateDepartmentCommand to Department entity: {@DepartmentEntity}", departmentEntity);

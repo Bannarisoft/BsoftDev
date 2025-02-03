@@ -18,15 +18,17 @@ namespace Core.Application.UserRole.Commands.CreateRole
     {
         
         private readonly IUserRoleCommandRepository _roleRepository;
+        private readonly IUserRoleQueryRepository _userRoleQueryRepository;
         private readonly IMapper _mapper;
         
         private readonly IMediator _mediator; 
         
           private readonly ILogger<CreateRoleCommandHandler> _logger;
 
-        public CreateRoleCommandHandler(IUserRoleCommandRepository roleRepository,IMapper mapper,IMediator mediator,ILogger<CreateRoleCommandHandler> logger)
+        public CreateRoleCommandHandler(IUserRoleCommandRepository roleRepository ,IUserRoleQueryRepository userRoleQueryRepository  ,IMapper mapper,IMediator mediator,ILogger<CreateRoleCommandHandler> logger)
         {
              _roleRepository=roleRepository;
+             _userRoleQueryRepository=  userRoleQueryRepository;
             _mapper=mapper;
             _mediator=mediator;
             _logger=logger;
@@ -34,9 +36,18 @@ namespace Core.Application.UserRole.Commands.CreateRole
 
         public async Task<ApiResponseDTO<UserRoleDto>>Handle(CreateRoleCommand request,CancellationToken cancellationToken)
          {          
-
             _logger.LogInformation("Starting CreateUserRoleCommandHandler for request: {@Request}", request);
-
+            
+            var exists = await _roleRepository.ExistsByCodeAsync(request.RoleName);
+              if (exists)
+                 {
+                     _logger.LogWarning("Entity Name {EntityName} already exists.", request.RoleName);
+                        return new ApiResponseDTO<UserRoleDto>
+                    {
+                    IsSuccess = false,
+                    Message = "UserRole Name already exists."
+                    };
+                }
             // Map the request to the entity
             var userRoleEntity = _mapper.Map<Core.Domain.Entities.UserRole>(request);
             _logger.LogInformation("Mapped CreateUserRoleCommand to userRole entity:{@userRoleEntity}", userRoleEntity);

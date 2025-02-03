@@ -12,9 +12,6 @@ namespace Core.Application.UserRole.Commands.DeleteRole
     
     {
         public int UserRoleId { get; set; } 
-
-          public UserRoleStatusDto userRoleStatusDto { get; set; } 
-
-        
+                
     }
 }

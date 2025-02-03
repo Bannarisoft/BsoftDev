@@ -5,13 +5,15 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IFinancialYear;
+using Core.Application.FinancialYear.Queries.GetFinancialYear;
+using Core.Application.GetFinancialYearYear.Queries.GetFinancialYear;
 using Core.Domain.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Core.Application.FinancialYear.Queries.GetFinancialYear
+namespace Core.Application.GetFinancialYear.Queries.GetFinancialYear
 {
-    public class GetFinancialYearQueryHandler  :IRequestHandler<GetFinancialYearQuery,ApiResponseDTO<List<FinancialYearDto>>>
+    public class GetFinancialYearQueryHandler  :IRequestHandler<GetFinancialYearQuery,ApiResponseDTO<List<GetFinancialYearDto>>>
     {
          private readonly IFinancialYearQueryRepository _financialyearRepository;
         private readonly IMapper _mapper; 
@@ -31,7 +33,7 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYear
 
         }
 
-        public async Task<ApiResponseDTO<List<FinancialYearDto>>> Handle(GetFinancialYearQuery request, CancellationToken cancellationToken)    
+        public async Task<ApiResponseDTO<List<GetFinancialYearDto>>> Handle(GetFinancialYearQuery request, CancellationToken cancellationToken)    
         {
          
 
@@ -45,10 +47,10 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYear
             {
                _logger.LogWarning("No FinancialYear records found in the database. Total count: {Count}", financialyear?.Count ?? 0);
 
-                  return new ApiResponseDTO<List<FinancialYearDto>> { IsSuccess = false, Message = "No Record Found" };
+                  return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = false, Message = "No Record Found" };
             }
 
-             var financialyearList = _mapper.Map<List<FinancialYearDto>>(financialyear);
+             var financialyearList = _mapper.Map<List<GetFinancialYearDto>>(financialyear);
              var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetAll",
                     actionCode: "",        
@@ -60,7 +62,7 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYear
                   await _mediator.Publish(domainEvent, cancellationToken);
               
             _logger.LogInformation("FinancialYear {department} Listed successfully.", financialyearList.Count);
-            return new ApiResponseDTO<List<FinancialYearDto>> { IsSuccess = true, Message = "Success", Data = financialyearList };       
+            return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = true, Message = "Success", Data = financialyearList };       
         }
     }
 

@@ -49,7 +49,6 @@ namespace BSOFT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-
                     b.Property<int>("IsActive")
                         .HasColumnType("int");
 
@@ -578,12 +577,10 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("CreatedByName")
                         .IsRequired()
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("CreatedIP")
                         .IsRequired()
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("DeptName")
@@ -606,11 +603,9 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("ModifiedIP")
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("ShortName")
@@ -642,12 +637,10 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("CreatedByName")
                         .IsRequired()
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("CreatedIP")
                         .IsRequired()
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<bool>("IsActive")
@@ -665,11 +658,9 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("ModifiedIP")
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Name")
@@ -707,12 +698,10 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("CreatedByName")
                         .IsRequired()
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("CreatedIP")
                         .IsRequired()
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Email")
@@ -750,11 +739,9 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("ModifiedIP")
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Phone")
@@ -825,80 +812,6 @@ namespace BSOFT.Infrastructure.Migrations
                     b.ToTable("Language", "AppData");
                 });
 
- modelBuilder.Entity("Core.Domain.Entities.FinancialYear", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("CreatedAt");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("CreatedBy");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("CreatedByName");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("CreatedIP");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("EndDate");
-
-                    b.Property<string>("FinYearName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("FinYearName");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("ModifiedAt");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("ModifiedBy");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("ModifiedByName");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(25)")
-                        .HasColumnName("ModifiedIP");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("StartDate");
-
-                    b.Property<string>("StartYear")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("StartYear");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FinancialYear", "AppData");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
                 {
                     b.Property<int>("Id")
@@ -961,12 +874,10 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("CreatedByName")
                         .IsRequired()
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("CreatedIP")
                         .IsRequired()
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<bool>("IsActive")
@@ -984,11 +895,9 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("ModifiedIP")
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("PwdComplexityRule")
@@ -1089,7 +998,6 @@ namespace BSOFT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                        .HasColumnType("tinyint");
                     b.Property<int>("IsActive")
                         .HasColumnType("int");
 
@@ -1226,12 +1134,10 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("CreatedByName")
                         .IsRequired()
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("CreatedIP")
                         .IsRequired()
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<int>("DivisionId")
@@ -1253,11 +1159,9 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("ModifiedIP")
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("ShortName")
@@ -1399,12 +1303,10 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("CreatedByName")
                         .IsRequired()
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("CreatedIP")
                         .IsRequired()
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<int>("DivisionId")
@@ -1456,11 +1358,9 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("ModifiedIP")
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("PasswordHash")
@@ -1537,12 +1437,10 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("CreatedByName")
                         .IsRequired()
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("CreatedIP")
                         .IsRequired()
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Description")
@@ -1565,11 +1463,9 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("ModifiedIP")
-
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("RoleName")

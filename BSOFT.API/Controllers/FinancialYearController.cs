@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using BSOFT.Infrastructure.Data;
 using Core.Application.Common.Interfaces.IFinancialYear;
 using Core.Application.FinancialYear.Command.CreateFinancialYear;
+using Core.Application.FinancialYear.Command.DeleteFinancialYear;
 using Core.Application.FinancialYear.Command.UpdateFinancialYear;
 using Core.Application.FinancialYear.Queries.GetFinancialYear;
 using Core.Application.FinancialYear.Queries.GetFinancialYearGetById;
+using Core.Application.GetFinancialYearYear.Queries.GetFinancialYear;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -63,7 +65,7 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             _logger.LogInformation("Fetching FinancialYear with ID {Id} request started.", id);
-            var financialyr = await Mediator.Send(new GetFinancialYearByIdQuery  { FYId = id });
+            var financialyr = await Mediator.Send(new GetFinancialYearByIdQuery  { Id = id });
             if (financialyr == null || financialyr.Data == null)
             {
                 _logger.LogInformation("FinancialYear with ID {Id} not found in the database.", id);
@@ -136,7 +138,7 @@ namespace BSOFT.API.Controllers
              _logger.LogInformation("Update Financial Year request started with data: {@Command}", command);
 
            
-             var financialyearresult = await Mediator.Send(new GetFinancialYearByIdQuery { FYId = command.Id });
+             var financialyearresult = await Mediator.Send(new GetFinancialYearByIdQuery { Id = command.Id });
             if (financialyearresult == null)
             {
                 _logger.LogWarning("Financial Year with ID {FYId} not found.", command.Id);
@@ -191,6 +193,57 @@ namespace BSOFT.API.Controllers
         
 
             }
+
+
+             [HttpPut("delete")]
+        
+
+        public async Task<IActionResult> Delete(DeleteFinancialYearCommand deleteFinancialYearCommand)
+        {
+            _logger.LogInformation("Delete FinancialYear Command request started with ID: {DepartmentId}", deleteFinancialYearCommand.Id);
+
+                // Check if the department exists
+                var department = await Mediator.Send(new GetFinancialYearByIdQuery { Id = deleteFinancialYearCommand.Id });
+                if (department == null)
+                {
+                    _logger.LogWarning("FinancialYear  with ID {FYId} not found.", deleteFinancialYearCommand.Id);
+
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "FinancialYear not found"
+                    });
+                }
+
+                _logger.LogInformation("FinancialYear with ID {FYId} found. Proceeding with deletion.", deleteFinancialYearCommand.Id);
+
+                // Attempt to delete the department
+                var result = await Mediator.Send(deleteFinancialYearCommand);
+
+                if (result.IsSuccess)
+                {
+                    _logger.LogInformation("FinancialYear with ID {FYId} deleted successfully.", deleteFinancialYearCommand.Id);
+
+                    return Ok(new
+                    {
+                        Message = result.Message,
+                        StatusCode = StatusCodes.Status200OK
+                      
+                    });
+                }
+
+                _logger.LogWarning("Failed to delete FinancialYear with ID {FYId}. Reason: {Message}", deleteFinancialYearCommand.Id, result.Message);
+
+                return BadRequest(new
+                {
+                    Message = result.Message,
+                    StatusCode = StatusCodes.Status400BadRequest
+                });
+
+
+     
+        }
+
 
 
 

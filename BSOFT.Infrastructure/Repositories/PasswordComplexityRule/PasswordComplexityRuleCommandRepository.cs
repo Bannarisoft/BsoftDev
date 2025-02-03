@@ -45,12 +45,20 @@ namespace BSOFT.Infrastructure.Repositories.PasswordComplexityRule
             var PwdcomplexityruleToDelete = await _applicationDbContext.PasswordComplexityRule.FirstOrDefaultAsync(u => u.Id == id);
             
             if (PwdcomplexityruleToDelete != null)
-            {               
-                PwdcomplexityruleToDelete.IsActive = pwdcomplexityrule.IsActive;
+            {   
+                 PwdcomplexityruleToDelete.IsDeleted = pwdcomplexityrule.IsDeleted;
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; 
            }
+
+
+             public Task<bool> ExistsByCodeAsync(string PasswordComplexityRule)
+        {
+        
+            return _applicationDbContext.PasswordComplexityRule.AnyAsync(c => c.PwdComplexityRule == PasswordComplexityRule);
+            
+        }
 
     }
 }

@@ -23,10 +23,10 @@ namespace BSOFT.Infrastructure.Data.Configurations
             // Relationships
 
             // Role Relationship
-            builder.HasOne(re => re.UserRole)
-                .WithMany(r => r.RoleEntitlements)
-                .HasForeignKey(re => re.UserRoleId)
-                .OnDelete(DeleteBehavior.Cascade); // Deletes role entitlements when a role is deleted
+            // builder.HasOne(re => re.UserRole)
+            //     .WithMany(r => r.RoleEntitlements)
+            //     .HasForeignKey(re => re.UserRoleId)
+            //     .OnDelete(DeleteBehavior.Cascade); // Deletes role entitlements when a role is deleted
 
             // Module Relationship
             builder.HasOne(re => re.Module)

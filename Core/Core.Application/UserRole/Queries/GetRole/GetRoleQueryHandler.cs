@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.UserRole.Queries.GetRole
 {
-    public class GetRoleQueryHandler :IRequestHandler<GetRoleQuery,ApiResponseDTO<List<UserRoleDto>>>
+    public class GetRoleQueryHandler :IRequestHandler<GetRoleQuery,ApiResponseDTO<List<GetUserRoleDto>>>
     {
        
      private readonly IUserRoleQueryRepository _userRoleRepository;
@@ -36,7 +36,7 @@ namespace Core.Application.UserRole.Queries.GetRole
             _logger = logger;
         }
 
-        public async Task<ApiResponseDTO<List<UserRoleDto>>> Handle(GetRoleQuery request ,CancellationToken cancellationToken )
+        public async Task<ApiResponseDTO<List<GetUserRoleDto>>> Handle(GetRoleQuery request ,CancellationToken cancellationToken )
         {
 
             _logger.LogInformation("Starting GetRoleQueryHandler.");
@@ -47,7 +47,7 @@ namespace Core.Application.UserRole.Queries.GetRole
                 if (roles == null || roles.Count == 0)
                 {
                     _logger.LogWarning("No user roles found.");
-                    return new ApiResponseDTO<List<UserRoleDto>>
+                    return new ApiResponseDTO<List<GetUserRoleDto>>
                     {
                         IsSuccess = false,
                         Message = "No roles found",
@@ -56,7 +56,7 @@ namespace Core.Application.UserRole.Queries.GetRole
                 }
 
                 _logger.LogInformation("Mapping user roles to DTO.");
-                var roleList = _mapper.Map<List<UserRoleDto>>(roles);
+                var roleList = _mapper.Map<List<GetUserRoleDto>>(roles);
 
                 // Publish domain event
                 var domainEvent = new AuditLogsDomainEvent(
@@ -71,7 +71,7 @@ namespace Core.Application.UserRole.Queries.GetRole
                 await _mediator.Publish(domainEvent, cancellationToken);
 
                 _logger.LogInformation("Returning success response with fetched user roles.");
-                return new ApiResponseDTO<List<UserRoleDto>>
+                return new ApiResponseDTO<List<GetUserRoleDto>>
                 {
                     IsSuccess = true,
                     Message = "Success",

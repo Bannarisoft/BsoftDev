@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace Core.Application.Departments.Queries.GetDepartments
 {
 
-    public class GetDepartmentQueryHandler :IRequestHandler<GetDepartmentQuery,ApiResponseDTO<List<DepartmentDto>>>
+    public class GetDepartmentQueryHandler :IRequestHandler<GetDepartmentQuery,ApiResponseDTO<List<GetDepartmentDto>>>
     {
         private readonly IDepartmentQueryRepository _departmentRepository;
         private readonly IMapper _mapper; 
@@ -31,7 +31,7 @@ namespace Core.Application.Departments.Queries.GetDepartments
         }
 
 
-        public async Task<ApiResponseDTO<List<DepartmentDto>>> Handle(GetDepartmentQuery request ,CancellationToken cancellationToken )
+        public async Task<ApiResponseDTO<List<GetDepartmentDto>>> Handle(GetDepartmentQuery request ,CancellationToken cancellationToken )
         {
              _logger.LogInformation("Fetching Department Request started: {request}", request);
            
@@ -42,10 +42,10 @@ namespace Core.Application.Departments.Queries.GetDepartments
             {
                _logger.LogWarning("No department records found in the database. Total count: {Count}", department?.Count ?? 0);
 
-                  return new ApiResponseDTO<List<DepartmentDto>> { IsSuccess = false, Message = "No Record Found" };
+                  return new ApiResponseDTO<List<GetDepartmentDto>> { IsSuccess = false, Message = "No Record Found" };
             }
 
-             var departmentList = _mapper.Map<List<DepartmentDto>>(department);
+             var departmentList = _mapper.Map<List<GetDepartmentDto>>(department);
              var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetAll",
                     actionCode: "",        
@@ -57,7 +57,7 @@ namespace Core.Application.Departments.Queries.GetDepartments
                   await _mediator.Publish(domainEvent, cancellationToken);
               
             _logger.LogInformation("Department {department} Listed successfully.", departmentList.Count);
-            return new ApiResponseDTO<List<DepartmentDto>> { IsSuccess = true, Message = "Success", Data = departmentList };  
+            return new ApiResponseDTO<List<GetDepartmentDto>> { IsSuccess = true, Message = "Success", Data = departmentList };  
            
         }
 

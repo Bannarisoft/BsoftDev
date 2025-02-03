@@ -242,7 +242,7 @@ namespace BSOFT.Infrastructure
 
                 typeof(CompanySettingsProfile),
                 typeof(UpdateUnitProfile),
-                typeof(FinancialYearProfile)
+                typeof(FinancialYearProfile),
                 typeof(CompanySettingsProfile)
             );
 

@@ -16,8 +16,8 @@ namespace Core.Domain.Entities
 
         public string FinYearName { get; set; }
 
-        public  FinancialYearStatus IsActive  { get; set; }
+       // public  FinancialYearStatus IsActive  { get; set; }
 
-        public  FinancialYearDelete IsDeleted { get; set; }
+       // public  FinancialYearDelete IsDeleted { get; set; }
     }
 }

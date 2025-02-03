@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
 {
 
-    public class GetDepartmentAutoCompleteSearchQueryHandler : IRequestHandler<GetDepartmentAutoCompleteSearchQuery, ApiResponseDTO<List<DepartmentDto>>>
+    public class GetDepartmentAutoCompleteSearchQueryHandler : IRequestHandler<GetDepartmentAutoCompleteSearchQuery, ApiResponseDTO<List<DepartmentAutocompleteDto>>>
     {
         private readonly IDepartmentQueryRepository _departmentRepository;
         private readonly IMapper _mapper;
@@ -29,7 +29,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
         }
 
 
-        public async Task<ApiResponseDTO<List<DepartmentDto>>> Handle(GetDepartmentAutoCompleteSearchQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<DepartmentAutocompleteDto>>> Handle(GetDepartmentAutoCompleteSearchQuery request, CancellationToken cancellationToken)
         { 
 
             _logger.LogInformation("Handling GetDepartmentAutoCompleteSearchQuery with search pattern: {SearchPattern}", request.SearchPattern);
@@ -39,18 +39,18 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
                 if (result == null || !result.Any())
                 {
                     _logger.LogWarning("No departments found for search pattern: {SearchPattern}", request.SearchPattern);
-                    return new ApiResponseDTO<List<DepartmentDto>>
+                    return new ApiResponseDTO<List<DepartmentAutocompleteDto>>
                     {
                         IsSuccess = false,
                         Message = "No matching departments found",
-                        Data = new List<DepartmentDto>()
+                        Data = new List<DepartmentAutocompleteDto>()
                     };
                 }
 
                 _logger.LogInformation("Departments found for search pattern: {SearchPattern}. Mapping results to DTO.", request.SearchPattern);
 
                 // Map the result to DTO
-                var deptDto = _mapper.Map<List<DepartmentDto>>(result);
+                var deptDto = _mapper.Map<List<DepartmentAutocompleteDto>>(result);
 
                 // Publish domain event for audit logs
                 var domainEvent = new AuditLogsDomainEvent(
@@ -64,7 +64,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
 
                 _logger.LogInformation("Domain event published for search pattern: {SearchPattern}", request.SearchPattern);
 
-                return new ApiResponseDTO<List<DepartmentDto>>
+                return new ApiResponseDTO<List<DepartmentAutocompleteDto>>
                 {
                     IsSuccess = true,
                     Message = "Success",

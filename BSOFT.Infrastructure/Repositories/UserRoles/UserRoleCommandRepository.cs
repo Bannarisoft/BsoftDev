@@ -27,8 +27,7 @@ namespace BSOFT.Infrastructure.Repositories.UserRoles
     {
         
             var userroleToDelete = await _applicationDbContext.UserRole.FirstOrDefaultAsync(u => u.Id == id);
-            if (userroleToDelete != null)
-            {
+            if (userroleToDelete != null)            {
                
                 userroleToDelete.IsActive = userRole.IsActive;
                 return await _applicationDbContext.SaveChangesAsync();
@@ -51,7 +50,18 @@ namespace BSOFT.Infrastructure.Repositories.UserRoles
             }
             return 0; // No user found
     }
-
+    
+    
+     public Task<bool> ExistsByCodeAsync(string userrole)
+        {
+        
+            return _applicationDbContext.UserRole.AnyAsync(c => c.RoleName == userrole);
+            
+        }
+   public async Task<bool> ExistsByNameupdateAsync(string name, int id)
+        {
+            return await _applicationDbContext.UserRole.AnyAsync(c => c.RoleName == name && c.Id != id);
+        }
 
     }
 }

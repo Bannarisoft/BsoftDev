@@ -8,6 +8,8 @@ using Core.Domain.Entities;
 using Core.Application.Departments.Commands.CreateDepartment;
 using Core.Application.Departments.Commands.DeleteDepartment;
 using Core.Application.Departments.Commands.UpdateDepartment;
+using static Core.Domain.Enums.Common.Enums;
+using Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
 
 namespace Core.Application.Common.Mappings
 {
@@ -16,16 +18,32 @@ namespace Core.Application.Common.Mappings
           public DepartmentProfile()
     {
       
-            CreateMap<CreateDepartmentCommand, Department>();
+        CreateMap<CreateDepartmentCommand, Department>()             
+        .ForMember(dest => dest.ShortName, opt => opt.MapFrom(src => src.ShortName))
+        .ForMember(dest => dest.DeptName, opt => opt.MapFrom(src => src.DeptName))
+        .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))        
+        .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
+        .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.CompanyId));
 
-            CreateMap<DeleteDepartmentCommand, Department>();
+         CreateMap<Department, DepartmentDto>()             
+        .ForMember(dest => dest.ShortName, opt => opt.MapFrom(src => src.ShortName))
+        .ForMember(dest => dest.DeptName, opt => opt.MapFrom(src => src.DeptName))
+        .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.CompanyId));
 
-            CreateMap<Department, DepartmentDto>();
+        CreateMap<DeleteDepartmentCommand, Department>()
+        .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
+
+            CreateMap<Department, GetDepartmentDto>();
+            CreateMap<Department, DepartmentAutocompleteDto>();
+            
+
+
             CreateMap<DepartmentStatusDto, Department>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
-           CreateMap<UpdateDepartmentCommand, Department>() ;
+           CreateMap<UpdateDepartmentCommand, Department>() 
+           .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
     }
     }
 }

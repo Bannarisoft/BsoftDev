@@ -16,7 +16,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Application.FinancialYear.Command.CreateFinancialYear
 {
-    public class CreateFinancialYearCommandHandler :IRequestHandler<CreateFinancialYearCommand, ApiResponseDTO<int>>
+    public class CreateFinancialYearCommandHandler :IRequestHandler<CreateFinancialYearCommand, ApiResponseDTO<FinancialYearDto>>
     {
 
 
@@ -38,31 +38,19 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
             
 
         } 
-
-        // public async Task<Core.Domain.Entities.FinancialYear> GetFinancialYearByDateRangeAsync(DateTime startDate, DateTime endDate)
-        //     {
-        //         return await _dbContext.FinancialYear
-        //             .Where(fy => (fy.StartDate <= startDate && fy.EndDate >= startDate) ||
-        //                         (fy.StartDate <= endDate && fy.EndDate >= endDate) ||
-        //                         (fy.StartDate >= startDate && fy.EndDate <= endDate))
-        //             .FirstOrDefaultAsync();
-        //     }  
-
-                   
-        public async Task<ApiResponseDTO<int>> Handle(CreateFinancialYearCommand request, CancellationToken cancellationToken)
+                public async Task<ApiResponseDTO<FinancialYearDto>> Handle(CreateFinancialYearCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Starting CreateFinancialYearCommandHandler for request: {@Request}", request);
            
              var financialYears = await _financialYearQueryRepository.GetAllFinancialYearAsync();
                 //  var existingFinancialYear = await _financialYearQueryRepository.GetFinancialYearByDateRangeAsync(request.StartDate, request.EndDate);
 
-
              var existingFinancialYear = financialYears.FirstOrDefault(fy => fy.StartDate == request.StartDate && fy.EndDate == request.EndDate);
 
             if (existingFinancialYear != null)
             {
                 _logger.LogWarning("FinancialYear with start year {StartYear} already exists.", request.StartYear);
-                return new ApiResponseDTO<int>
+                return new ApiResponseDTO<FinancialYearDto>
                 {
                     IsSuccess = false,
                     Message = "FinancialYear with start year already exists."
@@ -79,7 +67,7 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
              if (createdfinancialYear == null)
             {
                 _logger.LogWarning("Failed to create department. Department entity: {@DepartmentEntity}", financialYearEntity);
-                return new ApiResponseDTO<int>
+                return new ApiResponseDTO<FinancialYearDto>
                 {
                     IsSuccess = false,
                     Message = "FinancialYear not created"
@@ -100,16 +88,15 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
             _logger.LogInformation("AuditLogsDomainEvent published for FinancialYear ID: {FYId}", financialYearEntity.Id);
 
             // Map result to DTO
-            var financialYearDto = _mapper.Map<FinancialYearDto>(createdfinancialYear);
-          
+            var financialYearDto = _mapper.Map<FinancialYearDto>(createdfinancialYear);          
 
             _logger.LogInformation("Returning success response for FinancialYear ID: {FYId}", financialYearEntity.Id);
 
-            return new ApiResponseDTO<int>
+            return new ApiResponseDTO<FinancialYearDto>
             {
                 IsSuccess = true,
                 Message = "FinancialYear created successfully",
-                Data = financialYearDto.Id
+                Data = financialYearDto
         };
         }
 

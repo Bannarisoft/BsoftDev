@@ -8,6 +8,9 @@ using Core.Application.Common.Interfaces.IFinancialYear;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Core.Domain.Events;
+using Core.Application.FinancialYear.Queries.GetFinancialYear;
+using Core.Application.FinancialYear.Command.UpdateFinancialYear;
+
 
 
 
@@ -36,13 +39,31 @@ namespace Core.Application.FinancialYear.Command.UpdateFinancialYear
          public async Task<ApiResponseDTO<int>> Handle(UpdateFinancialYearCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Starting UpdateFinancialYearCommandHandler for request: {@Request}", request);
+              
+            //   var financialYears = await _financialYearQueryRepository.GetAllFinancialYearAsync();
+            //     //  var existingFinancialYear = await _financialYearQueryRepository.GetFinancialYearByDateRangeAsync(request.StartDate, request.EndDate);
+
+
+            //  var existingFinancialYear = financialYears.FirstOrDefault(fy => fy.StartDate == request.StartDate && fy.EndDate == request.EndDate);
+
+            // if (existingFinancialYear != null)
+            // {
+            //     _logger.LogWarning("FinancialYear with start year {StartYear} already exists.", request.StartYear);
+            //     return new ApiResponseDTO<int>
+            //     {
+            //         IsSuccess = false,
+            //         Message = "FinancialYear with start year already exists."
+            //     };
+            // }
+
+         
 
             var financialYear = _Imapper.Map<Core.Domain.Entities.FinancialYear>(request);
 
             var result = await _financialYearCommandRepository.UpdateAsync( request.Id,financialYear);
 
 
-            if (result == -1) // Entity not found
+            if (result == null) // Entity not found
             {
                 _logger.LogInformation("FinancialYear {FinancialYearId} not found.", request.Id);
                 return new ApiResponseDTO<int> { IsSuccess = false, Message = "FinancialYear not found." };

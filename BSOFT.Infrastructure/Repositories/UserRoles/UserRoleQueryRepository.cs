@@ -33,7 +33,6 @@ namespace BSOFT.Infrastructure.Repositories.UserRoles
 
           const string query = "SELECT RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole WHERE Id = @Id";
           return await _dbConnection.QueryFirstOrDefaultAsync<UserRole>(query, new { id });
-
     
     }   
     public async Task<List<UserRole>> GetRolesAsync(string searchTerm)

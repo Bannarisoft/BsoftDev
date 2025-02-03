@@ -6,6 +6,8 @@ using Core.Domain.Entities;
 using Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace BSOFT.Infrastructure.Data.Configurations
 {
@@ -14,6 +16,19 @@ namespace BSOFT.Infrastructure.Data.Configurations
 
   public void Configure(EntityTypeBuilder<FinancialYear> builder)
         {
+           var isActiveConverter = new ValueConverter<Status, bool>
+               (
+                    v => v == Status.Active,  
+                    v => v ? Status.Active : Status.Inactive 
+                );
+
+                var isDeletedConverter = new ValueConverter<IsDelete, bool>
+                (
+                 v => v == IsDelete.Deleted,  
+                 v => v ? IsDelete.Deleted : IsDelete.NotDeleted 
+                );
+
+
           builder.ToTable("FinancialYear", "AppData");
 
             builder.HasKey(u => u.Id);
@@ -46,20 +61,15 @@ namespace BSOFT.Infrastructure.Data.Configurations
             .IsRequired();
 
             builder.Property(u => u.IsActive)
-            .HasColumnName("IsActive")
-            .HasColumnType("bit")
-            .HasConversion(
-             v => v == FinancialYearEnum.FinancialYearStatus.Active, // convert enum to bool
-             v => v ? FinancialYearEnum.FinancialYearStatus.Active : FinancialYearEnum.FinancialYearStatus.Inactive // convert bool to enum
-             )
-            .IsRequired();
-        builder.Property(u => u.IsDeleted)
+                .HasColumnName("IsActive")
+                .HasColumnType("bit")
+                .HasConversion(isActiveConverter)
+                .IsRequired();
+
+                 builder.Property(u => u.IsDeleted)
             .HasColumnName("IsDeleted")
             .HasColumnType("bit")
-            .HasConversion(
-             v => v == FinancialYearEnum.FinancialYearDelete.Deleted, // convert enum to bool
-             v => v ? FinancialYearEnum.FinancialYearDelete.Deleted : FinancialYearEnum.FinancialYearDelete.NotDeleted // convert bool to enum
-             )
+            .HasConversion(isDeletedConverter)
             .IsRequired();
             
 

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Queries.GetRoleById
 {
-    public class GetRoleByIdQuery :IRequest<ApiResponseDTO<UserRoleDto>>
+    public class GetRoleByIdQuery :IRequest<ApiResponseDTO<GetUserRoleDto>>
     {
       public int Id { get; set; }
     }

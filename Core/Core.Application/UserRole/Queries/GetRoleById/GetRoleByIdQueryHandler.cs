@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.UserRole.Queries.GetRoleById
 {
-    public class GetRoleByIdQueryHandler :IRequestHandler<GetRoleByIdQuery,ApiResponseDTO<UserRoleDto>>
+    public class GetRoleByIdQueryHandler :IRequestHandler<GetRoleByIdQuery,ApiResponseDTO<GetUserRoleDto>>
     {
     private readonly IUserRoleQueryRepository _userRoleRepository;
      private readonly IMapper _mapper;
@@ -33,17 +33,17 @@ namespace Core.Application.UserRole.Queries.GetRoleById
         
           }
 
-          public async Task<ApiResponseDTO<UserRoleDto>> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
+          public async Task<ApiResponseDTO<GetUserRoleDto>> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
           {
               _logger.LogInformation("Processing GetRoleByIdQuery for ID: {Id}.", request.Id);
 
 
               // Fetch the user role by ID
-                var user = await _userRoleRepository.GetByIdAsync(request.Id);
-                if (user == null)
+                var userRole = await _userRoleRepository.GetByIdAsync(request.Id);
+                if (userRole == null)
                 {
                     _logger.LogWarning("No user role found with ID: {Id}.", request.Id);
-                    return new ApiResponseDTO<UserRoleDto>
+                    return new ApiResponseDTO<GetUserRoleDto>
                     {
                         IsSuccess = false,
                         Message = $"No user role found with ID: {request.Id}.",
@@ -52,7 +52,7 @@ namespace Core.Application.UserRole.Queries.GetRoleById
                 }
 
                 _logger.LogInformation("User role found with ID: {Id}. Mapping to DTO.", request.Id);
-                var roleDto = _mapper.Map<UserRoleDto>(user);
+                var roleDto = _mapper.Map<GetUserRoleDto>(userRole);
 
                 // Publish domain event
                 var domainEvent = new AuditLogsDomainEvent(
@@ -67,7 +67,7 @@ namespace Core.Application.UserRole.Queries.GetRoleById
                 await _mediator.Publish(domainEvent, cancellationToken);
 
                 _logger.LogInformation("Returning success response for UserRole ID: {Id}.", roleDto.UserRoleId);
-                return new ApiResponseDTO<UserRoleDto>
+                return new ApiResponseDTO<GetUserRoleDto>
                 {
                     IsSuccess = true,
                     Message = "Success",

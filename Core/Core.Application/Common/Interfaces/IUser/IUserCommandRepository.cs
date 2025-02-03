@@ -11,7 +11,8 @@ namespace Core.Application.Common.Interfaces.IUser
     {      
         Task<User> CreateAsync(User user);
         Task<int> UpdateAsync(int userId,User user);
-        Task<int> DeleteAsync(int userId,User user);   
+        Task<int> DeleteAsync(int userId,User user);
+     
         // Task<User?> GetByIdAsync(int userId);   
         // Task<User?> GetByUsernameAsync(string username); 
         // Task<List<string>> GetUserRolesAsync(int userId);

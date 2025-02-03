@@ -12,41 +12,38 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.FinancialYear.Queries.GetFinancialYearGetById
 {
-    public class GetFinancialYearByIdQueryHanlder  :IRequestHandler<GetFinancialYearByIdQuery,ApiResponseDTO<List<FinancialYearDto>>>
+    public class GetFinancialYearByIdQueryHanlder  :IRequestHandler<GetFinancialYearByIdQuery,ApiResponseDTO<List<GetFinancialYearDto>>>
     {
              
         private readonly IFinancialYearQueryRepository _financialyearRepository;
         private readonly IMapper _mapper;
-         private readonly IMediator _mediator;
-           private readonly ILogger<GetFinancialYearByIdQueryHanlder> _logger;
+        private readonly IMediator _mediator;
+        private readonly ILogger<GetFinancialYearByIdQueryHanlder> _logger;
 
 
-        public GetFinancialYearByIdQueryHanlder(IFinancialYearQueryRepository financialyearRepository,IMapper mapper , IMediator mediator, ILogger<GetFinancialYearByIdQueryHanlder> logger)    
-        {
-            _financialyearRepository = financialyearRepository;
-            _mapper = mapper;
-            _mediator = mediator;
-            _logger = logger;
-        }
-
-        public async Task<ApiResponseDTO<List<FinancialYearDto>>> Handle(GetFinancialYearByIdQuery request, CancellationToken cancellationToken)
-        {
-          
+    public GetFinancialYearByIdQueryHanlder(IFinancialYearQueryRepository financialyearRepository,IMapper mapper , IMediator mediator, ILogger<GetFinancialYearByIdQueryHanlder> logger)    
+    {
+        _financialyearRepository = financialyearRepository;
+        _mapper = mapper;
+        _mediator = mediator;
+        _logger = logger;
+     }
+        public async Task<ApiResponseDTO<List<GetFinancialYearDto>>> Handle(GetFinancialYearByIdQuery request, CancellationToken cancellationToken)
+        {          
           _logger.LogInformation("Fetching FinancialYear Request started: {Request}", request);
 
                     // Fetch department by ID
-                    var financialyear = await _financialyearRepository.GetByIdAsync(request.FYId);
+                    var financialyear = await _financialyearRepository.GetByIdAsync(request.Id);
                     
                     if (financialyear == null)
                     {
-                        _logger.LogWarning("FinancialYear with ID {DepartmentId} not found.", request.FYId);
+                        _logger.LogWarning("FinancialYear with ID {DepartmentId} not found.", request.Id);
 
-                        return new ApiResponseDTO<List<FinancialYearDto>>{ IsSuccess = false,Message = "FinancialYear not found.", Data = null };
-                    }
-            
+                        return new ApiResponseDTO<List<GetFinancialYearDto>>{ IsSuccess = false,Message = "FinancialYear not found.", Data = null };
+                    }            
 
-              var financialyearDto = _mapper.Map<FinancialYearDto>(financialyear);
- //Domain Event
+              var financialyearDto = _mapper.Map<GetFinancialYearDto>(financialyear);
+                //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetById",
                     actionCode: financialyearDto.Id.ToString(),        
@@ -57,7 +54,7 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYearGetById
 
                 await _mediator.Publish(domainEvent, cancellationToken);
            // return new ApiResponseDTO<FinancialYearDto> { IsSuccess = true, Message = "Success", Data = dfinancialyearDto };
-           return new ApiResponseDTO<List<FinancialYearDto>> { IsSuccess = true, Message = "Success", Data = new List<FinancialYearDto> { financialyearDto }};
+           return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = true, Message = "Success", Data = new List<GetFinancialYearDto> { financialyearDto }};
         }
     }
 }
