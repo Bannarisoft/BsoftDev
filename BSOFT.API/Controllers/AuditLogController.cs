@@ -23,8 +23,7 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetAllAuditLogsAsync()
         {            
 
-            var auditLogs = await Mediator.Send(new GetAuditLogQuery());
-            //var activeCities = auditLogs.Where(c => c.IsActive == 1).ToList(); 
+            var auditLogs = await Mediator.Send(new GetAuditLogQuery());            
             return Ok(auditLogs);
         }              
         [HttpGet("GetAuditLogSearch")]

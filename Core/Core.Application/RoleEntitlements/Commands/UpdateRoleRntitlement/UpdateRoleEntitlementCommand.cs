@@ -13,5 +13,6 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
     {
         public string RoleName { get; set; }
         public List<ModuleMenuPermissionDto> ModuleMenus { get; set; }
+        public byte IsActive { get; set; } 
     }
 }

@@ -8,6 +8,6 @@ namespace Core.Application.Common.Interfaces.IState
         Task<int>  UpdateAsync(int stateId,States state);
         Task<int>  DeleteAsync(int stateId,States state);             
         Task<bool> CountryExistsAsync(int stateId); 
-        Task<bool> GetStateByCodeAsync(string StateCode, int countryId);         
+        Task<States> GetStateByCodeAsync(string StateName,string StateCode, int countryId);         
     }
 }

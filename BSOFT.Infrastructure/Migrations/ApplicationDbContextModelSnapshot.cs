@@ -211,11 +211,11 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.Property<string>("CreatedByName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("CreatedIP")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("EntityId")
                         .HasColumnType("int")
@@ -230,8 +230,9 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsActive");
 
-                    b.Property<int>("IsDeleted")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
 
                     b.Property<string>("LegalName")
                         .IsRequired()
@@ -250,10 +251,10 @@ namespace BSOFT.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("ModifiedIP")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("TAN")
                         .IsRequired()
@@ -1018,6 +1019,11 @@ namespace BSOFT.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("CanAdd")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("CanApprove")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);

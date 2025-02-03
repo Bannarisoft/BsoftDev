@@ -27,7 +27,7 @@ namespace BSOFT.API.Filters
                 var decodedCredentials = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedCredentials));
                 var credentials = decodedCredentials.Split(':');
 
-                if (credentials.Length == 2)
+                if (credentials.Length is 2)
                 {
                     var username = credentials[0];
                     var password = credentials[1];

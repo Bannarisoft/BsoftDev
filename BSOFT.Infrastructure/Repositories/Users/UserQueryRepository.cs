@@ -14,7 +14,7 @@ namespace BSOFT.Infrastructure.Repositories.Users
     public class UserQueryRepository : IUserQueryRepository
     {
         private readonly ApplicationDbContext _applicationDbContext;
-         private readonly IDbConnection _dbConnection;
+        private readonly IDbConnection _dbConnection;
         private readonly IAsyncPolicy _retryPolicy;
         private readonly IAsyncPolicy _circuitBreakerPolicy;
         private readonly IAsyncPolicy _timeoutPolicy;
@@ -55,7 +55,6 @@ namespace BSOFT.Infrastructure.Repositories.Users
         public async Task<List<User>> GetAllUsersAsync()
         {
 
-           
              const string query = @"SELECT ur.Id,
              ur.UserId,
                          ur.DivisionId,
@@ -77,8 +76,6 @@ namespace BSOFT.Infrastructure.Repositories.Users
                      Left JOIN AppSecurity.UserRoleAllocation ura ON   ur.UserId = ura.UserId and ura.IsActive = 1
                      Left JOIN AppSecurity.UserCompany uc ON uc.UserId = ur.UserId and uc.IsActive = 1
                      WHERE  ur.IsDeleted = 0";
-
-
 
               var userDictionary = new Dictionary<int, User>();
 
@@ -145,11 +142,11 @@ namespace BSOFT.Infrastructure.Repositories.Users
           new { userId },
           splitOn: "UserRoleId,CompanyId");
 
-var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
- return await policyWrap.ExecuteAsync(async () =>
-            {
-             return userResponse.FirstOrDefault();
-});
+            var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+            return await policyWrap.ExecuteAsync(async () =>
+                        {
+                        return userResponse.FirstOrDefault();
+            });
             // const string query = "SELECT * FROM AppSecurity.Users WHERE UserId = @UserId";
             // return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { userId });
         }
@@ -200,7 +197,6 @@ var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeout
                 FROM AppSecurity.UserRole ur
                 INNER JOIN AppSecurity.UserRoleAllocation ura ON   ur.Id = ura.UserRoleId
                 INNER JOIN AppSecurity.Users u ON u.UserId = ura.UserId
-
                 WHERE u.UserId = @UserId and u.IsDeleted = 0";
                 // const string query = @"
                 // SELECT 'Admin' as RoleName FROM AppSecurity.Users u 

@@ -7,7 +7,6 @@ using Core.Application.Country.Queries.GetCountryAutoComplete;
 using Core.Application.Country.Queries.GetCountryById;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
@@ -36,13 +35,14 @@ namespace BSOFT.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
+                message = countries.Message,
                 data = countries.Data
             });
         }
-        [HttpGet("{countryId}")]        
-        public async Task<IActionResult> GetByIdAsync(int countryId)
+        [HttpGet("{id}")]     
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            if (countryId <= 0)
+            if (id <= 0)
             {
                 return BadRequest(new
                 {
@@ -50,7 +50,7 @@ namespace BSOFT.API.Controllers
                     message = "Invalid Country ID"
                 });
             }            
-            var result = await Mediator.Send(new GetCountryByIdQuery { Id = countryId });            
+            var result = await Mediator.Send(new GetCountryByIdQuery { Id = id });            
             if (!result.IsSuccess)
             {                
                 return NotFound(new 
@@ -65,7 +65,7 @@ namespace BSOFT.API.Controllers
                 data = result.Data
             });
         }
-        [HttpPost]        
+        [HttpPost("create")]          
         public async Task<IActionResult> CreateAsync(CreateCountryCommand  command)
         { 
             var validationResult = await _createCountryCommandValidator.ValidateAsync(command);
@@ -95,7 +95,7 @@ namespace BSOFT.API.Controllers
             });
                        
         }
-        [HttpPut("update")]        
+        [HttpPut("update")]      
         public async Task<IActionResult> UpdateAsync( UpdateCountryCommand command)
         {
             var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
@@ -135,33 +135,37 @@ namespace BSOFT.API.Controllers
                 });
             }
         }
-        [HttpDelete("delete")]        
-        public async Task<IActionResult> DeleteAsync(DeleteCountryCommand command)
+        [HttpDelete("delete{id}")]   
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            var result = await Mediator.Send(command);
-            if (result.IsSuccess)
+            if (id <= 0)
             {
-                return Ok(new 
-                { 
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Country Deleted successfully", 
-                    data = result.Data 
-                });
-            }
-            else
-            {            
-                return BadRequest(new 
-                { 
+                return BadRequest(new
+                {
                     StatusCode = StatusCodes.Status400BadRequest,
-                    message = result.Message 
+                    message = "Invalid Country ID"
+                });
+            }            
+              var result = await Mediator.Send(new DeleteCountryCommand { Id = id });                 
+            if (!result.IsSuccess)
+            {                
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
                 });
             }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data =$"Country ID {id} Deleted" 
+            });
         }
 
-        [HttpGet("GetCountrySearch")]        
-        public async Task<IActionResult> GetCountry([FromQuery] string searchPattern)
+        [HttpGet("by-name{name}")]     
+        public async Task<IActionResult> GetCountry(string name)
         {
-            var result = await Mediator.Send(new GetCountryAutoCompleteQuery { SearchPattern = searchPattern });
+            var result = await Mediator.Send(new GetCountryAutoCompleteQuery { SearchPattern = name });
             if (!result.IsSuccess)
             {
                 return NotFound(new 

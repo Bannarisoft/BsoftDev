@@ -59,6 +59,8 @@ using BSOFT.Infrastructure.Repositories.Currency;
 using Core.Application.Common.Interfaces.ITimeZones;
 using BSOFT.Infrastructure.Repositories.TimeZones;
 using BSOFT.Infrastructure.PollyResilience;
+using Core.Application.Common.Interfaces.ILanguage;
+using BSOFT.Infrastructure.Repositories.Language;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -199,7 +201,9 @@ namespace BSOFT.Infrastructure
             services.AddScoped<ITimeZonesQueryRepository, TimeZonesQueryRepository>();
 
             services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();
-            services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();   
+            services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();
+            services.AddScoped<ILanguageCommand, LanguageCommandRepository>();
+            services.AddScoped<ILanguageQuery, LanguageQueryRepository>(); 
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();            

@@ -13,6 +13,5 @@ namespace Core.Application.Companies.Commands.DeleteCompany
     public class DeleteCompanyCommand : IRequest<ApiResponseDTO<bool>>
     {
         public int Id { get; set; }
-        public CompanyDeleteDTO CompanyDelete { get; set; }
     }
 }

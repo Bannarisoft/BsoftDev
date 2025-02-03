@@ -19,21 +19,21 @@ namespace BSOFT.API.Validation.Common
         {
             var entityType = _model.FindEntityType(typeof(T));
 
-            if (entityType == null)
+            if (entityType is null)
             {
                 throw new InvalidOperationException($"Entity type {typeof(T).Name} not found in the model.");
             }
 
             var property = entityType.FindProperty(propertyName);
 
-            if (property == null)
+            if (property is null)
             {
                 throw new InvalidOperationException($"Property {propertyName} not found in entity type {typeof(T).Name}.");
             }
 
             // Retrieve the column type from annotations
             var columnType = property.GetAnnotations()
-                                     .FirstOrDefault(a => a.Name == "Relational:ColumnType")?.Value?.ToString();
+                                     .FirstOrDefault(a => a.Name is "Relational:ColumnType")?.Value?.ToString();
 
             if (string.IsNullOrEmpty(columnType))
             {

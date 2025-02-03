@@ -5,6 +5,7 @@ using Core.Application.State.Queries.GetStates;
 using Core.Application.Common.Interfaces.IState;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using Core.Domain.Enums.Common;
 
 namespace Core.Application.State.Commands.UpdateState
 {    
@@ -25,7 +26,7 @@ namespace Core.Application.State.Commands.UpdateState
         public async Task<ApiResponseDTO<StateDto>> Handle(UpdateStateCommand request, CancellationToken cancellationToken)
         {
             var state = await _stateQueryRepository.GetByIdAsync(request.Id);
-             if (state == null)                
+             if (state is null)                
                 return new ApiResponseDTO<StateDto>
                 {
                     IsSuccess = false,
@@ -34,7 +35,7 @@ namespace Core.Application.State.Commands.UpdateState
 
             var oldStateName = state.StateName;
             state.StateName = request.StateName;
-            if (state == null || state.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
+            if (state is null || state.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
             {                
                 return new ApiResponseDTO<StateDto>
                 {
@@ -51,14 +52,37 @@ namespace Core.Application.State.Commands.UpdateState
                     Message = "Invalid CountryID. The specified Country does not exist or is inactive."
                 };
             }
-            var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateCode, request.CountryId);
-            if (stateExists)
-            {                
-                return new ApiResponseDTO<StateDto>
+            if ((byte)state.IsActive != request.IsActive)
+            {    
+                 state.IsActive =  (Enums.Status)request.IsActive;             
+                await _stateRepository.UpdateAsync(state.Id, state);
+                if (request.IsActive is 0)
                 {
-                    IsSuccess = false,
-                    Message = "StateCode already exists in the specified Country."
-                };
+                    return new ApiResponseDTO<StateDto>
+                    {
+                        IsSuccess = false,
+                        Message = "StateCode DeActivated."
+                    };
+                }
+                else{
+                    return new ApiResponseDTO<StateDto>
+                    {
+                        IsSuccess = false,
+                        Message = "StateCode Activated."
+                    }; 
+                }                                     
+            }
+            var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName ?? string.Empty,request.StateCode ??string.Empty, request.CountryId);
+            if (stateExists!= null)
+            {              
+                if ((byte)stateExists.IsActive == request.IsActive)
+                {                    
+                    return new ApiResponseDTO<StateDto>
+                    {
+                        IsSuccess = false,
+                        Message = $"StateCode already exists and is {(Enums.Status) request.IsActive}."
+                    };                                 
+                }               
             }
             var updatedStateEntity = _mapper.Map<States>(request);          
             var updateResult = await _stateRepository.UpdateAsync(request.Id, updatedStateEntity);            
@@ -67,11 +91,12 @@ namespace Core.Application.State.Commands.UpdateState
             if (updatedState != null)
             {                    
                 var stateDto = _mapper.Map<StateDto>(updatedState);
+
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: stateDto.StateCode,
-                    actionName: stateDto.StateName,                            
+                    actionCode: stateDto.StateCode ?? string.Empty,
+                    actionName: stateDto.StateName ?? string.Empty,                           
                     details: $"State '{oldStateName}' was updated to '{stateDto.StateName}'.  StateCode: {stateDto.StateCode}",
                     module:"State"
                 );
@@ -88,7 +113,7 @@ namespace Core.Application.State.Commands.UpdateState
                 return new ApiResponseDTO<StateDto>
                 {
                     IsSuccess = false,
-                    Message = "City not updated."
+                    Message = "State not updated."
                 };
             }
             else

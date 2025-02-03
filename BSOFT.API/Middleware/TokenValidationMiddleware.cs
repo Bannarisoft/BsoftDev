@@ -44,7 +44,7 @@ namespace BSOFT.API.Middleware
                 var principal = jwtTokenHelper.ValidateToken(token);
 
                 // Extract the JWT ID (jti) and validate it
-                var jti = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
+                var jti = principal.Claims.FirstOrDefault(c => c.Type is JwtRegisteredClaimNames.Jti)?.Value;
                 if (string.IsNullOrEmpty(jti))
                 {
                     await WriteErrorResponse(context, StatusCodes.Status401Unauthorized, "Invalid JWT ID.");
@@ -53,15 +53,15 @@ namespace BSOFT.API.Middleware
 
                 // Check session in the database
                 var session = await sessionRepository.GetSessionByJwtIdAsync(jti);
-                if (session == null || session.IsActive == 0 || session.ExpiresAt <= DateTime.UtcNow)
+                if (session is null || session.IsActive is 0 || session.ExpiresAt <= DateTime.UtcNow)
                 {
                     await WriteErrorResponse(context, StatusCodes.Status401Unauthorized, "Session is invalid or expired.");
                     return;
                 }
 
                 // Attach UserId and UserName to HttpContext for further use
-                context.Items["UserId"] = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                context.Items["UserName"] = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value;
+                context.Items["UserId"] = principal.Claims.FirstOrDefault(c => c.Type is ClaimTypes.NameIdentifier)?.Value;
+                context.Items["UserName"] = principal.Claims.FirstOrDefault(c => c.Type is JwtRegisteredClaimNames.Name)?.Value;
 
                 // Update session's last activity
                 session.LastActivity = DateTime.UtcNow;

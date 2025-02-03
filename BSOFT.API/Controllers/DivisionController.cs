@@ -34,7 +34,7 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> GetAllDivisionsAsync()
         {
            var divisions = await Mediator.Send(new GetDivisionQuery());
-            var activedivisions = divisions.Data.Where(c => c.IsActive == 1).ToList(); 
+            var activedivisions = divisions.Data.ToList(); 
            
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = activedivisions});
         }
