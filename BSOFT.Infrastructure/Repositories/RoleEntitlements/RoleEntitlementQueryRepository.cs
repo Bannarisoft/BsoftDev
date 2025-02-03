@@ -20,7 +20,7 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
 
         public RoleEntitlementQueryRepository(IDbConnection dbConnection)
         {
-            _dbConnection = dbConnection;
+            _dbConnection = dbConnection;   
 
         }
         public async Task<RoleEntitlement> GetByIdAsync(int roleEntitlementId)
@@ -37,7 +37,8 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
 			INNER JOIN AppSecurity.UserRole ur on re.UserRoleId=ur.Id
 			INNER JOIN AppData.Modules m on re.ModuleId=m.Id
 			INNER JOIN AppData.Menus mn on re.MenuId=mn.Id
-            WHERE re.Id = @RoleEntitlementId  AND re.IsDeleted= 0";
+            WHERE re.Id = @RoleEntitlementId  AND re.IsDeleted= 0
+            ORDER BY re.Id";
                   
             var roleEntitlement = await _dbConnection.QuerySingleOrDefaultAsync<RoleEntitlement>(query, new { RoleEntitlementId = roleEntitlementId });
 
