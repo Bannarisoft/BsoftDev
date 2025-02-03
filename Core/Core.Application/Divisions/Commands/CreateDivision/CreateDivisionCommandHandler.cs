@@ -32,8 +32,13 @@ namespace Core.Application.Divisions.Commands.CreateDivision
 
                 var divisionresult = await _divisionRepository.CreateAsync(division);
 
-                //Domain Event
-                 var domainEvent = new AuditLogsDomainEvent(
+                
+                 
+
+                var divisionMap = _imapper.Map<DivisionDTO>(divisionresult);
+                if (divisionresult.Id > 0)
+                {
+                    var domainEvent = new AuditLogsDomainEvent(
                      actionDetail: "Create",
                      actionCode: divisionresult.ShortName,
                      actionName: divisionresult.Name,
@@ -41,10 +46,7 @@ namespace Core.Application.Divisions.Commands.CreateDivision
                      module:"Division"
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
-
-                var divisionMap = _imapper.Map<DivisionDTO>(divisionresult);
-                if (divisionresult.Id > 0)
-                {
+                 
                     return new ApiResponseDTO<DivisionDTO>{IsSuccess = true, Message = "Division created successfully", Data = divisionMap};
                 }
                
