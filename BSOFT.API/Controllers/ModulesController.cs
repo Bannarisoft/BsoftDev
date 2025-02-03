@@ -45,7 +45,6 @@ namespace BSOFT.API.Controllers
         }
 
     [HttpPost]
-    [Route("Create")]
     public async Task<IActionResult> CreateModule([FromBody] CreateModuleCommand command)
     {
         var validationResult = await _createModuleCommandValidator.ValidateAsync(command);
@@ -73,7 +72,6 @@ namespace BSOFT.API.Controllers
     }
 
     [HttpGet]
-    [Route("GetAll")]
     public async Task<IActionResult> GetModules()
     {
         var modules = await Mediator.Send(new GetModulesQuery());
@@ -82,7 +80,6 @@ namespace BSOFT.API.Controllers
     }
 
     [HttpPut]
-    [Route("Update")]
     public async Task<IActionResult> UpdateModule([FromBody] UpdateModuleCommand command)
     {
         var validationResult = await _updateModuleCommandValidator.ValidateAsync(command);
@@ -120,13 +117,8 @@ namespace BSOFT.API.Controllers
     }
 
     [HttpDelete]
-    [Route("Delete/{moduleId}")]
-    public async Task<IActionResult> DeleteModule(int moduleId, DeleteModuleCommand deleteModuleCommand)
+    public async Task<IActionResult> DeleteModule(DeleteModuleCommand deleteModuleCommand)
     {
-        if(moduleId != deleteModuleCommand.ModuleId)
-        {
-            return BadRequest();
-        }
         var updatedModule = await Mediator.Send(deleteModuleCommand);
         if(updatedModule.IsSuccess)
         {
