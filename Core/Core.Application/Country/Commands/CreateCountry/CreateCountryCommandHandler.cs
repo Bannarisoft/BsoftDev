@@ -23,8 +23,8 @@ public class CreateCountryCommandHandler : IRequestHandler<CreateCountryCommand,
 
     public async Task<ApiResponseDTO<CountryDto>> Handle(CreateCountryCommand request, CancellationToken cancellationToken)
     {
-        var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryCode);
-        if (countryExists)
+        var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryName ?? string.Empty,request.CountryCode ?? string.Empty);
+        if (countryExists!= null)
         {
             return new ApiResponseDTO<CountryDto>
             {

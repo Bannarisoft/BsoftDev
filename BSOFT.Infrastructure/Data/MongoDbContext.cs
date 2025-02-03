@@ -9,7 +9,7 @@ namespace Infrastructure.Data
 
         public MongoDbContext(IMongoClient client, string databaseName)
         {
-            if (client == null) throw new ArgumentNullException(nameof(client));
+            if (client is null) throw new ArgumentNullException(nameof(client));
             if (string.IsNullOrWhiteSpace(databaseName)) throw new ArgumentNullException(nameof(databaseName));
 
             _database = client.GetDatabase(databaseName);

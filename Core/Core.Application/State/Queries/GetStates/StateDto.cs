@@ -1,5 +1,6 @@
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.State.Queries.GetStates
 {
@@ -9,7 +10,7 @@ namespace Core.Application.State.Queries.GetStates
         public string? StateCode { get; set; } 
         public string? StateName { get; set; } 
         public int CountryId { get; set; }   
-        public byte IsActive { get; set; }   
+         public Status IsActive { get; set; }       
         public int CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? CreatedByName { get; set; }
@@ -17,6 +18,6 @@ namespace Core.Application.State.Queries.GetStates
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string? ModifiedByName { get; set; }
-        public string? ModifiedIP { get; set; }          
+        public string? ModifiedIP { get; set; }       
     }
 }

@@ -10,6 +10,7 @@ namespace Core.Application.Common.Interfaces.ICity
     {
         Task<Cities>  GetByIdAsync(int cityId);
         Task<List<Cities>> GetAllCityAsync();        
-        Task<List<Cities>> GetByCityNameAsync(string cityName);        
+        Task<List<Cities>> GetByCityNameAsync(string cityName); 
+        Task<List<Cities>> GetCityByStateIdAsync(int stateId);          
     }
 }

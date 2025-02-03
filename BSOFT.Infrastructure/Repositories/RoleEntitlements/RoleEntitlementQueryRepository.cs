@@ -33,7 +33,7 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
 
             const string query = @"
                 SELECT re.Id, re.IsActive,m.Id as ModuleId, m.ModuleName,mn.Id as MenuId,mn.MenuName,ur.RoleName,CanAdd,CanDelete,CanExport,CanUpdate,CanView,CanApprove
-            FROM AppSecurity.RoleEntitlements re WITH (NOLOCK)
+            FROM AppSecurity.RoleEntitlements re 
 			INNER JOIN AppSecurity.UserRole ur on re.UserRoleId=ur.Id
 			INNER JOIN AppData.Modules m on re.ModuleId=m.Id
 			INNER JOIN AppData.Menus mn on re.MenuId=mn.Id
@@ -85,7 +85,7 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
             const string query = @"
         SELECT Id, RoleName, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
                ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
-        FROM AppSecurity.UserRole WITH (NOLOCK)
+        FROM AppSecurity.UserRole 
         WHERE RoleName = @RoleName";
 
         var userRole = await _dbConnection.QueryFirstOrDefaultAsync<UserRole>(query, new { RoleName = roleName });
