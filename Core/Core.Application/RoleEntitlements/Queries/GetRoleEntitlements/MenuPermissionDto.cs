@@ -13,5 +13,7 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlements
     public bool CanUpdate { get; set; }
     public bool CanDelete { get; set; }
     public bool CanExport { get; set; }
+    public bool CanApprove { get; set; }
+
     }
 }

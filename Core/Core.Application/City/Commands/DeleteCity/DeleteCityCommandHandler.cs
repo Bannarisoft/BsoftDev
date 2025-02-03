@@ -31,7 +31,7 @@ namespace Core.Application.City.Commands.DeleteCity
         {
             // Fetch the city to be deleted
             var city = await _cityQueryRepository.GetByIdAsync(request.Id);
-            if (city == null || city.IsDeleted != Enums.IsDelete.Deleted)
+            if (city is null || city.IsDeleted is Enums.IsDelete.Deleted )
             {
                 return new ApiResponseDTO<CityDto>
                 {
@@ -39,26 +39,17 @@ namespace Core.Application.City.Commands.DeleteCity
                     Message = "Invalid CityID. The specified City does not exist or is inactive."
                 };
             }
-
-            // Mark the city as inactive (soft delete)
-            var cityUpdate = new Cities
-            {
-                Id = request.Id,
-                CityCode = city.CityCode, 
-                CityName = city.CityName, 
-                StateId = city.StateId,
-                IsActive = 0
-            };
+            var cityDelete = _mapper.Map<Cities>(request);           
            
-            var updateResult = await _cityRepository.DeleteAsync(request.Id, cityUpdate);
+            var updateResult = await _cityRepository.DeleteAsync(request.Id, cityDelete);
             if (updateResult > 0)
             {
-                var cityDto = _mapper.Map<CityDto>(cityUpdate);  
+                var cityDto = _mapper.Map<CityDto>(cityDelete);  
                 //Domain Event  
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Delete",
-                    actionCode: cityDto.CityCode,
-                    actionName: cityDto.CityName,
+                    actionCode: cityDto.CityCode ?? string.Empty,
+                    actionName: cityDto.CityName ?? string.Empty,
                     details: $"City '{cityDto.CityName}' was created. CityCode: {cityDto.CityCode}",
                     module:"City"
                 );               
@@ -74,7 +65,7 @@ namespace Core.Application.City.Commands.DeleteCity
             return new ApiResponseDTO<CityDto>
             {
                 IsSuccess = false,
-                Message = "City deletion failed."                
+                Message = "City deletion failed."                             
             };
            
         }

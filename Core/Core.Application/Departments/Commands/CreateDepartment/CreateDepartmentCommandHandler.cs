@@ -55,7 +55,7 @@ namespace Core.Application.Departments.Commands.CreateDepartment
             // Save the department
             var createdDepartment = await _departmentRepository.CreateAsync(departmentEntity);
 
-            if (createdDepartment == null)
+            if (createdDepartment is null)
             {
                 _logger.LogWarning("Failed to create department. Department entity: {@DepartmentEntity}", departmentEntity);
                 return new ApiResponseDTO<DepartmentDto>

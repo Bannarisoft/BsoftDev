@@ -9,7 +9,8 @@ namespace Core.Application.State.Commands.UpdateState
               public int Id { get; set; }
               public string? StateCode { get; set; }
               public string? StateName { get; set; }
-              public int CountryId { get; set; }         
+              public int CountryId { get; set; }    
+              public byte IsActive { get; set; }      
          }
   
 }

@@ -82,12 +82,11 @@ namespace BSOFT.Infrastructure.Repositories
 
             }
         
-
-          public async Task<List<User>> GetAllUsersAsync()
-         {
-              const string query = "SELECT * FROM AppSecurity.Users";
-              return (await _dbConnection.QueryAsync<User>(query)).ToList();
-         }
+        // public async Task<List<User>> GetAllUsersAsync()
+        //  {
+        //       const string query = "SELECT * FROM AppSecurity.Users";
+        //       return (await _dbConnection.QueryAsync<User>(query)).ToList();
+        //  }
      
         public async Task<int> DeleteAsync(int userId,User user)
         {

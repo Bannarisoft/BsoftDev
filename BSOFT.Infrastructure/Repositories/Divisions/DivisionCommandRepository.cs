@@ -40,7 +40,7 @@ namespace BSOFT.Infrastructure.Repositories.Divisions
             var existingDivision = await _applicationDbContext.Divisions.FirstOrDefaultAsync(u => u.Id == id);
             if (existingDivision != null)
             {
-                existingDivision.IsActive = division.IsActive;
+                existingDivision.IsDeleted = division.IsDeleted;
                 return await _applicationDbContext.SaveChangesAsync() >0;
             }
             return false; 

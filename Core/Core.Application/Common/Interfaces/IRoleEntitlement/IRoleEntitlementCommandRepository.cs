@@ -12,10 +12,10 @@ namespace Core.Application.Common.Interfaces.IRoleEntitlement
         Task UpdateRoleEntitlementsAsync(int roleId, List<RoleEntitlement> roleEntitlements, CancellationToken cancellationToken);
         Task<int>  DeleteAsync(int roleId,RoleEntitlement RoleEntitlement);
                // Add these new method definitions
-        Task<List<RoleEntitlement>> GetExistingRoleEntitlementsAsync(List<int> userRoleIds, List<int> moduleIds, List<int> menuIds, CancellationToken cancellationToken);
+        // Task<List<RoleEntitlement>> GetExistingRoleEntitlementsAsync(List<int> userRoleIds, List<int> moduleIds, List<int> menuIds, CancellationToken cancellationToken);
         Task<bool> ModuleExistsAsync(int moduleId, CancellationToken cancellationToken);
         Task<bool> MenuExistsAsync(int menuId, CancellationToken cancellationToken);
-        Task<Core.Domain.Entities.UserRole> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken);
-        Task<List<RoleEntitlement>> GetRoleEntitlementsByRoleNameAsync(string roleName, CancellationToken cancellationToken);   
+        // Task<Core.Domain.Entities.UserRole> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken);
+        // Task<List<RoleEntitlement>> GetRoleEntitlementsByRoleNameAsync(string roleName, CancellationToken cancellationToken);   
     }
 }

@@ -7,6 +7,7 @@ using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using Core.Domain.Enums.Common;
 
 namespace Core.Application.City.Commands.UpdateCity
 {       
@@ -27,22 +28,22 @@ namespace Core.Application.City.Commands.UpdateCity
         public async Task<ApiResponseDTO<CityDto>> Handle(UpdateCityCommand request, CancellationToken cancellationToken)
         {
             var city = await _cityQueryRepository.GetByIdAsync(request.Id);
-            if (city == null)
+            if (city is null)
                 return new ApiResponseDTO<CityDto>
                 {
                     IsSuccess = false,
-                    Message = "City not found"
+                    Message = "Invalid CityID. The specified City does not exist or is inactive."
                 };
 
             var oldCityName = city.CityName;
             city.CityName = request.CityName;
 
-            if (city == null || city.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
+            if (city is null || city.IsDeleted is Enums.IsDelete.Deleted )
             {
                 return new ApiResponseDTO<CityDto>
                 {
                     IsSuccess = false,
-                    Message = "Invalid CityID. The specified City does not exist or is inactive."
+                    Message = "Invalid CityID. The specified City does not exist or is deleted."
                 };
             }
 
@@ -55,17 +56,40 @@ namespace Core.Application.City.Commands.UpdateCity
                     Message = "Invalid StateId. The specified state does not exist or is inactive."
                 };
             }
-
-            var cityExists = await _cityRepository.GetCityByCodeAsync(request.CityCode, request.StateId);
-            if (cityExists)
-            {
-                return new ApiResponseDTO<CityDto>
+            if ((byte)city.IsActive != request.IsActive)
+            {    
+                 city.IsActive =  (Enums.Status)request.IsActive;             
+                await _cityRepository.UpdateAsync(city.Id, city);
+                if (request.IsActive is 0)
                 {
-                    IsSuccess = false,
-                    Message = "CityCode already exists in the specified State."
-                };
+                    return new ApiResponseDTO<CityDto>
+                    {
+                        IsSuccess = false,
+                        Message = "CityCode DeActivated."
+                    };
+                }
+                else{
+                    return new ApiResponseDTO<CityDto>
+                    {
+                        IsSuccess = false,
+                        Message = "CityCode Activated."
+                    }; 
+                }                                     
             }
-
+            // Check if the city name already exists in the same state
+            var cityExistsByName = await _cityRepository.GetCityByNameAsync(request.CityName ?? string.Empty,request.CityCode ?? string.Empty, request.StateId);           
+            if (cityExistsByName!= null)
+            {  
+                if ((byte)cityExistsByName.IsActive == request.IsActive)
+                {                     
+                    return new ApiResponseDTO<CityDto>
+                    {
+                        IsSuccess = false,
+                        Message = $"CityCode already exists and is {(Enums.Status) request.IsActive}."
+                    };
+                    
+                }               
+            }
             var updatedCityEntity = _mapper.Map<Cities>(request);                   
             var updateResult = await _cityRepository.UpdateAsync(request.Id, updatedCityEntity);            
 
@@ -76,8 +100,8 @@ namespace Core.Application.City.Commands.UpdateCity
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: cityDto.CityCode,
-                    actionName: cityDto.CityName,                            
+                    actionCode: cityDto.CityCode ?? string.Empty,
+                    actionName: cityDto.CityName ?? string.Empty,                            
                     details: $"State '{oldCityName}' was updated to '{cityDto.CityName}'.  StateCode: {cityDto.CityCode}",
                     module:"State"
                 );            

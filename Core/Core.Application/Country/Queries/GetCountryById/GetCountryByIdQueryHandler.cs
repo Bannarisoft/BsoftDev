@@ -25,7 +25,7 @@ namespace Core.Application.Country.Queries.GetCountryById
         public async Task<ApiResponseDTO<CountryDto>> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
         {           
             var country = await _countryRepository.GetByIdAsync(request.Id);
-            if (country == null)
+            if (country is null)
             {
                 return new ApiResponseDTO<CountryDto>
                 {
@@ -38,8 +38,8 @@ namespace Core.Application.Country.Queries.GetCountryById
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetById",
-                actionCode: countryDto.CountryCode,        
-                actionName: countryDto.CountryName,                
+                actionCode: countryDto.CountryCode ?? string.Empty,        
+                actionName: countryDto.CountryName ?? string.Empty,                
                 details: $"Country '{countryDto.CountryName}' was created. CountryCode: {countryDto.CountryCode}",
                 module:"Country"
             );

@@ -33,23 +33,24 @@ namespace Core.Application.City.Commands.CreateCity
                     IsSuccess = false, 
                     Message = "Invalid StateId. The specified state does not exist or is inactive."
                     };               
-            }
-            var cityExists = await _cityRepository.GetCityByCodeAsync(request.CityCode, request.StateId);
-            if (cityExists)
+            }      
+            // Check if the city name already exists in the same state
+            var cityExistsByName = await _cityRepository.GetCityByNameAsync(request.CityName ?? string.Empty,request.CityCode ?? string.Empty, request.StateId) ;
+            if (cityExistsByName!= null)
             {
-            return new ApiResponseDTO<CityDto>{
-                IsSuccess = false, 
-                Message = "CityCode already exists in the specified state."
+                return new ApiResponseDTO<CityDto> {
+                    IsSuccess = false, 
+                    Message = "City name & code already exists in the specified state."
                 };
-            }            
+            }    
             var cityEntity = _mapper.Map<Cities>(request);            
             var result = await _cityRepository.CreateAsync(cityEntity);
             
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
-                actionCode: result.CityCode,
-                actionName: result.CityName,
+                actionCode: result.CityCode ?? string.Empty,
+                actionName: result.CityName ?? string.Empty,
                 details: $"City '{result.CityName}' was created. CityCode: {result.CityCode}",
                 module:"City"
             );

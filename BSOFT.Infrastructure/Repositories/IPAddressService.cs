@@ -21,7 +21,7 @@ namespace BSOFT.Infrastructure.Repositories
             {
                 ipAddress = Dns.GetHostEntry(Dns.GetHostName())
                     .AddressList
-                    .FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?
+                    .FirstOrDefault(ip => ip.AddressFamily is System.Net.Sockets.AddressFamily.InterNetwork)?
                     .ToString() ?? ipAddress;
             }
             catch
@@ -72,7 +72,7 @@ namespace BSOFT.Infrastructure.Repositories
             string version = match.Groups[2].Value;
 
             // Normalize Trident/IE versions
-            if (browser == "Trident")
+            if (browser is "Trident")
             {
             browser = "IE";
             version = "11.0"; // Default for Trident

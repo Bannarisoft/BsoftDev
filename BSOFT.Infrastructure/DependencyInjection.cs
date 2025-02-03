@@ -59,6 +59,8 @@ using BSOFT.Infrastructure.Repositories.CompanySettings;
 using FluentValidation;
 using Core.Application.FinancialYear.Command.CreateFinancialYear;
 using BSOFT.Infrastructure.PollyResilience;
+using Core.Application.Common.Interfaces.ILanguage;
+using BSOFT.Infrastructure.Repositories.Language;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -204,7 +206,9 @@ namespace BSOFT.Infrastructure
             services.AddScoped<ICompanyQuerySettings ,  CompanySettingsQueryRepository>(); 
 
             services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();
-            services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();   
+            services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();
+            services.AddScoped<ILanguageCommand, LanguageCommandRepository>();
+            services.AddScoped<ILanguageQuery, LanguageQueryRepository>(); 
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();            

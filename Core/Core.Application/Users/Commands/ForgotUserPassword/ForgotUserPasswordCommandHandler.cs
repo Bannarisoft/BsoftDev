@@ -64,12 +64,16 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
                 return CreateErrorResponse("Username does not exist.");
             }
 
-            if (user.IsDeleted != Enums.IsDelete.Deleted)
+            if (user.IsDeleted == Enums.IsDelete.Deleted)
+            {
+                _logger.LogWarning($"Username '{request.UserName}' is deleted. Contact admin.");
+                return CreateErrorResponse("The account is deleted. Contact admin.");
+            }
+            if (user.IsActive == Enums.Status.Inactive)
             {
                 _logger.LogWarning($"Username '{request.UserName}' is inactive. Contact admin.");
                 return CreateErrorResponse("The account is inactive. Contact admin.");
             }
-
             if (string.IsNullOrEmpty(user.Mobile) || string.IsNullOrEmpty(user.EmailId))
             {
                 _logger.LogWarning($"Username '{request.UserName}' does not have a registered email or mobile.");

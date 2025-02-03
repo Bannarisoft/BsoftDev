@@ -46,6 +46,8 @@ namespace BSOFT.Infrastructure.Data.Configurations
             builder.Property(re => re.CanUpdate).HasDefaultValue(false);
             builder.Property(re => re.CanDelete).HasDefaultValue(false);
             builder.Property(re => re.CanExport).HasDefaultValue(false);
+            builder.Property(re => re.CanApprove).HasDefaultValue(false);
+
 
     }
     }

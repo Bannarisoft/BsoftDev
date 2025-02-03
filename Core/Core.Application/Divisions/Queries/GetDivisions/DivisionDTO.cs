@@ -7,6 +7,7 @@ using Core.Domain.Entities;
 using Core.Application.Common.Mappings;
 using Microsoft.AspNetCore.Http;
 using Core.Application.Common;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Divisions.Queries.GetDivisions
 {
@@ -16,6 +17,6 @@ namespace Core.Application.Divisions.Queries.GetDivisions
         public string ShortName { get; set; }
         public string Name { get; set; }
         public int CompanyId { get; set; }
-        public byte IsActive { get; set; }
+        public Status IsActive { get; set; }
     }
 }

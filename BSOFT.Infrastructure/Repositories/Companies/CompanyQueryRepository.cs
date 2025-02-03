@@ -50,7 +50,8 @@ namespace BSOFT.Infrastructure.Repositories.Companies
                     B.Remark AS Remarks 
                 FROM AppData.Company C
                 LEFT JOIN AppData.CompanyAddress A ON A.CompanyId = C.Id
-                LEFT JOIN AppData.CompanyContact B ON B.CompanyId = C.Id";
+                LEFT JOIN AppData.CompanyContact B ON B.CompanyId = C.Id
+                WHERE C.IsDeleted = 0";
             
             var companyDictionary = new Dictionary<int, Company>();
             
@@ -111,7 +112,7 @@ namespace BSOFT.Infrastructure.Repositories.Companies
              FROM AppData.Company C
              LEFT JOIN AppData.CompanyAddress A ON A.CompanyId = C.Id
              LEFT JOIN AppData.CompanyContact B ON B.CompanyId = C.Id
-             WHERE C.Id = @id";
+             WHERE C.Id = @id AND C.IsDeleted = 0";
     var companyResponse = await _dbConnection.QueryAsync<Company,CompanyAddress,CompanyContact,Company>(query, 
     (company,companyAddress,companyContact) =>
     {
@@ -137,7 +138,7 @@ namespace BSOFT.Infrastructure.Repositories.Companies
                 SELECT 
                 Id, 
                 CompanyName
-            FROM AppData.Company where CompanyName like @SearchPattern";
+            FROM AppData.Company where IsDeleted = 0 and CompanyName like @SearchPattern";
                 
             // Update the object to use SearchPattern instead of Name
             var result = await _dbConnection.QueryAsync<Company>(query, new { SearchPattern = $"%{searchPattern}%" });

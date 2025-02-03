@@ -5,6 +5,7 @@ using AutoMapper;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
+using Core.Domain.Enums.Common;
 
 
 namespace Core.Application.Country.Commands.UpdateCountry
@@ -26,32 +27,54 @@ namespace Core.Application.Country.Commands.UpdateCountry
         public async Task<ApiResponseDTO<CountryDto>> Handle(UpdateCountryCommand request, CancellationToken cancellationToken)
         {
             var country = await _countryQueryRepository.GetByIdAsync(request.Id);
-            if (country == null)
+            if (country is null)
                 return new ApiResponseDTO<CountryDto>
                 {
                     IsSuccess = false,
                     Message = "Country not found"
                 };
-
             var oldCountryName = country.CountryName;
             country.CountryName = request.CountryName;
-            if (country == null || country.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
+            if (country is null || country.IsDeleted is Enums.IsDelete.Deleted)
             {
                 return new ApiResponseDTO<CountryDto>
                 {
                     IsSuccess = false,
                     Message = "Invalid CountryID. The specified Country does not exist or is inactive."
                 };
-            }           
-            var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryCode);
-            if (countryExists)
-            {
-                return new ApiResponseDTO<CountryDto>
+            }   
+                      
+            if ((byte)country.IsActive != request.IsActive)
+            {    
+                 country.IsActive =  (Enums.Status)request.IsActive;             
+                await _countryRepository.UpdateAsync(country.Id, country);
+                if (request.IsActive is 0)
+                {
+                    return new ApiResponseDTO<CountryDto>
+                    {
+                        IsSuccess = false,
+                        Message = "CountryCode DeActivated."
+                    };
+                }
+                else{
+                    return new ApiResponseDTO<CountryDto>
+                    {
+                        IsSuccess = false,
+                        Message = "CountryCode Activated."
+                    }; 
+                }                                     
+            }
+            var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryName ?? string.Empty,request.CountryCode ?? string.Empty);
+            if (countryExists != null)
+            {                   
+                await _countryRepository.UpdateAsync(countryExists.Id, countryExists); 
+                    return new ApiResponseDTO<CountryDto>
                 {
                     IsSuccess = false,
-                    Message = "CountryCode already exists"
-                };
-            }
+                    Message = $"CountryCode already exists and is {(Enums.Status) request.IsActive}."
+                };                                        
+                
+            }            
             var updatedCountryEntity = _mapper.Map<Countries>(request);
             
             var updateResult = await _countryRepository.UpdateAsync(request.Id, updatedCountryEntity);            
@@ -63,8 +86,8 @@ namespace Core.Application.Country.Commands.UpdateCountry
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: countryDto.CountryCode,
-                    actionName: countryDto.CountryName,                            
+                    actionCode: countryDto.CountryCode ?? string.Empty,
+                    actionName: countryDto.CountryName ?? string.Empty,                            
                     details: $"State '{oldCountryName}' was updated to '{countryDto.CountryName}'.  StateCode: {countryDto.CountryCode}",
                     module:"State"
                 );            
