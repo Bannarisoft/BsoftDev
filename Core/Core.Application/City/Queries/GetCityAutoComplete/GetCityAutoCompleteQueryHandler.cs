@@ -8,7 +8,6 @@ using Core.Application.Common.HttpResponse;
 namespace Core.Application.City.Queries.GetCityAutoComplete
 {
     public class GetCityAutoCompleteQueryHandler : IRequestHandler<GetCityAutoCompleteQuery, ApiResponseDTO<List<CityDto>>>
-    
     {
         private readonly ICityQueryRepository _cityRepository;
         private readonly IMapper _mapper;

@@ -9,17 +9,22 @@ namespace Core.Application.EventHandlers
     {
         private readonly IMongoDbContext _mongoDbContext;
         private readonly IIPAddressService _ipAddressService;
-        public DomainEventHandler(IMongoDbContext mongoDbContext, IIPAddressService ipAddressService)
+        private readonly ITimeZoneService _timeZoneService;
+
+        public DomainEventHandler(IMongoDbContext mongoDbContext, IIPAddressService ipAddressService, ITimeZoneService timeZoneService)
         {
             _mongoDbContext = mongoDbContext;
-             _ipAddressService = ipAddressService;
+            _ipAddressService = ipAddressService;
+            _timeZoneService = timeZoneService;  
         }
 
         public async Task Handle(AuditLogsDomainEvent notification, CancellationToken cancellationToken)
         {          
-            var userIdString = _ipAddressService.GetUserId();        
+            var userIdString = _ipAddressService.GetUserId();   
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);              
             var auditLog = new
-            {
+            {                
                 Module = notification.Module,   
                 Action = notification.ActionDetail,
                 Details = notification.Details,             
@@ -27,7 +32,7 @@ namespace Core.Application.EventHandlers
                 OS = _ipAddressService.GetUserOS(),
                 IPAddress = _ipAddressService.GetSystemIPAddress(),
                 Browser = _ipAddressService.GetUserAgent(),
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = currentTime,
                 CreatedBy =userIdString,
                 CreatedByName=_ipAddressService.GetUserName(),
             };

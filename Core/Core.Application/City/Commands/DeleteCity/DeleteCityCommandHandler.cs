@@ -1,10 +1,6 @@
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.City.Queries.GetCities;
-using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Entities;
 using Core.Domain.Enums.Common;

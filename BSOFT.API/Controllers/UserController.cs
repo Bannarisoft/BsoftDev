@@ -221,25 +221,24 @@ namespace BSOFT.API.Controllers
         public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand command)
         {       
             var response = await Mediator.Send(command);
-            if (response[0].IsSuccess)
+            if (response.IsSuccess)
             {
                 _logger.LogInformation("User {Username} fetched successfully.", command.UserName);
                 
-        return Ok(new
-        {
-            StatusCode = StatusCodes.Status200OK,
-            Message = response[0].Data.Message, // Correctly access the message
-            
-        });
-    }
-    _logger.LogWarning("Invalid username/ Email and Mobile number Does not exists.", command.UserName);
-    return BadRequest(new
-    {
-        StatusCode = StatusCodes.Status400BadRequest,
-        Message = response[0].Message // Access the message for error
-    });
-}
+              return Ok(new
+              {
+                  StatusCode = StatusCodes.Status200OK,
+                  Message = response.Data, // Correctly access the message
 
+              });
+            }
+            _logger.LogWarning("Invalid username/ Email and Mobile number Does not exists.", command.UserName);
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = response.Message // Access the message for error
+            });
+        }
         [HttpPut]
         [Route("ResetUserPassword")]
         public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand command)

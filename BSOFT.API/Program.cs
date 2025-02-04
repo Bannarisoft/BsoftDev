@@ -142,30 +142,13 @@ app.UseHangfireDashboard("/hangfire",new DashboardOptions()
 app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
 
 // Configure the HTTP request pipeline. 
-//if (app.Environment.IsDevelopment())
-//{
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseDeveloperExceptionPage(); 
-//}
-
- // Map endpoint to handle CreateStateCommand
-app.MapPost("/state", async (
-    CreateStateCommand request,
-    IMediator mediator,
-    CancellationToken cancellationToken) =>
-{
-    var result = await mediator.Send(request, cancellationToken);
-
-    
-if (!result.IsSuccess)
-    {
-        return Results.BadRequest(result);
-    }
-
-    return Results.Created($"/states/{result.Data.Id}", result.Data);
-});
-
+}
+ 
 
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing

@@ -201,6 +201,7 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
+            services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
             services.AddScoped<IChangePassword, PasswordChangeRepository>();            
             
 
@@ -210,8 +211,8 @@ namespace BSOFT.Infrastructure
             services.AddHttpClient(); 
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.Configure<SmsSettings>(configuration.GetSection("SmsSettings"));
-            services.AddScoped<IEmailService,EmailService>();            
-            services.AddScoped<ISmsService, SmsService>();
+            services.AddSingleton<IEmailService,EmailService>();            
+            services.AddSingleton<ISmsService, SmsService>();
 
             // AutoMapper profiles
             services.AddAutoMapper(

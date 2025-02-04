@@ -23,10 +23,10 @@ namespace Core.Application.UserLogin.Commands.UserLogin
 		private readonly IIPAddressService _ipAddressService;
          private readonly JwtSettings _jwtSettings;
         private readonly ILogger<UserLoginCommandHandler> _logger;
-        private readonly IMediator _mediator; 
-        private readonly TimeZoneInfo _indianZone;
+        private readonly IMediator _mediator;
+        private readonly ITimeZoneService _timeZoneService;
 
-        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository, IMediator mediator,ILogger<UserLoginCommandHandler> logger,IUserSessionRepository userSessionRepository, IHttpContextAccessor httpContextAccessor, IIPAddressService ipAddressService, IOptions<JwtSettings> jwtSettings)
+        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository, IMediator mediator,ILogger<UserLoginCommandHandler> logger,IUserSessionRepository userSessionRepository, IHttpContextAccessor httpContextAccessor, IIPAddressService ipAddressService, IOptions<JwtSettings> jwtSettings, ITimeZoneService timeZoneService)
         {
             _userRepository = userRepository;
             _userQueryRepository = userQueryRepository;
@@ -36,14 +36,8 @@ namespace Core.Application.UserLogin.Commands.UserLogin
             _ipAddressService = ipAddressService;
             _jwtSettings = jwtSettings.Value;
              _mediator = mediator; 
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _indianZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"); 
-        }
-        private DateTime GetIndianTime()
-        {
-            // Convert UTC to Indian Standard Time
-            DateTime utcNow = DateTime.UtcNow;
-            return TimeZoneInfo.ConvertTimeFromUtc(utcNow, _indianZone);
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));   
+            _timeZoneService = timeZoneService;         
         }
 
        public async Task<ApiResponseDTO<LoginResponse>> Handle(UserLoginCommand request, CancellationToken cancellationToken)
@@ -121,16 +115,17 @@ namespace Core.Application.UserLogin.Commands.UserLogin
             var httpContext = _httpContextAccessor.HttpContext;
             var browserInfo = httpContext?.Request.Headers["User-Agent"].ToString();
             string broswerDetails = browserInfo != null ? _ipAddressService.GetUserBrowserDetails(browserInfo) : string.Empty;
-            var indianTime = GetIndianTime();
-            DateTime expirationTime = indianTime.AddMinutes(_jwtSettings.ExpiryMinutes);
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);  
+            DateTime expirationTime = currentTime.AddMinutes(_jwtSettings.ExpiryMinutes);
             await _userSessionRepository.AddSessionAsync(new UserSessions
             {
                 UserId = user.UserId,
                 JwtId = jti,
                 ExpiresAt =expirationTime, // Token expiry
                 IsActive = 1,
-                CreatedAt = indianTime,
-                LastActivity =indianTime,
+                CreatedAt = currentTime,
+                LastActivity =currentTime,
                 BrowserInfo=broswerDetails
             });           
              _logger.LogInformation("JWT token generated for Username: {Username}", user.UserName);
@@ -146,7 +141,7 @@ namespace Core.Application.UserLogin.Commands.UserLogin
             await _mediator.Publish(domainEvent, cancellationToken);
             
             //Log login event via Serilog
-            Log.Information("User {UserName} logged in successfully at {Time}. Roles: {Roles}", user.UserName, DateTime.UtcNow, string.Join(", ", roles));
+            Log.Information("User {UserName} logged in successfully at {Time}. Roles: {Roles}", user.UserName, currentTime, string.Join(", ", roles));
             return new ApiResponseDTO<LoginResponse>
             {
                 IsSuccess = true,

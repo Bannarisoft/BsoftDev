@@ -10,6 +10,8 @@ using System.Collections.Concurrent;
 using Hangfire;
 using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettingsById;
 using Core.Application.Common.Interfaces.IUser;
+using Infrastructure;
+using Core.Application.Common.Interfaces;
 
 namespace BSOFT.API.Controllers
 {
@@ -23,34 +25,28 @@ namespace BSOFT.API.Controllers
         private readonly IMapper _mapper;        
         private readonly IValidator<UserLoginCommand> _userLoginCommandValidator;
         private readonly ILogger<AuthController> _logger;
-        private readonly IUserSessionRepository _userSessionRepository;
-        private readonly TimeZoneInfo _indianZone;
+        private readonly IUserSessionRepository _userSessionRepository;        
         private readonly IUserQueryRepository _userQueryRepository;
+        private readonly ITimeZoneService _timeZoneService;
 
-        public AuthController(IMediator mediator,IValidator<UserLoginCommand> userLoginCommandValidator, IMapper mapper, ILogger<AuthController> logger,IUserSessionRepository userSessionRepository, IUserQueryRepository userQueryRepository)
+        public AuthController(IMediator mediator,IValidator<UserLoginCommand> userLoginCommandValidator, IMapper mapper, ILogger<AuthController> logger,IUserSessionRepository userSessionRepository, IUserQueryRepository userQueryRepository, ITimeZoneService timeZoneService)
         {
             _mediator = mediator;
             _userLoginCommandValidator = userLoginCommandValidator;
             _mapper = mapper;
             _logger = logger;
             _userSessionRepository = userSessionRepository;            
-            _userQueryRepository = userQueryRepository;
-            _indianZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"); 
-        }
-        private DateTime GetIndianTime()
-        {
-            // Convert UTC to Indian Standard Time
-            DateTime utcNow = DateTime.UtcNow;
-            return TimeZoneInfo.ConvertTimeFromUtc(utcNow, _indianZone);
+            _userQueryRepository = userQueryRepository; 
+            _timeZoneService = timeZoneService;           
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {  
-            var indianTime = GetIndianTime();
-            string username = request.Username;
-            
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
+            string username = request.Username;            
    
             // Check if the user is locked
             if (_userLockoutInfo.TryGetValue(username, out var lockoutInfo) && lockoutInfo.IsLocked)
@@ -61,14 +57,10 @@ namespace BSOFT.API.Controllers
                     Message = $"User is locked. Try again after {lockoutInfo.UnlockTime:G}."
                 });
             }
-
-
             // Map the incoming request to a UserLoginCommand
             var command = _mapper.Map<UserLoginCommand>(request);         
             // Process the command using Mediator
             var response = await _mediator.Send(command);   
-        
-
             if (response.IsSuccess)
             {                
                 _logger.LogInformation("User {Username} authenticated successfully.", command.Username);
@@ -97,7 +89,7 @@ namespace BSOFT.API.Controllers
       
                 // Retrieve max login attempts from AdminSecuritySettings            
                 var user = await _userQueryRepository.GetByUsernameAsync(username);
-                int companyId = user.CompanyId;
+                int companyId = user?.CompanyId??0;
                 const int adminSecuritySettingId = 18; // Replace with the actual ID for your settings
     //          var adminSettings = await _mediator.Send(new GetAdminSecuritySettingsByIdQuery { Id = companyId });         
                 var adminSettings = await _mediator.Send(new GetAdminSecuritySettingsByIdQuery { Id = adminSecuritySettingId });                        
@@ -120,7 +112,7 @@ namespace BSOFT.API.Controllers
                 {
                     // Lock the user
                     userInfo.IsLocked = true; 
-                    userInfo.UnlockTime = indianTime.AddMinutes(AutoLockMinutes);
+                    userInfo.UnlockTime = currentTime .AddMinutes(AutoLockMinutes);
 
                     // Schedule Hangfire job to unlock user
                     BackgroundJob.Schedule(() => UnlockUser(username), TimeSpan.FromMinutes(AutoLockMinutes));

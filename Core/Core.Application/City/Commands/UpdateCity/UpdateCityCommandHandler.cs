@@ -1,9 +1,7 @@
-using Core.Application.Common.Interfaces;
 using MediatR;
 using Core.Domain.Entities;
 using AutoMapper;
 using Core.Application.City.Queries.GetCities;
-using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICity;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;

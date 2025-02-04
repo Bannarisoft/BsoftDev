@@ -1,39 +1,29 @@
-
-using BSOFT.Infrastructure.Services;
-using Microsoft.AspNetCore.Authorization;
+using Core.Application.Email.Commands;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BSOFT.API.Controllers
 {
+    [Route("api/email")]
     [ApiController]
-    [Route("api/[controller]")]
-    [AllowAnonymous]
     public class EmailController : ControllerBase
     {
-        private readonly EmailService _emailService;
+        private readonly IMediator _mediator;
 
-        public EmailController(EmailService emailService)
+        public EmailController(IMediator mediator)
         {
-            _emailService = emailService;
+            _mediator = mediator;
         }
 
-        [HttpPost("send-email")]
-        public async Task<IActionResult> SendEmail([FromBody] EmailRequest request)
+        [HttpPost("send")]
+        public async Task<IActionResult> SendEmail([FromBody] SendEmailCommand command)
         {
-            var isSent = await _emailService.SendEmailAsync(request.To, request.Subject, request.Body);
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok(new { Message = "Email sent successfully" });
 
-            if (isSent)
-            {
-                return Ok(new { Message = "Email sent successfully!" });
-            }
-            return BadRequest(new { Message = "Failed to send email." });
+            return BadRequest(new { Message = "Email sending failed" });
         }
     }
 
-    public class EmailRequest
-    {
-        public string To { get; set; }
-        public string Subject { get; set; }
-        public string Body { get; set; }
-    }
 }

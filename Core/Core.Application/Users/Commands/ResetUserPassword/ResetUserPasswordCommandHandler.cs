@@ -15,19 +15,23 @@ namespace Core.Application.Users.Commands.ResetUserPassword
         private readonly IMapper _mapper;
         private readonly IChangePassword _changePassword;
         private readonly IUserQueryRepository _userQueryRepository;
+        private readonly ITimeZoneService _timeZoneService;
 
         public ResetUserPasswordCommandHandler(
             IMapper mapper,
             IChangePassword changePassword,
-            IUserQueryRepository userRepository)
+            IUserQueryRepository userRepository, ITimeZoneService timeZoneService)
         {
             _mapper = mapper;
             _changePassword = changePassword;
             _userQueryRepository = userRepository;
+            _timeZoneService = timeZoneService;
         }
 
         public async Task<string> Handle(ResetUserPasswordCommand request, CancellationToken cancellationToken)
         {
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId); 
             // Check if the verification code exists in ForgotPasswordCache
             if (!ForgotPasswordCache.CodeStorage.TryGetValue(request.UserName, out var verificationCodeDetails))
             {
@@ -41,7 +45,7 @@ namespace Core.Application.Users.Commands.ResetUserPassword
             }
 
             // Check if the verification code has expired
-            if (verificationCodeDetails.ExpiryTime < DateTime.UtcNow)
+            if (verificationCodeDetails.ExpiryTime < currentTime)
             {
                 // Remove expired code from the cache
                 ForgotPasswordCache.CodeStorage.Remove(request.UserName);
@@ -60,13 +64,13 @@ namespace Core.Application.Users.Commands.ResetUserPassword
             {
                 return "Your new password cannot be the same as the old password. Please choose a different password.";
             }
-
+           
             // Update the user's password
             var passwordLog = new PasswordLog
             {
                 UserId = user.UserId,
                 PasswordHash = await _changePassword.PasswordEncode(request.Password),
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = currentTime
             };
 
             var result = await _changePassword.FirstTimeUserChangePassword(user.UserId, passwordLog);

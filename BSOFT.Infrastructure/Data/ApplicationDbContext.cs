@@ -11,11 +11,13 @@ namespace BSOFT.Infrastructure.Data
     public class ApplicationDbContext : DbContext
     {
         private readonly IIPAddressService _ipAddressService;
-         
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions, IIPAddressService ipAddressService) 
+        private readonly ITimeZoneService _timeZoneService; 
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions, IIPAddressService ipAddressService, ITimeZoneService timeZoneService) 
             : base(dbContextOptions)
         {  
-            _ipAddressService = ipAddressService;               
+            _ipAddressService = ipAddressService; 
+            _timeZoneService = timeZoneService;              
                
         }
         
@@ -100,19 +102,22 @@ namespace BSOFT.Infrastructure.Data
             string currentIp = _ipAddressService.GetSystemIPAddress();
             int userId = _ipAddressService.GetUserId(); 
             string username = _ipAddressService.GetUserName();
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);  
+            
             foreach (EntityEntry entry in ChangeTracker.Entries<BaseEntity>())
             {
                 if (entry.State == EntityState.Added)
                 {
                     entry.Property("CreatedIP").CurrentValue = currentIp;
-                    entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
+                    entry.Property("CreatedAt").CurrentValue = currentTime;
                     entry.Property("CreatedBy").CurrentValue = userId;
                     entry.Property("CreatedByName").CurrentValue = username;
                 }
                 if (entry.State == EntityState.Modified)
                 {
                     entry.Property("ModifiedIP").CurrentValue = currentIp;
-                    entry.Property("ModifiedAt").CurrentValue = DateTime.UtcNow;
+                    entry.Property("ModifiedAt").CurrentValue = currentTime;
                     entry.Property("ModifiedBy").CurrentValue = userId;
                     entry.Property("ModifiedByName").CurrentValue = username;
                 }

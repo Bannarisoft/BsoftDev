@@ -31,8 +31,7 @@ namespace Core.Application.State.Commands.CreateState
                     IsSuccess = false, 
                     Message = "Invalid CountryId. The specified country does not exist or is inactive."
                     };                     
-            }
-            //var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName,request.StateCode, request.CountryId);
+            }            
             var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName ?? string.Empty, 
                 request.StateCode ?? string.Empty,      request.CountryId ) ;
             if (stateExists!= null)

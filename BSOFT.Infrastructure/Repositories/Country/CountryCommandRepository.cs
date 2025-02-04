@@ -30,7 +30,7 @@ namespace BSOFT.Infrastructure.Repositories.Country
                 CountryToDelete.IsDeleted = country.IsDeleted;                 
                 return await _applicationDbContext.SaveChangesAsync();
             }
-            return 0; // No user found
+            return 0; 
         }
         public async Task<int> UpdateAsync(int id, Countries country)
         {
@@ -43,16 +43,13 @@ namespace BSOFT.Infrastructure.Repositories.Country
                 _applicationDbContext.Countries.Update(existingCountry);
                 return await _applicationDbContext.SaveChangesAsync();
             }
-           return 0; // No user found
+           return 0;
         }
 
         public async Task<Countries> GetCountryByCodeAsync(string countryName,string countryCode)
         {
-               var country = await _applicationDbContext.Countries
-            .FirstOrDefaultAsync(c => c.CountryName == countryName && c.CountryCode == countryCode);
-
-            return country; //?? throw new Exception("Country not found");
-            
+               return await _applicationDbContext.Countries
+            .FirstOrDefaultAsync(c => c.CountryName == countryName && c.CountryCode == countryCode) ?? new Countries();
         }
 
     }
