@@ -37,3 +37,7 @@ UserManagement.Infrastructure/Migrations/Archive/
 /UserManagement/UserManagement.API/bin
 /.vs
 /.vscode
+/UserManagement/Core/Core.Domain/obj
+/UserManagement/Core/Core.Domain/bin
+/UserManagement/Core/Core.Application/obj
+/UserManagement/Core/Core.Application/bin
