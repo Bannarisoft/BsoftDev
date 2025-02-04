@@ -24,13 +24,13 @@ namespace BSOFT.Infrastructure.Repositories.UserRoles
     }
 
         public async Task<int> DeleteAsync(int id ,UserRole userRole )
-    {
-        
+    {        
             var userroleToDelete = await _applicationDbContext.UserRole.FirstOrDefaultAsync(u => u.Id == id);
-            if (userroleToDelete != null)            {
-               
-                userroleToDelete.IsActive = userRole.IsActive;
-                return await _applicationDbContext.SaveChangesAsync();
+            if (userroleToDelete != null)            
+            {                              
+                userroleToDelete.IsDeleted = userRole.IsDeleted;
+                 await _applicationDbContext.SaveChangesAsync();
+                return  1;
             }
             return 0; // No user found
     }

@@ -31,7 +31,7 @@ namespace BSOFT.Infrastructure.Repositories.UserRoles
     {
         //return await _applicationDbContext.UserRole.AsNoTracking().FirstOrDefaultAsync(b=>b.Id==id);     
 
-          const string query = "SELECT RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole WHERE Id = @Id";
+          const string query = "SELECT Id,RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole WHERE Id = @Id";
           return await _dbConnection.QueryFirstOrDefaultAsync<UserRole>(query, new { id });
     
     }   
@@ -51,7 +51,7 @@ namespace BSOFT.Infrastructure.Repositories.UserRoles
             }
 
             const string query = @"
-                 select Id,RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole 
+                 SELECT  Id,RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole 
             WHERE RoleName LIKE @searchTerm OR Id LIKE @searchTerm and IsActive =1
             ORDER BY RoleName";
                 

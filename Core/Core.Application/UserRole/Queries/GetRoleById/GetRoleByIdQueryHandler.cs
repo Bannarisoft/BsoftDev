@@ -57,16 +57,16 @@ namespace Core.Application.UserRole.Queries.GetRoleById
                 // Publish domain event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetById",
-                    actionCode: roleDto.UserRoleId.ToString(),
+                    actionCode: roleDto.RoleName,
                     actionName: roleDto.RoleName,
-                    details: $"UserRole '{roleDto.RoleName}' was fetched. RoleID: {roleDto.UserRoleId}.",
+                    details: $"UserRole '{roleDto.RoleName}' was fetched. RoleID: {roleDto.Id}.",
                     module: "UserRole"
                 );
 
-                _logger.LogInformation("Publishing AuditLogsDomainEvent for UserRole ID: {Id}.", roleDto.UserRoleId);
+                _logger.LogInformation("Publishing AuditLogsDomainEvent for UserRole ID: {Id}.", roleDto.Id);
                 await _mediator.Publish(domainEvent, cancellationToken);
 
-                _logger.LogInformation("Returning success response for UserRole ID: {Id}.", roleDto.UserRoleId);
+                _logger.LogInformation("Returning success response for UserRole ID: {Id}.", roleDto.Id);
                 return new ApiResponseDTO<GetUserRoleDto>
                 {
                     IsSuccess = true,

@@ -42,12 +42,14 @@ namespace BSOFT.Infrastructure.Repositories.PasswordComplexityRule
 
           public async Task<int> DeleteAsync(int id ,Core.Domain.Entities.PasswordComplexityRule pwdcomplexityrule )
            {                        
+
             var PwdcomplexityruleToDelete = await _applicationDbContext.PasswordComplexityRule.FirstOrDefaultAsync(u => u.Id == id);
             
             if (PwdcomplexityruleToDelete != null)
             {   
                  PwdcomplexityruleToDelete.IsDeleted = pwdcomplexityrule.IsDeleted;
-                return await _applicationDbContext.SaveChangesAsync();
+                 await _applicationDbContext.SaveChangesAsync();
+                 return 1;
             }
             return 0; 
            }

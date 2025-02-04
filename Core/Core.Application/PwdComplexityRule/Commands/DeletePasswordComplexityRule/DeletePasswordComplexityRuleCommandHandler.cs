@@ -37,18 +37,7 @@ namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRu
              _logger.LogInformation("PasswordComplexityRule  with ID {Id} found. Proceeding with deletion.", request.Id);
 
              var userrole = await _IpasswordComplexityRepository.DeleteAsync(request.Id, PasswordComplexityRulemap);
-                           // Check if department exists
-            // var passwordComplexityRules = await _passwordComplexityRuleQueryRepository.GetByIdAsync(request.Id);
-            // if (passwordComplexityRules == null)
-            // {
-            //     _logger.LogWarning("passwordComplexityRule with ID {Id} not found.", request.Id);
-            //     return new ApiResponseDTO<int>
-            //     {
-            //         IsSuccess = false,
-            //         Message = "passwordComplexityRule not found",
-            //         Data = 0
-            //     };
-            // }
+            
                _logger.LogInformation("Password Complexity Rule with ID {Id} found. Proceeding with deletion.", request.Id);
                  // Map request to entity and delete
             var updatedpasswordComplexity = _Imapper.Map<Core.Domain.Entities.PasswordComplexityRule>(request);
@@ -64,7 +53,6 @@ namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRu
                     Message = "Failed to delete Password Complexity /Deleted"                   
                 };
             }
-
                 _logger.LogInformation("Password Complexity Rule with ID: {Id} deleted successfully.", request.Id);
 
                 // Publish domain event
@@ -85,10 +73,7 @@ namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRu
                     Message = " Password Complexity Rule deleted successfully"
                    
                     
-                };  
-                
-     
-       
+                };                              
          
       }
     }

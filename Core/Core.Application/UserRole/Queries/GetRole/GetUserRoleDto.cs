@@ -8,7 +8,7 @@ namespace Core.Application.UserRole.Queries.GetRole
 {
     public class GetUserRoleDto
     {
-        public int UserRoleId  { get; set; }
+        public int Id  { get; set; }
         public string? RoleName { get; set; }
         public string? Description { get; set; }
         public int CompanyId { get; set; }
