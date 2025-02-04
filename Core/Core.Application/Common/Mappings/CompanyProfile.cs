@@ -20,15 +20,13 @@ namespace Core.Application.Common.Mappings
                  .ForMember(dest => dest.CompanyAddress, opt => opt.MapFrom(src => src.CompanyAddress))
                  .ForMember(dest => dest.CompanyContact, opt => opt.MapFrom(src => src.CompanyContact))
                  .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
-                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
-                 .ForMember(dest => dest.Logo, opt => opt.Ignore());
+                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
                  CreateMap<UpdateCompanyDTO, Company>()
                 
                  .ForMember(dest => dest.CompanyAddress, opt => opt.MapFrom(src => src.CompanyAddress))
                  .ForMember(dest => dest.CompanyContact, opt => opt.MapFrom(src => src.CompanyContact))
-                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive))
-                 .ForMember(dest => dest.Logo, opt => opt.Ignore());
+                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
                  
               CreateMap<CompanyAddressDTO, CompanyAddress>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())

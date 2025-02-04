@@ -5,7 +5,7 @@
     },
     {
         "rule": "Email",      
-        "pattern": "^[\\w-\\.]+@[\\w-]+\\.[a-zA-Z]{2,}$", 
+        "pattern": "^[\\w.-]+@(gmail\\.com|bannarimills\\.co\\.in)$", 
         "error": "Invalid email address format."
     } , 
     {
@@ -61,7 +61,7 @@
     },
     {
         "rule": "Website",  
-        "pattern": "^(https?:\\/\\/)(([\\w-]+\\.)+[\\w-]+)(\\/[\\w\\-\\/]*)?\\/?$",
+        "pattern": "^(https?:\\/\\/)[\\w.-]+",
         "error": "Website must be a valid URL starting with http or https."
     },
     {

@@ -63,11 +63,9 @@ namespace BSOFT.Infrastructure.Data.Configurations
             .HasColumnType("varchar(255)");
 
             builder.Property(b => b.ModifiedByName)
-            .IsRequired()
             .HasColumnType("varchar(50)");
 
             builder.Property(b => b.ModifiedIP)
-            .IsRequired()
             .HasColumnType("varchar(255)");
         }
     }
