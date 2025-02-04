@@ -57,13 +57,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
          options.Events = new JwtBearerEvents
         {
             OnAuthenticationFailed = context =>
-            {
-                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+            {            
                 return Task.CompletedTask;
             },
             OnTokenValidated = context =>
-            {
-                Console.WriteLine("Token validated successfully");
+            {             
                 return Task.CompletedTask;
             }
          };
@@ -122,6 +120,8 @@ builder.Services.AddCors(options =>
 });
 
 
+
+
 var app = builder.Build();
  
 // Enable Hangfire Dashboard
@@ -139,7 +139,7 @@ app.UseHangfireDashboard("/hangfire",new DashboardOptions()
 );
 
 // Register SeriLoggingMiddleware
-app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
+
 
 // Configure the HTTP request pipeline. 
 if (app.Environment.IsDevelopment())
@@ -158,5 +158,6 @@ app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseMiddleware<BSOFT.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
 app.UseAuthorization();
+app.UseSession();
 app.MapControllers();
 app.Run();

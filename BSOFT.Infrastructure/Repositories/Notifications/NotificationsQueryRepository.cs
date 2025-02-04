@@ -33,14 +33,18 @@ namespace BSOFT.Infrastructure.Repositories.Notifications
 
         public async Task<(int PwdExpiryDays, int PwdExpiryAlertDays)> GetPasswordExpiryDays()
         {
-             var query = @"SELECT PasswordExpiryDays, PasswordExpiryAlertDays FROM AppSecurity.AdminSecuritySettings";
+             var query = @"
+             SELECT PasswordExpiryDays, PasswordExpiryAlertDays 
+             FROM AppSecurity.AdminSecuritySettings";
              var result = await _dbConnection.QueryFirstOrDefaultAsync<(int PwdExpiryDays, int PwdExpiryAlertDays)>(query);
              return result;
         }
 
         public async Task<int> GetResetCodeExpiryMinutes()
         {
-            var query = @"SELECT PasswordResetCodeExpiryMinutes FROM AppSecurity.AdminSecuritySettings";
+            var query = @"
+            SELECT PasswordResetCodeExpiryMinutes 
+            FROM AppSecurity.AdminSecuritySettings";
             var result = await _dbConnection.QueryFirstOrDefaultAsync<int>(query);
             return result;
         }

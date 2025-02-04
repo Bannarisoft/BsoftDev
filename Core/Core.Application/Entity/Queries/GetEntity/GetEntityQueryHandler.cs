@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Entity.Queries.GetEntity
 {
-    public class GetEntityQueryHandler : IRequestHandler<GetEntityQuery, ApiResponseDTO<List<EntityDto>>>
+    public class GetEntityQueryHandler : IRequestHandler<GetEntityQuery, ApiResponseDTO<List<GetEntityDTO>>>
     {
          private readonly IEntityQueryRepository _entityRepository;        
         private readonly IMapper _mapper;
@@ -27,22 +27,22 @@ namespace Core.Application.Entity.Queries.GetEntity
             _mediator = mediator;
             _logger = logger?? throw new ArgumentNullException(nameof(logger));
         }
-        public async Task<ApiResponseDTO<List<EntityDto>>> Handle(GetEntityQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<GetEntityDTO>>> Handle(GetEntityQuery request, CancellationToken cancellationToken)
         {
           
-               _logger.LogInformation("Fetching Entity Request started: {request}", request);
+               _logger.LogInformation($"Fetching Entity Request started: {request}");
                 var newentity = await _entityRepository.GetAllEntityAsync();
-                if (newentity == null || !newentity.Any() || newentity.Count == 0)
+                if (newentity is null || !newentity.Any() || newentity.Count == 0)
                 {
-                 _logger.LogWarning("No Entity Record {Entity} not found in DB.", newentity.Count);
-                     return new ApiResponseDTO<List<EntityDto>>
+                 _logger.LogWarning($"No Entity Record {newentity.Count} not found in DB.");
+                     return new ApiResponseDTO<List<GetEntityDTO>>
                      {
                          IsSuccess = false,
                          Message = "No entity found"
                      };
                 }
-                var entitylist = _mapper.Map<List<EntityDto>>(newentity);
-                _logger.LogInformation("Fetching Entity Request Completed: {request}", entitylist.Count);
+                var entitylist = _mapper.Map<List<GetEntityDTO>>(newentity);
+                _logger.LogInformation($"Fetching Entity Request Completed: {entitylist.Count}");
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetEntityQuery",
@@ -52,8 +52,8 @@ namespace Core.Application.Entity.Queries.GetEntity
                     module:"Entity"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                _logger.LogInformation("Entity {Entities} Listed successfully.", entitylist.Count);
-                return new ApiResponseDTO<List<EntityDto>>
+                _logger.LogInformation($"Entity {entitylist.Count} Listed successfully.");
+                return new ApiResponseDTO<List<GetEntityDTO>>
                 { 
                     IsSuccess = true, 
                     Message = "Success", 

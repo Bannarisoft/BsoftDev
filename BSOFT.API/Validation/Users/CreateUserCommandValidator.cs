@@ -80,9 +80,7 @@ namespace BSOFT.API.Validation.Users
                             .WithMessage($"{nameof(CreateUserCommand.UserType)} {rule.Error}");
                         break;
 
-                    default:
-                        // Handle unknown rule (log or throw)
-                        // Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                    default:                        
                         break;
                 }
             }

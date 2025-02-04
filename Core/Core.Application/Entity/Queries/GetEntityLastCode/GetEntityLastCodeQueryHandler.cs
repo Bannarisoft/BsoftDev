@@ -23,9 +23,9 @@ namespace Core.Application.Entity.Queries.GetEntityLastCode
 
         public async Task<ApiResponseDTO<string>> Handle(GetEntityLastCodeQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Fetching EntityCode Request started: {request}", request);
+            _logger.LogInformation($"Fetching EntityCode Request started: {request}");
            var entityCode = await _entityRepository.GenerateEntityCodeAsync();
-           _logger.LogInformation("Fetching EntityCode Request Completed: {request}", entityCode);
+           _logger.LogInformation($"Fetching EntityCode Request Completed: {entityCode}");
            return new ApiResponseDTO<string> { IsSuccess = true, Message = "Success", Data = entityCode };
         }       
 

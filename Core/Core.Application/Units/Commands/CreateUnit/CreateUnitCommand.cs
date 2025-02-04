@@ -8,8 +8,14 @@ namespace Core.Application.Units.Commands.CreateUnit
 {
     public class CreateUnitCommand : IRequest<ApiResponseDTO<int>> 
     {
-         public UnitDto UnitDto { get; set; }
-         
+    public string? UnitName { get; set; }
+    public string? ShortName { get; set; }
+    public int CompanyId { get; set; }
+    public int DivisionId { get; set; }
+    public string? UnitHeadName { get; set; }
+    public string? CINNO { get; set; }
+    public UnitAddressDto? UnitAddressDto { get; set; } 
+    public UnitContactsDto? UnitContactsDto { get; set;}   
     }
 
 

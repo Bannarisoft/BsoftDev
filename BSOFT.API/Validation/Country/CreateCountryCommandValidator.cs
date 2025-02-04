@@ -49,9 +49,7 @@ namespace BSOFT.API.Validation.Country
                             .MaximumLength(countryCodeMaxLength) // Dynamic value from MaxLengthProvider
                             .WithMessage($"{nameof(CreateCountryCommand.CountryCode)} {rule.Error} {countryCodeMaxLength}");
                             break;                 
-                    default:
-                        // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                    default:                        
                         break;
                 }
             }

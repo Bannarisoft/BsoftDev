@@ -22,14 +22,21 @@ namespace BSOFT.Infrastructure.Repositories.Entities
 
         public async Task<List<Entity>> GetByIdAsync(int id)
         {
-             const string query = "SELECT * FROM AppData.Entity WHERE Id = @Id";
+             const string query = @"
+             SELECT * 
+             FROM AppData.Entity 
+             WHERE Id = @Id and IsDeleted = 0
+             ORDER BY CreatedAt DESC";
              var entityList = await _dbConnection.QueryAsync<Entity>(query, new { id });
              return entityList?.ToList() ?? new List<Entity>();
         }
 
         public async Task<string> GenerateEntityCodeAsync()
         {
-            var query = @"SELECT TOP 1 EntityCode FROM AppData.Entity ORDER BY Id DESC";
+            var query = @"
+            SELECT TOP 1 EntityCode 
+            FROM AppData.Entity 
+            ORDER BY Id DESC";
             var lastCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
 
             if (string.IsNullOrEmpty(lastCode))
@@ -50,10 +57,10 @@ namespace BSOFT.Infrastructure.Repositories.Entities
             }
 
             const string query = @"
-                 SELECT *
-            FROM AppData.Entity
-            WHERE EntityName LIKE @SearchPattern OR EntityCode LIKE @SearchPattern and IsActive = 1
-            ORDER BY EntityName";
+                SELECT *
+                FROM AppData.Entity
+                WHERE EntityName LIKE @SearchPattern OR EntityCode LIKE @SearchPattern and IsDeleted = 0
+                ORDER BY CreatedAt DESC";
                 
             // Update the object to use SearchPattern instead of Name
             var Entitylist = await _dbConnection.QueryAsync<Entity>(query, new { SearchPattern = $"%{searchPattern}%" });
@@ -64,7 +71,8 @@ namespace BSOFT.Infrastructure.Repositories.Entities
         {          
              const string query = @"
               SELECT *
-            FROM AppData.Entity";
+              FROM AppData.Entity WHERE IsDeleted = 0 
+              ORDER BY CreatedAt DESC";
             return (await _dbConnection.QueryAsync<Entity>(query)).ToList() ?? new List<Entity>();
         }
 

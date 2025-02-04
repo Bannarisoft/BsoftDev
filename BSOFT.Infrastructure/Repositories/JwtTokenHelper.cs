@@ -171,9 +171,7 @@ namespace BSOFT.Infrastructure.Repositories
                 return principal; // Return claims principal on successful validation
             }
             catch (Exception ex)
-            {
-                // Log the exception and rethrow
-                Console.WriteLine($"Token validation failed: {ex.Message}");
+            {                
                 throw new SecurityTokenException("Invalid or decryption failed for token.", ex);
             }
         }

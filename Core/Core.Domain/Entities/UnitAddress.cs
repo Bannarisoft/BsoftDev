@@ -13,7 +13,7 @@ namespace Core.Domain.Entities
 
         public int CityId { get; set; }
 
-        public string AddressLine1 { get; set; }
+        public string? AddressLine1 { get; set; }
 
 
         public string? AddressLine2 { get; set; }
@@ -21,12 +21,12 @@ namespace Core.Domain.Entities
         public int PinCode  { get; set; }
         
     
-        public string  ContactNumber { get; set; }
+        public string?  ContactNumber { get; set; }
 
       
         public string?  AlternateNumber { get; set; }
 
-         public Unit Unit { get; set; }
+         public Unit? Unit { get; set; }
          
 
     }

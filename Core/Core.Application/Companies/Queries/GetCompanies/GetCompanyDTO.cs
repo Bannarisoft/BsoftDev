@@ -18,6 +18,7 @@ namespace Core.Application.Companies.Queries.GetCompanies
         public int YearOfEstablishment { get; set; }
         public string Website { get; set; }
         public string Logo { get; set; }
+        public string LogoBase64 { get; set; }
         public int EntityId { get; set; }
         public Status IsActive { get; set; }
         public IsDelete IsDeleted { get; set; }

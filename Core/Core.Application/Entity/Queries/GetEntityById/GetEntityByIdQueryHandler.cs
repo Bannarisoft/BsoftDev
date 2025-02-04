@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Entity.Queries.GetEntityById
 {
-    public class GetEntityByIdQueryHandler : IRequestHandler<GetEntityByIdQuery, ApiResponseDTO<List<EntityDto>>>
+    public class GetEntityByIdQueryHandler : IRequestHandler<GetEntityByIdQuery, ApiResponseDTO<List<GetEntityDTO>>>
     {
         private readonly IEntityQueryRepository _entityRepository;        
         private readonly IMapper _mapper;
@@ -27,21 +27,21 @@ namespace Core.Application.Entity.Queries.GetEntityById
            _logger = logger?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<ApiResponseDTO<List<EntityDto>>>  Handle(GetEntityByIdQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDTO<List<GetEntityDTO>>>  Handle(GetEntityByIdQuery request, CancellationToken cancellationToken)
     {
-                _logger.LogInformation("Fetching Entity Request started: {request}", request.EntityId);
+                _logger.LogInformation($"Fetching Entity Request started: {request.EntityId}");
                 var entitylist = await _entityRepository.GetByIdAsync(request.EntityId);
 
-                if (entitylist == null || !entitylist.Any())
+                if (entitylist is null || !entitylist.Any())
                 {
-                     _logger.LogWarning("No Entity Record {Entity} not found in DB.", request.EntityId);
-                     return new ApiResponseDTO<List<EntityDto>>
+                     _logger.LogWarning($"No Entity Record {request.EntityId} not found in DB.");
+                     return new ApiResponseDTO<List<GetEntityDTO>>
                      {
                          IsSuccess = false,
                          Message = "Entity not found"
                      };
                 }
-                var entityDto = _mapper.Map<List<EntityDto>>(entitylist);
+                var entityDto = _mapper.Map<List<GetEntityDTO>>(entitylist);
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetEntityByIdQuery",
@@ -51,8 +51,8 @@ namespace Core.Application.Entity.Queries.GetEntityById
                     module:"Entity"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                _logger.LogInformation("Entity {Entities} Listed successfully.", entityDto.Count);
-                return new ApiResponseDTO<List<EntityDto>>
+                _logger.LogInformation($"Entity {entityDto.Count} Listed successfully.");
+                return new ApiResponseDTO<List<GetEntityDTO>>
                 {
                     IsSuccess = true,
                     Message = "Entity Fetched Successfully",

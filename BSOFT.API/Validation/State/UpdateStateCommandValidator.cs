@@ -50,9 +50,7 @@ namespace BSOFT.API.Validation.State
                             .MaximumLength(stateCodeMaxLength) // Dynamic value from MaxLengthProvider
                             .WithMessage($"{nameof(CreateStateCommand.StateCode)} {rule.Error} {stateCodeMaxLength}");
                         break;                                 
-                    default:
-                        // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                    default:                        
                         break;
                 }
             }
