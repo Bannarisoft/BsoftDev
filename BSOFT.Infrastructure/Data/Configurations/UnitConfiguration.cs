@@ -1,4 +1,5 @@
 using Core.Domain.Entities;
+using Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -62,6 +63,7 @@ namespace BSOFT.Infrastructure.Data.Configurations
             .IsRequired();
 
 
+
         builder.Property(u => u.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
@@ -88,13 +90,15 @@ namespace BSOFT.Infrastructure.Data.Configurations
             builder.Property(b => b.ModifiedIP)
             .HasColumnType("varchar(255)");
             
-        builder.HasMany(u => u.UnitAddress)
+        builder.HasOne(u => u.UnitAddress)
             .WithOne(ua => ua.Unit)
-            .HasForeignKey(ua => ua.UnitId);
 
-        builder.HasMany(u => u.UnitContacts)
+            .HasForeignKey<UnitAddress>(ua => ua.UnitId);
+
+
+        builder.HasOne(u => u.UnitContacts)
             .WithOne(uc => uc.Unit)
-            .HasForeignKey(uc => uc.UnitId);
+            .HasForeignKey<UnitContacts>(uc => uc.UnitId);
         }
     }
 }

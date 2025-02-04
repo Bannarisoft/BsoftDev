@@ -34,9 +34,9 @@ namespace BSOFT.API.Controllers
         {
             var result = await Mediator.Send(new GetUnitQuery());
             
-        if (result == null || result.Data == null || !result.Data.Any())
+        if (result is null || result.Data is null || !result.Data.Any())
         {
-            _logger.LogInformation("No Unit Record {Unit} not found in DB.", result.Data);
+            _logger.LogInformation($"No Unit Record {result.Data} not found in DB.");
             return NotFound(new
             {
                 message = result.Message,
@@ -44,7 +44,7 @@ namespace BSOFT.API.Controllers
             });
         }
          
-        _logger.LogInformation("Unit {Units} Listed successfully.", result.Data.Count);
+        _logger.LogInformation($"Unit {result.Data.Count} Active Listed successfully.");
         return Ok(new
         {
             message = "Units retrieved successfully.",
@@ -60,7 +60,7 @@ namespace BSOFT.API.Controllers
         {
              if (id <= 0)
         {
-            _logger.LogWarning("Unit {UnitId} not found.", id);
+            _logger.LogWarning($"UnitId {id} not found.");
             
             return BadRequest(new
                 {
@@ -71,7 +71,7 @@ namespace BSOFT.API.Controllers
             var unit = await Mediator.Send(new GetUnitByIdQuery() { Id = id});
            if (unit.IsSuccess)
             {
-               _logger.LogInformation("Unit {UniTd} Listed successfully.", unit.Data);
+               _logger.LogInformation($"UnitId {unit.Data} Listed successfully.");
                 return Ok(new
                 {
                     message = unit.Message,
@@ -79,7 +79,7 @@ namespace BSOFT.API.Controllers
                     data = unit.Data
                 });
             }
-            _logger.LogWarning("Unit {UnitId} Not found.", unit.Data);
+            _logger.LogWarning($"UnitId {unit.Data} Not found.");
            return NotFound(new
             {
                 message = unit.Message,
@@ -89,10 +89,10 @@ namespace BSOFT.API.Controllers
         }
 
     [HttpPost]
-    public async Task<IActionResult> CreateUnitAsync(CreateUnitCommand command)
+    public async Task<IActionResult> CreateUnitAsync(CreateUnitCommand createUnitCommand)
     {
-        var validationResult = await _createUnitCommandValidator.ValidateAsync(command);
-        _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
+        var validationResult = await _createUnitCommandValidator.ValidateAsync(createUnitCommand);
+        _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
         if (!validationResult.IsValid)
         {
           return BadRequest(
@@ -100,14 +100,14 @@ namespace BSOFT.API.Controllers
             {
                 StatusCode = StatusCodes.Status400BadRequest,
                 message = "Validation failed",
-                errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                errors = validationResult.Errors.Select(e => e.ErrorMessage)
             }
           );
         }
-        var createdUnit = await Mediator.Send(command);
+        var createdUnit = await Mediator.Send(createUnitCommand);
          if(createdUnit.IsSuccess)
          {
-            _logger.LogInformation("Unit {UnitId} created successfully.", createdUnit.Data);
+            _logger.LogInformation($"UnitId {createdUnit.Data} created successfully.");
              return Ok(new
              {
                  message = createdUnit.Message,
@@ -115,7 +115,7 @@ namespace BSOFT.API.Controllers
                  data = createdUnit.Data
              });
          }
-         _logger.LogWarning("Unit {UnitId} Creation failed.", createdUnit.Data);
+         _logger.LogWarning($"UnitId {createdUnit.Data} Creation failed.");
         return BadRequest(new
         {
             message = createdUnit.Message,
@@ -126,24 +126,24 @@ namespace BSOFT.API.Controllers
 
 
     [HttpPut("update")]
-    public async Task<IActionResult> UpdateUnitAsync( UpdateUnitCommand command)
+    public async Task<IActionResult> UpdateUnitAsync( UpdateUnitCommand updateUnitCommand)
     {
-        var validationResult = await _updateUnitCommandValidator.ValidateAsync(command);
+        var validationResult = await _updateUnitCommandValidator.ValidateAsync(updateUnitCommand);
         if (!validationResult.IsValid)
         { 
-             _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
+            _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
              return BadRequest(new
              {
                  StatusCode = StatusCodes.Status400BadRequest,
                  message = "Validation failed",
-                 errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                 errors = validationResult.Errors.Select(e => e.ErrorMessage)
              });
         }
        
-        var result = await Mediator.Send(command);
+        var result = await Mediator.Send(updateUnitCommand);
         if(result.IsSuccess)
         {
-            _logger.LogInformation("Unit {UnitId} updated successfully.", result.Data);
+            _logger.LogInformation($"UnitId {result.Data} updated successfully.");
             return Ok(new
             {
                 message = result.Message,
@@ -151,7 +151,7 @@ namespace BSOFT.API.Controllers
              
             });
         }
-         _logger.LogWarning("Unit {UnitId} updated Failed.", result.Data);
+         _logger.LogWarning($"UnitId {result.Data} updated Failed.");
         return BadRequest(new
         {
             message = result.Message,
@@ -160,15 +160,15 @@ namespace BSOFT.API.Controllers
     }
 
 
-    [HttpDelete("delete")]
-    public async Task<IActionResult> DeleteUnitAsync(DeleteUnitCommand command)
+    [HttpDelete]
+    public async Task<IActionResult> DeleteUnitAsync(DeleteUnitCommand deleteUnitCommand)
     {
         
-       var result = await Mediator.Send(command);
+       var result = await Mediator.Send(deleteUnitCommand);
 
         if (result.IsSuccess)
         {
-            _logger.LogInformation("Unit {UnitId} deleted successfully.", result.Data);
+            _logger.LogInformation($"UnitId {result.Data} deleted successfully.");
             return Ok(new
             {
                 message = result.Message,
@@ -176,7 +176,7 @@ namespace BSOFT.API.Controllers
                 
             });
         }
-        _logger.LogWarning("Unit {UnitId} deleted Failed.", result.Data);
+        _logger.LogWarning($"UnitId {result.Data} deleted Failed.");
         return BadRequest(new
         {
             message = result.Message,
@@ -184,13 +184,13 @@ namespace BSOFT.API.Controllers
         });
     }
 
-       [HttpGet("GetUnitSearch")]
-        public async Task<IActionResult> GetUnit([FromQuery] string searchPattern)
+       [HttpGet("unit/by-name/{name}")]
+        public async Task<IActionResult> GetUnit([FromRoute] string name)
         {
             // Check if searchPattern is provided
-        if (string.IsNullOrEmpty(searchPattern))
+        if (string.IsNullOrEmpty(name))
         {
-            _logger.LogInformation("Search pattern {searchPattern} cannot be empty.", searchPattern);
+            _logger.LogInformation($"Search pattern {name} cannot be empty.");
             return BadRequest(new 
             { 
                 StatusCode = StatusCodes.Status400BadRequest,
@@ -198,11 +198,11 @@ namespace BSOFT.API.Controllers
             });
           
         }
-            var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = searchPattern});
-             _logger.LogInformation("Search pattern: {SearchPattern}", searchPattern);
+            var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = name});
+             _logger.LogInformation("Search pattern: {SearchPattern}", name);
             if(units.IsSuccess)
             {
-                _logger.LogInformation("Unit {Units} Listed successfully.", units.Data.Count);
+                _logger.LogInformation($"Unit {units.Data.Count} Listed successfully.");
                 return Ok(new
                 {
                     message = units.Message,
@@ -210,7 +210,7 @@ namespace BSOFT.API.Controllers
                     data = units.Data
                 });
             }
-            _logger.LogWarning("No Unit Record {Unit} not found in DB.", units.Data);
+            _logger.LogWarning($"No Unit Record in the {name} not found in DB.");
             return NotFound(new
             {
                 message = units.Message,

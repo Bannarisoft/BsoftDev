@@ -20,7 +20,7 @@ namespace BSOFT.Infrastructure.Repositories
         }
         public async Task<AuditLogs> CreateAsync(AuditLogs auditLog)
         {
-            if (auditLog == null) throw new ArgumentNullException(nameof(auditLog));
+            if (auditLog is null) throw new ArgumentNullException(nameof(auditLog));
             await _mongoDbContext.GetCollection<dynamic>("AuditLogs").InsertOneAsync(auditLog);
             return auditLog;
         }

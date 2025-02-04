@@ -32,32 +32,26 @@ namespace Core.Application.Units.Commands.CreateUnit
         {
        
             
-            _logger.LogInformation("Starting creation process for Unit: {UnitName}", request.UnitDto.UnitName);
-              var unit = _mapper.Map<Core.Domain.Entities.Unit>(request.UnitDto);
+            _logger.LogInformation($"Starting creation process for Unit: {request.UnitName}");
+             // Check if Unit Name already exists
+            var exists = await _iUnitRepository.ExistsByCodeAsync(request.UnitName);
+            if (exists)
+            {
+                 _logger.LogWarning($"Unit Name {request.UnitName} already exists.");
+                 return new ApiResponseDTO<int>
+            {
+            IsSuccess = false,
+            Message = "Unit Name already exists."
+        
+            };
+            }
+              var unit = _mapper.Map<Core.Domain.Entities.Unit>(request);
               var result =  await _iUnitRepository.CreateUnitAsync(unit);
-            _logger.LogInformation("Completed creation process for Unit: {UnitName}", request.UnitDto.UnitName);
+            _logger.LogInformation($"Completed creation process for Unit: {request.UnitName}");
             
 
               var unitId = unit.Id;
-              _logger.LogInformation("Unit {UnitId} created successfully", unitId);
-
-                foreach (var addressDto in request.UnitDto.UnitAddressDto)
-              {
-                 _logger.LogInformation("Starting creation process for UnitAddress: {UnitId}", unitId);
-                  var address = _mapper.Map<UnitAddress>(addressDto);
-                  address.UnitId = unitId;
-                  await _iUnitRepository.CreateUnitAddressAsync(address);
-                  _logger.LogInformation("Completed creation process for UnitAddress: {UnitId}", unitId);
-              }
-
-                foreach (var contactDto in request.UnitDto.UnitContactsDto)
-                {   
-                _logger.LogInformation("Starting creation process for UnitContacts: {UnitId}", unitId);
-                  var contact = _mapper.Map<UnitContacts>(contactDto);
-                  contact.UnitId = unitId;
-                  await _iUnitRepository.CreateUnitContactsAsync(contact);
-                 _logger.LogInformation("Completed creation process for UnitContacts: {UnitId}", unitId);
-                }
+              _logger.LogInformation($"Unit {unitId} created successfully");
 
                    //Domain Event
                   var domainEvent = new AuditLogsDomainEvent(
@@ -70,7 +64,7 @@ namespace Core.Application.Units.Commands.CreateUnit
                   await _Imediator.Publish(domainEvent, cancellationToken);
                   if (result > 0)
                   {
-                     _logger.LogInformation("Unit {UnitId} created successfully", unitId);
+                     _logger.LogInformation($"Unit {unitId} created successfully");
                         return new ApiResponseDTO<int>
                        {
                            IsSuccess = true,
@@ -78,7 +72,7 @@ namespace Core.Application.Units.Commands.CreateUnit
                            Data = unitId
                       };
                  }
-                 _logger.LogWarning("Unit {UnitId} Creation Failed", unitId);
+                 _logger.LogWarning($"Unit {unitId} Creation Failed" );
                   return new ApiResponseDTO<int>
                   {
                       IsSuccess = false,

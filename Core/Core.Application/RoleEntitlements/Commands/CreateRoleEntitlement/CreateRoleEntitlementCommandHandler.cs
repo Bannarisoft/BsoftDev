@@ -11,6 +11,7 @@ using Core.Application.Common.Interfaces.IRoleEntitlement;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {

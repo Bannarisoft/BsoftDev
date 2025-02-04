@@ -64,23 +64,7 @@ namespace BSOFT.API.Controllers
 
 
             // Map the incoming request to a UserLoginCommand
-            var command = _mapper.Map<UserLoginCommand>(request);            
-           
-           /*  // Validate the command
-            var validationResult = await _userLoginCommandValidator.ValidateAsync(command);
-
-            if (!validationResult.IsValid)
-            {
-                _logger.LogWarning("Validation failed for login request: {Errors}", 
-                    string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                });
-            } */
-
+            var command = _mapper.Map<UserLoginCommand>(request);         
             // Process the command using Mediator
             var response = await _mediator.Send(command);   
         
@@ -101,7 +85,7 @@ namespace BSOFT.API.Controllers
             _logger.LogWarning("Authentication failed for user: {Username}. Reason: {Message}", 
                 command.Username, response.Message);
 
-            if (response.Message == "Invalid username or password.")
+            if (response.Message is "Invalid username or password.")
             {
                // Track invalid login attempts
                 if (!_userLockoutInfo.ContainsKey(username))
@@ -191,7 +175,7 @@ namespace BSOFT.API.Controllers
 
             var session = await _userSessionRepository.GetSessionByJwtIdAsync(jwtId);
 
-            if (session == null)
+            if (session is null)
             {
                 //return NotFound(new { Message = "Session not found for the provided JWT ID." });
                 return NotFound(new

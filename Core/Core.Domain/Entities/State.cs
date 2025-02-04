@@ -14,6 +14,6 @@ namespace Core.Domain.Entities
         public int CountryId { get; set; }
 
         public Countries? Countries { get; set; }  
-        public ICollection<Cities> Cities { get; set; } = new List<Cities>(); 
+        public ICollection<Cities> Cities { get; set; } = new List<Cities>();
     }
 }

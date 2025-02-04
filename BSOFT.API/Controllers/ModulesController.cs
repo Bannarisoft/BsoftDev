@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BSOFT.Application.Modules.Commands.DeleteModule;
 using Microsoft.AspNetCore.Authorization;
+using Core.Application.Modules.Queries.GetModuleById;
 
 namespace BSOFT.API.Controllers
 {
@@ -45,11 +46,11 @@ namespace BSOFT.API.Controllers
         }
 
     [HttpPost]
-    [Route("Create")]
-    public async Task<IActionResult> CreateModule([FromBody] CreateModuleCommand command)
+    public async Task<IActionResult> CreateModule([FromBody] CreateModuleCommand createModuleCommand)
     {
-        var validationResult = await _createModuleCommandValidator.ValidateAsync(command);
-        _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
+        var validationResult = await _createModuleCommandValidator.ValidateAsync(createModuleCommand);
+        _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
+
         if (!validationResult.IsValid)
         {
             return BadRequest(new
@@ -60,34 +61,47 @@ namespace BSOFT.API.Controllers
             });
         }
 
-        var response = await Mediator.Send(command);
+        var response = await Mediator.Send(createModuleCommand);
         if (response.IsSuccess)
             {
-                _logger.LogInformation("Module {ModuleName} created successfully.", command.ModuleName);
+                _logger.LogInformation($"Module {createModuleCommand.ModuleName} created successfully.");
 
                 return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
             }
-                _logger.LogWarning("Module creation failed for Module: {Username}", command.ModuleName);
+                _logger.LogWarning($"Failed to create module {createModuleCommand.ModuleName}.");
 
                 return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
     }
 
     [HttpGet]
-    [Route("GetAll")]
     public async Task<IActionResult> GetModules()
     {
         var modules = await Mediator.Send(new GetModulesQuery());
-        _logger.LogInformation("Module Listed successfully.", modules.Count);
+        _logger.LogInformation($"Total {modules.Count} modules listed successfully.");
         return Ok(new { StatusCode = StatusCodes.Status200OK, data = modules });
     }
 
-    [HttpPut]
-    [Route("Update")]
-    public async Task<IActionResult> UpdateModule([FromBody] UpdateModuleCommand command)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var validationResult = await _updateModuleCommandValidator.ValidateAsync(command);
-        _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
+            
+        var module = await Mediator.Send(new GetModuleByIdQuery { Id = id });
 
+        if (module is null)
+        {
+            _logger.LogWarning($"Module not found for ID {id}.");
+
+           return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"Module ID {id} not found." });
+        }
+           _logger.LogWarning("Module Listed successfully: {Modulename}", module);
+
+        return Ok(new { StatusCode = StatusCodes.Status200OK, data = module });
+    }
+    [HttpPut]
+    public async Task<IActionResult> UpdateModule([FromBody] UpdateModuleCommand updateModuleCommand)
+    {
+        var validationResult = await _updateModuleCommandValidator.ValidateAsync(updateModuleCommand);
+        _logger.LogWarning($"Validation failed: {string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))}");
 
         if (!validationResult.IsValid)
         {
@@ -98,42 +112,48 @@ namespace BSOFT.API.Controllers
                 errors = validationResult.Errors.Select(e => e.ErrorMessage)
             });
         }
-            // var moduleExists = await Mediator.Send(new GetModuleByIdAsync { ModuleId = command.ModuleId });
-            // if (moduleExists == null)
-            // {
-            //     _logger.LogInformation("Module {ModuleId} not found for update.", command.ModuleId);
 
-            //     return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"Module ID {command.ModuleId} not found." });
-            // }
-
-
-        var response = await Mediator.Send(command);
+        var response = await Mediator.Send(updateModuleCommand);
         if (response.IsSuccess)
             {
-                _logger.LogInformation("Module {moduleName} updated successfully.", command.ModuleName);
+                _logger.LogInformation($"Module {updateModuleCommand.ModuleName} updated successfully.");
 
                 return Ok(new { StatusCode = StatusCodes.Status200OK, message = response.Message });
             }
-                _logger.LogWarning("Module update failed for Module: {ModuleName}", command.ModuleName);
+                _logger.LogWarning($"Failed to update module {updateModuleCommand.ModuleName}.");
 
                 return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message });
     }
 
-    [HttpDelete]
-    [Route("Delete/{moduleId}")]
-    public async Task<IActionResult> DeleteModule(int moduleId, DeleteModuleCommand deleteModuleCommand)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteModule(int id)
     {
-        if(moduleId != deleteModuleCommand.ModuleId)
+        if (id <= 0)
         {
-            return BadRequest();
+            return BadRequest(new
+           {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = "Invalid Module ID"
+            });
         }
-        var updatedModule = await Mediator.Send(deleteModuleCommand);
-        if(updatedModule.IsSuccess)
-        {
-          return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedModule.Message, errors = "" });
-        }
+        var result = await Mediator.Send(new DeleteModuleCommand { ModuleId= id });                 
+            if (!result.IsSuccess)
+            {          
+                 _logger.LogWarning($"Deletion failed for module {id}: {result?.Message ?? "Unknown error"}.");
+    
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                });
+            }
+            _logger.LogInformation($"Module {id} deleted successfully.");
 
-        return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedModule.Message, errors = "" });
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data =$"Module ID {id} Deleted" 
+            });
     }
 
 

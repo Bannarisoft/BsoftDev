@@ -50,8 +50,11 @@ using Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySetting
 using Core.Application.CompanySettings.Commands.CreateCompanySettings;
 using BSOFT.API.Validation.CompanySettings;
 using Core.Application.CompanySettings.Commands.UpdateCompanySettings;
+using Core.Application.Currency.Commands.CreateCurrency;
 using Core.Application.Language.Commands.CreateLanguage;
+using BSOFT.API.Validation.Currency;
 using BSOFT.API.Validation.Languages;
+using Core.Application.Currency.Commands.UpdateCurrency;
 using Core.Application.Language.Commands.UpdateLanguage;
 using Core.Application.Companies.Commands.UploadFileCompany;
 namespace BSOFT.API.Validation.Common
@@ -87,7 +90,6 @@ namespace BSOFT.API.Validation.Common
         services.AddScoped<IValidator<UpdateRoleCommand>, UpdateRoleCommandValidator>();
         services.AddScoped<IValidator<FirstTimeUserPasswordCommand>,PasswordChangeCommandValidator>();
         services.AddScoped<IValidator<ChangeUserPasswordCommand>,ExistingUserPasswordChangeCommandValidator>();
-
  		services.AddScoped<IValidator<CreatePasswordComplexityRuleCommand>, CreatePasswordComplexityRuleCommandValidator>();
         services.AddScoped<IValidator<UserLoginCommand>,UserLoginCommandValidator>();
         services.AddScoped<IValidator<UpdatePasswordComplexityRuleCommand>, UpdatePasswordComplexityRuleCommandValidator>();
@@ -95,8 +97,11 @@ namespace BSOFT.API.Validation.Common
         services.AddScoped<IValidator<UpdateAdminSecuritySettingsCommand> ,UpdateAdminSecuritySettingsCommandValidator>();  
         services.AddScoped<IValidator<FirstTimeUserPasswordCommand>,PasswordChangeCommandValidator>();
         services.AddScoped<IValidator<CreateCompanySettingsCommand>, CreateCompanySettingsCommandValidator>();
+
         services.AddScoped<IValidator<UpdateCompanySettingsCommand>, UpdateCompanySettingsCommandValidator>();
+        services.AddScoped<IValidator<CreateCurrencyCommand>, CreateCurrencyCommandValidator>();
         services.AddScoped<IValidator<CreateLanguageCommand>, CreateLanguageCommandValidator>();
+        services.AddScoped<IValidator<UpdateCurrencyCommand>, UpdateCurrencyCommandValidator>();
         services.AddScoped<IValidator<UpdateLanguageCommand>, UpdateLanguageCommandValidator>();
         services.AddScoped<IValidator<UploadFileCompanyCommand>, UploadCompanyCommandValidator>();
          }  

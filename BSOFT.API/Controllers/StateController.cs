@@ -8,7 +8,7 @@ using Core.Application.State.Queries.GetStateById;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+using Core.Application.State.Queries.GetStateByCountryId;
 
 namespace BSOFT.API.Controllers
 {
@@ -41,10 +41,10 @@ namespace BSOFT.API.Controllers
             });
         }
 
-        [HttpGet("{stateId}")]
-        public async Task<IActionResult> GetByIdAsync(int stateId)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            if (stateId <= 0)
+            if (id <= 0)
             {                
                 return BadRequest(new 
                 { 
@@ -52,8 +52,8 @@ namespace BSOFT.API.Controllers
                     message = "Invalid State ID" 
                 });
             }
-            var result = await Mediator.Send(new GetStateByIdQuery { Id = stateId });                         
-            if(result == null)
+            var result = await Mediator.Send(new GetStateByIdQuery { Id = id });                         
+            if(result is null)
             {                
                 return NotFound(new 
                 { 
@@ -67,7 +67,7 @@ namespace BSOFT.API.Controllers
                 data = result
             });   
         }        
-        [HttpPost]
+        [HttpPost("create")]   
         public async Task<IActionResult> CreateAsync(CreateStateCommand  command)
         { 
             var validationResult = await _createStateCommandValidator.ValidateAsync(command);
@@ -89,7 +89,7 @@ namespace BSOFT.API.Controllers
             return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
             
         }
-        [HttpPut("{stateId}")]
+        [HttpPut("update")]
         public async Task<IActionResult> UpdateAsync(int stateId, UpdateStateCommand command)
         {   
             if (stateId != command.Id)
@@ -131,48 +131,82 @@ namespace BSOFT.API.Controllers
             }
             return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
         }        
-        [HttpDelete("{stateId}")]
-        public async Task<IActionResult> DeleteAsync(int stateId,DeleteStateCommand command)
-        {
-            if(stateId != command.Id)
+        [HttpDelete("delete{id}")]   
+        public async Task<IActionResult> DeleteAsync(int id)
+        {          
+            if (id <= 0)
             {
-            return BadRequest("StateID Mismatch"); 
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Invalid Country ID"
+                });
+            }            
+              var result = await Mediator.Send(new DeleteStateCommand { Id = id });                 
+            if (!result.IsSuccess)
+            {                
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                });
             }
-            if (stateId <= 0)
+            return Ok(new
             {
-                return BadRequest(new { Message = "Invalid State ID" });
-            }
-            var result = await Mediator.Send(command);          
-            if(result.IsSuccess)
-            {
-                return Ok(new { StatusCode=StatusCodes.Status200OK, message = result.Message, errors = "" });                
-            }
-            return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" });
+                StatusCode = StatusCodes.Status200OK,
+                data =$"State ID {id} Deleted" 
+            });
         }
 
-        [HttpGet("GetStateSearch")]
-            public async Task<IActionResult> GetState([FromQuery] string searchPattern)
+        [HttpGet("by-name{name}")]  
+        public async Task<IActionResult> GetState(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
             {
-                if (string.IsNullOrWhiteSpace(searchPattern))
+                return BadRequest(new { Message = "Search pattern is required" });
+            }
+            var result = await Mediator.Send(new GetStateAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
+            if (result.IsSuccess)
+            {
+                return Ok(new 
                 {
-                    return BadRequest(new { Message = "Search pattern is required" });
-                }
-                var result = await Mediator.Send(new GetStateAutoCompleteQuery {SearchPattern = searchPattern}); // Pass `searchPattern` to the constructor
-                if (result.IsSuccess)
-                {
-                    return Ok(new 
-                    {
-                        StatusCode=StatusCodes.Status200OK,
-                        message = result.Message,
-                        data = result.Data
-                    });
-                }
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
+                    StatusCode=StatusCodes.Status200OK,
                     message = result.Message,
                     data = result.Data
                 });
-            }    
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = result.Message,
+                data = result.Data
+            });
+        }  
+        [HttpGet("by-country/{countryid}")]
+        public async Task<IActionResult> GetStateByCountryId(int countryid)
+        {
+            if (countryid <= 0)
+            {                
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest,
+                    message = "Invalid State ID" 
+                });
+            }
+            var result = await Mediator.Send(new GetStateByCountryIdQuery { Id = countryid });                         
+            if(result is null)
+            {                
+                return NotFound(new 
+                { 
+                    StatusCode=StatusCodes.Status404NotFound,
+                    message = "StateID {stateId} not found", 
+                });
+            }
+            return Ok(new 
+            {
+                StatusCode=StatusCodes.Status200OK,
+                data = result
+            });   
+        }   
     }
 }

@@ -61,13 +61,65 @@ namespace BSOFT.Infrastructure.Repositories.RoleEntitlements
 
     public async Task UpdateRoleEntitlementsAsync(int roleId, List<RoleEntitlement> roleEntitlements, CancellationToken cancellationToken)
     {
-        // Remove existing entitlements for the role
-        var existingEntitlements = _applicationDbContext.RoleEntitlements.Where(re => re.UserRoleId == roleId);
-        _applicationDbContext.RoleEntitlements.RemoveRange(existingEntitlements);
+    // Fetch existing entitlements for the role
+    var existingEntitlements = await _applicationDbContext.RoleEntitlements
+        .Where(re => re.UserRoleId == roleId)
+        .ToListAsync(cancellationToken);
 
-        // Add updated entitlements
-        await _applicationDbContext.RoleEntitlements.AddRangeAsync(roleEntitlements, cancellationToken);
-        await _applicationDbContext.SaveChangesAsync(cancellationToken);
+    // Identify entitlements to remove
+    var entitlementsToRemove = existingEntitlements
+        .Where(existing => !roleEntitlements.Any(updated => updated.ModuleId == existing.ModuleId && updated.MenuId == existing.MenuId))
+        .ToList();
+
+    // Identify entitlements to add
+    var entitlementsToAdd = roleEntitlements
+        .Where(updated => !existingEntitlements.Any(existing => existing.ModuleId == updated.ModuleId && existing.MenuId == updated.MenuId))
+        .ToList();
+
+    // Remove entitlements
+    if (entitlementsToRemove.Any())
+    {
+        _applicationDbContext.RoleEntitlements.RemoveRange(entitlementsToRemove);
+    }
+
+    // Update existing entitlements
+    foreach (var existing in existingEntitlements)
+    {
+        var updated = roleEntitlements.FirstOrDefault(u => u.ModuleId == existing.ModuleId && u.MenuId == existing.MenuId);
+        
+        if (updated != null) // Ensure the updated entry exists
+        {
+            existing.CanView = updated.CanView;
+            existing.CanAdd = updated.CanAdd;
+            existing.CanUpdate = updated.CanUpdate;
+            existing.CanDelete = updated.CanDelete;
+            existing.CanExport = updated.CanExport;
+            existing.CanApprove = updated.CanApprove;
+            existing.IsActive = updated.IsActive; // Ensure IsActive is updated
+        }
+    }
+
+    // Add new entitlements
+    if (entitlementsToAdd.Any())
+    {
+        await _applicationDbContext.RoleEntitlements.AddRangeAsync(entitlementsToAdd, cancellationToken);
+    }
+
+    // Save changes
+    var changes = await _applicationDbContext.SaveChangesAsync(cancellationToken);
+
+    // Debugging: Check if any rows were affected
+    if (changes == 0)
+    {
+        throw new Exception("No changes were saved. Ensure the database is updated properly.");
+    }
+        // // Remove existing entitlements for the role
+        // var existingEntitlements = _applicationDbContext.RoleEntitlements.Where(re => re.UserRoleId == roleId);
+        // _applicationDbContext.RoleEntitlements.RemoveRange(existingEntitlements);
+
+        // // Add updated entitlements
+        // await _applicationDbContext.RoleEntitlements.AddRangeAsync(roleEntitlements, cancellationToken);
+        // await _applicationDbContext.SaveChangesAsync(cancellationToken);
     }
     public async Task<int> DeleteAsync(int id, RoleEntitlement roleEntitlement)
     {
