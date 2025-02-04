@@ -4,6 +4,7 @@ using BSOFT.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250203051348_languageModifyColumnIssue")]
+    partial class languageModifyColumnIssue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -556,64 +559,6 @@ namespace BSOFT.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Country", "AppData");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Currency", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("varchar(6)")
-                        .HasColumnName("Code");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("Name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Currency", "AppData");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Department", b =>
@@ -1170,74 +1115,6 @@ namespace BSOFT.Infrastructure.Migrations
                     b.ToTable("State", "AppData");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.TimeZones", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("Code");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("Location");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("Name");
-
-                    b.Property<string>("Offset")
-                        .IsRequired()
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("Offset");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TimeZones", "AppData");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.Unit", b =>
                 {
                     b.Property<int>("Id")
@@ -1363,8 +1240,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UnitId")
-                        .IsUnique();
+                    b.HasIndex("UnitId");
 
                     b.ToTable("UnitAddress", "AppData");
                 });
@@ -1408,8 +1284,7 @@ namespace BSOFT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UnitId")
-                        .IsUnique();
+                    b.HasIndex("UnitId");
 
                     b.ToTable("UnitContacts", "AppData");
                 });
@@ -1782,8 +1657,8 @@ namespace BSOFT.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.UnitAddress", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Unit", "Unit")
-                        .WithOne("UnitAddress")
-                        .HasForeignKey("Core.Domain.Entities.UnitAddress", "UnitId")
+                        .WithMany("UnitAddress")
+                        .HasForeignKey("UnitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1793,8 +1668,8 @@ namespace BSOFT.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.UnitContacts", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Unit", "Unit")
-                        .WithOne("UnitContacts")
-                        .HasForeignKey("Core.Domain.Entities.UnitContacts", "UnitId")
+                        .WithMany("UnitContacts")
+                        .HasForeignKey("UnitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1883,11 +1758,9 @@ namespace BSOFT.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Unit", b =>
                 {
-                    b.Navigation("UnitAddress")
-                        .IsRequired();
+                    b.Navigation("UnitAddress");
 
-                    b.Navigation("UnitContacts")
-                        .IsRequired();
+                    b.Navigation("UnitContacts");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.User", b =>

@@ -7,6 +7,8 @@ using AutoMapper;
 using Azure;
 using Core.Application.Common.Interfaces.ICompany;
 using Core.Application.Common.Interfaces;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace BSOFT.Infrastructure.Repositories.Companies
 {
@@ -14,11 +16,13 @@ namespace BSOFT.Infrastructure.Repositories.Companies
     {
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IMapper _imapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-         public CompanyCommandRepository(ApplicationDbContext applicationDbContext, IMapper imapper)
+         public CompanyCommandRepository(ApplicationDbContext applicationDbContext, IMapper imapper, IHttpContextAccessor httpContextAccessor)
         {
             _applicationDbContext = applicationDbContext;
             _imapper = imapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
       
@@ -27,6 +31,15 @@ namespace BSOFT.Infrastructure.Repositories.Companies
             var entry =_applicationDbContext.Entry(company);
             await _applicationDbContext.Companies.AddAsync(company);
             await _applicationDbContext.SaveChangesAsync();
+
+            var context = _httpContextAccessor.HttpContext;
+             var userId =   _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+             var key = $"Companylogo-{userId}";
+            if (context != null && context.Session != null)
+             {
+                 context.Session.Remove(key);
+                 
+             }
             return company.Id;
         }      
            public async Task<bool> UpdateAsync(int id, Company company)
@@ -62,8 +75,19 @@ namespace BSOFT.Infrastructure.Repositories.Companies
                 existingCompany.CompanyContact.Phone = company.CompanyContact.Phone;
                 existingCompany.CompanyContact.Remarks = company.CompanyContact.Remarks;
                 _applicationDbContext.Companies.Update(existingCompany);
+
+            var context = _httpContextAccessor.HttpContext;
+             var userId =   _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+             var key = $"Companylogo-{userId}";
+            if (context != null && context.Session != null)
+             {
+                 context.Session.Remove(key);
+                 
+             }
+
                 return await _applicationDbContext.SaveChangesAsync() >0;
             }
+            
             return false; 
         }
          public async Task<bool> DeleteAsync(int id,Company company)

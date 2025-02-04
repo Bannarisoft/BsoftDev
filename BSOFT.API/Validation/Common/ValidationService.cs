@@ -51,9 +51,14 @@ using Core.Application.CompanySettings.Commands.CreateCompanySettings;
 using BSOFT.API.Validation.CompanySettings;
 using Core.Application.FinancialYear.Command.CreateFinancialYear;
 using BSOFT.API.Validation.FinancialYear;
-using Core.Application.FinancialYear.Command.UpdateFinancialYear;using Core.Application.Currency.Commands.CreateCurrency;
+using Core.Application.FinancialYear.Command.UpdateFinancialYear;using Core.Application.CompanySettings.Commands.UpdateCompanySettings;
+using Core.Application.Currency.Commands.CreateCurrency;
+using Core.Application.Language.Commands.CreateLanguage;
 using BSOFT.API.Validation.Currency;
+using BSOFT.API.Validation.Languages;
 using Core.Application.Currency.Commands.UpdateCurrency;
+using Core.Application.Language.Commands.UpdateLanguage;
+using Core.Application.Companies.Commands.UploadFileCompany;
 namespace BSOFT.API.Validation.Common
 {
     public class ValidationService
@@ -96,9 +101,12 @@ namespace BSOFT.API.Validation.Common
         services.AddScoped<IValidator<CreateCompanySettingsCommand>, CreateCompanySettingsCommandValidator>();
 services.AddScoped<IValidator<CreateFinancialYearCommand>, CreateFinancialYearCommandValidator>();
         services.AddScoped<IValidator<UpdateFinancialYearCommand>, UpdateFinancialYearCommandValidator>();
-        
+        services.AddScoped<IValidator<UpdateCompanySettingsCommand>, UpdateCompanySettingsCommandValidator>();
         services.AddScoped<IValidator<CreateCurrencyCommand>, CreateCurrencyCommandValidator>();
+        services.AddScoped<IValidator<CreateLanguageCommand>, CreateLanguageCommandValidator>();
         services.AddScoped<IValidator<UpdateCurrencyCommand>, UpdateCurrencyCommandValidator>();
-        }  
+        services.AddScoped<IValidator<UpdateLanguageCommand>, UpdateLanguageCommandValidator>();
+        services.AddScoped<IValidator<UploadFileCompanyCommand>, UploadCompanyCommandValidator>();
+         }  
     }
 }

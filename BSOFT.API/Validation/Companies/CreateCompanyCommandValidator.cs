@@ -29,11 +29,11 @@ namespace BSOFT.API.Validation.Companies
                 {
                     case "NotEmpty":
                         // Apply NotEmpty validation
-                        RuleFor(x => x.Company.File)
-                            .NotNull()
-                            .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}")
-                            .NotEmpty()
-                            .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}");
+                        // RuleFor(x => x.Company.File)
+                        //     .NotNull()
+                        //     .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}")
+                        //     .NotEmpty()
+                        //     .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}");
 
                              RuleFor(x => x.Company.CompanyName)
                             .NotEmpty()
@@ -77,13 +77,13 @@ namespace BSOFT.API.Validation.Companies
                             .WithMessage($"{nameof(CreateCompanyCommand.Company.CompanyContact.Phone)} {rule.Error}");
                         break;
 
-                    case "FileValidation":
-                    RuleFor(x => x.Company.File)
-                    .Must(file => IsValidFileType(file, rule.allowedExtensions))
-                    .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}")
-                    .Must(file => file.Length <= 2 * 1024 * 1024)
-                    .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}");
-                    break;
+                    // case "FileValidation":
+                    // RuleFor(x => x.Company.File)
+                    // .Must(file => IsValidFileType(file, rule.allowedExtensions))
+                    // .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}")
+                    // .Must(file => file.Length <= 2 * 1024 * 1024)
+                    // .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}");
+                    // break;
 
                      case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values
@@ -138,7 +138,13 @@ namespace BSOFT.API.Validation.Companies
                     case "Telephone":
                         RuleFor(x => x.Company.CompanyAddress.AlternatePhone)
                         .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                        .WithMessage($"{nameof(CreateCompanyCommand.Company.CompanyAddress.AlternatePhone)} {rule.Error}");
+                        .WithMessage($"{nameof(CreateCompanyCommand.Company.CompanyAddress.AlternatePhone)} {rule.Error}")
+                        .When(x => !string.IsNullOrWhiteSpace(x.Company.CompanyAddress.AlternatePhone));
+
+                         RuleFor(x => x.Company.CompanyAddress.Phone)
+                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                        .WithMessage($"{nameof(CreateCompanyCommand.Company.CompanyAddress.Phone)} {rule.Error}")
+                        .When(x => !string.IsNullOrWhiteSpace(x.Company.CompanyAddress.Phone));
 
                          RuleFor(x => x.Company.CompanyContact.Phone)
                         .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
@@ -161,20 +167,20 @@ namespace BSOFT.API.Validation.Companies
             
          
         }
-             private bool IsValidFileType(IFormFile file, List<string> allowedExtensions)
-                {
-                    Console.WriteLine(file.FileName);
-                    foreach (var extension in allowedExtensions)
-                    {
-                        Console.WriteLine(extension);
+            //  private bool IsValidFileType(IFormFile file, List<string> allowedExtensions)
+            //     {
+            //         Console.WriteLine(file.FileName);
+            //         foreach (var extension in allowedExtensions)
+            //         {
+            //             Console.WriteLine(extension);
                         
-                    }
+            //         }
                     
-                    if (file == null) return false;
+            //         if (file == null) return false;
                 
-                    var fileExtension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
-                    return allowedExtensions.Contains(fileExtension);
-                }
+            //         var fileExtension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
+            //         return allowedExtensions.Contains(fileExtension);
+            //     }
 
     }
 }
