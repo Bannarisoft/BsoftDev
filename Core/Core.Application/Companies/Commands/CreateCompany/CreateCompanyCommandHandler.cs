@@ -27,13 +27,7 @@ namespace Core.Application.Companies.Commands.CreateCompany
         {
             
              var company  = _imapper.Map<Company>(request.Company);
-             string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources/AllFiles");
-             var uploadResult = await _ifileUploadService.UploadFileAsync(request.Company.File,  uploadPath);
-             if (!uploadResult.IsSuccess)
-             {
-                 return new ApiResponseDTO<int>{IsSuccess = false, Message = "File not uploaded"};
-             }
-             company.Logo =uploadResult.FilePath;
+           
             
              var CompanyId = await _icompanyRepository.CreateAsync(company);
 

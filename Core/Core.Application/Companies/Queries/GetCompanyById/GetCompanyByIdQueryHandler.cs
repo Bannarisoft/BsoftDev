@@ -30,7 +30,14 @@ namespace Core.Application.Companies.Queries.GetCompanyById
         {
            
             var result = await _companyRepository.GetByIdAsync(request.CompanyId);
+            string logoBase64 = null;
+             if (!string.IsNullOrEmpty(result.Logo) && File.Exists(result.Logo))
+             {
+                 byte[] imageBytes = await File.ReadAllBytesAsync(result.Logo);
+                 logoBase64 = Convert.ToBase64String(imageBytes);
+             }
             var company = _mapper.Map<GetCompanyDTO>(result);
+            company.LogoBase64 = logoBase64;
              //Domain Event
                  var domainEvent = new AuditLogsDomainEvent(
                      actionDetail: "GetCompanyById",

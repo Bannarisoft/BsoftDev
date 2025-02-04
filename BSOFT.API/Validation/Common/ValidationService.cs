@@ -53,6 +53,7 @@ using Core.Application.CompanySettings.Commands.UpdateCompanySettings;
 using Core.Application.Language.Commands.CreateLanguage;
 using BSOFT.API.Validation.Languages;
 using Core.Application.Language.Commands.UpdateLanguage;
+using Core.Application.Companies.Commands.UploadFileCompany;
 namespace BSOFT.API.Validation.Common
 {
     public class ValidationService
@@ -97,6 +98,7 @@ namespace BSOFT.API.Validation.Common
         services.AddScoped<IValidator<UpdateCompanySettingsCommand>, UpdateCompanySettingsCommandValidator>();
         services.AddScoped<IValidator<CreateLanguageCommand>, CreateLanguageCommandValidator>();
         services.AddScoped<IValidator<UpdateLanguageCommand>, UpdateLanguageCommandValidator>();
+        services.AddScoped<IValidator<UploadFileCompanyCommand>, UploadCompanyCommandValidator>();
          }  
     }
 }

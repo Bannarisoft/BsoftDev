@@ -32,25 +32,25 @@ namespace Core.Application.Companies.Commands.UpdateCompany
           public async Task<ApiResponseDTO<bool>> Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
         {
             
-            var existingCompany = await _companyQueryRepository.GetByIdAsync(request.Company.Id);
+            // var existingCompany = await _companyQueryRepository.GetByIdAsync(request.Company.Id);
             
             var company  = _imapper.Map<Company>(request.Company);
             
-            if(existingCompany.Logo == request.Company.LogoPath)
-            {
-                company.Logo = existingCompany.Logo;
-            }
-            else
-            {
-                string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources/AllFiles");
-             var uploadResult = await _ifileUploadService.UploadFileAsync(request.Company.File,  uploadPath);
+            // if(existingCompany.Logo == request.Company.Logo)
+            // {
+            //     company.Logo = existingCompany.Logo;
+            // }
+            // else
+            // {
+            //     string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources/AllFiles");
+            //  var uploadResult = await _ifileUploadService.UploadFileAsync(request.Company.File,  uploadPath);
              
-                if (!uploadResult.IsSuccess)
-                 {
-                     return new ApiResponseDTO<bool>{IsSuccess = false, Message = "File not uploaded"};
-                 }
-                 company.Logo =uploadResult.FilePath;
-            }
+            //     if (!uploadResult.IsSuccess)
+            //      {
+            //          return new ApiResponseDTO<bool>{IsSuccess = false, Message = "File not uploaded"};
+            //      }
+            //      company.Logo =uploadResult.FilePath;
+            // }
 
              var  CompanyId = await _icompanyRepository.UpdateAsync(request.Company.Id, company);
            

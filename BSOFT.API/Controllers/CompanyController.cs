@@ -16,6 +16,7 @@ using Core.Application.Common.Interfaces;
 using System.Text.Json;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
+using Core.Application.Companies.Commands.UploadFileCompany;
 
 namespace BSOFT.API.Controllers
 {
@@ -27,12 +28,14 @@ namespace BSOFT.API.Controllers
         
         private readonly IValidator<CreateCompanyCommand>  _CreateCompanyCommandvalidator;
         private readonly IValidator<UpdateCompanyCommand> _UpdateCompanyCommandvalidator;
+        private readonly IValidator<UploadFileCompanyCommand> _UploadFileCompanyCommandvalidator;
 
-        public CompanyController(ISender mediator, IValidator<CreateCompanyCommand> createCompanyCommandValidator, IValidator<UpdateCompanyCommand> updateCompanyCommandValidator) 
+        public CompanyController(ISender mediator, IValidator<CreateCompanyCommand> createCompanyCommandValidator, IValidator<UpdateCompanyCommand> updateCompanyCommandValidator, IValidator<UploadFileCompanyCommand> uploadFileCompanyCommandvalidator) 
         : base(mediator)
         {
             _CreateCompanyCommandvalidator = createCompanyCommandValidator;
             _UpdateCompanyCommandvalidator = updateCompanyCommandValidator;
+            _UploadFileCompanyCommandvalidator = uploadFileCompanyCommandvalidator;
         }
 
         [HttpGet("GetAllCompaniesAsync")]
@@ -49,7 +52,7 @@ namespace BSOFT.API.Controllers
             });
         }
          [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromForm] CreateCompanyCommand command)
+        public async Task<IActionResult> CreateAsync(CreateCompanyCommand command)
         {
             var validationResult = await _CreateCompanyCommandvalidator.ValidateAsync(command);
             if (!validationResult.IsValid)
@@ -61,6 +64,7 @@ namespace BSOFT.API.Controllers
                     errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
                 });
             }
+           
             var createdCompany = await Mediator.Send(command);
             if (createdCompany.IsSuccess)
             {
@@ -110,7 +114,7 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> Update([FromForm]  UpdateCompanyCommand command)
+        public async Task<IActionResult> Update(UpdateCompanyCommand command)
         {
             var validationResult = await _UpdateCompanyCommandvalidator.ValidateAsync(command);
             if (!validationResult.IsValid)
@@ -185,6 +189,41 @@ namespace BSOFT.API.Controllers
             { StatusCode=StatusCodes.Status200OK, 
             data = companies.Data 
             });
+        }
+        [HttpPost("upload-logo")]
+        public async Task<IActionResult> UploadLogo(UploadFileCompanyCommand uploadFileCompanyCommand)
+        {
+            var validationResult = await _UploadFileCompanyCommandvalidator.ValidateAsync(uploadFileCompanyCommand);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest, 
+                    message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+            }
+            var file = await Mediator.Send(uploadFileCompanyCommand);
+            if (!file.IsSuccess)
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest, 
+                    message = file.Message, 
+                    errors = "" 
+                });
+            }
+           
+               
+           return Ok(new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                message = file.Message, 
+                data = file.Data,
+                errors = "" 
+            });
+              
+
         }
      
     }

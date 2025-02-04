@@ -21,7 +21,8 @@ namespace Core.Application.Companies.Queries.GetCompanies
         public int YearOfEstablishment { get; set; }
         public string Website { get; set; }
         public int EntityId { get; set; }
-        public IFormFile File { get; set; }
+        public string Logo { get; set; }
+        // public IFormFile File { get; set; }
         public CompanyAddressDTO CompanyAddress { get; set; }
         public CompanyContactDTO CompanyContact { get; set; }
     }
