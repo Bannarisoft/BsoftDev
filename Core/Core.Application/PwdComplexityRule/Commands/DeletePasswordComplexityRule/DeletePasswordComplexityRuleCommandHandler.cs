@@ -19,61 +19,49 @@ namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRu
         private readonly  IPasswordComplexityRuleCommandRepository _IpasswordComplexityRepository;  
        private readonly IMapper _Imapper;
         private readonly IMediator _mediator; 
+        private readonly IPasswordComplexityRuleQueryRepository _passwordComplexityRuleQueryRepository;
         private readonly ILogger<DeletePasswordComplexityRuleCommandHandler> _logger;
        
-        public DeletePasswordComplexityRuleCommandHandler (IPasswordComplexityRuleCommandRepository passwordcomplexityrulerepository , IMapper mapper,ILogger<DeletePasswordComplexityRuleCommandHandler> logger)
+        public DeletePasswordComplexityRuleCommandHandler (IPasswordComplexityRuleCommandRepository passwordcomplexityrulerepository,IPasswordComplexityRuleQueryRepository passwordComplexityRuleQueryRepository , IMapper mapper,ILogger<DeletePasswordComplexityRuleCommandHandler> logger)
       {
          _IpasswordComplexityRepository = passwordcomplexityrulerepository;
             _Imapper = mapper;
             _logger = logger;
       }
-
        public async Task<ApiResponseDTO<int>>Handle(DeletePasswordComplexityRuleCommand request, CancellationToken cancellationToken)
       {       
         _logger.LogInformation("Handling DeletePasswordComplexityRuleCommand for Password Complexity Rule with ID: {Id}", request.Id);
-          // Map the request to the entity
-                var pwdComplexityRule = _Imapper.Map<Core.Domain.Entities.PasswordComplexityRule>(request.updatePwdRuleStatusDto);
 
-                // Perform the delete operation
-                var result = await _IpasswordComplexityRepository.DeleteAsync(request.Id, pwdComplexityRule);
+          var PasswordComplexityRulemap = _Imapper.Map<Core.Domain.Entities.PasswordComplexityRule>(request);
 
-                if (result == 0)
-                {
-                    _logger.LogWarning("Failed to delete Password Complexity Rule with ID: {Id}", request.Id);
-                
-                      return new ApiResponseDTO<int>
-                    {
-                        IsSuccess = false,
-                        Message = "Department not found"
-                     
-                    };
-                }
+             _logger.LogInformation("PasswordComplexityRule  with ID {Id} found. Proceeding with deletion.", request.Id);
 
-               _logger.LogInformation("Password Complexity Rule with ID {DepartmentId} found. Proceeding with deletion.", request.Id);
+             var userrole = await _IpasswordComplexityRepository.DeleteAsync(request.Id, PasswordComplexityRulemap);
+            
+               _logger.LogInformation("Password Complexity Rule with ID {Id} found. Proceeding with deletion.", request.Id);
                  // Map request to entity and delete
-            var updatedpasswordComplexity = _Imapper.Map<Core.Domain.Entities.PasswordComplexityRule>(request.updatePwdRuleStatusDto);
+            var updatedpasswordComplexity = _Imapper.Map<Core.Domain.Entities.PasswordComplexityRule>(request);
+           
             var pwdcompresult = await _IpasswordComplexityRepository.DeleteAsync(request.Id, updatedpasswordComplexity);
 
             if (pwdcompresult <= 0)
             {
-                _logger.LogWarning("Failed to delete Department with ID {DepartmentId}.", request.Id);
+                _logger.LogWarning("Failed to delete Password Complexity  with ID {Id}.", request.Id);
                 return new ApiResponseDTO<int>
                 {
                     IsSuccess = false,
-                    Message = "Failed to delete department",
-                    Data = pwdcompresult
+                    Message = "Failed to delete Password Complexity /Deleted"                   
                 };
             }
-
                 _logger.LogInformation("Password Complexity Rule with ID: {Id} deleted successfully.", request.Id);
 
                 // Publish domain event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Delete",
-                    actionCode: request.Id.ToString(),
+                    actionCode: updatedpasswordComplexity.Id.ToString(),
                     actionName: "",
-                    details: $"Admin Security settings ID: {request.Id} was changed to Status Inactive.",
-                    module: "Admin Security settings"
+                    details: $" Password Complexitys ID: {request.Id} was changed to Status Inactive.",
+                    module: " Password Complexity"
                 );
 
                  await _mediator.Publish(domainEvent, cancellationToken);
@@ -83,11 +71,9 @@ namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRu
                 {
                     IsSuccess = true,
                     Message = " Password Complexity Rule deleted successfully"
+                   
                     
-                };  
-                
-     
-       
+                };                              
          
       }
     }

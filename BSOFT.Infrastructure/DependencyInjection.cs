@@ -38,7 +38,6 @@ using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationQue
 using BSOFT.Infrastructure.Repositories.UserRoleAllocation.UserRoleAllocationCommandRepository;
 using Core.Application.Common.Interfaces.AuditLog;
 using Infrastructure.Data;
-using BSOFT.Infrastructure.Logging;
 using Serilog;
 using Core.Application.Common.Interfaces.IUserSession;
 using Core.Application.Notification.Queries;
@@ -61,6 +60,8 @@ using BSOFT.Infrastructure.Repositories.TimeZones;
 using BSOFT.Infrastructure.PollyResilience;
 using Core.Application.Common.Interfaces.ILanguage;
 using BSOFT.Infrastructure.Repositories.Language;
+using Core.Application.Common.Interfaces.IFinancialYear;
+using BSOFT.Infrastructure.Repositories.FinancialYear;
 namespace BSOFT.Infrastructure
 {
     public static class DependencyInjection
@@ -201,12 +202,13 @@ namespace BSOFT.Infrastructure
             services.AddScoped<IPasswordComplexityRuleCommandRepository, PasswordComplexityRuleCommandRepository>();
             services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
             services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            
+            services.AddScoped<IFinancialYearQueryRepository,  FinancialYearQueryRepository>();
+            services.AddScoped<IFinancialYearCommandRepository , FinancialYearCommandRepository>();
             services.AddHttpContextAccessor();            
             services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();   
             services.AddScoped<ICurrencyQueryRepository, CurrencyQueryRepository>();
             services.AddScoped<ICurrencyCommandRepository, CurrencyCommandRepository>();
             services.AddScoped<ITimeZonesQueryRepository, TimeZonesQueryRepository>();
-
             services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();
             services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();
             services.AddScoped<ILanguageCommand, LanguageCommandRepository>();
@@ -237,10 +239,9 @@ namespace BSOFT.Infrastructure
                 typeof(ChangePasswordProfile),             
 				typeof(PasswordComplexityRuleProfile),
                 typeof(EntityProfile),
-
  				typeof(AdminSecuritySettingsProfile),
 				typeof(DepartmentProfile),
-
+                typeof(FinancialYearProfile),
                 typeof(CurrencyProfile),
                 typeof(UnitsProfile),
 				typeof(CompanySettingsProfile)

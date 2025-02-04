@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Core.Application.Departments.Queries.GetDepartmentById
 {
 
-    public class GetDepartmentByIdQuery :IRequest<ApiResponseDTO<DepartmentDto>>
+    public class GetDepartmentByIdQuery :IRequest<ApiResponseDTO<GetDepartmentDto>>
     {
         
         public int DepartmentId { get; set; }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Departments.Commands.UpdateDepartment
 {
@@ -18,7 +19,7 @@ namespace Core.Application.Departments.Commands.UpdateDepartment
         public string ShortName { get; set; }
         public string DeptName { get; set; }
         public int CompanyId { get; set; }
-        public byte  IsActive { get; set; }
+        public Status  IsActive { get; set; }
              
     }
 }

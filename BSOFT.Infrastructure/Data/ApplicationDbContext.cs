@@ -47,7 +47,7 @@ namespace BSOFT.Infrastructure.Data
         public DbSet<UserCompany> UserCompanies { get; set; }
         public DbSet<CompanySettings> CompanySettings { get; set; } 
         public DbSet<Language> Languages { get; set; }
-        
+        public DbSet<FinancialYear> FinancialYear { get; set;}
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -78,6 +78,7 @@ namespace BSOFT.Infrastructure.Data
 
             
             modelBuilder.ApplyConfiguration(new PasswordLogConfiguration());
+ modelBuilder.ApplyConfiguration(new FinancialYearConfiguration());
             modelBuilder.ApplyConfiguration(new CurrencyConfiguration());
             modelBuilder.ApplyConfiguration(new TimeZonesConfiguration());
             modelBuilder.ApplyConfiguration(new UserCompanyConfiguration());

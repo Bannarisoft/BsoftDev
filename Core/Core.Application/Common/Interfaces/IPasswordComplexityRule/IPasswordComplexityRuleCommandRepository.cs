@@ -11,5 +11,11 @@ namespace Core.Application.Common.Interfaces.IPasswordComplexityRule
       Task<Core.Domain.Entities.PasswordComplexityRule> CreateAsync(Core.Domain.Entities.PasswordComplexityRule passwordComplexityRule);
       Task<int> UpdateAsync(int id, Core.Domain.Entities.PasswordComplexityRule passwordComplexityRule);
       Task<int> DeleteAsync(int id, Core.Domain.Entities.PasswordComplexityRule passwordComplexityRule);
+
+
+       Task<bool> ExistsByCodeAsync(string PasswordComplexityRule);
+
+
+
     }
 }

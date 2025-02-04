@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 using Core.Domain.Entities;
 using Dapper;
+using DnsClient.Internal;
 
 
 
@@ -29,37 +30,16 @@ namespace BSOFT.Infrastructure.Repositories.PasswordComplexityRule
     {
        
 
-         const string query = @"SELECT * FROM AppSecurity.PasswordComplexityRule WHERE Id = @Id ";
+         const string query = @"SELECT * FROM AppSecurity.PasswordComplexityRule WHERE Id = @Id AND IsDeleted = 0";
             var passwordComplexity = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.PasswordComplexityRule>(query, new { id });           
              if (passwordComplexity == null)
             {
-                throw new KeyNotFoundException($" PasswordComplexityRule with ID {id} not found.");
+               // throw new KeyNotFoundException($" PasswordComplexityRule with ID {id} not found."); 
+               return null;            
+               
             }
             return passwordComplexity;
-        }
-
-        // public Task<List<Core.Domain.Entities.PasswordComplexityRule>> GetpwdautocompleteAsync(string searchTerm)
-        // {
-        //        if (string.IsNullOrWhiteSpace(searchTerm))
-        //     {
-        //         throw new ArgumentException("PasswordComplexityRule cannot be null or empty.", nameof(searchTerm));
-        //     }
-
-        //     const string query = @"
-        //          select Id,PwdComplexityRule from  AppSecurity.PasswordComplexityRule 
-        //     WHERE PwdComplexityRule LIKE @searchTerm OR Id LIKE @searchTerm and IsActive =1
-        //     ORDER BY PwdComplexityRule";
-
-            
-        //     var result = await _dbConnection.QueryAsync<Core.Domain.Entities.PasswordComplexityRule>(query, new { SearchTerm = $"%{searchTerm}%" });
-
-        //     return result.ToList();
-
-
-
-            
-        // }
-
+        }       
          public async Task<List<Core.Domain.Entities.PasswordComplexityRule>>  GetpwdautocompleteAsync(string searchTerm = null)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -68,7 +48,7 @@ namespace BSOFT.Infrastructure.Repositories.PasswordComplexityRule
             }
            const string query = @" 
            select  * from  AppSecurity.PasswordComplexityRule 
-            WHERE PwdComplexityRule LIKE @searchTerm OR Id LIKE @searchTerm and IsActive =1
+            WHERE PwdComplexityRule LIKE @searchTerm OR Id LIKE @searchTerm AND IsDeleted = 0
             ORDER BY PwdComplexityRule";
             // Update the object to use SearchPattern instead of Name
           var Pwdrule = await _dbConnection.QueryAsync<Core.Domain.Entities.PasswordComplexityRule>(query, new { SearchTerm  = $"%{searchTerm}%" });

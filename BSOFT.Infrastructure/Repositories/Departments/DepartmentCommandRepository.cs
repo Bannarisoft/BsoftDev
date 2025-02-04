@@ -46,10 +46,23 @@ namespace BSOFT.Infrastructure.Repositories.Departments
             if (deptToDelete != null)
             {
                
-                deptToDelete.IsActive = department.IsActive;
+                deptToDelete.IsDeleted = department.IsDeleted;
                 return await _applicationDbContext.SaveChangesAsync();
             }
             return 0; // No user found
     }
+
+        public Task<bool> ExistsByCodeAsync(string Department)
+        {
+        
+            return _applicationDbContext.Department.AnyAsync(c => c.DeptName == Department);
+            
+        }
+            public async Task<bool> ExistsByNameupdateAsync(string name, int id)
+                    {
+                        return await _applicationDbContext.Department.AnyAsync(c => c.DeptName == name && c.Id != id);
+                    }
+
+        
     }
 }

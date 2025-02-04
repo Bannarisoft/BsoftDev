@@ -7,10 +7,12 @@ using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
+using Core.Application.Departments.Queries.GetDepartments;
+using Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRule;
 
 namespace Core.Application.PwdComplexityRule.Queries
 {
-    public class GetPwdRuleQueryHandler  :IRequestHandler<GetPwdRuleQuery, ApiResponseDTO<List<PwdRuleDto>>>
+    public class GetPwdRuleQueryHandler  :IRequestHandler<GetPwdRuleQuery, ApiResponseDTO<List<GetPwdRuleDto>>>
     {
        private readonly IPasswordComplexityRuleQueryRepository _passwordComplexityRepository; 
        private readonly IMapper _mapper; 
@@ -27,7 +29,7 @@ namespace Core.Application.PwdComplexityRule.Queries
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<PwdRuleDto>>> Handle(GetPwdRuleQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<GetPwdRuleDto>>> Handle(GetPwdRuleQuery request, CancellationToken cancellationToken)
         {
 
 
@@ -41,10 +43,10 @@ namespace Core.Application.PwdComplexityRule.Queries
             {
                _logger.LogWarning("No Password Rule records found in the database. Total count: {Count}", pwdcomplexityrules?.Count ?? 0);
 
-                  return new ApiResponseDTO<List<PwdRuleDto>> { IsSuccess = false, Message = "No Record Found" };
+                  return new ApiResponseDTO<List<GetPwdRuleDto>> { IsSuccess = false, Message = "No Record Found" };
             }
 
-             var pwdcomruleList = _mapper.Map<List<PwdRuleDto>>(pwdcomplexityrules);
+             var pwdcomruleList = _mapper.Map<List<GetPwdRuleDto>>(pwdcomplexityrules);
              var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetAll",
                     actionCode: "",        
@@ -56,23 +58,9 @@ namespace Core.Application.PwdComplexityRule.Queries
                   await _mediator.Publish(domainEvent, cancellationToken);
               
             _logger.LogInformation("Password Complexity Rule  Listed successfully.", pwdcomruleList.Count);
-            return new ApiResponseDTO<List<PwdRuleDto>> { IsSuccess = true, Message = "Success", Data = pwdcomruleList };  
+            return new ApiResponseDTO<List<GetPwdRuleDto>> { IsSuccess = true, Message = "Success", Data = pwdcomruleList };  
 
-        //  _logger.LogInformation("Handling GetPwdRuleQuery request.");
-        //     // Fetch password complexity rules
-        //         var pwdComplexityRules = await _passwordComplexityRepository.GetPasswordComplexityAsync();
-
-        //         if (pwdComplexityRules == null || !pwdComplexityRules.Any())
-        //         {
-        //             _logger.LogWarning("No password complexity rules found.");
-        //             return new List<PwdRuleDto>();
-        //         }
-
-        //         _logger.LogInformation("Password complexity rules retrieved successfully. Mapping results to DTO.");
-
-        //         // Map rules to DTO
-        //         return _mapper.Map<List<PwdRuleDto>>(pwdComplexityRules);                     
-
+        
      
 
         }

@@ -11,6 +11,8 @@ using Core.Application.Common.Interfaces;
 using FluentValidation;
 using BSOFT.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
+using Core.Application.Common.Interfaces.IUser;
+using Core.Application.Common.HttpResponse;
 
 namespace BSOFT.API.Controllers
 {
@@ -23,13 +25,17 @@ namespace BSOFT.API.Controllers
         private readonly IValidator<UpdateRoleCommand> _updateRoleCommandValidator;
          private readonly ApplicationDbContext _dbContext;
          private readonly ILogger<UserRoleController> _logger;
+
+         private readonly IUserCommandRepository  _userCommandRepository;
         public UserRoleController(ISender mediator    , IValidator<CreateRoleCommand> createRoleCommandValidator,
+        IUserCommandRepository userCommandRepository,
         IValidator<UpdateRoleCommand> updateRoleCommandValidator, 
         ILogger<UserRoleController> logger,
         ApplicationDbContext dbContext ) : base(mediator)
         {
             _createRoleCommandValidator= createRoleCommandValidator;
             _updateRoleCommandValidator= updateRoleCommandValidator;
+            _userCommandRepository= userCommandRepository;
              _dbContext = dbContext; 
              _logger = logger;
 
@@ -96,14 +102,14 @@ namespace BSOFT.API.Controllers
              var query = new GetRolesAutocompleteQuery { SearchTerm = searchTerm };
                 var result = await Mediator.Send(query);
 
-                if (result.Data == null )
+                if (result.Data == null  || !result.Data.Any())
                 {
                     _logger.LogWarning("No User Role found for search pattern: {SearchPattern}", searchTerm);
 
                     return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
-                        Message = "No matching User Role found."
+                        Message = "No matching User Role found / Deleted."
                     });
                 }
 
@@ -161,32 +167,32 @@ namespace BSOFT.API.Controllers
                
         }
 
-         [HttpPut("delete/{id}")]
-        public async Task<IActionResult> DeleteAsync(int id, DeleteRoleCommand command)
+         [HttpPut("Delete")]
+        public async Task<IActionResult> DeleteAsync( DeleteRoleCommand userroleDeleteCommand)
         {
-              _logger.LogInformation("Delete Department request started with ID: {DepartmentId}", command.UserRoleId);
+              _logger.LogInformation("Delete User Role request started with ID: {DepartmentId}", userroleDeleteCommand.Id);
 
                 // Check if the department exists
-                var userRole = await Mediator.Send(new GetRoleByIdQuery { Id = command.UserRoleId });
+                var userRole = await Mediator.Send(new GetRoleByIdQuery { Id = userroleDeleteCommand.Id });
                 if (userRole == null)
                 {
-                    _logger.LogWarning("Department with ID {DepartmentId} not found.", command.UserRoleId);
+                    _logger.LogWarning("User Role with ID {DepartmentId} not found.", userroleDeleteCommand.Id);
 
                     return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Department not found"
+                        Message = "User Role not found"
                     });
                 }
 
-                _logger.LogInformation("Department with ID {DepartmentId} found. Proceeding with deletion.", command.UserRoleId);
+                _logger.LogInformation("User Role with ID {Id} found. Proceeding with deletion.", userroleDeleteCommand.Id);
 
                 // Attempt to delete the department
-                var result = await Mediator.Send(command);
+                var result = await Mediator.Send(userroleDeleteCommand);
 
                 if (result.IsSuccess)
                 {
-                    _logger.LogInformation("Department with ID {DepartmentId} deleted successfully.", command.UserRoleId);
+                    _logger.LogInformation("User Role with ID {Id} deleted successfully.", userroleDeleteCommand.Id);
 
                     return Ok(new
                     {
@@ -196,7 +202,7 @@ namespace BSOFT.API.Controllers
                     });
                 }
 
-                _logger.LogWarning("Failed to delete User Role with ID {Id}. Reason: {Message}", command.UserRoleId, result.Message);
+                _logger.LogWarning("Failed to delete User Role with ID {Id}. Reason: {Message}", userroleDeleteCommand.Id, result.Message);
 
                 return BadRequest(new
                 {
@@ -207,16 +213,18 @@ namespace BSOFT.API.Controllers
         
         }
        
-     [HttpPut("update/{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, UpdateRoleCommand command)
+  
+
+    [HttpPut("Update")]
+    public async Task<IActionResult> UpdateAsync( UpdateRoleCommand updateRolecommand)
     {      
-               _logger.LogInformation("Update User Role  request started with data: {@Command}", command);
+               _logger.LogInformation($"Update User Role  request started with data: {updateRolecommand}");
 
             // Check if the department exists
-            var department = await Mediator.Send(new GetRoleByIdQuery { Id = command.Id });
+            var department = await Mediator.Send(new GetRoleByIdQuery { Id = updateRolecommand.Id });
             if (department == null)
             {
-                _logger.LogWarning("User Role with ID {Id} not found.", command.Id);
+                _logger.LogWarning("User Role with ID {Id} not found.", updateRolecommand.Id);
 
                 return NotFound(new
                 {
@@ -224,9 +232,8 @@ namespace BSOFT.API.Controllers
                     Message = "User Role  not found"
                 });
             }
-
-            // Validate the update command
-            var validationResult = await _updateRoleCommandValidator.ValidateAsync(command);
+                    // Validate the update command
+            var validationResult = await _updateRoleCommandValidator.ValidateAsync(updateRolecommand);
             if (!validationResult.IsValid)
             {
                 _logger.LogWarning("Validation failed for Update User Role  request. Errors: {@Errors}", validationResult.Errors);
@@ -240,10 +247,10 @@ namespace BSOFT.API.Controllers
             }
 
             // Update the department
-            var updateResult = await Mediator.Send(command);
+            var updateResult = await Mediator.Send(updateRolecommand);
             if (updateResult.IsSuccess)
             {
-                _logger.LogInformation("User Role  with ID {Id} updated successfully.", command.Id);
+                _logger.LogInformation("User Role  with ID {Id} updated successfully.", updateRolecommand.Id);
 
                 return Ok(new
                 {
@@ -253,29 +260,18 @@ namespace BSOFT.API.Controllers
                 });
             }
 
-            _logger.LogWarning("Failed to update User Role  with ID {Id}. Reason: {Message}", command.Id, updateResult.Message);
+            _logger.LogWarning("Failed to update User Role  with ID {Id}. Reason: {Message}", updateRolecommand.Id, updateResult.Message);
 
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
                 Message = updateResult.Message
-            });
-        
-
-        //   var validationResult = await _updateRoleCommandValidator.ValidateAsync(command);
-        // if (!validationResult.IsValid)
-        // {
-        // return BadRequest(validationResult.Errors);
-        // }
-        // if (id != command.Id)
-        // {
-        //     return BadRequest("UserRole Id Mismatch");
-        // }
-
-        // var UpdateUserRole = await Mediator.Send(command);
-        // return Ok("Updated Successfully");
-   
+            });               
     }
+
+
+
+   
 
 
 

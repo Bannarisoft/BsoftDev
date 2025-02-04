@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 {
-    public class GetRolesAutocompleteQueryHandler : IRequestHandler<GetRolesAutocompleteQuery, ApiResponseDTO<List<UserRoleDto>>>
+    public class GetRolesAutocompleteQueryHandler : IRequestHandler<GetRolesAutocompleteQuery, ApiResponseDTO<List<GetUserRoleAutocompleteDto>>>
     {
         private readonly IUserRoleQueryRepository _userRoleRepository;
      private readonly IMapper _mapper;
@@ -34,7 +34,7 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 
         }
 
-        public async Task<ApiResponseDTO<List<UserRoleDto>>> Handle(GetRolesAutocompleteQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<GetUserRoleAutocompleteDto>>> Handle(GetRolesAutocompleteQuery request, CancellationToken cancellationToken)
         {
 
                   _logger.LogInformation("Handling GetDepartmentAutoCompleteSearchQuery with search pattern: {SearchPattern}", request.SearchTerm);
@@ -44,18 +44,18 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
                 if (result == null || !result.Any())
                 {
                     _logger.LogWarning("No departments found for search pattern: {SearchPattern}", request.SearchTerm);
-                    return new ApiResponseDTO<List<UserRoleDto>>
+                    return new ApiResponseDTO<List<GetUserRoleAutocompleteDto>>
                     {
                         IsSuccess = false,
                         Message = "No matching departments found",
-                        Data = new List<UserRoleDto>()
+                        Data = new List<GetUserRoleAutocompleteDto>()
                     };
                 }
 
                 _logger.LogInformation("Departments found for search pattern: {SearchPattern}. Mapping results to DTO.", request.SearchTerm);
 
                 // Map the result to DTO
-                var userRoleDto = _mapper.Map<List<UserRoleDto>>(result);
+                var userRoleDto = _mapper.Map<List<GetUserRoleAutocompleteDto>>(result);
 
                 // Publish domain event for audit logs
                 var domainEvent = new AuditLogsDomainEvent(
@@ -69,7 +69,7 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 
                 _logger.LogInformation("Domain event published for search pattern: {SearchPattern}", request.SearchTerm);
 
-                return new ApiResponseDTO<List<UserRoleDto>>
+                return new ApiResponseDTO<List<GetUserRoleAutocompleteDto>>
                 {
                     IsSuccess = true,
                     Message = "Success",

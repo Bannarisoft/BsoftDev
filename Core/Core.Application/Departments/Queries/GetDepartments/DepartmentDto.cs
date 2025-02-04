@@ -6,6 +6,7 @@ using Core.Domain.Entities;
 using Core.Application.Common.Mappings;
 using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Departments.Queries.GetDepartments
 {
@@ -15,7 +16,6 @@ namespace Core.Application.Departments.Queries.GetDepartments
         public string ShortName { get; set; }
         public string DeptName { get; set; }
         public int CompanyId { get; set; }
-        public byte  IsActive { get; set; }
       
     }
 }

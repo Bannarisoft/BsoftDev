@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 {
-    public class GetRolesAutocompleteQuery : IRequest<ApiResponseDTO<List<UserRoleDto>>> 
+    public class GetRolesAutocompleteQuery : IRequest<ApiResponseDTO<List<GetUserRoleAutocompleteDto>>> 
     {
         public string SearchTerm { get; set; }
     }

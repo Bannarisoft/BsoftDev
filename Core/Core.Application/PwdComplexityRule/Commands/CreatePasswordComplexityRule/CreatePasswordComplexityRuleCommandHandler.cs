@@ -33,12 +33,18 @@ namespace Core.Application.PwdComplexityRule.Commands.CreatePasswordComplexityRu
          public async Task<ApiResponseDTO<PwdRuleDto>> Handle(CreatePasswordComplexityRuleCommand request, CancellationToken cancellationToken)
         {         
           _logger.LogInformation("Handling CreatePasswordComplexityRuleCommand for Password Complexity Rule: {PwdComplexityRule}", request.PwdComplexityRule);
-
- 
+     
+                var exists = await _passwordComplexityRepository.ExistsByCodeAsync(request.PwdComplexityRule);
+                    if (exists)
+                    {
+                       _logger.LogWarning("PasswordComplexityRule  already exists.", request.PwdComplexityRule);
+                       return new ApiResponseDTO<PwdRuleDto>
+                        {
+                        IsSuccess = false,
+                        Message = "Password Complexity Rule Name already exists."
+                        };
+                    }
                 var passwordComplexityRuleEntity = _mapper.Map<Core.Domain.Entities.PasswordComplexityRule>(request);
-                _logger.LogInformation("Mapped CreatePasswordComplexityRuleCommand to PasswordComplexityRule entity.");
-
-               
                 var result = await _passwordComplexityRepository.CreateAsync(passwordComplexityRuleEntity);
 
                 if (result == null)

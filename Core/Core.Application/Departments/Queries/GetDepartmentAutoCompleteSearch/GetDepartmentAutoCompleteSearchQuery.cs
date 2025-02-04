@@ -11,7 +11,7 @@ using Core.Application.Common.HttpResponse;
 namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
 {
 
-    public class GetDepartmentAutoCompleteSearchQuery : IRequest<ApiResponseDTO<List<DepartmentDto>>>
+    public class GetDepartmentAutoCompleteSearchQuery : IRequest<ApiResponseDTO<List<DepartmentAutocompleteDto>>>
     {
         public string SearchPattern { get; set; } 
     }

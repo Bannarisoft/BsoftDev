@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 namespace Core.Application.Departments.Queries.GetDepartmentById
 {
 
-    public class GetDepartmentByIdQueryHandler :IRequestHandler<GetDepartmentByIdQuery,ApiResponseDTO<DepartmentDto>>
+    public class GetDepartmentByIdQueryHandler :IRequestHandler<GetDepartmentByIdQuery,ApiResponseDTO<GetDepartmentDto>>
     {
           private readonly IDepartmentQueryRepository _departmentRepository;        
         private readonly IMapper _mapper;
@@ -35,7 +35,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentById
             _logger = logger;
         } 
 
-      public async Task<ApiResponseDTO<DepartmentDto>> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
+      public async Task<ApiResponseDTO<GetDepartmentDto>> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
         {
             
                 _logger.LogInformation("Fetching Department Request started: {Request}", request);
@@ -47,7 +47,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentById
                     {
                         _logger.LogWarning("Department with ID {DepartmentId} not found.", request.DepartmentId);
 
-                        return new ApiResponseDTO<DepartmentDto>
+                        return new ApiResponseDTO<GetDepartmentDto>
                         {
                             IsSuccess = false,
                             Message = "Department not found.",
@@ -56,7 +56,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentById
                     }
             
 
-              var deptDto = _mapper.Map<DepartmentDto>(department);
+              var deptDto = _mapper.Map<GetDepartmentDto>(department);
  //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetById",
@@ -67,7 +67,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentById
                 );
 
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<DepartmentDto> { IsSuccess = true, Message = "Success", Data = deptDto };
+            return new ApiResponseDTO<GetDepartmentDto> { IsSuccess = true, Message = "Success", Data = deptDto };
 
                
 

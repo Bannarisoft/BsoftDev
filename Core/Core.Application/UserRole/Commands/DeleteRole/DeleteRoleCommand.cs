@@ -11,10 +11,7 @@ namespace Core.Application.UserRole.Commands.DeleteRole
     public class DeleteRoleCommand :IRequest<ApiResponseDTO<int>> 
     
     {
-        public int UserRoleId { get; set; } 
-
-          public UserRoleStatusDto userRoleStatusDto { get; set; } 
-
-        
+        public int Id { get; set; } 
+                
     }
 }

@@ -9,13 +9,11 @@ using System.Threading.Tasks;
 namespace Core.Application.UserRole.Commands.CreateRole
 {
     public class CreateRoleCommand  : IRequest<ApiResponseDTO<UserRoleDto>>
-    {
-        
- 
+    {         
         public string RoleName { get; set; }
         public string Description { get; set; }
         public int CompanyId { get; set; }
-        public byte  IsActive { get; set; } = 1;
+       
        
     }
 }

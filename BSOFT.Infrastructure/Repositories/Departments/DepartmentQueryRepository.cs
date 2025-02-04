@@ -21,25 +21,34 @@ namespace BSOFT.Infrastructure.Repositories.Departments
     public async Task<List<Department>>GetAllDepartmentAsync()
     {
         
-        const string query = @"SELECT  * FROM AppData.Department";
+        const string query = @"SELECT  * FROM AppData.Department WHERE IsDeleted = 0";
             return (await _dbConnection.QueryAsync<Department>(query)).ToList();
         
     }
 
-    public async Task<Department> GetByIdAsync(int id)
+    public async Task<Department?> GetByIdAsync(int id)
     {
-         //  const string query = "SELECT * FROM AppData.Department WHERE Id = @Id";
-      //  return await _dbConnection.QueryFirstOrDefaultAsync<Department>(query, new { id });
+        const string query = @"SELECT * FROM AppData.Department WHERE Id = @Id AND IsDeleted = 0";
+        var departments = await _dbConnection.QueryAsync<Department>(query, new { Id = id });
 
+    var department = departments.FirstOrDefault();
 
-         const string query = @"SELECT * FROM AppData.Department WHERE Id = @Id AND IsActive = 1";
-            var department = await _dbConnection.QueryFirstOrDefaultAsync<Department>(query, new { id });           
-             if (department == null)
-            {
-                throw new KeyNotFoundException($"Department with ID {id} not found.");
-            }
-            return department;
-        }   
+    if (department == null)
+    {
+       return null;
+    }
+
+    return department; // Returns null if not found
+        //  const string query = @"SELECT * FROM AppData.Department WHERE Id = @Id AND IsDeleted = 0";
+        //    // var department = await _dbConnection.QueryFirstOrDefaultAsync<Department>(query, new { id });           
+        //     //  if (department == null)
+        //     // {
+        //     //   ///  throw new KeyNotFoundException($"Department with ID {id} not found.");
+        //     //   return null;
+        //     // }
+        //       var department = await _dbConnection.QueryAsync<Department>(query, new { id });
+        //      return department ?? new List<Department>();
+        }                  
     
 
 
@@ -54,12 +63,13 @@ namespace BSOFT.Infrastructure.Repositories.Departments
             
            const string query = @"
             select Id,CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
-            WHERE (DeptName LIKE @SearchDept OR Id LIKE @SearchDept) and IsActive =1
+            WHERE (DeptName LIKE @SearchDept OR Id LIKE @SearchDept) and IsDeleted = 0
             ORDER BY DeptName";
            
           var departments = await _dbConnection.QueryAsync<Department>(query, new { SearchDept = $"%{SearchDept}%" });
             return departments.ToList();
         }
 
+       
     }
 }

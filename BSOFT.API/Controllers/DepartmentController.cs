@@ -163,6 +163,8 @@ namespace BSOFT.API.Controllers
                 });
             }
 
+          
+
             // Update the department
             var updateResult = await Mediator.Send(command);
             if (updateResult.IsSuccess)
@@ -188,8 +190,7 @@ namespace BSOFT.API.Controllers
     }
 
         
-    [HttpPut("delete")]
-        
+    [HttpPut("delete")]       
 
         public async Task<IActionResult> Delete(DeleteDepartmentCommand deleteDepartmentCommand)
         {
@@ -263,14 +264,7 @@ namespace BSOFT.API.Controllers
                     StatusCode = StatusCodes.Status200OK,
                     Data = result.Data
                 });
-            // var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = searchDept };
-            // var result = await Mediator.Send(query);
-
-            // return Ok(new
-            // {
-            //     StatusCode = StatusCodes.Status200OK,
-            //     data = result.Data
-            // });
+            
         }
 
    

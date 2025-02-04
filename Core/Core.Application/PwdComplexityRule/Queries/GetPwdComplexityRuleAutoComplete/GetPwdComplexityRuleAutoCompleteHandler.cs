@@ -13,7 +13,7 @@ using Core.Application.UserRole.Queries.GetRole;
 
 namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleAutoComplete
 {
-    public class GetPwdComplexityRuleAutoCompleteHandler : IRequestHandler<GetPwdComplexityRuleAutoComplete, ApiResponseDTO<List<PwdRuleDto>>>
+    public class GetPwdComplexityRuleAutoCompleteHandler : IRequestHandler<GetPwdComplexityRuleAutoComplete, ApiResponseDTO<List<PwdComplexityRuleAutoCompleteAutocompleteDto>>>
     {
         
       
@@ -39,28 +39,28 @@ namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleAutoCom
         }
 
 
-         public async Task<ApiResponseDTO<List<PwdRuleDto>>> Handle(GetPwdComplexityRuleAutoComplete request, CancellationToken cancellationToken)
+         public async Task<ApiResponseDTO<List<PwdComplexityRuleAutoCompleteAutocompleteDto>>> Handle(GetPwdComplexityRuleAutoComplete request, CancellationToken cancellationToken)
         {
 
                   _logger.LogInformation("Handling GetDepartmentAutoCompleteSearchQuery with search pattern: {SearchPattern}", request.SearchTerm);
 
              // Fetch departments matching the search pattern
                 var result = await _passwordComplexityRuleQueryRepository.GetpwdautocompleteAsync(request.SearchTerm);
-                if (result == null )
+                if (!result.Any() || result.Count() == 0)
                 {
                     _logger.LogWarning("No Password Password Rule  found for search pattern: {SearchPattern}", request.SearchTerm);
-                    return new ApiResponseDTO<List<PwdRuleDto>>
+                    return new ApiResponseDTO<List<PwdComplexityRuleAutoCompleteAutocompleteDto>>
                     {
                         IsSuccess = false,
                         Message = "No matching Password Password Rule  found",
-                        Data = new List<PwdRuleDto>()
+                        Data = new List<PwdComplexityRuleAutoCompleteAutocompleteDto>()
                     };
                 }
 
                 _logger.LogInformation("Password  Rule  found for search pattern: {SearchPattern}. Mapping results to DTO.", request.SearchTerm);
 
                 // Map the result to DTO
-                var pwdRoleDto = _mapper.Map<List<PwdRuleDto>>(result);
+                var pwdRoleDto = _mapper.Map<List<PwdComplexityRuleAutoCompleteAutocompleteDto>>(result);
 
                 // Publish domain event for audit logs
                 var domainEvent = new AuditLogsDomainEvent(
@@ -74,7 +74,7 @@ namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleAutoCom
 
                 _logger.LogInformation("Domain event published for search pattern: {SearchPattern}", request.SearchTerm);
 
-                return new ApiResponseDTO<List<PwdRuleDto>>
+                return new ApiResponseDTO<List<PwdComplexityRuleAutoCompleteAutocompleteDto>>
                 {
                     IsSuccess = true,
                     Message = "Success",
