@@ -10,6 +10,7 @@ using Core.Application.Common.Interfaces.IRoleEntitlement;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
 {
@@ -39,7 +40,8 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
             _logger.LogError("UpdateRoleEntitlementCommand request is null.");
             throw new ArgumentNullException(nameof(request));
         }
-         _logger.LogInformation("Starting role entitlement update process for RoleName: {RoleName}", request.RoleName);
+
+        _logger.LogInformation("Starting role entitlement update process for RoleName: {RoleName}", request.RoleName);
 
         // Validate role existence
         var role = await _roleEntitlementQueryrepository.GetRoleByNameAsync(request.RoleName, cancellationToken);
@@ -52,45 +54,50 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
                 Message = "Role not found."
             };
         }
+
         // Fetch existing role entitlements
-            var existingEntitlements = await _roleEntitlementQueryrepository.GetRoleEntitlementsByRoleNameAsync(request.RoleName, cancellationToken);
-            if (existingEntitlements == null || !existingEntitlements.Any())
-            {
-                _logger.LogWarning("No existing role entitlements found for RoleName: {RoleName}", request.RoleName);
-            }
-// var roleEntitlement  = _mapper.Map<RoleEntitlement>(request);
+        var existingEntitlements = await _roleEntitlementQueryrepository.GetRoleEntitlementsByRoleNameAsync(request.RoleName, cancellationToken);
+        
+        if (existingEntitlements == null)
+        {
+            existingEntitlements = new List<RoleEntitlement>();
+            _logger.LogWarning("No existing role entitlements found for RoleName: {RoleName}", request.RoleName);
+        }
+
         // Map the new entitlements
         var updatedEntitlements = request.ModuleMenus
             .SelectMany(moduleMenu => moduleMenu.Menus
-                .Select(menu => 
+                .Select(menu =>
                 {
-                    var entitlement = _mapper.Map<RoleEntitlement>(menu);;
+                    var entitlement = _mapper.Map<RoleEntitlement>(menu);
                     entitlement.UserRoleId = role.Id;
                     entitlement.ModuleId = moduleMenu.ModuleId;
+                    entitlement.IsActive = request.IsActive == 1 ? Status.Active : Status.Inactive;
                     return entitlement;
                 }))
             .ToList();
 
-        // Update or replace existing entitlements
+        // Perform update operation
         await _roleEntitlementCommanderepository.UpdateRoleEntitlementsAsync(role.Id, updatedEntitlements, cancellationToken);
-                //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "Update",
-                    actionCode: role.RoleName,
-                    actionName: role.RoleName,
-                    details: $"RoleEntitlements for Role '{role.RoleName}' were updated.",
-                    module:"RoleEntitlement"
-                );
-                await _mediator.Publish(domainEvent, cancellationToken);
 
-            _logger.LogInformation("Successfully updated role entitlements for RoleName: {RoleName}", request.RoleName);
+        // Publish Domain Event for Logging/Audit
+        var domainEvent = new AuditLogsDomainEvent(
+            actionDetail: "Update",
+            actionCode: role.RoleName,
+            actionName: role.RoleName,
+            details: $"RoleEntitlements for Role '{role.RoleName}' were updated.",
+            module: "RoleEntitlement"
+        );
+        await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = true,
-                Message = "Role entitlements updated successfully.",
-                Data = true
-            };
+        _logger.LogInformation("Successfully updated role entitlements for RoleName: {RoleName}", request.RoleName);
+
+        return new ApiResponseDTO<bool>
+        {
+            IsSuccess = true,
+            Message = "Role entitlements updated successfully.",
+            Data = true
+        };
     }
     }
 }

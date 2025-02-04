@@ -44,9 +44,9 @@ namespace Core.Application.Users.Commands.DeleteUser
 
           // Perform the delete operation
             var RowsDeleted = await _userRepository.DeleteAsync(request.UserId, userToDelete);
-            bool isDeleted = RowsDeleted > 0; 
+            // bool isDeleted = RowsDeleted > 0; 
 
-            if (isDeleted)
+            if (RowsDeleted)
             {
                 _logger.LogInformation("User with UserId: {UserId} deleted successfully.", request.UserId);
                 return new ApiResponseDTO<bool>

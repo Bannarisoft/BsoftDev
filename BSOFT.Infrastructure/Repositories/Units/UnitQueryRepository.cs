@@ -10,14 +10,16 @@ namespace BSOFT.Infrastructure.Repositories.Units
 {
     public class UnitQueryRepository : IUnitQueryRepository
     {
-        private readonly IDbConnection _dbConnection;        
+        private readonly IDbConnection _dbConnection;  
+
+         
 
         public UnitQueryRepository(IDbConnection dbConnection)
         {
           _dbConnection = dbConnection;
         }
 
-        public async Task<List<UnitDto>> GetAllUnitsAsync()
+        public async Task<List<Unit>> GetAllUnitsAsync()
         {
             var query = @"
                 SELECT 
@@ -52,24 +54,40 @@ namespace BSOFT.Infrastructure.Repositories.Units
                     AppData.UnitAddress  ua ON u.Id = ua.UnitId
                 INNER JOIN 
                     AppData.UnitContacts uc ON u.Id = uc.UnitId
+                WHERE  U.IsDeleted = 0
+                ORDER BY 
+                    u.CreatedAt DESC
             ";
 
-            var result = await _dbConnection.QueryAsync<UnitDto, UnitAddressDto, UnitContactsDto, UnitDto>(
-            query,
-            (unit, address, contact) =>
-            {
-                unit.UnitAddressDto.Add(address);
-                unit.UnitContactsDto.Add(contact);
-                return unit;
-            },
-            splitOn: "AddressId, ContactId");
-            var units = result.GroupBy(u => u.Id)
-            .Select(g => g.First())
-            .ToList(); 
-            return units;
+             var unitDictionary = new Dictionary<int, Unit>();
+            
+            var units = await _dbConnection.QueryAsync<Unit, UnitAddress, UnitContacts, Unit>(
+                query,
+                (unit, address, contact) =>
+                {
+                    if (!unitDictionary.TryGetValue(unit.Id, out var existingunit))
+                    {
+                        existingunit = unit;
+                        existingunit.UnitAddress = address;
+                        existingunit.UnitContacts = contact;
+                        unitDictionary.Add(existingunit.Id, existingunit);
+                    }
+                    else
+                    {
+                        existingunit.UnitAddress = address;
+                        existingunit.UnitContacts = contact;
+                    }
+            
+                    return existingunit;
+                },
+                splitOn: "AddressLine1,Name" 
+            );
+            
+            return units.ToList();
+
         }
 
-        public async Task<List<UnitDto>> GetByIdAsync(int id)
+        public async Task<List<Unit>> GetByIdAsync(int id)
         {
                 var query = @"
                 SELECT 
@@ -104,26 +122,42 @@ namespace BSOFT.Infrastructure.Repositories.Units
                     AppData.UnitAddress  ua ON u.Id = ua.UnitId
                 INNER JOIN 
                     AppData.UnitContacts uc ON u.Id = uc.UnitId
+                WHERE u.Id = @id
+                AND U.IsDeleted = 0
+                ORDER BY 
+                    u.CreatedAt DESC
             ";
 
-            var result = await _dbConnection.QueryAsync<UnitDto, UnitAddressDto, UnitContactsDto, UnitDto>(
-            query,
-            (unit, address, contact) =>
-            {
-            unit.UnitAddressDto.Add(address);
-            unit.UnitContactsDto.Add(contact);
-            return unit;
-            },
-            splitOn: "AddressId, ContactId");
-            var units = result.Where(u => u.Id == id)
-            .GroupBy(u => u.Id)
-            .Select(g => g.First())
-            .ToList();
-            return units; 
+            var unitDictionary = new Dictionary<int, Unit>();
+            
+            var units = await _dbConnection.QueryAsync<Unit, UnitAddress, UnitContacts, Unit>(
+                query,
+                (unit, address, contact) =>
+                {
+                    if (!unitDictionary.TryGetValue(unit.Id, out var existingunit))
+                    {
+                        existingunit = unit;
+                        existingunit.UnitAddress = address;
+                        existingunit.UnitContacts = contact;
+                        unitDictionary.Add(existingunit.Id, existingunit);
+                    }
+                    else
+                    {
+                        existingunit.UnitAddress = address;
+                        existingunit.UnitContacts = contact;
+                    }
+            
+                    return existingunit;
+                },
+                splitOn: "AddressLine1,Name",
+                param: new { id = id }
+            );
+            
+            return units.ToList();
         }
 
 
-         public async Task<List<UnitDto>> GetUnit(string searchPattern = null)
+         public async Task<List<Unit>> GetUnit(string searchPattern = null)
         {
             if (string.IsNullOrWhiteSpace(searchPattern))
             {
@@ -164,25 +198,38 @@ namespace BSOFT.Infrastructure.Repositories.Units
                 INNER JOIN 
                     AppData.UnitContacts uc ON u.Id = uc.UnitId
 				WHERE U.UnitName LIKE @SearchPattern OR U.Id LIKE @SearchPattern
-                AND U.IsActive = 1
-                ORDER BY U.UnitName";
-                var result = await _dbConnection.QueryAsync<UnitDto, UnitAddressDto, UnitContactsDto, UnitDto>(
+                AND U.IsDeleted = 0
+                ORDER BY 
+                    u.CreatedAt DESC";
+
+            var unitDictionary = new Dictionary<int, Unit>();
+            
+            var units = await _dbConnection.QueryAsync<Unit, UnitAddress, UnitContacts, Unit>(
                 query,
                 (unit, address, contact) =>
                 {
-                    unit.UnitAddressDto.Add(address);
-                    unit.UnitContactsDto.Add(contact);
-                    return unit;
+                    if (!unitDictionary.TryGetValue(unit.Id, out var existingunit))
+                    {
+                        existingunit = unit;
+                        existingunit.UnitAddress = address;
+                        existingunit.UnitContacts = contact;
+                        unitDictionary.Add(existingunit.Id, existingunit);
+                    }
+                    else
+                    {
+                        existingunit.UnitAddress = address;
+                        existingunit.UnitContacts = contact;
+                    }
+            
+                    return existingunit;
                 },
-                splitOn: "AddressId, ContactId",
-                //param: new { SearchPattern = $"%{SearchPattern}%" });
-                param: new { SearchPattern = $"%{searchPattern}%" });
-                var units = result.GroupBy(u => u.Id)
-                .Select(g => g.First())
-                .ToList(); 
-                return units;                  
+                splitOn: "AddressLine1,Name",
+                param: new { SearchPattern = $"%{searchPattern}%" }
+            );
+            
+            return units.ToList();
+        }             
             
         }
 
     }
-}

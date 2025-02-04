@@ -88,7 +88,7 @@ namespace BSOFT.Infrastructure.Repositories
         //       return (await _dbConnection.QueryAsync<User>(query)).ToList();
         //  }
      
-        public async Task<int> DeleteAsync(int userId,User user)
+        public async Task<bool> DeleteAsync(int userId,User user)
         {
 
             var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);         
@@ -97,11 +97,11 @@ namespace BSOFT.Infrastructure.Repositories
                 var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
                 if (existingUser != null)
                 {
-                    existingUser.IsActive = user.IsActive;
-                    return await _applicationDbContext.SaveChangesAsync();
+                    existingUser.IsDeleted = user.IsDeleted;
+                    return await _applicationDbContext.SaveChangesAsync() > 0;
                 }
                 
-                 return 0; // No user found
+                 return false; // No user found
             });
       
         }

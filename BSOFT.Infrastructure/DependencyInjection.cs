@@ -48,8 +48,6 @@ using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 using BSOFT.Infrastructure.Repositories.PasswordComplexityRule;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
 using BSOFT.Infrastructure.Repositories.AdminSecuritySettings;
-using Core.Application.Common.Interfaces.IFinancialYear;
-using BSOFT.Infrastructure.Repositories.FinancialYear;
 using Hangfire;
 using Hangfire.SqlServer;
 using BSOFT.Infrastructure.Services;
@@ -57,7 +55,10 @@ using Core.Domain.Common;
 using Core.Application.Common.Interfaces.ICompanySettings;
 using BSOFT.Infrastructure.Repositories.CompanySettings;
 using FluentValidation;
-using Core.Application.FinancialYear.Command.CreateFinancialYear;
+using Core.Application.FinancialYear.Command.CreateFinancialYear;using Core.Application.Common.Interfaces.ICurrency;
+using BSOFT.Infrastructure.Repositories.Currency;
+using Core.Application.Common.Interfaces.ITimeZones;
+using BSOFT.Infrastructure.Repositories.TimeZones;
 using BSOFT.Infrastructure.PollyResilience;
 using Core.Application.Common.Interfaces.ILanguage;
 using BSOFT.Infrastructure.Repositories.Language;
@@ -81,7 +82,6 @@ namespace BSOFT.Infrastructure
                 }
 
             // Register ApplicationDbContext with SQL Server
-
            /*  services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString)); */
                 services.AddDbContext<ApplicationDbContext>(options =>
@@ -194,16 +194,14 @@ namespace BSOFT.Infrastructure
 			services.AddScoped<IPasswordComplexityRuleQueryRepository,  PasswordComplexityRuleQueryRepository>();
             services.AddScoped<IPasswordComplexityRuleCommandRepository, PasswordComplexityRuleCommandRepository>();
             services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
-
-
-            services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>(); 
-            services.AddScoped<IFinancialYearQueryRepository,  FinancialYearQueryRepository>();
+            services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            
+ services.AddScoped<IFinancialYearQueryRepository,  FinancialYearQueryRepository>();
             services.AddScoped<IFinancialYearCommandRepository , FinancialYearCommandRepository>();
-
-          
-                     
             services.AddHttpContextAccessor();            
-            services.AddScoped<ICompanyQuerySettings ,  CompanySettingsQueryRepository>(); 
+            services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();   
+            services.AddScoped<ICurrencyQueryRepository, CurrencyQueryRepository>();
+            services.AddScoped<ICurrencyCommandRepository, CurrencyCommandRepository>();
+            services.AddScoped<ITimeZonesQueryRepository, TimeZonesQueryRepository>();
 
             services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();
             services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();
@@ -215,10 +213,7 @@ namespace BSOFT.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
-
-
-            services.AddScoped<IChangePassword, PasswordChangeRepository>();
-                   
+            services.AddScoped<IChangePassword, PasswordChangeRepository>();            
             
 
             /*services.Configure<EmailJobSettings>(configuration.GetSection("EmailJobSettings"));
@@ -238,16 +233,14 @@ namespace BSOFT.Infrastructure
                 typeof(ChangePasswordProfile),             
 				typeof(PasswordComplexityRuleProfile),
                 typeof(EntityProfile),
-                typeof(UnitProfile),
+
  				typeof(AdminSecuritySettingsProfile),
 				typeof(DepartmentProfile),
-                typeof(UpdateUnitProfile),
-                typeof(CreateUnitProfile),
 
-                typeof(CompanySettingsProfile),
-                typeof(UpdateUnitProfile),
-                typeof(FinancialYearProfile),
-                typeof(CompanySettingsProfile)
+typeof(FinancialYearProfile),
+                typeof(CurrencyProfile),
+                typeof(UnitsProfile),
+				typeof(CompanySettingsProfile)
             );
 
             return services;

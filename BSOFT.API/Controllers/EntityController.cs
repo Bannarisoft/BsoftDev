@@ -45,9 +45,9 @@ public async Task<IActionResult> GetAllEntityAsync()
 {
         
         var result  = await Mediator.Send(new GetEntityQuery());
-        if (result == null || result.Data == null || !result.Data.Any())
+        if (result is null || result.Data is null || !result.Data.Any())
         {
-            _logger.LogWarning("No Entity Record {Entity} not found in DB.", result.Data);
+            _logger.LogWarning($"No Entity Record {result.Data} not found in DB.");
             return NotFound(new
             {
                 message = result.Message,
@@ -55,7 +55,7 @@ public async Task<IActionResult> GetAllEntityAsync()
               
             });
         }
-        _logger.LogInformation("Entity {Entities} Listed successfully.", result.Data.Count);
+        _logger.LogInformation($"Entity {result.Data.Count} Listed successfully.");
         return Ok(new
         {
             
@@ -72,7 +72,7 @@ public async Task<IActionResult> GetByIdAsync(int id)
         
         if (id <= 0)
         {
-            _logger.LogWarning("Entity {EntityId} not found.", id);
+            _logger.LogWarning($"EntityId {id} not found.");
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
@@ -84,7 +84,7 @@ public async Task<IActionResult> GetByIdAsync(int id)
 
         if (result.IsSuccess)
         {
-              _logger.LogInformation("Entity {EntityId} Listed successfully.", result.Data);
+              _logger.LogInformation($"EntityId {result.Data} Listed successfully.");
               return Ok(new
              {
                  message = result.Message,
@@ -92,7 +92,7 @@ public async Task<IActionResult> GetByIdAsync(int id)
                  data = result.Data
              }); 
         }
-        _logger.LogWarning("Entity {EntityId} Not found.", result.Data);
+        _logger.LogWarning($"EntityId {result.Data} Not found.");
         return NotFound(new
         {
             message = result.Message,
@@ -101,7 +101,7 @@ public async Task<IActionResult> GetByIdAsync(int id)
    
 }
        
-    [HttpGet("GenerateNewEntityCode")]
+    [HttpGet("entity/new-code")]
 public async Task<IActionResult> GenerateEntityCodeAsync()
 {
    
@@ -110,7 +110,7 @@ public async Task<IActionResult> GenerateEntityCodeAsync()
 
         if (lastEntityCode.IsSuccess)
         {
-            _logger.LogInformation("Entity {EntityCode} Generated successfully.", lastEntityCode.Data);
+            _logger.LogInformation($"EntityCode {lastEntityCode.Data} Generated successfully.");
             return Ok(new
             {
                 message = lastEntityCode.Message,
@@ -118,7 +118,7 @@ public async Task<IActionResult> GenerateEntityCodeAsync()
                 data = lastEntityCode.Data
             });
         }
-        _logger.LogInformation("Entity {EntityCode} Not found.", lastEntityCode.Data);
+        _logger.LogInformation($"EntityCode {lastEntityCode.Data} Not found.");
         return BadRequest(new
         {
             message = lastEntityCode.Message,
@@ -128,12 +128,12 @@ public async Task<IActionResult> GenerateEntityCodeAsync()
 }
 
 [HttpPost]
-public async Task<IActionResult> CreateAsync(CreateEntityCommand command)
+public async Task<IActionResult> CreateAsync(CreateEntityCommand createEntityCommand)
 {
     
     // Validate the incoming command
-    var validationResult = await _createEntityCommandValidator.ValidateAsync(command);
-    _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
+    var validationResult = await _createEntityCommandValidator.ValidateAsync(createEntityCommand);
+     _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
     if (!validationResult.IsValid)
     {
         
@@ -141,16 +141,16 @@ public async Task<IActionResult> CreateAsync(CreateEntityCommand command)
         {
             StatusCode = StatusCodes.Status400BadRequest,
             message = "Validation failed",
-            errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+            errors = validationResult.Errors.Select(e => e.ErrorMessage)
         });
     }
 
     // Process the command
-    var createdEntityId = await _mediator.Send(command);
+    var createdEntityId = await _mediator.Send(createEntityCommand);
 
     if (createdEntityId.IsSuccess)
     {
-     _logger.LogInformation("Entity {EntityName} created successfully.", command.EntityName);
+     _logger.LogInformation($"EntityName {createEntityCommand.EntityName} created successfully.");
       return Ok(new
       {
           StatusCode = StatusCodes.Status201Created,
@@ -158,7 +158,7 @@ public async Task<IActionResult> CreateAsync(CreateEntityCommand command)
           data = createdEntityId.Data
       });
     }
-     _logger.LogWarning("Entity {EntityName} Creation failed.", command.EntityName);
+     _logger.LogWarning($"EntityName {createEntityCommand.EntityName} Creation failed.");
       return BadRequest(new
         {
             StatusCode = StatusCodes.Status400BadRequest,
@@ -167,13 +167,13 @@ public async Task<IActionResult> CreateAsync(CreateEntityCommand command)
   
 }
 
-[HttpPut("update")]
-public async Task<IActionResult> UpdateAsync( UpdateEntityCommand command)
+[HttpPut]
+public async Task<IActionResult> UpdateAsync( UpdateEntityCommand updateEntityCommand)
 {
   
         // Validate the incoming command
-        var validationResult = await _updateEntityCommandValidator.ValidateAsync(command);
-        _logger.LogWarning("Validation failed: {ErrorDetails}", validationResult);
+        var validationResult = await _updateEntityCommandValidator.ValidateAsync(updateEntityCommand);
+        _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
         if (!validationResult.IsValid)
         {
            
@@ -181,41 +181,41 @@ public async Task<IActionResult> UpdateAsync( UpdateEntityCommand command)
             {
                 StatusCode = StatusCodes.Status400BadRequest,
                 message = "Validation failed",
-                errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                errors = validationResult.Errors.Select(e => e.ErrorMessage)
             });
         }
 
-        var updatedEntity = await _mediator.Send(command);
+        var updatedEntity = await _mediator.Send(updateEntityCommand);
 
         if (updatedEntity.IsSuccess)
         {
-            _logger.LogInformation("Entity {EntityName} updated successfully.", command.EntityName);
+            _logger.LogInformation($"EntityName {updateEntityCommand.EntityName} updated successfully.");
            return Ok(new
             {
                 message = updatedEntity.Message,
                 statusCode = StatusCodes.Status200OK
             });
         }
-        _logger.LogWarning("Entity {EntityName} Update failed.", command.EntityName);
+        _logger.LogWarning($"EntityName {updateEntityCommand.EntityName} Update failed.");
         return NotFound(new
         {
-            message ="Entity not found",
+            message =updatedEntity.Message,
             statusCode = StatusCodes.Status404NotFound
         });
 
         
 }
 
-[HttpDelete("delete")]
-public async Task<IActionResult> DeleteEntityAsync( DeleteEntityCommand command)
+[HttpDelete]
+public async Task<IActionResult> DeleteEntityAsync( DeleteEntityCommand deleteEntityCommand)
 {
 
         // Process the delete command
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(deleteEntityCommand);
 
         if (result.IsSuccess) 
         {
-            _logger.LogInformation("Entity {EntityName} deleted successfully.", command.EntityId);
+            _logger.LogInformation($"EntityId {deleteEntityCommand.EntityId} deleted successfully.");
              return Ok(new
             {
                 message = result.Message,
@@ -223,7 +223,7 @@ public async Task<IActionResult> DeleteEntityAsync( DeleteEntityCommand command)
             });
             
         }
-         _logger.LogWarning("Entity {EntityName} Not Found or Invalid EntityId.", command.EntityId);
+         _logger.LogWarning($"EntityId {deleteEntityCommand.EntityId} Not Found or Invalid EntityId.");
         return NotFound(new
         {
             message = result.Message,
@@ -232,13 +232,13 @@ public async Task<IActionResult> DeleteEntityAsync( DeleteEntityCommand command)
    
 }
 
-[HttpGet("GetEntitysearch")]
-public async Task<IActionResult> GetEntity([FromQuery] string searchPattern)
+[HttpGet("entity/by-name/{name}")]
+public async Task<IActionResult> GetEntity([FromRoute] string name)
 {
       // Check if searchPattern is provided
-        if (string.IsNullOrEmpty(searchPattern))
+        if (string.IsNullOrEmpty(name))
         {
-            _logger.LogInformation("Search pattern cannot be empty.");
+            _logger.LogInformation($"Search pattern {name} cannot be empty.");
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
@@ -247,11 +247,11 @@ public async Task<IActionResult> GetEntity([FromQuery] string searchPattern)
         }
 
         // Fetch entities based on search pattern
-        var entities = await Mediator.Send(new GetEntityAutocompleteQuery { SearchPattern = searchPattern });
-        _logger.LogInformation("Search pattern: {SearchPattern}", searchPattern);
+        var entities = await Mediator.Send(new GetEntityAutocompleteQuery { SearchPattern = name });
+        _logger.LogInformation("Search pattern: {SearchPattern}", name);
        if (entities.IsSuccess)
         {
-        _logger.LogInformation("Entity {Entities} Listed successfully.", entities.Data.Count);
+        _logger.LogInformation($"Entity {entities.Data.Count} Listed successfully.");
          return Ok(new  
             {
                 message = entities.Message,
@@ -259,7 +259,7 @@ public async Task<IActionResult> GetEntity([FromQuery] string searchPattern)
                 data = entities.Data
             });
         }
-        _logger.LogInformation("No Entity Record {Entity} not found in DB.", entities.Data);
+        _logger.LogInformation($"No Entity Record in the DB {name} not found.");
         return NotFound(new
         {
             message = entities.Message,
