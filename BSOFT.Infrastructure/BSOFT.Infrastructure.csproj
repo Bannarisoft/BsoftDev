@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.Domain\Core.Domain.csproj"/>
-    <ProjectReference Include="..\Core\Core.Application\Core.Application.csproj"/>
-    <None Update="Templates\EmailTemplate.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\Core\Core.Application\Core.Application.csproj"/>  
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>

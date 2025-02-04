@@ -43,9 +43,7 @@ namespace BSOFT.API.Validation.UserLogin
                         .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
                         .WithMessage($"{nameof(UserLoginCommand.Password)} {rule.Error}");
                         break; 
-                    default:
-                        // Handle unknown rule (log or throw)
-                        // Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                    default:                        
                         break;
                 }
             }

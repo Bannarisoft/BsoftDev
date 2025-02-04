@@ -13,16 +13,19 @@ namespace BSOFT.API.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly JwtSettings _jwtSettings;
+        private readonly ITimeZoneService _timeZoneService;
 
-        public TokenValidationMiddleware(RequestDelegate next, IOptions<JwtSettings> jwtSettings)
+        public TokenValidationMiddleware(RequestDelegate next, IOptions<JwtSettings> jwtSettings, ITimeZoneService timeZoneService)
         {
             _next = next;
             _jwtSettings = jwtSettings.Value;
+            _timeZoneService = timeZoneService;
         }
 
         public async Task Invoke(HttpContext context, IJwtTokenHelper jwtTokenHelper, IUserSessionRepository sessionRepository)
         {
-            // Skip validation for endpoints marked with [AllowAnonymous]
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);             
             var endpoint = context.GetEndpoint();
             if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
             {
@@ -53,7 +56,7 @@ namespace BSOFT.API.Middleware
 
                 // Check session in the database
                 var session = await sessionRepository.GetSessionByJwtIdAsync(jti);
-                if (session is null || session.IsActive is 0 || session.ExpiresAt <= DateTime.UtcNow)
+                if (session is null || session.IsActive is 0 || session.ExpiresAt <= currentTime)
                 {
                     await WriteErrorResponse(context, StatusCodes.Status401Unauthorized, "Session is invalid or expired.");
                     return;
@@ -64,7 +67,7 @@ namespace BSOFT.API.Middleware
                 context.Items["UserName"] = principal.Claims.FirstOrDefault(c => c.Type is JwtRegisteredClaimNames.Name)?.Value;
 
                 // Update session's last activity
-                session.LastActivity = DateTime.UtcNow;
+                session.LastActivity = currentTime;
                 await sessionRepository.UpdateSessionAsync(session);
 
                 // Set the User principal

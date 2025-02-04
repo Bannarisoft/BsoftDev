@@ -12,8 +12,8 @@ namespace BSOFT.Infrastructure.Repositories
     public class JwtTokenHelper : IJwtTokenHelper
     {
         private readonly JwtSettings _jwtSettings;
-
-        public JwtTokenHelper(IOptions<JwtSettings> jwtSettings)
+        private readonly ITimeZoneService _timeZoneService;
+        public JwtTokenHelper(IOptions<JwtSettings> jwtSettings, ITimeZoneService timeZoneService)
         {          
             if (jwtSettings == null || jwtSettings.Value == null)
             {
@@ -21,6 +21,7 @@ namespace BSOFT.Infrastructure.Repositories
             }
 
             _jwtSettings = jwtSettings.Value;
+            _timeZoneService = timeZoneService;
 
             if (string.IsNullOrWhiteSpace(_jwtSettings.SecretKey))
             {
@@ -39,18 +40,15 @@ namespace BSOFT.Infrastructure.Repositories
             var encryptionKeyBytes = Convert.FromBase64String(_jwtSettings.EncryptionKey);            
            if (encryptionKeyBytes.Length  != 32)
             {
-                //var rawKey = RandomNumberGenerator.GetBytes(32);
-                //var base64Key = Convert.ToBase64String(rawKey);
-                //Console.WriteLine($"Generated EncryptionKey (DEBUG ONLY): {base64Key}");
-                //Console.WriteLine($"Encrpt key length:  { Encoding.UTF8.GetBytes(_jwtSettings.EncryptionKey).Length}");
                 throw new ArgumentException("JWT EncryptionKey must be exactly 32 bytes long.", nameof(_jwtSettings.EncryptionKey));
             } 
         }
 
       public string GenerateToken(string username, int userId, int usertype, IEnumerable<string> roles, out string jti)
         {
-            jti = Guid.NewGuid().ToString();
-            DateTime utcNow = DateTime.UtcNow;
+            jti = Guid.NewGuid().ToString();            
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId); 
 
             var claims = new List<Claim>
             {
@@ -58,29 +56,14 @@ namespace BSOFT.Infrastructure.Repositories
                 new Claim(JwtRegisteredClaimNames.NameId, userId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Typ, usertype.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, jti),
-                new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(utcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+                new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(currentTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             };
 
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
-
-            //var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-            //var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-
-            //var encryptionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.EncryptionKey));            
-            //var encryptingCredentials = new EncryptingCredentials(encryptionKey, SecurityAlgorithms.Aes256KW, SecurityAlgorithms.Aes256CbcHmacSha512);
-   /*     var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = utcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
-                SigningCredentials = signingCredentials,
-                EncryptingCredentials = encryptingCredentials,
-                Issuer = _jwtSettings.Issuer,
-                Audience = _jwtSettings.Audience
-            }; */
-             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
             var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
 
             // Decode Base64 EncryptionKey
@@ -95,7 +78,7 @@ namespace BSOFT.Infrastructure.Repositories
             var tokenDescriptor = new SecurityTokenDescriptor
             {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+            Expires = currentTime.AddMinutes(_jwtSettings.ExpiryMinutes),
             SigningCredentials = signingCredentials,
             EncryptingCredentials = encryptingCredentials,
             Issuer = _jwtSettings.Issuer,
@@ -188,9 +171,7 @@ namespace BSOFT.Infrastructure.Repositories
                 return principal; // Return claims principal on successful validation
             }
             catch (Exception ex)
-            {
-                // Log the exception and rethrow
-                Console.WriteLine($"Token validation failed: {ex.Message}");
+            {                
                 throw new SecurityTokenException("Invalid or decryption failed for token.", ex);
             }
         }

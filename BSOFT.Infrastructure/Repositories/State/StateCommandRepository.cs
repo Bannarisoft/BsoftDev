@@ -45,20 +45,17 @@ namespace BSOFT.Infrastructure.Repositories.State
                 _applicationDbContext.States.Update(existingState);
                 return await _applicationDbContext.SaveChangesAsync();
             }
-           return 0; // No user found
+           return 0; 
         }
         public async Task<bool> CountryExistsAsync(int countryId)
-        {
-        //return await _applicationDbContext.States.AnyAsync(c => c.Id == stateId);
+        {       
             return await _applicationDbContext.Countries.AnyAsync(s => s.Id == countryId && s.IsDeleted == Enums.IsDelete.NotDeleted && s.IsActive == Enums.Status.Active);
         }
         public async Task<States> GetStateByCodeAsync(string stateName,string stateCode, int countryId)
         {
-                var state = await _applicationDbContext.States
+                return await _applicationDbContext.States
                     .FirstOrDefaultAsync(s => s.StateCode == stateCode 
-                                  && s.StateName == stateName && s.CountryId == countryId)  ;
-                
-                return state; //?? throw new Exception("State not found");
+                                  && s.StateName == stateName && s.CountryId == countryId)?? new States()  ;
         }
     }
 }

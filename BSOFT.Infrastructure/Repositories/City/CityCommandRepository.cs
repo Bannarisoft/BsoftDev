@@ -50,10 +50,9 @@ namespace BSOFT.Infrastructure.Repositories.City
         }
         public async Task<Cities> GetCityByNameAsync(string cityName,string cityCode, int stateId)
         {           
-            var city = await _applicationDbContext.Cities
+            return await  _applicationDbContext.Cities
                 .FirstOrDefaultAsync(s => s.CityCode == cityCode 
-                            && s.CityName == cityName && s.StateId == stateId);
-                return city;                
+                            && s.CityName == cityName && s.StateId == stateId) ?? new Cities();                          
         }
 
     }

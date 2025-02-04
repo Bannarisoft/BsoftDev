@@ -6,7 +6,7 @@ namespace Core.Application.City.Commands.DeleteCity
 {
        public class DeleteCityCommand :  IRequest<ApiResponseDTO<CityDto>>  
        {
-                public int Id { get; set; }                
+              public int Id { get; set; }                
        }
     
 }

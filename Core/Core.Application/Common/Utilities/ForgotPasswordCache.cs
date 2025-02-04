@@ -23,7 +23,7 @@ namespace Core.Application.Common.Utilities
 // Verification code details class
 public class VerificationCodeDetails
 {
-    public string Code { get; set; }
+    public string? Code { get; set; }
     public DateTime ExpiryTime { get; set; }
 }
 

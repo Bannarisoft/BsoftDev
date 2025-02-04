@@ -73,7 +73,7 @@ namespace Core.Application.Users.Commands.CreateUser
                 };
             }                
             _logger.LogInformation("User successfully created for Username: {Username}", createdUser.UserName);
-                  // Attempt to send the email notification
+          /*         // Attempt to send the email notification
            bool emailSent = false;
             try
             {
@@ -96,7 +96,7 @@ namespace Core.Application.Users.Commands.CreateUser
             {
                 _logger.LogWarning("Failed to send login notification email to {Email}.", createdUser.EmailId);
             } 
-
+ */
           
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(

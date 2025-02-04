@@ -50,11 +50,6 @@ namespace BSOFT.Infrastructure.Repositories
                 WHERE (StateName LIKE @SearchPattern OR StateCode LIKE @SearchPattern) 
                 AND IsDeleted = 0
                 ORDER BY ID DESC";
-
-       /*      var states = await _dbConnection.QueryAsync<States>(
-                query,
-                new { SearchPattern = $"%{searchPattern}%" }
-            ); */
             var result = await _dbConnection.QueryAsync<States>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();              
         }

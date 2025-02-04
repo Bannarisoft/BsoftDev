@@ -59,20 +59,27 @@ namespace BSOFT.API.Controllers
         {
             var users = await Mediator.Send(new GetUserQuery());
             var activeUsers = users.ToList();
+
             _logger.LogInformation($"Total {activeUsers.Count} active users listed successfully.");
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, data = activeUsers });
         }
 
+
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             
+
             var user = await Mediator.Send(new GetUserByIdQuery { UserId = id });
+
 
             if (user is null)
             {
+
                 _logger.LogWarning($"User not found for ID {id}.");
+
 
                 return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"User ID {id} not found." });
             }
@@ -82,8 +89,12 @@ namespace BSOFT.API.Controllers
         }
 
         [HttpPost]
+
+
         public async Task<IActionResult> CreateAsync([FromBody] CreateUserCommand createUserCommand)
         {
+
+
             var validationResult = await _createUserCommandValidator.ValidateAsync(createUserCommand);
                 _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
 
@@ -97,19 +108,28 @@ namespace BSOFT.API.Controllers
                 });
             }
 
+
             var response = await Mediator.Send(createUserCommand);
             if (response.IsSuccess)
             {
+
+
                 _logger.LogInformation($"User {createUserCommand.UserName} created successfully.");
                 return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
             }
+
                 _logger.LogWarning($"Failed to create user {createUserCommand.UserName}.");
+
 
                 return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
         }        
         [HttpPut]
+
+
         public async Task<IActionResult> UpdateAsync([FromBody] UpdateUserCommand updateUserCommand)
         {
+
+
             var validationResult = await _updateUserCommandValidator.ValidateAsync(updateUserCommand);
                 _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
 
@@ -123,23 +143,33 @@ namespace BSOFT.API.Controllers
                 });
             }
 
+
+
             var userExists = await Mediator.Send(new GetUserByIdQuery { UserId = updateUserCommand.UserId });
             if (userExists is null)
             {
+
+
                 _logger.LogInformation($"User with ID {updateUserCommand.UserId} not found for update.");
                 return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"User ID {updateUserCommand.UserId} not found." });
             }
 
+
             var response = await Mediator.Send(updateUserCommand);
             if (response.IsSuccess)
             {
+
                 _logger.LogInformation($"User {updateUserCommand.UserName} updated successfully.");
                 return Ok(new { StatusCode = StatusCodes.Status200OK, message = response.Message });
             }
+
                 _logger.LogWarning($"Failed to update user {updateUserCommand.UserName}.");
 
                 return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
         }      
+
+
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
@@ -166,35 +196,50 @@ namespace BSOFT.API.Controllers
             }
             _logger.LogInformation($"User {id} deleted successfully.");
 
+
+
             return Ok(new
             {
+
                 StatusCode = StatusCodes.Status200OK,
                 data =$"User ID {id} Deleted" 
             });
             // var deleteUser = await Mediator.Send(deleteUserCommand);
+
 
             // if(deleteUser.IsSuccess)
             // {
             //     _logger.LogInformation($"User {deleteUserCommand.UserId} deleted successfully.");
             //     return Ok(new { StatusCode=StatusCodes.Status200OK, message = deleteUser.Message, errors = "" });
               
+
+
+
             // }
             //     _logger.LogInformation($"Failed to delete user with ID {deleteUserCommand.UserId}.");
             //     return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = deleteUser.Message, errors = "" });
         }
 
         [HttpGet]
+
+
         [Route("by-name/{name}")]
         public async Task<IActionResult> GetByUsernameAsync(string name)
         {
            
+
+
             var users = await Mediator.Send(new GetUserAutoCompleteQuery {SearchPattern = name});
             _logger.LogWarning($"Users listed successfully: {string.Join(", ", users)}");
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = users });
         }
+
+
+
         [HttpPut("password/first-time")]
         public async Task<IActionResult> FirstTimeUserChangePassword([FromBody] FirstTimeUserPasswordCommand firstTimeUserPasswordCommand)
         {
+
             var validationResult = await _firstTimeUserPasswordCommandValidator.ValidateAsync(firstTimeUserPasswordCommand);
             if (!validationResult.IsValid)
             {
@@ -206,13 +251,19 @@ namespace BSOFT.API.Controllers
                 });
             }
 
+
+
             var response = await Mediator.Send(firstTimeUserPasswordCommand);
             _logger.LogInformation($"First Time User {firstTimeUserPasswordCommand.UserName} and Password changed successfully.");
             return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });     
         }
+
+
+
         [HttpPut("password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangeUserPasswordCommand changeUserPasswordCommand)
         {
+
             var validationResult = await _changeUserPasswordCommandValidator.ValidateAsync(changeUserPasswordCommand);
             if (!validationResult.IsValid)
             {
@@ -224,39 +275,52 @@ namespace BSOFT.API.Controllers
                 });
             }
 
+
+
             var response = await Mediator.Send(changeUserPasswordCommand);
             _logger.LogInformation($"User {changeUserPasswordCommand.UserName} and password changed successfully.");
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });
         }
+
+
+
         [HttpPost("password/reset-request")]
         public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand forgotUserPasswordCommand)
         {       
+
             var response = await Mediator.Send(forgotUserPasswordCommand);
-            if (response[0].IsSuccess)
+
+            if (response.IsSuccess)
             {
+
                 _logger.LogInformation($"User {forgotUserPasswordCommand.UserName} fetched successfully.");
                 
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = response[0].Data.Message, // Correctly access the message
+
+              return Ok(new
+              {
+                  StatusCode = StatusCodes.Status200OK,
+                  message = response.Data, // Correctly access the message
                     
                 });
             }
             _logger.LogWarning($"Invalid username, email, or mobile number: {forgotUserPasswordCommand.UserName}.");
 
-            return BadRequest(new
+             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
-                Message = response[0].Message // Access the message for error
+                message = response.Message // Access the message for error
             });
 }
+
+
+
 
        [HttpPut("password/reset")]
         public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand resetUserPasswordCommand)
         {
             
+
             var response = await Mediator.Send(resetUserPasswordCommand);
             _logger.LogInformation($"Password changed successfully for user {resetUserPasswordCommand.UserName}.");
 

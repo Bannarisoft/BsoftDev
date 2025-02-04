@@ -57,13 +57,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
          options.Events = new JwtBearerEvents
         {
             OnAuthenticationFailed = context =>
-            {
-                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+            {            
                 return Task.CompletedTask;
             },
             OnTokenValidated = context =>
-            {
-                Console.WriteLine("Token validated successfully");
+            {             
                 return Task.CompletedTask;
             }
          };
@@ -144,30 +142,13 @@ app.UseHangfireDashboard("/hangfire",new DashboardOptions()
 
 
 // Configure the HTTP request pipeline. 
-//if (app.Environment.IsDevelopment())
-//{
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseDeveloperExceptionPage(); 
-//}
-
- // Map endpoint to handle CreateStateCommand
-app.MapPost("/state", async (
-    CreateStateCommand request,
-    IMediator mediator,
-    CancellationToken cancellationToken) =>
-{
-    var result = await mediator.Send(request, cancellationToken);
-
-    
-if (!result.IsSuccess)
-    {
-        return Results.BadRequest(result);
-    }
-
-    return Results.Created($"/states/{result.Data.Id}", result.Data);
-});
-
+}
+ 
 
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing

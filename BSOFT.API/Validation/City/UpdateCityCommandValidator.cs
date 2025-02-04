@@ -47,9 +47,7 @@ namespace BSOFT.API.Validation.Country
                             .MaximumLength(cityCodeMaxLength) // Dynamic value from MaxLengthProvider
                             .WithMessage($"{nameof(CreateCityCommand.CityCode)} {rule.Error} {cityCodeMaxLength}");
                         break;                                 
-                    default:
-                        // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                    default:                                               
                         break;
                 }
             }

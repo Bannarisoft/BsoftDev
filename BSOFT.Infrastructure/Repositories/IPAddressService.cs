@@ -120,12 +120,9 @@ namespace BSOFT.Infrastructure.Repositories
             var userName = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
 
             if (string.IsNullOrEmpty(userName))
-            {
-                Console.WriteLine("UserName is not available. Returning 'Anonymous'.");
+            {             
                 return "Anonymous";
             }
-
-            Console.WriteLine($"Retrieved UserName: {userName}");
             return userName;
         }
         public string GetUserOS()

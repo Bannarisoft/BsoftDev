@@ -6,7 +6,8 @@ using System.IO;
 using Core.Application.Common.Interfaces;
 using BSOFT.Infrastructure.Repositories;
 using MongoDB.Driver;
-using Microsoft.AspNetCore.Http;  // Ensure this is included if needed for IHttpContextAccessor
+using Microsoft.AspNetCore.Http;
+using BSOFT.Infrastructure.Services;  // Ensure this is included if needed for IHttpContextAccessor
 
 namespace BSOFT.Infrastructure
 {
@@ -30,8 +31,9 @@ namespace BSOFT.Infrastructure
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             // Create a dummy or mock IPAddressService implementation
             IIPAddressService ipAddressService = new IPAddressService(httpContextAccessor);
-            
-            return new ApplicationDbContext(optionsBuilder.Options, ipAddressService);  // Pass both dependencies
+            ITimeZoneService timeZoneService = new TimeZoneService();
+
+            return new ApplicationDbContext(optionsBuilder.Options, ipAddressService,timeZoneService);  // Pass both dependencies
             //return new ApplicationDbContext(optionsBuilder.Options);  // Pass both dependencies
         }
     }

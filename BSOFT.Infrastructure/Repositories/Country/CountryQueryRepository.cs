@@ -50,10 +50,6 @@ namespace BSOFT.Infrastructure.Repositories.Country
                 WHERE (CountryName LIKE @SearchPattern OR CountryCode LIKE @SearchPattern) 
                 AND IsDeleted = 0
                 ORDER BY ID DESC";
-            var countries = await _dbConnection.QueryAsync<Countries>(
-                query,
-                new { SearchPattern = $"%{searchPattern}%" }
-            );
             var result = await _dbConnection.QueryAsync<Countries>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();
         }
