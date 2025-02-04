@@ -139,7 +139,13 @@ namespace BSOFT.API.Validation.Companies
                     case "Telephone":
                         RuleFor(x => x.Company.CompanyAddress.AlternatePhone)
                         .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                        .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyAddress.AlternatePhone)} {rule.Error}");
+                        .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyAddress.AlternatePhone)} {rule.Error}")
+                        .When(x => !string.IsNullOrWhiteSpace(x.Company.CompanyAddress.AlternatePhone));
+
+                        RuleFor(x => x.Company.CompanyAddress.Phone)
+                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                        .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyAddress.Phone)} {rule.Error}")
+                        .When(x => !string.IsNullOrWhiteSpace(x.Company.CompanyAddress.Phone));
 
                          RuleFor(x => x.Company.CompanyContact.Phone)
                         .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
