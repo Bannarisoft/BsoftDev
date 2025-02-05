@@ -77,7 +77,7 @@ namespace UserManagement.API.Controllers
             return Ok(new { StatusCode=StatusCodes.Status200OK, data = division.Data});
         }
 
-        [HttpPut("update")]
+        [HttpPut]
         public async Task<IActionResult> Update( UpdateDivisionCommand command )
         {
             var validationResult = await _updateDivisionCommandValidator.ValidateAsync(command);
@@ -106,12 +106,12 @@ namespace UserManagement.API.Controllers
         }
 
 
-        [HttpPut("delete")]
+        [HttpDelete("{id}")]
         
-        public async Task<IActionResult> Delete(DeleteDivisionCommand deleteDivisionCommand)
+        public async Task<IActionResult> Delete(int id)
         {
            
-           var updatedDivision = await Mediator.Send(deleteDivisionCommand);
+           var updatedDivision = await Mediator.Send(new DeleteDivisionCommand { Id = id });
 
            if(updatedDivision.IsSuccess)
            {
@@ -122,11 +122,11 @@ namespace UserManagement.API.Controllers
             return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedDivision.Message, errors = "" });
             
         }
-         [HttpGet("GetDivision")]
-        public async Task<IActionResult> GetDivision([FromQuery] string searchPattern)
+         [HttpGet("by-name/{name}")]
+        public async Task<IActionResult> GetDivision(string name)
         {
            
-            var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = searchPattern});
+            var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = name});
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = divisions.Data });
         }
       

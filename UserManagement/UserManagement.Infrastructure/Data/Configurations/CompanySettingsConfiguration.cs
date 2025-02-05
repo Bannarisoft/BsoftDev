@@ -98,13 +98,13 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 )
                 .IsRequired();
 
-            builder.Property(c => c.Currency)
-                .HasColumnName("Currency")
+            builder.Property(c => c.CurrencyId)
+                .HasColumnName("CurrencyId")
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(c => c.Language)
-                .HasColumnName("Language")
+            builder.Property(c => c.LanguageId)
+                .HasColumnName("LanguageId")
                 .HasColumnType("int")
                 .IsRequired();
 
@@ -113,8 +113,8 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(c => c.FinancialYear)
-                .HasColumnName("FinancialYear")
+            builder.Property(c => c.FinancialYearId)
+                .HasColumnName("FinancialYearId")
                 .HasColumnType("int")
                 .IsRequired();
 
@@ -129,6 +129,18 @@ namespace UserManagement.Infrastructure.Data.Configurations
             .HasColumnType("bit")
             .HasConversion(isDeletedConverter)
             .IsRequired();
+
+             builder.HasOne(ca => ca.Currency)
+                .WithOne(ca => ca.CompanySettings)
+                .HasForeignKey<CompanySettings>(ca => ca.CurrencyId);
+
+            builder.HasOne(ca => ca.Language)
+                .WithOne(ca => ca.CompanySettings)
+                .HasForeignKey<CompanySettings>(ca => ca.LanguageId);
+
+            builder.HasOne(ca => ca.FinancialYear)
+                .WithOne(ca => ca.CompanySettings)
+                .HasForeignKey<CompanySettings>(ca => ca.FinancialYearId);
         }
     }
 }

@@ -25,11 +25,11 @@ namespace Core.Application.Companies.Commands.UploadFileCompany
 
         public async Task<ApiResponseDTO<GetCompanyDTO>> Handle(UploadFileCompanyCommand request, CancellationToken cancellationToken)
         {
-            var existingFile = await _ifileUploadService.GetFileSession();
-            if(existingFile != "Not Found")
-            {
-                await _ifileUploadService.DeleteFileAsync(existingFile);
-            }
+            // var existingFile = await _ifileUploadService.GetFileSession();
+            // if(existingFile != "Not Found")
+            // {
+            //     await _ifileUploadService.DeleteFileAsync(existingFile);
+            // }
               string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources/AllFiles");
               if (!Directory.Exists(uploadPath))
             {
@@ -46,7 +46,7 @@ namespace Core.Application.Companies.Commands.UploadFileCompany
                      Logo = uploadResult.FilePath,
                      LogoBase64 = uploadResult.logoBase64
                  };
-              await _ifileUploadService.SetFileSession( uploadResult.FilePath);
+            //   await _ifileUploadService.SetFileSession( uploadResult.FilePath);
              return new ApiResponseDTO<GetCompanyDTO>{IsSuccess = true, Data =  response};
         }
     }

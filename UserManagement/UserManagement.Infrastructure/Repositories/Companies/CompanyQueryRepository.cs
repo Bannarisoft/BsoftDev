@@ -80,6 +80,24 @@ namespace UserManagement.Infrastructure.Repositories.Companies
             return companies.Distinct().ToList();
 
         }
+        public async Task<Company?> GetByCompanynameAsync(string name, int? id = null)
+        {
+
+             var query = """
+                 SELECT * FROM AppData.Company 
+                 WHERE CompanyName = @Name AND IsDeleted = 0
+                 """;
+
+             var parameters = new DynamicParameters(new { Name = name });
+
+             if (id is not null)
+             {
+                 query += " AND Id != @Id";
+                 parameters.Add("Id", id);
+             }
+
+            return await _dbConnection.QueryFirstOrDefaultAsync<Company>(query, parameters);
+        }
          public async Task<Company> GetByIdAsync(int id)
         {            
            const string query = @"
@@ -129,10 +147,7 @@ namespace UserManagement.Infrastructure.Repositories.Companies
         
          public async Task<List<Company>>  GetCompany(string searchPattern = null)
         {
-                if (string.IsNullOrWhiteSpace(searchPattern))
-            {
-                throw new ArgumentException("DivisionName cannot be null or empty.", nameof(searchPattern));
-            }
+             
 
             const string query = @"
                 SELECT 
@@ -140,7 +155,7 @@ namespace UserManagement.Infrastructure.Repositories.Companies
                 CompanyName
             FROM AppData.Company where IsDeleted = 0 and CompanyName like @SearchPattern";
                 
-            // Update the object to use SearchPattern instead of Name
+            
             var result = await _dbConnection.QueryAsync<Company>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();
         }

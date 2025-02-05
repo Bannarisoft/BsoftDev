@@ -23,7 +23,14 @@ namespace Core.Application.Companies.Queries.GetCompanyAutoComplete
          }  
           public async Task<ApiResponseDTO<List<CompanyAutoCompleteDTO>>> Handle(GetCompanyAutoCompleteQuery request, CancellationToken cancellationToken)
           {
-         
+                if (string.IsNullOrWhiteSpace(request.SearchPattern))
+                 {
+                     return new ApiResponseDTO<List<CompanyAutoCompleteDTO>> 
+                     { 
+                         IsSuccess = false,
+                          Message = "Search pattern cannot be empty." 
+                     };
+                 }
 
               var result = await _companyRepository.GetCompany(request.SearchPattern);
               var company = _mapper.Map<List<CompanyAutoCompleteDTO>>(result);
