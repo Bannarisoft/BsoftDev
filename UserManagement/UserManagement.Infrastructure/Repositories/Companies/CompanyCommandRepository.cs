@@ -32,14 +32,14 @@ namespace UserManagement.Infrastructure.Repositories.Companies
             await _applicationDbContext.Companies.AddAsync(company);
             await _applicationDbContext.SaveChangesAsync();
 
-            var context = _httpContextAccessor.HttpContext;
-             var userId =   _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-             var key = $"Companylogo-{userId}";
-            if (context != null && context.Session != null)
-             {
-                 context.Session.Remove(key);
+            // var context = _httpContextAccessor.HttpContext;
+            //  var userId =   _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //  var key = $"Companylogo-{userId}";
+            // if (context != null && context.Session != null)
+            //  {
+            //      context.Session.Remove(key);
                  
-             }
+            //  }
             return company.Id;
         }      
            public async Task<bool> UpdateAsync(int id, Company company)
@@ -76,14 +76,14 @@ namespace UserManagement.Infrastructure.Repositories.Companies
                 existingCompany.CompanyContact.Remarks = company.CompanyContact.Remarks;
                 _applicationDbContext.Companies.Update(existingCompany);
 
-            var context = _httpContextAccessor.HttpContext;
-             var userId =   _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-             var key = $"Companylogo-{userId}";
-            if (context != null && context.Session != null)
-             {
-                 context.Session.Remove(key);
+            // var context = _httpContextAccessor.HttpContext;
+            //  var userId =   _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //  var key = $"Companylogo-{userId}";
+            // if (context != null && context.Session != null)
+            //  {
+            //      context.Session.Remove(key);
                  
-             }
+            //  }
 
                 return await _applicationDbContext.SaveChangesAsync() >0;
             }

@@ -4,16 +4,19 @@ using UserManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace UserManagement.Infrastructure.Migrations
+namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250204134653_companysettingFK")]
+    partial class companysettingFK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,11 +45,9 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedIP")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("IsActive")
@@ -140,12 +141,10 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("CreatedBy");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("CreatedByName");
 
                     b.Property<string>("CreatedIP")
-                        .IsRequired()
                         .HasColumnType("varchar(25)")
                         .HasColumnName("CreatedIP");
 
@@ -412,11 +411,9 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedIP")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CurrencyId")
@@ -529,12 +526,10 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("CreatedBy");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("CreatedByName");
 
                     b.Property<string>("CreatedIP")
-                        .IsRequired()
                         .HasColumnType("varchar(25)")
                         .HasColumnName("CreatedIP");
 
@@ -821,7 +816,8 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.ToTable("Entity", "AppData");
                 });
-                modelBuilder.Entity("Core.Domain.Entities.FinancialYear", b =>
+
+            modelBuilder.Entity("Core.Domain.Entities.FinancialYear", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1133,11 +1129,9 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedIP")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("IsActive")
@@ -1200,12 +1194,10 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("CreatedBy");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("CreatedByName");
 
                     b.Property<string>("CreatedIP")
-                        .IsRequired()
                         .HasColumnType("varchar(25)")
                         .HasColumnName("CreatedIP");
 
@@ -1722,32 +1714,7 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.ToTable("UserRoleAllocation", "AppSecurity");
                 });
-            modelBuilder.Entity("Core.Domain.Entities.CompanySettings", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.Currency", "Currency")
-                        .WithOne("CompanySettings")
-                        .HasForeignKey("Core.Domain.Entities.CompanySettings", "CurrencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.FinancialYear", "FinancialYear")
-                        .WithOne("CompanySettings")
-                        .HasForeignKey("Core.Domain.Entities.CompanySettings", "FinancialYearId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.Language", "Language")
-                        .WithOne("CompanySettings")
-                        .HasForeignKey("Core.Domain.Entities.CompanySettings", "LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Currency");
-
-                    b.Navigation("FinancialYear");
-
-                    b.Navigation("Language");
-                });
             modelBuilder.Entity("Core.Domain.Entities.UserSessions", b =>
                 {
                     b.Property<int>("Id")
@@ -1824,6 +1791,33 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.CompanySettings", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Currency", "Currency")
+                        .WithOne("CompanySettings")
+                        .HasForeignKey("Core.Domain.Entities.CompanySettings", "CurrencyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.FinancialYear", "FinancialYear")
+                        .WithOne("CompanySettings")
+                        .HasForeignKey("Core.Domain.Entities.CompanySettings", "FinancialYearId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Language", "Language")
+                        .WithOne("CompanySettings")
+                        .HasForeignKey("Core.Domain.Entities.CompanySettings", "LanguageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Currency");
+
+                    b.Navigation("FinancialYear");
+
+                    b.Navigation("Language");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Modules", "Module")
@@ -1871,23 +1865,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("Module");
 
                     b.Navigation("UserRole");
-                });
-                modelBuilder.Entity("Core.Domain.Entities.Currency", b =>
-                {
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.FinancialYear", b =>
-                {
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Language", b =>
-                {
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.States", b =>
@@ -1986,6 +1963,24 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("States");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Currency", b =>
+                {
+                    b.Navigation("CompanySettings")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.FinancialYear", b =>
+                {
+                    b.Navigation("CompanySettings")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Language", b =>
+                {
+                    b.Navigation("CompanySettings")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
                 {
                     b.Navigation("RoleEntitlements");
@@ -2005,11 +2000,9 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Unit", b =>
                 {
-                    b.Navigation("UnitAddress")
-                        .IsRequired();
+                    b.Navigation("UnitAddress");
 
-                    b.Navigation("UnitContacts")
-                        .IsRequired();
+                    b.Navigation("UnitContacts");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.User", b =>

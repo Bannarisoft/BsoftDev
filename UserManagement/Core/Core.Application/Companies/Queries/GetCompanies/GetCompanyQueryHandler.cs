@@ -17,7 +17,8 @@ namespace Core.Application.Companies.Queries.GetCompanies
              _mapper =mapper;
              _mediator = mediator;
         } 
-        public async Task<ApiResponseDTO<List<GetCompanyDTO>>> Handle(GetCompanyQuery requst, CancellationToken cancellationToken){
+        public async Task<ApiResponseDTO<List<GetCompanyDTO>>> Handle(GetCompanyQuery requst, CancellationToken cancellationToken)
+        {
             
             var companies = await _companyRepository.GetAllCompaniesAsync();             
             

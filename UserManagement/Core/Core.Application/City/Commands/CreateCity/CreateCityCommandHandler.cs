@@ -35,8 +35,8 @@ namespace Core.Application.City.Commands.CreateCity
                     };               
             }      
             // Check if the city name already exists in the same state
-            var cityExistsByName = await _cityRepository.GetCityByNameAsync(request.CityName ?? string.Empty,request.CityCode ?? string.Empty, request.StateId) ;
-            if (cityExistsByName!= null)
+            var cityExistsByName = await _cityRepository.GetCityByNameAsync(request.CityName ?? string.Empty,request.CityCode ?? string.Empty, request.StateId) ;            
+            if (cityExistsByName.Id !=0)
             {
                 return new ApiResponseDTO<CityDto> {
                     IsSuccess = false, 

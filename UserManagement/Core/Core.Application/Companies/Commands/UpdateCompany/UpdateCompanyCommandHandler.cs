@@ -32,31 +32,20 @@ namespace Core.Application.Companies.Commands.UpdateCompany
           public async Task<ApiResponseDTO<bool>> Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
         {
             
-            // var existingCompany = await _companyQueryRepository.GetByIdAsync(request.Company.Id);
             
+            var existingCompany = await _companyQueryRepository.GetByCompanynameAsync(request.Company.CompanyName,request.Company.Id);
+
+              if (existingCompany != null)
+              {
+                  return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Company already exists"};
+              }
             var company  = _imapper.Map<Company>(request.Company);
             
-            // if(existingCompany.Logo == request.Company.Logo)
-            // {
-            //     company.Logo = existingCompany.Logo;
-            // }
-            // else
-            // {
-            //     string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources/AllFiles");
-            //  var uploadResult = await _ifileUploadService.UploadFileAsync(request.Company.File,  uploadPath);
-             
-            //     if (!uploadResult.IsSuccess)
-            //      {
-            //          return new ApiResponseDTO<bool>{IsSuccess = false, Message = "File not uploaded"};
-            //      }
-            //      company.Logo =uploadResult.FilePath;
-            // }
-
-             var  CompanyId = await _icompanyRepository.UpdateAsync(request.Company.Id, company);
+            var  CompanyId = await _icompanyRepository.UpdateAsync(request.Company.Id, company);
            
            if (CompanyId)
            {
-             //Domain Event
+             
                  var domainEvent = new AuditLogsDomainEvent(
                      actionDetail: "Update",
                      actionCode: "",

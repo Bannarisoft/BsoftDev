@@ -14,20 +14,27 @@ namespace Core.Application.Divisions.Commands.UpdateDivision
         private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
         private readonly IMediator _mediator;
-        public UpdateDivisionCommandHandler(IDivisionCommandRepository divisionRepository,IMapper imapper, IMediator mediator)
+        private readonly IDivisionQueryRepository _divisionQueryRepository;
+        public UpdateDivisionCommandHandler(IDivisionCommandRepository divisionRepository,IMapper imapper, IMediator mediator, IDivisionQueryRepository divisionQueryRepository)
         {
             _divisionRepository =divisionRepository;
             _imapper =imapper;
             _mediator = mediator;
+            _divisionQueryRepository = divisionQueryRepository;
         }
           public async Task<ApiResponseDTO<bool>> Handle(UpdateDivisionCommand request, CancellationToken cancellationToken)
         {
-            
+                var existingDivision = await _divisionQueryRepository.GetByDivisionnameAsync(request.Name, request.Id);
+
+                if (existingDivision != null)
+                {
+                    return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Division already exists"};
+                }
                  var division  = _imapper.Map<Division>(request);
          
                 var divisionresult = await _divisionRepository.UpdateAsync(division);
 
-                //Domain Event  
+                
                     var domainEvent = new AuditLogsDomainEvent(
                         actionDetail: "Update",
                         actionCode: division.ShortName,

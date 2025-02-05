@@ -1,4 +1,4 @@
-using Core.Domain.Entities;
+    using Core.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using Core.Application.State.Queries.GetStates;
@@ -34,7 +34,7 @@ namespace Core.Application.State.Commands.CreateState
             }            
             var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName ?? string.Empty, 
                 request.StateCode ?? string.Empty,      request.CountryId ) ;
-            if (stateExists!= null)
+            if (stateExists.Id !=0)
             {
                 return new ApiResponseDTO<StateDto>{
                 IsSuccess = false, 

@@ -156,13 +156,13 @@ namespace UserManagement.Infrastructure
 
 
         }); 
-        services.AddDistributedMemoryCache();
-        services.AddSession(options =>
-        {
-            options.IdleTimeout = TimeSpan.FromHours(1);
-            options.Cookie.HttpOnly = true;
-            options.Cookie.IsEssential = true;
-        });
+        // services.AddDistributedMemoryCache();
+        // services.AddSession(options =>
+        // {
+        //     options.IdleTimeout = TimeSpan.FromHours(1);
+        //     options.Cookie.HttpOnly = true;
+        //     options.Cookie.IsEssential = true;
+        // });
         // Register Polly Policies
         services.AddPollyPolicies(configuration);
             

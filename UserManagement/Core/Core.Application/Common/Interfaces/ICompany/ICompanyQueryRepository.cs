@@ -12,6 +12,7 @@ namespace Core.Application.Common.Interfaces.ICompany
         Task<List<Company>> GetAllCompaniesAsync();
         Task<Company> GetByIdAsync(int id);
         Task<List<Company>> GetCompany(string searchPattern);
+        Task<Company?> GetByCompanynameAsync(string name,int? id = null);
        
     }
 }
