@@ -158,6 +158,6 @@ app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
 app.UseAuthorization();
-app.UseSession();
+// app.UseSession();
 app.MapControllers();
 app.Run();

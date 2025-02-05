@@ -20,7 +20,7 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
         }
          public async Task<List<Division>> GetAllDivisionAsync()
         {
-            //return await _applicationDbContext.Divisions.ToListAsync();
+            
 
              const string query = @"
             SELECT 
@@ -31,11 +31,28 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
                 IsActive
             FROM AppData.Division WHERE IsDeleted = 0";
             return (await _dbConnection.QueryAsync<Division>(query)).ToList();
-        }      
+        }   
+
+        public async Task<Division?> GetByDivisionnameAsync(string name, int? id = null)
+        {
+              var query = """
+                 SELECT * FROM AppData.Division 
+                 WHERE Name = @Name AND IsDeleted = 0
+                 """;
+
+             var parameters = new DynamicParameters(new { Name = name });
+
+             if (id is not null)
+             {
+                 query += " AND Id != @Id";
+                 parameters.Add("Id", id);
+             }
+
+            return await _dbConnection.QueryFirstOrDefaultAsync<Division>(query, parameters);
+        }   
          public async Task<Division> GetByIdAsync(int id)
         {
-            //return await _applicationDbContext.Divisions.AsNoTracking()
-                //.FirstOrDefaultAsync(b => b.Id == id);
+            
 
              const string query = "SELECT * FROM AppData.Division WHERE Id = @Id AND IsDeleted = 0";
             return await _dbConnection.QueryFirstOrDefaultAsync<Division>(query, new { id });
@@ -43,17 +60,14 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
       
         public async Task<List<Division>>  GetDivision(string searchPattern)
         {
-            if (string.IsNullOrWhiteSpace(searchPattern))
-            {
-                throw new ArgumentException("DivisionName cannot be null or empty.", nameof(searchPattern));
-            }
+            
 
             const string query = @"
                 SELECT Id, Name 
                 FROM AppData.Division 
                 WHERE IsDeleted = 0 AND Name LIKE @SearchPattern";
                 
-            // Update the object to use SearchPattern instead of Name
+            
             var divisions = await _dbConnection.QueryAsync<Division>(query, new { SearchPattern = $"%{searchPattern}%" });
             return divisions.ToList();
         }

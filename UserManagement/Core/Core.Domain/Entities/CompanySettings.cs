@@ -20,9 +20,12 @@ namespace Core.Domain.Entities
         public int MaxConcurrentLogins { get; set; }
         public int ForgotPasswordCodeExpiry { get; set; }
         public byte CaptchaOnLogin { get; set; }
-        public int Currency { get; set; }
-        public int Language { get; set; }
+        public Currency Currency { get; set; }
+        public int CurrencyId { get; set; }
+        public Language Language { get; set; }
+        public int LanguageId { get; set; }
         public int TimeZone { get; set; }
-        public int FinancialYear { get; set; }
+        public FinancialYear FinancialYear { get; set; }
+        public int FinancialYearId { get; set; }
     }
 }
