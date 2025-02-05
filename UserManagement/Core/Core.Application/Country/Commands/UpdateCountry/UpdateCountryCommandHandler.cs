@@ -64,8 +64,8 @@ namespace Core.Application.Country.Commands.UpdateCountry
                     }; 
                 }                                     
             }
-            var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryName ?? string.Empty,request.CountryCode ?? string.Empty);
-            if (countryExists != null)
+            var countryExists = await _countryRepository.GetCountryByCodeAsync(request.CountryName ?? string.Empty,request.CountryCode ?? string.Empty);            
+            if (countryExists.Id !=0)
             {                   
                 await _countryRepository.UpdateAsync(countryExists.Id, countryExists); 
                     return new ApiResponseDTO<CountryDto>
