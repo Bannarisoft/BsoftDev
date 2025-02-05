@@ -72,8 +72,8 @@ namespace Core.Application.State.Commands.UpdateState
                     }; 
                 }                                     
             }
-            var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName ?? string.Empty,request.StateCode ??string.Empty, request.CountryId);
-            if (stateExists!= null)
+            var stateExists = await _stateRepository.GetStateByCodeAsync(request.StateName ?? string.Empty,request.StateCode ??string.Empty, request.CountryId);            
+            if (stateExists.Id !=0)
             {              
                 if ((byte)stateExists.IsActive == request.IsActive)
                 {                    

@@ -75,8 +75,8 @@ namespace Core.Application.City.Commands.UpdateCity
                 }                                     
             }
             // Check if the city name already exists in the same state
-            var cityExistsByName = await _cityRepository.GetCityByNameAsync(request.CityName ?? string.Empty,request.CityCode ?? string.Empty, request.StateId);           
-            if (cityExistsByName!= null)
+            var cityExistsByName = await _cityRepository.GetCityByNameAsync(request.CityName ?? string.Empty,request.CityCode ?? string.Empty, request.StateId);                       
+            if (cityExistsByName.Id !=0)
             {  
                 if ((byte)cityExistsByName.IsActive == request.IsActive)
                 {                     
