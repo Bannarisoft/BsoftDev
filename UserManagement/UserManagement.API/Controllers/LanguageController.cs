@@ -72,10 +72,10 @@ namespace UserManagement.API.Controllers
             return Ok(new { StatusCode=StatusCodes.Status200OK, data = language.Data});
         }
 
-        [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update( int id,UpdateLanguageCommand command )
+        [HttpPut]
+        public async Task<IActionResult> Update( UpdateLanguageCommand command )
         {
-            command.Id = id;
+            
             var validationResult = await _updateLanguageCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
@@ -102,7 +102,7 @@ namespace UserManagement.API.Controllers
         }
 
 
-        [HttpPut("delete/{id}")]
+        [HttpPut("{id}")]
         
         public async Task<IActionResult> Delete(int id)
         {
@@ -118,11 +118,11 @@ namespace UserManagement.API.Controllers
             return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedLanguage.Message, errors = "" });
             
         }
-         [HttpGet("GetLanguage")]
-        public async Task<IActionResult> GetLanguage([FromQuery] string searchPattern)
+         [HttpGet("by-name/{name}")]
+        public async Task<IActionResult> GetLanguage(string name)
         {
            
-            var languages = await Mediator.Send(new GetLanguageAutoCompleteQuery {SearchPattern = searchPattern});
+            var languages = await Mediator.Send(new GetLanguageAutoCompleteQuery {SearchPattern = name});
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = languages.Data });
         }
       

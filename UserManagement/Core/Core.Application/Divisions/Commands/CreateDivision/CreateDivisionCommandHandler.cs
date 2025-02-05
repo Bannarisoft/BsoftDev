@@ -17,24 +17,29 @@ namespace Core.Application.Divisions.Commands.CreateDivision
          private readonly IDivisionCommandRepository _divisionRepository;
         private readonly IMapper _imapper;
         private readonly IMediator _mediator;
+        private readonly IDivisionQueryRepository _divisionQueryRepository;
 
-        public CreateDivisionCommandHandler(IDivisionCommandRepository divisionRepository, IMapper imapper, IMediator mediator)
+        public CreateDivisionCommandHandler(IDivisionCommandRepository divisionRepository, IMapper imapper, IMediator mediator, IDivisionQueryRepository divisionQueryRepository)
         {
             _divisionRepository = divisionRepository;
             _imapper = imapper;
             _mediator = mediator;
+            _divisionQueryRepository = divisionQueryRepository;
         }
 
         public async Task<ApiResponseDTO<DivisionDTO>> Handle(CreateDivisionCommand request, CancellationToken cancellationToken)
         {
+              var existingDivision = await _divisionQueryRepository.GetByDivisionnameAsync(request.Name);
+
+               if (existingDivision != null)
+               {
+                   return new ApiResponseDTO<DivisionDTO>{IsSuccess = false, Message = "Division already exists"};
+               }
            
                  var division  = _imapper.Map<Division>(request);
 
                 var divisionresult = await _divisionRepository.CreateAsync(division);
-
                 
-                 
-
                 var divisionMap = _imapper.Map<DivisionDTO>(divisionresult);
                 if (divisionresult.Id > 0)
                 {

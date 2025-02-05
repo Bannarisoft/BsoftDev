@@ -15,9 +15,6 @@ namespace Core.Domain.Entities
         public DateTime EndDate { get; set; } 
 
         public string FinYearName { get; set; }
-
-       // public  FinancialYearStatus IsActive  { get; set; }
-
-       // public  FinancialYearDelete IsDeleted { get; set; }
+         public CompanySettings CompanySettings { get; set; }
     }
 }

@@ -12,5 +12,6 @@ namespace Core.Application.Common.Interfaces.IDivision
         Task<List<Division>> GetAllDivisionAsync();
         Task<Division> GetByIdAsync(int id);
         Task<List<Division>> GetDivision(string searchPattern);
+        Task<Division?> GetByDivisionnameAsync(string name,int? id = null);
     }
 }

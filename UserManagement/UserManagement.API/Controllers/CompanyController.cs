@@ -8,6 +8,7 @@ using Core.Application.Companies.Commands.DeleteCompany;
 using Core.Application.Companies.Queries.GetCompanyAutoComplete;
 using FluentValidation;
 using Core.Application.Companies.Commands.UploadFileCompany;
+using Core.Application.Companies.Commands.DeleteFileCompany;
 
 namespace UserManagement.API.Controllers
 {
@@ -29,7 +30,7 @@ namespace UserManagement.API.Controllers
             _UploadFileCompanyCommandvalidator = uploadFileCompanyCommandvalidator;
         }
 
-        [HttpGet("GetAllCompaniesAsync")]
+        [HttpGet]
         
         public async Task<IActionResult> GetAllCompaniesAsync()
         {
@@ -104,7 +105,7 @@ namespace UserManagement.API.Controllers
             });
         }
 
-        [HttpPut("update")]
+        [HttpPut]
         public async Task<IActionResult> Update(UpdateCompanyCommand command)
         {
             var validationResult = await _UpdateCompanyCommandvalidator.ValidateAsync(command);
@@ -148,11 +149,11 @@ namespace UserManagement.API.Controllers
                 errors = "" 
             });
         }
-        [HttpPut("delete")]
-        public async Task<IActionResult> Delete(DeleteCompanyCommand deleteCompanyCommand)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
            
-           var updatedCompany = await Mediator.Send(deleteCompanyCommand);
+           var updatedCompany = await Mediator.Send(new DeleteCompanyCommand { Id = id });
 
             if(updatedCompany.IsSuccess)
             {
@@ -171,11 +172,11 @@ namespace UserManagement.API.Controllers
                 errors = "" 
             });
         }
-         [HttpGet("GetCompany")]
-        public async Task<IActionResult> GetCompany([FromQuery] string searchPattern)
+         [HttpGet("by-name/{name}")]
+        public async Task<IActionResult> GetCompany(string name)
         {
            
-            var companies = await Mediator.Send(new GetCompanyAutoCompleteQuery {SearchPattern = searchPattern});
+            var companies = await Mediator.Send(new GetCompanyAutoCompleteQuery {SearchPattern = name});
             return Ok(new 
             { StatusCode=StatusCodes.Status200OK, 
             data = companies.Data 
@@ -215,6 +216,26 @@ namespace UserManagement.API.Controllers
             });
               
 
+        }
+        [HttpDelete("delete-logo")]
+        public async Task<IActionResult> DeleteLogo(DeleteFileCompanyCommand deleteFileCompanyCommand)
+        {
+            var file = await Mediator.Send(deleteFileCompanyCommand);
+            if (!file.IsSuccess)
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest, 
+                    message = file.Message, 
+                    errors = "" 
+                });
+            }
+            return Ok(new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                message = file.Message, 
+                errors = "" 
+            });
         }
      
     }

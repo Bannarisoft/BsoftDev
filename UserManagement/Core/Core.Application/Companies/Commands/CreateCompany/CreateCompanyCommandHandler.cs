@@ -14,18 +14,25 @@ namespace Core.Application.Companies.Commands.CreateCompany
          private readonly IFileUploadService _ifileUploadService;
         private readonly IMapper _imapper;
         private readonly IMediator _mediator;
+        private readonly ICompanyQueryRepository _companyQueryRepository;
 
-        public CreateCompanyCommandHandler(ICompanyCommandRepository icompanyRepository, IMapper imapper, IFileUploadService ifileUploadService, IMediator mediator)
+        public CreateCompanyCommandHandler(ICompanyCommandRepository icompanyRepository, IMapper imapper, IFileUploadService ifileUploadService, IMediator mediator, ICompanyQueryRepository companyQueryRepository)
         {
             _icompanyRepository = icompanyRepository;
             _imapper = imapper;
             _ifileUploadService = ifileUploadService;
             _mediator = mediator;
+            _companyQueryRepository = companyQueryRepository;
         }
 
         public async Task<ApiResponseDTO<int>> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
         {
-            
+            var existingCompany = await _companyQueryRepository.GetByCompanynameAsync(request.Company.CompanyName);
+
+              if (existingCompany != null)
+              {
+                  return new ApiResponseDTO<int>{IsSuccess = false, Message = "Company already exists"};
+              }
              var company  = _imapper.Map<Company>(request.Company);
            
             
