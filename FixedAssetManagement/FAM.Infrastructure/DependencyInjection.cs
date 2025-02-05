@@ -1,7 +1,13 @@
 using System.Data;
 using System.Reflection;
+using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.AuditLog;
+using FAM.Infrastructure.Data;
+using FAM.Infrastructure.Repositories;
+using FAM.Infrastructure.Services;
 using Hangfire;
 using Hangfire.SqlServer;
+using Infrastructure.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -29,14 +35,14 @@ namespace FAM.Infrastructure
 
             // Register ApplicationDbContext with SQL Server
 
-            // services.AddDbContext<ApplicationDbContext>(options =>
-            // options.UseSqlServer(connectionString, sqlOptions =>
-            // {
-            //     sqlOptions.EnableRetryOnFailure(
-            //         maxRetryCount: 5, // Number of retry attempts
-            //         maxRetryDelay: TimeSpan.FromSeconds(30), // Delay between retries
-            //         errorNumbersToAdd: null); // Add specific SQL error numbers to retry on (optional)
-            // }));
+            services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5, // Number of retry attempts
+                    maxRetryDelay: TimeSpan.FromSeconds(30), // Delay between retries
+                    errorNumbersToAdd: null); // Add specific SQL error numbers to retry on (optional)
+            }));
 
             // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
@@ -53,23 +59,23 @@ namespace FAM.Infrastructure
                 return new MongoClient(mongoConnectionString);
             });
 
-            // services.AddSingleton<IMongoDbContext>(sp =>
-            // {
-            //     var client = sp.GetRequiredService<IMongoClient>();
-            //     var databaseName = configuration["MongoDb:DatabaseName"];
-            //     if (string.IsNullOrWhiteSpace(databaseName))
-            //     {
-            //         throw new InvalidOperationException("MongoDB database name is missing or empty.");
-            //     }
-            //     return new MongoDbContext(client, databaseName);
-            // });
+            services.AddSingleton<IMongoDbContext>(sp =>
+            {
+                var client = sp.GetRequiredService<IMongoClient>();
+                var databaseName = configuration["MongoDb:DatabaseName"];
+                if (string.IsNullOrWhiteSpace(databaseName))
+                {
+                    throw new InvalidOperationException("MongoDB database name is missing or empty.");
+                }
+                return new MongoDbContext(client, databaseName);
+            });
             
-            // // Optional: Register IMongoDatabase if needed directly
-            // services.AddSingleton(sp =>
-            // {
-            //     var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
-            //     return mongoDbContext.GetDatabase();
-            // });
+            // Optional: Register IMongoDatabase if needed directly
+            services.AddSingleton(sp =>
+            {
+                var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
+                return mongoDbContext.GetDatabase();
+            });
 
             // Register Hangfire services
             services.AddHangfire(config =>
@@ -94,9 +100,19 @@ namespace FAM.Infrastructure
             services.AddLogging(builder =>
             {
                 builder.AddSerilog();
-
-
             }); 
+
+            // Register IDateTime
+            services.AddHttpContextAccessor();
+
+            // Register repositories
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();    
+
+            // Miscellaneous services
+            services.AddScoped<IIPAddressService, IPAddressService>(); 
+            services.AddTransient<IFileUploadService, FileUploadRepository>();
+            services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
+
             return services;
         }
     }
