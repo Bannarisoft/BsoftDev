@@ -17,12 +17,21 @@ namespace Infrastructure.Data
 
         public IMongoCollection<T> GetCollection<T>(string name)
         {
+            EnsureCollectionExists(name);
             return _database.GetCollection<T>(name);
         }
 
         public IMongoDatabase GetDatabase()
         {
             return _database;
+        }
+        private void EnsureCollectionExists(string collectionName)
+        {
+            var collectionList = _database.ListCollectionNames().ToList();
+            if (!collectionList.Contains(collectionName))
+            {
+                _database.CreateCollection(collectionName);                
+            }
         }
     }
 }
