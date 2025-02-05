@@ -22,7 +22,8 @@ namespace Core.Application.EventHandlers
         {          
             var userIdString = _ipAddressService.GetUserId();   
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
-            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);              
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId); 
+            
             var auditLog = new
             {                
                 Module = notification.Module,   
