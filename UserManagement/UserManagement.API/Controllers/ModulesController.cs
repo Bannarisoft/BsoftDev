@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BSOFT.Application.Modules.Commands.DeleteModule;
+using Core.Application.Modules.Commands.DeleteModule;
 using Microsoft.AspNetCore.Authorization;
 using Core.Application.Modules.Queries.GetModuleById;
 
