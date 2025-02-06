@@ -6,9 +6,9 @@ using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Companies.Queries.GetCompanies
 {
-    public class GetCompanyDTO
+    public class GetByIdDTO
     {
-        public int Id { get; set; }
+         public int Id { get; set; }
         public string CompanyName { get; set; }
         public string LegalName { get; set; }
         public string GstNumber { get; set; }
@@ -23,7 +23,7 @@ namespace Core.Application.Companies.Queries.GetCompanies
         public Status IsActive { get; set; }
         public IsDelete IsDeleted { get; set; }
 
-        //  public CompanyAddressDTO CompanyAddress { get; set; }
-        // public CompanyContactDTO CompanyContact { get; set; }
+         public CompanyAddressDTO CompanyAddress { get; set; }
+        public CompanyContactDTO CompanyContact { get; set; }
     }
 }

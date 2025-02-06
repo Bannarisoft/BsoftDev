@@ -8,6 +8,7 @@ using Polly;
 using Polly.Timeout;
 using Serilog;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Core.Domain.Common;
 
 namespace UserManagement.Infrastructure.Repositories.Users
 {
@@ -52,59 +53,46 @@ namespace UserManagement.Infrastructure.Repositories.Users
             // _fallbackPolicy = Policy<List<User>>.Handle<Exception>()
             //     .FallbackAsync(new List<User>());
         }
-        public async Task<List<User>> GetAllUsersAsync()
+        public async Task<List<User>> GetAllUsersAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
 
-             const string query = @"SELECT ur.Id,
-             ur.UserId,
-                         ur.DivisionId,
-                         ur.FirstName,
-                         ur.LastName,
-                         ur.UserName,
-                         ur.IsActive,
-                         ur.PasswordHash,
-                         ur.UserType,
-                         ur.Mobile,
-                         ur.EmailId,
-                         ur.UnitId,
-                         ur.UserId,
-                         ur.IsFirstTimeUser,
-                         ur.IsDeleted,
-                         ura.UserRoleId,
-                         uc.CompanyId 
-                         FROM AppSecurity.Users ur
-                     Left JOIN AppSecurity.UserRoleAllocation ura ON   ur.UserId = ura.UserId and ura.IsActive = 1
-                     Left JOIN AppSecurity.UserCompany uc ON uc.UserId = ur.UserId and uc.IsActive = 1
-                     WHERE  ur.IsDeleted = 0";
+                     var query = $$"""
+                SELECT DISTINCT ur.Id,
+                                ur.UserId,
+                                ur.DivisionId,
+                                ur.FirstName,
+                                ur.LastName,
+                                ur.UserName,
+                                ur.IsActive,
+                                ur.PasswordHash,
+                                ur.UserType,
+                                ur.Mobile,
+                                ur.EmailId,
+                                ur.UnitId,
+                                ur.IsFirstTimeUser,
+                                ur.IsDeleted
+                FROM AppSecurity.Users ur
+                WHERE ur.IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ur.FirstName LIKE @Search OR ur.LastName LIKE @Search OR ur.UserName LIKE @Search)")}}
+                ORDER BY ur.UserId desc
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+            """;
 
-              var userDictionary = new Dictionary<int, User>();
+             var parameters = new
+                       {
+                           Search = $"%{SearchTerm}%",
+                           Offset = (PageNumber - 1) * PageSize,
+                           PageSize
+                       };
+                    var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
 
-              var users = await _dbConnection.QueryAsync<User, Core.Domain.Entities.UserRoleAllocation, UserCompany, User>(
-             query,
-             (user, userRole, userCompany) =>
-             {
-                 if (!userDictionary.TryGetValue(user.UserId, out var existingUser))
-                 {
-                     existingUser = user;
-                     existingUser.UserRoleAllocations = new List<Core.Domain.Entities.UserRoleAllocation> { userRole };
-                     existingUser.UserCompanies = new List<UserCompany> { userCompany };
-                     userDictionary.Add(existingUser.UserId, existingUser);
-                 }
-                 else
-                 {
-                     existingUser.UserRoleAllocations.Add(userRole);
-                     existingUser.UserCompanies.Add(userCompany);
-                 }
+                    return await policyWrap.ExecuteAsync(async () =>
+                    {
+                        
+                         return (await _dbConnection.QueryAsync<User>(query,parameters)).ToList();
 
-                 return existingUser;
-             },
-             splitOn: "UserRoleId,CompanyId"  
-             );
-            var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
-            return await policyWrap.ExecuteAsync(async () =>
-            {
-                 return users.Distinct().ToList();
-            });
+                        
+                    });
         }
 
         public async Task<User?> GetByIdAsync(int userId)
@@ -127,20 +115,23 @@ namespace UserManagement.Infrastructure.Repositories.Users
                     ur.IsFirstTimeUser,
                     ur.IsDeleted,
                     ura.UserRoleId,
-                    uc.CompanyId 
+                    uc.CompanyId,
+                    uu.UnitId 
                     FROM AppSecurity.Users ur
                 Left JOIN AppSecurity.UserRoleAllocation ura ON   ur.UserId = ura.UserId and ura.IsActive = 1
                 Left JOIN AppSecurity.UserCompany uc ON uc.UserId = ur.UserId and uc.IsActive = 1
+                Left JOIN AppSecurity.UserUnit uu ON uu.UserId = ur.UserId and uu.IsActive = 1
                 WHERE  ur.IsDeleted = 0 and ur.UserId = @UserId";
-          var userResponse = await _dbConnection.QueryAsync<User, Core.Domain.Entities.UserRoleAllocation, UserCompany, User>(query, 
-          (user, userRole, userCompany) =>
+          var userResponse = await _dbConnection.QueryAsync<User, Core.Domain.Entities.UserRoleAllocation, UserCompany, UserUnit,User>(query, 
+          (user, userRole, userCompany, userUnit) =>
           {
               user.UserRoleAllocations = new List<Core.Domain.Entities.UserRoleAllocation> { userRole };
               user.UserCompanies = new List<UserCompany> { userCompany };
+              user.UserUnits = new List<UserUnit> { userUnit };
               return user;
               }, 
           new { userId },
-          splitOn: "UserRoleId,CompanyId");
+          splitOn: "UserRoleId,CompanyId,UnitId");
 
             var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
             return await policyWrap.ExecuteAsync(async () =>
@@ -151,15 +142,9 @@ namespace UserManagement.Infrastructure.Repositories.Users
             // return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { userId });
         }
 
-        public async Task<User?> GetByUsernameAsync(string username, int? id = null)
+        public async Task<User?> GetByUsernameAsync(string? username, int? id = null)
         {
-            
-             if (string.IsNullOrWhiteSpace(username))
-            {
-                throw new ArgumentException("Username cannot be null or empty.", nameof(username));
-            }
-
-
+           
              var query = """
                  SELECT * FROM AppSecurity.Users 
                  WHERE UserName = @Username AND IsDeleted = 0
@@ -172,23 +157,33 @@ namespace UserManagement.Infrastructure.Repositories.Users
                  query += " AND UserId != @Id";
                  parameters.Add("Id", id);
              }
-
             
-        
-
-            var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
-            return await policyWrap.ExecuteAsync(async () =>
-            {
-                // Execute the Dapper query with Polly policies
-                return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, parameters);
-            });
-            // if (string.IsNullOrWhiteSpace(username))
-            // {
-            //     throw new ArgumentException("Username cannot be null or empty.", nameof(username));
-            // }
-
-            // const string query = "SELECT * FROM AppSecurity.Users WHERE UserName = @Username";
-            // return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { Username = username });
+               var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+            
+               return await policyWrap.ExecuteAsync(async () =>
+               {
+                   return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, parameters);
+               });
+          
+        }
+        public async Task<List<User>> GetUser(string searchPattern)
+        {
+             const string query = @"
+                SELECT UserId, UserName 
+                FROM AppSecurity.Users
+                WHERE IsDeleted = 0 AND UserName LIKE @SearchPattern";
+                
+            
+            var users = await _dbConnection.QueryAsync<User>(query, new { SearchPattern = $"%{searchPattern}%" });
+            
+            
+               var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+            
+               return await policyWrap.ExecuteAsync(async () =>
+               {
+                   return users.ToList();
+               });
+          
         }
         public async Task<List<string>> GetUserRolesAsync(int userId)
         {

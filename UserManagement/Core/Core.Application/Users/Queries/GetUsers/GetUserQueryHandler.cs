@@ -10,10 +10,11 @@ using Core.Domain.Entities;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
+using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.Users.Queries.GetUsers
 {
-    public class GetUserQueryHandler : IRequestHandler<GetUserQuery,List<UserDto>>
+    public class GetUserQueryHandler : IRequestHandler<GetUserQuery,ApiResponseDTO<List<UserDto>>>
     {
         private readonly IUserQueryRepository _userRepository;
         private readonly IMapper _mapper;
@@ -30,16 +31,20 @@ namespace Core.Application.Users.Queries.GetUsers
 
 
         }
-        public async Task<List<UserDto>> Handle(GetUserQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<UserDto>>> Handle(GetUserQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Fetching all users from the repository.");
             
             // Fetch all users from the repository
-            var users = await _userRepository.GetAllUsersAsync();
+            var users = await _userRepository.GetAllUsersAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             if (users == null || users.Count == 0)
             {
                 _logger.LogWarning("No users found in the repository.");
-                return new List<UserDto>();
+                return new ApiResponseDTO<List<UserDto>>
+                { 
+                    IsSuccess = false, 
+                    Message = "No users found"
+                };
             }
 
             var userList = _mapper.Map<List<UserDto>>(users);
@@ -54,7 +59,16 @@ namespace Core.Application.Users.Queries.GetUsers
                     module:"User"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return userList;
+            return new ApiResponseDTO<List<UserDto>> 
+            { 
+                IsSuccess = true, 
+                Message = "Success", 
+                Data = userList,
+                TotalCount = users.Count,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+                
+            };
         }
     }
 }

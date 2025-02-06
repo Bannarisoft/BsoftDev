@@ -9,7 +9,7 @@ namespace Core.Application.Common.Interfaces.IDivision
 {
     public interface IDivisionQueryRepository
     {
-        Task<List<Division>> GetAllDivisionAsync();
+        Task<List<Division>> GetAllDivisionAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<Division> GetByIdAsync(int id);
         Task<List<Division>> GetDivision(string searchPattern);
         Task<Division?> GetByDivisionnameAsync(string name,int? id = null);

@@ -15,16 +15,27 @@ namespace UserManagement.Infrastructure.Repositories.Language
         {
             _dbConnection = dbConnection;
         }
-        public async Task<List<Core.Domain.Entities.Language>> GetAllLanguageAsync()
+        public async Task<List<Core.Domain.Entities.Language>> GetAllLanguageAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-             const string query = @"
-            SELECT 
+             var query = $$"""
+                SELECT 
                 Id, 
                 Code,
                 Name,
                 IsActive
-            FROM AppData.Language WHERE IsDeleted = 0";
-            return (await _dbConnection.QueryAsync<Core.Domain.Entities.Language>(query)).ToList();
+            FROM AppData.Language WHERE IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR Name LIKE @Search )")}}
+                ORDER BY Id desc
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+            """;
+            var parameters = new
+                       {
+                           Search = $"%{SearchTerm}%",
+                           Offset = (PageNumber - 1) * PageSize,
+                           PageSize
+                       };
+           
+            return (await _dbConnection.QueryAsync<Core.Domain.Entities.Language>(query,parameters)).ToList();
         }
 
         public async Task<Core.Domain.Entities.Language> GetByIdAsync(int id)
@@ -58,12 +69,8 @@ namespace UserManagement.Infrastructure.Repositories.Language
             
         }
 
-        public async Task<List<Core.Domain.Entities.Language>> GetLanguage(string searchPattern)
+        public async Task<List<Core.Domain.Entities.Language>> GetLanguage(string searchPattern=null)
         {
-             if (string.IsNullOrWhiteSpace(searchPattern))
-            {
-                throw new ArgumentException("LanguageName cannot be null or empty.", nameof(searchPattern));
-            }
 
             const string query = @"
                 SELECT Id, Name 

@@ -18,21 +18,32 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
         {
             _dbConnection = dbConnection;
         }
-         public async Task<List<Division>> GetAllDivisionAsync()
+         public async Task<List<Division>> GetAllDivisionAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-            
-
-             const string query = @"
-            SELECT 
+                 var query = $$"""
+                SELECT 
                 Id, 
                 ShortName,
                 Name,
                 CompanyId,
                 IsActive
-            FROM AppData.Division WHERE IsDeleted = 0";
-            return (await _dbConnection.QueryAsync<Division>(query)).ToList();
-        }   
+            FROM AppData.Division 
+            WHERE 
+            IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShortName LIKE @Search OR Name LIKE @Search )")}}
+                ORDER BY Id desc
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+            """;
 
+            
+             var parameters = new
+                       {
+                           Search = $"%{SearchTerm}%",
+                           Offset = (PageNumber - 1) * PageSize,
+                           PageSize
+                       };
+            return (await _dbConnection.QueryAsync<Division>(query,parameters)).ToList();
+        }   
         public async Task<Division?> GetByDivisionnameAsync(string name, int? id = null)
         {
               var query = """
@@ -49,7 +60,8 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
              }
 
             return await _dbConnection.QueryFirstOrDefaultAsync<Division>(query, parameters);
-        }   
+        } 
+
          public async Task<Division> GetByIdAsync(int id)
         {
             

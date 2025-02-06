@@ -55,14 +55,35 @@ namespace UserManagement.API.Controllers
         }
         
         [HttpGet]
-        public async Task<IActionResult> GetAllUsersAsync()
+        public async Task<IActionResult> GetAllUsersAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {
-            var users = await Mediator.Send(new GetUserQuery());
-            var activeUsers = users.ToList();
+            var users = await Mediator.Send(new GetUserQuery
+            {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
+            // var activeUsers = users.ToList();
+            if(!users.IsSuccess)
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode = StatusCodes.Status400BadRequest, 
+                    message = users.Message 
+                });
+            }
 
-            _logger.LogInformation($"Total {activeUsers.Count} active users listed successfully.");
+            _logger.LogInformation($"Total {users.Data.Count} active users listed successfully.");
 
-            return Ok(new { StatusCode = StatusCodes.Status200OK, data = activeUsers });
+            return Ok(new 
+            { 
+            StatusCode = StatusCodes.Status200OK, 
+            data = users.Data,
+             TotalCount = users.TotalCount,
+             PageNumber = users.PageNumber,
+            PageSize = users.PageSize
+
+            });
         }
 
 
@@ -223,15 +244,15 @@ namespace UserManagement.API.Controllers
         [HttpGet]
 
 
-        [Route("by-name/{name}")]
-        public async Task<IActionResult> GetByUsernameAsync(string name)
+        [Route("by-name")]
+        public async Task<IActionResult> GetByUsernameAsync([FromQuery] string? name)
         {
            
 
 
             var users = await Mediator.Send(new GetUserAutoCompleteQuery {SearchPattern = name});
             _logger.LogWarning($"Users listed successfully: {string.Join(", ", users)}");
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = users });
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = users.Data });
         }
 
 

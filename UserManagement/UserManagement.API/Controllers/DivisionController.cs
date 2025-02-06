@@ -31,12 +31,25 @@ namespace UserManagement.API.Controllers
             _updateDivisionCommandValidator = updateDivisionCommandValidator;
         }
          [HttpGet]
-        public async Task<IActionResult> GetAllDivisionsAsync()
+        public async Task<IActionResult> GetAllDivisionsAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {
-           var divisions = await Mediator.Send(new GetDivisionQuery());
-            var activedivisions = divisions.Data.ToList(); 
+           var divisions = await Mediator.Send(
+            new GetDivisionQuery
+            {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
+          //  var activedivisions = divisions.Data.ToList(); 
            
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = activedivisions});
+            return Ok( new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                data = divisions.Data,
+                TotalCount = divisions.TotalCount,
+                PageNumber = divisions.PageNumber,
+                PageSize = divisions.PageSize
+                });
         }
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateDivisionCommand command)
@@ -122,8 +135,8 @@ namespace UserManagement.API.Controllers
             return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedDivision.Message, errors = "" });
             
         }
-         [HttpGet("by-name/{name}")]
-        public async Task<IActionResult> GetDivision(string name)
+         [HttpGet("by-name")]
+        public async Task<IActionResult> GetDivision([FromQuery] string? name)
         {
            
             var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = name});

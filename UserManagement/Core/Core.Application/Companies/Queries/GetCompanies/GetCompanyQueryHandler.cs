@@ -20,7 +20,7 @@ namespace Core.Application.Companies.Queries.GetCompanies
         public async Task<ApiResponseDTO<List<GetCompanyDTO>>> Handle(GetCompanyQuery requst, CancellationToken cancellationToken)
         {
             
-            var companies = await _companyRepository.GetAllCompaniesAsync();             
+            var companies = await _companyRepository.GetAllCompaniesAsync(requst.PageNumber, requst.PageSize, requst.SearchTerm);             
             
             var companylist = _mapper.Map<List<GetCompanyDTO>>(companies);
             
@@ -38,7 +38,10 @@ namespace Core.Application.Companies.Queries.GetCompanies
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = response
+                Data = response,
+                TotalCount = companies.Count,
+                PageNumber = requst.PageNumber,
+                PageSize = requst.PageSize
             };
         }
     }

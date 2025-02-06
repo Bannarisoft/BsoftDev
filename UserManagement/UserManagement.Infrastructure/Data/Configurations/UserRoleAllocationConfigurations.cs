@@ -39,9 +39,9 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 )
                 .IsRequired();
 
-            // builder.HasOne(ura => ura.UserRole)
-            //     .WithMany(ur => ur.UserRoleAllocations)
-            //     .HasForeignKey(ura => ura.UserRoleId);
+            builder.HasOne(ura => ura.UserRole)
+                .WithMany(ur => ur.UserRoleAllocations)
+                .HasForeignKey(ura => ura.UserRoleId);
 
             builder.HasOne(ura => ura.User)
                 .WithMany(u => u.UserRoleAllocations)

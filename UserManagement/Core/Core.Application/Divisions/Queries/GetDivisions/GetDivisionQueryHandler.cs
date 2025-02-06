@@ -26,7 +26,7 @@ namespace Core.Application.Divisions.Queries.GetDivisions
         }
         public async Task<ApiResponseDTO<List<DivisionDTO>>> Handle(GetDivisionQuery requst, CancellationToken cancellationToken)
         {
-            var divisions = await _divisionRepository.GetAllDivisionAsync();
+            var divisions = await _divisionRepository.GetAllDivisionAsync(requst.PageNumber, requst.PageSize, requst.SearchTerm);
             var divisionList = _mapper.Map<List<DivisionDTO>>(divisions);
 
              //Domain Event
@@ -38,7 +38,15 @@ namespace Core.Application.Divisions.Queries.GetDivisions
                     module:"Division"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<DivisionDTO>> { IsSuccess = true, Message = "Success", Data = divisionList };
+            return new ApiResponseDTO<List<DivisionDTO>> 
+            { 
+                IsSuccess = true, 
+                Message = "Success", 
+                Data = divisionList ,
+                TotalCount = divisions.Count,
+                PageNumber = requst.PageNumber,
+                PageSize = requst.PageSize
+                };
         }
     }
 }
