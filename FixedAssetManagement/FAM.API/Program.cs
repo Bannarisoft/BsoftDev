@@ -4,6 +4,7 @@ using Serilog;
 using Microsoft.IdentityModel.Logging;
 using Serilog.Events;
 using FAM.API.Validation.Common;
+using FAM.API.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,26 +22,27 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Load Serilog configuration from appsettings.json
-builder.Host.UseSerilog((context, config) =>
-{
-    config.ReadFrom.Configuration(context.Configuration);
-});
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("settings/serilogsetting.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+// Configure Serilog
+builder.Host.ConfigureSerilog(); 
 
 // Add validation services
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
 
-//Add layer dependency 
+//Add layer dependency & Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddSwaggerDocumentation();
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration,builder.Services);
-builder.Configuration.AddEnvironmentVariables();
-
-builder.Services.AddControllers();
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -55,10 +57,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
-// Enable CORS
-app.UseCors();
+app.UseCors();// Enable CORS
 app.UseAuthentication();
 app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
 app.UseAuthorization();
 app.MapControllers();
+app.ConfigureHangfireDashboard();
 app.Run();
