@@ -113,6 +113,12 @@ namespace FAM.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
 
+            // AutoMapper profiles
+            // services.AddAutoMapper(
+                
+				// typeof(CompanySettingsProfile)
+            // );
+
             return services;
         }
     }
