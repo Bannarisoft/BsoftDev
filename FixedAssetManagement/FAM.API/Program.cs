@@ -1,9 +1,48 @@
+using Core.Application;
+using FAM.Infrastructure;
+using Serilog;
+using Microsoft.IdentityModel.Logging;
+using Serilog.Events;
+using FAM.API.Validation.Common;
+using FAM.API.Configurations;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Configure Serilog for logging to MongoDB and console
+
+// Log.Logger = new LoggerConfiguration()
+//     .MinimumLevel.Debug()
+//     .WriteTo.Console() // Log to console for debugging
+//     .WriteTo.MongoDB("mongodb://192.168.1.126:27017/FixedAsset") // MongoDB connection string (adjust as needed)
+//     .WriteTo.MongoDB("mongodb://192.168.1.126:27017/FixedAsset", collectionName: "ApplicationLogs", restrictedToMinimumLevel: LogEventLevel.Warning)
+//     .Enrich.FromLogContext()
+//     .CreateLogger();
+
+// builder.Host.UseSerilog(); // Use Serilog for logging in the app
+
+
+// Load Serilog configuration from appsettings.json
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("settings/serilogsetting.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+// Configure Serilog
+builder.Host.ConfigureSerilog(); 
+
+// Add validation services
+var validationService = new ValidationService();
+validationService.AddValidationServices(builder.Services);
+
+//Add layer dependency & Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddSwaggerDocumentation();
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddCorsPolicy();
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureServices(builder.Configuration,builder.Services);
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -12,33 +51,16 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage(); 
+
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
-
+app.UseRouting(); // Enable routing
+app.UseCors();// Enable CORS
+app.UseAuthentication();
+app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
+app.UseAuthorization();
+app.MapControllers();
+app.ConfigureHangfireDashboard();
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
