@@ -59,7 +59,7 @@ namespace UserManagement.API.Controllers
         }
 
          [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdAsync(int id)
+       public async Task<IActionResult> GetByIdAsync(int id)
         {
            _logger.LogInformation("Starting GetByIdAsync for Password Complexity Rule with ID: {Id}", id);
 
@@ -89,17 +89,17 @@ namespace UserManagement.API.Controllers
 
         }
         
-         [HttpGet("PasswordRuleSearch")]
-    public async Task<IActionResult> Getpwdautocomplete([FromQuery] string searchTerm)
+          [HttpGet("by-name/{name}")]
+    public async Task<IActionResult> Getpwdautocomplete( string name)
     {
-          _logger.LogInformation("Starting GetAllUserRoleAutoCompleteSearchAsync with search pattern: {SearchPattern}", searchTerm);
-             var query = new GetPwdComplexityRuleAutoComplete { SearchTerm  = searchTerm };
+          _logger.LogInformation("Starting GetAllUserRoleAutoCompleteSearchAsync with search pattern: {SearchPattern}", name);
+             var query = new GetPwdComplexityRuleAutoComplete { SearchTerm  = name };
                 var result = await Mediator.Send(query);
 
                 if (result.IsSuccess )
                 {               
 
-                     _logger.LogInformation("Password Complexity Rule found for search pattern: {SearchPattern}. Returning data.", searchTerm);
+                     _logger.LogInformation("Password Complexity Rule found for search pattern: {SearchPattern}. Returning data.", name);
 
                 return Ok(new
                 {
@@ -107,7 +107,7 @@ namespace UserManagement.API.Controllers
                     Data = result.Data
                 });
                 }
-                   _logger.LogWarning("Password Complexity Rule found for search pattern: {SearchPattern}", searchTerm);
+                   _logger.LogWarning("Password Complexity Rule found for search pattern: {SearchPattern}", name);
 
                   return NotFound(new
                  {
@@ -119,7 +119,7 @@ namespace UserManagement.API.Controllers
     }
 
          [HttpPost]
-         [Route("Create")]
+        
         public async Task<IActionResult>CreateAsync([FromBody] CreatePasswordComplexityRuleCommand createPasswordComplexityRuleCommand)
         {
              _logger.LogInformation("Starting CreateAsync for creating a Password Complexity Rule.");
@@ -165,15 +165,13 @@ namespace UserManagement.API.Controllers
              
         }
 
-          [HttpPut("update/{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, UpdatePasswordComplexityRuleCommand updatePasswordComplexityRuleCommand)
+    [HttpPut]
+    public async Task<IActionResult> UpdateAsync( UpdatePasswordComplexityRuleCommand updatePasswordComplexityRuleCommand)
     {
-        _logger.LogInformation("Starting UpdateAsync for Password Complexity Rule with ID: {Id}", id);
           // Validate the command
         var validationResult = await _updatepasswordComplexityRuleCommandValidator.ValidateAsync(updatePasswordComplexityRuleCommand);
         if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Validation failed for UpdatePasswordComplexityRuleCommand. Errors: {@Errors}", validationResult.Errors);
+        {          
 
             return BadRequest(new
             {
@@ -182,11 +180,11 @@ namespace UserManagement.API.Controllers
                 Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
             });
         }
-
+      var PasswordComplexityRule = await Mediator.Send(new GetPwdComplexityRuleByIdQuery { Id = updatePasswordComplexityRuleCommand.Id });
         // Check for ID mismatch
-        if (id != updatePasswordComplexityRuleCommand.Id)
+        if (PasswordComplexityRule==null)
         {
-            _logger.LogWarning("Password Complexity Rule ID mismatch. Route ID: {RouteId}, Command ID: {CommandId}", id, updatePasswordComplexityRuleCommand.Id);
+            _logger.LogWarning($"Password Complexity Rule ID {updatePasswordComplexityRuleCommand.Id} mismatch." );
 
             return BadRequest(new
             {
@@ -195,14 +193,14 @@ namespace UserManagement.API.Controllers
             });
         }
 
-        _logger.LogInformation("Validation passed. Proceeding to update Password Complexity Rule with ID: {Id}", id);
+        _logger.LogInformation($"Validation passed. Proceeding to update Password Complexity Rule with ID: {updatePasswordComplexityRuleCommand.Id}");
 
         // Send the update command to the mediator
         var updateResult = await Mediator.Send(updatePasswordComplexityRuleCommand);
 
         if (updateResult == null)
         {
-            _logger.LogWarning("Failed to update Password Complexity Rule with ID: {Id}", id);
+            _logger.LogWarning("Failed to update Password Complexity Rule with ID: {updatePasswordComplexityRuleCommand.Id}");
 
             return StatusCode(StatusCodes.Status500InternalServerError, new
             {
@@ -211,7 +209,7 @@ namespace UserManagement.API.Controllers
             });
         }
 
-        _logger.LogInformation("Password Complexity Rule with ID: {Id} updated successfully.", id);
+        _logger.LogInformation($"Password Complexity Rule with ID: {updatePasswordComplexityRuleCommand.Id} updated successfully.");
 
         return Ok(new
         {
@@ -221,17 +219,17 @@ namespace UserManagement.API.Controllers
         });
     }
 
-     [HttpPut("Delete")]
+     [HttpDelete]
         
         public async Task<IActionResult> Delete(DeletePasswordComplexityRuleCommand  deletePasswordComplexityRuleCommand)
         {
-             _logger.LogInformation("Starting Delete operation for Password Complexity Rule with ID: {Id}", deletePasswordComplexityRuleCommand.Id);
+             _logger.LogInformation($"Starting Delete operation for Password Complexity Rule with ID: {deletePasswordComplexityRuleCommand.Id}" );
 
          var PasswordComplexityRule = await Mediator.Send(new GetPwdComplexityRuleByIdQuery { Id = deletePasswordComplexityRuleCommand.Id });
           //var department = await Mediator.Send(new GetDepartmentByIdQuery { DepartmentId = deleteDepartmentCommand.Id });
                 if (PasswordComplexityRule == null)
                 {
-                    _logger.LogWarning("Password Complexity Rule with ID {Id} not found.", deletePasswordComplexityRuleCommand.Id);
+                    _logger.LogWarning($"Password Complexity Rule with ID {deletePasswordComplexityRuleCommand.Id} not found.");
 
                     return NotFound(new
                     {
@@ -244,7 +242,7 @@ namespace UserManagement.API.Controllers
 
                 if (result.IsSuccess)
                 {
-                    _logger.LogInformation("PasswordComplexityRule with ID {Id} deleted successfully.", deletePasswordComplexityRuleCommand.Id);
+                    _logger.LogInformation($"PasswordComplexityRule with ID {deletePasswordComplexityRuleCommand.Id} deleted successfully.");
 
                     return Ok(new
                     {
@@ -254,7 +252,7 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-            _logger.LogInformation("Password Complexity Rule with ID {Id} deleted successfully.", deletePasswordComplexityRuleCommand.Id);
+            _logger.LogInformation($"Password Complexity Rule with ID {deletePasswordComplexityRuleCommand.Id} deleted successfully.");
 
             return Ok(new
             {

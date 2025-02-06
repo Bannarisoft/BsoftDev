@@ -8,7 +8,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IUserRole;
 using Microsoft.Extensions.Logging;
-using Core.Application.Departments.Commands.DeleteDepartment;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
 
@@ -35,17 +34,17 @@ namespace Core.Application.UserRole.Commands.DeleteRole
 
        public async Task<ApiResponseDTO<int>>Handle(DeleteRoleCommand request, CancellationToken cancellationToken)
       {       
-         _logger.LogInformation("DeleteUserroleCommandHandler started for User Role ID: {Id}", request.Id);
+         _logger.LogInformation($"DeleteUserroleCommandHandler started for User Role ID: {request.Id}");
             var updateduserrolemap = _mapper.Map<Core.Domain.Entities.UserRole>(request);
            
-            _logger.LogInformation("User Role  with ID {Id} found. Proceeding with deletion.", request.Id);
+            _logger.LogInformation($"User Role  with ID {request.Id} found. Proceeding with deletion.");
 
             
            var userrole = await _IuserroleRepository.DeleteAsync(request.Id, updateduserrolemap);
                          
             if (userrole <= 0)
             {
-                _logger.LogWarning("Failed to delete UserRole   with ID {Id}.", request.Id);
+                _logger.LogWarning($"Failed to delete UserRole   with ID {request.Id}.");
                 return new ApiResponseDTO<int>
                 {
                     IsSuccess = false,
@@ -53,7 +52,7 @@ namespace Core.Application.UserRole.Commands.DeleteRole
                    
                 };
             }
-                _logger.LogInformation("UserRole with ID {Id} deleted successfully.", request.Id);
+                _logger.LogInformation($"UserRole with ID {request.Id} deleted successfully.");
 
             // Publish domain event
             var domainEvent = new AuditLogsDomainEvent(
@@ -65,7 +64,7 @@ namespace Core.Application.UserRole.Commands.DeleteRole
             );
 
             await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("AuditLogsDomainEvent published for UserRole ID {Id}.", request.Id);
+            _logger.LogInformation($"AuditLogsDomainEvent published for UserRole ID {request.Id}." );
 
             return new ApiResponseDTO<int>
             {

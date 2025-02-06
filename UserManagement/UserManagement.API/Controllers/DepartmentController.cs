@@ -20,11 +20,10 @@ namespace UserManagement.API.Controllers
     
     public class DepartmentController : ApiControllerBase
     {
-
         private readonly IValidator<CreateDepartmentCommand> _createDepartmentCommandValidator;
         private readonly IValidator<UpdateDepartmentCommand> _updateDepartmentCommandValidator;
-          private readonly ApplicationDbContext _dbContext;
-          private readonly ILogger<DepartmentController> _logger;
+        private readonly ApplicationDbContext _dbContext;
+        private readonly ILogger<DepartmentController> _logger;
         public DepartmentController( ISender mediator , IValidator<CreateDepartmentCommand> createDepartmentCommandValidator
         ,IValidator<UpdateDepartmentCommand> updateDepartmentCommandValidator, ApplicationDbContext dbContext ,ILogger<DepartmentController> logger ) : base(mediator)
         {
@@ -34,8 +33,8 @@ namespace UserManagement.API.Controllers
              _logger = logger;
 
         }
-       [HttpGet]
-       public async Task<IActionResult> GetAllDepartmentAsync()
+    [HttpGet]
+    public async Task<IActionResult> GetAllDepartmentAsync()
         {       
            _logger.LogInformation("Fetching All Department Request started.");
            
@@ -56,11 +55,11 @@ namespace UserManagement.API.Controllers
                 StatusCode = StatusCodes.Status200OK,
                 data = departments.Data
             });
-        }
+    }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdAsync(int id)
-        {
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetByIdAsync(int id)
+    {
             _logger.LogInformation("Fetching single department with ID {Id} request started.", id);
 
             // Retrieve the department
@@ -85,9 +84,9 @@ namespace UserManagement.API.Controllers
                 Data = department.Data
             });
          
-        }
+}
         [HttpPost]
-         [Route("Create")]
+        
         public async Task<IActionResult>CreateAsync([FromBody] CreateDepartmentCommand command)
         {
                 _logger.LogInformation("Create Department request started with data: {@Command}", command);
@@ -131,7 +130,7 @@ namespace UserManagement.API.Controllers
         }
 
 
-      [HttpPut("update")]
+      [HttpPut]
     public async Task<IActionResult> UpdateAsync( UpdateDepartmentCommand command)
     {
                 _logger.LogInformation("Update Department request started with data: {@Command}", command);
@@ -190,7 +189,7 @@ namespace UserManagement.API.Controllers
     }
 
         
-    [HttpPut("delete")]       
+    [HttpDelete]      
 
         public async Task<IActionResult> Delete(DeleteDepartmentCommand deleteDepartmentCommand)
         {
@@ -239,16 +238,19 @@ namespace UserManagement.API.Controllers
         }
 
 
-         [HttpGet("autocomplete")]
-        public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync([FromQuery] string searchDept)
+      
+    //    [HttpGet("Department/by-name/{name}")]
+         [HttpGet("by-name/{name}")]
+
+        public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync(string name)
         {
-            _logger.LogInformation("Starting GetAllDepartmentAutoCompleteSearchAsync with search pattern: {SearchPattern}", searchDept);
-             var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = searchDept };
+            _logger.LogInformation("Starting GetAllDepartmentAutoCompleteSearchAsync with search pattern: {SearchPattern}", name);
+             var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = name };
                 var result = await Mediator.Send(query);
 
                 if (result.Data == null || !result.Data.Any())
                 {
-                    _logger.LogWarning("No departments found for search pattern: {SearchPattern}", searchDept);
+                    _logger.LogWarning("No departments found for search pattern: {SearchPattern}", name);
 
                     return NotFound(new
                     {
@@ -257,7 +259,7 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogInformation("Departments found for search pattern: {SearchPattern}. Returning data.", searchDept);
+                _logger.LogInformation("Departments found for search pattern: {SearchPattern}. Returning data.", name);
 
                 return Ok(new
                 {

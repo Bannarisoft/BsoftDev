@@ -13,8 +13,8 @@ namespace Core.Application.UserRole.Commands.UpdateRole
     public class UpdateRoleCommand : IRequest<ApiResponseDTO<UserRoleDto>>
     {
          public int Id { get; set; }
-        public string RoleName { get; set; }
-        public string Description { get; set; }
+        public string? RoleName { get; set; }
+        public string? Description { get; set; }
         public int CompanyId { get; set; }
         public byte  IsActive { get; set; }
        

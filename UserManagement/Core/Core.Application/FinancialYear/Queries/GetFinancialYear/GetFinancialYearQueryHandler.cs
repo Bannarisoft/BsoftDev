@@ -38,14 +38,14 @@ namespace Core.Application.GetFinancialYear.Queries.GetFinancialYear
          
 
 
-             _logger.LogInformation("Fetching FinancialYear Request started: {request}", request);
+             _logger.LogInformation($"Fetching FinancialYear Request started: {request}");
            
            
              var financialyear = await _financialyearRepository.GetAllFinancialYearAsync();
             
-             if (financialyear == null || !financialyear.Any())
+             if (financialyear is null || !financialyear.Any())
             {
-               _logger.LogWarning("No FinancialYear records found in the database. Total count: {Count}", financialyear?.Count ?? 0);
+               _logger.LogWarning($"No FinancialYear records found in the database. Total count: {financialyear?.Count ?? 0}");
 
                   return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = false, Message = "No Record Found" };
             }
@@ -61,7 +61,7 @@ namespace Core.Application.GetFinancialYear.Queries.GetFinancialYear
 
                   await _mediator.Publish(domainEvent, cancellationToken);
               
-            _logger.LogInformation("FinancialYear {department} Listed successfully.", financialyearList.Count);
+            _logger.LogInformation($"FinancialYear {financialyearList} Listed successfully." );
             return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = true, Message = "Success", Data = financialyearList };       
         }
     }

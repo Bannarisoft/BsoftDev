@@ -37,22 +37,22 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
         public async Task<ApiResponseDTO<List<GetUserRoleAutocompleteDto>>> Handle(GetRolesAutocompleteQuery request, CancellationToken cancellationToken)
         {
 
-                  _logger.LogInformation("Handling GetDepartmentAutoCompleteSearchQuery with search pattern: {SearchPattern}", request.SearchTerm);
+                  _logger.LogInformation($"Handling GetUserRoleAutoCompleteSearchQuery with search pattern: {request.SearchTerm}");
 
-             // Fetch departments matching the search pattern
+             // Fetch UserRole matching the search pattern
                 var result = await _userRoleRepository.GetRolesAsync(request.SearchTerm);
-                if (result == null || !result.Any())
+                if (result is null || !result.Any())
                 {
-                    _logger.LogWarning("No departments found for search pattern: {SearchPattern}", request.SearchTerm);
+                    _logger.LogWarning($"No UserRole found for search pattern: {request.SearchTerm}" );
                     return new ApiResponseDTO<List<GetUserRoleAutocompleteDto>>
                     {
                         IsSuccess = false,
-                        Message = "No matching departments found",
+                        Message = "No matching UserRole found",
                         Data = new List<GetUserRoleAutocompleteDto>()
                     };
                 }
 
-                _logger.LogInformation("Departments found for search pattern: {SearchPattern}. Mapping results to DTO.", request.SearchTerm);
+                _logger.LogInformation($"UserRole found for search pattern: {request.SearchTerm}. Mapping results to DTO.");
 
                 // Map the result to DTO
                 var userRoleDto = _mapper.Map<List<GetUserRoleAutocompleteDto>>(result);
@@ -67,7 +67,7 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
 
-                _logger.LogInformation("Domain event published for search pattern: {SearchPattern}", request.SearchTerm);
+                _logger.LogInformation($"Domain event published for search pattern: {request.SearchTerm}");
 
                 return new ApiResponseDTO<List<GetUserRoleAutocompleteDto>>
                 {

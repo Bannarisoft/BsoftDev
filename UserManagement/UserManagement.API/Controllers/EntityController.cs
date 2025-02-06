@@ -101,7 +101,7 @@ public async Task<IActionResult> GetByIdAsync(int id)
    
 }
        
-    [HttpGet("entity/new-code")]
+[HttpGet("entity/new-code")]
 public async Task<IActionResult> GenerateEntityCodeAsync()
 {
    

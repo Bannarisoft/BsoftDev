@@ -26,8 +26,11 @@ namespace UserManagement.Infrastructure.Repositories.AdminSecuritySettings
      public async Task<int>UpdateAsync(int id, Core.Domain.Entities.AdminSecuritySettings adminSecuritySettings)
     {
             var existingadminsettings = await _applicationDbContext.AdminSecuritySettings.FirstOrDefaultAsync(u => u.Id == id);
-            if (existingadminsettings != null)
-            {
+                    if (existingadminsettings == null)
+                {
+                    return -1; //indicate failure
+                }
+           
                   existingadminsettings.PasswordHistoryCount=adminSecuritySettings.PasswordHistoryCount;
                   existingadminsettings.SessionTimeoutMinutes= adminSecuritySettings.SessionTimeoutMinutes;
                   existingadminsettings.MaxFailedLoginAttempts=adminSecuritySettings.MaxFailedLoginAttempts;
@@ -40,28 +43,33 @@ namespace UserManagement.Infrastructure.Repositories.AdminSecuritySettings
                   existingadminsettings.PasswordResetCodeExpiryMinutes=adminSecuritySettings.PasswordResetCodeExpiryMinutes;
                   existingadminsettings.PasswordResetCodeExpiryMinutes=adminSecuritySettings.PasswordResetCodeExpiryMinutes;
                   existingadminsettings.IsCaptchaEnabledOnLogin=adminSecuritySettings.IsCaptchaEnabledOnLogin;
+                  existingadminsettings.IsActive=adminSecuritySettings.IsActive;
                 
 
 
                 _applicationDbContext.AdminSecuritySettings.Update(existingadminsettings);
-                return await _applicationDbContext.SaveChangesAsync();
-            }
-            return 0; // No user found
+                 await _applicationDbContext.SaveChangesAsync();
+            
+            return 1; // No user found
     }
 
         public async Task<int> DeleteAsync(int id ,Core.Domain.Entities.AdminSecuritySettings adminSecuritySettings )
     {
         
             var adminsettingsToDelete = await _applicationDbContext.AdminSecuritySettings.FirstOrDefaultAsync(u => u.Id == id);
-            if (adminsettingsToDelete != null)
-            {
-                adminsettingsToDelete.IsActive = adminSecuritySettings.IsActive;
+             if (adminsettingsToDelete == null)
+                {
+                    return -1; //indicate failure
+                }            
+                adminsettingsToDelete.IsDeleted = adminSecuritySettings.IsDeleted;
                 _applicationDbContext.AdminSecuritySettings.Update(adminsettingsToDelete);
                  await _applicationDbContext.SaveChangesAsync();
                  return 1;
-            }
-           return 0;
+           
+         
     }
+
+   
 
 
 

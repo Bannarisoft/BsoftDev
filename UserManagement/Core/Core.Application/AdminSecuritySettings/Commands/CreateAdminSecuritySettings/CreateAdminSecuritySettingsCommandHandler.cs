@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySettings
 {
-    public class CreateAdminSecuritySettingsCommandHandler  :IRequestHandler<CreateAdminSecuritySettingsCommand, ApiResponseDTO<AdminSecuritySettingsDto >>
+    public class CreateAdminSecuritySettingsCommandHandler  :IRequestHandler<CreateAdminSecuritySettingsCommand, ApiResponseDTO<int>>
     {
         private readonly IAdminSecuritySettingsCommandRepository _adminSecuritySettingsCommandRepository;
         private readonly IMapper _mapper;
@@ -24,20 +24,23 @@ namespace Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySet
           public CreateAdminSecuritySettingsCommandHandler(IAdminSecuritySettingsCommandRepository adminSecuritySettingsCommandRepository,IMapper mapper,IMediator mediator,   ILogger<CreateAdminSecuritySettingsCommandHandler> logger)
         {
              _adminSecuritySettingsCommandRepository=adminSecuritySettingsCommandRepository;
+
             _mapper=mapper;
             _mediator=mediator;
             _logger=logger;
         }
 
-        public async Task<ApiResponseDTO<AdminSecuritySettingsDto>> Handle(CreateAdminSecuritySettingsCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<int>> Handle(CreateAdminSecuritySettingsCommand request, CancellationToken cancellationToken)
         {        
              _logger.LogInformation("Processing CreateAdminSecuritySettingsCommand request.");
 
               var adminsettingsEntity = _mapper.Map<Core.Domain.Entities.AdminSecuritySettings>(request);
-                _logger.LogDebug("Mapped CreateAdminSecuritySettingsCommand to AdminSecuritySettings entity.");
+
+              
+                _logger.LogDebug($"Mapped CreateAdminSecuritySettingsCommand to AdminSecuritySettings entity {request}.");
 
                 var result = await _adminSecuritySettingsCommandRepository.CreateAsync(adminsettingsEntity);
-                _logger.LogInformation("Successfully created AdminSecuritySettings entity with ID: {Id}.", result.Id);
+                _logger.LogInformation($"Successfully created AdminSecuritySettings entity with ID: { result.Id}.");
 
                 // Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
@@ -49,17 +52,17 @@ namespace Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySet
                 );
 
                 await _mediator.Publish(domainEvent, cancellationToken);
-                _logger.LogInformation("Published AuditLogsDomainEvent for AdminSecuritySettings entity with ID: {Id}.", result.Id);
+                _logger.LogInformation($"Published AuditLogsDomainEvent for AdminSecuritySettings entity with ID: { result.Id}.");
 
                 var AdminSettingsDto = _mapper.Map<AdminSecuritySettingsDto>(result);
                 _logger.LogDebug("Mapped AdminSecuritySettings entity to AdminSecuritySettingsDto.");
 
             
-                 return new ApiResponseDTO<AdminSecuritySettingsDto>
+                 return new ApiResponseDTO<int>
             {
                 IsSuccess = true,
                 Message = "AdminSecuritySettings created successfully",
-                Data = AdminSettingsDto
+                Data = AdminSettingsDto.Id
             };
     
        

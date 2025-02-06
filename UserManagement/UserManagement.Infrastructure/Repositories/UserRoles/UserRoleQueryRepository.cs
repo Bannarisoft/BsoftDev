@@ -23,7 +23,7 @@ namespace UserManagement.Infrastructure.Repositories.UserRoles
     {
         
         //return await _applicationDbContext.UserRole.ToListAsync();
-         const string query = @"SELECT  * FROM AppSecurity.UserRole";
+         const string query = @"SELECT  * FROM AppSecurity.UserRole WHERE IsDeleted=0 ORDER BY Id DESC";
         return (await _dbConnection.QueryAsync<UserRole>(query)).ToList();
     }
 
@@ -31,7 +31,7 @@ namespace UserManagement.Infrastructure.Repositories.UserRoles
     {
         //return await _applicationDbContext.UserRole.AsNoTracking().FirstOrDefaultAsync(b=>b.Id==id);     
 
-          const string query = "SELECT Id,RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole WHERE Id = @Id";
+          const string query = "SELECT Id,RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole WHERE Id = @Id AND IsDeleted=0 ORDER BY Id DESC";
           return await _dbConnection.QueryFirstOrDefaultAsync<UserRole>(query, new { id });
     
     }   
@@ -52,8 +52,8 @@ namespace UserManagement.Infrastructure.Repositories.UserRoles
 
             const string query = @"
                  SELECT  Id,RoleName,Description,CompanyId,IsActive from  AppSecurity.UserRole 
-            WHERE RoleName LIKE @searchTerm OR Id LIKE @searchTerm and IsActive =1
-            ORDER BY RoleName";
+            WHERE RoleName LIKE @searchTerm OR Id LIKE @searchTerm and IsDeleted =0
+            ORDER BY Id DESC";
                 
             // Update the object to use SearchPattern instead of Name
             var result = await _dbConnection.QueryAsync<UserRole>(query, new { SearchTerm = $"%{searchTerm}%" });

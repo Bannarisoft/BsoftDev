@@ -20,15 +20,34 @@ namespace UserManagement.Infrastructure.Repositories.FinancialYear
      public async Task<List<Core.Domain.Entities.FinancialYear>>GetAllFinancialYearAsync()
     {
         
-        const string query = @"SELECT  * FROM AppData.FinancialYear WHERE   IsDeleted = 0 order by CreatedAt desc";
+        const string query = @"SELECT  * FROM AppData.FinancialYear WHERE   IsDeleted = 0 ORDER BY ID DESC ";
         return (await _dbConnection.QueryAsync<Core.Domain.Entities.FinancialYear>(query)).ToList();
         
     }
        public async Task<Core.Domain.Entities.FinancialYear>GetByIdAsync(int id)
     {               
-             const string query = @"SELECT * FROM AppData.FinancialYear WHERE Id = @Id AND   IsDeleted = 0  order by CreatedAt DESC";
+             const string query = @"SELECT * FROM AppData.FinancialYear WHERE Id = @Id AND   IsDeleted = 0  ORDER BY ID DESC";
             return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.FinancialYear>(query, new { id });
     } 
+
+     public async Task<List<Core.Domain.Entities.FinancialYear>>  GetAllFinancialAutoCompleteSearchAsync(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                throw new ArgumentException($"FinancialYear start year { nameof(searchTerm)} cannot be null or empty.");
+            }
+
+            
+           const string query = @"
+            SELECT  * from AppData.FinancialYear
+            WHERE (StartYear LIKE @searchTerm OR Id LIKE @searchTerm) and IsDeleted = 0
+            ORDER BY ID DESC";
+           
+          var financialYears = await _dbConnection.QueryAsync<Core.Domain.Entities.FinancialYear>(query, new { SearchTerm = $"%{searchTerm}%" });
+            return financialYears.ToList();
+        }
+
+
 
 
 

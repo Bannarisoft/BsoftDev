@@ -34,36 +34,18 @@ namespace Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplex
 
         public async Task<ApiResponseDTO<PwdRuleDto>> Handle(UpdatePasswordComplexityRuleCommand request, CancellationToken cancellationToken)
             {
-              _logger.LogInformation("Handling UpdatePasswordComplexityRuleCommand for Password Complexity Rule with ID: {Id}", request.Id);
+              _logger.LogInformation($"Handling UpdatePasswordComplexityRuleCommand for Password Complexity Rule with ID: { request.Id}");
 
 
                  var dePasswordComplexityMap  = _Imapper.Map<Core.Domain.Entities.PasswordComplexityRule>(request);
-                    // // Retrieve the password complexity rule by ID
-                    // var pwdComplexity = await _IpasswordComplexityRuleQueryRepository.GetByIdAsync(request.Id , dePasswordComplexityMap);
-                    //  // Fetch the department by ID
-                       
-                    //     if (pwdComplexity == null)
-                    //     {
-                    //         _logger.LogWarning("Password Complexity Rule  with ID {Id} not found.", request.Id);
-                    //         return new ApiResponseDTO<PwdRuleDto>
-                    //         {
-                    //             IsSuccess = false,
-                    //             Message = "Password Complexity Rule  not found"
-                    //         };
-                    //     }
-
-                    _logger.LogInformation("Password Complexity Rule with ID {Id} retrieved successfully. Proceeding with update.", request.Id);
-
-                    // Update the properties
-                    // dePasswordComplexityMap.PwdComplexityRule = request.PwdComplexityRule;
-                    // dePasswordComplexityMap.IsActive=request.IsActive;
-                   
-
+                  
+                  _logger.LogInformation($"Password Complexity Rule with ID {request.Id} retrieved successfully. Proceeding with update." );
+   
                     // Save the updates
                     var result = await _IPasswordComplexityRepository.UpdateAsync(request.Id, dePasswordComplexityMap);
-                                if (result == null)
+                                if (result <=0)
                         {
-                            _logger.LogWarning("Failed to update Password Complexity Rule with ID {Id}.", request.Id);
+                            _logger.LogWarning($"Failed to update Password Complexity Rule with ID {request.Id}.");
                             return new ApiResponseDTO<PwdRuleDto>
                             {
                                 IsSuccess = false,
@@ -72,7 +54,7 @@ namespace Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplex
                         }
                   
 
-                    _logger.LogInformation("Password Complexity Rule with ID {Id} updated successfully.", request.Id);
+                    _logger.LogInformation($"Password Complexity Rule with ID {request.Id} updated successfully.");
 
                     // Publish domain event
                     var domainEvent = new AuditLogsDomainEvent(
@@ -85,7 +67,7 @@ namespace Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplex
 
                  
                       await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("AuditLogsDomainEvent published for Password Complexity Rule ID {DepartmentId}.", request.Id);
+            _logger.LogInformation($"AuditLogsDomainEvent published for Password Complexity Rule ID {request.Id}.");
 
             return new ApiResponseDTO<PwdRuleDto>
             {

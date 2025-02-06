@@ -22,7 +22,7 @@ namespace UserManagement.Infrastructure.Repositories.PasswordComplexityRule
       public async Task<List<Core.Domain.Entities.PasswordComplexityRule>>GetPasswordComplexityAsync( )
     {
         
-        const string query = @"SELECT  * FROM AppSecurity.PasswordComplexityRule";
+        const string query = @"SELECT  * FROM AppSecurity.PasswordComplexityRule WHERE IsDeleted = 0 ORDER BY Id DESC";
             return (await _dbConnection.QueryAsync<Core.Domain.Entities.PasswordComplexityRule>(query)).ToList();        
     }
 
@@ -30,7 +30,7 @@ namespace UserManagement.Infrastructure.Repositories.PasswordComplexityRule
     {
        
 
-         const string query = @"SELECT * FROM AppSecurity.PasswordComplexityRule WHERE Id = @Id AND IsDeleted = 0";
+         const string query = @"SELECT * FROM AppSecurity.PasswordComplexityRule WHERE Id = @Id AND IsDeleted = 0 ORDER BY Id DESC";
             var passwordComplexity = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.PasswordComplexityRule>(query, new { id });           
              if (passwordComplexity == null)
             {
@@ -49,7 +49,7 @@ namespace UserManagement.Infrastructure.Repositories.PasswordComplexityRule
            const string query = @" 
            select  * from  AppSecurity.PasswordComplexityRule 
             WHERE PwdComplexityRule LIKE @searchTerm OR Id LIKE @searchTerm AND IsDeleted = 0
-            ORDER BY PwdComplexityRule";
+            ORDER BY ID DESC";
             // Update the object to use SearchPattern instead of Name
           var Pwdrule = await _dbConnection.QueryAsync<Core.Domain.Entities.PasswordComplexityRule>(query, new { SearchTerm  = $"%{searchTerm}%" });
             return Pwdrule.ToList();

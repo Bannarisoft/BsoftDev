@@ -21,14 +21,14 @@ namespace UserManagement.Infrastructure.Repositories.Departments
     public async Task<List<Department>>GetAllDepartmentAsync()
     {
         
-        const string query = @"SELECT  * FROM AppData.Department WHERE IsDeleted = 0";
+        const string query = @"SELECT  * FROM AppData.Department WHERE IsDeleted = 0 ORDER BY Id DESC ";
             return (await _dbConnection.QueryAsync<Department>(query)).ToList();
         
     }
 
     public async Task<Department?> GetByIdAsync(int id)
     {
-        const string query = @"SELECT * FROM AppData.Department WHERE Id = @Id AND IsDeleted = 0";
+        const string query = @"SELECT * FROM AppData.Department WHERE Id = @Id AND IsDeleted = 0 ORDER BY Id DESC ";
         var departments = await _dbConnection.QueryAsync<Department>(query, new { Id = id });
 
     var department = departments.FirstOrDefault();
@@ -39,21 +39,9 @@ namespace UserManagement.Infrastructure.Repositories.Departments
     }
 
     return department; // Returns null if not found
-        //  const string query = @"SELECT * FROM AppData.Department WHERE Id = @Id AND IsDeleted = 0";
-        //    // var department = await _dbConnection.QueryFirstOrDefaultAsync<Department>(query, new { id });           
-        //     //  if (department == null)
-        //     // {
-        //     //   ///  throw new KeyNotFoundException($"Department with ID {id} not found.");
-        //     //   return null;
-        //     // }
-        //       var department = await _dbConnection.QueryAsync<Department>(query, new { id });
-        //      return department ?? new List<Department>();
-        }                  
-    
-
-
-
-    public async Task<List<Department>>  GetAllDepartmentAutoCompleteSearchAsync(string SearchDept)
+      
+        }       
+        public async Task<List<Department>>  GetAllDepartmentAutoCompleteSearchAsync(string SearchDept)
         {
             if (string.IsNullOrWhiteSpace(SearchDept))
             {
@@ -62,9 +50,9 @@ namespace UserManagement.Infrastructure.Repositories.Departments
 
             
            const string query = @"
-            select Id,CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
+            SELECT Id,CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
             WHERE (DeptName LIKE @SearchDept OR Id LIKE @SearchDept) and IsDeleted = 0
-            ORDER BY DeptName";
+            ORDER BY Id DESC";
            
           var departments = await _dbConnection.QueryAsync<Department>(query, new { SearchDept = $"%{SearchDept}%" });
             return departments.ToList();
