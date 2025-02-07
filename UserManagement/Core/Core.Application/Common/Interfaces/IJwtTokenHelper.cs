@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Core.Domain.Common;
 
 namespace Core.Application.Common.Interfaces
 {

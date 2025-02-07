@@ -31,6 +31,7 @@ namespace Core.Domain.Entities
 
      public ICollection<PasswordLog>? Passwords { get; set; }
      public IList<UserCompany>? UserCompanies { get; set; }
+     public IList<UserUnit> UserUnits { get; set; }
 
     public void SetPassword(string password)
     {

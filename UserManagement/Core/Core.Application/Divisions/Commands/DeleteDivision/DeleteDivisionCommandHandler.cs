@@ -42,10 +42,10 @@ namespace Core.Application.Divisions.Commands.DeleteDivision
 
                  if(divisionresult)
                 {
-                    return new ApiResponseDTO<DivisionDTO>{IsSuccess = true, Message = "Division updated successfully."};
+                    return new ApiResponseDTO<DivisionDTO>{IsSuccess = true, Message = "Division deleted successfully."};
                 }
 
-                return new ApiResponseDTO<DivisionDTO>{IsSuccess = false, Message = "Division not updated."};
+                return new ApiResponseDTO<DivisionDTO>{IsSuccess = false, Message = "Division not deleted."};
         }
     }
 }

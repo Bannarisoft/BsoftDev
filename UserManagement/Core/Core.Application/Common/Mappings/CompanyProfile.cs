@@ -52,7 +52,10 @@ namespace Core.Application.Common.Mappings
             CreateMap<DeleteCompanyCommand, Company>()
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
 
-            CreateMap<Company, GetCompanyDTO>()
+            CreateMap<Company, GetCompanyDTO>();
+            // .ForMember(dest => dest.CompanyAddress, opt => opt.MapFrom(src => src.CompanyAddress))
+            // .ForMember(dest => dest.CompanyContact, opt => opt.MapFrom(src => src.CompanyContact));
+             CreateMap<Company, GetByIdDTO>()
             .ForMember(dest => dest.CompanyAddress, opt => opt.MapFrom(src => src.CompanyAddress))
             .ForMember(dest => dest.CompanyContact, opt => opt.MapFrom(src => src.CompanyContact));
 
