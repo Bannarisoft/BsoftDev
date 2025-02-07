@@ -19,7 +19,7 @@ namespace Core.Application.Common.Mappings
                 CreateMap<CreateAssetGroupCommand, Core.Domain.Entities.AssetGroup>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Code))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.GroupName, opt => opt.MapFrom(src => src.GroupNameName))
                 .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));

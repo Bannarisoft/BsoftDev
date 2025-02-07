@@ -9,7 +9,7 @@ namespace Core.Domain.Entities
     public class AssetGroup :BaseEntity
     {
         public string? Code { get; set; }
-        public string? Name { get; set; }
+        public string? GroupName { get; set; }
         public int SortOrder { get; set; }
         public  AssetCategories? AssetCategories { get; set; } 
 

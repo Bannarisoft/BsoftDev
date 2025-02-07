@@ -39,8 +39,8 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(10)")
                 .IsRequired();                
       
-                builder.Property(ag => ag.Name)
-                .HasColumnName("Name")
+                builder.Property(ag => ag.GroupName)
+                .HasColumnName("GroupName")
                 .HasColumnType("varchar(50)")
                 .IsRequired();
                 

@@ -49,11 +49,11 @@ namespace Core.Application.AssetGroup.Command.CreateAssetGroup
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
                 actionCode: assetGroup.Code,
-                actionName: assetGroup.Name,
+                actionName: assetGroup.GroupName,
                 details: $"AssetGroup details was created",
                 module: "AssetGroup");
             await _imediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation($"AssetGroup {assetGroup.Name} Created successfully.");
+            _logger.LogInformation($"AssetGroup {assetGroup.GroupName} Created successfully.");
             var assetGroupDtoDto = _imapper.Map<AssetGroupDto>(assetGroup);
 
             return new ApiResponseDTO<int>()
