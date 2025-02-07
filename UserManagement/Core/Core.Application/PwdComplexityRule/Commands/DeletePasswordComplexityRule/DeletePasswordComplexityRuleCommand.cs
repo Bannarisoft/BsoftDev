@@ -13,7 +13,7 @@ namespace Core.Application.PwdComplexityRule.Commands.DeletePasswordComplexityRu
     {
 
           public int Id { get; set; }
-        // public PwdRuleStatusDto updatePwdRuleStatusDto { get; set; }
+       
          
     }
 }

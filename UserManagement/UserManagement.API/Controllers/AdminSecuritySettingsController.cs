@@ -22,14 +22,15 @@ using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettingsByI
 
 namespace UserManagement.API.Controllers
 {
-    [Route("api/admin")]
+    [ApiController]
+    [Route("api/[controller]")]
     public class AdminSecuritySettingsController : ApiControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly IValidator<CreateAdminSecuritySettingsCommand> _createAdminSecuritySettingsCommandValidator;   
-    private readonly IValidator <UpdateAdminSecuritySettingsCommand> _updateAdminSecuritysettingsCommandValidator;
-    
-      private readonly ILogger<AdminSecuritySettingsController> _logger;
+        private readonly IValidator <UpdateAdminSecuritySettingsCommand> _updateAdminSecuritysettingsCommandValidator;
+        
+        private readonly ILogger<AdminSecuritySettingsController> _logger;
 
 
 
@@ -100,6 +101,8 @@ namespace UserManagement.API.Controllers
                 
             
             }
+
+            
 
          [HttpPost]        
         public async Task<IActionResult>CreateAsync([FromBody] CreateAdminSecuritySettingsCommand createAdminSecuritySettingscmd)
@@ -199,16 +202,14 @@ namespace UserManagement.API.Controllers
                 
             }
             
-        [HttpDelete]       
-        public async Task<IActionResult>Delete( DeleteAdminSecuritySettingsCommand deleteAdminSecuritySettingCommand)
+          [HttpDelete("{id}")]       
+        public async Task<IActionResult>Delete( int id)
         {
-             _logger.LogInformation($"Delete Admin Security Settings  request started with ID: {deleteAdminSecuritySettingCommand.Id}" );
-
-                // Check if the department exists
-                var department = await Mediator.Send(new GetAdminSecuritySettingsByIdQuery { Id = deleteAdminSecuritySettingCommand.Id });
-                if (department == null)
+               // Check if the department exists
+                var department = await Mediator.Send(new GetAdminSecuritySettingsByIdQuery { Id = id });
+                if (department is null)
                 {
-                    _logger.LogWarning($"Admin Security Settings  with ID {deleteAdminSecuritySettingCommand.Id} not found." );
+                    _logger.LogWarning($"Admin Security Settings  with ID {id} not found." );
 
                     return NotFound(new
                     {
@@ -217,14 +218,14 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogInformation($"Admin Security Settings  with ID {deleteAdminSecuritySettingCommand.Id} found. Proceeding with deletion.");
+                _logger.LogInformation($"Admin Security Settings  with ID {id} found. Proceeding with deletion.");
 
                 // Attempt to delete the department
-                var result = await Mediator.Send(deleteAdminSecuritySettingCommand);
+                var result = await Mediator.Send(new DeleteAdminSecuritySettingsCommand { Id = id });
 
                 if (result.IsSuccess)
                 {
-                    _logger.LogInformation($"Admin Security Settings  with ID {deleteAdminSecuritySettingCommand.Id} deleted successfully.");
+                    _logger.LogInformation($"Admin Security Settings  with ID {id} deleted successfully.");
 
                     return Ok(new
                     {
@@ -234,7 +235,7 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogWarning($"Failed to delete Admin Security Settings  with ID {deleteAdminSecuritySettingCommand.Id}. Reason: {result.Message}"  );
+                _logger.LogWarning($"Failed to delete Admin Security Settings  with ID {id}. Reason: {result.Message}"  );
 
                 return BadRequest(new
                 {

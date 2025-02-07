@@ -47,8 +47,7 @@ namespace UserManagement.Infrastructure.Repositories.PasswordComplexityRule
                 throw new ArgumentException("PwdComplexityRule cannot be null or empty.", nameof(searchTerm));
             }
            const string query = @" 
-           select  * from  AppSecurity.PasswordComplexityRule 
-            WHERE PwdComplexityRule LIKE @searchTerm OR Id LIKE @searchTerm AND IsDeleted = 0
+           SELECT  * FROM  AppSecurity.PasswordComplexityRule WHERE PwdComplexityRule LIKE @searchTerm OR Id LIKE @searchTerm AND IsDeleted = 0
             ORDER BY ID DESC";
             // Update the object to use SearchPattern instead of Name
           var Pwdrule = await _dbConnection.QueryAsync<Core.Domain.Entities.PasswordComplexityRule>(query, new { SearchTerm  = $"%{searchTerm}%" });

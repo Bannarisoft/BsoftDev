@@ -50,7 +50,7 @@ namespace UserManagement.Infrastructure.Repositories.Departments
 
             
            const string query = @"
-            SELECT Id,CompanyId,ShortName,DeptName,IsActive from  AppData.Department 
+            SELECT Id,CompanyId,ShortName,DeptName,IsActive FROM  AppData.Department 
             WHERE (DeptName LIKE @SearchDept OR Id LIKE @SearchDept) and IsDeleted = 0
             ORDER BY Id DESC";
            

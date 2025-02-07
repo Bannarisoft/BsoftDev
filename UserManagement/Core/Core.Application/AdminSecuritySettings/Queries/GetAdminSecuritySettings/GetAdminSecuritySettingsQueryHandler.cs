@@ -42,7 +42,7 @@ namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySetting
                
                     if (adminSecuritySettings is  null || !adminSecuritySettings.Any() || adminSecuritySettings.Count==0)
               {
-               _logger.LogWarning($"No adminSecuritySettings records found in the database. Total count: { adminSecuritySettings?.Count ?? 0} ");
+               _logger.LogWarning($"No AdminSecuritySettings records found in the database. Total count: { adminSecuritySettings?.Count ?? 0} ");
 
                   return new ApiResponseDTO<List<GetAdminSecuritySettingsDto>>                      
                      {

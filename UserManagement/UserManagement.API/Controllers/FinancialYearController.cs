@@ -81,6 +81,34 @@ namespace UserManagement.API.Controllers
                 StatusCode = StatusCodes.Status200OK,
                 Data = financialyr.Data
             });
+        } 
+
+        [HttpGet("by-Year/{Year}")]
+        public async Task<IActionResult> GetAllFinancialYearAutoCompleteSearchAsync( string Year)
+        {
+            _logger.LogInformation($"Starting GetAllFinancialYearAutoCompleteSearchAsync with search pattern: {Year}" );
+             var query = new GetFinancialYearAutoCompleteQuery { SearchTerm = Year };
+                var result = await Mediator.Send(query);
+
+                if (result.Data == null || !result.Data.Any())
+                {
+                    _logger.LogWarning($"No FinancialYear found for search pattern: {Year}");
+
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "No matching FinancialYear found."
+                    });
+                }
+
+                _logger.LogInformation($"FinancialYear found for search pattern: {Year}. Returning data.");
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Data = result.Data
+                });
+            
         }
 
 
@@ -196,17 +224,17 @@ namespace UserManagement.API.Controllers
             }
 
 
-             [HttpDelete]
+             [HttpDelete("{id}")]   
              
-            public async Task<IActionResult> Delete(DeleteFinancialYearCommand deleteFinancialYearCommand)
+            public async Task<IActionResult> Delete(int id )
             {
-            _logger.LogInformation($"Delete FinancialYear Command request started with ID: { deleteFinancialYearCommand.Id}");
+            _logger.LogInformation($"Delete FinancialYear Command request started with ID: {id}");
 
                 // Check if the department exists
-                var department = await Mediator.Send(new GetFinancialYearByIdQuery { Id = deleteFinancialYearCommand.Id });
+                var department = await Mediator.Send(new GetFinancialYearByIdQuery { Id = id });
                 if (department == null)
                 {
-                    _logger.LogWarning($"FinancialYear  with ID {deleteFinancialYearCommand.Id} not found." );
+                    _logger.LogWarning($"FinancialYear  with ID {id} not found." );
 
                     return NotFound(new
                     {
@@ -215,14 +243,14 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogInformation($"FinancialYear with ID {deleteFinancialYearCommand.Id} found. Proceeding with deletion.");
+                _logger.LogInformation($"FinancialYear with ID {id} found. Proceeding with deletion.");
 
                 // Attempt to delete the department
-                var result = await Mediator.Send(deleteFinancialYearCommand);
+                var result = await Mediator.Send( new DeleteFinancialYearCommand { Id=id} );
 
                 if (result.IsSuccess)
                 {
-                    _logger.LogInformation($"FinancialYear with ID {deleteFinancialYearCommand.Id} deleted successfully." );
+                    _logger.LogInformation($"FinancialYear with ID {id} deleted successfully." );
 
                     return Ok(new
                     {
@@ -232,7 +260,7 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogWarning($"Failed to delete FinancialYear with ID {deleteFinancialYearCommand.Id}. Reason: {result.Message}");
+                _logger.LogWarning($"Failed to delete FinancialYear with ID {id}. Reason: {result.Message}");
 
                 return BadRequest(new
                 {
@@ -244,33 +272,7 @@ namespace UserManagement.API.Controllers
      
         }
 
-        [HttpGet("by-Year/{Year}")]
-        public async Task<IActionResult> GetAllFinancialYearAutoCompleteSearchAsync( string Year)
-        {
-            _logger.LogInformation($"Starting GetAllFinancialYearAutoCompleteSearchAsync with search pattern: {Year}" );
-             var query = new GetFinancialYearAutoCompleteQuery { SearchTerm = Year };
-                var result = await Mediator.Send(query);
-
-                if (result.Data == null || !result.Data.Any())
-                {
-                    _logger.LogWarning($"No FinancialYear found for search pattern: {Year}");
-
-                    return NotFound(new
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "No matching FinancialYear found."
-                    });
-                }
-
-                _logger.LogInformation($"FinancialYear found for search pattern: {Year}. Returning data.");
-
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Data = result.Data
-                });
-            
-        }
+      
 
 
     }

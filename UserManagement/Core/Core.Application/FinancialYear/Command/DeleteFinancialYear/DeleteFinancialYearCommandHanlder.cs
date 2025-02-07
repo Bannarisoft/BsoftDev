@@ -74,7 +74,7 @@ namespace Core.Application.FinancialYear.Command.DeleteFinancialYear
             // Publish domain event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Delete",
-                actionCode: updatedFinancialYear.Id.ToString(),
+                actionCode: updatedFinancialYear.FinYearName,
                 actionName: updatedFinancialYear.FinYearName,
                 details: $"FinancialYear ID: {request.Id} was changed to status inactive.",
                 module: "FinancialYear"

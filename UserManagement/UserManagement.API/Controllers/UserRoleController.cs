@@ -167,16 +167,16 @@ namespace UserManagement.API.Controllers
                
         }
 
-         [HttpDelete]      
-        public async Task<IActionResult> DeleteAsync( DeleteRoleCommand userroleDeleteCommand)
+        [HttpDelete("{id}")]         
+        public async Task<IActionResult> DeleteAsync( int id )
         {
-              _logger.LogInformation($"Delete User Role request started with ID: {userroleDeleteCommand.Id}");
+              _logger.LogInformation($"Delete User Role request started with ID: {id}");
 
                 // Check if the department exists
-                var userRole = await Mediator.Send(new GetRoleByIdQuery { Id = userroleDeleteCommand.Id });
+                var userRole = await Mediator.Send(new GetRoleByIdQuery { Id = id });
                 if (userRole == null)
                 {
-                    _logger.LogWarning($"User Role with ID {userroleDeleteCommand.Id} not found.");
+                    _logger.LogWarning($"User Role with ID {id} not found.");
 
                     return NotFound(new
                     {
@@ -185,14 +185,14 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogInformation($"User Role with ID {userroleDeleteCommand.Id} found. Proceeding with deletion.");
+                _logger.LogInformation($"User Role with ID {id} found. Proceeding with deletion.");
 
                 // Attempt to delete the department
-                var result = await Mediator.Send(userroleDeleteCommand);
+                var result = await Mediator.Send(new  DeleteRoleCommand {Id=id});
 
                 if (result.IsSuccess)
                 {
-                    _logger.LogInformation($"User Role with ID {userroleDeleteCommand.Id} deleted successfully.");
+                    _logger.LogInformation($"User Role with ID {id} deleted successfully.");
 
                     return Ok(new
                     {
@@ -202,7 +202,7 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogWarning($"Failed to delete User Role with ID {userroleDeleteCommand.Id}. Reason: {result.Message}");
+                _logger.LogWarning($"Failed to delete User Role with ID {id}. Reason: {result.Message}");
 
                 return BadRequest(new
                 {

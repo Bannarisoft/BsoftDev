@@ -42,7 +42,7 @@ namespace UserManagement.API.Controllers
            if (departments.Data == null || !departments.Data.Any())
             {
                
-                _logger.LogInformation("No department records found in the database. Total count: {Count}", departments?.Data?.Count ?? 0);
+                _logger.LogInformation($"No department records found in the database. Total count: {departments?.Data?.Count ?? 0}");
                  return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
@@ -60,7 +60,7 @@ namespace UserManagement.API.Controllers
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(int id)
     {
-            _logger.LogInformation("Fetching single department with ID {Id} request started.", id);
+            _logger.LogInformation($"Fetching single department with ID {id} request started.");
 
             // Retrieve the department
             var department = await Mediator.Send(new GetDepartmentByIdQuery { DepartmentId = id });
@@ -68,7 +68,7 @@ namespace UserManagement.API.Controllers
             // Check if the department exists
             if (department == null || department.Data == null)
             {
-                _logger.LogInformation("Department with ID {Id} not found in the database.", id);
+                _logger.LogInformation($"Department with ID {id} not found in the database.");
 
                 return NotFound(new
                 {
@@ -84,18 +84,47 @@ namespace UserManagement.API.Controllers
                 Data = department.Data
             });
          
-}
-        [HttpPost]
-        
+        }
+
+           [HttpGet("by-name/{name}")]
+
+        public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync(string name)
+        {
+            _logger.LogInformation($"Starting GetAllDepartmentAutoCompleteSearchAsync with search pattern: {name} ");
+             var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = name };
+                var result = await Mediator.Send(query);
+
+                if (result.Data == null || !result.Data.Any())
+                {
+                    _logger.LogWarning($"No departments found for search pattern: {name}");
+
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "No matching departments found."
+                    });
+                }
+
+                _logger.LogInformation($"Departments found for search pattern: {name}. Returning data." );
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Data = result.Data
+                });
+            
+        }
+
+        [HttpPost]        
         public async Task<IActionResult>CreateAsync([FromBody] CreateDepartmentCommand command)
         {
-                _logger.LogInformation("Create Department request started with data: {@Command}", command);
+                _logger.LogInformation($"Create Department request started with data: {command}" );
 
             // Validate the command
             var validationResult = await _createDepartmentCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                _logger.LogWarning("Validation failed for Create Department request. Errors: {@Errors}", validationResult.Errors);
+                _logger.LogWarning($"Validation failed for Create Department request. Errors: {validationResult.Errors}" );
 
                 return BadRequest(new
                 {
@@ -109,7 +138,7 @@ namespace UserManagement.API.Controllers
             var createdepartment = await Mediator.Send(command);
             if (createdepartment.IsSuccess)
             {
-                _logger.LogInformation("Create Department request succeeded. Department created with ID: {DepartmentId}", createdepartment.Data.Id);
+                _logger.LogInformation($"Create Department request succeeded. Department created with ID: {createdepartment.Data.Id}" );
 
                 return Ok(new
                 {
@@ -118,88 +147,25 @@ namespace UserManagement.API.Controllers
                     Data = createdepartment.Data
                 });
             }
-            _logger.LogWarning("Create Department request failed. Reason: {Message}", createdepartment.Message);
+            _logger.LogWarning($"Create Department request failed. Reason: {createdepartment.Message}");
 
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
                 Message = createdepartment.Message
-            });
-            
-               
+            });                           
         }
 
-
       [HttpPut]
-    public async Task<IActionResult> UpdateAsync( UpdateDepartmentCommand command)
-    {
-                _logger.LogInformation("Update Department request started with data: {@Command}", command);
-
-            // Check if the department exists
-            var department = await Mediator.Send(new GetDepartmentByIdQuery { DepartmentId = command.Id });
-            if (department == null)
-            {
-                _logger.LogWarning("Department with ID {DepartmentId} not found.", command.Id);
-
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Department not found"
-                });
-            }
-
-            // Validate the update command
-            var validationResult = await _updateDepartmentCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                _logger.LogWarning("Validation failed for Update Department request. Errors: {@Errors}", validationResult.Errors);
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
-
-          
-
-            // Update the department
-            var updateResult = await Mediator.Send(command);
-            if (updateResult.IsSuccess)
-            {
-                _logger.LogInformation("Department with ID {DepartmentId} updated successfully.", command.Id);
-
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Department updated successfully"
-                  
-                });
-            }
-
-            _logger.LogWarning("Failed to update Department with ID {DepartmentId}. Reason: {Message}", command.Id, updateResult.Message);
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = updateResult.Message
-            });
-        
-    }
-
-        
-    [HttpDelete]      
-
-        public async Task<IActionResult> Delete(DeleteDepartmentCommand deleteDepartmentCommand)
+        public async Task<IActionResult> UpdateAsync( UpdateDepartmentCommand command)
         {
-            _logger.LogInformation("Delete Department request started with ID: {DepartmentId}", deleteDepartmentCommand.Id);
+                    _logger.LogInformation($"Update Department request started with data: {command}" );
 
                 // Check if the department exists
-                var department = await Mediator.Send(new GetDepartmentByIdQuery { DepartmentId = deleteDepartmentCommand.Id });
+                var department = await Mediator.Send(new GetDepartmentByIdQuery { DepartmentId = command.Id });
                 if (department == null)
                 {
-                    _logger.LogWarning("Department with ID {DepartmentId} not found.", deleteDepartmentCommand.Id);
+                    _logger.LogWarning($"Department with ID {command.Id} not found." );
 
                     return NotFound(new
                     {
@@ -208,14 +174,72 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogInformation("Department with ID {DepartmentId} found. Proceeding with deletion.", deleteDepartmentCommand.Id);
+                // Validate the update command
+                var validationResult = await _updateDepartmentCommandValidator.ValidateAsync(command);
+                if (!validationResult.IsValid)
+                {
+                    _logger.LogWarning($"Validation failed for Update Department request. Errors: {validationResult.Errors}" );
+
+                    return BadRequest(new
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Validation failed",
+                        Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                    });
+                }          
+
+                // Update the department
+                var updateResult = await Mediator.Send(command);
+                if (updateResult.IsSuccess)
+                {
+                    _logger.LogInformation($"Department with ID { command.Id} updated successfully.");
+
+                    return Ok(new
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        Message = "Department updated successfully"
+                    
+                    });
+                }
+
+                _logger.LogWarning($"Failed to update Department with ID {command.Id}. Reason: {updateResult.Message}" );
+
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = updateResult.Message
+                });
+            
+        }
+
+        
+     [HttpDelete("{id}")]         
+
+        public async Task<IActionResult> Delete(int  id )
+        {
+            _logger.LogInformation($"Delete Department request started with ID: {id}");
+
+                // Check if the department exists
+                var department = await Mediator.Send(new GetDepartmentByIdQuery { DepartmentId = id });
+                if (department == null)
+                {
+                    _logger.LogWarning($"Department with ID {id} not found.");
+
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Department not found"
+                    });
+                }
+
+                _logger.LogInformation($"Department with ID {id} found. Proceeding with deletion.");
 
                 // Attempt to delete the department
-                var result = await Mediator.Send(deleteDepartmentCommand);
+                var result = await Mediator.Send(new DeleteDepartmentCommand { Id = id });
 
                 if (result.IsSuccess)
                 {
-                    _logger.LogInformation("Department with ID {DepartmentId} deleted successfully.", deleteDepartmentCommand.Id);
+                    _logger.LogInformation($"Department with ID {id} deleted successfully.");
 
                     return Ok(new
                     {
@@ -224,8 +248,7 @@ namespace UserManagement.API.Controllers
                       
                     });
                 }
-
-                _logger.LogWarning("Failed to delete Department with ID {DepartmentId}. Reason: {Message}", deleteDepartmentCommand.Id, result.Message);
+                _logger.LogWarning($"Failed to delete Department with ID {id}. Reason: {result.Message}" );
 
                 return BadRequest(new
                 {
@@ -236,39 +259,9 @@ namespace UserManagement.API.Controllers
 
      
         }
-
-
+     
+    
       
-    //    [HttpGet("Department/by-name/{name}")]
-         [HttpGet("by-name/{name}")]
-
-        public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync(string name)
-        {
-            _logger.LogInformation("Starting GetAllDepartmentAutoCompleteSearchAsync with search pattern: {SearchPattern}", name);
-             var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = name };
-                var result = await Mediator.Send(query);
-
-                if (result.Data == null || !result.Data.Any())
-                {
-                    _logger.LogWarning("No departments found for search pattern: {SearchPattern}", name);
-
-                    return NotFound(new
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "No matching departments found."
-                    });
-                }
-
-                _logger.LogInformation("Departments found for search pattern: {SearchPattern}. Returning data.", name);
-
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Data = result.Data
-                });
-            
-        }
-
    
 
 
