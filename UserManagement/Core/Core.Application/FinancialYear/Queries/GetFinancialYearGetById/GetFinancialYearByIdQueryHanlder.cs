@@ -30,14 +30,14 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYearGetById
      }
         public async Task<ApiResponseDTO<List<GetFinancialYearDto>>> Handle(GetFinancialYearByIdQuery request, CancellationToken cancellationToken)
         {          
-          _logger.LogInformation("Fetching FinancialYear Request started: {Request}", request);
+          _logger.LogInformation($"Fetching FinancialYear Request started: {request}");
 
-                    // Fetch department by ID
+                    // Fetch FinancialYear by ID
                     var financialyear = await _financialyearRepository.GetByIdAsync(request.Id);
                     
-                    if (financialyear == null)
+                    if (financialyear is null)
                     {
-                        _logger.LogWarning("FinancialYear with ID {DepartmentId} not found.", request.Id);
+                        _logger.LogWarning($"FinancialYear with ID {request.Id} not found." );
 
                         return new ApiResponseDTO<List<GetFinancialYearDto>>{ IsSuccess = false,Message = "FinancialYear not found.", Data = null };
                     }            
@@ -46,14 +46,14 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYearGetById
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetById",
-                    actionCode: financialyearDto.Id.ToString(),        
+                    actionCode: "Getfinancialyear",        
                     actionName: financialyearDto.StartYear,                
                     details: $"FinancialYear '{financialyearDto.StartYear}' was created. FinancialYearCode: {financialyearDto.Id}",
                     module:"FinancialYear"
                 );
 
                 await _mediator.Publish(domainEvent, cancellationToken);
-           // return new ApiResponseDTO<FinancialYearDto> { IsSuccess = true, Message = "Success", Data = dfinancialyearDto };
+         
            return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = true, Message = "Success", Data = new List<GetFinancialYearDto> { financialyearDto }};
         }
     }

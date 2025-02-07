@@ -15,6 +15,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Core.Application.FinancialYear.Queries.GetFinancialYearAutoComplete;
 
 namespace UserManagement.API.Controllers
 {
@@ -46,7 +47,7 @@ namespace UserManagement.API.Controllers
            if (financialyr.Data == null || !financialyr.Data.Any())
             {
                
-                _logger.LogInformation("No FinancialYear records found in the database. Total count: {Count}", financialyr?.Data?.Count ?? 0);
+                _logger.LogInformation($"No FinancialYear records found in the database. Total count: {financialyr?.Data?.Count ?? 0}");
                  return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
@@ -61,14 +62,14 @@ namespace UserManagement.API.Controllers
             });
         }
 
- [HttpGet("{id}")]
+       [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            _logger.LogInformation("Fetching FinancialYear with ID {Id} request started.", id);
+            _logger.LogInformation($"Fetching FinancialYear with ID {id} request started." );
             var financialyr = await Mediator.Send(new GetFinancialYearByIdQuery  { Id = id });
             if (financialyr == null || financialyr.Data == null)
             {
-                _logger.LogInformation("FinancialYear with ID {Id} not found in the database.", id);
+                _logger.LogInformation($"FinancialYear with ID {id} not found in the database.");
                 return NotFound(new
                 {
                     StatusCode = StatusCodes.Status404NotFound,
@@ -80,14 +81,42 @@ namespace UserManagement.API.Controllers
                 StatusCode = StatusCodes.Status200OK,
                 Data = financialyr.Data
             });
+        } 
+
+        [HttpGet("by-Year/{Year}")]
+        public async Task<IActionResult> GetAllFinancialYearAutoCompleteSearchAsync( string Year)
+        {
+            _logger.LogInformation($"Starting GetAllFinancialYearAutoCompleteSearchAsync with search pattern: {Year}" );
+             var query = new GetFinancialYearAutoCompleteQuery { SearchTerm = Year };
+                var result = await Mediator.Send(query);
+
+                if (result.Data == null || !result.Data.Any())
+                {
+                    _logger.LogWarning($"No FinancialYear found for search pattern: {Year}");
+
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "No matching FinancialYear found."
+                    });
+                }
+
+                _logger.LogInformation($"FinancialYear found for search pattern: {Year}. Returning data.");
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Data = result.Data
+                });
+            
         }
 
 
-         [HttpPost]
-         [Route("Create")]
+        [HttpPost]
+         
         public async Task<IActionResult>CreateAsync([FromBody] CreateFinancialYearCommand command)
         {
-                _logger.LogInformation("Create Financial Year request started with data: {@Command}", command);
+                _logger.LogInformation($"Create Financial Year request started with data: {command}");
 
             // Validate the command
             var validationResult = await _createFinancialYearCommandValidator.ValidateAsync(command);
@@ -107,7 +136,7 @@ namespace UserManagement.API.Controllers
             var createFinancialYear = await Mediator.Send(command);
             if (createFinancialYear.IsSuccess)
             {
-                _logger.LogInformation("Create Financial Year request succeeded. Financial Year created with ID: {FYId}", createFinancialYear.Data);
+                _logger.LogInformation($"Create Financial Year request succeeded. Financial Year created with ID: {createFinancialYear.Data.Id}");
 
                 return Ok(new
                 {
@@ -116,7 +145,7 @@ namespace UserManagement.API.Controllers
                     Data = createFinancialYear.Data
                 });
             }
-            _logger.LogWarning("Create FinancialYear request failed. Reason: {Message}", createFinancialYear.Message);
+            _logger.LogWarning($"Create FinancialYear request failed. Reason: {createFinancialYear.Message}" );
 
             return BadRequest(new
             {
@@ -126,8 +155,8 @@ namespace UserManagement.API.Controllers
             
                
         }
-        [HttpPut("update")]
-   
+
+        [HttpPut]   
         public async Task<IActionResult> UpdateAsync([FromBody] UpdateFinancialYearCommand command)
         {
                     if (command == null)
@@ -135,13 +164,13 @@ namespace UserManagement.API.Controllers
                 _logger.LogError("UpdateFinancialYearCommand is null.");
                 return BadRequest("Invalid request: UpdateFinancialYearCommand is required.");
             }
-             _logger.LogInformation("Update Financial Year request started with data: {@Command}", command);
+             _logger.LogInformation($"Update Financial Year request started with data: {command}" );
 
            
              var financialyearresult = await Mediator.Send(new GetFinancialYearByIdQuery { Id = command.Id });
             if (financialyearresult == null)
             {
-                _logger.LogWarning("Financial Year with ID {FYId} not found.", command.Id);
+                _logger.LogWarning($"Financial Year with ID {command.Id} not found.");
 
                 return NotFound(new
                 {
@@ -154,7 +183,7 @@ namespace UserManagement.API.Controllers
                 var validationResult = await _updateFinancialYearCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                _logger.LogWarning("Validation failed for Update Financial Year request. Errors: {@Errors}", validationResult.Errors);
+                _logger.LogWarning($"Validation failed for Update Financial Year request. Errors: {validationResult.Errors}" );
 
                 return BadRequest(new
                 {
@@ -173,7 +202,7 @@ namespace UserManagement.API.Controllers
             var updateResult = await Mediator.Send(command);
             if (updateResult.IsSuccess)
             {
-                _logger.LogInformation("Financial Year  with ID {FYId} updated successfully.", command.Id);
+                _logger.LogInformation($"Financial Year  with ID {command.Id} updated successfully." );
 
                 return Ok(new
                 {
@@ -183,7 +212,7 @@ namespace UserManagement.API.Controllers
                 });
             }
 
-            _logger.LogWarning("Failed to update Financial Year  with ID {FYId}. Reason: {Message}", command.Id, updateResult.Message);
+            _logger.LogWarning($"Failed to update Financial Year  with ID {command.Id}. Reason: {updateResult.Message}" );
 
             return BadRequest(new
             {
@@ -195,18 +224,17 @@ namespace UserManagement.API.Controllers
             }
 
 
-             [HttpPut("delete")]
-        
-
-        public async Task<IActionResult> Delete(DeleteFinancialYearCommand deleteFinancialYearCommand)
-        {
-            _logger.LogInformation("Delete FinancialYear Command request started with ID: {DepartmentId}", deleteFinancialYearCommand.Id);
+             [HttpDelete("{id}")]   
+             
+            public async Task<IActionResult> Delete(int id )
+            {
+            _logger.LogInformation($"Delete FinancialYear Command request started with ID: {id}");
 
                 // Check if the department exists
-                var department = await Mediator.Send(new GetFinancialYearByIdQuery { Id = deleteFinancialYearCommand.Id });
+                var department = await Mediator.Send(new GetFinancialYearByIdQuery { Id = id });
                 if (department == null)
                 {
-                    _logger.LogWarning("FinancialYear  with ID {FYId} not found.", deleteFinancialYearCommand.Id);
+                    _logger.LogWarning($"FinancialYear  with ID {id} not found." );
 
                     return NotFound(new
                     {
@@ -215,14 +243,14 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogInformation("FinancialYear with ID {FYId} found. Proceeding with deletion.", deleteFinancialYearCommand.Id);
+                _logger.LogInformation($"FinancialYear with ID {id} found. Proceeding with deletion.");
 
                 // Attempt to delete the department
-                var result = await Mediator.Send(deleteFinancialYearCommand);
+                var result = await Mediator.Send( new DeleteFinancialYearCommand { Id=id} );
 
                 if (result.IsSuccess)
                 {
-                    _logger.LogInformation("FinancialYear with ID {FYId} deleted successfully.", deleteFinancialYearCommand.Id);
+                    _logger.LogInformation($"FinancialYear with ID {id} deleted successfully." );
 
                     return Ok(new
                     {
@@ -232,7 +260,7 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogWarning("Failed to delete FinancialYear with ID {FYId}. Reason: {Message}", deleteFinancialYearCommand.Id, result.Message);
+                _logger.LogWarning($"Failed to delete FinancialYear with ID {id}. Reason: {result.Message}");
 
                 return BadRequest(new
                 {
@@ -244,8 +272,7 @@ namespace UserManagement.API.Controllers
      
         }
 
-
-
+      
 
 
     }

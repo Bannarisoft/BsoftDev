@@ -36,16 +36,16 @@ namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySet
 
       }
 
-     public async Task<ApiResponseDTO<int>> Handle(DeleteAdminSecuritySettingsCommand request, CancellationToken cancellationToken)
+     public async Task<ApiResponseDTO<int>> Handle(DeleteAdminSecuritySettingsCommand deleteAdminSecuritySettingsCommand, CancellationToken cancellationToken)
       {       
 
-          _logger.LogInformation("DeleteAdmin SecuritySettingsCommandHandler started for Admin Security Settings ID: {Id}", request.Id);
+          _logger.LogInformation($"DeleteAdmin SecuritySettingsCommandHandler started for Admin Security Settings ID: {deleteAdminSecuritySettingsCommand.Id}");
 
-            // Check if department exists
-            var department = await _IadminSecuritySettingsQueryRepository.GetAdminSecuritySettingsByIdAsync(request.Id);
-            if (department == null)
+            // Check if adminSecuritySettings exists
+            var adminSecuritySettings = await _IadminSecuritySettingsQueryRepository.GetAdminSecuritySettingsByIdAsync(deleteAdminSecuritySettingsCommand.Id);
+            if (adminSecuritySettings is null)
             {
-                _logger.LogWarning("Admin Security Settings with ID {Id} not found.", request.Id);
+                _logger.LogWarning($"Admin Security Settings with ID { deleteAdminSecuritySettingsCommand.Id} not found.");
                 return new ApiResponseDTO<int>
                 {
                     IsSuccess = false,
@@ -54,15 +54,15 @@ namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySet
                 };
             }
 
-              _logger.LogInformation("Admin Security Settings with ID {Id} found. Proceeding with deletion.", request.Id);
+              _logger.LogInformation($"Admin Security Settings with ID { deleteAdminSecuritySettingsCommand.Id} found. Proceeding with deletion.");
 
             // Map request to entity and delete
-            var updatedDepartment = _Imapper.Map<Core.Domain.Entities.AdminSecuritySettings>(request.AdminSecuritySettingsStatusDto);
-            var result = await _IadminSecuritySettingsCommandRepository.DeleteAsync(request.Id, updatedDepartment);
+            var updatedAdminSecuritySettings = _Imapper.Map<Core.Domain.Entities.AdminSecuritySettings>(deleteAdminSecuritySettingsCommand);
+            var result = await _IadminSecuritySettingsCommandRepository.DeleteAsync(deleteAdminSecuritySettingsCommand.Id, updatedAdminSecuritySettings);
 
             if (result <= 0)
             {
-                _logger.LogWarning("Failed to delete Admin Security Settings with ID {Id}.", request.Id);
+                _logger.LogWarning($"Failed to delete Admin Security Settings with ID { deleteAdminSecuritySettingsCommand.Id}.");
                 return new ApiResponseDTO<int>
                 {
                     IsSuccess = false,
@@ -71,19 +71,19 @@ namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySet
                 };
             }
 
-            _logger.LogInformation("Admin Security Settings with ID {Id} deleted successfully.", request.Id);
+            _logger.LogInformation($"Admin Security Settings with ID { deleteAdminSecuritySettingsCommand.Id} deleted successfully.");
 
             // Publish domain event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Delete",
-                actionCode: updatedDepartment.Id.ToString(),
+                actionCode: "",
                 actionName: "",
-                details: $"Admin Security Settings ID: {request.Id} was changed to status inactive.",
+                details: $"Admin Security Settings ID: {deleteAdminSecuritySettingsCommand.Id} was changed to status inactive.",
                 module: "Admin Security Settings"
             );
 
             await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("AuditLogsDomainEvent published for Admin Security Settings ID {Id}.", request.Id);
+            _logger.LogInformation($"AuditLogsDomainEvent published for Admin Security Settings ID { deleteAdminSecuritySettingsCommand.Id}.");
 
             return new ApiResponseDTO<int>
             {
@@ -91,68 +91,7 @@ namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySet
                 Message = "Admin Security Settings deleted successfully",
                 Data = result
             };  
-    //    _logger.LogInformation("Processing DeleteAdminSecuritySettingsCommand for ID: {Id}", request.Id);
-    //       // Map the command to the Entity
-    //             _logger.LogDebug("Mapping command to AdminSecuritySettings entity.");
-    //             var adminsettings = _Imapper.Map<Core.Domain.Entities.AdminSecuritySettings>(request.AdminSecuritySettingsStatusDto);
-
-    //             // Call repository to delete the entity
-    //             _logger.LogInformation("Calling repository to delete Admin Security Settings with ID: {Id}", request.Id);
-    //             var result = await _IadminSecuritySettingsCommandRepository.DeleteAsync(request.Id, adminsettings);
-
-    //              if (result == null)
-    //         {
-    //             _logger.LogWarning("Failed to update Admin Security Settings with ID {Id}.", request.Id);
-    //             return new ApiResponseDTO<int>
-    //             {
-    //                 IsSuccess = false,
-    //                 Message = "Failed to update adminsecuritysettings"
-    //             };
-    //         }
-
-    //         _logger.LogInformation("Admin Security Settings with ID {Id} updated successfully.", request.Id);
-
-    //         // Map the updated entity to DTO
-    //         var adminsecuritysetting = await _IadminSecuritySettingsQueryRepository.GetAdminSecuritySettingsByIdAsync(request.Id);
-    //         var result = _Imapper.Map<AdminSecuritySettingsDto>(adminsecuritysetting);
-
-    //             _logger.LogInformation("Successfully deleted Admin Security Settings with ID: {Id}.", request.Id);
-
-    //             // Domain Event
-    //             var domainEvent = new AuditLogsDomainEvent(
-    //                 actionDetail: "Delete",
-    //                 actionCode: request.Id.ToString(),
-    //                 actionName: "",
-    //                 details: $"Admin Security Settings Id: {request.Id} was changed to Status Inactive.",
-    //                 module: "Admin Security Settings"
-    //             );
-
-               
-    //              await _mediator.Publish(domainEvent, cancellationToken);
-    //         _logger.LogInformation("AuditLogsDomainEvent published for Department ID {DepartmentId}.", adminsecuritysetting.Id);
-
-    //         return new ApiResponseDTO<int>
-    //         {
-    //             IsSuccess = true,
-    //             Message = "Department updated successfully"
-               
-    //         };
-    //      // Map the command to the Entity
-    //     var adminsettings = _Imapper.Map<Core.Domain.Entities.AdminSecuritySettings>(request.AdminSecuritySettingsStatusDto);
-    //     // Call repository to delete the entity
-    //     var result = await _IadminSecuritySettingsCommandRepository.DeleteAsync(request.Id, adminsettings);
-
-    //    // Domain Event
-    //     var domainEvent = new AuditLogsDomainEvent(
-    //         actionDetail: "Delete",
-    //         actionCode: request.Id.ToString(),
-    //         actionName:"",
-    //         details:$"Admin Security settings Id: {request.Id} was Changed to Status Inactive.",
-    //         module:"Admin Security settings"
-    //     );
-
-    //     await _mediator.Publish(domainEvent, cancellationToken);
-    //      return ApiResponseDTO<int>.Success(result); // Return the number of affected rows (e.g., 1 for success)
+   
       }
 
     }

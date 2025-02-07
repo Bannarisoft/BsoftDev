@@ -12,7 +12,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettingsById
 {
-    public class GetAdminSecuritySettingsByIdQuery  :IRequest<ApiResponseDTO<AdminSecuritySettingsDto>>
+    public class GetAdminSecuritySettingsByIdQuery  :IRequest<ApiResponseDTO<GetAdminSecuritySettingsDto>>
     {
        
        

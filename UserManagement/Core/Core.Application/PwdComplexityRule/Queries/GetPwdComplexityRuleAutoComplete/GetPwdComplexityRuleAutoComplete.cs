@@ -7,8 +7,8 @@ using MediatR;
 
 namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleAutoComplete
 {
-    public class GetPwdComplexityRuleAutoComplete : IRequest<ApiResponseDTO<List<PwdComplexityRuleAutoCompleteAutocompleteDto>>> 
+    public class GetPwdComplexityRuleAutoComplete : IRequest<ApiResponseDTO<List<PwdComplexityRuleAutoCompleteDto>>> 
     {
-                public string SearchTerm  { get; set; } 
+                public string? SearchTerm  { get; set; } 
     }
 }

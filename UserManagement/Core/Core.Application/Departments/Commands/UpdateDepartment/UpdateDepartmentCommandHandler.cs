@@ -50,8 +50,8 @@ namespace Core.Application.Departments.Commands.UpdateDepartment
             var departmentMap  = _Imapper.Map<Department>(request);
             // Save updates to the repository
             var result = await _IDepartmentCommandRepository.UpdateAsync(request.Id, departmentMap);
-
-            if (result == null)
+           // var resultCode = result ?? 0;
+            if(result <= 0)
             {
                 _logger.LogWarning("Failed to update Department with ID {DepartmentId}.", request.Id);
                 return new ApiResponseDTO<DepartmentDto>
@@ -76,8 +76,7 @@ namespace Core.Application.Departments.Commands.UpdateDepartment
             // Map the updated entity to DTO
             var dept = await _departmentQueryRepository.GetByIdAsync(request.Id);
             var departmentDto = _Imapper.Map<DepartmentDto>(dept);
-           // var departmentDto = _Imapper.Map<DepartmentDto>(result);
-
+           
             // Publish domain event for audit logs
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Update",
