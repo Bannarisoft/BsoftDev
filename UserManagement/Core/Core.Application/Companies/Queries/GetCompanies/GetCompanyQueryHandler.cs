@@ -3,6 +3,7 @@ using MediatR;
 using Core.Application.Common.Interfaces.ICompany;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
+using Core.Application.Common.Interfaces;
 
 namespace Core.Application.Companies.Queries.GetCompanies
 {
@@ -20,7 +21,7 @@ namespace Core.Application.Companies.Queries.GetCompanies
         public async Task<ApiResponseDTO<List<GetCompanyDTO>>> Handle(GetCompanyQuery requst, CancellationToken cancellationToken)
         {
             
-            var companies = await _companyRepository.GetAllCompaniesAsync();             
+            var (companies, totalCount) = await _companyRepository.GetAllCompaniesAsync(requst.PageNumber, requst.PageSize, requst.SearchTerm);             
             
             var companylist = _mapper.Map<List<GetCompanyDTO>>(companies);
             
@@ -38,7 +39,10 @@ namespace Core.Application.Companies.Queries.GetCompanies
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = response
+                Data = response,
+                TotalCount = totalCount,
+                PageNumber = requst.PageNumber,
+                PageSize = requst.PageSize
             };
         }
     }

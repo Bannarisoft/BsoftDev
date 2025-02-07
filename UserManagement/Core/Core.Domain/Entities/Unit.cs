@@ -18,6 +18,7 @@ public string? CINNO {get; set;}
 
 public  UnitAddress? UnitAddress { get; set; }
 public  UnitContacts? UnitContacts { get; set; }
+public IList<UserUnit> UserUnits { get; set; }
        
 }
 }

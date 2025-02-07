@@ -25,7 +25,7 @@ namespace Core.Application.Language.Queries.GetLanguageAutoComplete
 
         public async Task<ApiResponseDTO<List<LanguageAutoCompleteDTO>>> Handle(GetLanguageAutoCompleteQuery request, CancellationToken cancellationToken)
         {
-            var result = await _languageQuery.GetByLanguagenameAsync(request.SearchPattern);
+            var result = await _languageQuery.GetLanguage(request.SearchPattern);
             var languages = _mapper.Map<List<LanguageAutoCompleteDTO>>(result);
              //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(

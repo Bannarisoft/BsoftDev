@@ -19,7 +19,7 @@ namespace UserManagement.Infrastructure
 
             // Build configuration
             IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../BSOFT.Api"))
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../UserManagement.Api"))
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 

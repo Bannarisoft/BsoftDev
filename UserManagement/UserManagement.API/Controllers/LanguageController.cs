@@ -27,12 +27,25 @@ namespace UserManagement.API.Controllers
             _updateLanguageCommandValidator = updateLanguageCommandValidator;
         }
           [HttpGet]
-        public async Task<IActionResult> GetAllLanguagesAsync()
+        public async Task<IActionResult> GetAllLanguagesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {
-           var languages = await Mediator.Send(new GetLanguageQuery());
+           var languages = await Mediator.Send(
+            new GetLanguageQuery
+           {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
             
            
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = languages.Data.ToList()});
+            return Ok( new 
+            { 
+                StatusCode=StatusCodes.Status200OK,
+                 data = languages.Data.ToList(),
+                TotalCount = languages.TotalCount,
+                 PageNumber = languages.PageNumber,
+                 PageSize = languages.PageSize
+                 });
         }
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateLanguageCommand command)
@@ -118,8 +131,8 @@ namespace UserManagement.API.Controllers
             return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedLanguage.Message, errors = "" });
             
         }
-         [HttpGet("by-name/{name}")]
-        public async Task<IActionResult> GetLanguage(string name)
+         [HttpGet("by-name")]
+        public async Task<IActionResult> GetLanguage([FromQuery] string? name)
         {
            
             var languages = await Mediator.Send(new GetLanguageAutoCompleteQuery {SearchPattern = name});

@@ -3,7 +3,9 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Core.Application.Common.Interfaces;
+using Core.Domain.Common;
 using Core.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -54,11 +56,16 @@ namespace UserManagement.Infrastructure.Repositories
             {
                 new Claim(ClaimTypes.Name, username),
                 new Claim(JwtRegisteredClaimNames.NameId, userId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Typ, usertype.ToString()),
-                new Claim(JwtRegisteredClaimNames.PhoneNumber, mobile.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, email.ToString()),
-                new Claim(JwtRegisteredClaimNames.Typ, unitId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Typ, companyId.ToString()),
+                // new Claim(JwtRegisteredClaimNames.Typ, usertype.ToString()),
+                // new Claim(JwtRegisteredClaimNames.PhoneNumber, mobile.ToString()),
+                // new Claim(JwtRegisteredClaimNames.Email, email.ToString()),
+                // new Claim(JwtRegisteredClaimNames.Typ, unitId.ToString()),
+                // new Claim(JwtRegisteredClaimNames.Typ, companyId.ToString()),
+                new Claim("usertype", usertype.ToString()),
+                new Claim("mobile", mobile.ToString()),
+                new Claim("email", email.ToString()),
+                new Claim("unitId", unitId.ToString()),
+                new Claim("companyId", companyId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, jti),
                 new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(currentTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             };
@@ -179,6 +186,7 @@ namespace UserManagement.Infrastructure.Repositories
                 throw new SecurityTokenException("Invalid or decryption failed for token.", ex);
             }
         }
+       
 
     }
 }

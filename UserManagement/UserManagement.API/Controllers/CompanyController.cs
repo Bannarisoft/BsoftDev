@@ -9,6 +9,7 @@ using Core.Application.Companies.Queries.GetCompanyAutoComplete;
 using FluentValidation;
 using Core.Application.Companies.Commands.UploadFileCompany;
 using Core.Application.Companies.Commands.DeleteFileCompany;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UserManagement.API.Controllers
 {
@@ -29,18 +30,27 @@ namespace UserManagement.API.Controllers
             _UpdateCompanyCommandvalidator = updateCompanyCommandValidator;
             _UploadFileCompanyCommandvalidator = uploadFileCompanyCommandvalidator;
         }
-
+        
         [HttpGet]
         
-        public async Task<IActionResult> GetAllCompaniesAsync()
+        public async Task<IActionResult> GetAllCompaniesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {
-            var companies = await Mediator.Send(new GetCompanyQuery());
-            var activecompanies = companies.Data.ToList(); 
+            var companies = await Mediator.Send(
+            new GetCompanyQuery
+            {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
+           // var activecompanies = companies.Data.ToList(); 
 
             return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
-                data = activecompanies
+                data = companies.Data,
+                TotalCount = companies.TotalCount,
+                PageNumber = companies.PageNumber,
+                PageSize = companies.PageSize
             });
         }
          [HttpPost]
@@ -172,8 +182,8 @@ namespace UserManagement.API.Controllers
                 errors = "" 
             });
         }
-         [HttpGet("by-name/{name}")]
-        public async Task<IActionResult> GetCompany(string name)
+         [HttpGet("by-name")]
+        public async Task<IActionResult> GetCompany([FromQuery] string? name)
         {
            
             var companies = await Mediator.Send(new GetCompanyAutoCompleteQuery {SearchPattern = name});

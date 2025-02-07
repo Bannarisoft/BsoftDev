@@ -72,14 +72,14 @@ namespace UserManagement.Infrastructure.Data.Configurations
             builder.Property(b => b.ModifiedIP)
             .HasColumnType("varchar(255)");
 
-            // builder.HasMany(ur => ur.UserRoleAllocations)
-            //     .WithOne(ura => ura.UserRole)
-            //     .HasForeignKey(ura => ura.UserRoleId);
+            builder.HasMany(ur => ur.UserRoleAllocations)
+                .WithOne(ura => ura.UserRole)
+                .HasForeignKey(ura => ura.UserRoleId);
                 
-            // builder.HasMany(ur => ur.RoleEntitlements)
-            // .WithOne(re => re.UserRole)
-            // .HasForeignKey(re => re.UserRoleId)
-            // .OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(ur => ur.RoleEntitlements)
+            .WithOne(re => re.UserRole)
+            .HasForeignKey(re => re.UserRoleId)
+            .OnDelete(DeleteBehavior.Cascade);
             
         }
     }

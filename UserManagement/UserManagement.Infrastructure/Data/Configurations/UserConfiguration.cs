@@ -135,6 +135,10 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .WithOne()
                 .HasForeignKey(ura => ura.UserId);
 
+                  builder.HasMany(u => u.UserUnits)
+                .WithOne()
+                .HasForeignKey(u => u.UserId);
+
 
             
 

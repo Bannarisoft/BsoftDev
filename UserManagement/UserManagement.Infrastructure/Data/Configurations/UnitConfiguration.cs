@@ -99,6 +99,10 @@ namespace UserManagement.Infrastructure.Data.Configurations
         builder.HasOne(u => u.UnitContacts)
             .WithOne(uc => uc.Unit)
             .HasForeignKey<UnitContacts>(uc => uc.UnitId);
+
+            builder.HasMany(u => u.UserUnits)
+                .WithOne(uu => uu.Unit)
+                .HasForeignKey(uu => uu.UnitId);
         }
     }
 }

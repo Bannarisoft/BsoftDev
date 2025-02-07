@@ -3,7 +3,7 @@ using Core.Application.Common.Mappings;
 
 namespace Core.Application.Users.Queries.GetUserAutoComplete
 {
-    public class UserAutoCompleteDtoo : IMapFrom<User>
+    public class UserAutoCompleteDto 
     {
         public int UserId { get; set; }
         public string UserName { get; set; }

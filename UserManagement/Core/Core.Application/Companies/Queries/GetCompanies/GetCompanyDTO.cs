@@ -23,7 +23,7 @@ namespace Core.Application.Companies.Queries.GetCompanies
         public Status IsActive { get; set; }
         public IsDelete IsDeleted { get; set; }
 
-         public CompanyAddressDTO CompanyAddress { get; set; }
-        public CompanyContactDTO CompanyContact { get; set; }
+        //  public CompanyAddressDTO CompanyAddress { get; set; }
+        // public CompanyContactDTO CompanyContact { get; set; }
     }
 }

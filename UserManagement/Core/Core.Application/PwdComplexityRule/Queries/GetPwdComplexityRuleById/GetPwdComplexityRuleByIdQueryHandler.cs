@@ -35,14 +35,14 @@ namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleById
         public async Task<ApiResponseDTO<GetPwdRuleDto>> Handle(GetPwdComplexityRuleByIdQuery request, CancellationToken cancellationToken)
         {
 
-             _logger.LogInformation("Handling GetPwdComplexityRuleByIdQuery for ID: {Id}", request.Id);
+             _logger.LogInformation($"Handling GetPwdComplexityRuleByIdQuery for ID: {request.Id}");
 
               // Fetch password complexity rule by ID
                 var pwdComplexityRule = await _pwdComplexityRuleQueryRepository.GetByIdAsync(request.Id);
 
-                if (pwdComplexityRule == null)
+                if (pwdComplexityRule is null)
                 {
-                    _logger.LogWarning("PasswordComplexityRule with ID {Id} not found.", request.Id);
+                    _logger.LogWarning($"PasswordComplexityRule with ID { request.Id} not found.");
                       return new ApiResponseDTO<GetPwdRuleDto>
                         {
                             IsSuccess = false,
@@ -51,12 +51,11 @@ namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleById
                         };                 
                 }
 
-                _logger.LogInformation("PasswordComplexityRule with ID {Id} retrieved successfully.", request.Id);
+                _logger.LogInformation($"PasswordComplexityRule with ID { request.Id} retrieved successfully.");
 
                 // Map the rule to DTO
                 var updatedpwdcomplexrule = _mapper.Map<GetPwdRuleDto>(pwdComplexityRule);
-                ///  var result = await _passwordComplexityRuleCommandRepository.DeleteAsync(request.Id, updatedpwdcomplexrule);
-                         
+                
                 // Publish domain event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetById",
@@ -68,7 +67,7 @@ namespace Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRuleById
 
 
                 await _mediator.Publish(domainEvent, cancellationToken);
-                _logger.LogInformation("Domain event published for PasswordComplexityRule with ID {Id}.", updatedpwdcomplexrule.Id);
+                _logger.LogInformation($"Domain event published for PasswordComplexityRule with ID {updatedpwdcomplexrule.Id}." );
                
             return new ApiResponseDTO<GetPwdRuleDto> { IsSuccess = true, Message = "Success", Data = updatedpwdcomplexrule };           
         }

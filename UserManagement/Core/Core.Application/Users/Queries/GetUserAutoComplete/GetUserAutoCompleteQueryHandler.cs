@@ -7,9 +7,10 @@ using Core.Application.Users.Queries.GetUsers;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
+using Core.Application.Common.HttpResponse;
 namespace Core.Application.Users.Queries.GetUserAutoComplete
 {
-    public class GetUserAutoCompleteQueryHandler: IRequestHandler<GetUserAutoCompleteQuery,List<UserDto>>
+    public class GetUserAutoCompleteQueryHandler: IRequestHandler<GetUserAutoCompleteQuery,ApiResponseDTO<List<UserAutoCompleteDto>>>
     {
 
         private readonly IUserQueryRepository _userRepository;
@@ -27,25 +28,17 @@ namespace Core.Application.Users.Queries.GetUserAutoComplete
            
         }  
         
-       public async Task<List<UserDto>> Handle(GetUserAutoCompleteQuery request, CancellationToken cancellationToken)
+       public async Task<ApiResponseDTO<List<UserAutoCompleteDto>>> Handle(GetUserAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             
-            if (request == null || string.IsNullOrEmpty(request.SearchPattern))
-            {
-                 _logger.LogWarning("SearchPattern is null or empty in GetUserAutoCompleteQuery.");
-                throw new ArgumentNullException(nameof(request.SearchPattern), "SearchPattern is null or empty");
-            }
+            
             _logger.LogInformation("Fetching users matching SearchPattern: {SearchPattern}", request.SearchPattern);
 
             // Fetch users matching the search pattern
-            var users = await _userRepository.GetByUsernameAsync(request.SearchPattern);
-            if (users == null || users.UserId == 0)
-            {
-                _logger.LogWarning("No users found for SearchPattern: {SearchPattern}", request.SearchPattern);
-                return new List<UserDto>();
-            }
+            var users = await _userRepository.GetUser(request.SearchPattern);
+           
 
-            _logger.LogInformation("Found {UserCount} users matching SearchPattern: {SearchPattern}", users.UserId, request.SearchPattern);
+            _logger.LogInformation("Found {UserCount} users matching SearchPattern: {SearchPattern}", users.Count, request.SearchPattern);
             // Publish a domain event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetAutoComplete",
@@ -55,18 +48,14 @@ namespace Core.Application.Users.Queries.GetUserAutoComplete
                     module:"User"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new List<UserDto> { _mapper.Map<UserDto>(users) };
-            // var user = await _userRepository.GetByUsernameAsync(request.SearchPattern);
-            // var userList = new List<UserAutoCompleteDto>
-            // {
-            //     new UserAutoCompleteDto
-            //     {
-            //         UserId = user.UserId,
-            //         UserName = user.UserName
-            //     }
-            // };
-
-            // return userList;
+                
+                var userDto = _mapper.Map<List<UserAutoCompleteDto>>(users);
+            return new ApiResponseDTO<List<UserAutoCompleteDto>>
+            {
+                IsSuccess = true,
+                Data = userDto
+            };
+            
         }
     }
 }

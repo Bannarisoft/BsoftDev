@@ -44,7 +44,7 @@ namespace Core.Application.UserRole.Queries.GetRole
         //     _logger.LogInformation("Fetching user roles from repository.");
                 var roles = await _userRoleRepository.GetAllRoleAsync();
 
-                if (roles == null || roles.Count == 0)
+                if (roles is null)
                 {
                     _logger.LogWarning("No user roles found.");
                     return new ApiResponseDTO<List<GetUserRoleDto>>

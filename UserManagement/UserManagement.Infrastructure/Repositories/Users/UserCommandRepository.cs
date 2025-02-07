@@ -113,6 +113,7 @@ namespace UserManagement.Infrastructure.Repositories
                 var existingUser = await _applicationDbContext.User
                     .Include(uc => uc.UserCompanies)
                     .Include(ur => ur.UserRoleAllocations)
+                    .Include(uu => uu.UserUnits)
                     .FirstOrDefaultAsync(u => u.UserId == userId);
                     if (existingUser != null)
                     {
@@ -124,9 +125,9 @@ namespace UserManagement.Infrastructure.Repositories
                         existingUser.UserType = user.UserType;
                         existingUser.Mobile = user.Mobile;
                         existingUser.EmailId = user.EmailId;
-                        existingUser.CompanyId = user.CompanyId;
+                        // existingUser.CompanyId = user.CompanyId;
                         existingUser.DivisionId = user.DivisionId;
-                        existingUser.UnitId = user.UnitId;
+                        // existingUser.UnitId = user.UnitId;
                         // existingUser.UserRoleId = user.UserRoleId;
                         existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
                         existingUser.IsActive = user.IsActive;
@@ -169,20 +170,27 @@ namespace UserManagement.Infrastructure.Repositories
                                   IsActive = 1
                               });
                           }
-                        // _applicationDbContext.UserCompanies.RemoveRange(existingUser.UserCompanies);
-                        // _applicationDbContext.UserRoleAllocations.RemoveRange(existingUser.UserRoleAllocations);
 
-                        //  existingUser.UserCompanies = user.UserCompanies.Select(uc => new UserCompany
-                        //    {
-                        //        UserId = existingUser.UserId,
-                        //        CompanyId = uc.CompanyId
-                        //    }).ToList();
+                          var updatedUnitIds = user.UserUnits.Select(ur => ur.UnitId).ToList();
+                          foreach (var existingUnit in existingUser.UserUnits)
+                          {
+                              existingUnit.IsActive = updatedUnitIds.Contains(existingUnit.UnitId) ? (byte)1 : (byte)0;
+                          }
 
-                        //    existingUser.UserRoleAllocations = user.UserRoleAllocations.Select(ur => new Core.Domain.Entities.UserRoleAllocation
-                        //    {
-                        //        UserId = existingUser.UserId,
-                        //        UserRoleId = ur.UserRoleId
-                        //    }).ToList();
+                          var newUnitIds = updatedUnitIds
+                              .Where(id => !existingUser.UserUnits.Any(ur => ur.UnitId == id))
+                              .ToList();
+
+                          foreach (var newUnitId in newUnitIds)
+                          {
+                              existingUser.UserUnits.Add(new Core.Domain.Entities.UserUnit
+                              {
+                                  UserId = existingUser.UserId,
+                                  UnitId = newUnitId,
+                                  IsActive = 1
+                              });
+                          }
+                        
 
                         _applicationDbContext.User.Update(existingUser);
                     return await _applicationDbContext.SaveChangesAsync();

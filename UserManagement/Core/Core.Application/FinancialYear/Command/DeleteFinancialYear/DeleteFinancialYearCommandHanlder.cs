@@ -37,13 +37,13 @@ namespace Core.Application.FinancialYear.Command.DeleteFinancialYear
       {  
 
 
-           _logger.LogInformation("DeleteFinancial YearCommandHandler started for FinancialYear ID: {Id}", request.Id);
+           _logger.LogInformation($"DeleteFinancial YearCommandHandler started for FinancialYear ID: {request.Id}" );
 
-            // Check if department exists
-            var department = await _financialYearQueryRepository.GetByIdAsync(request.Id);
-            if (department == null)
+            // Check if FinancialYear exists
+            var FinYear = await _financialYearQueryRepository.GetByIdAsync(request.Id);
+            if (FinYear is null)
             {
-                _logger.LogWarning("Financial Year with ID {Id} not found.", request.Id);
+                _logger.LogWarning($"Financial Year with ID {request.Id} not found." );
                 return new ApiResponseDTO<int>
                 {
                     IsSuccess = false,
@@ -52,7 +52,7 @@ namespace Core.Application.FinancialYear.Command.DeleteFinancialYear
                 };
             }
 
-            _logger.LogInformation("FinancialYear with ID {Id} found. Proceeding with deletion.", request.Id);
+            _logger.LogInformation($"FinancialYear with ID {request.Id} found. Proceeding with deletion.");
 
             // Map request to entity and delete
             var updatedFinancialYear = _Imapper.Map<Core.Domain.Entities.FinancialYear>(request);
@@ -60,7 +60,7 @@ namespace Core.Application.FinancialYear.Command.DeleteFinancialYear
 
             if (result <= 0)
             {
-                _logger.LogWarning("Failed to delete FinancialYear with ID {Id}.", request.Id);
+                _logger.LogWarning($"Failed to delete FinancialYear with ID {request.Id}.");
                 return new ApiResponseDTO<int>
                 {
                     IsSuccess = false,
@@ -69,19 +69,19 @@ namespace Core.Application.FinancialYear.Command.DeleteFinancialYear
                 };
             }
 
-            _logger.LogInformation("FinancialYear with ID {Id} deleted successfully.", request.Id);
+            _logger.LogInformation($"FinancialYear with ID {request.Id} deleted successfully.");
 
             // Publish domain event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Delete",
-                actionCode: updatedFinancialYear.Id.ToString(),
+                actionCode: updatedFinancialYear.FinYearName,
                 actionName: updatedFinancialYear.FinYearName,
                 details: $"FinancialYear ID: {request.Id} was changed to status inactive.",
                 module: "FinancialYear"
             );
 
             await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("AuditLogsDomainEvent published for FinancialYear ID {Id}.", request.Id);
+            _logger.LogInformation($"AuditLogsDomainEvent published for FinancialYear ID {request.Id}.");
 
             return new ApiResponseDTO<int>
             {

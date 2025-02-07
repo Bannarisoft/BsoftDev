@@ -16,8 +16,8 @@ namespace Core.Application.Departments.Commands.UpdateDepartment
     public class UpdateDepartmentCommand : IRequest<ApiResponseDTO<DepartmentDto>>
     {
         public int Id { get; set; }       
-        public string ShortName { get; set; }
-        public string DeptName { get; set; }
+        public string? ShortName { get; set; }
+        public string? DeptName { get; set; }
         public int CompanyId { get; set; }
         public Status  IsActive { get; set; }
              

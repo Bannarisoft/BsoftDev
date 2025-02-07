@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings
 {
-    public class GetAdminSecuritySettingsQuery : IRequest<ApiResponseDTO<List<AdminSecuritySettingsDto>>>
+    public class GetAdminSecuritySettingsQuery : IRequest<ApiResponseDTO<List<GetAdminSecuritySettingsDto>>>
     {
         
         

@@ -6,6 +6,7 @@ using Core.Application.Users.Commands.DeleteUser;
 
 using Core.Domain.Entities;
 using static Core.Domain.Enums.Common.Enums;
+using Core.Application.Users.Queries.GetUserAutoComplete;
 
 public class UserProfile : Profile
 {
@@ -31,15 +32,22 @@ public class UserProfile : Profile
             .ForMember(dest => dest.UserRoleId, opt => opt.MapFrom(src => src.UserRoleId))
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
 
+        CreateMap<UserUnitDTO, UserUnit>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.UserId, opt => opt.Ignore())
+            .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => src.UnitId))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
+
         CreateMap<User, UserDto>()
-            .ForMember(dest => dest.UserId, opt => opt.Ignore()) // UserId is auto-generated
-            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
-            .ForMember(dest => dest.userRoleAllocations, opt => opt.MapFrom(src => src.UserRoleAllocations));
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id));
+            // .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
+            // .ForMember(dest => dest.userRoleAllocations, opt => opt.MapFrom(src => src.UserRoleAllocations))
+            // .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.UserUnits));
 
         CreateMap<UpdateUserCommand, User>()
         .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
         .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations))
+        .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.userUnits))
         .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
         .ForMember(dest => dest.IsFirstTimeUser, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
@@ -53,6 +61,17 @@ public class UserProfile : Profile
 
         CreateMap<UserRoleAllocation, UserRoleAllocationDTO>()
             .ForMember(dest => dest.UserRoleId, opt => opt.MapFrom(src => src.UserRoleId));
+
+        CreateMap<UserUnit, UserUnitDTO>()
+            .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => src.UnitId));
+
+            CreateMap<User, UserByIdDTO>()
+            .ForMember(dest => dest.UserId, opt => opt.Ignore()) 
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
+            .ForMember(dest => dest.userRoleAllocations, opt => opt.MapFrom(src => src.UserRoleAllocations))
+            .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.UserUnits));
+            CreateMap<User, UserAutoCompleteDto>();
             
     }
 }

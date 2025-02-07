@@ -7,7 +7,6 @@ using Core.Application.Common.Interfaces.IPasswordComplexityRule;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
-using Core.Application.Departments.Queries.GetDepartments;
 using Core.Application.PwdComplexityRule.Queries.GetPwdComplexityRule;
 
 namespace Core.Application.PwdComplexityRule.Queries
@@ -34,14 +33,14 @@ namespace Core.Application.PwdComplexityRule.Queries
 
 
 
-  _logger.LogInformation("Fetching Department Request started: {request}", request);
+  _logger.LogInformation("Fetching Password Complexity Rule Request started: {request}", request);
            
            
              var pwdcomplexityrules = await _passwordComplexityRepository.GetPasswordComplexityAsync();
             
-             if (pwdcomplexityrules == null )
+             if (pwdcomplexityrules is null )
             {
-               _logger.LogWarning("No Password Rule records found in the database. Total count: {Count}", pwdcomplexityrules?.Count ?? 0);
+               _logger.LogWarning($"No Password Rule records found in the database. Total count: {pwdcomplexityrules?.Count ?? 0}" );
 
                   return new ApiResponseDTO<List<GetPwdRuleDto>> { IsSuccess = false, Message = "No Record Found" };
             }
@@ -57,7 +56,7 @@ namespace Core.Application.PwdComplexityRule.Queries
 
                   await _mediator.Publish(domainEvent, cancellationToken);
               
-            _logger.LogInformation("Password Complexity Rule  Listed successfully.", pwdcomruleList.Count);
+            _logger.LogInformation($"Password Complexity Rule { pwdcomruleList.Count}  Listed successfully.");
             return new ApiResponseDTO<List<GetPwdRuleDto>> { IsSuccess = true, Message = "Success", Data = pwdcomruleList };  
 
         

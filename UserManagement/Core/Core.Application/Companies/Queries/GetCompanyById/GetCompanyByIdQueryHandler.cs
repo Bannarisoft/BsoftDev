@@ -15,7 +15,7 @@ using Core.Domain.Events;
 
 namespace Core.Application.Companies.Queries.GetCompanyById
 {
-    public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery,ApiResponseDTO<GetCompanyDTO>>
+    public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery,ApiResponseDTO<GetByIdDTO>>
     {
           private readonly ICompanyQueryRepository _companyRepository;
         private readonly IMapper _mapper;
@@ -26,7 +26,7 @@ namespace Core.Application.Companies.Queries.GetCompanyById
              _mapper =mapper;
              _mediator = mediator;
         } 
-        public async Task<ApiResponseDTO<GetCompanyDTO>> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<GetByIdDTO>> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
         {
            
             var result = await _companyRepository.GetByIdAsync(request.CompanyId);
@@ -36,7 +36,7 @@ namespace Core.Application.Companies.Queries.GetCompanyById
                  byte[] imageBytes = await File.ReadAllBytesAsync(result.Logo);
                  logoBase64 = Convert.ToBase64String(imageBytes);
              }
-            var company = _mapper.Map<GetCompanyDTO>(result);
+            var company = _mapper.Map<GetByIdDTO>(result);
             company.LogoBase64 = logoBase64;
              //Domain Event
                  var domainEvent = new AuditLogsDomainEvent(
@@ -47,7 +47,7 @@ namespace Core.Application.Companies.Queries.GetCompanyById
                      module:"Company"
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<GetCompanyDTO> { IsSuccess = true, Message = "Success", Data = company };
+            return new ApiResponseDTO<GetByIdDTO> { IsSuccess = true, Message = "Success", Data = company };
         }
     }
 }
