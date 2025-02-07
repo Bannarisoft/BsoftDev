@@ -15,26 +15,47 @@ namespace FAM.Infrastructure.Services
             _systemTimeZoneId = TimeZoneInfo.Local.Id; // Fetch system timezone dynamically
         }
 
-        public DateTime ConvertUtcToTimeZone(DateTime utcDateTime, string timeZoneId)
+        public DateTimeOffset ConvertUtcToTimeZone(DateTimeOffset utcDateTime, string timeZoneId)
+        {   try
         {
-            try
-            {
-                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-                return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, timeZone);
-            }
-            catch (TimeZoneNotFoundException)
-            {
-                throw new ArgumentException($"Invalid TimeZoneId: {timeZoneId}");
-            }
+            TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            return TimeZoneInfo.ConvertTime(utcDateTime, timeZone);
         }
-        public DateTime GetCurrentTime(string timeZoneId)
+        catch (TimeZoneNotFoundException)    
         {
-            return ConvertUtcToTimeZone(DateTime.UtcNow, timeZoneId);
+            throw new ArgumentException($"Invalid TimeZoneId: {timeZoneId}");
         }
+        }
+
+        public DateTimeOffset GetCurrentTime(string timeZoneId)
+        {
+             return ConvertUtcToTimeZone(DateTimeOffset.UtcNow, timeZoneId);
+        }
+
+        // public DateTime ConvertUtcToTimeZone(DateTime utcDateTime, string timeZoneId)
+        // {
+        //     try
+        //     {
+        //         var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+        //         return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, timeZone);
+        //     }
+        //     catch (TimeZoneNotFoundException)
+        //     {
+        //         throw new ArgumentException($"Invalid TimeZoneId: {timeZoneId}");
+        //     }
+        // }
+        // public DateTime GetCurrentTime(string timeZoneId)
+        // {
+        //     return ConvertUtcToTimeZone(DateTime.UtcNow, timeZoneId);
+        // }
+
+
 
         public string GetSystemTimeZone()
         {
             return _systemTimeZoneId;
         }
+
+      
     }
 }

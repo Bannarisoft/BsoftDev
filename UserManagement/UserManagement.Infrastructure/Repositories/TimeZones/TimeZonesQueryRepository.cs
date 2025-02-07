@@ -21,7 +21,7 @@ namespace UserManagement.Infrastructure.Repositories.TimeZones
                 SELECT * 
                 FROM AppData.Timezones 
                 WHERE Id = @Id and IsDeleted = 0
-                ORDER BY CreatedAt DESC";
+                ORDER BY Id DESC";
              var timeszoneList =await _dbConnection.QueryAsync<Core.Domain.Entities.TimeZones>(query, new { id });
              return timeszoneList?.ToList() ?? new List<Core.Domain.Entities.TimeZones>();
         }
@@ -31,7 +31,7 @@ namespace UserManagement.Infrastructure.Repositories.TimeZones
              const string query = @"
               SELECT *
               FROM AppData.Timezones Where IsDeleted = 0 
-              ORDER BY CreatedAt DESC";
+              ORDER BY Id DESC";
             return (await _dbConnection.QueryAsync<Core.Domain.Entities.TimeZones>(query)).ToList() ?? new List<Core.Domain.Entities.TimeZones>();
         }
 
@@ -46,7 +46,7 @@ namespace UserManagement.Infrastructure.Repositories.TimeZones
                  SELECT *
                  FROM AppData.Timezones
                  WHERE Name LIKE @SearchPattern OR Code LIKE @SearchPattern and IsDeleted = 0
-                 ORDER BY CreatedAt DESC";
+                 ORDER BY Id DESC";
                 
             // Update the object to use SearchPattern instead of Name
             var timeszoneList = await _dbConnection.QueryAsync<Core.Domain.Entities.TimeZones>(query, new { SearchPattern = $"%{searchPattern}%" });

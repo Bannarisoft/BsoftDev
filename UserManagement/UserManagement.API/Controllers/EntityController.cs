@@ -206,16 +206,16 @@ public async Task<IActionResult> UpdateAsync( UpdateEntityCommand updateEntityCo
         
 }
 
-[HttpDelete]
-public async Task<IActionResult> DeleteEntityAsync( DeleteEntityCommand deleteEntityCommand)
+[HttpDelete("{id}")]
+public async Task<IActionResult> DeleteEntityAsync(int id)
 {
 
         // Process the delete command
-        var result = await _mediator.Send(deleteEntityCommand);
+        var result = await _mediator.Send(new DeleteEntityCommand { EntityId = id });
 
         if (result.IsSuccess) 
         {
-            _logger.LogInformation($"EntityId {deleteEntityCommand.EntityId} deleted successfully.");
+            _logger.LogInformation($"EntityId {id} deleted successfully.");
              return Ok(new
             {
                 message = result.Message,
@@ -223,7 +223,7 @@ public async Task<IActionResult> DeleteEntityAsync( DeleteEntityCommand deleteEn
             });
             
         }
-         _logger.LogWarning($"EntityId {deleteEntityCommand.EntityId} Not Found or Invalid EntityId.");
+         _logger.LogWarning($"EntityId {id} Not Found or Invalid EntityId.");
         return NotFound(new
         {
             message = result.Message,

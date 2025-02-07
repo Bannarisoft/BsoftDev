@@ -13,17 +13,19 @@ namespace Core.Domain.Common
             NotDeleted = 0,
             Deleted = 1
         }
+
+         // Enum properties
+        public Status IsActive { get; set; } = Status.Active; // Default Active
+        public IsDelete IsDeleted { get; set; } = IsDelete.NotDeleted; // Default NotDeleted
         public int CreatedBy { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset? CreatedDate { get; set; }
       
         public string? CreatedByName { get; set; }
       
         public string? CreatedIP { get; set; }
         public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedAt { get; set; }
-       
+        public DateTimeOffset? ModifiedDate { get; set; }
         public string? ModifiedByName { get; set; }
-       
         public string? ModifiedIP { get; set; }
         
     }

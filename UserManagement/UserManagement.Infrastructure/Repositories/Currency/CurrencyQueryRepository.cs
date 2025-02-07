@@ -22,7 +22,7 @@ namespace UserManagement.Infrastructure.Repositories.Currency
                SELECT * 
                FROM AppData.Currency 
                WHERE Id = @Id and IsDeleted = 0
-               ORDER BY CreatedAt DESC";
+               ORDER BY Id DESC";
              var currencyList = await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query, new { id });
              return currencyList?.ToList() ?? new List<Core.Domain.Entities.Currency>();
         }
@@ -37,7 +37,7 @@ namespace UserManagement.Infrastructure.Repositories.Currency
                  SELECT *
                  FROM AppData.Currency
                  WHERE Name LIKE @SearchPattern OR Code LIKE @SearchPattern and IsDeleted = 0
-                 ORDER BY CreatedAt DESC";
+                 ORDER BY Id DESC";
                 
             // Update the object to use SearchPattern instead of Name
             var Currencylist = await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query, new { SearchPattern = $"%{searchPattern}%" });
@@ -50,7 +50,7 @@ namespace UserManagement.Infrastructure.Repositories.Currency
              SELECT * 
              FROM AppData.Currency 
              WHERE IsDeleted = 0 
-             ORDER BY CreatedAt DESC";
+             ORDER BY Id DESC";
             return (await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query)).ToList() ?? new List<Core.Domain.Entities.Currency>();
         }
 
