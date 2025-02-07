@@ -38,7 +38,14 @@ namespace UserManagement.API.Controllers
             });
             
            
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = languages.Data.ToList()});
+            return Ok( new 
+            { 
+                StatusCode=StatusCodes.Status200OK,
+                 data = languages.Data.ToList(),
+                TotalCount = languages.TotalCount,
+                 PageNumber = languages.PageNumber,
+                 PageSize = languages.PageSize
+                 });
         }
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateLanguageCommand command)

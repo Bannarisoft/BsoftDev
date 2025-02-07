@@ -53,10 +53,17 @@ namespace UserManagement.Infrastructure.Repositories.Users
             // _fallbackPolicy = Policy<List<User>>.Handle<Exception>()
             //     .FallbackAsync(new List<User>());
         }
-        public async Task<List<User>> GetAllUsersAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<User>,int)> GetAllUsersAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
 
                      var query = $$"""
+
+                     DECLARE @TotalCount INT;
+             SELECT @TotalCount = COUNT(*) 
+               FROM AppSecurity.Users 
+              WHERE IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (FirstName LIKE @Search OR LastName LIKE @Search OR UserName LIKE @Search)")}};
+
                 SELECT DISTINCT ur.Id,
                                 ur.UserId,
                                 ur.DivisionId,
@@ -76,6 +83,8 @@ namespace UserManagement.Infrastructure.Repositories.Users
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ur.FirstName LIKE @Search OR ur.LastName LIKE @Search OR ur.UserName LIKE @Search)")}}
                 ORDER BY ur.UserId desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+                SELECT @TotalCount AS TotalCount;
             """;
 
              var parameters = new
@@ -88,8 +97,12 @@ namespace UserManagement.Infrastructure.Repositories.Users
 
                     return await policyWrap.ExecuteAsync(async () =>
                     {
+                          var user = await _dbConnection.QueryMultipleAsync(query, parameters);
+                          var userlist = (await user.ReadAsync<User>()).ToList();
+                          int totalCount = (await user.ReadFirstAsync<int>());
+                          
+                          return  (userlist, totalCount);
                         
-                         return (await _dbConnection.QueryAsync<User>(query,parameters)).ToList();
 
                         
                     });

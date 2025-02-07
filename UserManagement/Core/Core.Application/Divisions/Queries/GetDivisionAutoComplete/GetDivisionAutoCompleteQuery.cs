@@ -12,5 +12,6 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
     {
         
         public string SearchPattern { get; set; }
+        public int CompanyId { get; set; }
     }
 }

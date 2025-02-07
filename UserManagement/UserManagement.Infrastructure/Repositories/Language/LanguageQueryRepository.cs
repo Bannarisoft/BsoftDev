@@ -15,9 +15,16 @@ namespace UserManagement.Infrastructure.Repositories.Language
         {
             _dbConnection = dbConnection;
         }
-        public async Task<List<Core.Domain.Entities.Language>> GetAllLanguageAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<Core.Domain.Entities.Language>,int)> GetAllLanguageAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
              var query = $$"""
+
+              DECLARE @TotalCount INT;
+             SELECT @TotalCount = COUNT(*) 
+               FROM AppData.Language 
+              WHERE IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR Name LIKE @Search)")}};
+
                 SELECT 
                 Id, 
                 Code,
@@ -27,6 +34,8 @@ namespace UserManagement.Infrastructure.Repositories.Language
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR Name LIKE @Search )")}}
                 ORDER BY Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+                SELECT @TotalCount AS TotalCount;
             """;
             var parameters = new
                        {
@@ -34,8 +43,12 @@ namespace UserManagement.Infrastructure.Repositories.Language
                            Offset = (PageNumber - 1) * PageSize,
                            PageSize
                        };
-           
-            return (await _dbConnection.QueryAsync<Core.Domain.Entities.Language>(query,parameters)).ToList();
+
+             var language = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var languagelist = (await language.ReadAsync<Core.Domain.Entities.Language>()).ToList();
+             int totalCount = (await language.ReadFirstAsync<int>());
+             
+           return (languagelist, totalCount);
         }
 
         public async Task<Core.Domain.Entities.Language> GetByIdAsync(int id)

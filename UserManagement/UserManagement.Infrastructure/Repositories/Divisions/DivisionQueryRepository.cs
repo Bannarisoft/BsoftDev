@@ -18,9 +18,15 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
         {
             _dbConnection = dbConnection;
         }
-         public async Task<List<Division>> GetAllDivisionAsync(int PageNumber, int PageSize, string? SearchTerm)
+         public async Task<(List<Division>,int)> GetAllDivisionAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
                  var query = $$"""
+             DECLARE @TotalCount INT;
+             SELECT @TotalCount = COUNT(*) 
+               FROM AppData.Division 
+              WHERE IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShortName LIKE @Search OR Name LIKE @Search)")}};
+
                 SELECT 
                 Id, 
                 ShortName,
@@ -33,6 +39,8 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShortName LIKE @Search OR Name LIKE @Search )")}}
                 ORDER BY Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+                SELECT @TotalCount AS TotalCount;
             """;
 
             
@@ -42,7 +50,11 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
                            Offset = (PageNumber - 1) * PageSize,
                            PageSize
                        };
-            return (await _dbConnection.QueryAsync<Division>(query,parameters)).ToList();
+
+               var division = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var divisionlist = (await division.ReadAsync<Division>()).ToList();
+             int totalCount = (await division.ReadFirstAsync<int>());
+            return (divisionlist, totalCount);
         }   
         public async Task<Division?> GetByDivisionnameAsync(string name, int? id = null)
         {
@@ -70,17 +82,23 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
             return await _dbConnection.QueryFirstOrDefaultAsync<Division>(query, new { id });
         }
       
-        public async Task<List<Division>>  GetDivision(string searchPattern)
+        public async Task<List<Division>>  GetDivision(string searchPattern, int CompanyId)
         {
             
 
             const string query = @"
                 SELECT Id, Name 
                 FROM AppData.Division 
-                WHERE IsDeleted = 0 AND Name LIKE @SearchPattern";
+                WHERE IsDeleted = 0 AND Name LIKE @SearchPattern AND CompanyId = @CompanyId";
                 
             
-            var divisions = await _dbConnection.QueryAsync<Division>(query, new { SearchPattern = $"%{searchPattern}%" });
+            var parameters = new 
+              { 
+                  SearchPattern = $"%{searchPattern ?? string.Empty}%", 
+                  CompanyId = CompanyId 
+              };
+
+            var divisions = await _dbConnection.QueryAsync<Division>(query, parameters);
             return divisions.ToList();
         }
     }

@@ -10,7 +10,7 @@ namespace Core.Application.Common.Interfaces.IUser
 {
     public interface IUserQueryRepository
     {
-        Task<List<User>> GetAllUsersAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<(List<User>,int)> GetAllUsersAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<User?> GetByIdAsync(int userId);      
         Task<List<User>>GetUser(string searchPattern);
         Task<List<string>> GetUserRolesAsync(int userId);

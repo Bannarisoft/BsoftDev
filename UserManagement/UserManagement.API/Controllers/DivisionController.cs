@@ -138,8 +138,8 @@ namespace UserManagement.API.Controllers
          [HttpGet("by-name")]
         public async Task<IActionResult> GetDivision([FromQuery] string? name)
         {
-           
-            var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = name});
+           var companyid = User.FindFirst("companyId")?.Value;
+            var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = name,CompanyId = int.Parse(companyid)});
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = divisions.Data });
         }
       

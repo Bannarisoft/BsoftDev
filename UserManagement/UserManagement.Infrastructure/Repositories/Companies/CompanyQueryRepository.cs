@@ -20,27 +20,35 @@ namespace UserManagement.Infrastructure.Repositories.Companies
          _dbConnection = dbConnection;
         }
 
-         public async Task<List<Company>> GetAllCompaniesAsync(int PageNumber, int PageSize, string? SearchTerm)
+         public async Task<(List<Company>,int)> GetAllCompaniesAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             var query = $$"""
+            DECLARE @TotalCount INT;
+             SELECT @TotalCount = COUNT(*) 
+               FROM AppData.Company C
+              WHERE C.IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (C.CompanyName LIKE @Search OR C.LegalName LIKE @Search)")}};
+
                 SELECT 
-                    C.Id, 
-                    C.CompanyName, 
-                    C.LegalName,
-                    C.GstNumber,
-                    C.TIN,
-                    C.TAN,
-                    C.CSTNo,
-                    C.YearOfEstablishment,
-                    C.Website,
-                    C.Logo,
-                    C.EntityId, 
-                    C.IsActive
-                FROM AppData.Company C
-                WHERE C.IsDeleted = 0
-                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (C.CompanyName LIKE @Search OR C.LegalName LIKE @Search )")}}
-                ORDER BY C.Id desc
-                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+            C.Id, 
+            C.CompanyName, 
+            C.LegalName,
+            C.GstNumber,
+            C.TIN,
+            C.TAN,
+            C.CSTNo,
+            C.YearOfEstablishment,
+            C.Website,
+            C.Logo,
+            C.EntityId, 
+            C.IsActive
+             FROM AppData.Company C
+              WHERE C.IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (C.CompanyName LIKE @Search OR C.LegalName LIKE @Search)")}}
+              ORDER BY C.Id DESC
+              OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+             SELECT @TotalCount AS TotalCount;
             """;
             
             
@@ -50,8 +58,10 @@ namespace UserManagement.Infrastructure.Repositories.Companies
                            Offset = (PageNumber - 1) * PageSize,
                            PageSize
                        };
-            
-            return (await _dbConnection.QueryAsync<Company>(query,parameters)).ToList();
+              var company = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var companies = (await company.ReadAsync<Company>()).ToList();
+             int totalCount = (await company.ReadFirstAsync<int>());
+            return (companies, totalCount);
 
         }
          public async Task<Company?> GetByCompanynameAsync(string name, int? id = null)

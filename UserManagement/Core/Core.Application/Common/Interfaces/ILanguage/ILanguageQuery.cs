@@ -8,7 +8,7 @@ namespace Core.Application.Common.Interfaces.ILanguage
 {
     public interface ILanguageQuery
     {
-        Task<List<Core.Domain.Entities.Language>> GetAllLanguageAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<(List<Core.Domain.Entities.Language>,int)> GetAllLanguageAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<Core.Domain.Entities.Language> GetByIdAsync(int id);
         Task<List<Core.Domain.Entities.Language>> GetLanguage(string searchPattern);
         Task<Core.Domain.Entities.Language?> GetByLanguagenameAsync(string name,int? id = null);

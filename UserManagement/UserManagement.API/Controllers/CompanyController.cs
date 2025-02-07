@@ -9,6 +9,7 @@ using Core.Application.Companies.Queries.GetCompanyAutoComplete;
 using FluentValidation;
 using Core.Application.Companies.Commands.UploadFileCompany;
 using Core.Application.Companies.Commands.DeleteFileCompany;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UserManagement.API.Controllers
 {
@@ -29,7 +30,7 @@ namespace UserManagement.API.Controllers
             _UpdateCompanyCommandvalidator = updateCompanyCommandValidator;
             _UploadFileCompanyCommandvalidator = uploadFileCompanyCommandvalidator;
         }
-
+        
         [HttpGet]
         
         public async Task<IActionResult> GetAllCompaniesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)

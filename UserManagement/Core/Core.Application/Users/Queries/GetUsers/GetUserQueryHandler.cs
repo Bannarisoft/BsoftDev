@@ -36,7 +36,7 @@ namespace Core.Application.Users.Queries.GetUsers
             _logger.LogInformation("Fetching all users from the repository.");
             
             // Fetch all users from the repository
-            var users = await _userRepository.GetAllUsersAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+            var (users, totalCount) = await _userRepository.GetAllUsersAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             if (users == null || users.Count == 0)
             {
                 _logger.LogWarning("No users found in the repository.");
@@ -64,7 +64,7 @@ namespace Core.Application.Users.Queries.GetUsers
                 IsSuccess = true, 
                 Message = "Success", 
                 Data = userList,
-                TotalCount = users.Count,
+                TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
                 

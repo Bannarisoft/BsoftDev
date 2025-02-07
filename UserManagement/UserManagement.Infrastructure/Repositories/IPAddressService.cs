@@ -151,6 +151,7 @@ namespace UserManagement.Infrastructure.Repositories
             if (userAgent.Contains("Opera") || userAgent.Contains("OPR")) return "Opera";
             return "Unknown Browser";
         }
+      
     }    
 }
 

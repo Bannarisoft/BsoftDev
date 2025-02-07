@@ -31,7 +31,7 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
           public async Task<ApiResponseDTO<List<DivisionAutoCompleteDTO>>> Handle(GetDivisionAutoCompleteQuery request, CancellationToken cancellationToken)
           {
                 
-            var result = await _divisionRepository.GetDivision(request.SearchPattern);
+            var result = await _divisionRepository.GetDivision(request.SearchPattern,request.CompanyId);
             var division = _mapper.Map<List<DivisionAutoCompleteDTO>>(result);
              //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(

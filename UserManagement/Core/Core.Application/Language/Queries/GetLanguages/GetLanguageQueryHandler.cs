@@ -27,7 +27,7 @@ namespace Core.Application.Language.Queries.GetLanguages
 
         public async Task<ApiResponseDTO<List<LanguageDTO>>> Handle(GetLanguageQuery request, CancellationToken cancellationToken)
         {
-            var languages = await _languageQuery.GetAllLanguageAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+            var (languages, totalCount) = await _languageQuery.GetAllLanguageAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var languagesList = _mapper.Map<List<LanguageDTO>>(languages);
 
              //Domain Event
@@ -44,7 +44,7 @@ namespace Core.Application.Language.Queries.GetLanguages
                 IsSuccess = true, 
                 Message = "Success", 
                 Data = languagesList ,
-                TotalCount = languages.Count,
+                TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
                 };
