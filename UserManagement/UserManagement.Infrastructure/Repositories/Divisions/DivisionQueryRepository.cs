@@ -82,20 +82,27 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
             return await _dbConnection.QueryFirstOrDefaultAsync<Division>(query, new { id });
         }
       
-        public async Task<List<Division>>  GetDivision(string searchPattern, int CompanyId)
+        public async Task<List<Division>>  GetDivision(string searchPattern, List<UserCompany> userCompanies)
         {
-            
+            var CompanyId = new List<int>();
+            foreach (var userCompany in userCompanies)
+            {
+                CompanyId.Add(userCompany.CompanyId);
+            }
+            if (CompanyId is null || !CompanyId.Any())
+                return new List<Division>();
 
-            const string query = @"
-                SELECT Id, Name 
-                FROM AppData.Division 
-                WHERE IsDeleted = 0 AND Name LIKE @SearchPattern AND CompanyId = @CompanyId";
+            var query = $@"
+        SELECT Id, Name 
+        FROM AppData.Division 
+        WHERE IsDeleted = 0 
+        AND Name LIKE @SearchPattern
+        AND CompanyId IN ({string.Join(",", CompanyId)})";
                 
             
             var parameters = new 
               { 
-                  SearchPattern = $"%{searchPattern ?? string.Empty}%", 
-                  CompanyId = CompanyId 
+                  SearchPattern = $"%{searchPattern ?? string.Empty}%"
               };
 
             var divisions = await _dbConnection.QueryAsync<Division>(query, parameters);

@@ -3,6 +3,7 @@ using Core.Application.Divisions.Commands.CreateDivision;
 using Core.Application.Divisions.Commands.DeleteDivision;
 using Core.Application.Divisions.Commands.UpdateDivision;
 using Core.Application.Divisions.Queries.GetDivisions;
+using Core.Application.Users.Queries.GetUsers;
 using Core.Domain.Entities;
 using static Core.Domain.Enums.Common.Enums;
 
@@ -21,6 +22,7 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
             CreateMap<Division, DivisionDTO>();            
             CreateMap<Division, DivisionAutoCompleteDTO>();
+            CreateMap<UserCompanyDTO, UserCompany>();
         }
     }
 }
