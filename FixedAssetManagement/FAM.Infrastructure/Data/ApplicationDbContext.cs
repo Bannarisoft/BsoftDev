@@ -3,6 +3,7 @@ using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
+using FAM.Infrastructure.Data.Configurations;
 
 namespace FAM.Infrastructure.Data
 {
@@ -19,11 +20,13 @@ namespace FAM.Infrastructure.Data
                
         }
         
-        // public DbSet<Entity> Entity { get; set; } 
+        public DbSet<AssetGroup> AssetGroup { get; set; } 
+        public DbSet<AssetCategories> AssetCategories { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // modelBuilder.ApplyConfiguration(new EntityConfiguration());
+             modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
+             modelBuilder.ApplyConfiguration(new AssetCategoriesConfiguration());
             
                
             base.OnModelCreating(modelBuilder);
@@ -53,14 +56,14 @@ namespace FAM.Infrastructure.Data
                 if (entry.State == EntityState.Added)
                 {
                     entry.Property("CreatedIP").CurrentValue = currentIp;
-                    entry.Property("CreatedAt").CurrentValue = currentTime;
+                    entry.Property("CreatedDate").CurrentValue = currentTime;
                     entry.Property("CreatedBy").CurrentValue = userId;
                     entry.Property("CreatedByName").CurrentValue = username;
                 }
                 if (entry.State == EntityState.Modified)
                 {
                     entry.Property("ModifiedIP").CurrentValue = currentIp;
-                    entry.Property("ModifiedAt").CurrentValue = currentTime;
+                    entry.Property("ModifiedDate").CurrentValue = currentTime;
                     entry.Property("ModifiedBy").CurrentValue = userId;
                     entry.Property("ModifiedByName").CurrentValue = username;
                 }

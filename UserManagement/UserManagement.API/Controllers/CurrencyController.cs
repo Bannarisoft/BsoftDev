@@ -215,15 +215,15 @@ public async Task<IActionResult> UpdateAsync( UpdateCurrencyCommand updateCurren
         
 } 
 
-[HttpDelete]
-public async Task<IActionResult> DeleteCurrencyAsync( DeleteCurrencyCommand deleteCurrencyCommand)
+[HttpDelete("{id}")]
+public async Task<IActionResult> DeleteCurrencyAsync(int id)
 {
         // Process the delete command
-        var result = await _mediator.Send(deleteCurrencyCommand);
+        var result = await _mediator.Send(new DeleteCurrencyCommand { Id = id });
 
         if (result.IsSuccess) 
         {
-            _logger.LogInformation($"CurrencyId {deleteCurrencyCommand.Id} deleted successfully.");
+            _logger.LogInformation($"CurrencyId {id} deleted successfully.");
              return Ok(new
             {
                 message = result.Message,
@@ -231,7 +231,7 @@ public async Task<IActionResult> DeleteCurrencyAsync( DeleteCurrencyCommand dele
             });
             
         }
-        _logger.LogWarning($"CurrencyId {deleteCurrencyCommand.Id} Not Found or Invalid CurrencyId.");
+        _logger.LogWarning($"CurrencyId {id} Not Found or Invalid CurrencyId.");
         return NotFound(new
         {
             message = result.Message,
