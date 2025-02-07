@@ -36,12 +36,12 @@ namespace Core.Application.UserRole.Commands.CreateRole
 
         public async Task<ApiResponseDTO<UserRoleDto>>Handle(CreateRoleCommand request,CancellationToken cancellationToken)
          {          
-            _logger.LogInformation("Starting CreateUserRoleCommandHandler for request: {@Request}", request);
+            _logger.LogInformation($"Starting CreateUserRoleCommandHandler for request: {request}");
             
             var exists = await _roleRepository.ExistsByCodeAsync(request.RoleName);
               if (exists)
                  {
-                     _logger.LogWarning("Entity Name {EntityName} already exists.", request.RoleName);
+                     _logger.LogWarning($"Entity Name {request.RoleName} already exists." );
                         return new ApiResponseDTO<UserRoleDto>
                     {
                     IsSuccess = false,
@@ -50,14 +50,14 @@ namespace Core.Application.UserRole.Commands.CreateRole
                 }
             // Map the request to the entity
             var userRoleEntity = _mapper.Map<Core.Domain.Entities.UserRole>(request);
-            _logger.LogInformation("Mapped CreateUserRoleCommand to userRole entity:{@userRoleEntity}", userRoleEntity);
+            _logger.LogInformation($"Mapped CreateUserRoleCommand to userRole entity:{userRoleEntity}" );
 
-            // Save the department
+            // Save the UserRole
             var createdUserRole = await _roleRepository.CreateAsync(userRoleEntity);
 
-            if (createdUserRole == null)
+            if (createdUserRole is null)
             {
-                _logger.LogWarning("Failed to create department. UserRole entity: {@userRoleEntity}", userRoleEntity);
+                _logger.LogWarning($"Failed to create UserRole. UserRole entity: {userRoleEntity}");
                 return new ApiResponseDTO<UserRoleDto>
                 {
                     IsSuccess = false,
@@ -65,7 +65,7 @@ namespace Core.Application.UserRole.Commands.CreateRole
                 };
             }
 
-            _logger.LogInformation("UserRole successfully created with ID: {Id}", createdUserRole.Id);
+            _logger.LogInformation($"UserRole successfully created with ID: {createdUserRole.Id}" );
 
             // Publish the domain event
             var domainEvent = new AuditLogsDomainEvent(
@@ -77,12 +77,12 @@ namespace Core.Application.UserRole.Commands.CreateRole
             );
 
             await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("AuditLogsDomainEvent published for UserRole ID: {Id}", createdUserRole.Id);
+            _logger.LogInformation($"AuditLogsDomainEvent published for UserRole ID: {createdUserRole.Id}");
 
             // Map the result to DTO
             var userrolrDto = _mapper.Map<UserRoleDto>(createdUserRole);
 
-            _logger.LogInformation("Returning success response for UserRole ID: {Id}", createdUserRole.Id);
+            _logger.LogInformation($"Returning success response for UserRole ID: {createdUserRole.Id}");
 
             return new ApiResponseDTO<UserRoleDto>
             {

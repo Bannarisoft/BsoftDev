@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.AdminSecuritySettings.Commands.CreateAdminSecuritySettings
 {
-    public class CreateAdminSecuritySettingsCommand : IRequest<ApiResponseDTO<Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettings.AdminSecuritySettingsDto>>
+    public class CreateAdminSecuritySettingsCommand : IRequest<ApiResponseDTO<int>>
     {  public int Id { get; set; }
     public int PasswordHistoryCount { get; set; }
     public int SessionTimeoutMinutes { get; set; }

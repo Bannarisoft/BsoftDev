@@ -32,13 +32,13 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
         public async Task<ApiResponseDTO<List<DepartmentAutocompleteDto>>> Handle(GetDepartmentAutoCompleteSearchQuery request, CancellationToken cancellationToken)
         { 
 
-            _logger.LogInformation("Handling GetDepartmentAutoCompleteSearchQuery with search pattern: {SearchPattern}", request.SearchPattern);
+            _logger.LogInformation($"Handling GetDepartmentAutoCompleteSearchQuery with search pattern: {request.SearchPattern}" );
 
              // Fetch departments matching the search pattern
                 var result = await _departmentRepository.GetAllDepartmentAutoCompleteSearchAsync(request.SearchPattern);
                 if (result == null || !result.Any())
                 {
-                    _logger.LogWarning("No departments found for search pattern: {SearchPattern}", request.SearchPattern);
+                    _logger.LogWarning($"No departments found for search pattern: {request.SearchPattern}" );
                     return new ApiResponseDTO<List<DepartmentAutocompleteDto>>
                     {
                         IsSuccess = false,
@@ -47,7 +47,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
                     };
                 }
 
-                _logger.LogInformation("Departments found for search pattern: {SearchPattern}. Mapping results to DTO.", request.SearchPattern);
+                _logger.LogInformation($"Departments found for search pattern: {request.SearchPattern}. Mapping results to DTO.");
 
                 // Map the result to DTO
                 var deptDto = _mapper.Map<List<DepartmentAutocompleteDto>>(result);
@@ -62,7 +62,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
 
-                _logger.LogInformation("Domain event published for search pattern: {SearchPattern}", request.SearchPattern);
+                _logger.LogInformation($"Domain event published for search pattern: {request.SearchPattern}");
 
                 return new ApiResponseDTO<List<DepartmentAutocompleteDto>>
                 {
@@ -70,20 +70,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
                     Message = "Success",
                     Data = deptDto
                 };
-//                   var result = await _departmentRepository.GetAllDepartmentAutoCompleteSearchAsync(request.SearchPattern);
-//                   var department =_mapper.Map<ApiResponseDTO<List<DepartmentDto>>>(result);   
-
-//  var deptDto = _mapper.Map<List<DepartmentDto>>(result);
-//                 //Domain Event
-//                 var domainEvent = new AuditLogsDomainEvent(
-//                     actionDetail: "GetAutoComplete",
-//                     actionCode:"",        
-//                     actionName: request.SearchPattern,                
-//                     details: $"Department '{request.SearchPattern}' was searched",
-//                     module:"Department"
-//                 );
-//                 await _mediator.Publish(domainEvent, cancellationToken);
-//                 return new ApiResponseDTO<List<DepartmentDto>> { IsSuccess = true, Message = "Success", Data = department.Data };  
+               
 
         }
     }

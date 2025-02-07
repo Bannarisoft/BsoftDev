@@ -13,11 +13,11 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYear
     public class FinancialYearDto  : IMapFrom<ApiResponseDTO<Core.Domain.Entities.FinancialYear>>
     {
          public int Id { get; set; }
-        public string StartYear { get; set; }
+        public string? StartYear { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; } 
 
-        public string FinYearName { get; set; }
+        public string? FinYearName { get; set; }
 
 
         

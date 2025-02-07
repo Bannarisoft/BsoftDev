@@ -34,8 +34,7 @@ namespace Core.Application.Common.Mappings
         .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
 
             CreateMap<Department, GetDepartmentDto>();
-            CreateMap<Department, DepartmentAutocompleteDto>();
-            
+            CreateMap<Department, DepartmentAutocompleteDto>();            
 
 
             CreateMap<DepartmentStatusDto, Department>()

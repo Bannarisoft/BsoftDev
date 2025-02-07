@@ -24,7 +24,7 @@ namespace Core.Application.Entity.Queries.GetEntityById
            _entityRepository = entityRepository;
            _mapper =mapper;
            _mediator = mediator;
-           _logger = logger?? throw new ArgumentNullException(nameof(logger));
+         
     }
 
     public async Task<ApiResponseDTO<List<GetEntityDTO>>>  Handle(GetEntityByIdQuery request, CancellationToken cancellationToken)

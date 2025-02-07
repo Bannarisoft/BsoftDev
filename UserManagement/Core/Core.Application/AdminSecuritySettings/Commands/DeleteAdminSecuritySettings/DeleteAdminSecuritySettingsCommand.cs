@@ -13,7 +13,6 @@ namespace Core.Application.AdminSecuritySettings.Commands.DeleteAdminSecuritySet
     public class DeleteAdminSecuritySettingsCommand : IRequest<ApiResponseDTO<int>> 
     {
 
-         public int Id { get; set; }
-        public AdminSecuritySettingsStatusDto AdminSecuritySettingsStatusDto { get; set; }
+         public int Id { get; set; }      
     }
 }

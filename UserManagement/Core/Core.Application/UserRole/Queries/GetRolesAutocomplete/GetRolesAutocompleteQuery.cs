@@ -11,6 +11,6 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 {
     public class GetRolesAutocompleteQuery : IRequest<ApiResponseDTO<List<GetUserRoleAutocompleteDto>>> 
     {
-        public string SearchTerm { get; set; }
+        public string? SearchTerm { get; set; }
     }
 }
