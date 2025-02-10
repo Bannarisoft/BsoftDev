@@ -34,13 +34,13 @@ namespace Core.Application.Currency.Commands.DeleteCurrency
         _logger.LogInformation($"Soft Deleting Currency with ID: {request.Id}");
 
         var currency = await currencyQueryRepository.GetByIdAsync(request.Id);
-        if (currency is null)
+        if (currency is null || currency.Count == 0)
         {
             _logger.LogWarning($"Soft Deleting Currency Failed: Currency with ID {request.Id} not found.");
             return new ApiResponseDTO<int>
             {
                 IsSuccess = false,
-                Message = "Currency not found.",
+                Message = "Currency not found / Currency is deleted.",
                 
             };
         }
@@ -71,7 +71,7 @@ namespace Core.Application.Currency.Commands.DeleteCurrency
             return new ApiResponseDTO<int>
             {
                 IsSuccess = true,
-                Message = "Currency successfully soft deleted.",
+                Message = "Success",
                 Data = request.Id
             };
         

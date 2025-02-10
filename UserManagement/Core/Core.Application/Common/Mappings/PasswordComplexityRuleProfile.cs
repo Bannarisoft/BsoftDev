@@ -40,7 +40,7 @@ namespace Core.Application.Common.Mappings
             // .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ));
 
             CreateMap<Core.Domain.Entities.PasswordComplexityRule, GetPwdRuleDto>();
-            CreateMap< Core.Domain.Entities.PasswordComplexityRule, PwdComplexityRuleAutoCompleteAutocompleteDto>();
+            CreateMap< Core.Domain.Entities.PasswordComplexityRule, PwdComplexityRuleAutoCompleteDto>();
 
             CreateMap<PwdRuleStatusDto, Core.Domain.Entities.PasswordComplexityRule>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())

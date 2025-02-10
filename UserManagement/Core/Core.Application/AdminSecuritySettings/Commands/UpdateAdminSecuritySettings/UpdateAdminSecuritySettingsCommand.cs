@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySettings
 {
-    public class UpdateAdminSecuritySettingsCommand :  IRequest<ApiResponseDTO<AdminSecuritySettingsDto>> 
+    public class UpdateAdminSecuritySettingsCommand :  IRequest<ApiResponseDTO<int>> 
     {
          public int Id { get; set; }
     public int PasswordHistoryCount { get; set; }
@@ -23,5 +23,6 @@ namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySet
     public byte IsForcePasswordChangeOnFirstLogin { get; set; }
     public int PasswordResetCodeExpiryMinutes { get; set; }
     public byte IsCaptchaEnabledOnLogin { get; set; }
+    public byte IsActive {get; set;}
     }
 }

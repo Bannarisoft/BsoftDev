@@ -50,6 +50,7 @@ namespace UserManagement.Infrastructure.Data
         public DbSet<CompanySettings> CompanySettings { get; set; } 
         public DbSet<Language> Languages { get; set; }
         public DbSet<FinancialYear> FinancialYear { get; set;}
+        public DbSet<UserUnit> UserUnit { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -86,6 +87,7 @@ namespace UserManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UserCompanyConfiguration());
             modelBuilder.ApplyConfiguration(new CompanySettingsConfiguration());
             modelBuilder.ApplyConfiguration(new LanguageConfiguration());
+            modelBuilder.ApplyConfiguration(new UserUnitConfiguration());
             
                
             base.OnModelCreating(modelBuilder);

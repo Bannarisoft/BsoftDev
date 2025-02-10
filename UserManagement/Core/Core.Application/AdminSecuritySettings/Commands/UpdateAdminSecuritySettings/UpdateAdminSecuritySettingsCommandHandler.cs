@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySettings
 {
-    public class UpdateAdminSecuritySettingsCommandHandler      : IRequestHandler<UpdateAdminSecuritySettingsCommand ,ApiResponseDTO<AdminSecuritySettingsDto>>
+    public class UpdateAdminSecuritySettingsCommandHandler      : IRequestHandler<UpdateAdminSecuritySettingsCommand ,ApiResponseDTO<int>>
     {
        public readonly IAdminSecuritySettingsCommandRepository _IAdminSecuritySettingsCommandRepository;
        private readonly IMapper _Imapper; 
@@ -24,88 +24,67 @@ namespace Core.Application.AdminSecuritySettings.Commands.UpdateAdminSecuritySet
             _IAdminSecuritySettingsCommandRepository = adminSecuritySettingsCommandRepository;
             _IAdminSecuritySettingsQueryRepository = adminSecuritySettingsQueryRepository;
             _Imapper = Imapper;
-            _logger = logger;
-           
+            _logger = logger;           
              _mediator = mediator;
         }
 
-
-         public async Task<ApiResponseDTO<AdminSecuritySettingsDto>> Handle(UpdateAdminSecuritySettingsCommand request, CancellationToken cancellationToken)
-       {
-
-             // Fetch the existing department by ID
+        public async Task<ApiResponseDTO<int>> Handle(UpdateAdminSecuritySettingsCommand request, CancellationToken cancellationToken)
+        {
+             // Fetch the existing adminSecuritySettings by ID
                 var adminSecSettings  = await _IAdminSecuritySettingsQueryRepository.GetAdminSecuritySettingsByIdAsync(request.Id);
       
-
-
-                if (adminSecSettings  == null )
+                if (adminSecSettings  is null )
                 {
-                  //  return ApiResponseDTO<AdminSecuritySettingsDto>.Failure("Invalid Admin Settings Id. The specified Department does not exist or is inactive.");
-                   _logger.LogWarning("Department with ID {DepartmentId} not found.", request.Id);
-                return new ApiResponseDTO<AdminSecuritySettingsDto>
+                 
+                   _logger.LogWarning($" Admin Settings with ID {request.Id} not found.");
+                return new ApiResponseDTO<int >
                 {
                     IsSuccess = false,
-                    Message = "AdminSecuritySettings not found"
+                    Message = "AdminSecuritySettings not found/AdminSecuritySettings is deleted "
                 };
-                }
+                }                
+              var adminsettingsentity = _Imapper.Map<Core.Domain.Entities.AdminSecuritySettings>(request);
 
-                // Map the request to the department entity
-                  adminSecSettings.Id = request.Id; // Update properties based on the request
-                 adminSecSettings.PasswordHistoryCount = request.PasswordHistoryCount;
-                 adminSecSettings.SessionTimeoutMinutes = request.SessionTimeoutMinutes;
-                  adminSecSettings.MaxFailedLoginAttempts=request.MaxFailedLoginAttempts;
-                  adminSecSettings.AccountAutoUnlockMinutes=request.AccountAutoUnlockMinutes;
-                  adminSecSettings.PasswordExpiryDays=request.PasswordExpiryDays;
-                  adminSecSettings.PasswordExpiryAlertDays=request.PasswordExpiryAlertDays;
-                  adminSecSettings.IsTwoFactorAuthenticationEnabled=request.IsTwoFactorAuthenticationEnabled;
-                  adminSecSettings.MaxConcurrentLogins=request.MaxConcurrentLogins;
-                  adminSecSettings.IsForcePasswordChangeOnFirstLogin=request.IsForcePasswordChangeOnFirstLogin;
-                  adminSecSettings.PasswordResetCodeExpiryMinutes=request.PasswordResetCodeExpiryMinutes;
-                  adminSecSettings.PasswordResetCodeExpiryMinutes=request.PasswordResetCodeExpiryMinutes;
-                  adminSecSettings.IsCaptchaEnabledOnLogin=request.IsCaptchaEnabledOnLogin;
-             
-                 var result = await _IAdminSecuritySettingsCommandRepository.UpdateAsync(request.Id, adminSecSettings);
-
-                if (result == null)
+              var result = await _IAdminSecuritySettingsCommandRepository.UpdateAsync(request.Id, adminsettingsentity);
+            
+             if (result == -1) // Entity not found
             {
-                _logger.LogWarning("Failed to update Department with ID {DepartmentId}.", request.Id);
-                return new ApiResponseDTO<AdminSecuritySettingsDto>
+                _logger.LogWarning($"Failed to update AdminSecuritySettings with ID {request.Id }.");
+                return new ApiResponseDTO<int>
                 {
                     IsSuccess = false,
-                    Message = "Failed to update department"
+                    Message = "Failed to update AdminSecuritySettings"
                 };
             }
 
-            _logger.LogInformation("Department with ID {DepartmentId} updated successfully.", request.Id);
+            _logger.LogInformation($"AdminSecuritySettings with ID { request.Id} updated successfully.");
 
             // Map the updated entity to DTO
-            var dept = await _IAdminSecuritySettingsQueryRepository.GetAdminSecuritySettingsByIdAsync(request.Id);
-            var departmentDto = _Imapper.Map<AdminSecuritySettingsDto>(dept);
+            var adminsetting = await _IAdminSecuritySettingsQueryRepository.GetAdminSecuritySettingsByIdAsync(request.Id);
+            var adminsettingsDto = _Imapper.Map<AdminSecuritySettingsDto>(adminsetting);
 
          
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: request.Id.ToString(),
+                    actionCode: $"Update Admin Security Settings{adminsettingsDto.Id}" ,
                      actionName: "Update Admin Security Settings",
                     details: $"Admin Settings  was updated. Admin Settings ID: {request.Id}",
                     module: "Admin Secutrity Settings"
                 );
-                // await _mediator.Publish(domainEvent, cancellationToken);
-
-           
-                // return Result<int>.Success(result);
+               
                  await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("AuditLogsDomainEvent published for Department ID {DepartmentId}.", adminSecSettings.Id);
+            _logger.LogInformation($"AuditLogsDomainEvent published for AdminSecuritySettings ID {adminSecSettings.Id}.");
 
-            return new ApiResponseDTO<AdminSecuritySettingsDto>
+            return new ApiResponseDTO<int>
             {
                 IsSuccess = true,
-                Message = "Department updated successfully"
+                Message = "AdminSecuritySettings updated successfully",
+                Data=result
                
             };
 
         
-         }
+        }
 
 
         

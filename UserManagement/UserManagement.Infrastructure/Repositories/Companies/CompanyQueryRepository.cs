@@ -20,67 +20,51 @@ namespace UserManagement.Infrastructure.Repositories.Companies
          _dbConnection = dbConnection;
         }
 
-         public async Task<List<Company>> GetAllCompaniesAsync()
+         public async Task<(List<Company>,int)> GetAllCompaniesAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-               const string query = @"
+            var query = $$"""
+            DECLARE @TotalCount INT;
+             SELECT @TotalCount = COUNT(*) 
+               FROM AppData.Company C
+              WHERE C.IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (C.CompanyName LIKE @Search OR C.LegalName LIKE @Search)")}};
+
                 SELECT 
-                    C.Id, 
-                    C.CompanyName, 
-                    C.LegalName,
-                    C.GstNumber,
-                    C.TIN,
-                    C.TAN,
-                    C.CSTNo,
-                    C.YearOfEstablishment,
-                    C.Website,
-                    C.Logo,
-                    C.EntityId, 
-                    C.IsActive,
-                    A.AddressLine1,
-                    A.AddressLine2,
-                    A.PinCode,
-                    A.CountryId,
-                    A.StateId,
-                    A.CityId,
-                    A.Phone AS AddressPhone, 
-                    B.Name,
-                    B.Designation,
-                    B.Email,
-                    B.Phone AS ContactPhone,
-                    B.Remark AS Remarks 
-                FROM AppData.Company C
-                LEFT JOIN AppData.CompanyAddress A ON A.CompanyId = C.Id
-                LEFT JOIN AppData.CompanyContact B ON B.CompanyId = C.Id
-                WHERE C.IsDeleted = 0";
+            C.Id, 
+            C.CompanyName, 
+            C.LegalName,
+            C.GstNumber,
+            C.TIN,
+            C.TAN,
+            C.CSTNo,
+            C.YearOfEstablishment,
+            C.Website,
+            C.Logo,
+            C.EntityId, 
+            C.IsActive
+             FROM AppData.Company C
+              WHERE C.IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (C.CompanyName LIKE @Search OR C.LegalName LIKE @Search)")}}
+              ORDER BY C.Id DESC
+              OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+             SELECT @TotalCount AS TotalCount;
+            """;
             
-            var companyDictionary = new Dictionary<int, Company>();
             
-            var companies = await _dbConnection.QueryAsync<Company, CompanyAddress, CompanyContact, Company>(
-                query,
-                (company, address, contact) =>
-                {
-                    if (!companyDictionary.TryGetValue(company.Id, out var existingCompany))
-                    {
-                        existingCompany = company;
-                        existingCompany.CompanyAddress = address;
-                        existingCompany.CompanyContact = contact;
-                        companyDictionary.Add(existingCompany.Id, existingCompany);
-                    }
-                    else
-                    {
-                        existingCompany.CompanyAddress = address;
-                        existingCompany.CompanyContact = contact;
-                    }
-            
-                    return existingCompany;
-                },
-                splitOn: "AddressLine1,Name" 
-            );
-            
-            return companies.Distinct().ToList();
+            var parameters = new
+                       {
+                           Search = $"%{SearchTerm}%",
+                           Offset = (PageNumber - 1) * PageSize,
+                           PageSize
+                       };
+              var company = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var companies = (await company.ReadAsync<Company>()).ToList();
+             int totalCount = (await company.ReadFirstAsync<int>());
+            return (companies, totalCount);
 
         }
-        public async Task<Company?> GetByCompanynameAsync(string name, int? id = null)
+         public async Task<Company?> GetByCompanynameAsync(string name, int? id = null)
         {
 
              var query = """
@@ -98,6 +82,7 @@ namespace UserManagement.Infrastructure.Repositories.Companies
 
             return await _dbConnection.QueryFirstOrDefaultAsync<Company>(query, parameters);
         }
+     
          public async Task<Company> GetByIdAsync(int id)
         {            
            const string query = @"

@@ -36,14 +36,14 @@ namespace Core.Application.UserRole.Commands.UpdateRole
 
         public async Task<ApiResponseDTO<UserRoleDto>> Handle(UpdateRoleCommand request, CancellationToken cancellationToken)
         {
-            // // Map the updated data from the request to the domain entity
-            _logger.LogInformation("Starting UpdateUserRoleCommandHandler for request: {@Request}", request);
+            
+            _logger.LogInformation($"Starting UpdateUserRoleCommandHandler for request: {request}" );
 
-            // Fetch the department by ID
+         
             var userrole = await _IUserRoleQueryRepository.GetByIdAsync(request.Id);
             if (userrole == null)
             {
-                _logger.LogWarning("User Role with ID {Id} not found.", request.Id);
+                _logger.LogWarning($"User Role with ID {request.Id} not found.");
                 return new ApiResponseDTO<UserRoleDto>
                 {
                     IsSuccess = false,
@@ -51,16 +51,16 @@ namespace Core.Application.UserRole.Commands.UpdateRole
                 };
             }
 
-            _logger.LogInformation("User Role with ID {Id} retrieved successfully.", request.Id);
+            _logger.LogInformation($"User Role with ID {request.Id} retrieved successfully.");
             
             var userroleMap  = _Imapper.Map<Core.Domain.Entities.UserRole>(request);                            
 
             // Save updates to the repository
             var result = await _IUserRoleRepository.UpdateAsync(request.Id, userroleMap);
 
-            if (result == null)
+            if (result <= 0)
             {
-                _logger.LogWarning("Failed to update User Role with ID {Id}.", request.Id);
+                _logger.LogWarning($"Failed to update User Role with ID {request.Id}.");
                 return new ApiResponseDTO<UserRoleDto>
                 {
                     IsSuccess = false,
@@ -78,24 +78,24 @@ namespace Core.Application.UserRole.Commands.UpdateRole
                     };
                 }
 
-            _logger.LogInformation("User Role with ID {Id} updated successfully.", request.Id);
+            _logger.LogInformation($"User Role with ID {request.Id} updated successfully." );
 
             // Map the updated entity to DTO
             var role = await _IUserRoleQueryRepository.GetByIdAsync(request.Id);
-            var departmentDto = _Imapper.Map<UserRoleDto>(role);
-           // var departmentDto = _Imapper.Map<DepartmentDto>(result);
+            var roleDto = _Imapper.Map<UserRoleDto>(role);
+         
 
             // Publish domain event for audit logs
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Update",
-                actionCode: userrole.Id.ToString(),
+                actionCode: userrole.RoleName,
                 actionName: userrole.RoleName,
                 details: $"User Role '{userrole.RoleName}' was updated. User Role ID: {request.Id}",
                 module: "User Role"
             );
 
             await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation("AuditLogsDomainEvent published for User Role ID {DepartmentId}.", userrole.Id);
+            _logger.LogInformation($"AuditLogsDomainEvent published for User Role ID {userrole.Id}." );
 
             return new ApiResponseDTO<UserRoleDto>
             {

@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Users.Queries.GetUserById
 {
-    public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery,UserDto>
+    public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery,UserByIdDTO>
     {
         private readonly IUserQueryRepository _userRepository;
         private readonly IMapper _mapper;
@@ -31,7 +31,7 @@ namespace Core.Application.Users.Queries.GetUserById
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         }
-        public async Task<UserDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+        public async Task<UserByIdDTO> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Fetching user details for UserId: {UserId}", request.UserId);
             
@@ -54,7 +54,7 @@ namespace Core.Application.Users.Queries.GetUserById
                 );
 
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return _mapper.Map<UserDto>(user);
+                return _mapper.Map<UserByIdDTO>(user);
 
         }
     }

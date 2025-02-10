@@ -56,7 +56,7 @@ namespace UserManagement.Infrastructure.Repositories.Units
                     AppData.UnitContacts uc ON u.Id = uc.UnitId
                 WHERE  U.IsDeleted = 0
                 ORDER BY 
-                    u.CreatedAt DESC
+                    u.Id DESC
             ";
 
              var unitDictionary = new Dictionary<int, Unit>();
@@ -125,7 +125,7 @@ namespace UserManagement.Infrastructure.Repositories.Units
                 WHERE u.Id = @id
                 AND U.IsDeleted = 0
                 ORDER BY 
-                    u.CreatedAt DESC
+                    u.Id DESC
             ";
 
             var unitDictionary = new Dictionary<int, Unit>();
@@ -200,7 +200,7 @@ namespace UserManagement.Infrastructure.Repositories.Units
 				WHERE U.UnitName LIKE @SearchPattern OR U.Id LIKE @SearchPattern
                 AND U.IsDeleted = 0
                 ORDER BY 
-                    u.CreatedAt DESC";
+                    u.Id DESC";
 
             var unitDictionary = new Dictionary<int, Unit>();
             

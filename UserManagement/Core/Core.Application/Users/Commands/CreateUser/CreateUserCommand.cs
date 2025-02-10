@@ -1,5 +1,6 @@
 using Core.Application.Common.HttpResponse;
 using Core.Application.Users.Queries.GetUsers;
+using Core.Domain.Entities;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -23,11 +24,12 @@ namespace Core.Application.Users.Commands.CreateUser
     public string Mobile { get; set; }
     public string EmailId { get; set; }
     // public int CompanyId { get; set; }
-    public int UnitId { get; set; }
+    // public int UnitId { get; set; }
     public int DivisionId { get; set; }
     // public int UserRoleId { get; set; }
     // public UserDelete IsDeleted { get; set; }
     public List<UserCompanyDTO> UserCompanies  { get; set; }
     public List<UserRoleAllocationDTO> userRoleAllocations { get; set; }
+    public List<UserUnitDTO> userUnits { get; set; }
     }
 }

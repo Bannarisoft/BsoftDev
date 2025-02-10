@@ -160,15 +160,15 @@ namespace UserManagement.API.Controllers
     }
 
 
-    [HttpDelete]
-    public async Task<IActionResult> DeleteUnitAsync(DeleteUnitCommand deleteUnitCommand)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUnitAsync(int id)
     {
         
-       var result = await Mediator.Send(deleteUnitCommand);
+       var result = await Mediator.Send(new DeleteUnitCommand { UnitId = id });
 
         if (result.IsSuccess)
         {
-            _logger.LogInformation($"UnitId {result.Data} deleted successfully.");
+            _logger.LogInformation($"UnitId {id} deleted successfully.");
             return Ok(new
             {
                 message = result.Message,
@@ -176,7 +176,7 @@ namespace UserManagement.API.Controllers
                 
             });
         }
-        _logger.LogWarning($"UnitId {result.Data} deleted Failed.");
+        _logger.LogWarning($"UnitId {id} deleted Failed.");
         return BadRequest(new
         {
             message = result.Message,

@@ -50,7 +50,7 @@ namespace UserManagement.API.Controllers
            if (userRole.Data == null || !userRole.Data.Any())
             {
                
-                _logger.LogInformation("No userRole records found in the database. Total count: {Count}", userRole?.Data?.Count ?? 0);
+                _logger.LogInformation($"No userRole records found in the database. Total count: {userRole?.Data?.Count ?? 0}" );
                  return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
@@ -63,8 +63,7 @@ namespace UserManagement.API.Controllers
                 StatusCode = StatusCodes.Status200OK,
                 data = userRole.Data
             });
-            // var roles =await Mediator.Send(new GetRoleQuery());
-            // return Ok(roles);
+           
         }
 
         [HttpGet("{id}")]
@@ -72,12 +71,12 @@ namespace UserManagement.API.Controllers
         {
 
 
-            _logger.LogInformation("Fetching role with ID: {Id}", id);
+            _logger.LogInformation($"Fetching role with ID: {id}");
 
              var userRole = await Mediator.Send(new GetRoleByIdQuery { Id = id });
               if (userRole == null || userRole.Data == null)
             {
-                _logger.LogInformation("userRole with ID {Id} not found in the database.", id);
+                _logger.LogInformation($"userRole with ID {id} not found in the database.");
 
                 return NotFound(new
                 {
@@ -95,16 +94,16 @@ namespace UserManagement.API.Controllers
            
 
         }
-            [HttpGet("RolesSearch")]
-    public async Task<IActionResult> GetRoles([FromQuery] string searchTerm)
-    {
-          _logger.LogInformation("Starting GetAllUserRoleAutoCompleteSearchAsync with search pattern: {SearchPattern}", searchTerm);
-             var query = new GetRolesAutocompleteQuery { SearchTerm = searchTerm };
+        [HttpGet("by-name/{name}")] 
+        public async Task<IActionResult> GetRoles(string name)
+        {
+          _logger.LogInformation($"Starting GetAllUserRoleAutoCompleteSearchAsync with search pattern: {name}");
+             var query = new GetRolesAutocompleteQuery { SearchTerm = name };
                 var result = await Mediator.Send(query);
 
                 if (result.Data == null  || !result.Data.Any())
                 {
-                    _logger.LogWarning("No User Role found for search pattern: {SearchPattern}", searchTerm);
+                    _logger.LogWarning($"No User Role found for search pattern: {name}" );
 
                     return NotFound(new
                     {
@@ -113,7 +112,7 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogInformation("User Role found for search pattern: {SearchPattern}. Returning data.", searchTerm);
+                _logger.LogInformation($"User Role found for search pattern: {name}. Returning data.");
 
                 return Ok(new
                 {
@@ -122,18 +121,19 @@ namespace UserManagement.API.Controllers
                 });
      
   
-    }
+        }
+
         [HttpPost]
-        public async Task<IActionResult>CreateAsync(CreateRoleCommand command)
+        public async Task<IActionResult>CreateAsync(CreateRoleCommand createRoleCommand)
         {
 
-                   _logger.LogInformation("Create User Role request started with data: {@Command}", command);
+                   _logger.LogInformation($"Create User Role request started with data: {createRoleCommand}");
 
             // Validate the command
-            var validationResult = await _createRoleCommandValidator.ValidateAsync(command);
+            var validationResult = await _createRoleCommandValidator.ValidateAsync(createRoleCommand);
             if (!validationResult.IsValid)
             {
-                _logger.LogWarning("Validation failed for Create User Role request. Errors: {@Errors}", validationResult.Errors);
+                _logger.LogWarning($"Validation failed for Create User Role request. Errors: { validationResult.Errors}");
 
                 return BadRequest(new
                 {
@@ -144,10 +144,10 @@ namespace UserManagement.API.Controllers
             }
 
             // Process the command
-            var createuserrole = await Mediator.Send(command);
+            var createuserrole = await Mediator.Send(createRoleCommand);
             if (createuserrole.IsSuccess)
             {
-                _logger.LogInformation("Create User Role request succeeded. User Role created with ID: {Id}", createuserrole.Data.UserRoleId);
+                _logger.LogInformation($"Create User Role request succeeded. User Role created with ID: {createuserrole.Data.UserRoleId}");
 
                 return Ok(new
                 {
@@ -156,7 +156,7 @@ namespace UserManagement.API.Controllers
                     
                 });
             }
-            _logger.LogWarning("Create User Role request failed. Reason: {Message}", createuserrole.Message);
+            _logger.LogWarning($"Create User Role request failed. Reason: {createuserrole.Message}");
 
             return BadRequest(new
             {
@@ -167,16 +167,16 @@ namespace UserManagement.API.Controllers
                
         }
 
-         [HttpPut("Delete")]
-        public async Task<IActionResult> DeleteAsync( DeleteRoleCommand userroleDeleteCommand)
+        [HttpDelete("{id}")]         
+        public async Task<IActionResult> DeleteAsync( int id )
         {
-              _logger.LogInformation("Delete User Role request started with ID: {DepartmentId}", userroleDeleteCommand.Id);
+              _logger.LogInformation($"Delete User Role request started with ID: {id}");
 
                 // Check if the department exists
-                var userRole = await Mediator.Send(new GetRoleByIdQuery { Id = userroleDeleteCommand.Id });
+                var userRole = await Mediator.Send(new GetRoleByIdQuery { Id = id });
                 if (userRole == null)
                 {
-                    _logger.LogWarning("User Role with ID {DepartmentId} not found.", userroleDeleteCommand.Id);
+                    _logger.LogWarning($"User Role with ID {id} not found.");
 
                     return NotFound(new
                     {
@@ -185,14 +185,14 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogInformation("User Role with ID {Id} found. Proceeding with deletion.", userroleDeleteCommand.Id);
+                _logger.LogInformation($"User Role with ID {id} found. Proceeding with deletion.");
 
                 // Attempt to delete the department
-                var result = await Mediator.Send(userroleDeleteCommand);
+                var result = await Mediator.Send(new  DeleteRoleCommand {Id=id});
 
                 if (result.IsSuccess)
                 {
-                    _logger.LogInformation("User Role with ID {Id} deleted successfully.", userroleDeleteCommand.Id);
+                    _logger.LogInformation($"User Role with ID {id} deleted successfully.");
 
                     return Ok(new
                     {
@@ -202,7 +202,7 @@ namespace UserManagement.API.Controllers
                     });
                 }
 
-                _logger.LogWarning("Failed to delete User Role with ID {Id}. Reason: {Message}", userroleDeleteCommand.Id, result.Message);
+                _logger.LogWarning($"Failed to delete User Role with ID {id}. Reason: {result.Message}");
 
                 return BadRequest(new
                 {
@@ -215,7 +215,7 @@ namespace UserManagement.API.Controllers
        
   
 
-    [HttpPut("Update")]
+    [HttpPut]
     public async Task<IActionResult> UpdateAsync( UpdateRoleCommand updateRolecommand)
     {      
                _logger.LogInformation($"Update User Role  request started with data: {updateRolecommand}");
@@ -224,7 +224,7 @@ namespace UserManagement.API.Controllers
             var department = await Mediator.Send(new GetRoleByIdQuery { Id = updateRolecommand.Id });
             if (department == null)
             {
-                _logger.LogWarning("User Role with ID {Id} not found.", updateRolecommand.Id);
+                _logger.LogWarning($"User Role with ID {updateRolecommand.Id} not found.");
 
                 return NotFound(new
                 {
@@ -236,7 +236,7 @@ namespace UserManagement.API.Controllers
             var validationResult = await _updateRoleCommandValidator.ValidateAsync(updateRolecommand);
             if (!validationResult.IsValid)
             {
-                _logger.LogWarning("Validation failed for Update User Role  request. Errors: {@Errors}", validationResult.Errors);
+                _logger.LogWarning($"Validation failed for Update User Role  request. Errors: {validationResult.Errors}" );
 
                 return BadRequest(new
                 {
@@ -246,11 +246,11 @@ namespace UserManagement.API.Controllers
                 });
             }
 
-            // Update the department
+          
             var updateResult = await Mediator.Send(updateRolecommand);
             if (updateResult.IsSuccess)
             {
-                _logger.LogInformation("User Role  with ID {Id} updated successfully.", updateRolecommand.Id);
+                _logger.LogInformation($"User Role  with ID {updateRolecommand.Id} updated successfully." );
 
                 return Ok(new
                 {
@@ -260,7 +260,7 @@ namespace UserManagement.API.Controllers
                 });
             }
 
-            _logger.LogWarning("Failed to update User Role  with ID {Id}. Reason: {Message}", updateRolecommand.Id, updateResult.Message);
+            _logger.LogWarning($"Failed to update User Role  with ID {updateRolecommand.Id}. Reason: {updateResult.Message}");
 
             return BadRequest(new
             {
@@ -268,11 +268,6 @@ namespace UserManagement.API.Controllers
                 Message = updateResult.Message
             });               
     }
-
-
-
-   
-
 
 
     }
