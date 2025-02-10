@@ -101,7 +101,7 @@ namespace UserManagement.API.Controllers
         });
    
 }
-       [HttpGet("currency/by-name/{name}")]
+       [HttpGet("by-name/{name}")]
         public async Task<IActionResult> GetCurrency([FromRoute] string name)
         {       
       // Check if searchPattern is provided

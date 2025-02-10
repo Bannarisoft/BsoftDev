@@ -232,7 +232,7 @@ public async Task<IActionResult> DeleteEntityAsync(int id)
    
 }
 
-[HttpGet("entity/by-name/{name}")]
+[HttpGet("by-name/{name}")]
 public async Task<IActionResult> GetEntity([FromRoute] string name)
 {
       // Check if searchPattern is provided

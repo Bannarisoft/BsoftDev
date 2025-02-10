@@ -184,7 +184,7 @@ namespace UserManagement.API.Controllers
         });
     }
 
-       [HttpGet("unit/by-name/{name}")]
+       [HttpGet("by-name/{name}")]
         public async Task<IActionResult> GetUnit([FromRoute] string name)
         {
             // Check if searchPattern is provided

@@ -89,7 +89,7 @@ namespace UserManagement.API.Controllers
         });
    
 }
-       [HttpGet("timezones/by-name/{name}")]
+       [HttpGet("by-name/{name}")]
         public async Task<IActionResult> GetTimeZones([FromRoute] string name)
         {       
       // Check if searchPattern is provided

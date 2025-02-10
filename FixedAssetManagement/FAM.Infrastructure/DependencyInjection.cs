@@ -110,7 +110,9 @@ namespace FAM.Infrastructure
 
             // Register repositories
             services.AddScoped<IAuditLogRepository, AuditLogRepository>(); 
-             services.AddScoped<IAssetGroupCommandRepository, AssetGroupCommandRepository>();   
+            services.AddScoped<IAssetGroupCommandRepository, AssetGroupCommandRepository>();
+            services.AddScoped<IAssetGroupQueryRepository, AssetGroupQueryRepository>();
+
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
