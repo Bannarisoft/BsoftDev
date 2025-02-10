@@ -26,7 +26,7 @@ namespace UserManagement.Infrastructure.Repositories.Entities
              SELECT * 
              FROM AppData.Entity 
              WHERE Id = @Id and IsDeleted = 0
-             ORDER BY CreatedAt DESC";
+             ORDER BY Id DESC";
              var entityList = await _dbConnection.QueryAsync<Entity>(query, new { id });
              return entityList?.ToList() ?? new List<Entity>();
         }
@@ -60,7 +60,7 @@ namespace UserManagement.Infrastructure.Repositories.Entities
                 SELECT *
                 FROM AppData.Entity
                 WHERE EntityName LIKE @SearchPattern OR EntityCode LIKE @SearchPattern and IsDeleted = 0
-                ORDER BY CreatedAt DESC";
+                ORDER BY Id DESC";
                 
             // Update the object to use SearchPattern instead of Name
             var Entitylist = await _dbConnection.QueryAsync<Entity>(query, new { SearchPattern = $"%{searchPattern}%" });
@@ -72,7 +72,7 @@ namespace UserManagement.Infrastructure.Repositories.Entities
              const string query = @"
               SELECT *
               FROM AppData.Entity WHERE IsDeleted = 0 
-              ORDER BY CreatedAt DESC";
+              ORDER BY Id DESC";
             return (await _dbConnection.QueryAsync<Entity>(query)).ToList() ?? new List<Entity>();
         }
 

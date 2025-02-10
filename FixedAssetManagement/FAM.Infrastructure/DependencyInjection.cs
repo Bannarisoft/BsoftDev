@@ -2,8 +2,11 @@ using System.Data;
 using System.Reflection;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IAssetGroup;
+using Core.Application.Common.Mappings;
 using FAM.Infrastructure.Data;
 using FAM.Infrastructure.Repositories;
+using FAM.Infrastructure.Repositories.AssetGroup;
 using FAM.Infrastructure.Services;
 using Hangfire;
 using Hangfire.SqlServer;
@@ -106,7 +109,8 @@ namespace FAM.Infrastructure
             services.AddHttpContextAccessor();
 
             // Register repositories
-            services.AddScoped<IAuditLogRepository, AuditLogRepository>();    
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>(); 
+             services.AddScoped<IAssetGroupCommandRepository, AssetGroupCommandRepository>();   
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -114,10 +118,10 @@ namespace FAM.Infrastructure
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
 
             // AutoMapper profiles
-            // services.AddAutoMapper(
+            services.AddAutoMapper(
                 
-				// typeof(CompanySettingsProfile)
-            // );
+				typeof(AssetGroupProfile)
+            );
 
             return services;
         }

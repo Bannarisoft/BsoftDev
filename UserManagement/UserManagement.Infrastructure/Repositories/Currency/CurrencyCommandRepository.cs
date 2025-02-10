@@ -29,7 +29,7 @@ namespace UserManagement.Infrastructure.Repositories.Currency
 
         // Return the ID of the created currency
         return currency.Id;
-    }
+        }
     public async Task<int> UpdateAsync(int id, Core.Domain.Entities.Currency currency)
 {
     var existingCurrency = await _applicationDbContext.Currency.FirstOrDefaultAsync(u => u.Id == id);
@@ -62,7 +62,7 @@ namespace UserManagement.Infrastructure.Repositories.Currency
     {
             var existingcurrencydelete = await _applicationDbContext.Currency.FirstOrDefaultAsync(u => u.Id == Id);
              // If the currency does not exist, throw a CustomException
-        if (existingcurrencydelete == null)
+        if (existingcurrencydelete is null)
         {
             return -1; //indicate failure
         }

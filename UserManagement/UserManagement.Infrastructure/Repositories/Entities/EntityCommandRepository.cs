@@ -68,7 +68,7 @@ public async Task<int> DeleteEntityAsync(int id, Entity entity)
         var entityToDelete = await _applicationDbContext.Entity.FirstOrDefaultAsync(e => e.Id == id);
 
         // If the entity does not exist, throw a CustomException
-        if (entityToDelete == null)
+        if (entityToDelete is null)
         {
             return -1; //indicate failure
         }
