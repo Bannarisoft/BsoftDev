@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Application.Common.Utilities;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.Users.Commands.ResetUserPassword
 {
-    public class ResetUserPasswordCommandHandler : IRequestHandler<ResetUserPasswordCommand, string>
+    public class ResetUserPasswordCommandHandler : IRequestHandler<ResetUserPasswordCommand, ApiResponseDTO<string>>
     {
         private readonly IMapper _mapper;
         private readonly IChangePassword _changePassword;
@@ -28,20 +29,20 @@ namespace Core.Application.Users.Commands.ResetUserPassword
             _timeZoneService = timeZoneService;
         }
 
-        public async Task<string> Handle(ResetUserPasswordCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<string>> Handle(ResetUserPasswordCommand request, CancellationToken cancellationToken)
         {
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
             var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId); 
             // Check if the verification code exists in ForgotPasswordCache
             if (!ForgotPasswordCache.CodeStorage.TryGetValue(request.UserName, out var verificationCodeDetails))
             {
-                return "Verification code is invalid or has expired.";
+                return new ApiResponseDTO<string> { IsSuccess = false, Message = "Verification code is invalid or has expired."};
             }
 
             // Validate the provided code
             if (verificationCodeDetails.Code != request.VerificationCode)
             {
-                return "Invalid verification code.";
+                return new ApiResponseDTO<string> { IsSuccess = false, Message = "Invalid verification code."};
             }
 
             // Check if the verification code has expired
@@ -49,20 +50,20 @@ namespace Core.Application.Users.Commands.ResetUserPassword
             {
                 // Remove expired code from the cache
                 ForgotPasswordCache.CodeStorage.Remove(request.UserName);
-                return "Verification code has expired.";
+                return new ApiResponseDTO<string> { IsSuccess = false, Message = "Verification code has expired."};
             }
 
             // Fetch the user from the database
             var user = await _userQueryRepository.GetByUsernameAsync(request.UserName);
             if (user == null)
             {
-                return "User not found.";
+                return new ApiResponseDTO<string> { IsSuccess = false, Message = "User not found."};
             }
 
             // Ensure the new password does not match the old password
             if (BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
-                return "Your new password cannot be the same as the old password. Please choose a different password.";
+                return new ApiResponseDTO<string> { IsSuccess = false, Message = "Your new password cannot be the same as the old password. Please choose a different password."};
             }
            
             // Update the user's password
@@ -80,10 +81,10 @@ namespace Core.Application.Users.Commands.ResetUserPassword
                 // Remove the verification code after successful password reset
                 ForgotPasswordCache.CodeStorage.Remove(request.UserName);
 
-                return "Password reset successfully.";
+                return new ApiResponseDTO<string> { IsSuccess = true, Message = "Password reset successfully."};
             }
 
-            return "Failed to reset the password. Please try again.";
+            return new ApiResponseDTO<string> { IsSuccess = false, Message = "Failed to reset the password. Please try again."};
         }
     }
 }

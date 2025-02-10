@@ -14,6 +14,7 @@ using System.IO;
 using Core.Application.Divisions.Queries.GetDivisionAutoComplete;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.Json;
 
 namespace UserManagement.API.Controllers
 {
@@ -135,11 +136,14 @@ namespace UserManagement.API.Controllers
             return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedDivision.Message, errors = "" });
             
         }
+
          [HttpGet("by-name")]
         public async Task<IActionResult> GetDivision([FromQuery] string? name)
         {
-           var companyid = User.FindFirst("companyId")?.Value;
-            var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = name,CompanyId = int.Parse(companyid)});
+           
+           var companiesClaim = User.FindFirst("companyId")?.Value; 
+           
+            var divisions = await Mediator.Send(new GetDivisionAutoCompleteQuery {SearchPattern = name,Companies = companiesClaim});
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = divisions.Data });
         }
       

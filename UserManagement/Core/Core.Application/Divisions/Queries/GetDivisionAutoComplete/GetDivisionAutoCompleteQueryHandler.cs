@@ -12,6 +12,8 @@ using System.Data;
 using Core.Application.Common.Interfaces.IDivision;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
+using System.Text.Json;
+using Core.Application.Users.Queries.GetUsers;
 
 
 
@@ -30,8 +32,9 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
          }  
           public async Task<ApiResponseDTO<List<DivisionAutoCompleteDTO>>> Handle(GetDivisionAutoCompleteQuery request, CancellationToken cancellationToken)
           {
-                
-            var result = await _divisionRepository.GetDivision(request.SearchPattern,request.CompanyId);
+                var companies = JsonSerializer.Deserialize<List<UserCompanyDTO>>(request.Companies) ?? new List<UserCompanyDTO>();
+             var companylist =   _mapper.Map<List<UserCompany>>(companies);
+            var result = await _divisionRepository.GetDivision(request.SearchPattern,companylist);
             var division = _mapper.Map<List<DivisionAutoCompleteDTO>>(result);
              //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
