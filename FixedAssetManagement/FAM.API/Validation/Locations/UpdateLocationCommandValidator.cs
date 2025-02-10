@@ -3,7 +3,7 @@ using Core.Domain.Entities;
 using FluentValidation;
 using Core.Application.Location.Command.UpdateLocation;
 
-namespace UserManagement.API.Validation.Divisions
+namespace FAM.API.Validation.Locations
 {
     public class UpdateLocationCommandValidator : AbstractValidator<UpdateLocationCommand>
     {

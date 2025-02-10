@@ -22,7 +22,9 @@ namespace FAM.Infrastructure.Data
         
         public DbSet<AssetGroup> AssetGroup { get; set; } 
         public DbSet<AssetCategories> AssetCategories { get; set; }
-        public DbSet<Location> Locations { get; set; } 
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<SubLocation> SubLocations { get; set; } 
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,6 +32,8 @@ namespace FAM.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
             modelBuilder.ApplyConfiguration(new AssetCategoriesConfiguration());
             modelBuilder.ApplyConfiguration(new LocationConfiguration());
+            modelBuilder.ApplyConfiguration(new SubLocationConfiguration());
+
                
             base.OnModelCreating(modelBuilder);
         }

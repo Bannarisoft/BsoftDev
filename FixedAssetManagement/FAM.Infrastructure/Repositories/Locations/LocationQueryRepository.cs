@@ -20,7 +20,7 @@ namespace FAM.Infrastructure.Repositories.Locations
              SELECT @TotalCount = COUNT(*) 
                FROM FixedAsset.Location 
               WHERE IsDeleted = 0
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShortName LIKE @Search OR Name LIKE @Search)")}};
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR LocationName LIKE @Search)")}};
 
                 SELECT 
                 Id, 
@@ -34,7 +34,7 @@ namespace FAM.Infrastructure.Repositories.Locations
             FROM FixedAsset.Location 
             WHERE 
             IsDeleted = 0
-                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShortName LIKE @Search OR Name LIKE @Search )")}}
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR LocationName LIKE @Search )")}}
                 ORDER BY Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
@@ -78,22 +78,14 @@ namespace FAM.Infrastructure.Repositories.Locations
 
             return await _dbConnection.QueryFirstOrDefaultAsync<Location>(query, parameters);
         }
-
-        public async Task<List<Location>> GetLocation(string searchPattern, int UnitId)
+        public async Task<List<Location>> GetLocation(string searchPattern=null)
         {
             const string query = @"
                 SELECT Id, LocationName 
                 FROM FixedAsset.Location 
-                WHERE IsDeleted = 0 AND LocationName LIKE @SearchPattern AND UnitId = @UnitId";
+                WHERE IsDeleted = 0 AND LocationName LIKE @SearchPattern";
                 
-            
-            var parameters = new 
-              { 
-                  SearchPattern = $"%{searchPattern ?? string.Empty}%", 
-                  UnitId = UnitId 
-              };
-
-            var locations = await _dbConnection.QueryAsync<Location>(query, parameters);
+            var locations = await _dbConnection.QueryAsync<Location>(query, new { SearchPattern = $"%{searchPattern}%" });
             return locations.ToList();
         }
     }

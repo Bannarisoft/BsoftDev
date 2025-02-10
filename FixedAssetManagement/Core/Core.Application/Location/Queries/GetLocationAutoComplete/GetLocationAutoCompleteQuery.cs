@@ -11,6 +11,5 @@ namespace Core.Application.Location.Queries.GetLocationAutoComplete
     public class GetLocationAutoCompleteQuery : IRequest<ApiResponseDTO<List<LocationAutoCompleteDto>>>
     {
         public string SearchPattern { get; set; }
-        public int UnitId { get; set; }
     }
 }
