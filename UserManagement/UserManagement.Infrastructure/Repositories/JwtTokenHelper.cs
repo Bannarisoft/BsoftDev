@@ -81,18 +81,18 @@ namespace UserManagement.Infrastructure.Repositories
             // Decode Base64 EncryptionKey
             var encryptionKeyBytes = Convert.FromBase64String(_jwtSettings.EncryptionKey);
             var encryptionKey = new SymmetricSecurityKey(encryptionKeyBytes);
-            var encryptingCredentials = new EncryptingCredentials(
-                encryptionKey,
-                SecurityAlgorithms.Aes256KW,
-                SecurityAlgorithms.Aes256CbcHmacSha512
-            );
+            // var encryptingCredentials = new EncryptingCredentials(
+            //     encryptionKey,
+            //     SecurityAlgorithms.Aes256KW,
+            //     SecurityAlgorithms.Aes256CbcHmacSha512
+            // );
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
             Subject = new ClaimsIdentity(claims),
             Expires = currentTime.AddMinutes(_jwtSettings.ExpiryMinutes),
             SigningCredentials = signingCredentials,
-            EncryptingCredentials = encryptingCredentials,
+            // EncryptingCredentials = encryptingCredentials,
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience
             };
