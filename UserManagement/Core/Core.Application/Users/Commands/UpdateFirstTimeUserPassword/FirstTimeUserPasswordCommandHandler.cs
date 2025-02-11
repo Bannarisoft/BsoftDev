@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Domain.Entities;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.Users.Commands.UpdateFirstTimeUserPassword
 {
-    public class FirstTimeUserPasswordCommandHandler : IRequestHandler<FirstTimeUserPasswordCommand, string>
+    public class FirstTimeUserPasswordCommandHandler : IRequestHandler<FirstTimeUserPasswordCommand, ApiResponseDTO<string>>
     {
         private readonly IMapper _imapper;
         private readonly IChangePassword _ichangePassword;
@@ -22,7 +23,7 @@ namespace Core.Application.Users.Commands.UpdateFirstTimeUserPassword
             _userQueryRepository = userRepository;
             
         }
-        public async Task<string> Handle(FirstTimeUserPasswordCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<string>> Handle(FirstTimeUserPasswordCommand request, CancellationToken cancellationToken)
         {
             //  try
             //   {
@@ -40,13 +41,13 @@ namespace Core.Application.Users.Commands.UpdateFirstTimeUserPassword
 
                       if (changedPasswordLog != null)
                       {
-                          return changedPasswordLog;
+                          return new ApiResponseDTO<string> { IsSuccess = true, Message = "Password changed successfully.", Data = changedPasswordLog};
                       }
 
-                     return "Password change failed."; 
+                     return new ApiResponseDTO<string> { IsSuccess = false, Message = "Password change failed."}; 
                  }
                  
-                 return "Your input password should not match the default password. Please try a different password.";    
+                 return new ApiResponseDTO<string> { IsSuccess = false, Message = "Your input password should not match the default password. Please try a different password."};    
             //    }
             // catch (Exception ex)
             // {

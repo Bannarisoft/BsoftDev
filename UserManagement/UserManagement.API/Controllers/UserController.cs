@@ -275,6 +275,10 @@ namespace UserManagement.API.Controllers
 
 
             var response = await Mediator.Send(firstTimeUserPasswordCommand);
+            if (!response.IsSuccess)
+            {
+                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message });
+            }
             _logger.LogInformation($"First Time User {firstTimeUserPasswordCommand.UserName} and Password changed successfully.");
             return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });     
         }
@@ -299,9 +303,22 @@ namespace UserManagement.API.Controllers
 
 
             var response = await Mediator.Send(changeUserPasswordCommand);
-            _logger.LogInformation($"User {changeUserPasswordCommand.UserName} and password changed successfully.");
+            if (response.IsSuccess)
+            {
+                 _logger.LogInformation($"User {changeUserPasswordCommand.UserName} and password changed successfully.");
 
-            return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });
+                return Ok(new 
+                { 
+                    StatusCode = StatusCodes.Status200OK, 
+                    message = response 
+                });
+           }
+           return BadRequest(new 
+           { 
+            StatusCode = StatusCodes.Status400BadRequest, 
+            message = response.Message 
+            });
+           
         }
 
 
@@ -341,6 +358,14 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand resetUserPasswordCommand)
         {
             var response = await Mediator.Send(resetUserPasswordCommand);
+            if (!response.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = response.Message
+                });
+            }
             _logger.LogInformation($"Password changed successfully for user {resetUserPasswordCommand.UserName}.");
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });     

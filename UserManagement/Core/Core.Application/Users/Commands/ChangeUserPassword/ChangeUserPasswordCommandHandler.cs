@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Application.Users.Commands.CreateFirstTimeUserPassword;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.Users.Commands.ChangeUserPassword
 {
-    public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswordCommand,string>
+    public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswordCommand,ApiResponseDTO<string>>
     {
         private readonly IMapper _imapper;
         private readonly IUserQueryRepository _userQueryRepository;
@@ -23,7 +24,7 @@ namespace Core.Application.Users.Commands.ChangeUserPassword
             _ichangePassword = ichangePassword;
         }
 
-        public async Task<string> Handle(ChangeUserPasswordCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<string>> Handle(ChangeUserPasswordCommand request, CancellationToken cancellationToken)
         {
             var user = await _userQueryRepository.GetByIdAsync(request.UserId);
             var passwordLog = _imapper.Map<PasswordLog>(request);
@@ -31,17 +32,17 @@ namespace Core.Application.Users.Commands.ChangeUserPassword
             {
                 if (request.NewPassword == request.OldPassword)
                 {
-                    return "New password cannot be the same as the old password.";
+                    return new ApiResponseDTO<string> { IsSuccess = false, Message = "New password cannot be the same as the old password." };
                 }
                 passwordLog.PasswordHash = await _ichangePassword.PasswordEncode(request.NewPassword);
                 var changedPassword = await _ichangePassword.ChangePassword(request.UserId,request.NewPassword,passwordLog);
 
                 
-                return changedPassword;
+                return new ApiResponseDTO<string> { IsSuccess = true, Message = "Password changed successfully.", Data = changedPassword };
             }
             
 
-            return "Old password is incorrect.";
+            return new ApiResponseDTO<string> { IsSuccess = false, Message = "Old password is incorrect." };
         }
     }
 }
