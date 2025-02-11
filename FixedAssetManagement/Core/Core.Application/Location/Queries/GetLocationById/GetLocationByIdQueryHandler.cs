@@ -29,7 +29,7 @@ namespace Core.Application.Location.Queries.GetLocationById
                 return new ApiResponseDTO<LocationDto>
                 {
                     IsSuccess = false,
-                    Message = "SubLocationId not found"
+                    Message = "LocationId not found"
                 };
             }  
            var location = _mapper.Map<LocationDto>(result);

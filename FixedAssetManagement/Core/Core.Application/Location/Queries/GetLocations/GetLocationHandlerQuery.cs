@@ -24,7 +24,7 @@ namespace Core.Application.Location.Queries.GetLocations
 
              //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetLocationss",
+                    actionDetail: "GetLocations",
                     actionCode: "",        
                     actionName: "",
                     details: $"Location details was fetched.",
