@@ -30,22 +30,24 @@ namespace UserManagement.API.Controllers
              
         }
         [HttpGet]                
-        public async Task<IActionResult> GetAllCitiesAsync()
-        {  
-            var cities = await Mediator.Send(new GetCityQuery());    
-             if (cities is null )
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode=StatusCodes.Status404NotFound,
-                    message = "City details not found", 
-                });
-            }        
+        public async Task<IActionResult> GetAllCitiesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        {            
+            var cities = await Mediator.Send(
+            new GetCityQuery
+           {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
+
             return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
                 message = cities.Message,
-                data = cities.Data 
+                data = cities.Data.ToList(),
+                TotalCount = cities.TotalCount,
+                PageNumber = cities.PageNumber,
+                PageSize = cities.PageSize
             });
         }
 
@@ -177,17 +179,9 @@ namespace UserManagement.API.Controllers
             });
         }
              
-        [HttpGet("by-name{name}")]  
-        public async Task<IActionResult> GetCity(string name)
-        {    
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                 return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Search pattern is required"
-                });                
-            }       
+        [HttpGet("by-name")]  
+        public async Task<IActionResult> GetCity([FromQuery] string? name)
+        {          
             var result = await Mediator.Send(new GetCityAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
             if (!result.IsSuccess)
             {

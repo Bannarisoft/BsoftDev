@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.Country.Queries.GetCountryAutoComplete
 {
-    public class GetCountryAutoCompleteQuery : IRequest<ApiResponseDTO<List<CountryDto>>>
+    public class GetCountryAutoCompleteQuery : IRequest<ApiResponseDTO<List<CountryAutoCompleteDTO>>>
     {
         public string? SearchPattern { get; set; }
     }

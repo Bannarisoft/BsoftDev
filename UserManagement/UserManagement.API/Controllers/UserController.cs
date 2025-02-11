@@ -307,6 +307,7 @@ namespace UserManagement.API.Controllers
 
 
         [HttpPost("password/reset-request")]
+        [AllowAnonymous]
         public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand forgotUserPasswordCommand)
         {       
 
@@ -332,16 +333,13 @@ namespace UserManagement.API.Controllers
                 StatusCode = StatusCodes.Status400BadRequest,
                 message = response.Message // Access the message for error
             });
-}
-
-
+        }
 
 
        [HttpPut("password/reset")]
+       [AllowAnonymous]
         public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand resetUserPasswordCommand)
         {
-            
-
             var response = await Mediator.Send(resetUserPasswordCommand);
             _logger.LogInformation($"Password changed successfully for user {resetUserPasswordCommand.UserName}.");
 

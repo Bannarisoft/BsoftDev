@@ -28,14 +28,25 @@ namespace UserManagement.API.Controllers
              
         }
         [HttpGet]        
-        public async Task<IActionResult> GetAllCountriesAsync()
-        {           
-            var countries = await Mediator.Send(new GetCountryQuery());          
+        public async Task<IActionResult> GetAllCountriesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        {   
+            var countries = await Mediator.Send(
+            new GetCountryQuery
+           {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
+
+                  
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 message = countries.Message,
-                data = countries.Data
+                data = countries.Data.ToList(),
+                TotalCount = countries.TotalCount,
+                PageNumber = countries.PageNumber,
+                PageSize = countries.PageSize
             });
         }
         [HttpGet("{id}")]     
@@ -161,8 +172,8 @@ namespace UserManagement.API.Controllers
             });
         }
 
-        [HttpGet("by-name{name}")]     
-        public async Task<IActionResult> GetCountry(string name)
+        [HttpGet("by-name")]     
+        public async Task<IActionResult> GetCountry([FromQuery] string? name)
         {
             var result = await Mediator.Send(new GetCountryAutoCompleteQuery { SearchPattern = name });
             if (!result.IsSuccess)
@@ -170,7 +181,8 @@ namespace UserManagement.API.Controllers
                 return NotFound(new 
                 { 
                     StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
+                    message = result.Message,
+                    data = result.Data
                  }); 
             }
             return Ok(new
