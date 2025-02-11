@@ -30,17 +30,17 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-                builder.Property(ag => ag.Code)
+                builder.Property(b => b.Code)
                 .HasColumnName("Code")
                 .HasColumnType("varchar(10)")
                 .IsRequired();                
       
-                builder.Property(ag => ag.SubLocationName)
-                .HasColumnName("LocationName")
+                builder.Property(b => b.SubLocationName)
+                .HasColumnName("SubLocationName")
                 .HasColumnType("varchar(50)")
                 .IsRequired();
 
-                 builder.Property(ag => ag.Description)
+                 builder.Property(b => b.Description)
                 .HasColumnName("Description")
                 .HasColumnType("varchar(250)")
                 .IsRequired();
@@ -51,7 +51,12 @@ namespace FAM.Infrastructure.Data.Configurations
 
                 builder.Property(d => d.DepartmentId)
                 .IsRequired()
-                .HasColumnType("int"); 
+                .HasColumnType("int");
+
+                builder.Property(u => u.LocationId)
+                .HasColumnName("LocationId")
+                .HasColumnType("int")
+                .IsRequired(); 
 
                 builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")
@@ -79,6 +84,12 @@ namespace FAM.Infrastructure.Data.Configurations
 
                 builder.Property(b => b.ModifiedIP)
                 .HasColumnType("varchar(255)");
+
+                // Configure the foreign key relationship
+                builder.HasOne(ag => ag.Location)   // Each SubLocation belongs to one Location
+                .WithMany(l => l.SubLocations)  // One Location can have many SubLocations
+                .HasForeignKey(ua => ua.LocationId)
+                .OnDelete(DeleteBehavior.Cascade);  
 
 
         }

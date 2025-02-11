@@ -26,6 +26,14 @@ namespace Core.Application.Location.Queries.GetLocationAutoComplete
         public async Task<ApiResponseDTO<List<LocationAutoCompleteDto>>> Handle(GetLocationAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _locationQueryRepository.GetLocation(request.SearchPattern);
+            if (result is null || result.Count is 0)
+            {
+                return new ApiResponseDTO<List<LocationAutoCompleteDto>>
+                {
+                    IsSuccess = false,
+                    Message = "No Location found matching the search pattern."
+                };
+            }
               var locations = _mapper.Map<List<LocationAutoCompleteDto>>(result);
               //Domain Event
                  var domainEvent = new AuditLogsDomainEvent(

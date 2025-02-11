@@ -4,12 +4,14 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
 using Core.Application.Common.Interfaces.IAssetGroup;
 using Core.Application.Common.Interfaces.ILocation;
+using Core.Application.Common.Interfaces.ISubLocation;
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities;
 using FAM.Infrastructure.Data;
 using FAM.Infrastructure.Repositories;
 using FAM.Infrastructure.Repositories.AssetGroup;
 using FAM.Infrastructure.Repositories.Locations;
+using FAM.Infrastructure.Repositories.SubLocation;
 using FAM.Infrastructure.Services;
 using Hangfire;
 using Hangfire.SqlServer;
@@ -115,9 +117,9 @@ namespace FAM.Infrastructure
             services.AddScoped<IAuditLogRepository, AuditLogRepository>(); 
             services.AddScoped<IAssetGroupCommandRepository, AssetGroupCommandRepository>();
             services.AddScoped<ILocationCommandRepository, LocationCommandRepository>();
-            services.AddScoped<ILocationQueryRepository, LocationQueryRepository>();   
-
-
+            services.AddScoped<ILocationQueryRepository, LocationQueryRepository>();
+            services.AddScoped<ISubLocationCommandRepository, SubLocationCommandRepository>();
+            services.AddScoped<ISubLocationQueryRepository, SubLocationQueryRepository>();   
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -127,7 +129,8 @@ namespace FAM.Infrastructure
             // AutoMapper profiles
             services.AddAutoMapper(
 				typeof(AssetGroupProfile),
-				typeof(LocationProfile)
+				typeof(LocationProfile),
+                typeof(SubLocationProfile)
 
             );
 

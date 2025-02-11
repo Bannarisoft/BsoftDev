@@ -10,7 +10,7 @@ namespace FAM.API.Validation.Locations
         private readonly List<ValidationRule> _validationRules;
         public UpdateLocationCommandValidator(MaxLengthProvider maxLengthProvider)
         {
-             var LocationNameMaxLength = maxLengthProvider.GetMaxLength<Location>("LocationName") ?? 50;
+            var LocationNameMaxLength = maxLengthProvider.GetMaxLength<Location>("LocationName") ?? 50;
             var DescriptionMaxLength = maxLengthProvider.GetMaxLength<Location>("Description") ?? 100;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();

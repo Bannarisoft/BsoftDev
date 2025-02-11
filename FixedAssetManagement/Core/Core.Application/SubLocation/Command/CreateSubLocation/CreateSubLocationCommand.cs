@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Domain.Common;
+using Core.Application.Common.HttpResponse;
+using Core.Application.SubLocation.Queries.GetSubLocations;
+using MediatR;
 
-namespace Core.Domain.Entities
+namespace Core.Application.SubLocation.Command.CreateSubLocation
 {
-    public class SubLocation : BaseEntity
+    public class CreateSubLocationCommand : IRequest<ApiResponseDTO<SubLocationDto>>
     {
         public string? Code { get; set; }
         public string? SubLocationName { get; set; }
@@ -14,8 +16,6 @@ namespace Core.Domain.Entities
         public int UnitId { get; set; }
         public int DepartmentId { get; set; }
         public int LocationId { get; set; }
-
-        public Location? Location { get; set; }
 
     }
 }

@@ -24,6 +24,14 @@ namespace Core.Application.Location.Queries.GetLocationById
         public async Task<ApiResponseDTO<LocationDto>> Handle(GetLocationByIdQuery request, CancellationToken cancellationToken)
         {
            var result = await _locationQueryRepository.GetByIdAsync(request.Id);
+            if (result is null)
+            {
+                return new ApiResponseDTO<LocationDto>
+                {
+                    IsSuccess = false,
+                    Message = "SubLocationId not found"
+                };
+            }  
            var location = _mapper.Map<LocationDto>(result);
 
           //Domain Event

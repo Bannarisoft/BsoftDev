@@ -26,11 +26,11 @@ namespace Core.Application.Location.Command.CreateLocation
         }
         public async Task<ApiResponseDTO<LocationDto>> Handle(CreateLocationCommand request, CancellationToken cancellationToken)
         {
-            var existingDivision = await _locationQueryRepository.GetByLocationNameAsync(request.LocationName);
+            var existingLocation = await _locationQueryRepository.GetByLocationNameAsync(request.LocationName);
 
-               if (existingDivision != null)
+               if (existingLocation != null)
                {
-                   return new ApiResponseDTO<LocationDto>{IsSuccess = false, Message = "Division already exists"};
+                   return new ApiResponseDTO<LocationDto>{IsSuccess = false, Message = "Location already exists"};
                }
            
                  var location  = _mapper.Map<Core.Domain.Entities.Location>(request);
