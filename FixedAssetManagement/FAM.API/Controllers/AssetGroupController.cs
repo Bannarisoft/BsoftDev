@@ -21,7 +21,7 @@ namespace FAM.API.Controllers
      [ApiController]
     public class AssetGroupController : ApiControllerBase
     {
-         private readonly IValidator<CreateAssetGroupCommand> _createassetgroupcommandvalidator;
+        private readonly IValidator<CreateAssetGroupCommand> _createassetgroupcommandvalidator;
         private readonly IValidator<UpdateAssetGroupCommand> _updateassetgroupcommandvalidator;
         private readonly ILogger<AssetGroupController> _logger;
         

@@ -46,6 +46,11 @@
         "Error": " must contain only numeric values."
     },
     {
+        "Rule": "NonNegativeInteger",
+        "pattern": "^[0-9]+$",
+        "Error": "must be a non-negative integer."
+    },
+    {
         "rule": "ByteValue",
         "error": " must be either 0 or 1."
     },

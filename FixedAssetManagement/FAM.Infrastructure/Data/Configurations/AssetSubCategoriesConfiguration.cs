@@ -10,11 +10,11 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace FAM.Infrastructure.Data.Configurations
 {
-    public class AssetGroupConfiguration : IEntityTypeConfiguration<AssetGroup>
+    public class AssetSubCategoriesConfiguration : IEntityTypeConfiguration<AssetSubCategories>
     {
-        public void Configure(EntityTypeBuilder<AssetGroup> builder)
+        public void Configure(EntityTypeBuilder<AssetSubCategories> builder)
         {
-          // ValueConverter for Status (enum to bit)
+            // ValueConverter for Status (enum to bit)
             var statusConverter = new ValueConverter<Status, bool>(
                 v => v == Status.Active,                    // Convert to DB (1 for Active)
                 v => v ? Status.Active : Status.Inactive    // Convert to Entity
@@ -26,31 +26,41 @@ namespace FAM.Infrastructure.Data.Configurations
                 v => v ? IsDelete.Deleted : IsDelete.NotDeleted // Convert to Entity
             );
 
-                builder.ToTable("AssetGroup", "FixedAsset");
-                // Primary Key
+              builder.ToTable("AssetSubCategories", "FixedAsset");
+
+              // Primary Key
                 builder.HasKey(b => b.Id);
                 builder.Property(b => b.Id)
                 .HasColumnName("Id")
                 .HasColumnType("int")
                 .IsRequired();
 
-                builder.Property(ag => ag.Code)
+                builder.Property(ac => ac.Code)
                 .HasColumnName("Code")
                 .HasColumnType("varchar(10)")
-                .IsRequired();                
-      
-                builder.Property(ag => ag.GroupName)
-                .HasColumnName("GroupName")
-                .HasColumnType("varchar(50)")
                 .IsRequired();
-                
+
+                builder.Property(ac => ac.SubCategoryName)
+                .HasColumnName("SubCategoryName")
+                .HasColumnType("varchar(50)")
+                .IsRequired();   
+
+                builder.Property(ac => ac.Description)
+                .HasColumnName("Description")
+                .HasColumnType("varchar(250)");
+              
 
                 builder.Property(ag => ag.SortOrder)
                 .HasColumnName("SortOrder")
                 .HasColumnType("int")
-                .IsRequired(); 
+                .IsRequired();  
 
-                builder.Property(b => b.IsActive)
+                 builder.Property(ac => ac.AssetCategoryId)
+                .HasColumnName("AssetCategoryId")
+                .HasColumnType("int")
+                .IsRequired();
+
+                  builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
                 .HasConversion(statusConverter)
@@ -77,7 +87,6 @@ namespace FAM.Infrastructure.Data.Configurations
 
                 builder.Property(b => b.ModifiedIP)
                 .HasColumnType("varchar(255)");
-    
         }
     }
 }

@@ -2,10 +2,13 @@ using System.Data;
 using System.Reflection;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IAssetCategories;
 using Core.Application.Common.Interfaces.IAssetGroup;
 using Core.Application.Common.Mappings;
+using Core.Domain.Entities;
 using FAM.Infrastructure.Data;
 using FAM.Infrastructure.Repositories;
+using FAM.Infrastructure.Repositories.AssetCategories;
 using FAM.Infrastructure.Repositories.AssetGroup;
 using FAM.Infrastructure.Services;
 using Hangfire;
@@ -112,6 +115,8 @@ namespace FAM.Infrastructure
             services.AddScoped<IAuditLogRepository, AuditLogRepository>(); 
             services.AddScoped<IAssetGroupCommandRepository, AssetGroupCommandRepository>();
             services.AddScoped<IAssetGroupQueryRepository, AssetGroupQueryRepository>();
+            services.AddScoped<IAssetCategoriesQueryRepository, AssetCategoriesQueryRepository>();
+            services.AddScoped<IAssetCategoriesCommandRepository, AssetCategoriesCommandRepository>();
 
 
             // Miscellaneous services
@@ -122,7 +127,9 @@ namespace FAM.Infrastructure
             // AutoMapper profiles
             services.AddAutoMapper(
                 
-				typeof(AssetGroupProfile)
+				typeof(AssetGroupProfile),
+                typeof(AssetCategoriesProfile)
+
             );
 
             return services;

@@ -2,16 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Domain.Common;
+using Core.Application.Common.HttpResponse;
+using MediatR;
+using static Core.Domain.Common.BaseEntity;
 
-namespace Core.Domain.Entities
+namespace Core.Application.AssetCategories.Command.CreateAssetCategories
 {
-    public class AssetCategories :BaseEntity
-    {
+    public class CreateAssetCategoriesCommand :IRequest<ApiResponseDTO<int>> 
+    {  
         public string? Code { get; set; }
         public string? CategoryName { get; set; }
         public string? Description { get; set; }
-        public int SortOrder { get; set; }
         public int AssetGroupId { get; set; }
 
     }

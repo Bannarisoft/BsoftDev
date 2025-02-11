@@ -14,7 +14,6 @@ namespace Core.Application.Common.Interfaces.IAssetGroup
          Task<int> UpdateAsync(int Id,Core.Domain.Entities.AssetGroup assetGroup);
          Task<(bool IsNameDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name, int sortOrder, int excludeId);   
          Task<int> DeleteAsync(int Id,Core.Domain.Entities.AssetGroup assetGroup);
-    //   Task<bool> ExistsByCodeAsync(string assetGroup); // Check if code exists
-    //   Task<bool> ExistsByNameupdateAsync(string name,int id );
+   
     }
 }

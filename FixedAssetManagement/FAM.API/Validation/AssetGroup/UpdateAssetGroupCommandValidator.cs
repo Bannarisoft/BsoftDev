@@ -28,10 +28,6 @@ namespace FAM.API.Validation.AssetGroup
                  switch (rule.Rule)
                 {
                     case "NotEmpty":
-                        // Apply NotEmpty validation
-                        RuleFor(x => x.SortOrder)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateAssetGroupCommand.SortOrder)} {rule.Error}");
                         RuleFor(x => x.GroupName)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateAssetGroupCommand.GroupName)} {rule.Error}");
@@ -49,6 +45,12 @@ namespace FAM.API.Validation.AssetGroup
                         RuleFor(x => x.GroupName)
                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
                             .WithMessage($"{nameof(UpdateAssetGroupCommand.GroupName)} {rule.Error}");
+                        break;
+
+                    case "NonNegativeInteger":
+                        RuleFor(x => x.SortOrder.ToString())
+                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                            .WithMessage($"{nameof(UpdateAssetGroupCommand.SortOrder)} {rule.Error}");
                         break;
                     default:
                         // Handle unknown rule (log or throw)

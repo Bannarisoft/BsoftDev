@@ -6,13 +6,12 @@ using Core.Domain.Common;
 
 namespace Core.Domain.Entities
 {
-    public class AssetCategories :BaseEntity
+    public class AssetSubCategories : BaseEntity
     {
         public string? Code { get; set; }
-        public string? CategoryName { get; set; }
+        public string? SubCategoryName { get; set; }
         public string? Description { get; set; }
         public int SortOrder { get; set; }
-        public int AssetGroupId { get; set; }
-
+        public int AssetCategoryId { get; set; }
     }
 }
