@@ -163,7 +163,8 @@ namespace UserManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data =$"State ID {id} Deleted" 
+                data =$"State ID {id} Deleted" ,
+                message = result.Message
             });
         }
 

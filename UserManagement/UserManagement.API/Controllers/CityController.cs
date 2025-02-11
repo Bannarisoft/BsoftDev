@@ -175,7 +175,8 @@ namespace UserManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data =$"City ID {id} Deleted" 
+                data =$"City ID {id} Deleted" ,
+                message = result.Message
             });
         }
              
