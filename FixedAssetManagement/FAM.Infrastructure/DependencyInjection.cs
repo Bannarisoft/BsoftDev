@@ -1,12 +1,13 @@
 using System.Data;
-using System.Reflection;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
 using Core.Application.Common.Interfaces.IAssetGroup;
+using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.Common.Mappings;
 using FAM.Infrastructure.Data;
 using FAM.Infrastructure.Repositories;
 using FAM.Infrastructure.Repositories.AssetGroup;
+using FAM.Infrastructure.Repositories.MiscTypeMaster;
 using FAM.Infrastructure.Services;
 using Hangfire;
 using Hangfire.SqlServer;
@@ -109,8 +110,12 @@ namespace FAM.Infrastructure
             services.AddHttpContextAccessor();
 
             // Register repositories
-            services.AddScoped<IAuditLogRepository, AuditLogRepository>(); 
-             services.AddScoped<IAssetGroupCommandRepository, AssetGroupCommandRepository>();   
+             services.AddScoped<IAuditLogRepository, AuditLogRepository>(); 
+             services.AddScoped<IAssetGroupCommandRepository, AssetGroupCommandRepository>(); 
+             services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>(); 
+             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>(); 
+             
+            
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -122,6 +127,7 @@ namespace FAM.Infrastructure
                 
 				typeof(AssetGroupProfile)
             );
+            services.AddAutoMapper(typeof(MisctypeMasterProfile));
 
             return services;
         }
