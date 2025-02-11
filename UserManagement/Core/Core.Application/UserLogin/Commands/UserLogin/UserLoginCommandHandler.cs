@@ -109,9 +109,9 @@ namespace Core.Application.UserLogin.Commands.UserLogin
         
 
             _logger.LogInformation("Roles retrieved for user {UserId}: {Roles}", user.UserId, string.Join(", ", roles));
-
+            var userlist = await _userQueryRepository.GetByIdAsync(user.UserId);
             // Generate JWT token            
- 			var token = _jwtTokenHelper.GenerateToken(user.UserName,user.UserId,user.UserType, roles,user.Mobile,user.EmailId,user.UnitId,user.CompanyId, out var jti);
+ 			var token = _jwtTokenHelper.GenerateToken(user.UserName,user.UserId,user.UserType, roles,user.Mobile,user.EmailId,user.UnitId,userlist.UserCompanies.ToList() , out var jti);
             var httpContext = _httpContextAccessor.HttpContext;
             var browserInfo = httpContext?.Request.Headers["User-Agent"].ToString();
             string broswerDetails = browserInfo != null ? _ipAddressService.GetUserBrowserDetails(browserInfo) : string.Empty;

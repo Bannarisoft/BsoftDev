@@ -1,4 +1,5 @@
 using AutoMapper;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IModule;
 using Core.Domain.Events;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Modules.Queries.GetModules
 {
-    public class GetModulesQueryHandler : IRequestHandler<GetModulesQuery, List<ModuleDto>>
+    public class GetModulesQueryHandler : IRequestHandler<GetModulesQuery, ApiResponseDTO<List<ModuleDto>>>
     {
         private readonly IModuleQueryRepository _moduleRepository;
         private readonly IMapper _mapper;
@@ -23,16 +24,16 @@ namespace Core.Application.Modules.Queries.GetModules
 
     }
 
-    public async Task<List<ModuleDto>> Handle(GetModulesQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDTO<List<ModuleDto>>> Handle(GetModulesQuery request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Fetching all modules from the repository.");
         // Fetch all modules from the repository
-            var modules = await _moduleRepository.GetAllModulesAsync();
-            if (modules == null || modules.Count == 0)
-            {
-                _logger.LogWarning("No modules found in the repository.");
-                return new List<ModuleDto>();
-            }
+            var (modules, totalCount) = await _moduleRepository.GetAllModulesAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+            // if (modules == null || modules.Count == 0)
+            // {
+            //     _logger.LogWarning("No modules found in the repository.");
+            //     return new List<ModuleDto>();
+            // }
 
             var moduleList= _mapper.Map<List<ModuleDto>>(modules);
             _logger.LogInformation("Fetched {ModuleCount} modules from the repository.", modules.Count);
@@ -46,7 +47,15 @@ namespace Core.Application.Modules.Queries.GetModules
                     module:"Module"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return moduleList;
+                 return new ApiResponseDTO<List<ModuleDto>> 
+            { 
+                IsSuccess = true, 
+                Message = "Success", 
+                Data = moduleList ,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+                };
 
     }
     }

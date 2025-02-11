@@ -52,39 +52,58 @@ namespace UserManagement.Infrastructure.Repositories.Module
         // return await _applicationDbContext.Modules.Include(m => m.Menus).FirstOrDefaultAsync(m => m.Id == id);
     }
 
-    public async Task<List<Modules>> GetAllModulesAsync()
+    public async Task<(List<Modules>,int)> GetAllModulesAsync(int PageNumber, int PageSize, string? SearchTerm)
     {
-         var sql = @"
+        var query = $$"""
+             DECLARE @TotalCount INT;
+             SELECT @TotalCount = COUNT(*) 
+               FROM [AppData].[Modules] 
+              WHERE IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search )")}};
+
                 SELECT 
-                    m.Id, m.ModuleName,mn.Id AS MenuId, mn.MenuName, mn.ModuleId 
-                FROM [AppData].[Modules] m
-                LEFT JOIN [AppData].[Menus] mn ON m.Id = mn.ModuleId
-                WHERE m.IsDeleted = 0
-                ORDER BY m.Id";
+                    Id, ModuleName
+                FROM [AppData].[Modules] 
+                WHERE IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search )")}}
+                ORDER BY Id desc
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
-            var moduleDictionary = new Dictionary<int, Modules>();
+                SELECT @TotalCount AS TotalCount;
+            """;
 
-            var result = await _dbConnection.QueryAsync<Modules, Menu, Modules>(
-                sql,
-                (module, menu) =>
-                {
-                    if (!moduleDictionary.TryGetValue(module.Id, out var currentModule))
-                    {
-                        currentModule = module;
-                        currentModule.Menus = new List<Menu>();
-                        moduleDictionary.Add(module.Id, currentModule);
-                    }
+            
+             var parameters = new
+                       {
+                           Search = $"%{SearchTerm}%",
+                           Offset = (PageNumber - 1) * PageSize,
+                           PageSize
+                       };
 
-                    if (menu != null)
-                        currentModule.Menus.Add(menu);
+               var modules = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var moduleslist = (await modules.ReadAsync<Modules>()).ToList();
+             int totalCount = (await modules.ReadFirstAsync<int>());
+            return (moduleslist, totalCount);
 
-                    return currentModule;
-                },
-                splitOn: "MenuId"
-            );
+         } 
+          public async Task<List<Modules>>  GetModule(string searchPattern)
+        {
+           
 
-            return moduleDictionary.Values.ToList();
-        // return await _applicationDbContext.Modules.Include(m => m.Menus).ToListAsync();
-    }  
+            var query = $@"
+        SELECT Id, ModuleName 
+        FROM AppData.Modules 
+        WHERE IsDeleted = 0 
+        AND ModuleName LIKE @SearchPattern";
+                
+            
+            var parameters = new 
+              { 
+                  SearchPattern = $"%{searchPattern ?? string.Empty}%"
+              };
+
+            var modules = await _dbConnection.QueryAsync<Modules>(query, parameters);
+            return modules.ToList();
+        } 
     }
 }
