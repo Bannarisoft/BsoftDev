@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using BSOFT.Application.Modules.Commands.DeleteModule;
 using Microsoft.AspNetCore.Authorization;
 using Core.Application.Modules.Queries.GetModuleById;
+using Core.Application.Modules.Queries.GetModuleAutoComplete;
 
 namespace UserManagement.API.Controllers
 {
@@ -74,11 +75,23 @@ namespace UserManagement.API.Controllers
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetModules()
+    public async Task<IActionResult> GetAllModuleAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
     {
-        var modules = await Mediator.Send(new GetModulesQuery());
-        _logger.LogInformation($"Total {modules.Count} modules listed successfully.");
-        return Ok(new { StatusCode = StatusCodes.Status200OK, data = modules });
+        var modules = await Mediator.Send(new GetModulesQuery
+            {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
+        _logger.LogInformation($"Total {modules.Data.Count} modules listed successfully.");
+          return Ok( new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                data = modules.Data,
+                TotalCount = modules.TotalCount,
+                PageNumber = modules.PageNumber,
+                PageSize = modules.PageSize
+                });
     }
 
     [HttpGet("{id}")]
@@ -95,7 +108,7 @@ namespace UserManagement.API.Controllers
         }
            _logger.LogWarning("Module Listed successfully: {Modulename}", module);
 
-        return Ok(new { StatusCode = StatusCodes.Status200OK, data = module });
+        return Ok(new { StatusCode = StatusCodes.Status200OK, data = module.Data });
     }
     [HttpPut]
     public async Task<IActionResult> UpdateModule([FromBody] UpdateModuleCommand updateModuleCommand)
@@ -155,6 +168,13 @@ namespace UserManagement.API.Controllers
                 data =$"Module ID {id} Deleted" 
             });
     }
+     [HttpGet("by-name")]
+        public async Task<IActionResult> GetModule([FromQuery] string? name)
+        {
+           
+            var modules = await Mediator.Send(new GetModuleAutoCompleteQuery {SearchPattern = name});
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = modules.Data });
+        }
 
 
     }

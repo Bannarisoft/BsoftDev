@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
 using Core.Domain.Entities;
@@ -46,7 +47,7 @@ namespace UserManagement.Infrastructure.Repositories
             } 
         }
 
-      public string GenerateToken(string username, int userId, int usertype, IEnumerable<string> roles,string mobile,string email,int unitId,int companyId, out string jti)
+      public string GenerateToken(string username, int userId, int usertype, IEnumerable<string> roles,string mobile,string email,int unitId,List<UserCompany> companyId, out string jti)
         {
             jti = Guid.NewGuid().ToString();            
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
@@ -65,7 +66,7 @@ namespace UserManagement.Infrastructure.Repositories
                 new Claim("mobile", mobile.ToString()),
                 new Claim("email", email.ToString()),
                 new Claim("unitId", unitId.ToString()),
-                new Claim("companyId", companyId.ToString()),
+                new Claim("companyId", JsonSerializer.Serialize(companyId)),
                 new Claim(JwtRegisteredClaimNames.Jti, jti),
                 new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(currentTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             };
@@ -80,18 +81,18 @@ namespace UserManagement.Infrastructure.Repositories
             // Decode Base64 EncryptionKey
             var encryptionKeyBytes = Convert.FromBase64String(_jwtSettings.EncryptionKey);
             var encryptionKey = new SymmetricSecurityKey(encryptionKeyBytes);
-            var encryptingCredentials = new EncryptingCredentials(
-                encryptionKey,
-                SecurityAlgorithms.Aes256KW,
-                SecurityAlgorithms.Aes256CbcHmacSha512
-            );
+            // var encryptingCredentials = new EncryptingCredentials(
+            //     encryptionKey,
+            //     SecurityAlgorithms.Aes256KW,
+            //     SecurityAlgorithms.Aes256CbcHmacSha512
+            // );
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
             Subject = new ClaimsIdentity(claims),
             Expires = currentTime.AddMinutes(_jwtSettings.ExpiryMinutes),
             SigningCredentials = signingCredentials,
-            EncryptingCredentials = encryptingCredentials,
+            // EncryptingCredentials = encryptingCredentials,
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience
             };
