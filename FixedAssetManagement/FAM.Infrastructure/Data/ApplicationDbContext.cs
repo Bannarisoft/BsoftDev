@@ -21,13 +21,14 @@ namespace FAM.Infrastructure.Data
         }
         
         public DbSet<AssetGroup> AssetGroup { get; set; } 
-        public DbSet<AssetCategories> AssetCategories { get; set; } 
+        public DbSet<AssetCategories> AssetCategories { get; set; }
+        public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-             modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
-             modelBuilder.ApplyConfiguration(new AssetCategoriesConfiguration());
-            
+            modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetCategoriesConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
                
             base.OnModelCreating(modelBuilder);
         }
