@@ -1,5 +1,6 @@
 using Core.Application.Email.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace UserManagement.API.Controllers
@@ -16,6 +17,7 @@ namespace UserManagement.API.Controllers
         }
 
         [HttpPost("send")]
+        [AllowAnonymous]
         public async Task<IActionResult> SendEmail([FromBody] SendEmailCommand command)
         {
             var result = await _mediator.Send(command);

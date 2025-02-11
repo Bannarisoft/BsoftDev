@@ -20,8 +20,9 @@ namespace Core.Application.City.Queries.GetCities
         }
         public async Task<ApiResponseDTO<List<CityDto>>> Handle(GetCityQuery request, CancellationToken cancellationToken)
         {          
-            var cities = await _cityRepository.GetAllCityAsync();
+            var (cities, totalCount) = await _cityRepository.GetAllCityAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var citiesList = _mapper.Map<List<CityDto>>(cities);
+
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetAll",
@@ -35,7 +36,10 @@ namespace Core.Application.City.Queries.GetCities
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = citiesList
+                Data = citiesList,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
             };            
         }
     }

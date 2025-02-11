@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.City.Queries.GetCityAutoComplete
 {
-    public class GetCityAutoCompleteQuery : IRequest<ApiResponseDTO<List<CityDto>>>
+    public class GetCityAutoCompleteQuery : IRequest<ApiResponseDTO<List<CityAutoCompleteDTO>>>
     {
         public string? SearchPattern { get; set; }
     }
