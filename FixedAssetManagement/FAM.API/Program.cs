@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Logging;
 using Serilog.Events;
 using FAM.API.Validation.Common;
 using FAM.API.Configurations;
+using FluentValidation;
+using FAM.API.Validation.DepreciationGroup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +36,8 @@ builder.Host.ConfigureSerilog();
 // Add validation services
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
+builder.Services.AddValidatorsFromAssemblyContaining<CreateDepreciationGroupCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateDepreciationGroupCommandValidator>();
 
 //Add layer dependency & Add services to the container.
 builder.Services.AddControllers();

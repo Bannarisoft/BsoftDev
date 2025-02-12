@@ -22,12 +22,13 @@ namespace FAM.Infrastructure.Data
         
         public DbSet<AssetGroup> AssetGroup { get; set; } 
         public DbSet<AssetCategories> AssetCategories { get; set; } 
+        public DbSet<DepreciationGroups> DepreciationGroups { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
              modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
              modelBuilder.ApplyConfiguration(new AssetCategoriesConfiguration());
-            
+             modelBuilder.ApplyConfiguration(new DepreciationGroupConfiguration());           
                
             base.OnModelCreating(modelBuilder);
         }

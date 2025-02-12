@@ -64,29 +64,6 @@ namespace UserManagement.Infrastructure.Repositories.City
             var result = await _dbConnection.QueryAsync<Cities>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();
         }
-        public async Task<Cities> GetByCityAsync(string name, int? id = null)
-        {
-             if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentException("CityName cannot be null or empty.", nameof(name));
-            }
-             var query = """
-                 SELECT * FROM AppData.City 
-                 WHERE CityName = @Name AND IsDeleted = 0
-                 """;
-
-             var parameters = new DynamicParameters(new { Name = name });
-
-             if (id is not null)
-             {
-                 query += " AND Id != @Id";
-                 parameters.Add("Id", id);
-             }
-
-            return await _dbConnection.QueryFirstOrDefaultAsync<Cities>(query, parameters);     
-                  
-        }
-
         public async Task<List<Cities>> GetCityByStateIdAsync(int stateId )
         {
            const string query = @"
