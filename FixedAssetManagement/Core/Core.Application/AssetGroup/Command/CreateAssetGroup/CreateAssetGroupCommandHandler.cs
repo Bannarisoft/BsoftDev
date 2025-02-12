@@ -55,12 +55,21 @@ namespace Core.Application.AssetGroup.Command.CreateAssetGroup
             await _imediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation($"AssetGroup {assetGroup.GroupName} Created successfully.");
             var assetGroupDtoDto = _imapper.Map<AssetGroupDto>(assetGroup);
-
-            return new ApiResponseDTO<int>()
+            if (result > 0)
+                  {
+                     _logger.LogInformation($"AssetGroupId {result} created successfully");
+                        return new ApiResponseDTO<int>
+                       {
+                           IsSuccess = true,
+                           Message = "AssetGroup created successfully",
+                           Data = result
+                      };
+                 }
+            return new ApiResponseDTO<int>
             {
                 IsSuccess = true,
-                Message = "AssetGroup Created Successfully",
-                Data = assetGroupDtoDto.Id
+                Message = "AssetGroup Creation Failed",
+                Data = result
             };
         }
     }

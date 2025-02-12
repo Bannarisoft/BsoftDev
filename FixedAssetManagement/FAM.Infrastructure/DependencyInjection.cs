@@ -2,16 +2,17 @@ using System.Data;
 using System.Reflection;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IAssetCategories;
 using Core.Application.Common.Interfaces.IAssetGroup;
-using Core.Application.Common.Interfaces.IDepreciationGroup;
 using Core.Application.Common.Interfaces.ILocation;
 using Core.Application.Common.Interfaces.ISubLocation;
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities;
+using Core.Domain.Entities;
 using FAM.Infrastructure.Data;
 using FAM.Infrastructure.Repositories;
+using FAM.Infrastructure.Repositories.AssetCategories;
 using FAM.Infrastructure.Repositories.AssetGroup;
-using FAM.Infrastructure.Repositories.DepreciationGroup;
 using FAM.Infrastructure.Repositories.Locations;
 using FAM.Infrastructure.Repositories.SubLocation;
 using FAM.Infrastructure.Services;
@@ -124,6 +125,11 @@ namespace FAM.Infrastructure
             services.AddScoped<ISubLocationQueryRepository, SubLocationQueryRepository>();   
  services.AddScoped<IDepreciationGroupCommandRepository, DepreciationGroupCommandRepository>();   
             services.AddScoped<IDepreciationGroupQueryRepository, DepreciationGroupQueryRepository>(); 
+            services.AddScoped<IAssetGroupQueryRepository, AssetGroupQueryRepository>();
+            services.AddScoped<IAssetCategoriesQueryRepository, AssetCategoriesQueryRepository>();
+            services.AddScoped<IAssetCategoriesCommandRepository, AssetCategoriesCommandRepository>();
+
+
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
             services.AddTransient<IFileUploadService, FileUploadRepository>();
@@ -133,8 +139,9 @@ namespace FAM.Infrastructure
             services.AddAutoMapper(
 				typeof(AssetGroupProfile),
 				typeof(LocationProfile),
-                typeof(SubLocationProfile),
-typeof(DepreciationGroupProfile)
+                typeof(DepreciationGroupProfile)
+                typeof(AssetCategoriesProfile)
+
 
             );
 

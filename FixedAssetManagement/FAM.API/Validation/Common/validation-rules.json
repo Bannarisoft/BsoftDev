@@ -31,9 +31,24 @@
         "Error": " must contain only alphabetic characters."
     },
     {
+        "Rule": "AlphanumericOnly", 
+        "pattern": "^[A-Za-z0-9]+$",        
+        "Error": "must contain only alphanumeric characters."
+    },
+    {
+        "Rule": "AlphaNumericWithPunctuation", 
+        "pattern": "^[A-Za-z0-9 .,!?;:'\"()\\-]+$",        
+        "Error": "must contain only letters, numbers, spaces, and standard punctuation."
+    },
+    {
         "Rule": "NumericOnly", 
         "pattern": "^[0-9]{10}$",
         "Error": " must contain only numeric values."
+    },
+    {
+        "Rule": "NonNegativeInteger",
+        "pattern": "^[0-9]+$",
+        "Error": "must be a non-negative integer."
     },
     {
         "rule": "ByteValue",

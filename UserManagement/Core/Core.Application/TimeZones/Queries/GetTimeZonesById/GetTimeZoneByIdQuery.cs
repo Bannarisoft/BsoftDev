@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.TimeZones.Queries.GetTimeZonesById
 {
-    public class GetTimeZoneByIdQuery :IRequest<ApiResponseDTO<List<TimeZonesDto>>>
+    public class GetTimeZoneByIdQuery :IRequest<ApiResponseDTO<TimeZonesDto>>
     { 
         public int TimeZoneId { get; set; }
     }

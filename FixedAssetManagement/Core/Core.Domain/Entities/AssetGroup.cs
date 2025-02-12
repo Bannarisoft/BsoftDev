@@ -11,9 +11,7 @@ namespace Core.Domain.Entities
         public string? Code { get; set; }
         public string? GroupName { get; set; }
         public int SortOrder { get; set; }
-        public  AssetCategories? AssetCategories { get; set; }           
         public ICollection<DepreciationGroups>? DepreciationGroups { get; set; }
-
     
     }
 }

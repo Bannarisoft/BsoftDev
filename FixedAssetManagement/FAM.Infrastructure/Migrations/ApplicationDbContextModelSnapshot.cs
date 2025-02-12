@@ -89,9 +89,6 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssetGroupId")
-                        .IsUnique();
-
                     b.ToTable("AssetCategories", "FixedAsset");
                 });
 

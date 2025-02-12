@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Core.Application.Entity.Queries.GetEntityById
 {
-    public class GetEntityByIdQuery :IRequest<ApiResponseDTO<List<GetEntityDTO>>>
+    public class GetEntityByIdQuery :IRequest<ApiResponseDTO<GetEntityDTO>>
     {
         public int EntityId { get; set; }
     }

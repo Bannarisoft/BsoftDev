@@ -13,7 +13,6 @@ namespace Core.Domain.Entities
         public string? Description { get; set; }
         public int SortOrder { get; set; }
         public int AssetGroupId { get; set; }
-        public AssetGroup? AssetGroup { get; set; }
 
     }
 }

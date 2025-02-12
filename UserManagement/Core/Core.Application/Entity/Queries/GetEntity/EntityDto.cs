@@ -1,5 +1,6 @@
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Mappings;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Entity.Queries.GetEntity
 {
@@ -12,5 +13,7 @@ namespace Core.Application.Entity.Queries.GetEntity
     public string? Address { get; set; }
     public string? Phone  { get; set; }
     public string? Email { get; set; }
+    public Status IsActive { get; set; }
+
     }
 }

@@ -29,8 +29,8 @@ namespace Core.Application.Units.Queries.GetUnits
         {
         
              _logger.LogInformation($"Fetching Unit Request started: {request}");
-            var units = await _unitRepository.GetAllUnitsAsync();
-             if (units is null || !units.Any() || units.Count == 0)
+            var (units, totalCount) = await _unitRepository.GetAllUnitsAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+             if (units is null )
                 {
                  _logger.LogWarning($"No Unit Record {units.Count} not found in DB.");
                      return new ApiResponseDTO<List<GetUnitsDTO>>
@@ -55,7 +55,10 @@ namespace Core.Application.Units.Queries.GetUnits
                 {
                     IsSuccess = true,
                     Message = "Success",
-                    Data = unitList
+                    Data = unitList,
+                    TotalCount = totalCount,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
                 };
            
         

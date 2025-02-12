@@ -87,6 +87,28 @@ namespace UserManagement.Infrastructure.Repositories
         }
 
 
+            public async Task<string> ResetUserPassword(int userId,PasswordLog passwordLog)
+            {
+             var existingUser = await _applicationDbContext.User
+             .FirstOrDefaultAsync(u => u.UserId == userId);
+            // Check if the user exists
+            if (existingUser == null)
+            {
+                return "Username not found.";
+            }
+            // Check if the user is a first-time user
+            if (existingUser.IsFirstTimeUser == FirstTimeUserStatus.Yes)
+            {
+                return "User is a first-time user. Please complete the initial setup.";
+            }
+                existingUser.PasswordHash = passwordLog.PasswordHash;
+                _applicationDbContext.User.Update(existingUser);
+                 await _applicationDbContext.SaveChangesAsync();
+                return "Password Reset successfully.";                            
+        }
+
+
+
         public Task<string> PasswordEncode(string password)
         {
              if (string.IsNullOrWhiteSpace(password))
@@ -104,6 +126,14 @@ namespace UserManagement.Infrastructure.Repositories
             var verificationCode = await Task.Run(() => new string(Enumerable.Repeat(chars, length)
                                     .Select(s => s[random.Next(s.Length)]).ToArray()));
             return verificationCode;
+        }
+
+        public async Task<bool> PasswordLog(PasswordLog passwordLog)
+        {
+            string SystemIp =  _ipAddressService.GetSystemIPAddress();
+                 passwordLog.CreatedIP=SystemIp;
+                await _applicationDbContext.PasswordLogs.AddAsync(passwordLog);
+                return await _applicationDbContext.SaveChangesAsync()>0;
         }
     }
 }

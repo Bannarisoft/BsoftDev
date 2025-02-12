@@ -19,217 +19,103 @@ namespace UserManagement.Infrastructure.Repositories.Units
           _dbConnection = dbConnection;
         }
 
-        public async Task<List<Unit>> GetAllUnitsAsync()
+        public async Task<(List<Unit>, int)> GetAllUnitsAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-            var query = @"
+            var query = $$"""
+            DECLARE @TotalCount INT;
+             SELECT @TotalCount = COUNT(*) 
+               FROM AppData.Unit C
+              WHERE C.IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (C.UnitName LIKE @Search OR C.ShortName LIKE @Search)")}};
+
                 SELECT 
-                    u.Id,
-                    u.UnitName,
-                    u.ShortName,
-                    u.CompanyId,
-                    u.DivisionId,
-                    u.UnitHeadName,
-                    u.CINNO,
-                    u.IsActive,
-                    ua.Id as AddressId,
-                    ua.UnitId,
-                    ua.CountryId,
-                    ua.StateId,
-                    ua.CityId,
-                    ua.AddressLine1,
-                    ua.AddressLine2,
-                    ua.PinCode,
-                    ua.ContactNumber,
-                    ua.AlternateNumber,
-                    uc.Id as ContactId,
-                    uc.UnitId,
-                    uc.Name,
-                    uc.Designation,
-                    uc.Email,
-                    uc.PhoneNo,
-                    uc.Remarks                   
-                FROM 
-                    AppData.Unit  u
-                INNER JOIN 
-                    AppData.UnitAddress  ua ON u.Id = ua.UnitId
-                INNER JOIN 
-                    AppData.UnitContacts uc ON u.Id = uc.UnitId
-                WHERE  U.IsDeleted = 0
-                ORDER BY 
-                    u.Id DESC
-            ";
+            C.Id, 
+            C.UnitName, 
+            C.ShortName,
+            C.CompanyId,
+            C.DivisionId,
+            C.UnitHeadName,
+            C.CINNO,
+            C.IsActive
+             FROM AppData.Unit C
+              WHERE C.IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (C.UnitName LIKE @Search OR C.ShortName LIKE @Search)")}}
+              ORDER BY C.Id DESC
+              OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
-             var unitDictionary = new Dictionary<int, Unit>();
+             SELECT @TotalCount AS TotalCount;
+            """;
             
-            var units = await _dbConnection.QueryAsync<Unit, UnitAddress, UnitContacts, Unit>(
-                query,
-                (unit, address, contact) =>
-                {
-                    if (!unitDictionary.TryGetValue(unit.Id, out var existingunit))
-                    {
-                        existingunit = unit;
-                        existingunit.UnitAddress = address;
-                        existingunit.UnitContacts = contact;
-                        unitDictionary.Add(existingunit.Id, existingunit);
-                    }
-                    else
-                    {
-                        existingunit.UnitAddress = address;
-                        existingunit.UnitContacts = contact;
-                    }
             
-                    return existingunit;
-                },
-                splitOn: "AddressLine1,Name" 
-            );
-            
-            return units.ToList();
-
+            var parameters = new
+                       {
+                           Search = $"%{SearchTerm}%",
+                           Offset = (PageNumber - 1) * PageSize,
+                           PageSize
+                       };
+              var unit = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var unitslits = (await unit.ReadAsync<Unit>()).ToList();
+             int totalCount = (await unit.ReadFirstAsync<int>());
+            return (unitslits, totalCount);
         }
 
-        public async Task<List<Unit>> GetByIdAsync(int id)
+        public async Task<Unit> GetByIdAsync(int Id)
         {
-                var query = @"
-                SELECT 
-                    u.Id,
-                    u.UnitName,
-                    u.ShortName,
-                    u.CompanyId,
-                    u.DivisionId,
-                    u.UnitHeadName,
-                    u.CINNO,
-                    u.IsActive,
-                    ua.Id as AddressId,
-                    ua.UnitId,
-                    ua.CountryId,
-                    ua.StateId,
-                    ua.CityId,
-                    ua.AddressLine1,
-                    ua.AddressLine2,
-                    ua.PinCode,
-                    ua.ContactNumber,
-                    ua.AlternateNumber,
-                    uc.Id as ContactId,
-                    uc.UnitId,
-                    uc.Name,
-                    uc.Designation,
-                    uc.Email,
-                    uc.PhoneNo,
-                    uc.Remarks                   
-                FROM 
-                    AppData.Unit  u
-                INNER JOIN 
-                    AppData.UnitAddress  ua ON u.Id = ua.UnitId
-                INNER JOIN 
-                    AppData.UnitContacts uc ON u.Id = uc.UnitId
-                WHERE u.Id = @id
-                AND U.IsDeleted = 0
-                ORDER BY 
-                    u.Id DESC
-            ";
-
-            var unitDictionary = new Dictionary<int, Unit>();
-            
-            var units = await _dbConnection.QueryAsync<Unit, UnitAddress, UnitContacts, Unit>(
-                query,
-                (unit, address, contact) =>
-                {
-                    if (!unitDictionary.TryGetValue(unit.Id, out var existingunit))
-                    {
-                        existingunit = unit;
-                        existingunit.UnitAddress = address;
-                        existingunit.UnitContacts = contact;
-                        unitDictionary.Add(existingunit.Id, existingunit);
-                    }
-                    else
-                    {
-                        existingunit.UnitAddress = address;
-                        existingunit.UnitContacts = contact;
-                    }
-            
-                    return existingunit;
-                },
-                splitOn: "AddressLine1,Name",
-                param: new { id = id }
-            );
-            
-            return units.ToList();
-        }
-
-
-         public async Task<List<Unit>> GetUnit(string searchPattern = null)
-        {
-            if (string.IsNullOrWhiteSpace(searchPattern))
-            {
-                throw new ArgumentException("Unitname cannot be null or empty.", nameof(searchPattern));
-            }
-
             const string query = @"
-                SELECT 
-                    u.Id,
-                    u.UnitName,
-                    u.ShortName,
-                    u.CompanyId,
-                    u.DivisionId,
-                    u.UnitHeadName,
-                    u.CINNO,
-                    u.IsActive,
-                    ua.Id as AddressId,
-                    ua.UnitId,
-                    ua.CountryId,
-                    ua.StateId,
-                    ua.CityId,
-                    ua.AddressLine1,
-                    ua.AddressLine2,
-                    ua.PinCode,
-                    ua.ContactNumber,
-                    ua.AlternateNumber,
-                    uc.Id as ContactId,
-                    uc.UnitId,
-                    uc.Name,
-                    uc.Designation,
-                    uc.Email,
-                    uc.PhoneNo,
-                    uc.Remarks                   
-                FROM 
-                    AppData.Unit  u
-                INNER JOIN 
-                    AppData.UnitAddress  ua ON u.Id = ua.UnitId
-                INNER JOIN 
-                    AppData.UnitContacts uc ON u.Id = uc.UnitId
-				WHERE U.UnitName LIKE @SearchPattern OR U.Id LIKE @SearchPattern
-                AND U.IsDeleted = 0
-                ORDER BY 
-                    u.Id DESC";
+             SELECT 
+            C.Id, 
+            C.UnitName, 
+            C.ShortName,
+            C.CompanyId,
+            C.DivisionId,
+            C.UnitHeadName,
+            C.CINNO,
+            C.IsActive,
+            A.CountryId,
+            A.StateId,
+            A.CityId,
+            A.AddressLine1,
+            A.AddressLine2,
+            A.PinCode,
+            A.ContactNumber,
+            A.AlternateNumber,
+            B.Name,
+                 B.Designation,
+                 B.Email,
+                 B.PhoneNo ,
+                 B.Remarks As Remarks 
+             FROM AppData.Unit C
+             LEFT JOIN AppData.UnitAddress A ON A.UnitId = C.Id
+             LEFT JOIN AppData.UnitContacts B ON B.UnitId = C.Id
+             WHERE C.Id = @id AND C.IsDeleted = 0";
+    var unitResponse = await _dbConnection.QueryAsync<Unit,UnitAddress,UnitContacts,Unit>(query, 
+    (unit,unitaddress,unitcontacts) =>
+    {
+        unit.UnitAddress = unitaddress;
+        unit.UnitContacts = unitcontacts;
+        return unit;
+        }, 
+    new { Id },
+    splitOn: "AddressLine1,Name");
 
-            var unitDictionary = new Dictionary<int, Unit>();
-            
-            var units = await _dbConnection.QueryAsync<Unit, UnitAddress, UnitContacts, Unit>(
-                query,
-                (unit, address, contact) =>
-                {
-                    if (!unitDictionary.TryGetValue(unit.Id, out var existingunit))
-                    {
-                        existingunit = unit;
-                        existingunit.UnitAddress = address;
-                        existingunit.UnitContacts = contact;
-                        unitDictionary.Add(existingunit.Id, existingunit);
-                    }
-                    else
-                    {
-                        existingunit.UnitAddress = address;
-                        existingunit.UnitContacts = contact;
-                    }
-            
-                    return existingunit;
-                },
-                splitOn: "AddressLine1,Name",
-                param: new { SearchPattern = $"%{searchPattern}%" }
-            );
-            
-            return units.ToList();
-        }             
-            
+             return unitResponse.FirstOrDefault();
         }
+
+        public async Task<List<Unit>> GetUnit(string searchPattern)
+        {
+             const string query = @"
+                SELECT 
+                Id, 
+                UnitName
+            FROM AppData.Unit where IsDeleted = 0 and UnitName like @SearchPattern";
+                
+            
+            var result = await _dbConnection.QueryAsync<Unit>(query, new { SearchPattern = $"%{searchPattern}%" });
+            return result.ToList();
+        }
+
+                  
+
+    }
 
     }

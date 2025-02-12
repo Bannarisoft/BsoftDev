@@ -35,7 +35,7 @@ namespace Core.Application.Currency.Commands.UpdateCurrency
 
     // 🔹 First, check if the ID exists in the database
     var existingCurrency = await _currencyQueryRepository.GetByIdAsync(request.Id);
-    if (!existingCurrency.Any() || existingCurrency is null || existingCurrency.Count == 0)
+    if (existingCurrency is null )
     {
         _logger.LogWarning($"Currency ID {request.Id} not found.");
         return new ApiResponseDTO<int>
