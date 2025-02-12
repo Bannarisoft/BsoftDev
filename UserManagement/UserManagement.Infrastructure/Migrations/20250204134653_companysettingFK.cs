@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace BSOFT.Infrastructure.Migrations
+namespace UserManagement.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class companysettingFK : Migration

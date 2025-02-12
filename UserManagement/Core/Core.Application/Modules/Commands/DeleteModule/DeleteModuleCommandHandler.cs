@@ -7,7 +7,7 @@ using Core.Application.Common.Interfaces.IModule;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
 
-namespace BSOFT.Application.Modules.Commands.DeleteModule
+namespace Core.Application.Modules.Commands.DeleteModule
 {
     public class DeleteModuleCommandHandler  : IRequestHandler<DeleteModuleCommand,ApiResponseDTO<bool>>
     {
