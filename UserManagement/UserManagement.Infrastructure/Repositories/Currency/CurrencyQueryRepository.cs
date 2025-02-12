@@ -16,43 +16,70 @@ namespace UserManagement.Infrastructure.Repositories.Currency
              _dbConnection = dbConnection;
         }
 
-        public async Task<List<Core.Domain.Entities.Currency>> GetByIdAsync(int id)
-        {
-             const string query = @"
-               SELECT * 
-               FROM AppData.Currency 
-               WHERE Id = @Id and IsDeleted = 0
-               ORDER BY Id DESC";
-             var currencyList = await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query, new { id });
-             return currencyList?.ToList() ?? new List<Core.Domain.Entities.Currency>();
-        }
          public async Task<List<Core.Domain.Entities.Currency>> GetByCurrencyNameAsync(string searchPattern)
         {
-          if (string.IsNullOrWhiteSpace(searchPattern))
-            {
-                throw new ArgumentException("CurrencyName cannot be null or empty.", nameof(searchPattern));
-            }
+          searchPattern = searchPattern ?? string.Empty; // Prevent null issues
 
             const string query = @"
-                 SELECT *
-                 FROM AppData.Currency
-                 WHERE Name LIKE @SearchPattern OR Code LIKE @SearchPattern and IsDeleted = 0
-                 ORDER BY Id DESC";
-                
-            // Update the object to use SearchPattern instead of Name
-            var Currencylist = await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query, new { SearchPattern = $"%{searchPattern}%" });
-             return Currencylist?.ToList() ?? new List<Core.Domain.Entities.Currency>();     
+             SELECT Id, Code 
+            FROM AppData.Currency
+            WHERE IsDeleted = 0 
+            AND Name LIKE @SearchPattern";  
+            var parameters = new 
+            { 
+            SearchPattern = $"%{searchPattern}%" 
+            };
+
+            var currenciesGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query, parameters);
+            return currenciesGroups.ToList();    
         }
 
-        public async Task<List<Core.Domain.Entities.Currency>> GetAllCurrencyAsync()
-        {          
-            const string query = @"
-             SELECT * 
-             FROM AppData.Currency 
-             WHERE IsDeleted = 0 
-             ORDER BY Id DESC";
-            return (await _dbConnection.QueryAsync<Core.Domain.Entities.Currency>(query)).ToList() ?? new List<Core.Domain.Entities.Currency>();
+        public async Task<(List<Core.Domain.Entities.Currency>, int)> GetAllCurrencyAsync(int PageNumber, int PageSize, string? SearchTerm)
+        {
+             var query = $$"""
+             DECLARE @TotalCount INT;
+             SELECT @TotalCount = COUNT(*) 
+               FROM AppData.Currency
+              WHERE IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Name LIKE @Search OR Code LIKE @Search)")}};
+
+                SELECT 
+                Id, 
+                Code,
+                Name,
+                IsActive
+            FROM AppData.Currency 
+            WHERE 
+            IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Name LIKE @Search OR Code LIKE @Search )")}}
+                ORDER BY Id desc
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+                SELECT @TotalCount AS TotalCount;
+            """;
+
+            
+             var parameters = new
+                       {
+                           Search = $"%{SearchTerm}%",
+                           Offset = (PageNumber - 1) * PageSize,
+                           PageSize
+                       };
+
+             var currencygroup = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var currenciesgrouplist = (await currencygroup.ReadAsync<Core.Domain.Entities.Currency>()).ToList();
+             int totalCount = (await currencygroup.ReadFirstAsync<int>());
+             return (currenciesgrouplist, totalCount);
         }
 
+         public async Task<Core.Domain.Entities.Currency?> GetByIdAsync(int id)
+        {
+             const string query = @"
+                    SELECT * 
+                    FROM AppData.Currency 
+                    WHERE Id = @Id AND IsDeleted = 0";
+                    var currencyGroup = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.Currency>(query, new { id });
+                    return currencyGroup;
+        }
     }
 }

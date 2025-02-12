@@ -2,13 +2,16 @@ using System.Data;
 using System.Reflection;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IAssetCategories;
 using Core.Application.Common.Interfaces.IAssetGroup;
 using Core.Application.Common.Interfaces.ILocation;
 using Core.Application.Common.Interfaces.ISubLocation;
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities;
+using Core.Domain.Entities;
 using FAM.Infrastructure.Data;
 using FAM.Infrastructure.Repositories;
+using FAM.Infrastructure.Repositories.AssetCategories;
 using FAM.Infrastructure.Repositories.AssetGroup;
 using FAM.Infrastructure.Repositories.Locations;
 using FAM.Infrastructure.Repositories.SubLocation;
@@ -120,6 +123,10 @@ namespace FAM.Infrastructure
             services.AddScoped<ILocationQueryRepository, LocationQueryRepository>();
             services.AddScoped<ISubLocationCommandRepository, SubLocationCommandRepository>();
             services.AddScoped<ISubLocationQueryRepository, SubLocationQueryRepository>();   
+            services.AddScoped<IAssetGroupQueryRepository, AssetGroupQueryRepository>();
+            services.AddScoped<IAssetCategoriesQueryRepository, AssetCategoriesQueryRepository>();
+            services.AddScoped<IAssetCategoriesCommandRepository, AssetCategoriesCommandRepository>();
+
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -130,7 +137,8 @@ namespace FAM.Infrastructure
             services.AddAutoMapper(
 				typeof(AssetGroupProfile),
 				typeof(LocationProfile),
-                typeof(SubLocationProfile)
+                typeof(SubLocationProfile),
+                typeof(AssetCategoriesProfile)
 
             );
 

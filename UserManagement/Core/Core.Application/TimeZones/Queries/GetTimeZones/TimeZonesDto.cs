@@ -16,6 +16,6 @@ namespace Core.Application.TimeZones.Queries.GetTimeZones
         public string? Location { get; set; } // New Field
         public string? Offset { get; set; } // New Field (e.g., UTC+05:30)
         public Status  IsActive { get; set; }
-        public IsDelete IsDeleted { get; set; }
+        
     }
 }

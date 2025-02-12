@@ -34,7 +34,7 @@ namespace Core.Application.Entity.Commands.UpdateEntity
 
             // 🔹 First, check if the ID exists in the database
             var existingEntity = await _IentityQueryRepository.GetByIdAsync(request.Id);
-            if (existingEntity is null || existingEntity.Count == 0)
+            if (existingEntity is null)
             {
                 _logger.LogWarning($"Entity ID {request.Id} not found.");
                 return new ApiResponseDTO<int>

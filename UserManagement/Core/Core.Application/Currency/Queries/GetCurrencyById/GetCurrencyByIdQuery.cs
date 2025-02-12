@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Currency.Queries.GetCurrencyById
 {
-    public class GetCurrencyByIdQuery :IRequest<ApiResponseDTO<List<CurrencyDto>>>
+    public class GetCurrencyByIdQuery :IRequest<ApiResponseDTO<CurrencyDto>>
     {
         public int CurrencyId { get; set; }
     }

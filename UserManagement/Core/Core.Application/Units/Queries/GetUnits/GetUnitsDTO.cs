@@ -18,7 +18,7 @@ namespace Core.Application.Units.Queries.GetUnits
     public string? CINNO { get; set; }
     public Status  IsActive { get; set; }
     public IsDelete IsDeleted { get; set; }
-    public UnitAddressDto? UnitAddressDto { get; set; } 
-    public UnitContactsDto? UnitContactsDto { get; set;} 
+    // public UnitAddressDto? UnitAddressDto { get; set; } 
+    // public UnitContactsDto? UnitContactsDto { get; set;} 
     }
 }

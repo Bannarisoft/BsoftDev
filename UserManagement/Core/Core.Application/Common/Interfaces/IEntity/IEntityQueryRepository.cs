@@ -12,17 +12,10 @@ namespace Core.Application.Common.Interfaces.IEntity
   public interface IEntityQueryRepository
     {
       
-      Task<List<Entity>> GetAllEntityAsync();
-      Task<List<Entity>> GetByIdAsync(int Id);
+      Task<(List<Entity>,int)> GetAllEntityAsync(int PageNumber, int PageSize, string? SearchTerm);
+      Task<Entity> GetByIdAsync(int Id);
       Task<List<Entity>> GetByEntityNameAsync(string entity);
       Task<string> GenerateEntityCodeAsync();
-
-
-  
-
-
-
-
        
     }
 }

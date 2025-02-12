@@ -11,6 +11,7 @@ namespace Core.Application.Common.Mappings
         public TimeZonesProfile()
         {
             CreateMap<Core.Domain.Entities.TimeZones, Core.Application.TimeZones.Queries.GetTimeZones.TimeZonesDto>();
+            CreateMap<Core.Domain.Entities.TimeZones, Core.Application.TimeZones.Queries.GetTimeZones.TimeZonesAutoCompleteDto>();
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Core.Application.Units.Commands.DeleteUnit
               _logger.LogInformation($"Starting Deletion process for UnitId: {request.UnitId}");
               // 🔹 First, check if the ID exists in the database
             var existingunitId = await _IunitQueryRepository.GetByIdAsync(request.UnitId);
-            if (existingunitId is null || existingunitId.Count == 0)
+            if (existingunitId is null)
             {
                 _logger.LogWarning($"Unit ID {request.UnitId} not found.");
                 return new ApiResponseDTO<int>
