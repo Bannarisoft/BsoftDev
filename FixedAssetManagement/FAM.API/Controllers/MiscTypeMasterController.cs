@@ -101,9 +101,7 @@ namespace FAM.API.Controllers
           
             var response = await Mediator.Send(command);
             if(response.IsSuccess)
-            {
-              
-                // return CreatedAtAction(nameof(GetByIdAsync), new {  id = response.Data }, response);
+            {                             
                 return Ok(new 
                 {
                      StatusCode=StatusCodes.Status201Created,
