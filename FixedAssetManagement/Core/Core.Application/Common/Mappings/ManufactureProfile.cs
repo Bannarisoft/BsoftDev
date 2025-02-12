@@ -1,14 +1,8 @@
 using AutoMapper;
-using Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup;
-using Core.Application.DepreciationGroup.Commands.DeleteDepreciationGroup;
-using Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup;
-using Core.Application.DepreciationGroup.Queries.GetDepreciationGroup;
-using Core.Domain.Entities;
-using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.Common.Mappings
 {
-    public class DepreciationGroupProfile : Profile
+    public class ManufactureProfile : Profile
     {
         public DepreciationGroupProfile()
         { 
