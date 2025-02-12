@@ -5,6 +5,9 @@ using Core.Application.Location.Command.UpdateLocation;
 using FAM.API.Validation.SubLocation;
 using Core.Application.Location.Command.UpdateSubLocation;
 using Core.Application.SubLocation.Command.CreateSubLocation;
+using FAM.API.Validation.DepreciationGroup;
+using Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup;
+using Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup;
 
 
 namespace FAM.API.Validation.Common
@@ -18,6 +21,8 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateLocationCommand>, UpdateLocationCommandValidator>();
         services.AddScoped<IValidator<CreateSubLocationCommand>, CreateSubLocationCommandValidator>();
         services.AddScoped<IValidator<UpdateSubLocationCommand>, UpdateSubLocationCommandValidator>();
+        services.AddScoped<IValidator<CreateDepreciationGroupCommand>, CreateDepreciationGroupCommandValidator>();
+        services.AddScoped<IValidator<UpdateDepreciationGroupCommand>, UpdateDepreciationGroupCommandValidator>();
     }  
     }
 }

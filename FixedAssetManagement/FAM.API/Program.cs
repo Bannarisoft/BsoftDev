@@ -36,8 +36,6 @@ builder.Host.ConfigureSerilog();
 // Add validation services
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
-builder.Services.AddValidatorsFromAssemblyContaining<CreateDepreciationGroupCommandValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<UpdateDepreciationGroupCommandValidator>();
 
 //Add layer dependency & Add services to the container.
 builder.Services.AddControllers();
