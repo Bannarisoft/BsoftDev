@@ -24,6 +24,7 @@ namespace FAM.Infrastructure.Data
         public DbSet<AssetCategories> AssetCategories { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<SubLocation> SubLocations { get; set; } 
+public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
 public DbSet<DepreciationGroups> DepreciationGroups { get; set; }
 
 
@@ -34,6 +35,7 @@ public DbSet<DepreciationGroups> DepreciationGroups { get; set; }
             modelBuilder.ApplyConfiguration(new AssetCategoriesConfiguration());
             modelBuilder.ApplyConfiguration(new LocationConfiguration());
             modelBuilder.ApplyConfiguration(new SubLocationConfiguration());
+modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
 modelBuilder.ApplyConfiguration(new DepreciationGroupConfiguration());
                
             base.OnModelCreating(modelBuilder);

@@ -34,6 +34,7 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
           {
                 var companies = JsonSerializer.Deserialize<List<UserCompanyDTO>>(request.Companies) ?? new List<UserCompanyDTO>();
              var companylist =   _mapper.Map<List<UserCompany>>(companies);
+             
             var result = await _divisionRepository.GetDivision(request.SearchPattern,companylist);
             var division = _mapper.Map<List<DivisionAutoCompleteDTO>>(result);
              //Domain Event

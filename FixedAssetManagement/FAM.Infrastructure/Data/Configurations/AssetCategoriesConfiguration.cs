@@ -60,7 +60,7 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-                  builder.Property(b => b.IsActive)
+                builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
                 .HasConversion(statusConverter)

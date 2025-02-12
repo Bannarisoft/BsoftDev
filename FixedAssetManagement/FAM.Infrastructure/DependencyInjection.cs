@@ -14,6 +14,8 @@ using FAM.Infrastructure.Repositories.AssetGroup;
 using FAM.Infrastructure.Repositories.DepreciationGroup;
 using FAM.Infrastructure.Repositories.Locations;
 using FAM.Infrastructure.Repositories.SubLocation;
+using FAM.Infrastructure.Repositories.MiscTypeMaster;
+using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using FAM.Infrastructure.Services;
 using Hangfire;
 using Hangfire.SqlServer;
@@ -122,6 +124,8 @@ namespace FAM.Infrastructure
             services.AddScoped<ILocationQueryRepository, LocationQueryRepository>();
             services.AddScoped<ISubLocationCommandRepository, SubLocationCommandRepository>();
             services.AddScoped<ISubLocationQueryRepository, SubLocationQueryRepository>();   
+            services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>(); 
+            services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
             services.AddScoped<IDepreciationGroupCommandRepository, DepreciationGroupCommandRepository>();   
             services.AddScoped<IDepreciationGroupQueryRepository, DepreciationGroupQueryRepository>(); 
             services.AddScoped<IAssetGroupQueryRepository, AssetGroupQueryRepository>();
@@ -138,6 +142,8 @@ namespace FAM.Infrastructure
             services.AddAutoMapper(
 				typeof(AssetGroupProfile),
 				typeof(LocationProfile),
+                typeof(SubLocationProfile),
+                typeof(MisctypeMasterProfile),
                 typeof(DepreciationGroupProfile),
                 typeof(AssetCategoriesProfile)
 

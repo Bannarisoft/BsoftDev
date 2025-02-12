@@ -39,28 +39,60 @@ namespace UserManagement.API.Controllers
 
         }
         [HttpGet]
-       public async Task<IActionResult> GetAllFinancialYearAsync()
-        {       
-           _logger.LogInformation("Fetching All FinancialYear Request started.");
-           
-            var financialyr =await Mediator.Send(new GetFinancialYearQuery());
-           if (financialyr.Data == null || !financialyr.Data.Any())
+        public async Task<IActionResult> GetAllFinancialYearAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
             {
-               
-                _logger.LogInformation($"No FinancialYear records found in the database. Total count: {financialyr?.Data?.Count ?? 0}");
-                 return NotFound(new
+                _logger.LogInformation("Starting GetAllFinancialYearAsync request.");
+
+                var financialYears = await Mediator.Send(new GetFinancialYearQuery
+                {
+                    PageNumber = PageNumber,
+                    PageSize = PageSize,
+                    SearchTerm = SearchTerm
+                });
+
+                if (financialYears == null || financialYears.Data == null || !financialYears.Data.Any())
+                {
+                    _logger.LogWarning("No financial year records found.");
+                    return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
-                        message = financialyr.Message
+                        Message = "No financial year records found."
                     });
-             }           
+                }
+
+                _logger.LogInformation("Financial year records retrieved successfully.");
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Data = financialYears.Data,
+                    TotalCount = financialYears.TotalCount,
+                    PageNumber = financialYears.PageNumber,
+                    PageSize = financialYears.PageSize
+                });
+            }
+
+    //    public async Task<IActionResult> GetAllFinancialYearAsync()
+    //     {       
+    //        _logger.LogInformation("Fetching All FinancialYear Request started.");
+           
+    //         var financialyr =await Mediator.Send(new GetFinancialYearQuery());
+    //        if (financialyr.Data == null || !financialyr.Data.Any())
+    //         {
+               
+    //             _logger.LogInformation($"No FinancialYear records found in the database. Total count: {financialyr?.Data?.Count ?? 0}");
+    //              return NotFound(new
+    //                 {
+    //                     StatusCode = StatusCodes.Status404NotFound,
+    //                     message = financialyr.Message
+    //                 });
+    //          }           
           
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status200OK,
-                data = financialyr.Data
-            });
-        }
+    //         return Ok(new
+    //         {
+    //             StatusCode = StatusCodes.Status200OK,
+    //             data = financialyr.Data
+    //         });
+    //     }
 
        [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
@@ -83,34 +115,35 @@ namespace UserManagement.API.Controllers
             });
         } 
 
-        [HttpGet("by-Year/{Year}")]
-        public async Task<IActionResult> GetAllFinancialYearAutoCompleteSearchAsync( string Year)
+        [HttpGet("by-Year")]
+        public async Task<IActionResult> GetAllFinancialYearAutoCompleteSearchAsync([FromQuery] string? year)
         {
-            _logger.LogInformation($"Starting GetAllFinancialYearAutoCompleteSearchAsync with search pattern: {Year}" );
-             var query = new GetFinancialYearAutoCompleteQuery { SearchTerm = Year };
-                var result = await Mediator.Send(query);
+            _logger.LogInformation($"Starting GetAllFinancialYearAutoCompleteSearchAsync with search pattern: {year}");
 
-                if (result.Data == null || !result.Data.Any())
-                {
-                    _logger.LogWarning($"No FinancialYear found for search pattern: {Year}");
+            var query = new GetFinancialYearAutoCompleteQuery { SearchTerm = year ?? string.Empty };
+            var result = await Mediator.Send(query);
 
-                    return NotFound(new
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "No matching FinancialYear found."
-                    });
-                }
-
-                _logger.LogInformation($"FinancialYear found for search pattern: {Year}. Returning data.");
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation($"Financial years found for search pattern: {year}. Returning data.");
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Data = result.Data
                 });
-            
+            }
+
+            _logger.LogWarning($"No financial years found for search pattern: {year}");
+
+            return NotFound(new
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                Message = "No matching financial years found."
+            });
         }
 
+       
 
         [HttpPost]
          

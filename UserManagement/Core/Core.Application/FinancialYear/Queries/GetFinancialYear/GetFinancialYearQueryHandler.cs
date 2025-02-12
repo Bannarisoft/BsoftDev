@@ -32,38 +32,74 @@ namespace Core.Application.GetFinancialYear.Queries.GetFinancialYear
             _logger = logger;
 
         }
-
-        public async Task<ApiResponseDTO<List<GetFinancialYearDto>>> Handle(GetFinancialYearQuery request, CancellationToken cancellationToken)    
+        public async Task<ApiResponseDTO<List<GetFinancialYearDto>>> Handle(GetFinancialYearQuery request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Fetching FinancialYear Request started: {request}", request);
+
+            var (financialYears, totalCount) = await _financialyearRepository.GetAllFinancialYearAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+
+            if (financialYears is null || !financialYears.Any())
+            {
+                _logger.LogWarning("No FinancialYear records found in the database. Total count: {TotalCount}", totalCount);
+                return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = false, Message = "No Record Found" };
+            }
+
+            var financialYearList = _mapper.Map<List<GetFinancialYearDto>>(financialYears);
+            
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "GetAll",
+                actionCode: "",
+                actionName: "",
+                details: "FinancialYear details were fetched.",
+                module: "FinancialYear"
+            );
+
+            await _mediator.Publish(domainEvent, cancellationToken);
+
+            _logger.LogInformation("FinancialYear {Count} listed successfully.", financialYearList.Count);
+            
+            return new ApiResponseDTO<List<GetFinancialYearDto>>
+            {
+                IsSuccess = true,
+                Message = "Success",
+                Data = financialYearList,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
+        // public async Task<ApiResponseDTO<List<GetFinancialYearDto>>> Handle(GetFinancialYearQuery request, CancellationToken cancellationToken)    
+        // {
          
 
 
-             _logger.LogInformation($"Fetching FinancialYear Request started: {request}");
+        //      _logger.LogInformation($"Fetching FinancialYear Request started: {request}");
            
            
-             var financialyear = await _financialyearRepository.GetAllFinancialYearAsync();
+        //      var financialyear = await _financialyearRepository.GetAllFinancialYearAsync();
             
-             if (financialyear is null || !financialyear.Any())
-            {
-               _logger.LogWarning($"No FinancialYear records found in the database. Total count: {financialyear?.Count ?? 0}");
+        //      if (financialyear is null || !financialyear.Any())
+        //     {
+        //        _logger.LogWarning($"No FinancialYear records found in the database. Total count: {financialyear?.Count ?? 0}");
 
-                  return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = false, Message = "No Record Found" };
-            }
+        //           return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = false, Message = "No Record Found" };
+        //     }
 
-             var financialyearList = _mapper.Map<List<GetFinancialYearDto>>(financialyear);
-             var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetAll",
-                    actionCode: "",        
-                    actionName: "",
-                    details: $"FinancialYear details was fetched.",
-                    module:"FinancialYear"
-                );
+        //      var financialyearList = _mapper.Map<List<GetFinancialYearDto>>(financialyear);
+        //      var domainEvent = new AuditLogsDomainEvent(
+        //             actionDetail: "GetAll",
+        //             actionCode: "",        
+        //             actionName: "",
+        //             details: $"FinancialYear details was fetched.",
+        //             module:"FinancialYear"
+        //         );
 
-                  await _mediator.Publish(domainEvent, cancellationToken);
+        //           await _mediator.Publish(domainEvent, cancellationToken);
               
-            _logger.LogInformation($"FinancialYear {financialyearList} Listed successfully." );
-            return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = true, Message = "Success", Data = financialyearList };       
-        }
+        //     _logger.LogInformation($"FinancialYear {financialyearList} Listed successfully." );
+        //     return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = true, Message = "Success", Data = financialyearList };       
+        // }
     }
 
 }
