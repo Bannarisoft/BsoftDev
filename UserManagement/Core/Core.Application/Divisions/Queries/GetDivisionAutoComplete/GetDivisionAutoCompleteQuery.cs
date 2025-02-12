@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Divisions.Queries.GetDivisions;
+using Core.Application.Users.Queries.GetUsers;
 using MediatR;
 
 namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
@@ -12,6 +13,6 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
     {
         
         public string SearchPattern { get; set; }
-        public int CompanyId { get; set; }
+        public string Companies { get; set; }
     }
 }

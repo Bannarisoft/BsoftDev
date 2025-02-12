@@ -7,7 +7,7 @@ using Core.Application.Common.HttpResponse;
 
 namespace Core.Application.City.Queries.GetCityAutoComplete
 {
-    public class GetCityAutoCompleteQueryHandler : IRequestHandler<GetCityAutoCompleteQuery, ApiResponseDTO<List<CityDto>>>
+    public class GetCityAutoCompleteQueryHandler : IRequestHandler<GetCityAutoCompleteQuery, ApiResponseDTO<List<CityAutoCompleteDTO>>>
     {
         private readonly ICityQueryRepository _cityRepository;
         private readonly IMapper _mapper;
@@ -20,18 +20,18 @@ namespace Core.Application.City.Queries.GetCityAutoComplete
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<CityDto>>> Handle(GetCityAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<CityAutoCompleteDTO>>> Handle(GetCityAutoCompleteQuery request, CancellationToken cancellationToken)
         {             
             var result = await _cityRepository.GetByCityNameAsync(request.SearchPattern ?? string.Empty);
             if (result is null || result.Count is 0)
             {
-                return new ApiResponseDTO<List<CityDto>>
+                return new ApiResponseDTO<List<CityAutoCompleteDTO>>
                 {
                     IsSuccess = false,
                     Message = "No Cities found matching the search pattern."
                 };
             }
-            var cityDto = _mapper.Map<List<CityDto>>(result);
+            var cityDto = _mapper.Map<List<CityAutoCompleteDTO>>(result);
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetAutoComplete",
@@ -41,7 +41,7 @@ namespace Core.Application.City.Queries.GetCityAutoComplete
                 module:"City"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<CityDto>>
+            return new ApiResponseDTO<List<CityAutoCompleteDTO>>
             {
                 IsSuccess = true,
                 Message = "Success",

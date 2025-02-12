@@ -13,7 +13,7 @@ namespace Core.Application.AuditLog.Queries.GetAuditLog
         public string? Action { get; set; }
         public string? Details { get; set; }
         public string? Module { get; set; }
-        public DateTime CreatedAt { get; set; }   
+        public DateTimeOffset CreatedAt { get; set; }   
         public int CreatedBy { get; set; }
         public string? CreatedByName { get; set; }       
         
