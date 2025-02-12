@@ -35,7 +35,7 @@ namespace Core.Application.Entity.Commands.DeleteEntity
        _logger.LogInformation($"Starting Entity Deletion process for EntityId: {request.EntityId}");
          // 🔹 First, check if the ID exists in the database
             var existingEntity = await _IentityQueryRepository.GetByIdAsync(request.EntityId);
-            if (existingEntity is null || existingEntity.Count == 0)
+            if (existingEntity is null )
             {
                 _logger.LogWarning($"Entity ID {request.EntityId} not found.");
                 return new ApiResponseDTO<int>

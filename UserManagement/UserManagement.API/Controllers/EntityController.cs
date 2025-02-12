@@ -41,10 +41,16 @@ namespace UserManagement.API.Controllers
         }
         
 [HttpGet]
-public async Task<IActionResult> GetAllEntityAsync()
+public async Task<IActionResult> GetAllEntityAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
 {
         
-        var result  = await Mediator.Send(new GetEntityQuery());
+        var result  = await Mediator.Send(
+        new GetEntityQuery
+          {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
         if (result is null || result.Data is null || !result.Data.Any())
         {
             _logger.LogWarning($"No Entity Record {result.Data} not found in DB.");
@@ -61,7 +67,10 @@ public async Task<IActionResult> GetAllEntityAsync()
             
             message = result.Message,
             data = result.Data,
-            statusCode = StatusCodes.Status200OK
+            statusCode = StatusCodes.Status200OK,
+            TotalCount = result.TotalCount,
+            PageNumber = result.PageNumber,
+            PageSize = result.PageSize
         });
    
 }
@@ -101,7 +110,7 @@ public async Task<IActionResult> GetByIdAsync(int id)
    
 }
        
-[HttpGet("entity/new-code")]
+[HttpGet("new-code")]
 public async Task<IActionResult> GenerateEntityCodeAsync()
 {
    
@@ -232,23 +241,12 @@ public async Task<IActionResult> DeleteEntityAsync(int id)
    
 }
 
-[HttpGet("by-name/{name}")]
-public async Task<IActionResult> GetEntity([FromRoute] string name)
+[HttpGet("by-name")]
+public async Task<IActionResult> GetEntity([FromQuery] string? EntityName)
 {
-      // Check if searchPattern is provided
-        if (string.IsNullOrEmpty(name))
-        {
-            _logger.LogInformation($"Search pattern {name} cannot be empty.");
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = "Search pattern cannot be empty."
-            });
-        }
-
         // Fetch entities based on search pattern
-        var entities = await Mediator.Send(new GetEntityAutocompleteQuery { SearchPattern = name });
-        _logger.LogInformation("Search pattern: {SearchPattern}", name);
+        var entities = await Mediator.Send(new GetEntityAutocompleteQuery { SearchPattern = EntityName?? string.Empty });
+        _logger.LogInformation("Search pattern: {SearchPattern}", EntityName);
        if (entities.IsSuccess)
         {
         _logger.LogInformation($"Entity {entities.Data.Count} Listed successfully.");
@@ -259,7 +257,7 @@ public async Task<IActionResult> GetEntity([FromRoute] string name)
                 data = entities.Data
             });
         }
-        _logger.LogInformation($"No Entity Record in the DB {name} not found.");
+        _logger.LogInformation($"No Entity Record in the DB {EntityName} not found.");
         return NotFound(new
         {
             message = entities.Message,

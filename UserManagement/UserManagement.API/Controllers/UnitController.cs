@@ -30,9 +30,16 @@ namespace UserManagement.API.Controllers
             _logger = logger;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllUnitsAsync()
+        public async Task<IActionResult> GetAllUnitsAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {
-            var result = await Mediator.Send(new GetUnitQuery());
+            var result = await Mediator.Send(
+            new GetUnitQuery
+             {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+                
+            });
             
         if (result is null || result.Data is null || !result.Data.Any())
         {
@@ -41,6 +48,7 @@ namespace UserManagement.API.Controllers
             {
                 message = result.Message,
                 statusCode = StatusCodes.Status404NotFound
+                
             });
         }
          
@@ -49,7 +57,10 @@ namespace UserManagement.API.Controllers
         {
             message = "Units retrieved successfully.",
             data = result.Data,
-            statusCode = StatusCodes.Status200OK
+            statusCode = StatusCodes.Status200OK,
+            TotalCount = result.TotalCount,
+            PageNumber = result.PageNumber,
+            PageSize = result.PageSize
         });
         }
 
@@ -184,22 +195,11 @@ namespace UserManagement.API.Controllers
         });
     }
 
-       [HttpGet("by-name/{name}")]
-        public async Task<IActionResult> GetUnit([FromRoute] string name)
+       [HttpGet("by-name")]
+        public async Task<IActionResult> GetUnit([FromQuery] string? unitname)
         {
-            // Check if searchPattern is provided
-        if (string.IsNullOrEmpty(name))
-        {
-            _logger.LogInformation($"Search pattern {name} cannot be empty.");
-            return BadRequest(new 
-            { 
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = "Search pattern cannot be empty." 
-            });
-          
-        }
-            var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = name});
-             _logger.LogInformation("Search pattern: {SearchPattern}", name);
+            var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = unitname??string.Empty});
+             _logger.LogInformation("Search pattern: {SearchPattern}", unitname);
             if(units.IsSuccess)
             {
                 _logger.LogInformation($"Unit {units.Data.Count} Listed successfully.");
@@ -210,7 +210,7 @@ namespace UserManagement.API.Controllers
                     data = units.Data
                 });
             }
-            _logger.LogWarning($"No Unit Record in the {name} not found in DB.");
+            _logger.LogWarning($"No Unit Record in the {unitname} not found in DB.");
             return NotFound(new
             {
                 message = units.Message,

@@ -30,10 +30,16 @@ namespace UserManagement.API.Controllers
             _dbContext = dbContext;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllTimeZonesAsync()
+        public async Task<IActionResult> GetAllTimeZonesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {
         
-        var result  = await Mediator.Send(new GetTimeZonesQuery());
+        var result  = await Mediator.Send(new 
+        GetTimeZonesQuery
+         {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
         if (result is null || result.Data is null || !result.Data.Any())
         {
             _logger.LogWarning($"No TimeZone Record {result.Data} not found in DB.");
@@ -50,7 +56,10 @@ namespace UserManagement.API.Controllers
             
             message = result.Message,
             data = result.Data,
-            statusCode = StatusCodes.Status200OK
+            statusCode = StatusCodes.Status200OK,
+            TotalCount = result.TotalCount,
+            PageNumber = result.PageNumber,
+            PageSize = result.PageSize
         });
    
 }
@@ -89,23 +98,12 @@ namespace UserManagement.API.Controllers
         });
    
 }
-       [HttpGet("by-name/{name}")]
-        public async Task<IActionResult> GetTimeZones([FromRoute] string name)
+        [HttpGet("by-name")]
+        public async Task<IActionResult> GetTimeZones([FromQuery] string? TimeZoneName)
         {       
-      // Check if searchPattern is provided
-        if (string.IsNullOrEmpty(name))
-        {
-            _logger.LogInformation($"Search pattern cannot be empty.");
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = "Search pattern cannot be empty."
-            });
-        }
-
         // Fetch entities based on search pattern
-        var result = await Mediator.Send(new GetTimeZonesAutocompleteQuery { SearchPattern = name });
-       _logger.LogInformation($"Search pattern {name} cannot be empty.");
+        var result = await Mediator.Send(new GetTimeZonesAutocompleteQuery { SearchPattern = TimeZoneName?? string.Empty });
+       _logger.LogInformation($"Search pattern {TimeZoneName} cannot be empty.");
        if (result.IsSuccess)
         {
         _logger.LogInformation($"TimeZone {result.Data.Count} Listed successfully.");
@@ -116,7 +114,7 @@ namespace UserManagement.API.Controllers
                 data = result.Data
             });
         }
-        _logger.LogInformation($"No TimeZone Record in search of {name} not found in DB.");
+        _logger.LogInformation($"No TimeZone Record in search of {TimeZoneName} not found in DB.");
         return NotFound(new
         {
             message = result.Message,

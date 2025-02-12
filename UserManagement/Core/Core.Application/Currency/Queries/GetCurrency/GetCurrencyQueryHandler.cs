@@ -25,22 +25,13 @@ namespace Core.Application.Currency.Queries.GetCurrency
             _currencyQueryRepository = currencyQueryRepository;            
             _mapper = mapper;
             _mediator = mediator;
-             _logger = logger?? throw new ArgumentNullException(nameof(logger));
+         _logger = logger?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<ApiResponseDTO<List<CurrencyDto>>> Handle(GetCurrencyQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Fetching Currency Request started: {request}");
-            var newcurrency = await _currencyQueryRepository.GetAllCurrencyAsync();
-            if (newcurrency is null || !newcurrency.Any() || newcurrency.Count == 0)
-            {
-                _logger.LogWarning($"No Currency Record {newcurrency.Count} not found in DB.");
-                return new ApiResponseDTO<List<CurrencyDto>>
-                {
-                    IsSuccess = false,
-                    Message = "No currency found"
-                };
-            }
+            var (newcurrency,totalCount) = await _currencyQueryRepository.GetAllCurrencyAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var currencylist = _mapper.Map<List<CurrencyDto>>(newcurrency);
             _logger.LogInformation($"Fetching Currency Request Completed: {currencylist.Count}");
             //Domain Event
@@ -56,7 +47,10 @@ namespace Core.Application.Currency.Queries.GetCurrency
             { 
                 IsSuccess = true, 
                 Message = "Success", 
-                Data = currencylist
+                Data = currencylist,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
             };
         }
     }

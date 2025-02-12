@@ -13,8 +13,7 @@ namespace Core.Application.Common.Mappings
     {
        public EntityProfile()
         {
-            CreateMap<Core.Domain.Entities.Entity,EntityDto>()
-               .ForMember(dest => dest.Id, opt => opt.Ignore());
+            CreateMap<Core.Domain.Entities.Entity,EntityAutoCompleteDto>();
 
             
             CreateMap<CreateEntityCommand, Core.Domain.Entities.Entity>()

@@ -42,10 +42,16 @@ namespace UserManagement.API.Controllers
         
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCurrencyAsync()
+        public async Task<IActionResult> GetAllCurrencyAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {
         
-        var result  = await Mediator.Send(new GetCurrencyQuery());
+            var result = await Mediator.Send(
+            new GetCurrencyQuery
+            {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
         if (result is null  || result.Data is null || !result.Data.Any())
         {
             _logger.LogWarning($"No Currency Record {result.Data} not found in DB.");
@@ -62,7 +68,10 @@ namespace UserManagement.API.Controllers
             
             message = result.Message,
             data = result.Data,
-            statusCode = StatusCodes.Status200OK
+            statusCode = StatusCodes.Status200OK,
+            TotalCount = result.TotalCount,
+            PageNumber = result.PageNumber,
+            PageSize = result.PageSize
         });
    
 }
@@ -101,23 +110,12 @@ namespace UserManagement.API.Controllers
         });
    
 }
-       [HttpGet("by-name/{name}")]
-        public async Task<IActionResult> GetCurrency([FromRoute] string name)
+        [HttpGet("by-name")]
+        public async Task<IActionResult> GetCurrency([FromQuery] string? CurrencyName)
         {       
-      // Check if searchPattern is provided
-        if (string.IsNullOrEmpty(name))
-        {
-           _logger.LogInformation($"Search pattern {name} cannot be empty.");
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = "Search pattern cannot be empty."
-            });
-        }
-
         // Fetch entities based on search pattern
-        var result = await Mediator.Send(new GetCurrencyAutocompleteQuery { SearchPattern = name });
-        _logger.LogInformation($"Search pattern: {name}");
+        var result = await Mediator.Send(new GetCurrencyAutocompleteQuery { SearchPattern = CurrencyName ?? string.Empty });
+        _logger.LogInformation($"Search pattern: {CurrencyName}");
        if (result.IsSuccess)
         {
         _logger.LogInformation($"Currency {result.Data.Count} Listed successfully.");
@@ -128,7 +126,7 @@ namespace UserManagement.API.Controllers
                 data = result.Data
             });
         }
-        _logger.LogInformation($"No Currency Record {name} of {result.Data} not found in DB.");
+        _logger.LogInformation($"No Currency Record {CurrencyName} of {result.Data} not found in DB.");
         return NotFound(new
         {
             message = result.Message,

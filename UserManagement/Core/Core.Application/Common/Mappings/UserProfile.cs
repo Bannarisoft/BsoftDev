@@ -72,6 +72,8 @@ public class UserProfile : Profile
             .ForMember(dest => dest.userRoleAllocations, opt => opt.MapFrom(src => src.UserRoleAllocations))
             .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.UserUnits));
             CreateMap<User, UserAutoCompleteDto>();
+
+            CreateMap<PasswordLogDTO, PasswordLog>();
             
     }
 }

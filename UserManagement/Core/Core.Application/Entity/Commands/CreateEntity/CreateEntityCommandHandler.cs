@@ -81,7 +81,7 @@ namespace Core.Application.Entity.Commands.CreateEntity
             );
             await _Imediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation($"Entity creation process completed for EntityCode: {entity.EntityCode}");
-            var entityDto = _Imapper.Map<EntityDto>(entity);
+            var entityDto = _Imapper.Map<GetEntityDTO>(entity);
 
              if (result > 0)
                   {
