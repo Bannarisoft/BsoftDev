@@ -14,14 +14,34 @@ namespace UserManagement.Infrastructure.Repositories
         {
             _dbConnection = dbConnection;
         }
-
-        public async Task<List<States>> GetAllStatesAsync()
+        public async Task<(List<States>, int)> GetAllStatesAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-             const string query = @"
-                SELECT 
-                Id,StateCode,StateName,IsActive,CountryId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
-                FROM AppData.State  where IsDeleted=0 ORDER BY ID DESC";
-             return (await _dbConnection.QueryAsync<States>(query)).ToList();     
+             var query = $$"""
+                DECLARE @TotalCount INT;
+                SELECT @TotalCount = COUNT(*) 
+                FROM AppData.State 
+                WHERE IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (StateCode LIKE @Search OR StateName LIKE @Search)")}};
+
+                SELECT Id,StateCode,StateName,IsActive,CountryId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP
+                FROM AppData.State WHERE IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (StateCode LIKE @Search OR StateName LIKE @Search )")}}
+                ORDER BY Id desc
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+                SELECT @TotalCount AS TotalCount;
+                """;
+            var parameters = new
+                       {
+                           Search = $"%{SearchTerm}%",
+                           Offset = (PageNumber - 1) * PageSize,
+                           PageSize
+                       };
+
+          
+            var states = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var stateList = (await states.ReadAsync<States>()).ToList();
+            int totalCount = (await states.ReadFirstAsync<int>());             
+            return (stateList, totalCount); 
         }
 
         public async Task<States> GetByIdAsync(int id)
@@ -38,17 +58,13 @@ namespace UserManagement.Infrastructure.Repositories
         }
 
         public async Task<List<States>> GetByStateNameAsync(string searchPattern)
-        {
-            if (string.IsNullOrWhiteSpace(searchPattern))
-            {                
-                throw new ArgumentException("State name cannot be null or empty.", nameof(searchPattern));
-            }           
+        {                      
             const string query = @"
                 SELECT Id, StateCode, StateName,countryId, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
                 ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP
                 FROM AppData.State 
                 WHERE (StateName LIKE @SearchPattern OR StateCode LIKE @SearchPattern) 
-                AND IsDeleted = 0
+                AND IsDeleted = 0 and IsActive=1
                 ORDER BY ID DESC";
             var result = await _dbConnection.QueryAsync<States>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();              
@@ -64,6 +80,6 @@ namespace UserManagement.Infrastructure.Repositories
                 throw new KeyNotFoundException($"State with ID {countryId} not found.");
             }
             return state.ToList();
-        }
-   }
+        }        
+    }
 }
