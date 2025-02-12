@@ -18,11 +18,50 @@ namespace UserManagement.Infrastructure.Repositories.Departments
     {
          _dbConnection = dbConnection;
     }
-    public async Task<List<Department>>GetAllDepartmentAsync()
+  //  public async Task<List<Department>>GetAllDepartmentAsync()
+    public async Task<(List<Department>,int)> GetAllDepartmentAsync(int PageNumber, int PageSize, string? SearchTerm)
     {
         
-        const string query = @"SELECT  * FROM AppData.Department WHERE IsDeleted = 0 ORDER BY Id DESC ";
-            return (await _dbConnection.QueryAsync<Department>(query)).ToList();
+           var query = $$"""
+             DECLARE @TotalCount INT;
+             SELECT @TotalCount = COUNT(*) 
+               FROM AppData.Department
+              WHERE IsDeleted = 0  
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShortName LIKE @Search OR DeptName LIKE @Search)")}};
+
+             SELECT Id
+                ,CompanyId
+                ,ShortName
+                ,DeptName
+                ,CreatedIP
+                ,IsActive
+                ,CreatedBy
+                ,CreatedByName
+                ,CreatedAt
+                ,ModifiedBy
+                ,ModifiedByName
+                ,ModifiedAt
+                ,ModifiedIP
+                ,IsDeleted
+                FROM AppData.Department WHERE IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShortName LIKE @Search OR DeptName LIKE @Search )")}}
+            ORDER BY Id DESC              
+            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+            SELECT @TotalCount AS TotalCount ;
+            """;
+
+           var parameters = new
+                       {
+                           Search = $"%{SearchTerm}%",
+                           Offset = (PageNumber - 1) * PageSize,
+                           PageSize
+                       };
+
+               var department = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var departmentlist = (await department.ReadAsync<Department>()).ToList();
+             int totalCount = (await department.ReadFirstAsync<int>());
+            return (departmentlist, totalCount);        
+            
         
     }
 
@@ -31,31 +70,31 @@ namespace UserManagement.Infrastructure.Repositories.Departments
         const string query = @"SELECT * FROM AppData.Department WHERE Id = @Id AND IsDeleted = 0 ORDER BY Id DESC ";
         var departments = await _dbConnection.QueryAsync<Department>(query, new { Id = id });
 
-    var department = departments.FirstOrDefault();
+          var department = departments.FirstOrDefault();
 
-    if (department == null)
-    {
-       return null;
-    }
+          if (department == null)
+          {
+            return null;
+          }
 
-    return department; // Returns null if not found
+          return department; // Returns null if not found
       
         }       
         public async Task<List<Department>>  GetAllDepartmentAutoCompleteSearchAsync(string SearchDept)
         {
-            if (string.IsNullOrWhiteSpace(SearchDept))
-            {
-                throw new ArgumentException("DepartmentName cannot be null or empty.", nameof(SearchDept));
-            }
-
             
            const string query = @"
             SELECT Id,CompanyId,ShortName,DeptName,IsActive FROM  AppData.Department 
-            WHERE (DeptName LIKE @SearchDept OR Id LIKE @SearchDept) and IsDeleted = 0
+            WHERE (DeptName LIKE @SearchDept OR  ShortName LIKE @SearchDept) and IsDeleted = 0
             ORDER BY Id DESC";
+
+              var parameters = new 
+              { 
+                  SearchDept = $"%{SearchDept ?? string.Empty}%"
+              };
            
-          var departments = await _dbConnection.QueryAsync<Department>(query, new { SearchDept = $"%{SearchDept}%" });
-            return departments.ToList();
+            var departments = await _dbConnection.QueryAsync<Department>(query, parameters);
+            return departments.ToList();       
         }
 
        

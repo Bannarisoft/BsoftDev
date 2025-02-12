@@ -35,10 +35,9 @@ namespace Core.Application.Departments.Queries.GetDepartments
         {
              _logger.LogInformation("Fetching Department Request started: {request}", request);
            
-           
-             var department = await _departmentRepository.GetAllDepartmentAsync();
+            var (department,totalCount) = await _departmentRepository.GetAllDepartmentAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             
-             if (department == null || !department.Any())
+             if (department is null || !department.Any())
             {
                _logger.LogWarning("No department records found in the database. Total count: {Count}", department?.Count ?? 0);
 
@@ -57,7 +56,12 @@ namespace Core.Application.Departments.Queries.GetDepartments
                   await _mediator.Publish(domainEvent, cancellationToken);
               
             _logger.LogInformation("Department {department} Listed successfully.", departmentList.Count);
-            return new ApiResponseDTO<List<GetDepartmentDto>> { IsSuccess = true, Message = "Success", Data = departmentList };  
+            return new ApiResponseDTO<List<GetDepartmentDto>> { IsSuccess = true,
+            Message = "Success",
+            Data = departmentList ,
+            TotalCount = totalCount,
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize};  
            
         }
 

@@ -45,32 +45,63 @@ namespace UserManagement.API.Controllers
              
         }
 
-        [HttpGet]
-       public async Task<IActionResult> GetAllAdminSecuritySettingsAsync( )
-        {     
-                _logger.LogInformation("Starting GetAllAdminSecuritySettingsAsync request.");
-                        // Fetch the admin security settings
-                var adminSecuritySettings = await Mediator.Send(new GetAdminSecuritySettingsQuery());
+         [HttpGet]
+                public async Task<IActionResult> GetAllAdminSecuritySettingsAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
+        {
+            _logger.LogInformation("Fetching All Admin Security Settings Request started.");
 
-                if (adminSecuritySettings == null || !adminSecuritySettings.Data.Any())
+            var adminSecuritySettings = await Mediator.Send(new GetAdminSecuritySettingsQuery
+            {
+                PageNumber = PageNumber,
+                PageSize = PageSize,
+                SearchTerm = SearchTerm
+            });
+
+            if (adminSecuritySettings.Data == null || !adminSecuritySettings.Data.Any())
+            {
+                _logger.LogWarning("No admin security settings found in the database. Total count: {Count}", adminSecuritySettings?.Data?.Count ?? 0);
+
+                return NotFound(new
                 {
-                    _logger.LogWarning($"No admin security settings found.{adminSecuritySettings.Data}");
-                    return NotFound(new
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "No admin security settings found."
-                    });
-                }
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = adminSecuritySettings.Message
+                });
+            }
 
-                _logger.LogInformation("Admin security settings retrieved successfully.");
+            _logger.LogInformation("Admin security settings retrieved successfully.");
 
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Data = adminSecuritySettings
-                });     
-          
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Data = adminSecuritySettings.Data
+            });
         }
+
+    //    public async Task<IActionResult> GetAllAdminSecuritySettingsAsync( )
+    //     {     
+    //             _logger.LogInformation("Starting GetAllAdminSecuritySettingsAsync request.");
+    //                     // Fetch the admin security settings
+    //             var adminSecuritySettings = await Mediator.Send(new GetAdminSecuritySettingsQuery());
+
+    //             if (adminSecuritySettings == null || !adminSecuritySettings.Data.Any())
+    //             {
+    //                 _logger.LogWarning($"No admin security settings found.{adminSecuritySettings.Data}");
+    //                 return NotFound(new
+    //                 {
+    //                     StatusCode = StatusCodes.Status404NotFound,
+    //                     Message = "No admin security settings found."
+    //                 });
+    //             }
+
+    //             _logger.LogInformation("Admin security settings retrieved successfully.");
+
+    //             return Ok(new
+    //             {
+    //                 StatusCode = StatusCodes.Status200OK,
+    //                 Data = adminSecuritySettings
+    //             });     
+          
+    //     }
         
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)

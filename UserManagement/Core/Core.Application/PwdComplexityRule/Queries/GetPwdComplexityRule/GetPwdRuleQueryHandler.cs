@@ -27,16 +27,15 @@ namespace Core.Application.PwdComplexityRule.Queries
             _logger = logger; 
             _mediator = mediator;
         }
+    
 
         public async Task<ApiResponseDTO<List<GetPwdRuleDto>>> Handle(GetPwdRuleQuery request, CancellationToken cancellationToken)
         {
 
-
-
-  _logger.LogInformation("Fetching Password Complexity Rule Request started: {request}", request);
+           _logger.LogInformation("Fetching Password Complexity Rule Request started: {request}", request);
            
            
-             var pwdcomplexityrules = await _passwordComplexityRepository.GetPasswordComplexityAsync();
+             var (pwdcomplexityrules,totalCount) = await _passwordComplexityRepository.GetPasswordComplexityAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             
              if (pwdcomplexityrules is null )
             {
@@ -57,12 +56,24 @@ namespace Core.Application.PwdComplexityRule.Queries
                   await _mediator.Publish(domainEvent, cancellationToken);
               
             _logger.LogInformation($"Password Complexity Rule { pwdcomruleList.Count}  Listed successfully.");
-            return new ApiResponseDTO<List<GetPwdRuleDto>> { IsSuccess = true, Message = "Success", Data = pwdcomruleList };  
+            return new ApiResponseDTO<List<GetPwdRuleDto>> 
+            {
+                 IsSuccess = true, 
+                 Message = "Success", 
+                 Data = pwdcomruleList ,
+                  TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+                 };  
 
         
      
 
         }
+
+
+
+        
     }
 
     

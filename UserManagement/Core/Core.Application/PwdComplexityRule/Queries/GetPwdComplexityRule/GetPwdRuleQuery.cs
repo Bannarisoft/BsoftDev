@@ -11,5 +11,9 @@ namespace Core.Application.PwdComplexityRule.Queries
     public class GetPwdRuleQuery : IRequest<ApiResponseDTO<List<GetPwdRuleDto>> >
     {
         
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 15;
+        public string? SearchTerm { get; set; }
+
     }
 }

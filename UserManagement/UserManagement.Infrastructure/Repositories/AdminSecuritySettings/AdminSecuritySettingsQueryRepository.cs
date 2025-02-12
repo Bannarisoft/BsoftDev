@@ -20,13 +20,67 @@ namespace UserManagement.Infrastructure.Repositories.AdminSecuritySettings
          _dbConnection = dbConnection;
     }
 
-    public async Task<List<Core.Domain.Entities.AdminSecuritySettings>> GetAllAdminSecuritySettingsAsync()
-    {
+    // public async Task<List<Core.Domain.Entities.AdminSecuritySettings>> GetAllAdminSecuritySettingsAsync()
+    // {
         
-        const string query = @"SELECT  * FROM AppSecurity.AdminSecuritySettings WHERE IsDeleted = 0 ORDER BY ID DESC";
-            return (await _dbConnection.QueryAsync<Core.Domain.Entities.AdminSecuritySettings>(query)).ToList();
+    //     const string query = @"SELECT  * FROM AppSecurity.AdminSecuritySettings WHERE IsDeleted = 0 ORDER BY ID DESC";
+    //         return (await _dbConnection.QueryAsync<Core.Domain.Entities.AdminSecuritySettings>(query)).ToList();
         
-    }
+    // }
+            public async Task<(List<Core.Domain.Entities.AdminSecuritySettings>, int)> GetAllAdminSecuritySettingsAsync(int PageNumber, int PageSize, string? SearchTerm)
+        {
+            var query = $$"""
+                DECLARE @TotalCount INT;
+                SELECT @TotalCount = COUNT(*) 
+                FROM AppSecurity.AdminSecuritySettings
+                WHERE IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Id LIKE @Search)")}};
+                
+                SELECT Id,
+                    PasswordHistoryCount,
+                    SessionTimeoutMinutes,
+                    MaxFailedLoginAttempts,
+                    AccountAutoUnlockMinutes,
+                    PasswordExpiryDays,
+                    PasswordExpiryAlertDays,
+                    IsTwoFactorAuthenticationEnabled,
+                    MaxConcurrentLogins,
+                    IsForcePasswordChangeOnFirstLogin,
+                    PasswordResetCodeExpiryMinutes,
+                    IsCaptchaEnabledOnLogin,
+                    IsActive,
+                    CreatedBy,
+                    CreatedAt,
+                    CreatedByName,
+                    CreatedIP,
+                    ModifiedBy,
+                    ModifiedAt,
+                    ModifiedByName,
+                    ModifiedIP,
+                    IsDeleted
+                FROM AppSecurity.AdminSecuritySettings
+                WHERE IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Id LIKE @Search)")}}
+                ORDER BY Id DESC
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+                
+                SELECT @TotalCount AS TotalCount;
+            """;
+
+            var parameters = new
+            {
+                Search = $"%{SearchTerm}%",
+                Offset = (PageNumber - 1) * PageSize,
+                PageSize
+            };
+
+            var securitySettings = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var settingsList = (await securitySettings.ReadAsync<Core.Domain.Entities.AdminSecuritySettings>()).ToList();
+            int totalCount = (await securitySettings.ReadFirstAsync<int>());
+
+            return (settingsList, totalCount);
+        }
+
 
         public async Task<Core.Domain.Entities.AdminSecuritySettings> GetAdminSecuritySettingsByIdAsync(int id)
         {

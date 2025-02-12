@@ -19,11 +19,47 @@ namespace UserManagement.Infrastructure.Repositories.PasswordComplexityRule
          _dbConnection = dbConnection;
     }
 
-      public async Task<List<Core.Domain.Entities.PasswordComplexityRule>>GetPasswordComplexityAsync( )
+      //public async Task<List<Core.Domain.Entities.PasswordComplexityRule>>GetPasswordComplexityAsync( )
+       public async Task<(List<Core.Domain.Entities.PasswordComplexityRule>,int)> GetPasswordComplexityAsync(int PageNumber, int PageSize, string? SearchTerm)
     {
-        
-        const string query = @"SELECT  * FROM AppSecurity.PasswordComplexityRule WHERE IsDeleted = 0 ORDER BY Id DESC";
-            return (await _dbConnection.QueryAsync<Core.Domain.Entities.PasswordComplexityRule>(query)).ToList();        
+          var query = $$"""
+             DECLARE @TotalCount INT;
+             SELECT @TotalCount = COUNT(*) 
+               FROM AppSecurity.PasswordComplexityRule 
+              WHERE IsDeleted = 0  
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (PwdComplexityRule LIKE @Search OR Id LIKE @Search)")}};
+            SELECT Id,PwdComplexityRule
+            ,IsActive
+            ,CreatedBy
+            ,CreatedAt
+            ,CreatedByName
+            ,CreatedIP
+            ,ModifiedBy
+            ,ModifiedAt
+            ,ModifiedByName
+            ,ModifiedIP
+            ,IsDeleted
+            FROM AppSecurity.PasswordComplexityRule WHERE IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (PwdComplexityRule LIKE @Search OR Id LIKE @Search )")}}
+            ORDER BY Id DESC              
+            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+            SELECT @TotalCount AS TotalCount ;
+            """;
+
+           var parameters = new
+                       {
+                           Search = $"%{SearchTerm}%",
+                           Offset = (PageNumber - 1) * PageSize,
+                           PageSize
+                       };
+
+               var passwordComplexityRule = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var PasswordComplexityRulelist = (await passwordComplexityRule.ReadAsync<Core.Domain.Entities.PasswordComplexityRule>()).ToList();
+             int totalCount = (await passwordComplexityRule.ReadFirstAsync<int>());
+            return (PasswordComplexityRulelist, totalCount);      
+
+       // const string query = @"SELECT  * FROM AppSecurity.PasswordComplexityRule WHERE IsDeleted = 0 ORDER BY Id DESC";
+       // return (await _dbConnection.QueryAsync<Core.Domain.Entities.PasswordComplexityRule>(query)).ToList();        
     }
 
       public async Task<Core.Domain.Entities.PasswordComplexityRule> GetByIdAsync(int id)
@@ -42,16 +78,29 @@ namespace UserManagement.Infrastructure.Repositories.PasswordComplexityRule
         }       
          public async Task<List<Core.Domain.Entities.PasswordComplexityRule>>  GetpwdautocompleteAsync(string searchTerm = null)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
-            {
-                throw new ArgumentException("PwdComplexityRule cannot be null or empty.", nameof(searchTerm));
-            }
+
+
            const string query = @" 
-           SELECT  * FROM  AppSecurity.PasswordComplexityRule WHERE PwdComplexityRule LIKE @searchTerm OR Id LIKE @searchTerm AND IsDeleted = 0
+           SELECT Id,PwdComplexityRule
+            ,IsActive
+            ,CreatedBy
+            ,CreatedAt
+            ,CreatedByName
+            ,CreatedIP
+            ,ModifiedBy
+            ,ModifiedAt
+            ,ModifiedByName
+            ,ModifiedIP
+            ,IsDeleted
+            FROM AppSecurity.PasswordComplexityRule WHERE  PwdComplexityRule LIKE @searchTerm OR Id LIKE @searchTerm AND IsDeleted = 0
             ORDER BY ID DESC";
-            // Update the object to use SearchPattern instead of Name
-          var Pwdrule = await _dbConnection.QueryAsync<Core.Domain.Entities.PasswordComplexityRule>(query, new { SearchTerm  = $"%{searchTerm}%" });
-            return Pwdrule.ToList();
+              var parameters = new 
+              { 
+                  searchTerm = $"%{searchTerm ?? string.Empty}%"
+              };
+
+               var Pwdrule = await _dbConnection.QueryAsync<Core.Domain.Entities.PasswordComplexityRule>(query, parameters);
+            return Pwdrule.ToList();   
         }
     }
 
