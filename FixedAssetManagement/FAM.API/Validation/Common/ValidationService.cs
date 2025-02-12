@@ -5,6 +5,12 @@ using Core.Application.Location.Command.UpdateLocation;
 using FAM.API.Validation.SubLocation;
 using Core.Application.Location.Command.UpdateSubLocation;
 using Core.Application.SubLocation.Command.CreateSubLocation;
+using Core.Application.AssetGroup.Command.CreateAssetGroup;
+using FAM.API.Validation.AssetGroup;
+using Core.Application.AssetGroup.Command.UpdateAssetGroup;
+using FAM.API.Validation.AssetCategories;
+using Core.Application.AssetCategories.Command.CreateAssetCategories;
+using Core.Application.AssetCategories.Command.UpdateAssetCategories;
 
 
 namespace FAM.API.Validation.Common
