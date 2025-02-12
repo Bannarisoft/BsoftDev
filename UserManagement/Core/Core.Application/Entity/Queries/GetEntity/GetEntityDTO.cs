@@ -16,6 +16,6 @@ namespace Core.Application.Entity.Queries.GetEntity
     public string? Phone  { get; set; }
     public string? Email { get; set; }
     public Status  IsActive { get; set; }
-    public IsDelete IsDeleted { get; set; }
+    
     }
 }

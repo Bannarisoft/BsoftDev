@@ -55,7 +55,7 @@ namespace UserManagement.Infrastructure.Repositories.Currency
 
     public async Task<bool> ExistsByCodeAsync(string code)
     {
-        return await _applicationDbContext.Currency.AnyAsync(c => c.Name == code);
+        return await _applicationDbContext.Currency.AnyAsync(c => c.Code == code);
     }
 
     public async Task<int> DeletecurrencyAsync(int Id, Core.Domain.Entities.Currency currency)

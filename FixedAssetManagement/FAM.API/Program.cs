@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Logging;
 using Serilog.Events;
 using FAM.API.Validation.Common;
 using FAM.API.Configurations;
+using FluentValidation;
+using FAM.API.Validation.DepreciationGroup;
 
 var builder = WebApplication.CreateBuilder(args);
 

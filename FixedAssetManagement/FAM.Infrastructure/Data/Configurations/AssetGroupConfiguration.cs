@@ -77,12 +77,7 @@ namespace FAM.Infrastructure.Data.Configurations
 
                 builder.Property(b => b.ModifiedIP)
                 .HasColumnType("varchar(255)");
-
-                builder.HasOne(ac => ac.AssetCategories)
-                .WithOne(ag => ag.AssetGroup)
-                .HasForeignKey<AssetCategories>(ua => ua.AssetGroupId);
-
-              
+    
         }
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Currency.Queries.GetCurrencyById
 {
-    public class GetCurrencyByIdQueryHandler : IRequestHandler<GetCurrencyByIdQuery, ApiResponseDTO<List<CurrencyDto>>>
+    public class GetCurrencyByIdQueryHandler : IRequestHandler<GetCurrencyByIdQuery, ApiResponseDTO<CurrencyDto>>
     {
         private readonly ICurrencyQueryRepository _currencyQueryRepository;        
         private readonly IMapper _mapper;
@@ -27,31 +27,31 @@ namespace Core.Application.Currency.Queries.GetCurrencyById
             _logger = logger?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<ApiResponseDTO<List<CurrencyDto>>> Handle(GetCurrencyByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<CurrencyDto>> Handle(GetCurrencyByIdQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Fetching Currency Request started: {request.CurrencyId}");
             var newcurrency = await _currencyQueryRepository.GetByIdAsync(request.CurrencyId);
-            if (newcurrency is null || !newcurrency.Any() || newcurrency.Count == 0)
+            if (newcurrency is null)
             {
-                _logger.LogWarning($"No Currency Record {newcurrency.Count} not found in DB.");
-                return new ApiResponseDTO<List<CurrencyDto>>
+                _logger.LogWarning($"No Currency Record {request.CurrencyId} not found in DB.");
+                return new ApiResponseDTO<CurrencyDto>
                 {
                     IsSuccess = false,
-                    Message = "No currency found"
+                     Message =$"Currency ID {request.CurrencyId} not found."
                 };
             }
-            var currencylist = _mapper.Map<List<CurrencyDto>>(newcurrency);
-            _logger.LogInformation($"Fetching Currency Request Completed: {currencylist.Count}");
+            var currencylist = _mapper.Map<CurrencyDto>(newcurrency);
+            _logger.LogInformation($"Fetching Currency Request Completed: {currencylist.Id}");
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetCurrencyByIdQuery",
                 actionCode: "Get Currency",                
-                actionName: currencylist.Count.ToString(),
+                actionName: "",
                 details: $"Currency details was fetched.",
                 module:"Currency");
             await _mediator.Publish(domainEvent, cancellationToken);
-            _logger.LogInformation($"Currency {currencylist.Count} Listed successfully.");
-            return new ApiResponseDTO<List<CurrencyDto>>
+            _logger.LogInformation($"Currency {currencylist.Id} Listed successfully.");
+            return new ApiResponseDTO<CurrencyDto>
             {                
                 IsSuccess = true,
                 Message = "Success",

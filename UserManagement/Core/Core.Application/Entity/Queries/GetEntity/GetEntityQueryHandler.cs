@@ -31,7 +31,7 @@ namespace Core.Application.Entity.Queries.GetEntity
         {
           
                _logger.LogInformation($"Fetching Entity Request started: {request}");
-                var newentity = await _entityRepository.GetAllEntityAsync();
+                var (newentity, totalCount) = await _entityRepository.GetAllEntityAsync(request.PageNumber, request.PageSize, request.SearchTerm);
                 if (newentity is null || !newentity.Any() || newentity.Count == 0)
                 {
                  _logger.LogWarning($"No Entity Record {newentity.Count} not found in DB.");
@@ -57,7 +57,10 @@ namespace Core.Application.Entity.Queries.GetEntity
                 { 
                     IsSuccess = true, 
                     Message = "Success", 
-                    Data = entitylist 
+                    Data = entitylist,
+                    TotalCount = totalCount,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
                  };
                 
        
