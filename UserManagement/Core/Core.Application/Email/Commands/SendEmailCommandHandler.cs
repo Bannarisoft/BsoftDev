@@ -21,10 +21,10 @@ namespace Core.Application.Email.Commands
             throw new ArgumentException("Email content cannot be empty");
         }
         await _emailService.SendEmailAsync(
-            request.Provider ?? string.Empty,
             request.ToEmail ?? string.Empty,
             request.Subject ?? string.Empty,
-            request.HtmlContent 
+            request.HtmlContent ,
+            request.Provider ?? string.Empty            
         );
         return true;
     }
