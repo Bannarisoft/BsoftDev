@@ -100,7 +100,7 @@ namespace UserManagement.API.Validation.Common
         services.AddScoped<IValidator<UpdateAdminSecuritySettingsCommand> ,UpdateAdminSecuritySettingsCommandValidator>();  
         services.AddScoped<IValidator<FirstTimeUserPasswordCommand>,PasswordChangeCommandValidator>();
         services.AddScoped<IValidator<CreateCompanySettingsCommand>, CreateCompanySettingsCommandValidator>();
-services.AddScoped<IValidator<CreateFinancialYearCommand>, CreateFinancialYearCommandValidator>();
+        services.AddScoped<IValidator<CreateFinancialYearCommand>, CreateFinancialYearCommandValidator>();
         services.AddScoped<IValidator<UpdateFinancialYearCommand>, UpdateFinancialYearCommandValidator>();
         services.AddScoped<IValidator<UpdateCompanySettingsCommand>, UpdateCompanySettingsCommandValidator>();
         services.AddScoped<IValidator<CreateCurrencyCommand>, CreateCurrencyCommandValidator>();

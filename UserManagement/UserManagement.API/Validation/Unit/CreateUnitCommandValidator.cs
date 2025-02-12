@@ -148,9 +148,14 @@ namespace UserManagement.API.Validation.Unit
                             .WithMessage($"{nameof(UnitContactsDto.PhoneNo)} {rule.Error}"); 
                      break;
                      case "Email":
-                RuleFor(x => x.UnitContactsDto.Email) 
-                    .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                    .WithMessage($"{nameof(UnitContactsDto.Email)} {rule.Error}");
+                        RuleFor(x => x.UnitContactsDto.Email) 
+                            .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
+                            .WithMessage($"{nameof(UnitContactsDto.Email)} {rule.Error}");
+                     break;
+                     case "PinCode":
+                        RuleFor(x => x.UnitAddressDto.PinCode.ToString()) 
+                            .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
+                            .WithMessage($"{nameof(UnitAddressDto.PinCode)} {rule.Error}");
                      break;
                     default:
                         // Handle unknown rule (log or throw)

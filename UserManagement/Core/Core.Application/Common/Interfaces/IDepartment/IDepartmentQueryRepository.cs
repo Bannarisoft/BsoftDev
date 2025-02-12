@@ -9,9 +9,10 @@ namespace Core.Application.Common.Interfaces.IDepartment
     public interface IDepartmentQueryRepository
     {
         
-        Task<List<Department>> GetAllDepartmentAsync();
+        Task<(List<Department>,int)> GetAllDepartmentAsync(int PageNumber, int PageSize, string? SearchTerm);
+  
         Task<Department> GetByIdAsync(int id);         
-         Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync(string SearchDept);
+        Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync(string SearchDept);
 
     
          

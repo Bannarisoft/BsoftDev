@@ -34,11 +34,20 @@ namespace UserManagement.API.Controllers
 
         }
     [HttpGet]
-    public async Task<IActionResult> GetAllDepartmentAsync()
-        {       
+    // public async Task<IActionResult> GetAllDepartmentAsync()
+        public async Task<IActionResult> GetAllDepartmentAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        {
+              
            _logger.LogInformation("Fetching All Department Request started.");
            
-            var departments =await Mediator.Send(new GetDepartmentQuery());
+            var departments =await Mediator.Send(
+                new GetDepartmentQuery
+                {
+                     PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+                });
+
            if (departments.Data == null || !departments.Data.Any())
             {
                
@@ -86,32 +95,35 @@ namespace UserManagement.API.Controllers
          
         }
 
-           [HttpGet("by-name/{name}")]
+           [HttpGet("by-name/")]
 
-        public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync(string name)
+        public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync([FromQuery] string? name)
         {
             _logger.LogInformation($"Starting GetAllDepartmentAutoCompleteSearchAsync with search pattern: {name} ");
-             var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = name };
+             var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = name ?? string.Empty };
                 var result = await Mediator.Send(query);
 
-                if (result.Data == null || !result.Data.Any())
-                {
-                    _logger.LogWarning($"No departments found for search pattern: {name}");
-
-                    return NotFound(new
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "No matching departments found."
-                    });
-                }
-
+             
+               if (result.IsSuccess )
+               {
                 _logger.LogInformation($"Departments found for search pattern: {name}. Returning data." );
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
                     Data = result.Data
-                });
+                });        
+               }
+                  _logger.LogWarning($"No departments found for search pattern: {name}");
+
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "No matching departments found."
+                    });
+
+
+
             
         }
 

@@ -30,7 +30,7 @@ namespace Core.Application.Units.Commands.UpdateUnit
             _logger.LogInformation($"Starting update process for UnitId: {request.UpdateUnitDto.Id}");
             //  First, check if the ID exists in the database
             var existingUnit = await _iunitQueryRepository.GetByIdAsync(request.UpdateUnitDto.Id);
-            if (existingUnit is null || existingUnit.Count == 0)
+            if (existingUnit is null )
             {
                 _logger.LogWarning($"Unit ID {request.UpdateUnitDto.Id} not found.");
                 return new ApiResponseDTO<int>

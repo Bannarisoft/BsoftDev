@@ -32,26 +32,26 @@ namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySetting
 
 
         }
+        public async Task<ApiResponseDTO<List<GetAdminSecuritySettingsDto>>> Handle(GetAdminSecuritySettingsQuery request, CancellationToken cancellationToken)
+            {
+                _logger.LogInformation("Fetching Admin Security Settings Request started: {request}", request);
 
-         public async Task<ApiResponseDTO<List<GetAdminSecuritySettingsDto>>>Handle(GetAdminSecuritySettingsQuery request ,CancellationToken cancellationToken )
-        {
+                // Fetch paginated admin security settings
+                var (adminSecuritySettings, totalCount) = await _adminSecuritySettingsQueryRepository
+                    .GetAllAdminSecuritySettingsAsync(request.PageNumber, request.PageSize, request.SearchTerm);
 
-              _logger.LogInformation($"Handling GetAdminSecuritySettingsQuery to fetch admin security settings{request}");
-             // Fetch admin security settings from the repository
-                var adminSecuritySettings = await _adminSecuritySettingsQueryRepository.GetAllAdminSecuritySettingsAsync();
-               
-                    if (adminSecuritySettings is  null || !adminSecuritySettings.Any() || adminSecuritySettings.Count==0)
-              {
-               _logger.LogWarning($"No AdminSecuritySettings records found in the database. Total count: { adminSecuritySettings?.Count ?? 0} ");
+                if (adminSecuritySettings == null || !adminSecuritySettings.Any())
+                {
+                    _logger.LogWarning("No Admin Security Settings records found in the database. Total count: {Count}", adminSecuritySettings?.Count ?? 0);
 
-                  return new ApiResponseDTO<List<GetAdminSecuritySettingsDto>>                      
-                     {
-                         IsSuccess = false,
-                         Message = "No entity found"
-                     };
-              }
+                    return new ApiResponseDTO<List<GetAdminSecuritySettingsDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "No Record Found"
+                    };
+                }
 
-                _logger.LogInformation("Admin security settings fetched successfully. Mapping to DTO.");
+                _logger.LogInformation("Admin Security Settings fetched successfully. Mapping to DTO.");
 
                 // Map the result to DTO
                 var adminSecuritySettingsList = _mapper.Map<List<GetAdminSecuritySettingsDto>>(adminSecuritySettings);
@@ -61,20 +61,67 @@ namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySetting
                     actionDetail: "GetAll",
                     actionCode: "",
                     actionName: "",
-                    details: $"Admin Security Settings details were fetched.",
+                    details: "Admin Security Settings details were fetched.",
                     module: "AdminSecuritySettings"
                 );
-                 await _mediator.Publish(domainEvent, cancellationToken);
+
+                await _mediator.Publish(domainEvent, cancellationToken);
+
+                _logger.LogInformation("Admin Security Settings {Count} listed successfully.", adminSecuritySettingsList.Count);
+
+                return new ApiResponseDTO<List<GetAdminSecuritySettingsDto>>
+                {
+                    IsSuccess = true,
+                    Message = "Success",
+                    Data = adminSecuritySettingsList,
+                    TotalCount = totalCount,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
+                };
+            }
+
+        //  public async Task<ApiResponseDTO<List<GetAdminSecuritySettingsDto>>>Handle(GetAdminSecuritySettingsQuery request ,CancellationToken cancellationToken )
+        // {
+
+        //       _logger.LogInformation($"Handling GetAdminSecuritySettingsQuery to fetch admin security settings{request}");
+        //      // Fetch admin security settings from the repository
+        //         var adminSecuritySettings = await _adminSecuritySettingsQueryRepository.GetAllAdminSecuritySettingsAsync();
+               
+        //             if (adminSecuritySettings is  null || !adminSecuritySettings.Any() || adminSecuritySettings.Count==0)
+        //       {
+        //        _logger.LogWarning($"No AdminSecuritySettings records found in the database. Total count: { adminSecuritySettings?.Count ?? 0} ");
+
+        //           return new ApiResponseDTO<List<GetAdminSecuritySettingsDto>>                      
+        //              {
+        //                  IsSuccess = false,
+        //                  Message = "No entity found"
+        //              };
+        //       }
+
+        //         _logger.LogInformation("Admin security settings fetched successfully. Mapping to DTO.");
+
+        //         // Map the result to DTO
+        //         var adminSecuritySettingsList = _mapper.Map<List<GetAdminSecuritySettingsDto>>(adminSecuritySettings);
+
+        //         // Publish domain event
+        //         var domainEvent = new AuditLogsDomainEvent(
+        //             actionDetail: "GetAll",
+        //             actionCode: "",
+        //             actionName: "",
+        //             details: $"Admin Security Settings details were fetched.",
+        //             module: "AdminSecuritySettings"
+        //         );
+        //          await _mediator.Publish(domainEvent, cancellationToken);
               
-            _logger.LogInformation($"AdminSecuritySettings  {adminSecuritySettingsList.Count} Listed successfully.");
-            return new ApiResponseDTO<List<GetAdminSecuritySettingsDto>> { IsSuccess = true, Message = "Success", Data = adminSecuritySettingsList };  
+        //     _logger.LogInformation($"AdminSecuritySettings  {adminSecuritySettingsList.Count} Listed successfully.");
+        //     return new ApiResponseDTO<List<GetAdminSecuritySettingsDto>> { IsSuccess = true, Message = "Success", Data = adminSecuritySettingsList };  
                
             
       
           
 
            
-        }
+        // }
 
 
         

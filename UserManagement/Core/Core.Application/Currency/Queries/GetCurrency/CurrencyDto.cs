@@ -1,6 +1,7 @@
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Mappings;
 using Core.Domain.Enums;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Currency.Queries.GetCurrency
 {
@@ -9,6 +10,7 @@ namespace Core.Application.Currency.Queries.GetCurrency
         public int Id { get; set; }
         public string? Code { get; set; }
         public string? Name { get; set; }
+        public Status IsActive { get; set; }
   
     }
 }

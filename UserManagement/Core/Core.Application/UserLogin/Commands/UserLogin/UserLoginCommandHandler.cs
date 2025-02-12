@@ -68,6 +68,7 @@ namespace Core.Application.UserLogin.Commands.UserLogin
 
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
+              //  user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
                 _logger.LogWarning("Invalid login attempt for Username: {Username}", request.Username);
                 
                 return new ApiResponseDTO<LoginResponse>

@@ -35,52 +35,52 @@ namespace Core.Application.UserRole.Queries.GetRole
             _mediator = mediator;
             _logger = logger;
         }
+            public async Task<ApiResponseDTO<List<GetUserRoleDto>>> Handle(GetRoleQuery request, CancellationToken cancellationToken)
+            {
+                _logger.LogInformation("Fetching User Role Request started: {request}", request);
 
-        public async Task<ApiResponseDTO<List<GetUserRoleDto>>> Handle(GetRoleQuery request ,CancellationToken cancellationToken )
-        {
+                // Fetch user roles with pagination and search
+                var (roles, totalCount) = await _userRoleRepository.GetAllRoleAsync(request.PageNumber, request.PageSize, request.SearchTerm);
 
-            _logger.LogInformation("Starting GetRoleQueryHandler.");
-
-        //     _logger.LogInformation("Fetching user roles from repository.");
-                var roles = await _userRoleRepository.GetAllRoleAsync();
-
-                if (roles is null)
+                if (roles is null || !roles.Any())
                 {
-                    _logger.LogWarning("No user roles found.");
+                    _logger.LogWarning("No User Role records found in the database. Total count: {totalCount}", totalCount);
+
                     return new ApiResponseDTO<List<GetUserRoleDto>>
                     {
                         IsSuccess = false,
-                        Message = "No roles found",
-                        Data = null
+                        Message = "No Record Found"
                     };
                 }
 
                 _logger.LogInformation("Mapping user roles to DTO.");
                 var roleList = _mapper.Map<List<GetUserRoleDto>>(roles);
 
-                // Publish domain event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetAll",
                     actionCode: "",
                     actionName: "",
-                    details: "UserRole details were fetched.",
+                    details: "User Role details were fetched.",
                     module: "UserRole"
                 );
 
                 _logger.LogInformation("Publishing AuditLogsDomainEvent.");
                 await _mediator.Publish(domainEvent, cancellationToken);
 
-                _logger.LogInformation("Returning success response with fetched user roles.");
+                _logger.LogInformation("User Role records listed successfully. Count: {Count}", roleList.Count);
+
                 return new ApiResponseDTO<List<GetUserRoleDto>>
                 {
                     IsSuccess = true,
                     Message = "Success",
-                    Data = roleList
+                    Data = roleList,
+                    TotalCount = totalCount,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
                 };
-       
-       
-        }
+            }
 
+     
 
 
   }

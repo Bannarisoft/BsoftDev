@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.Currency.Queries.GetCurrencyAutoComplete
 {
-    public class GetCurrencyAutocompleteQueryHandler : IRequestHandler<GetCurrencyAutocompleteQuery, ApiResponseDTO<List<CurrencyDto>>>
+    public class GetCurrencyAutocompleteQueryHandler : IRequestHandler<GetCurrencyAutocompleteQuery, ApiResponseDTO<List<CurrencyAutoCompleteDto>>>
     {
         
         private readonly ICurrencyQueryRepository _currencyQueryRepository;        
@@ -29,7 +29,7 @@ namespace Core.Application.Currency.Queries.GetCurrencyAutoComplete
             _logger = logger?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<ApiResponseDTO<List<CurrencyDto>>> Handle(GetCurrencyAutocompleteQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<CurrencyAutoCompleteDto>>>Handle(GetCurrencyAutocompleteQuery request, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Fetching Currency Request started: {request.SearchPattern}");
@@ -37,13 +37,13 @@ namespace Core.Application.Currency.Queries.GetCurrencyAutoComplete
             if (newcurrency is null || !newcurrency.Any() || newcurrency.Count == 0)
             {
                 _logger.LogWarning($"No Currency Record {newcurrency.Count} not found in DB.");
-                return new ApiResponseDTO<List<CurrencyDto>>
+                return new ApiResponseDTO<List<CurrencyAutoCompleteDto>>
                 {
                     IsSuccess = false,
                     Message = "No currency found"
                 };
             }
-            var currencylist = _mapper.Map<List<CurrencyDto>>(newcurrency);
+            var currencylist = _mapper.Map<List<CurrencyAutoCompleteDto>>(newcurrency);
             _logger.LogInformation($"Fetching Currency Request Completed: {currencylist.Count}");
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -54,12 +54,13 @@ namespace Core.Application.Currency.Queries.GetCurrencyAutoComplete
                 module:"Currency");
             await _mediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation($"Currency {currencylist.Count} Listed successfully.");
-            return new ApiResponseDTO<List<CurrencyDto>>
+            return new ApiResponseDTO<List<CurrencyAutoCompleteDto>>
             {
                 IsSuccess = true,
                 Message = "Success",
                 Data = currencylist
             };
         }
+
     }
 }

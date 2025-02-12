@@ -42,29 +42,38 @@ namespace UserManagement.API.Controllers
         }
        
         [HttpGet]
-        public async Task<IActionResult> GetAllRoleAsync()
-        {
-             _logger.LogInformation("Fetching All userRole Request started.");
-           
-            var userRole =await Mediator.Send(new GetRoleQuery());
-           if (userRole.Data == null || !userRole.Data.Any())
+        public async Task<IActionResult> GetAllRoleAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
             {
-               
-                _logger.LogInformation($"No userRole records found in the database. Total count: {userRole?.Data?.Count ?? 0}" );
-                 return NotFound(new
+                _logger.LogInformation("Fetching all user roles request started.");
+
+                var userRoles = await Mediator.Send(new GetRoleQuery
+                {
+                    PageNumber = PageNumber,
+                    PageSize = PageSize,
+                    SearchTerm = SearchTerm
+                });
+
+                if (userRoles == null || userRoles.Data == null || !userRoles.Data.Any())
+                {
+                    _logger.LogWarning("No user role records found.");
+                    return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
-                        message = userRole.Message
+                        Message = "No user roles found."
                     });
-             }           
-          
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status200OK,
-                data = userRole.Data
-            });
-           
-        }
+                }
+
+                _logger.LogInformation("User roles retrieved successfully.");
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Data = userRoles.Data,
+                    TotalCount = userRoles.TotalCount,
+                    PageNumber = PageNumber,
+                    PageSize = PageSize
+                });
+            }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
@@ -94,34 +103,61 @@ namespace UserManagement.API.Controllers
            
 
         }
-        [HttpGet("by-name/{name}")] 
-        public async Task<IActionResult> GetRoles(string name)
-        {
-          _logger.LogInformation($"Starting GetAllUserRoleAutoCompleteSearchAsync with search pattern: {name}");
-             var query = new GetRolesAutocompleteQuery { SearchTerm = name };
+        [HttpGet("by-name")] 
+        public async Task<IActionResult> GetRoles([FromQuery] string? name)
+            {
+                _logger.LogInformation("Starting GetAllUserRoleAutoCompleteSearchAsync with search pattern: {SearchPattern}", name);
+
+                var query = new GetRolesAutocompleteQuery { SearchTerm = name ?? string.Empty };
                 var result = await Mediator.Send(query);
 
-                if (result.Data == null  || !result.Data.Any())
+                if (result.IsSuccess)
                 {
-                    _logger.LogWarning($"No User Role found for search pattern: {name}" );
+                    _logger.LogInformation("User Role found for search pattern: {SearchPattern}. Returning data.", name);
 
-                    return NotFound(new
+                    return Ok(new
                     {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "No matching User Role found / Deleted."
+                        StatusCode = StatusCodes.Status200OK,
+                        Data = result.Data
                     });
                 }
 
-                _logger.LogInformation($"User Role found for search pattern: {name}. Returning data.");
+                _logger.LogWarning("No User Role found for search pattern: {SearchPattern}", name);
 
-                return Ok(new
+                return NotFound(new
                 {
-                    StatusCode = StatusCodes.Status200OK,
-                    Data = result.Data
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "No matching User Role found / Deleted."
                 });
+            }
+
+        // public async Task<IActionResult> GetRoles(string name)
+        // {
+        //   _logger.LogInformation($"Starting GetAllUserRoleAutoCompleteSearchAsync with search pattern: {name}");
+        //      var query = new GetRolesAutocompleteQuery { SearchTerm = name };
+        //         var result = await Mediator.Send(query);
+
+        //         if (result.Data == null  || !result.Data.Any())
+        //         {
+        //             _logger.LogWarning($"No User Role found for search pattern: {name}" );
+
+        //             return NotFound(new
+        //             {
+        //                 StatusCode = StatusCodes.Status404NotFound,
+        //                 Message = "No matching User Role found / Deleted."
+        //             });
+        //         }
+
+        //         _logger.LogInformation($"User Role found for search pattern: {name}. Returning data.");
+
+        //         return Ok(new
+        //         {
+        //             StatusCode = StatusCodes.Status200OK,
+        //             Data = result.Data
+        //         });
      
   
-        }
+        // }
 
         [HttpPost]
         public async Task<IActionResult>CreateAsync(CreateRoleCommand createRoleCommand)

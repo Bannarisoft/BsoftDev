@@ -33,20 +33,16 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
         { 
 
             _logger.LogInformation($"Handling GetDepartmentAutoCompleteSearchQuery with search pattern: {request.SearchPattern}" );
-
+              
              // Fetch departments matching the search pattern
                 var result = await _departmentRepository.GetAllDepartmentAutoCompleteSearchAsync(request.SearchPattern);
-                if (result == null || !result.Any())
-                {
-                    _logger.LogWarning($"No departments found for search pattern: {request.SearchPattern}" );
-                    return new ApiResponseDTO<List<DepartmentAutocompleteDto>>
+                
+                if (result is null || !result.Any())
                     {
-                        IsSuccess = false,
-                        Message = "No matching departments found",
-                        Data = new List<DepartmentAutocompleteDto>()
-                    };
-                }
+                    _logger.LogWarning("No department records found in the database. Total count: {Count}", result?.Count ?? 0);
 
+                        return new ApiResponseDTO<List<DepartmentAutocompleteDto>> { IsSuccess = false, Message = "No Record Found" };
+                    }
                 _logger.LogInformation($"Departments found for search pattern: {request.SearchPattern}. Mapping results to DTO.");
 
                 // Map the result to DTO

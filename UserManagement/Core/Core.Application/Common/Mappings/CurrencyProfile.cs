@@ -15,6 +15,7 @@ namespace Core.Application.Common.Mappings
         public CurrencyProfile()
         {
             CreateMap<Core.Domain.Entities.Currency, Core.Application.Currency.Queries.GetCurrency.CurrencyDto>();
+            CreateMap<Core.Domain.Entities.Currency, Core.Application.Currency.Queries.GetCurrency.CurrencyAutoCompleteDto>();
             CreateMap<CreateCurrencyCommand, Core.Domain.Entities.Currency>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))

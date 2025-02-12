@@ -46,8 +46,7 @@ namespace Core.Application.City.Queries.GetCityAutoComplete
                 IsSuccess = true,
                 Message = "Success",
                 Data = cityDto
-            };
-          
+            };          
         }
     }  
 }

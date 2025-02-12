@@ -9,7 +9,7 @@ namespace Core.Application.City.Queries.GetCityById
 {
     public class GetCityByIdQueryHandler : IRequestHandler<GetCityByIdQuery,ApiResponseDTO<CityDto>>
     {
-    private readonly ICityQueryRepository _cityRepository;
+        private readonly ICityQueryRepository _cityRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
 

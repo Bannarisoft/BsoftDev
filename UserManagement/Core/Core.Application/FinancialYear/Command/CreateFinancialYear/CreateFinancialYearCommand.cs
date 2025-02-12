@@ -15,7 +15,7 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
     public class CreateFinancialYearCommand : IRequest<ApiResponseDTO<FinancialYearDto>>
     {
 
-      //  public int Id { get; set; }
+        public int Id { get; set; }
         public string? StartYear { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; } 

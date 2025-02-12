@@ -12,6 +12,7 @@ namespace Core.Application
 
             // Use a specific AddAutoMapper overload
             services.AddAutoMapper(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
+         
 
             // Add MediatR
             services.AddMediatR(cfg =>
