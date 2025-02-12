@@ -124,8 +124,8 @@ namespace FAM.Infrastructure
             services.AddScoped<ILocationQueryRepository, LocationQueryRepository>();
             services.AddScoped<ISubLocationCommandRepository, SubLocationCommandRepository>();
             services.AddScoped<ISubLocationQueryRepository, SubLocationQueryRepository>();   
-services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>(); 
-             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
+            services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>(); 
+            services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
             services.AddScoped<IDepreciationGroupCommandRepository, DepreciationGroupCommandRepository>();   
             services.AddScoped<IDepreciationGroupQueryRepository, DepreciationGroupQueryRepository>(); 
             services.AddScoped<IAssetGroupQueryRepository, AssetGroupQueryRepository>();
@@ -143,7 +143,7 @@ services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository
 				typeof(AssetGroupProfile),
 				typeof(LocationProfile),
                 typeof(SubLocationProfile),
-typeof(MisctypeMasterProfile,
+                typeof(MisctypeMasterProfile),
                 typeof(DepreciationGroupProfile),
                 typeof(AssetCategoriesProfile)
 
