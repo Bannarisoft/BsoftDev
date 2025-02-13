@@ -26,7 +26,8 @@ namespace FAM.Infrastructure.Data
         public DbSet<SubLocation> SubLocations { get; set; } 
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<DepreciationGroups> DepreciationGroups { get; set; }
-        public DbSet<Manufactures> Manufactures { get; set; }
+        public DbSet<AssetSubCategories> AssetSubCategories { get; set; }
+public DbSet<Manufactures> Manufactures { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,8 +38,8 @@ namespace FAM.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new SubLocationConfiguration());
             modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new DepreciationGroupConfiguration());
-            modelBuilder.ApplyConfiguration(new ManufactureConfiguration());
-               
+            modelBuilder.ApplyConfiguration(new AssetSubCategoriesConfiguration());
+             modelBuilder.ApplyConfiguration(new ManufactureConfiguration());   
             base.OnModelCreating(modelBuilder);
         }
          public override int SaveChanges()
