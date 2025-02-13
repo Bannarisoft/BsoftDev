@@ -1,36 +1,37 @@
-using Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup;
-using Core.Application.DepreciationGroup.Commands.DeleteDepreciationGroup;
-using Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup;
-using Core.Application.DepreciationGroup.Queries.GetDepreciationGroup;
-using Core.Application.DepreciationGroup.Queries.GetDepreciationGroupAutoComplete;
-using Core.Application.DepreciationGroup.Queries.GetDepreciationGroupById;
+using Core.Application.Manufacture.Commands.CreateManufacture;
+using Core.Application.Manufacture.Commands.UpdateManufacture;
 using FluentValidation;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using MediatR;
+using Core.Application.Manufacture.Queries.GetManufacture;
+using Core.Application.Manufacture.Queries.GetManufactureById;
+using Core.Application.Manufacture.Commands.DeleteManufacture;
+using Core.Application.Manufacture.Queries.GetManufactureAutoComplete;
 
 namespace FAM.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DepreciationGroupController  : ApiControllerBase
-    {
-         private readonly IValidator<CreateDepreciationGroupCommand> _createDepreciationGroupCommandValidator;
-         private readonly IValidator<UpdateDepreciationGroupCommand> _updateDepreciationGroupCommandValidator;
+    public class ManufactureController  : ApiControllerBase
+    { 
+         private readonly IValidator<CreateManufactureCommand> _createManufactureCommandValidator;
+         private readonly IValidator<UpdateManufactureCommand> _updateManufactureCommandValidator;
          
          
-       public DepreciationGroupController(ISender mediator, 
-                             IValidator<CreateDepreciationGroupCommand> createDepreciationGroupCommandValidator, 
-                             IValidator<UpdateDepreciationGroupCommand> updateDepreciationGroupCommandValidator) 
+       public ManufactureController(ISender mediator, 
+                             IValidator<CreateManufactureCommand> createManufactureCommandValidator, 
+                             IValidator<UpdateManufactureCommand> updateManufactureCommandValidator) 
         : base(mediator)
         {        
-            _createDepreciationGroupCommandValidator = createDepreciationGroupCommandValidator;    
-            _updateDepreciationGroupCommandValidator = updateDepreciationGroupCommandValidator;                 
+            _createManufactureCommandValidator = createManufactureCommandValidator;    
+            _updateManufactureCommandValidator = updateManufactureCommandValidator;                 
         }
+
         [HttpGet]                
-        public async Task<IActionResult> GetAllDepreciationGroupsAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        public async Task<IActionResult> GetAllCitiesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {            
-            var depreciationGroups = await Mediator.Send(
-            new GetDepreciationGroupQuery
+            var manufactures = await Mediator.Send(
+            new GetManufactureQuery
             {
                 PageNumber = PageNumber, 
                 PageSize = PageSize, 
@@ -39,33 +40,33 @@ namespace FAM.API.Controllers
             return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
-                message = depreciationGroups.Message,
-                data = depreciationGroups.Data.ToList(),
-                TotalCount = depreciationGroups.TotalCount,
-                PageNumber = depreciationGroups.PageNumber,
-                PageSize = depreciationGroups.PageSize
+                message = manufactures.Message,
+                data = manufactures.Data.ToList(),
+                TotalCount = manufactures.TotalCount,
+                PageNumber = manufactures.PageNumber,
+                PageSize = manufactures.PageSize
             });
         }
 
-        [HttpGet("{id}")]  
-        [ActionName(nameof(GetByIdAsync))]        
+        [HttpGet("{id}")]   
+        [ActionName(nameof(GetByIdAsync))]     
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-             if (id <= 0)
+            if (id <= 0)
             {
                 return BadRequest(new 
                 { 
                     StatusCode=StatusCodes.Status400BadRequest,
-                    message = "Invalid DepreciationGroup ID" 
+                    message = "Invalid Manufacture ID" 
                 });
             }
-            var result = await Mediator.Send(new GetDepreciationGroupByIdQuery { Id = id });            
+            var result = await Mediator.Send(new GetManufactureByIdQuery { Id = id });            
             if (result is null )
             {                
                 return NotFound(new 
                 { 
                     StatusCode=StatusCodes.Status404NotFound,
-                    message = $"DepreciationGroupId {id} not found", 
+                    message = $"ManufactureId {id} not found", 
                 });
             }
             return Ok(new 
@@ -76,9 +77,9 @@ namespace FAM.API.Controllers
         }
 
         [HttpPost]               
-        public async Task<IActionResult> CreateAsync(CreateDepreciationGroupCommand  command)
+        public async Task<IActionResult> CreateAsync(CreateManufactureCommand  command)
         { 
-            var validationResult = await _createDepreciationGroupCommandValidator.ValidateAsync(command);
+            var validationResult = await _createManufactureCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
                 return BadRequest(new
@@ -108,9 +109,9 @@ namespace FAM.API.Controllers
             } 
         }
         [HttpPut]        
-        public async Task<IActionResult> UpdateAsync(UpdateDepreciationGroupCommand command)
+        public async Task<IActionResult> UpdateAsync(UpdateManufactureCommand command)
         {         
-            var validationResult = await _updateDepreciationGroupCommandValidator.ValidateAsync(command);
+            var validationResult = await _updateManufactureCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
                 return BadRequest(
@@ -128,7 +129,7 @@ namespace FAM.API.Controllers
                 return Ok(new 
                 {   StatusCode=StatusCodes.Status200OK,
                     message = result.Message, 
-                    City = result.Data
+                    manufacture = result.Data
                 });
             }
                 
@@ -139,7 +140,7 @@ namespace FAM.API.Controllers
                 });
                 
         }
-        [HttpDelete("   {id}")]        
+        [HttpDelete("{id}")]        
         public async Task<IActionResult> DeleteAsync(int id)
         {             
             if (id <= 0)
@@ -150,7 +151,7 @@ namespace FAM.API.Controllers
                     message = "Invalid Country ID"
                 });
             }            
-              var result = await Mediator.Send(new DeleteDepreciationGroupCommand { Id = id });                 
+              var result = await Mediator.Send(new DeleteManufactureCommand { Id = id });                 
             if (!result.IsSuccess)
             {                
                 return NotFound(new 
@@ -162,15 +163,15 @@ namespace FAM.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data =$"DepreciationGroup ID {id} Deleted" ,
+                data =$"Manufacture ID {id} Deleted" ,
                 message = result.Message
             });
         }
              
         [HttpGet("by-name")]  
-        public async Task<IActionResult> GetDepreciationGroup([FromQuery] string? name)
+        public async Task<IActionResult> GetManufacture([FromQuery] string? name)
         {          
-            var result = await Mediator.Send(new GetDepreciationGroupAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
+            var result = await Mediator.Send(new GetManufactureAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
             if (!result.IsSuccess)
             {
                 return NotFound(new 
