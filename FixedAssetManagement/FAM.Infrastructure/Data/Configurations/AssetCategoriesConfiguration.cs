@@ -55,10 +55,17 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();  
 
+
                  builder.Property(ac => ac.AssetGroupId)
                 .HasColumnName("AssetGroupId")
                 .HasColumnType("int")
                 .IsRequired();
+
+
+                 builder.HasOne(ac => ac.AssetGroup) 
+                .WithMany(ag => ag.AssetCategories) // One AssetGroup -> Many AssetCategories
+                .HasForeignKey(ac => ac.AssetGroupId) // Foreign Key in AssetCategories
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete if needed
 
                 builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")

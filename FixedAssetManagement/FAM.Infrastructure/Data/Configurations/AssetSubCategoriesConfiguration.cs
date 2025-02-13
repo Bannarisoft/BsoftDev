@@ -55,10 +55,16 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();  
 
-                 builder.Property(ac => ac.AssetCategoryId)
-                .HasColumnName("AssetCategoryId")
+                 builder.Property(ac => ac.AssetCategoriesId)
+                .HasColumnName("AssetCategoriesId")
                 .HasColumnType("int")
                 .IsRequired();
+
+                // **One-to-Many Relationship Configuration**
+                builder.HasOne(asc => asc.AssetCategories) // Correct reference
+                .WithMany(ac => ac.AssetSubCategories) // One AssetCategories -> Many AssetSubCategories
+                .HasForeignKey(asc => asc.AssetCategoriesId) // Correct FK naming
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete if needed
 
                   builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")
