@@ -48,7 +48,8 @@ namespace FAM.API.Controllers
             });
         }
 
-        [HttpGet("{id}")]        
+        [HttpGet("{id}")]   
+        [ActionName(nameof(GetByIdAsync))]     
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             if (id <= 0)
@@ -75,7 +76,7 @@ namespace FAM.API.Controllers
             });   
         }
 
-        [HttpPost("create")]               
+        [HttpPost]               
         public async Task<IActionResult> CreateAsync(CreateManufactureCommand  command)
         { 
             var validationResult = await _createManufactureCommandValidator.ValidateAsync(command);
@@ -107,7 +108,7 @@ namespace FAM.API.Controllers
                 });
             } 
         }
-        [HttpPut("update")]        
+        [HttpPut]        
         public async Task<IActionResult> UpdateAsync(UpdateManufactureCommand command)
         {         
             var validationResult = await _updateManufactureCommandValidator.ValidateAsync(command);
@@ -128,7 +129,7 @@ namespace FAM.API.Controllers
                 return Ok(new 
                 {   StatusCode=StatusCodes.Status200OK,
                     message = result.Message, 
-                    City = result.Data
+                    manufacture = result.Data
                 });
             }
                 
@@ -139,7 +140,7 @@ namespace FAM.API.Controllers
                 });
                 
         }
-        [HttpDelete("delete{id}")]        
+        [HttpDelete("{id}")]        
         public async Task<IActionResult> DeleteAsync(int id)
         {             
             if (id <= 0)

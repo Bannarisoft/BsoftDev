@@ -14,8 +14,9 @@ namespace FAM.Infrastructure.Repositories.Manufacture
         }
         public async Task<Manufactures> CreateAsync(Manufactures manufacture)
         {            
+            await _applicationDbContext.Manufactures.AddAsync(manufacture);
             await _applicationDbContext.SaveChangesAsync();
-            return manufacture;          
+            return manufacture;
         }
         public async Task<int> DeleteAsync(int id, Manufactures manufacture)
         {

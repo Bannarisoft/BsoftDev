@@ -47,7 +47,8 @@ namespace FAM.API.Controllers
             });
         }
 
-        [HttpGet("{id}")]        
+        [HttpGet("{id}")]  
+        [ActionName(nameof(GetByIdAsync))]        
         public async Task<IActionResult> GetByIdAsync(int id)
         {
              if (id <= 0)
@@ -74,7 +75,7 @@ namespace FAM.API.Controllers
             });   
         }
 
-        [HttpPost("create")]               
+        [HttpPost]               
         public async Task<IActionResult> CreateAsync(CreateDepreciationGroupCommand  command)
         { 
             var validationResult = await _createDepreciationGroupCommandValidator.ValidateAsync(command);
@@ -106,7 +107,7 @@ namespace FAM.API.Controllers
                 });
             } 
         }
-        [HttpPut("update")]        
+        [HttpPut]        
         public async Task<IActionResult> UpdateAsync(UpdateDepreciationGroupCommand command)
         {         
             var validationResult = await _updateDepreciationGroupCommandValidator.ValidateAsync(command);
@@ -138,7 +139,7 @@ namespace FAM.API.Controllers
                 });
                 
         }
-        [HttpDelete("delete{id}")]        
+        [HttpDelete("   {id}")]        
         public async Task<IActionResult> DeleteAsync(int id)
         {             
             if (id <= 0)

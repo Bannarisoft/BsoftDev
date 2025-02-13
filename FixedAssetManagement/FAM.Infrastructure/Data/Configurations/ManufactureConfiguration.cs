@@ -38,7 +38,7 @@ namespace FAM.Infrastructure.Data.Configurations
             .IsRequired();             
     
             builder.Property(dg => dg.ManufactureType)                
-            .HasColumnType("varchar(5)")
+            .HasColumnType("varchar(10)")
             .IsRequired();                
            
             builder.Property(dg => dg.CountryId)

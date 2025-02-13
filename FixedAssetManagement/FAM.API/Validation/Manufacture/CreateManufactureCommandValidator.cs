@@ -91,7 +91,18 @@ namespace FAM.API.Validation.Manufacture
                         RuleFor(x => x.PhoneNumber)
                             .MaximumLength(phoneMaxLength) 
                             .WithMessage($"{nameof(CreateManufactureCommand.PhoneNumber)} {rule.Error} {phoneMaxLength}");
-                        break;                                                     
+                        break;
+                    case "MinLength":
+                        RuleFor(x => x.CityId)
+                            .GreaterThanOrEqualTo(1)
+                            .WithMessage($"{nameof(CreateManufactureCommand.CityId)} {rule.Error} {0}");   
+                        RuleFor(x => x.CountryId)
+                            .GreaterThanOrEqualTo(1)
+                            .WithMessage($"{nameof(CreateManufactureCommand.CountryId)} {rule.Error} {0}");   
+                        RuleFor(x => x.StateId)
+                            .GreaterThanOrEqualTo(1)
+                            .WithMessage($"{nameof(CreateManufactureCommand.StateId)} {rule.Error} {0}");   
+                        break;
                     case "Telephone":
                         RuleFor(x => x.PhoneNumber)
                         .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))

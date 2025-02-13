@@ -25,7 +25,7 @@ namespace FAM.Infrastructure.Repositories.Manufacture
                 WHERE IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR ManufactureName LIKE @Search)")}};
 
-                SELECT Id,Code,ManufactureName,ManufactureType,Country,State,City,AddressLine1,AddressLine2,PinCode,PersonName,PhoneNumber,Email,  IsActive
+                SELECT Id,Code,ManufactureName,ManufactureType,CountryId,StateId,CityId,AddressLine1,AddressLine2,PinCode,PersonName,PhoneNumber,Email,  IsActive
                 ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
                 FROM FixedAsset.Manufacture  WHERE IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR ManufactureName LIKE @Search )")}}
@@ -49,7 +49,7 @@ namespace FAM.Infrastructure.Repositories.Manufacture
         public async Task<List<Manufactures>> GetByManufactureNameAsync(string searchPattern)
         {
             const string query = @"
-            SELECT Id,Code,ManufactureName,ManufactureType,Country,State,City,AddressLine1,AddressLine2,PinCode,PersonName,PhoneNumber,Email,  IsActive
+            SELECT Id,Code,ManufactureName,ManufactureType,CountryId,StateId,CityId,AddressLine1,AddressLine2,PinCode,PersonName,PhoneNumber,Email,  IsActive
                 ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
             FROM FixedAsset.Manufacture 
             WHERE (ManufactureName LIKE @SearchPattern OR Code LIKE @SearchPattern) 
@@ -62,7 +62,7 @@ namespace FAM.Infrastructure.Repositories.Manufacture
         public async Task<Manufactures> GetByIdAsync(int Id)
         {
             const string query = @"
-            SELECT Id,Code,ManufactureName,ManufactureType,Country,State,City,AddressLine1,AddressLine2,PinCode,PersonName,PhoneNumber,Email,  IsActive
+            SELECT Id,Code,ManufactureName,ManufactureType,CountryId,StateId,CityId,AddressLine1,AddressLine2,PinCode,PersonName,PhoneNumber,Email,  IsActive
                 ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
             FROM FixedAsset.Manufacture WHERE Id = @Id AND IsDeleted=0";
             var manufacture = await _dbConnection.QueryFirstOrDefaultAsync<Manufactures>(query, new { Id });           
