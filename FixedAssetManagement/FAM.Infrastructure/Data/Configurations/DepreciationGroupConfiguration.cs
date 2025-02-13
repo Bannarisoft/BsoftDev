@@ -22,7 +22,7 @@ namespace FAM.Infrastructure.Data.Configurations
                     v => v ? IsDelete.Deleted : IsDelete.NotDeleted
                 );
 
-                builder.ToTable("DepreciationGroup", "FixedAsset");
+                builder.ToTable("DepreciationGroups", "FixedAsset");
                 // Primary Key
                 builder.HasKey(b => b.Id);
                 builder.Property(b => b.Id)
