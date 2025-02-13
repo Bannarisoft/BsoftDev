@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserManagement.Infrastructure.Data;
 
 #nullable disable
 
-namespace UserManagement.Infrastructure.Migrations
+namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250211095202_rolemodulemenu")]
+    partial class rolemodulemenu
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1238,16 +1241,16 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Property<int>("MenuId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RoleModuleId")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MenuId");
 
-                    b.HasIndex("RoleModuleId");
+                    b.HasIndex("RoleId");
 
-                    b.ToTable("RoleMenu", "AppSecurity");
+                    b.ToTable("RoleMenu");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.RoleModule", b =>
@@ -1270,7 +1273,7 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RoleModule", "AppSecurity");
+                    b.ToTable("RoleModule");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.States", b =>
@@ -1951,12 +1954,6 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.Menu", "Parent")
-                        .WithMany("ChildMenus")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Core.Domain.Entities.Modules", "Module")
                         .WithMany("Menus")
                         .HasForeignKey("ModuleId")
@@ -1964,8 +1961,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Module");
-
-                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PasswordLog", b =>
@@ -2006,15 +2001,15 @@ namespace UserManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.RoleModule", "RoleModule")
+                    b.HasOne("Core.Domain.Entities.UserRole", "Role")
                         .WithMany("RoleMenus")
-                        .HasForeignKey("RoleModuleId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Menu");
 
-                    b.Navigation("RoleModule");
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.RoleModule", b =>
@@ -2171,8 +2166,6 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
                 {
-                    b.Navigation("ChildMenus");
-
                     b.Navigation("RoleMenus");
                 });
 
@@ -2181,11 +2174,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("Menus");
 
                     b.Navigation("RoleModules");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.RoleModule", b =>
-                {
-                    b.Navigation("RoleMenus");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.States", b =>
@@ -2215,6 +2203,8 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
                 {
+                    b.Navigation("RoleMenus");
+
                     b.Navigation("UserRoleAllocations");
 
                     b.Navigation("roleModules");

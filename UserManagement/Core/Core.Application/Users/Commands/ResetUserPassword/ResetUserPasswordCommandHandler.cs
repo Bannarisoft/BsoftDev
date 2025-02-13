@@ -76,7 +76,7 @@ namespace Core.Application.Users.Commands.ResetUserPassword
 
             var result = await _changePassword.FirstTimeUserChangePassword(user.UserId, passwordLog);
 
-            if (!string.IsNullOrEmpty(result))
+            if (!result)
             {
                 // Remove the verification code after successful password reset
                 ForgotPasswordCache.CodeStorage.Remove(request.UserName);

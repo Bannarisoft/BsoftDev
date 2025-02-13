@@ -6,6 +6,7 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IRoleEntitlement;
 using Core.Application.RoleEntitlements.Queries.GetRoleEntitlements;
+using Core.Domain.Entities;
 using Core.Domain.Events;
 using MediatR;
 
@@ -25,22 +26,28 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById
 
         public async Task<ApiResponseDTO<RoleEntitlementDto>> Handle(GetRoleEntitlementByIdQuery request, CancellationToken cancellationToken)
         {
-              var roleEntitlement = await _roleEntitlementRepository.GetByIdAsync(request.Id);
-            if (roleEntitlement == null)
-            {
-                return new ApiResponseDTO<RoleEntitlementDto>
-                {
-                    IsSuccess = false,
-                    Message = "RoleEntitlement not found"
-                };
-            }
-            var roleEntitlementDto = _mapper.Map<RoleEntitlementDto>(roleEntitlement);
+              var (userRole, roleModules, parentMenus, roleMenus) = await _roleEntitlementRepository.GetByIdAsync(request.Id);
+
+            var roleMap = _mapper.Map<RoleDto>(userRole);
+            var roleModuleMap = _mapper.Map<List<GetByIdModuleDTO>>(roleModules);
+              var mappedChildMenus = _mapper.Map<List<MenuDTO>>(parentMenus);
+              var permissions = _mapper.Map<List<GetByIdPermissionDTO>>(roleMenus);
+
+             
+             var roleEntitlementDto = new RoleEntitlementDto
+             {
+                 Role = roleMap,
+                 Modules = roleModuleMap,
+                 ParentMenu = mappedChildMenus,
+                 Permissions = permissions
+             };
+            // var roleEntitlementDto = _mapper.Map<RoleEntitlementDto>(roleEntitlement);
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetById",
-                actionCode: roleEntitlementDto.RoleName,        
-                actionName: roleEntitlementDto.ModuleName,                
-                details: $"RoleEntitlement '{roleEntitlementDto.RoleName}' was created. ModuleName: {roleEntitlementDto.ModuleName}",
+                actionCode: "GetById",        
+                actionName: "GetById",                
+                details: $"RoleEntitlement  was created. ",
                 module:"RoleEntitlement"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
@@ -52,5 +59,7 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById
             };           
 
         }
+     
+
     }
 }

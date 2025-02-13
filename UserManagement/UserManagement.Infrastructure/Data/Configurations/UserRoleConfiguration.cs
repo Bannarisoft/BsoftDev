@@ -75,11 +75,17 @@ namespace UserManagement.Infrastructure.Data.Configurations
             builder.HasMany(ur => ur.UserRoleAllocations)
                 .WithOne(ura => ura.UserRole)
                 .HasForeignKey(ura => ura.UserRoleId);
+
+                builder.HasMany(ur => ur.roleModules)
+                .WithOne(rm => rm.Role)
+                .HasForeignKey(ura => ura.RoleId);
+
+               
                 
-            builder.HasMany(ur => ur.RoleEntitlements)
-            .WithOne(re => re.UserRole)
-            .HasForeignKey(re => re.UserRoleId)
-            .OnDelete(DeleteBehavior.Cascade);
+            // builder.HasMany(ur => ur.RoleEntitlements)
+            // .WithOne(re => re.UserRole)
+            // .HasForeignKey(re => re.UserRoleId)
+            // .OnDelete(DeleteBehavior.Cascade);
             
         }
     }
