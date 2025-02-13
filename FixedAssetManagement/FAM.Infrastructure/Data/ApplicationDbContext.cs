@@ -11,21 +11,22 @@ namespace FAM.Infrastructure.Data
     {
         private readonly IIPAddressService _ipAddressService;
         private readonly ITimeZoneService _timeZoneService; 
-
+ 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions, IIPAddressService ipAddressService, ITimeZoneService timeZoneService) 
             : base(dbContextOptions)
         {  
             _ipAddressService = ipAddressService; 
             _timeZoneService = timeZoneService;              
                
-        }
+        } 
         
         public DbSet<AssetGroup> AssetGroup { get; set; } 
         public DbSet<AssetCategories> AssetCategories { get; set; }
         public DbSet<Location> Locations { get; set; }
-        public DbSet<SubLocation> SubLocations { get; set; } 
-public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
-public DbSet<DepreciationGroups> DepreciationGroups { get; set; }
+        public DbSet<SubLocation> SubLocations { get; set; }
+        public DbSet<MiscMaster> MiscMaster { get; set; } 
+        public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
+        public DbSet<DepreciationGroups> DepreciationGroups { get; set; }
 
 
 
@@ -35,11 +36,13 @@ public DbSet<DepreciationGroups> DepreciationGroups { get; set; }
             modelBuilder.ApplyConfiguration(new AssetCategoriesConfiguration());
             modelBuilder.ApplyConfiguration(new LocationConfiguration());
             modelBuilder.ApplyConfiguration(new SubLocationConfiguration());
-modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
-modelBuilder.ApplyConfiguration(new DepreciationGroupConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new DepreciationGroupConfiguration());
                
             base.OnModelCreating(modelBuilder);
         }
+
          public override int SaveChanges()
         {
             UpdateIpFields();            
