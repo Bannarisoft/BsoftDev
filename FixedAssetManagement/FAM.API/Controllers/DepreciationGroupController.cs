@@ -26,8 +26,8 @@ namespace FAM.API.Controllers
             _createDepreciationGroupCommandValidator = createDepreciationGroupCommandValidator;    
             _updateDepreciationGroupCommandValidator = updateDepreciationGroupCommandValidator;                 
         }
-     [HttpGet]                
-        public async Task<IActionResult> GetAllCitiesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        [HttpGet]                
+        public async Task<IActionResult> GetAllDepreciationGroupsAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {            
             var depreciationGroups = await Mediator.Send(
             new GetDepreciationGroupQuery
@@ -64,7 +64,7 @@ namespace FAM.API.Controllers
                 return NotFound(new 
                 { 
                     StatusCode=StatusCodes.Status404NotFound,
-                    message = "DepreciationGroupId {id} not found", 
+                    message = $"DepreciationGroupId {id} not found", 
                 });
             }
             return Ok(new 
@@ -167,7 +167,7 @@ namespace FAM.API.Controllers
         }
              
         [HttpGet("by-name")]  
-        public async Task<IActionResult> GetCity([FromQuery] string? name)
+        public async Task<IActionResult> GetDepreciationGroup([FromQuery] string? name)
         {          
             var result = await Mediator.Send(new GetDepreciationGroupAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
             if (!result.IsSuccess)

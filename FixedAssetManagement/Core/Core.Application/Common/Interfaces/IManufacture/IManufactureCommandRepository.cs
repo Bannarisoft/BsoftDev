@@ -7,7 +7,6 @@ namespace Core.Application.Common.Interfaces.IManufacture
         Task<Manufactures> CreateAsync(Manufactures manufacture);
         Task<int>  UpdateAsync(int Id,Manufactures manufacture);
         Task<int>  DeleteAsync(int Id,Manufactures manufacture);            
-        Task<bool> ExistsByCodeAsync(string code );
-        Task<int> GetMaxSortOrderAsync();
+        Task<bool> ExistsByCodeAsync(string code );        
     }    
 }
