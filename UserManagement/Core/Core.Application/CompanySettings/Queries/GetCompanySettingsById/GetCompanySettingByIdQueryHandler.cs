@@ -26,7 +26,7 @@ namespace Core.Application.CompanySettings.Queries.GetCompanySettingsById
 
         public async Task<ApiResponseDTO<CompanySettingsDTO>> Handle(GetCompanySettingByIdQuery request, CancellationToken cancellationToken)
         {
-             var result = await _ICompanyQuerySettings.GetByIdAsync(request.Id);
+             var result = await _ICompanyQuerySettings.GetAsync();
              if (result == null)
             {
                 return new ApiResponseDTO<CompanySettingsDTO> { IsSuccess = false, Message = "Company Setting not found" };

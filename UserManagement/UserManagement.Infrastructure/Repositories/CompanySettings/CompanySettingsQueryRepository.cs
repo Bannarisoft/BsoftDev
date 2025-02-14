@@ -16,10 +16,10 @@ namespace UserManagement.Infrastructure.Repositories.CompanySettings
         {
             _dbConnection = dbConnection;
         }
-        public async Task<Core.Domain.Entities.CompanySettings> GetByIdAsync(int id)
+        public async Task<Core.Domain.Entities.CompanySettings> GetAsync()
         {
-            const string query = "SELECT * FROM AppData.CompanySetting WHERE Id = @Id";
-            return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.CompanySettings>(query, new { id });
+            const string query = "SELECT * FROM AppData.CompanySetting";
+            return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.CompanySettings>(query);
         }
     }
 }
