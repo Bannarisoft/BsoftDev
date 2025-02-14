@@ -31,7 +31,8 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.FinancialYear, opt =>  opt.Ignore())
             .ForMember(dest => dest.CurrencyId, opt => opt.MapFrom(src => src.Currency))
             .ForMember(dest => dest.LanguageId, opt => opt.MapFrom(src => src.Language))
-            .ForMember(dest => dest.FinancialYearId, opt => opt.MapFrom(src => src.FinancialYear));
+            .ForMember(dest => dest.FinancialYearId, opt => opt.MapFrom(src => src.FinancialYear))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
 
             CreateMap<Core.Domain.Entities.CompanySettings, CompanySettingsDTO>()
             .ForMember(dest => dest.Currency, opt => opt.MapFrom(src => src.CurrencyId))
