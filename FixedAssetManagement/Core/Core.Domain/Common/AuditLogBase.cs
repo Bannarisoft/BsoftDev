@@ -11,7 +11,7 @@ namespace Core.Domain.Common
         public string? IPAddress { get; set; }
         public string? OS { get; set; }
         public string? Browser { get; set; }
-        public DateTime CreatedAt { get; set; }   
+        public DateTimeOffset CreatedAt { get; set; }   
         public int CreatedBy { get; set; }
         public String? CreatedByName { get; set; }
     }

@@ -19,7 +19,7 @@ namespace Core.Application.Country.Queries.GetCountries
         }
         public async Task<ApiResponseDTO<List<CountryDto>>> Handle(GetCountryQuery request, CancellationToken cancellationToken)
         {            
-            var countries = await _countryRepository.GetAllCountriesAsync();
+            var (countries, totalCount)= await _countryRepository.GetAllCountriesAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var countriesList = _mapper.Map<List<CountryDto>>(countries);
             
             //Domain Event
@@ -35,7 +35,10 @@ namespace Core.Application.Country.Queries.GetCountries
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = countriesList
+                Data = countriesList,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
             };
            
         }

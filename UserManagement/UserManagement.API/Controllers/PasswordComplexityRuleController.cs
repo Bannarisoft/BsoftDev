@@ -1,4 +1,5 @@
-using UserManagement.Infrastructure.Data;
+ 
+ using UserManagement.Infrastructure.Data;
 using Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityRule;
 
 //using Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityRule;
@@ -33,10 +34,17 @@ namespace UserManagement.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPasswordComplexityAsync()
-        {          
+    //    public async Task<IActionResult> GetPasswordComplexityAsync()
+        public async Task<IActionResult> GetPasswordComplexityAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        {
+               
                 _logger.LogInformation("Starting GetPasswordComplexityAsync request.");
-                var pwdComplexityRules = await Mediator.Send(new GetPwdRuleQuery());
+                var pwdComplexityRules = await Mediator.Send(new GetPwdRuleQuery
+                {
+                    PageNumber = PageNumber, 
+                    PageSize = PageSize, 
+                    SearchTerm = SearchTerm
+                });
 
             if (pwdComplexityRules == null )
             {
@@ -52,9 +60,13 @@ namespace UserManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Data = pwdComplexityRules
+                Data = pwdComplexityRules,
+                TotalCount = pwdComplexityRules.TotalCount,
+                PageNumber = pwdComplexityRules.PageNumber,
+                PageSize = pwdComplexityRules.PageSize
             });
 
+        
         
         }
 
@@ -89,11 +101,15 @@ namespace UserManagement.API.Controllers
 
         }
         
-          [HttpGet("by-name/{name}")]
-        public async Task<IActionResult> Getpwdautocomplete( string name)
+          [HttpGet("by-name")]
+        public async Task<IActionResult> Getpwdautocomplete([FromQuery] string? name)
         {
+
+
+            // var companiesClaim = User.FindFirst("companyId")?.Value; 
+
                 _logger.LogInformation("Starting GetAllUserRoleAutoCompleteSearchAsync with search pattern: {SearchPattern}", name);
-                    var query = new GetPwdComplexityRuleAutoComplete { SearchTerm  = name };
+                    var query = new GetPwdComplexityRuleAutoComplete { SearchTerm  = name ?? string.Empty };
                         var result = await Mediator.Send(query);
 
                         if (result.IsSuccess )

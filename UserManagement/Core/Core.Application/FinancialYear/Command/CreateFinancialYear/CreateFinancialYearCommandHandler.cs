@@ -39,10 +39,13 @@ namespace Core.Application.FinancialYear.Command.CreateFinancialYear
 
         } 
                 public async Task<ApiResponseDTO<FinancialYearDto>> Handle(CreateFinancialYearCommand request, CancellationToken cancellationToken)
-        {
+          {
             _logger.LogInformation($"Starting CreateFinancialYearCommandHandler for request: {request}" );
            
-             var financialYears = await _financialYearQueryRepository.GetAllFinancialYearAsync();
+          //   var financialYears = await _financialYearQueryRepository.GetAllFinancialYearAsync();
+
+           var (financialYears, totalCount) = await _financialYearQueryRepository.GetAllFinancialYearAsync(1, int.MaxValue, null);
+
                 //  var existingFinancialYear = await _financialYearQueryRepository.GetFinancialYearByDateRangeAsync(request.StartDate, request.EndDate);
 
              var existingFinancialYear = financialYears.FirstOrDefault(fy => fy.StartDate == request.StartDate && fy.EndDate == request.EndDate);

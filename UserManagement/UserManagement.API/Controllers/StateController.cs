@@ -30,14 +30,23 @@ namespace UserManagement.API.Controllers
             
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllStatesAsync()
+        public async Task<IActionResult> GetAllStatesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {
-            var states = await Mediator.Send(new GetStateQuery());            
+            var states = await Mediator.Send(
+            new GetStateQuery
+           {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });            
             return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
                 message = states.Message,
-                data = states.Data 
+                data = states.Data.ToList(),
+                TotalCount = states.TotalCount,
+                PageNumber = states.PageNumber,
+                PageSize = states.PageSize
             });
         }
 
@@ -67,7 +76,7 @@ namespace UserManagement.API.Controllers
                 data = result
             });   
         }        
-        [HttpPost("create")]   
+        [HttpPost]   
         public async Task<IActionResult> CreateAsync(CreateStateCommand  command)
         { 
             var validationResult = await _createStateCommandValidator.ValidateAsync(command);
@@ -89,15 +98,10 @@ namespace UserManagement.API.Controllers
             return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
             
         }
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateAsync(int stateId, UpdateStateCommand command)
-        {   
-            if (stateId != command.Id)
-            {
-                return BadRequest(new { Message = "State ID mismatch" });
-            }
+        [HttpPut]
+        public async Task<IActionResult> UpdateAsync(UpdateStateCommand command)
+        {           
             var validationResult = await _updateStateCommandValidator.ValidateAsync(command);
-
             if (!validationResult.IsValid)
             {                
                 return BadRequest(
@@ -131,7 +135,7 @@ namespace UserManagement.API.Controllers
             }
             return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
         }        
-        [HttpDelete("delete{id}")]   
+        [HttpDelete("{id}")]   
         public async Task<IActionResult> DeleteAsync(int id)
         {          
             if (id <= 0)
@@ -154,17 +158,14 @@ namespace UserManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data =$"State ID {id} Deleted" 
+                data =$"State ID {id} Deleted" ,
+                message = result.Message
             });
         }
 
-        [HttpGet("by-name{name}")]  
-        public async Task<IActionResult> GetState(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return BadRequest(new { Message = "Search pattern is required" });
-            }
+        [HttpGet("by-name")]  
+        public async Task<IActionResult> GetState([FromQuery] string? name)
+        {           
             var result = await Mediator.Send(new GetStateAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
             if (result.IsSuccess)
             {

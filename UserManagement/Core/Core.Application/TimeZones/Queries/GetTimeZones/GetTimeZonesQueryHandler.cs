@@ -31,7 +31,7 @@ namespace Core.Application.TimeZones.Queries.GetTimeZones
         public async Task<ApiResponseDTO<List<TimeZonesDto>>> Handle(GetTimeZonesQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Fetching TimeZones Request started: {request}");
-            var newTimeZones = await _timeZonesQueryRepository.GetAllTimeZonesAsync();
+            var (newTimeZones,totalCount) = await _timeZonesQueryRepository.GetAllTimeZonesAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             if (newTimeZones is null || !newTimeZones.Any() || newTimeZones.Count == 0)
             {
                 _logger.LogWarning($"No TimeZones Record {newTimeZones.Count} not found in DB.");
@@ -56,7 +56,10 @@ namespace Core.Application.TimeZones.Queries.GetTimeZones
             {   
                 IsSuccess = true,                
                 Message = "Success",
-                Data = TimeZoneslist
+                Data = TimeZoneslist,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
             };
         }
     }

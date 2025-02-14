@@ -4,6 +4,7 @@ using Core.Application.City.Commands.CreateCity;
 using Core.Application.City.Commands.UpdateCity;
 using Core.Application.City.Commands.DeleteCity;
 using static Core.Domain.Enums.Common.Enums;
+using Core.Application.City.Queries.GetCities;
 
 namespace Core.Application.Common.Mappings
 {
@@ -20,7 +21,8 @@ namespace Core.Application.Common.Mappings
 
             CreateMap<UpdateCityCommand, Cities>()
             .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));                       
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));      
+            CreateMap<Cities, CityAutoCompleteDTO>();                 
         }
     }
 }    

@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Currency.Queries.GetCurrencyAutoComplete
 {
-    public class GetCurrencyAutocompleteQuery : IRequest<ApiResponseDTO<List<CurrencyDto>>>
+    public class GetCurrencyAutocompleteQuery : IRequest<ApiResponseDTO<List<CurrencyAutoCompleteDto>>>
     {
         public string SearchPattern { get; set; }
     }

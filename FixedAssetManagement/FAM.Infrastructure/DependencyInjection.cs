@@ -1,12 +1,21 @@
 using System.Data;
-using System.Reflection;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IAssetCategories;
 using Core.Application.Common.Interfaces.IAssetGroup;
+using Core.Application.Common.Interfaces.IDepreciationGroup;
+using Core.Application.Common.Interfaces.ILocation;
+using Core.Application.Common.Interfaces.ISubLocation;
 using Core.Application.Common.Mappings;
 using FAM.Infrastructure.Data;
 using FAM.Infrastructure.Repositories;
+using FAM.Infrastructure.Repositories.AssetCategories;
 using FAM.Infrastructure.Repositories.AssetGroup;
+using FAM.Infrastructure.Repositories.DepreciationGroup;
+using FAM.Infrastructure.Repositories.Locations;
+using FAM.Infrastructure.Repositories.SubLocation;
+using FAM.Infrastructure.Repositories.MiscTypeMaster;
+using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using FAM.Infrastructure.Services;
 using Hangfire;
 using Hangfire.SqlServer;
@@ -17,6 +26,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using Serilog;
+using FAM.Infrastructure.Repositories.Manufacture;
+using Core.Application.Common.Interfaces.IManufacture;
+using Core.Domain.Entities;
 
 namespace FAM.Infrastructure
 {
@@ -110,7 +122,20 @@ namespace FAM.Infrastructure
 
             // Register repositories
             services.AddScoped<IAuditLogRepository, AuditLogRepository>(); 
-             services.AddScoped<IAssetGroupCommandRepository, AssetGroupCommandRepository>();   
+            services.AddScoped<IAssetGroupCommandRepository, AssetGroupCommandRepository>();
+            services.AddScoped<ILocationCommandRepository, LocationCommandRepository>();
+            services.AddScoped<ILocationQueryRepository, LocationQueryRepository>();
+            services.AddScoped<ISubLocationCommandRepository, SubLocationCommandRepository>();
+            services.AddScoped<ISubLocationQueryRepository, SubLocationQueryRepository>();   
+            services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>(); 
+            services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
+            services.AddScoped<IDepreciationGroupCommandRepository, DepreciationGroupCommandRepository>();   
+            services.AddScoped<IDepreciationGroupQueryRepository, DepreciationGroupQueryRepository>(); 
+            services.AddScoped<IAssetGroupQueryRepository, AssetGroupQueryRepository>();
+            services.AddScoped<IAssetCategoriesQueryRepository, AssetCategoriesQueryRepository>();
+            services.AddScoped<IAssetCategoriesCommandRepository, AssetCategoriesCommandRepository>();
+            services.AddScoped<IManufactureCommandRepository, ManufactureCommandRepository>();
+            services.AddScoped<IManufactureQueryRepository, ManufactureQueryRepository>();
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -119,8 +144,13 @@ namespace FAM.Infrastructure
 
             // AutoMapper profiles
             services.AddAutoMapper(
-                
-				typeof(AssetGroupProfile)
+				typeof(AssetGroupProfile),
+				typeof(LocationProfile),
+                typeof(SubLocationProfile),
+                typeof(MisctypeMasterProfile),
+                typeof(DepreciationGroupProfile),
+                typeof(AssetCategoriesProfile),
+                typeof(ManufactureProfile)
             );
 
             return services;

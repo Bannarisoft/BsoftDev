@@ -12,6 +12,8 @@ namespace Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySetting
     public class GetAdminSecuritySettingsQuery : IRequest<ApiResponseDTO<List<GetAdminSecuritySettingsDto>>>
     {
         
-        
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 15;
+        public string? SearchTerm { get; set; }
     }
 }

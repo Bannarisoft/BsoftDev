@@ -10,7 +10,9 @@ namespace Core.Application.Common.Interfaces.IUserRole
     public interface IUserRoleQueryRepository
     {
         
-        Task<List<UserRole>> GetAllRoleAsync();
+       // Task<List<UserRole>> GetAllRoleAsync();
+
+        Task<(List<UserRole>,int)> GetAllRoleAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<UserRole?> GetByIdAsync(int id);
         Task<List<UserRole>> GetRolesAsync(string searchTerm); 
         

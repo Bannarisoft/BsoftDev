@@ -27,7 +27,7 @@ namespace UserManagement.Infrastructure.Repositories.City
                 CityToDelete.IsDeleted = cities.IsDeleted;              
                 return await _applicationDbContext.SaveChangesAsync();
             }
-            return 0; // No user found
+            return 0; 
         }
         public async Task<int> UpdateAsync(int id, Cities city)
         {

@@ -22,7 +22,7 @@ namespace Core.Application.State.Queries.GetCountries
         public async Task<ApiResponseDTO<List<StateDto>>> Handle(GetStateQuery request, CancellationToken cancellationToken)
         {
            
-            var states = await _stateRepository.GetAllStatesAsync();
+            var (states, totalCount)= await _stateRepository.GetAllStatesAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var statesList = _mapper.Map<List<StateDto>>(states);            
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -37,7 +37,10 @@ namespace Core.Application.State.Queries.GetCountries
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = statesList
+                Data = statesList,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
             };       
         }
     }

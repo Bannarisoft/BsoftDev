@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.TimeZones.Queries.GetTimeZonesById
 {
-    public class GetTimeZoneByIdQueryHandler : IRequestHandler<GetTimeZoneByIdQuery, ApiResponseDTO<List<TimeZonesDto>>>
+    public class GetTimeZoneByIdQueryHandler : IRequestHandler<GetTimeZoneByIdQuery, ApiResponseDTO<TimeZonesDto>>
     {
         
         private readonly ITimeZonesQueryRepository _timeZonesQueryRepository;        
@@ -28,31 +28,31 @@ namespace Core.Application.TimeZones.Queries.GetTimeZonesById
             _logger = logger?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<ApiResponseDTO<List<TimeZonesDto>>> Handle(GetTimeZoneByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<TimeZonesDto>> Handle(GetTimeZoneByIdQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Fetching TimeZones Request started: {request.TimeZoneId}");
             var newTimeZones = await _timeZonesQueryRepository.GetByIdAsync(request.TimeZoneId);
-            if (newTimeZones is null || !newTimeZones.Any() || newTimeZones.Count == 0)
+            if (newTimeZones is null )
             {
-                _logger.LogWarning($"No TimeZones Record {newTimeZones.Count} not found in DB.");
-                return new ApiResponseDTO<List<TimeZonesDto>>
+                _logger.LogWarning($"No TimeZones Record {request.TimeZoneId} not found in DB.");
+                return new ApiResponseDTO<TimeZonesDto>
                 {
                     IsSuccess = false,
                     Message = "No TimeZones found"
                 };
             }
-            var TimeZoneslist = _mapper.Map<List<TimeZonesDto>>(newTimeZones);
-            _logger.LogInformation($"Fetching TimeZones Request Completed: {TimeZoneslist.Count}");
+            var TimeZoneslist = _mapper.Map<TimeZonesDto>(newTimeZones);
+            _logger.LogInformation($"Fetching TimeZones Request Completed: {request.TimeZoneId}");
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetTimeZoneByIdQuery",
                 actionCode: "Get TimeZones",                
-                actionName: TimeZoneslist.Count.ToString(),
+                actionName: request.TimeZoneId.ToString(),
                 details: $"TimeZones details was fetched.",
                 module:"TimeZones");
             await _mediator.Publish(domainEvent);
-            _logger.LogInformation($"TimeZones {TimeZoneslist.Count} Listed successfully.");            
-            return new ApiResponseDTO<List<TimeZonesDto>>
+            _logger.LogInformation($"TimeZones {request.TimeZoneId} Listed successfully.");            
+            return new ApiResponseDTO<TimeZonesDto>
             {               
                 IsSuccess = true,
                 Message = "Success",
