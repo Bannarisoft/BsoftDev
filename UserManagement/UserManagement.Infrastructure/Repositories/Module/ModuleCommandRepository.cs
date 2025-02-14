@@ -60,17 +60,17 @@ namespace UserManagement.Infrastructure.Repositories.Module
 
     public async Task DeleteModuleAsync(int moduleId)
     {
-        var module = await _applicationDbContext.Modules.Include(m => m.Menus).FirstOrDefaultAsync(m => m.Id == moduleId);
+        // var module = await _applicationDbContext.Modules.Include(m => m.Menus).FirstOrDefaultAsync(m => m.Id == moduleId);
 
-        if (module != null)
-        {
-            module.IsDeleted = true;
+        // if (module != null)
+        // {
+        //     module.IsDeleted = true;
 
-            foreach (var menu in module.Menus)
-            {
-                menu.IsDeleted = true;
-            }
-        }
+        //     foreach (var menu in module.Menus)
+        //     {
+        //         menu.IsDeleted = true;
+        //     }
+        // }
     }
 
     }

@@ -96,5 +96,33 @@ namespace UserManagement.API.Controllers
                 errors = "" 
             });
         }
+           [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(int id)
+        {
+            
+            if (id <= 0)
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest,
+                    Message = "Invalid Company Setting ID" 
+                });
+            }
+
+            var company = await Mediator.Send(new GetCompanySettingByIdQuery() { Id = id });
+            if (company == null)
+            {
+                return NotFound(new 
+                { 
+                    StatusCode=StatusCodes.Status404NotFound,
+                    Message = "Company Setting not found" 
+                });
+            }
+            return Ok(new 
+            {
+                StatusCode=StatusCodes.Status200OK,
+                data = company.Data
+            });
+        }
     }
 }

@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserManagement.Infrastructure.Data;
 
 #nullable disable
 
-namespace UserManagement.Infrastructure.Migrations
+namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250211102458_rolemodulemenFKchange")]
+    partial class rolemodulemenFKchange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -482,9 +485,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("TwoFactorAuth");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CompanyId")
-                        .IsUnique();
 
                     b.HasIndex("CurrencyId")
                         .IsUnique();
@@ -1927,12 +1927,6 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.CompanySettings", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.Company", "company")
-                        .WithOne("CompanySettings")
-                        .HasForeignKey("Core.Domain.Entities.CompanySettings", "CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Core.Domain.Entities.Currency", "Currency")
                         .WithOne("CompanySettings")
                         .HasForeignKey("Core.Domain.Entities.CompanySettings", "CurrencyId")
@@ -1956,18 +1950,10 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("FinancialYear");
 
                     b.Navigation("Language");
-
-                    b.Navigation("company");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.Menu", "Parent")
-                        .WithMany("ChildMenus")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Core.Domain.Entities.Modules", "Module")
                         .WithMany("Menus")
                         .HasForeignKey("ModuleId")
@@ -1975,8 +1961,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Module");
-
-                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PasswordLog", b =>
@@ -2154,9 +2138,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("CompanyContact")
                         .IsRequired();
 
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
-
                     b.Navigation("UserCompanies");
                 });
 
@@ -2185,8 +2166,6 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
                 {
-                    b.Navigation("ChildMenus");
-
                     b.Navigation("RoleMenus");
                 });
 

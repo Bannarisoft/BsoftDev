@@ -141,6 +141,10 @@ namespace UserManagement.Infrastructure.Data.Configurations
             builder.HasOne(ca => ca.FinancialYear)
                 .WithOne(ca => ca.CompanySettings)
                 .HasForeignKey<CompanySettings>(ca => ca.FinancialYearId);
+
+                 builder.HasOne(ca => ca.company)
+                .WithOne(ca => ca.CompanySettings)
+                .HasForeignKey<CompanySettings>(ca => ca.CompanyId);
         }
     }
 }
