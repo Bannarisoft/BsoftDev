@@ -28,6 +28,7 @@ namespace Core.Domain.Entities
         public  CompanyAddress CompanyAddress { get; set; }
         public  CompanyContact CompanyContact { get; set; }
         public IList<UserCompany> UserCompanies { get; set; }
+        public CompanySettings CompanySettings { get; set; }
 
           
     }
