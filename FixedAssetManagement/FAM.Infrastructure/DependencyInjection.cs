@@ -26,6 +26,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using Serilog;
+using Core.Application.Common.Interfaces.IMiscMaster;
+using FAM.Infrastructure.Repositories.MiscMaster;
 
 namespace FAM.Infrastructure
 {
@@ -131,6 +133,8 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetGroupQueryRepository, AssetGroupQueryRepository>();
             services.AddScoped<IAssetCategoriesQueryRepository, AssetCategoriesQueryRepository>();
             services.AddScoped<IAssetCategoriesCommandRepository, AssetCategoriesCommandRepository>();
+            services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
+            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
 
 
             // Miscellaneous services
@@ -143,9 +147,10 @@ namespace FAM.Infrastructure
 				typeof(AssetGroupProfile),
 				typeof(LocationProfile),
                 typeof(SubLocationProfile),
-                typeof(MisctypeMasterProfile),
+                typeof(MiscTypeMasterProfile),
                 typeof(DepreciationGroupProfile),
-                typeof(AssetCategoriesProfile)
+                typeof(AssetCategoriesProfile),                
+                typeof(MiscMasterProfile)
 
 
             );

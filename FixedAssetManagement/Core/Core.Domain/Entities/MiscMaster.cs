@@ -8,11 +8,12 @@ namespace Core.Domain.Entities
 {
     public class MiscMaster  :BaseEntity
     {
-        public int MiscTypeCode  { get; set;}
+        
+         public int MiscTypeMasterId { get; set; }  
         public string? Code { get; set;}
         public string? Description { get; set;}
         public int SortOrder  { get; set;}
-        public int MiscTypeMasterId { get; set; }        
+            
         public MiscTypeMaster? MiscTypeMaster { get; set; } 
                
     }

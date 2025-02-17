@@ -19,7 +19,8 @@ using Core.Application.FinancialYear.Queries.GetFinancialYearAutoComplete;
 
 namespace UserManagement.API.Controllers
 {
-    [Route("[controller]")]
+   [Route("api/[controller]")]
+    [ApiController]
     public class FinancialYearController : ApiControllerBase
     {
       
@@ -71,28 +72,7 @@ namespace UserManagement.API.Controllers
                 });
             }
 
-    //    public async Task<IActionResult> GetAllFinancialYearAsync()
-    //     {       
-    //        _logger.LogInformation("Fetching All FinancialYear Request started.");
-           
-    //         var financialyr =await Mediator.Send(new GetFinancialYearQuery());
-    //        if (financialyr.Data == null || !financialyr.Data.Any())
-    //         {
-               
-    //             _logger.LogInformation($"No FinancialYear records found in the database. Total count: {financialyr?.Data?.Count ?? 0}");
-    //              return NotFound(new
-    //                 {
-    //                     StatusCode = StatusCodes.Status404NotFound,
-    //                     message = financialyr.Message
-    //                 });
-    //          }           
-          
-    //         return Ok(new
-    //         {
-    //             StatusCode = StatusCodes.Status200OK,
-    //             data = financialyr.Data
-    //         });
-    //     }
+   
 
        [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)

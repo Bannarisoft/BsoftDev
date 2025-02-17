@@ -31,16 +31,24 @@ namespace FAM.Infrastructure.Data.Configurations
             );
             
             builder.ToTable("MiscMaster", "FixedAsset");
-
+          
 
         // Primary Key is inherited from BaseEntity (e.g., Id)
-        
-        // Properties
+
+         // Properties
+       // Properties
+         // Properties
+            builder.Property(m => m.MiscTypeMasterId)  // Foreign Key column
+                .HasColumnName("MiscTypeMasterId")
+                .HasColumnType("int")  // Set as int
+                .IsRequired();
+
         builder.Property(m => m.Code)
-               .HasColumnName("code")
-               .HasColumnType("varchar(50)")
+               .HasColumnName("Code")
+               .HasColumnType("nvarchar(50)")  // Set as nvarchar(50)
                .IsRequired();
 
+               
         builder.Property(m => m.Description)
                .HasColumnName("description")
                .HasColumnType("varchar(250)")
@@ -80,16 +88,12 @@ namespace FAM.Infrastructure.Data.Configurations
         builder.Property(b => b.ModifiedIP)
                 .HasColumnType("varchar(20)");        
 
-        // Foreign Key Relationship
-        builder.HasOne(m => m.MiscTypeMaster)
-               .WithMany(t => t.MiscMaster)
-               .HasForeignKey(m => m.MiscTypeCode)
-               .HasPrincipalKey(t => t.Id)
-               .OnDelete(DeleteBehavior.Restrict); // Use .Cascade if needed
-
-     
-           
-            
+       // Foreign Key Relationship
+            builder.HasOne(m => m.MiscTypeMaster)
+                .WithMany(t => t.MiscMaster)
+                .HasForeignKey(m => m.MiscTypeMasterId) // Foreign Key property in MiscMaster
+                .HasPrincipalKey(t => t.Id)  // Principal Key in MiscTypeMaster (Id)
+                .OnDelete(DeleteBehavior.Restrict); // Use .Cascade if needed                          
             
         }
     }

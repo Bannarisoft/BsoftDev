@@ -12,7 +12,7 @@ namespace Core.Application.Departments.Commands.CreateDepartment
 
     public class CreateDepartmentCommand : IRequest<ApiResponseDTO<DepartmentDto>>
     {
-    //    public int DeptId { get; set; }
+    
         public string? ShortName { get; set; }
         public string? DeptName { get; set; }
         public int CompanyId { get; set; }

@@ -58,8 +58,7 @@ namespace UserManagement.Infrastructure.Repositories.PasswordComplexityRule
              int totalCount = (await passwordComplexityRule.ReadFirstAsync<int>());
             return (PasswordComplexityRulelist, totalCount);      
 
-       // const string query = @"SELECT  * FROM AppSecurity.PasswordComplexityRule WHERE IsDeleted = 0 ORDER BY Id DESC";
-       // return (await _dbConnection.QueryAsync<Core.Domain.Entities.PasswordComplexityRule>(query)).ToList();        
+      
     }
 
       public async Task<Core.Domain.Entities.PasswordComplexityRule> GetByIdAsync(int id)
@@ -70,7 +69,7 @@ namespace UserManagement.Infrastructure.Repositories.PasswordComplexityRule
             var passwordComplexity = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.PasswordComplexityRule>(query, new { id });           
              if (passwordComplexity == null)
             {
-               // throw new KeyNotFoundException($" PasswordComplexityRule with ID {id} not found."); 
+             
                return null;            
                
             }

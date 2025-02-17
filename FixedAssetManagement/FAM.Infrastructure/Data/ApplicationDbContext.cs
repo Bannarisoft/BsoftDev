@@ -23,18 +23,11 @@ namespace FAM.Infrastructure.Data
         public DbSet<AssetGroup> AssetGroup { get; set; } 
         public DbSet<AssetCategories> AssetCategories { get; set; }
         public DbSet<Location> Locations { get; set; }
-public DbSet<MiscMaster> MiscMaster { get; set; }
-<<<<<<< .mine
         public DbSet<SubLocation> SubLocations { get; set; }
         public DbSet<MiscMaster> MiscMaster { get; set; } 
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<DepreciationGroups> DepreciationGroups { get; set; }
-=======
-        public DbSet<SubLocation> SubLocations { get; set; } 
-        public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
-        public DbSet<DepreciationGroups> DepreciationGroups { get; set; }
-        public DbSet<AssetSubCategories> AssetSubCategories { get; set; }
->>>>>>> .theirs
+
 
 
 
@@ -44,16 +37,10 @@ public DbSet<MiscMaster> MiscMaster { get; set; }
             modelBuilder.ApplyConfiguration(new AssetCategoriesConfiguration());
             modelBuilder.ApplyConfiguration(new LocationConfiguration());
             modelBuilder.ApplyConfiguration(new SubLocationConfiguration());
- modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
-<<<<<<< .mine
             modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new DepreciationGroupConfiguration());
-=======
-            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
-            modelBuilder.ApplyConfiguration(new DepreciationGroupConfiguration());
-            modelBuilder.ApplyConfiguration(new AssetSubCategoriesConfiguration());
->>>>>>> .theirs
+
                
             base.OnModelCreating(modelBuilder);
         }
