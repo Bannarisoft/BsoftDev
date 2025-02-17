@@ -7,14 +7,19 @@ using Core.Application.Location.Command.UpdateSubLocation;
 using Core.Application.SubLocation.Command.CreateSubLocation;
 using FAM.API.Validation.MiscTypeMaster;
 using Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster;
-using Core.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster;using FAM.API.Validation.DepreciationGroup;
+using Core.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster;
+using FAM.API.Validation.DepreciationGroup;
 using Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup;
-using Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup;using Core.Application.AssetGroup.Command.CreateAssetGroup;
+using Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup;
+using Core.Application.AssetGroup.Command.CreateAssetGroup;
 using FAM.API.Validation.AssetGroup;
 using Core.Application.AssetGroup.Command.UpdateAssetGroup;
 using FAM.API.Validation.AssetCategories;
 using Core.Application.AssetCategories.Command.CreateAssetCategories;
 using Core.Application.AssetCategories.Command.UpdateAssetCategories;
+using Core.Application.AssetSubCategories.Command.CreateAssetSubCategories;
+using Core.Application.AssetSubCategories.Command.UpdateAssetSubCategories;
+using FAM.API.Validation.AssetSubCategories;
 
 
 namespace FAM.API.Validation.Common
@@ -24,7 +29,7 @@ namespace FAM.API.Validation.Common
     public void AddValidationServices(IServiceCollection services)
     {
         services.AddScoped<MaxLengthProvider>();
-         services.AddScoped<IValidator<CreateAssetGroupCommand>, CreateAssetGroupCommandValidator>();
+        services.AddScoped<IValidator<CreateAssetGroupCommand>, CreateAssetGroupCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetGroupCommand>, UpdateAssetGroupCommandValidator>();
         services.AddScoped<IValidator<CreateAssetCategoriesCommand>, CreateAssetCategoriesCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetCategoriesCommand >, UpdateAssetCategoriesCommandValidator>();
@@ -32,9 +37,13 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateLocationCommand>, UpdateLocationCommandValidator>();
         services.AddScoped<IValidator<CreateSubLocationCommand>, CreateSubLocationCommandValidator>();
         services.AddScoped<IValidator<UpdateSubLocationCommand>, UpdateSubLocationCommandValidator>();
-services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
-         services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>(); services.AddScoped<IValidator<CreateDepreciationGroupCommand>, CreateDepreciationGroupCommandValidator>();
+        services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
+        services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>(); 
+        services.AddScoped<IValidator<CreateDepreciationGroupCommand>, CreateDepreciationGroupCommandValidator>();
         services.AddScoped<IValidator<UpdateDepreciationGroupCommand>, UpdateDepreciationGroupCommandValidator>();
+        services.AddScoped<IValidator<CreateAssetSubCategoriesCommand>, CreateAssetSubCategoriesCommandValidator>();
+        services.AddScoped<IValidator<UpdateAssetSubCategoriesCommand >, UpdateAssetSubCategoriesCommandValidator>();
+
     }  
     }
 }
