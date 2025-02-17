@@ -25,15 +25,17 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(100)");
 
             // Configure relationships
-            builder.HasMany(m => m.RoleEntitlements)
-                .WithOne(re => re.Module) // Define navigation property in RoleEntitlement
-                .HasForeignKey(re => re.ModuleId) // Foreign key in RoleEntitlement
-                .OnDelete(DeleteBehavior.Restrict); // Restrict delete behavior
+            // builder.HasMany(m => m.RoleEntitlements)
+            //     .WithOne(re => re.Module) // Define navigation property in RoleEntitlement
+            //     .HasForeignKey(re => re.ModuleId) // Foreign key in RoleEntitlement
+            //     .OnDelete(DeleteBehavior.Restrict); // Restrict delete behavior
 
             builder.HasMany(m => m.Menus)
-                .WithOne(menu => menu.Module) // Define navigation property in Menu
-                .HasForeignKey(menu => menu.ModuleId) // Foreign key in Menu
-                .OnDelete(DeleteBehavior.Cascade); // Cascade delete behavior
+                .WithOne(menu => menu.Module) 
+                .HasForeignKey(menu => menu.ModuleId) 
+                .OnDelete(DeleteBehavior.Cascade); 
+
+               
         }
     }
 }

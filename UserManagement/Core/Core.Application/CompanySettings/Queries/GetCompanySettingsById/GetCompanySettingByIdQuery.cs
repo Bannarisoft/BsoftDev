@@ -10,6 +10,6 @@ namespace Core.Application.CompanySettings.Queries.GetCompanySettingsById
 {
     public class GetCompanySettingByIdQuery : IRequest<ApiResponseDTO<CompanySettingsDTO>>
     {
-        public int Id { get; set; }
+        // public int Id { get; set; }
     }
 }

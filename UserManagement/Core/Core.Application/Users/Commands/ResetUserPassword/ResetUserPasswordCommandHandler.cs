@@ -68,6 +68,7 @@ namespace Core.Application.Users.Commands.ResetUserPassword
             }
            
             // Update the user's password
+
             var passwordLog = new PasswordLogDTO
             {
                 UserId = user.UserId,
@@ -75,6 +76,8 @@ namespace Core.Application.Users.Commands.ResetUserPassword
                 PasswordHash = await _changePassword.PasswordEncode(request.Password),
                 CreatedAt = currentTime
             };
+
+
             var passwordLogMap = _mapper.Map<PasswordLog>(passwordLog);
             var result = await _changePassword.ResetUserPassword(user.UserId,passwordLogMap);
             bool log = await _changePassword.PasswordLog(passwordLogMap);

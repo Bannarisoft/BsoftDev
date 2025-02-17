@@ -77,31 +77,7 @@ namespace UserManagement.API.Controllers
             });
         }
 
-    //    public async Task<IActionResult> GetAllAdminSecuritySettingsAsync( )
-    //     {     
-    //             _logger.LogInformation("Starting GetAllAdminSecuritySettingsAsync request.");
-    //                     // Fetch the admin security settings
-    //             var adminSecuritySettings = await Mediator.Send(new GetAdminSecuritySettingsQuery());
-
-    //             if (adminSecuritySettings == null || !adminSecuritySettings.Data.Any())
-    //             {
-    //                 _logger.LogWarning($"No admin security settings found.{adminSecuritySettings.Data}");
-    //                 return NotFound(new
-    //                 {
-    //                     StatusCode = StatusCodes.Status404NotFound,
-    //                     Message = "No admin security settings found."
-    //                 });
-    //             }
-
-    //             _logger.LogInformation("Admin security settings retrieved successfully.");
-
-    //             return Ok(new
-    //             {
-    //                 StatusCode = StatusCodes.Status200OK,
-    //                 Data = adminSecuritySettings
-    //             });     
-          
-    //     }
+   
         
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)

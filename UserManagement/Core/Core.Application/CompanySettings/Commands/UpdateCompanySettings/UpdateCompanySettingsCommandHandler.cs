@@ -25,7 +25,7 @@ namespace Core.Application.CompanySettings.Commands.UpdateCompanySettings
         {
             var companySettings = _imapper.Map<Core.Domain.Entities.CompanySettings>(request);
 
-            var CompanySettingResponse = await _icompanyCommandSettings.UpdateAsync(companySettings.Id, companySettings);
+            var CompanySettingResponse = await _icompanyCommandSettings.UpdateAsync(request.Id, companySettings);
 
             if(CompanySettingResponse)
             {

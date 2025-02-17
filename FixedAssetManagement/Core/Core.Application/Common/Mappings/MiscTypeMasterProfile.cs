@@ -11,13 +11,11 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.Common.Mappings
 {
-    public class MisctypeMasterProfile  : Profile
+    public class MiscTypeMasterProfile : Profile
     {
-
-        public MisctypeMasterProfile()
+        public MiscTypeMasterProfile()
         {
-                CreateMap<Core.Domain.Entities.MiscTypeMaster,GetMiscTypeMasterDto>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore());
+                CreateMap<Core.Domain.Entities.MiscTypeMaster,GetMiscTypeMasterDto>();
 
                 CreateMap<Core.Domain.Entities.MiscTypeMaster,GetMiscTypeMasterAutocompleteDto>();
 
@@ -28,15 +26,9 @@ namespace Core.Application.Common.Mappings
                 CreateMap<UpdateMiscTypeMasterCommand, Core.Domain.Entities.MiscTypeMaster>()
                  .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
 
-
                 CreateMap<DeleteMiscTypeMasterCommand,  Core.Domain.Entities.MiscTypeMaster>()
-                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
-    
-
-
-                
-
+                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted)); 
         }
-        
+
     }
 }

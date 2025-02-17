@@ -17,13 +17,7 @@ namespace UserManagement.Infrastructure.Repositories.FinancialYear
          _dbConnection = dbConnection;
     }
 
-    //  public async Task<List<Core.Domain.Entities.FinancialYear>>GetAllFinancialYearAsync()
-    // {
-        
-    //     const string query = @"SELECT  * FROM AppData.FinancialYear WHERE   IsDeleted = 0 ORDER BY ID DESC ";
-    //     return (await _dbConnection.QueryAsync<Core.Domain.Entities.FinancialYear>(query)).ToList();
-        
-    // }
+   
             public async Task<(List<Core.Domain.Entities.FinancialYear>, int)> GetAllFinancialYearAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             var query = $$"""

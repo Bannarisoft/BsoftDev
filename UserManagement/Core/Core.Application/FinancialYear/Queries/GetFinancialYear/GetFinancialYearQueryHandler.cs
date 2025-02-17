@@ -20,9 +20,6 @@ namespace Core.Application.GetFinancialYear.Queries.GetFinancialYear
          private readonly IMediator _mediator; 
 
          private readonly ILogger<GetFinancialYearQueryHandler> _logger;
-      
-
-
     
        public GetFinancialYearQueryHandler(IFinancialYearQueryRepository financialyearRepository,IMapper mapper , IMediator mediator, ILogger<GetFinancialYearQueryHandler> logger)
         {
@@ -69,37 +66,7 @@ namespace Core.Application.GetFinancialYear.Queries.GetFinancialYear
             };
         }
 
-        // public async Task<ApiResponseDTO<List<GetFinancialYearDto>>> Handle(GetFinancialYearQuery request, CancellationToken cancellationToken)    
-        // {
-         
-
-
-        //      _logger.LogInformation($"Fetching FinancialYear Request started: {request}");
-           
-           
-        //      var financialyear = await _financialyearRepository.GetAllFinancialYearAsync();
-            
-        //      if (financialyear is null || !financialyear.Any())
-        //     {
-        //        _logger.LogWarning($"No FinancialYear records found in the database. Total count: {financialyear?.Count ?? 0}");
-
-        //           return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = false, Message = "No Record Found" };
-        //     }
-
-        //      var financialyearList = _mapper.Map<List<GetFinancialYearDto>>(financialyear);
-        //      var domainEvent = new AuditLogsDomainEvent(
-        //             actionDetail: "GetAll",
-        //             actionCode: "",        
-        //             actionName: "",
-        //             details: $"FinancialYear details was fetched.",
-        //             module:"FinancialYear"
-        //         );
-
-        //           await _mediator.Publish(domainEvent, cancellationToken);
-              
-        //     _logger.LogInformation($"FinancialYear {financialyearList} Listed successfully." );
-        //     return new ApiResponseDTO<List<GetFinancialYearDto>> { IsSuccess = true, Message = "Success", Data = financialyearList };       
-        // }
+      
     }
 
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.CompanySettings.Queries.GetCompanySettings
 {
@@ -23,6 +24,6 @@ namespace Core.Application.CompanySettings.Queries.GetCompanySettings
         public int Language { get; set; }
         public int TimeZone { get; set; }
         public int FinancialYear { get; set; }
-        public byte IsActive { get; set; }
+        public Status IsActive { get; set; }
     }
 }

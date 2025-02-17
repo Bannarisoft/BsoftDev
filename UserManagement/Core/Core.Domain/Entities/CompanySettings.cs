@@ -10,6 +10,7 @@ namespace Core.Domain.Entities
     {
         public int Id { get; set; }
         public int CompanyId { get; set; }
+        public Company company { get; set; }
         public int PasswordHistoryCount { get; set; }
         public int SessionTimeout { get; set; }
         public int FailedLoginAttempts { get; set; }

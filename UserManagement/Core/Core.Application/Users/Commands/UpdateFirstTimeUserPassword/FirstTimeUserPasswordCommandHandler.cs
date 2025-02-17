@@ -39,9 +39,9 @@ namespace Core.Application.Users.Commands.UpdateFirstTimeUserPassword
                       
                       var changedPasswordLog = await _ichangePassword.FirstTimeUserChangePassword(request.UserId,passwordLog);
 
-                      if (changedPasswordLog != null)
+                      if (changedPasswordLog)
                       {
-                          return new ApiResponseDTO<string> { IsSuccess = true, Message = "Password changed successfully.", Data = changedPasswordLog};
+                          return new ApiResponseDTO<string> { IsSuccess = true, Message = "Password changed successfully."};
                       }
 
                      return new ApiResponseDTO<string> { IsSuccess = false, Message = "Password change failed."}; 

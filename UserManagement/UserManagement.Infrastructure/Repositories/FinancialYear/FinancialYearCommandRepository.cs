@@ -60,10 +60,6 @@ namespace UserManagement.Infrastructure.Repositories.FinancialYear
     }
    
 
-        // public async Task<bool> ExistsByStartAndEndDateAsync(DateTime startDate, DateTime endDate)
-        // {
-        //     return await _applicationDbContext.FinancialYear
-        //         .AnyAsync(fy => fy.StartDate == startDate && fy.EndDate == endDate );
-        // }
+      
     }
 }
