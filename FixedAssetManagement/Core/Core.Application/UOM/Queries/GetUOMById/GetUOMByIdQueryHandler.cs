@@ -40,8 +40,8 @@ namespace Core.Application.UOM.Queries.GetUOMById
                     actionDetail: "GetById",
                     actionCode: "",        
                     actionName: "",
-                    details: $"Location details {location.Id} was fetched.",
-                    module:"Location"
+                    details: $"UOM details {location.Id} was fetched.",
+                    module:"UOM"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
           return new ApiResponseDTO<UOMDto> { IsSuccess = true, Message = "Success", Data = location };
