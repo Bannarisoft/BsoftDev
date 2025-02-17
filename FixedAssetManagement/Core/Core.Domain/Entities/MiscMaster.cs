@@ -15,6 +15,9 @@ namespace Core.Domain.Entities
         public int SortOrder  { get; set;}
             
         public MiscTypeMaster? MiscTypeMaster { get; set; } 
+
+        // Navigation Property for UOMs referencing this MiscMaster
+        public ICollection<UOM> UOMs { get; set; } = new List<UOM>();
                
     }
 }

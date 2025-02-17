@@ -27,11 +27,14 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using Serilog;
 using Core.Application.Common.Interfaces.IAssetSubCategories;
-using FAM.Infrastructure.Repositories.AssetSubCategories;using Core.Application.Common.Interfaces.IMiscMaster;
+using FAM.Infrastructure.Repositories.AssetSubCategories;
+using Core.Application.Common.Interfaces.IMiscMaster;
 using FAM.Infrastructure.Repositories.MiscMaster;
 using FAM.Infrastructure.Repositories.Manufacture;
 using Core.Application.Common.Interfaces.IManufacture;
 using Core.Domain.Entities;
+using Core.Application.Common.Interfaces.IUOM;
+using FAM.Infrastructure.Repositories.UOMs;
 
 namespace FAM.Infrastructure
 {
@@ -138,10 +141,13 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetCategoriesQueryRepository, AssetCategoriesQueryRepository>();
             services.AddScoped<IAssetCategoriesCommandRepository, AssetCategoriesCommandRepository>();
  			services.AddScoped<IAssetSubCategoriesQueryRepository, AssetSubCategoriesQueryRepository>();
-            services.AddScoped<IAssetSubCategoriesCommandRepository, AssetSubCategoriesCommandRepository>();			services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
+            services.AddScoped<IAssetSubCategoriesCommandRepository, AssetSubCategoriesCommandRepository>();			
+            services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
             services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();            
 			services.AddScoped<IManufactureCommandRepository, ManufactureCommandRepository>();
             services.AddScoped<IManufactureQueryRepository, ManufactureQueryRepository>();
+            services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
+            services.AddScoped<IUOMQueryRepository, UOMQueryRepository>();
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -158,7 +164,8 @@ namespace FAM.Infrastructure
                 typeof(DepreciationGroupProfile),
                 typeof(AssetCategoriesProfile),
 				typeof(AssetSubCategoriesProfile),
-				typeof(ManufactureProfile)
+				typeof(ManufactureProfile),
+                typeof(UOMProfile)
             );
 
             return services;
