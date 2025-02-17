@@ -62,38 +62,46 @@ namespace UserManagement.API.Validation.FinancialYear
             }
 
             private void AddFinancialYearDateValidation()
-            {         
-                        RuleFor(x => x.StartYear)
-                    .NotEmpty()
-                    .WithMessage("Start Year is required.")
-                    .Must(startYear => int.TryParse(startYear, out var year) && year > 0)
-                    .WithMessage("Start Year must be a positive number.");
+            {    
+                    RuleFor(x => x.StartYear)
+                        .NotEmpty()
+                        .WithMessage("Start Year is required.")
+                        .Must(startYear => 
+                            int.TryParse(startYear, out var year) && 
+                            year > 0 && 
+                            startYear.Length == 4)  // Ensures 4-digit format
+                        .WithMessage("Start Year must be a valid 4-digit year (e.g., 2023).");   
 
-                RuleFor(x => x.StartDate)
-                    .NotEmpty()
-                    .WithMessage("Start Date is required.")
-                    .Must((command, startDate) => 
-                    {
-                        if (int.TryParse(command.StartYear, out var startYear))
+                    RuleFor(x => x.StartDate)
+                        .NotEmpty()
+                        .WithMessage("Start Date is required.")
+                        .Must((command, startDate) => 
                         {
-                            return startDate == new DateTime(startYear, 4, 1);
-                        }
-                        return false;
-                    })
-                    .WithMessage(command => $"Start Date should be April 1st of the Start Year ({command.StartYear}).");
+                            if (int.TryParse(command.StartYear, out var startYear))
+                            {
+                                return startDate == new DateTime(startYear, 4, 1);
+                            }
+                            return false;
+                        })
+                        .WithMessage(command => $"Start Date should be April 1st of the Start Year ({command.StartYear}).");
 
-                RuleFor(x => x.EndDate)
-                    .NotEmpty()
-                    .WithMessage("End Date is required.")
-                    .Must((command, endDate) => 
-                    {
-                        if (int.TryParse(command.StartYear, out var startYear))
+                    RuleFor(x => x.EndDate)
+                        .NotEmpty()
+                        .WithMessage("End Date is required.")
+                        .Must((command, endDate) => 
                         {
-                            return endDate == new DateTime(startYear + 1, 3, 31);
-                        }
-                        return false;
-                    })
-                    .WithMessage(command => $"End Date should be March 31st of the following year ({command.StartYear}).");
+                            // Check if StartDate is valid and parse StartYear
+                            if (command.StartDate != default && int.TryParse(command.StartYear, out var startYear))
+                            {
+                                // Calculate the expected EndDate
+                                var expectedEndDate = command.StartDate.AddYears(1).AddDays(-1); // One year minus 1 day
+                                return endDate == expectedEndDate;
+                            }
+                            return false;
+                        })
+                        .WithMessage(command => 
+                            $"End Date should be March 31st of the next year after Start Date ({command.StartDate.AddYears(1).AddDays(-1):yyyy-MM-dd}).");     
+                
             }
 
     }

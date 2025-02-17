@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250213112026_AddMiscMasterConfiguration")]
+    partial class AddMiscMasterConfiguration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,72 +163,60 @@ namespace FAM.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AssetCategoriesId")
-                        .HasColumnType("int")
-                        .HasColumnName("AssetCategoriesId");
+                        .HasColumnType("int");
 
                     b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("Code");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Description");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("ModifiedDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SortOrder")
-                        .HasColumnType("int")
-                        .HasColumnName("SortOrder");
+                        .HasColumnType("int");
 
                     b.Property<string>("SubCategoryName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("SubCategoryName");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AssetCategoriesId");
 
-                    b.ToTable("AssetSubCategories", "FixedAsset");
+                    b.ToTable("AssetSubCategories");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.DepreciationGroups", b =>
@@ -378,7 +369,7 @@ namespace FAM.Infrastructure.Migrations
                     b.ToTable("Location", "FixedAsset");
                 });
 
- modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
+            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -445,96 +436,6 @@ namespace FAM.Infrastructure.Migrations
                     b.HasIndex("MiscTypeMasterId");
 
                     b.ToTable("MiscMaster", "FixedAsset");
-                });
-            modelBuilder.Entity("Core.Domain.Entities.Manufactures", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AddressLine1")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)");
-
-                    b.Property<string>("AddressLine2")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)");
-
-                    b.Property<int>("CityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<int>("CountryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ManufactureName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("ManufactureType")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("PersonName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<string>("PinCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<int>("StateId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Manufacture", "FixedAsset");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
@@ -686,7 +587,7 @@ namespace FAM.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.AssetCategories", "AssetCategories")
                         .WithMany("AssetSubCategories")
                         .HasForeignKey("AssetCategoriesId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AssetCategories");
@@ -703,7 +604,7 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetGroup");
                 });
 
-     modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
+            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
                         .WithMany("MiscMaster")
@@ -713,6 +614,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Navigation("MiscTypeMaster");
                 });
+
             modelBuilder.Entity("Core.Domain.Entities.SubLocation", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Location", "Location")
@@ -740,7 +642,8 @@ namespace FAM.Infrastructure.Migrations
                 {
                     b.Navigation("SubLocations");
                 });
-     modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
+
+            modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
                 {
                     b.Navigation("MiscMaster");
                 });

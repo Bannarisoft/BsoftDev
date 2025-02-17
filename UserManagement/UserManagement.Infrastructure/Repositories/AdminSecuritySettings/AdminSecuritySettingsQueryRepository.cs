@@ -19,14 +19,7 @@ namespace UserManagement.Infrastructure.Repositories.AdminSecuritySettings
     {
          _dbConnection = dbConnection;
     }
-
-    // public async Task<List<Core.Domain.Entities.AdminSecuritySettings>> GetAllAdminSecuritySettingsAsync()
-    // {
-        
-    //     const string query = @"SELECT  * FROM AppSecurity.AdminSecuritySettings WHERE IsDeleted = 0 ORDER BY ID DESC";
-    //         return (await _dbConnection.QueryAsync<Core.Domain.Entities.AdminSecuritySettings>(query)).ToList();
-        
-    // }
+   
             public async Task<(List<Core.Domain.Entities.AdminSecuritySettings>, int)> GetAllAdminSecuritySettingsAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             var query = $$"""
