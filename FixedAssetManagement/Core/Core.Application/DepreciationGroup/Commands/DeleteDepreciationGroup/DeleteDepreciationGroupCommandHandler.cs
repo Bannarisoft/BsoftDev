@@ -66,8 +66,7 @@ namespace Core.Application.DepreciationGroup.Commands.DeleteDepreciationGroup
             {
                 IsSuccess = false,
                 Message = "DepreciationGroup deletion failed."                             
-            };
-           
+            };           
         }
     }
 }

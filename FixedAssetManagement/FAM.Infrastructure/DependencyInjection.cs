@@ -29,6 +29,8 @@ using Serilog;
 using FAM.Infrastructure.Repositories.Manufacture;
 using Core.Application.Common.Interfaces.IManufacture;
 using Core.Domain.Entities;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral;
 
 namespace FAM.Infrastructure
 {
@@ -136,6 +138,8 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetCategoriesCommandRepository, AssetCategoriesCommandRepository>();
             services.AddScoped<IManufactureCommandRepository, ManufactureCommandRepository>();
             services.AddScoped<IManufactureQueryRepository, ManufactureQueryRepository>();
+            services.AddScoped<IAssetMasterGeneralCommandRepository, AssetMasterGeneralCommandRepository>();
+            services.AddScoped<IAssetMasterGeneralQueryRepository, AssetMasterGeneralQueryRepository>();
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 

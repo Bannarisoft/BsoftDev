@@ -33,6 +33,26 @@ namespace Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup
                 IsSuccess = false,
                 Message = "Invalid DepreciationGroupID. The specified Name does not exist or is inactive."
             };
+
+              // Check for duplicate GroupName or SortOrder
+            var (isNameDuplicate, isSortOrderDuplicate) = await _depreciationGroupRepository
+                                    .CheckForDuplicatesAsync(request.DepreciationGroupName ?? string.Empty, request.SortOrder, request.Id);
+
+            if (isNameDuplicate || isSortOrderDuplicate)
+            {
+                string errorMessage = isNameDuplicate && isSortOrderDuplicate
+                ? "Both Category Name and Sort Order already exist."
+                : isNameDuplicate
+                ? "DepreciationGroup with the same Name already exists."
+                : "DepreciationGroup with the same Sort Order already exists.";
+
+                return new ApiResponseDTO<DepreciationGroupDTO>
+                {
+                    IsSuccess = false,
+                    Message = errorMessage                    
+                };
+            }
+            
             var oldDepreciationName = depreciationGroups.DepreciationGroupName;
             depreciationGroups.DepreciationGroupName = request.DepreciationGroupName;
 

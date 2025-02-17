@@ -61,5 +61,15 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
         {
             return await _applicationDbContext.DepreciationGroups.MaxAsync(ac => (int?)ac.SortOrder) ?? -1;
         }       
+        public async Task<(bool IsNameDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name, int sortOrder, int excludeId)
+        {
+            var isNameDuplicate = await _applicationDbContext.DepreciationGroups
+                .AnyAsync(ag => ag.DepreciationGroupName == name && ag.Id != excludeId);
+
+            var isSortOrderDuplicate = await _applicationDbContext.DepreciationGroups
+                .AnyAsync(ag => ag.SortOrder == sortOrder && ag.Id != excludeId);
+
+            return (isNameDuplicate, isSortOrderDuplicate);
+       }
     }
 }

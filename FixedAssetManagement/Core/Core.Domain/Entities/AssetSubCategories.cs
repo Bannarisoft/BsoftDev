@@ -14,5 +14,6 @@ namespace Core.Domain.Entities
         public int SortOrder { get; set; }
         public int AssetCategoriesId { get; set; }
         public AssetCategories AssetCategories { get; set; } = null!;
+        public ICollection<AssetMasterGenerals>? AssetMasterGeneral { get; set; } 
     }
 }

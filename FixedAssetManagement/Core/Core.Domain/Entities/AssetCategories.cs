@@ -15,6 +15,7 @@ namespace Core.Domain.Entities
         public int AssetGroupId { get; set; }
         public AssetGroup AssetGroup { get; set; } = null!;
         public ICollection<AssetSubCategories>? AssetSubCategories { get; set; } 
+        public ICollection<AssetMasterGenerals>? AssetMasterGeneral { get; set; } 
 
     }
 }

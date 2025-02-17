@@ -20,6 +20,10 @@ using Core.Application.AssetCategories.Command.UpdateAssetCategories;
 using Core.Application.Manufacture.Commands.UpdateManufacture;
 using FAM.API.Validation.Manufacture;
 using Core.Application.Manufacture.Commands.CreateManufacture;
+using FAM.API.Validation.AssetMaster.AssetMasterGeneral;
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral;
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
+
 
 
 namespace FAM.API.Validation.Common
@@ -43,6 +47,8 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateDepreciationGroupCommand>, UpdateDepreciationGroupCommandValidator>();
         services.AddScoped<IValidator<UpdateManufactureCommand>, UpdateManufactureCommandValidator>();
         services.AddScoped<IValidator<CreateManufactureCommand>, CreateManufactureCommandValidator>();
+        services.AddScoped<IValidator<CreateAssetMasterGeneralCommand>, CreateAssetMasterGeneralCommandValidator>();
+        services.AddScoped<IValidator<UpdateAssetMasterGeneralCommand>, UpdateAssetMasterGeneralCommandValidator>();
     }  
     }
 }

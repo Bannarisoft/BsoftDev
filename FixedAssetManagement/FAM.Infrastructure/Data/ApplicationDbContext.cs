@@ -27,7 +27,8 @@ namespace FAM.Infrastructure.Data
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<DepreciationGroups> DepreciationGroups { get; set; }
         public DbSet<AssetSubCategories> AssetSubCategories { get; set; }
-public DbSet<Manufactures> Manufactures { get; set; }
+        public DbSet<Manufactures> Manufactures { get; set; }
+        public DbSet<AssetMasterGenerals> AssetMasterGenerals { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
