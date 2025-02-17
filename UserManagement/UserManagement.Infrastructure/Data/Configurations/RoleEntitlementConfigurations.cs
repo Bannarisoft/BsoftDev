@@ -29,16 +29,16 @@ namespace UserManagement.Infrastructure.Data.Configurations
             //     .OnDelete(DeleteBehavior.Cascade); // Deletes role entitlements when a role is deleted
 
             // Module Relationship
-            builder.HasOne(re => re.Module)
-                .WithMany(m => m.RoleEntitlements)
-                .HasForeignKey(re => re.ModuleId)
-                .OnDelete(DeleteBehavior.Restrict); // Restricts deletion of a module if entitlements exist
+            // builder.HasOne(re => re.Module)
+            //     .WithMany(m => m.RoleEntitlements)
+            //     .HasForeignKey(re => re.ModuleId)
+            //     .OnDelete(DeleteBehavior.Restrict); // Restricts deletion of a module if entitlements exist
 
             // Menu Relationship
-            builder.HasOne(re => re.Menu)
-                .WithMany(me => me.RoleEntitlements)
-                .HasForeignKey(re => re.MenuId)
-                .OnDelete(DeleteBehavior.Restrict); // Restricts deletion of a menu if entitlements exist
+            // builder.HasOne(re => re.Menu)
+            //     .WithMany(me => me.RoleEntitlements)
+            //     .HasForeignKey(re => re.MenuId)
+            //     .OnDelete(DeleteBehavior.Restrict); // Restricts deletion of a menu if entitlements exist
 
             // Default Values for Permissions
             builder.Property(re => re.CanView).HasDefaultValue(false);

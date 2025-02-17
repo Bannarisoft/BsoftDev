@@ -75,7 +75,7 @@ namespace UserManagement.API.Controllers
                 data = result.Data
             });
         }
-        [HttpPost("create")]          
+        [HttpPost]          
         public async Task<IActionResult> CreateAsync(CreateCountryCommand  command)
         { 
             var validationResult = await _createCountryCommandValidator.ValidateAsync(command);
@@ -105,7 +105,7 @@ namespace UserManagement.API.Controllers
             });
                        
         }
-        [HttpPut("update")]      
+        [HttpPut]      
         public async Task<IActionResult> UpdateAsync( UpdateCountryCommand command)
         {
             var validationResult = await _updateCountryCommandValidator.ValidateAsync(command);
@@ -145,7 +145,7 @@ namespace UserManagement.API.Controllers
                 });
             }
         }
-        [HttpDelete("delete{id}")]   
+        [HttpDelete("{id}")]   
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id <= 0)

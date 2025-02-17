@@ -19,8 +19,7 @@ using Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster;
 
 namespace FAM.API.Controllers
 {
-    [Route("[controller]")]
-    [ApiController]
+   [Route("api/[controller]")]
     public class MiscTypeMasterController : ApiControllerBase
     {
 
@@ -73,7 +72,7 @@ namespace FAM.API.Controllers
            
         }
 
-          [HttpGet("by-name")]
+        [HttpGet("by-name")]
         public async Task<IActionResult> GetMiscTypeMaster([FromQuery] string? name)
         {
           
@@ -101,9 +100,7 @@ namespace FAM.API.Controllers
           
             var response = await Mediator.Send(command);
             if(response.IsSuccess)
-            {
-              
-                // return CreatedAtAction(nameof(GetByIdAsync), new {  id = response.Data }, response);
+            {                             
                 return Ok(new 
                 {
                      StatusCode=StatusCodes.Status201Created,
@@ -168,7 +165,6 @@ namespace FAM.API.Controllers
         }
        
       
-
 
 
 

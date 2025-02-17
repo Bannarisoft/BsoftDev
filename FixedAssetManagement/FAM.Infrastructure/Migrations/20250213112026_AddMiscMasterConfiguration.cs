@@ -6,62 +6,65 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FAM.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDepreciationGroup : Migration
+    public partial class AddMiscMasterConfiguration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+          
+
             migrationBuilder.CreateTable(
-                name: "DepreciationGroup",
+                name: "MiscMaster",
                 schema: "FixedAsset",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Code = table.Column<string>(type: "varchar(10)", nullable: false),
-                    BookType = table.Column<string>(type: "varchar(50)", nullable: false),
-                    DepreciationGroupName = table.Column<string>(type: "varchar(50)", nullable: false),
-                    AssetGroupId = table.Column<int>(type: "int", nullable: true),
-                    UsefulLife = table.Column<int>(type: "int", nullable: false),
-                    DepreciationMethod = table.Column<string>(type: "varchar(50)", nullable: false),
-                    ResidualValue = table.Column<int>(type: "int", nullable: false),
-                    SortOrder = table.Column<int>(type: "int", nullable: false),
+                    MiscTypeMasterId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    description = table.Column<string>(type: "varchar(250)", nullable: false),
+                    sortOrder = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     CreatedByName = table.Column<string>(type: "varchar(50)", nullable: false),
-                    CreatedIP = table.Column<string>(type: "varchar(50)", nullable: false),
+                    CreatedIP = table.Column<string>(type: "varchar(20)", nullable: false),
                     ModifiedBy = table.Column<int>(type: "int", nullable: true),
                     ModifiedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     ModifiedByName = table.Column<string>(type: "varchar(50)", nullable: true),
-                    ModifiedIP = table.Column<string>(type: "varchar(50)", nullable: true)
+                    ModifiedIP = table.Column<string>(type: "varchar(20)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DepreciationGroup", x => x.Id);
+                    table.PrimaryKey("PK_MiscMaster", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DepreciationGroup_AssetGroup_AssetGroupId",
-                        column: x => x.AssetGroupId,
+                        name: "FK_MiscMaster_MiscTypeMaster_MiscTypeMasterId",
+                        column: x => x.MiscTypeMasterId,
                         principalSchema: "FixedAsset",
-                        principalTable: "AssetGroup",
+                        principalTable: "MiscTypeMaster",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DepreciationGroup_AssetGroupId",
+                name: "IX_MiscMaster_MiscTypeMasterId",
                 schema: "FixedAsset",
-                table: "DepreciationGroup",
-                column: "AssetGroupId");
+                table: "MiscMaster",
+                column: "MiscTypeMasterId");
+
+         
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+           
             migrationBuilder.DropTable(
-                name: "DepreciationGroup",
+                name: "MiscMaster",
                 schema: "FixedAsset");
+
+       
         }
     }
 }

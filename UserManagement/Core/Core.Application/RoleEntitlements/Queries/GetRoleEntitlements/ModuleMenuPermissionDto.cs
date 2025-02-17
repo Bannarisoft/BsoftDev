@@ -7,7 +7,8 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlements
 {
     public class ModuleMenuPermissionDto
     {
-    public int ModuleId { get; set; }
-    public List<MenuPermissionDto>? Menus { get; set; }
+     public int RoleId { get; set; }
+     public int ModuleId { get; set; }
+     public IList<MenuPermissionDto> MenuPermissions { get; set; }
     }
 }

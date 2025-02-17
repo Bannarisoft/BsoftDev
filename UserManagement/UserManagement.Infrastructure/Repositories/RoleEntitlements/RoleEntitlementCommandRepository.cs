@@ -20,106 +20,47 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
     }
 
   
-    public async Task AddRoleEntitlementsAsync(IEnumerable<RoleEntitlement> roleEntitlements, CancellationToken cancellationToken)
+    public async Task<IList<RoleModule>> AddRoleEntitlementsAsync(IList<RoleModule> roleEntitlements, CancellationToken cancellationToken)
     {
-        // await _applicationDbContext.RoleEntitlements.AddRangeAsync(roleEntitlements, cancellationToken);
-        // await _applicationDbContext.SaveChangesAsync(cancellationToken);
-        // Extract role entitlement keys (assuming RoleId and MenuId are composite keys)
-            if (roleEntitlements == null || !roleEntitlements.Any())
-            return;
-
-        // Extract unique RoleId, MenuId, and ModuleId combinations
-        var roleMenuModulePairs = roleEntitlements
-            .Select(re => new { re.UserRoleId, re.MenuId, re.ModuleId })
-            .Distinct()
-            .ToList();
-
-        // Fetch existing records from the database
-        var existingEntitlements = await _applicationDbContext.RoleEntitlements
-            .Where(re => roleMenuModulePairs.Select(pair => pair.UserRoleId).Contains(re.UserRoleId) &&
-                        roleMenuModulePairs.Select(pair => pair.MenuId).Contains(re.MenuId) &&
-                        roleMenuModulePairs.Select(pair => pair.ModuleId).Contains(re.ModuleId))
-            .Select(re => new { re.UserRoleId, re.MenuId, re.ModuleId })
-            .ToListAsync(cancellationToken);
-
-        // Convert to HashSet for fast lookup
-        var existingSet = new HashSet<(int RoleId, int MenuId, int ModuleId)>(
-            existingEntitlements.Select(e => (e.UserRoleId, e.MenuId, e.ModuleId))
-        );
-
-        // Filter out already existing RoleEntitlements
-        var newEntitlements = roleEntitlements
-            .Where(re => !existingSet.Contains((re.UserRoleId, re.MenuId, re.ModuleId)))
-            .ToList();
-
-        if (newEntitlements.Any())
-        {
-            await _applicationDbContext.RoleEntitlements.AddRangeAsync(newEntitlements, cancellationToken);
-            await _applicationDbContext.SaveChangesAsync(cancellationToken);
-        }
-    }
-
-    public async Task UpdateRoleEntitlementsAsync(int roleId, List<RoleEntitlement> roleEntitlements, CancellationToken cancellationToken)
-    {
-    // Fetch existing entitlements for the role
-    var existingEntitlements = await _applicationDbContext.RoleEntitlements
-        .Where(re => re.UserRoleId == roleId)
-        .ToListAsync(cancellationToken);
-
-    // Identify entitlements to remove
-    var entitlementsToRemove = existingEntitlements
-        .Where(existing => !roleEntitlements.Any(updated => updated.ModuleId == existing.ModuleId && updated.MenuId == existing.MenuId))
-        .ToList();
-
-    // Identify entitlements to add
-    var entitlementsToAdd = roleEntitlements
-        .Where(updated => !existingEntitlements.Any(existing => existing.ModuleId == updated.ModuleId && existing.MenuId == updated.MenuId))
-        .ToList();
-
-    // Remove entitlements
-    if (entitlementsToRemove.Any())
-    {
-        _applicationDbContext.RoleEntitlements.RemoveRange(entitlementsToRemove);
-    }
-
-    // Update existing entitlements
-    foreach (var existing in existingEntitlements)
-    {
-        var updated = roleEntitlements.FirstOrDefault(u => u.ModuleId == existing.ModuleId && u.MenuId == existing.MenuId);
+        await _applicationDbContext.RoleModules.AddRangeAsync(roleEntitlements, cancellationToken);
+                      await _applicationDbContext.SaveChangesAsync();
+                      return roleEntitlements;
         
-        if (updated != null) // Ensure the updated entry exists
-        {
-            existing.CanView = updated.CanView;
-            existing.CanAdd = updated.CanAdd;
-            existing.CanUpdate = updated.CanUpdate;
-            existing.CanDelete = updated.CanDelete;
-            existing.CanExport = updated.CanExport;
-            existing.CanApprove = updated.CanApprove;
-            existing.IsActive = updated.IsActive; // Ensure IsActive is updated
+    }
+
+    public async Task<bool> UpdateRoleEntitlementsAsync(int roleId, IList<RoleModule> roleEntitlements, CancellationToken cancellationToken)
+    {
+    
+         var existingRoleModules  = await _applicationDbContext.RoleModules
+                                    .Where(re => re.RoleId == roleId)
+                                    .ToListAsync(cancellationToken);
+
+         
+          if (existingRoleModules.Any())
+          {
+              var roleModuleIds = existingRoleModules.Select(rm => rm.Id).ToList();
+
+              var roleMenusToRemove = await _applicationDbContext.RoleMenus
+                  .Where(rm => roleModuleIds.Contains(rm.RoleModuleId))
+                  .ToListAsync(cancellationToken);
+
+              if (roleMenusToRemove.Any())
+              {
+                  _applicationDbContext.RoleMenus.RemoveRange(roleMenusToRemove);
+              }
+
+
+             _applicationDbContext.RoleModules.RemoveRange(existingRoleModules);
         }
-    }
 
-    // Add new entitlements
-    if (entitlementsToAdd.Any())
-    {
-        await _applicationDbContext.RoleEntitlements.AddRangeAsync(entitlementsToAdd, cancellationToken);
-    }
+                
+         await _applicationDbContext.RoleModules.AddRangeAsync(roleEntitlements, cancellationToken);
+                 
 
-    // Save changes
-    var changes = await _applicationDbContext.SaveChangesAsync(cancellationToken);
+    
+         return await _applicationDbContext.SaveChangesAsync(cancellationToken)>0;
 
-    // Debugging: Check if any rows were affected
-    if (changes == 0)
-    {
-        throw new Exception("No changes were saved. Ensure the database is updated properly.");
-    }
-        // // Remove existing entitlements for the role
-        // var existingEntitlements = _applicationDbContext.RoleEntitlements.Where(re => re.UserRoleId == roleId);
-        // _applicationDbContext.RoleEntitlements.RemoveRange(existingEntitlements);
-
-        // // Add updated entitlements
-        // await _applicationDbContext.RoleEntitlements.AddRangeAsync(roleEntitlements, cancellationToken);
-        // await _applicationDbContext.SaveChangesAsync(cancellationToken);
+    
     }
     public async Task<int> DeleteAsync(int id, RoleEntitlement roleEntitlement)
     {

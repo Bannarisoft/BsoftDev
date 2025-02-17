@@ -483,6 +483,9 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompanyId")
+                        .IsUnique();
+
                     b.HasIndex("CurrencyId")
                         .IsUnique();
 
@@ -950,14 +953,59 @@ namespace UserManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("MenuIcon")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("MenuName")
                         .IsRequired()
                         .HasColumnType("varchar(100)");
 
+                    b.Property<string>("MenuUrl")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(255)");
+
                     b.Property<int>("ModuleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SortOrder")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -1152,9 +1200,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ModuleId")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserRoleId")
                         .HasColumnType("int");
 
@@ -1162,11 +1207,73 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.HasIndex("MenuId");
 
-                    b.HasIndex("ModuleId");
-
                     b.HasIndex("UserRoleId");
 
                     b.ToTable("RoleEntitlements", "AppSecurity");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.RoleMenu", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("CanAdd")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanApprove")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanExport")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanUpdate")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanView")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MenuId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleModuleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuId");
+
+                    b.HasIndex("RoleModuleId");
+
+                    b.ToTable("RoleMenu", "AppSecurity");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.RoleModule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModuleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RoleModule", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.States", b =>
@@ -1820,6 +1927,12 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.CompanySettings", b =>
                 {
+                    b.HasOne("Core.Domain.Entities.Company", "company")
+                        .WithOne("CompanySettings")
+                        .HasForeignKey("Core.Domain.Entities.CompanySettings", "CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Core.Domain.Entities.Currency", "Currency")
                         .WithOne("CompanySettings")
                         .HasForeignKey("Core.Domain.Entities.CompanySettings", "CurrencyId")
@@ -1843,10 +1956,18 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("FinancialYear");
 
                     b.Navigation("Language");
+
+                    b.Navigation("company");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
                 {
+                    b.HasOne("Core.Domain.Entities.Menu", "Parent")
+                        .WithMany("ChildMenus")
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Core.Domain.Entities.Modules", "Module")
                         .WithMany("Menus")
                         .HasForeignKey("ModuleId")
@@ -1854,6 +1975,8 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Module");
+
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PasswordLog", b =>
@@ -1870,28 +1993,58 @@ namespace UserManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.RoleEntitlement", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Menu", "Menu")
-                        .WithMany("RoleEntitlements")
+                        .WithMany()
                         .HasForeignKey("MenuId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.Modules", "Module")
-                        .WithMany("RoleEntitlements")
-                        .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.UserRole", "UserRole")
-                        .WithMany("RoleEntitlements")
+                        .WithMany()
                         .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Menu");
 
+                    b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.RoleMenu", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Menu", "Menu")
+                        .WithMany("RoleMenus")
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.RoleModule", "RoleModule")
+                        .WithMany("RoleMenus")
+                        .HasForeignKey("RoleModuleId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Menu");
+
+                    b.Navigation("RoleModule");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.RoleModule", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Modules", "Module")
+                        .WithMany("RoleModules")
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.UserRole", "Role")
+                        .WithMany("roleModules")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Module");
 
-                    b.Navigation("UserRole");
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.States", b =>
@@ -2001,6 +2154,9 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("CompanyContact")
                         .IsRequired();
 
+                    b.Navigation("CompanySettings")
+                        .IsRequired();
+
                     b.Navigation("UserCompanies");
                 });
 
@@ -2029,14 +2185,21 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
                 {
-                    b.Navigation("RoleEntitlements");
+                    b.Navigation("ChildMenus");
+
+                    b.Navigation("RoleMenus");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Modules", b =>
                 {
                     b.Navigation("Menus");
 
-                    b.Navigation("RoleEntitlements");
+                    b.Navigation("RoleModules");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.RoleModule", b =>
+                {
+                    b.Navigation("RoleMenus");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.States", b =>
@@ -2066,9 +2229,9 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
                 {
-                    b.Navigation("RoleEntitlements");
-
                     b.Navigation("UserRoleAllocations");
+
+                    b.Navigation("roleModules");
                 });
 #pragma warning restore 612, 618
         }

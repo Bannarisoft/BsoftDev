@@ -6,8 +6,7 @@ namespace Core.Domain.Entities
     {
         public string? Code { get; set; }
         public int BookType { get; set; }
-        public string? DepreciationGroupName { get; set; }
-        
+        public string? DepreciationGroupName { get; set; }        
         // Foreign Key
         public int AssetGroupId { get; set; }
         public AssetGroup AssetGroup { get; set; } = null!;

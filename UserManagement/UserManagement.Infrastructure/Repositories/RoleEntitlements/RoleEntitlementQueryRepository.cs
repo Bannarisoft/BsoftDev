@@ -23,38 +23,92 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
             _dbConnection = dbConnection;   
 
         }
-        public async Task<RoleEntitlement> GetByIdAsync(int roleEntitlementId)
+        public async Task<(Core.Domain.Entities.UserRole,List<Core.Domain.Entities.RoleModule>, List<Menu>,List<RoleMenu>)> GetByIdAsync(int roleEntitlementId)
         {
-            if (roleEntitlementId <= 0)
-            {
-                Log.Error("Invalid RoleEntitlementId: {RoleEntitlementId}", roleEntitlementId);
-                throw new ArgumentException("RoleEntitlementId must be greater than zero.", nameof(roleEntitlementId));
-            }
 
-            const string query = @"
-                SELECT re.Id, re.IsActive,m.Id as ModuleId, m.ModuleName,mn.Id as MenuId,mn.MenuName,ur.RoleName,CanAdd,CanDelete,CanExport,CanUpdate,CanView,CanApprove
-            FROM AppSecurity.RoleEntitlements re 
-			INNER JOIN AppSecurity.UserRole ur on re.UserRoleId=ur.Id
-			INNER JOIN AppData.Modules m on re.ModuleId=m.Id
-			INNER JOIN AppData.Menus mn on re.MenuId=mn.Id
-            WHERE re.Id = @RoleEntitlementId  AND re.IsDeleted= 0
-            ORDER BY re.Id";
+            var  query = @"
+                SELECT  Id FROM [AppSecurity].[UserRole] WHERE Id = @RoleEntitlementId
+
+                SELECT Id,ModuleId FROM [AppSecurity].[RoleModule] WHERE RoleId=@RoleEntitlementId
+
+                SELECT m.Id,m.MenuName,m.ModuleId,m.ParentId FROM [AppData].[Menus] m
+                Inner join [AppSecurity].[RoleMenu] rmenu ON rmenu.MenuId=m.Id
+                Inner join [AppSecurity].[RoleModule] rm ON rm.Id=rmenu.RoleModuleId
+                 WHERE   rm.RoleId = @RoleEntitlementId
+                
+                SELECT rmenu.Id,rmenu.RoleModuleId,rmenu.MenuId,rmenu.CanView,rmenu.CanAdd,rmenu.CanUpdate,rmenu.CanDelete,rmenu.CanApprove,rmenu.CanExport,rmenu.CanView  FROM   [AppSecurity].[RoleModule] rm
+	             Inner join [AppSecurity].[RoleMenu] rmenu ON rm.Id=rmenu.RoleModuleId
+                 WHERE rm.RoleId = @RoleEntitlementId
+                
+                 ";
+
+                    using var multi = await _dbConnection.QueryMultipleAsync(query, new { RoleEntitlementId = roleEntitlementId });
+
+            
+           var role = await multi.ReadFirstOrDefaultAsync<UserRole>();
+
+             // Read Modules
+             var modules = (await multi.ReadAsync<Core.Domain.Entities.RoleModule>()).ToList();
+
+             // Read Parent Menus (Menus with ParentId = 0)
+            //  var parentIds = (await multi.ReadAsync<Menu>()).ToList();
+
+             // Read All Child Menus
+             var allMenus = (await multi.ReadAsync<Menu>()).ToList();
+
+             // Read RoleMenu Permissions
+             var roleMenus = (await multi.ReadAsync<RoleMenu>()).ToList();
+           
+            var menuHierarchy = GetChildMenus(allMenus.ToList());
+          
+           
+
+            return (role, modules, menuHierarchy,roleMenus);
+        }
+        
+        private List<Menu> GetChildMenus( List<Menu> allMenus)
+        {
+            var menuDict = allMenus.ToDictionary(m => m.Id);
+            List<Menu> rootMenus = new();
+
+              foreach (var menu in allMenus)
+              {
+                  if (menu.ParentId != 0 && menuDict.ContainsKey(menu.ParentId))
+                  {
+                      menuDict[menu.ParentId].ChildMenus.Add(menu);
+                  }
+                  else
+                  {
+                      rootMenus.Add(menu);
+                  }
+              }
+              return rootMenus;
+            // var childMenus = allMenus.Where(m => m.ParentId == menuid && m.ModuleId == moduleId).ToList();
+
+            // foreach (var child in childMenus)
+            // {
+            //     // Assign RoleMenu Permissions
+            //     var permissions = roleMenus.Where(rm => rm.MenuId == child.Id && rm.RoleModuleId == RoleModuleId).ToList();
+                
+
+            //     if (permissions.Any())
+            //     {
+            //         child.RoleMenus = permissions;
+                    
                   
-            var roleEntitlement = await _dbConnection.QuerySingleOrDefaultAsync<RoleEntitlement>(query, new { RoleEntitlementId = roleEntitlementId });
+            //     }
 
-            if (roleEntitlement == null)
-            {
-                Log.Warning("RoleEntitlement with ID {RoleEntitlementId} not found.", roleEntitlementId);
-                throw new KeyNotFoundException($"RoleEntitlement with ID {roleEntitlementId} not found.");
-            }
+            //     // Recursively Assign Nested Child Menus (Grandchildren)
+                
+            // }
 
-            Log.Information("Successfully fetched RoleEntitlement with ID {RoleEntitlementId}", roleEntitlementId);
-            return roleEntitlement;
+            // return childMenus;
         }
 
-        public async Task<List<RoleEntitlement>> GetExistingRoleEntitlementsAsync(List<int> userRoleIds, List<int> moduleIds, List<int> menuIds, CancellationToken cancellationToken)
+
+        public async Task<List<RoleEntitlement>> GetExistingRoleEntitlementsAsync(List<int> userRoleIds,  List<int> menuIds, CancellationToken cancellationToken)
         {
-            if (!userRoleIds.Any() || !moduleIds.Any() || !menuIds.Any())
+            if (!userRoleIds.Any() || !menuIds.Any())
             {
                 return new List<RoleEntitlement>(); // Return empty list if any input list is empty
             }
@@ -68,7 +122,7 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
             var parameters = new
             {
                 UserRoleIds = userRoleIds,
-                ModuleIds = moduleIds,
+                // ModuleIds = moduleIds,
                 MenuIds = menuIds
             };
 
@@ -109,8 +163,8 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
                re.MenuId, mn.MenuName
         FROM AppSecurity.RoleEntitlements re
         INNER JOIN AppSecurity.UserRole ur ON re.UserRoleId = ur.Id
-        LEFT JOIN AppData.Modules m ON re.ModuleId = m.Id
         LEFT JOIN AppData.Menus mn ON re.MenuId = mn.Id
+        LEFT JOIN AppData.Modules m ON mn.ModuleId = m.Id
         WHERE ur.RoleName = @RoleName AND re.IsDeleted = 0";
 
     var roleEntitlements = await _dbConnection.QueryAsync<RoleEntitlement, UserRole, Modules, Menu, RoleEntitlement>(
@@ -118,7 +172,7 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
         (re, ur, m, mn) =>
         {
             re.UserRole = ur;
-            re.Module = m;
+            mn.Module = m;
             re.Menu = mn;
             return re;
         },

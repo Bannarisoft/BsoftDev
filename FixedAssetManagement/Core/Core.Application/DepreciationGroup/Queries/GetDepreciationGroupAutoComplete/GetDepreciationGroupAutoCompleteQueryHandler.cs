@@ -46,8 +46,7 @@ namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroupAutoCom
                 IsSuccess = true,
                 Message = "Success",
                 Data = depreciationGroupsDto
-            };
-          
+            };          
         }
     }
 }

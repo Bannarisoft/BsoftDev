@@ -37,8 +37,11 @@ namespace Core.Application.Users.Commands.ChangeUserPassword
                 passwordLog.PasswordHash = await _ichangePassword.PasswordEncode(request.NewPassword);
                 var changedPassword = await _ichangePassword.ChangePassword(request.UserId,request.NewPassword,passwordLog);
 
-                
-                return new ApiResponseDTO<string> { IsSuccess = true, Message = "Password changed successfully.", Data = changedPassword };
+                if (!changedPassword)
+                {
+                    return new ApiResponseDTO<string> { IsSuccess = false, Message = "Password change failed." };
+                }
+                return new ApiResponseDTO<string> { IsSuccess = true, Message = "Password changed successfully."};
             }
             
 
