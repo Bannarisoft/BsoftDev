@@ -9,7 +9,7 @@ namespace Core.Application.Users.Commands.ResetUserPassword
 {
     public class ResetUserPasswordCommand : IRequest<ApiResponseDTO<string>>
     {
-        public int UserId { get; set; }
+       // public int UserId { get; set; }
         public string UserName { get; set; }
         public string VerificationCode { get; set; }
         public string Password { get; set; }

@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FAM.API.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
      [ApiController]
     public class AssetGroupController : ApiControllerBase
     {

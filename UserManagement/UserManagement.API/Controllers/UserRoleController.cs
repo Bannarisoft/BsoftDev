@@ -131,33 +131,7 @@ namespace UserManagement.API.Controllers
                 });
             }
 
-        // public async Task<IActionResult> GetRoles(string name)
-        // {
-        //   _logger.LogInformation($"Starting GetAllUserRoleAutoCompleteSearchAsync with search pattern: {name}");
-        //      var query = new GetRolesAutocompleteQuery { SearchTerm = name };
-        //         var result = await Mediator.Send(query);
-
-        //         if (result.Data == null  || !result.Data.Any())
-        //         {
-        //             _logger.LogWarning($"No User Role found for search pattern: {name}" );
-
-        //             return NotFound(new
-        //             {
-        //                 StatusCode = StatusCodes.Status404NotFound,
-        //                 Message = "No matching User Role found / Deleted."
-        //             });
-        //         }
-
-        //         _logger.LogInformation($"User Role found for search pattern: {name}. Returning data.");
-
-        //         return Ok(new
-        //         {
-        //             StatusCode = StatusCodes.Status200OK,
-        //             Data = result.Data
-        //         });
-     
-  
-        // }
+      
 
         [HttpPost]
         public async Task<IActionResult>CreateAsync(CreateRoleCommand createRoleCommand)
