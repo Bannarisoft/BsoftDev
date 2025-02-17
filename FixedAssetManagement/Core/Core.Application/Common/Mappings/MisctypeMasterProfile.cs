@@ -29,7 +29,7 @@ namespace Core.Application.Common.Mappings
 
 
                 CreateMap<DeleteMiscTypeMasterCommand,  Core.Domain.Entities.MiscTypeMaster>()
-                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
+                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted)); 
         }
         
     }
