@@ -17,8 +17,21 @@ namespace FAM.Infrastructure.Repositories.Locations
             _applicationDbContext = applicationDbContext;
         }
 
+        public async Task<(bool IsNameDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name, int sortOrder, int excludeId)
+        {
+            var isNameDuplicate = await _applicationDbContext.Locations
+            .AnyAsync(ag => ag.LocationName == name && ag.Id != excludeId);
+
+            var isSortOrderDuplicate = await _applicationDbContext.Locations
+            .AnyAsync(ag => ag.SortOrder == sortOrder && ag.Id != excludeId);
+
+            return (isNameDuplicate, isSortOrderDuplicate);
+        }
+
         public async Task<Core.Domain.Entities.Location> CreateAsync(Core.Domain.Entities.Location location)
         {
+            // Auto-generate SortOrder
+            location.SortOrder = await GetMaxSortOrderAsync() + 1;
             await _applicationDbContext.Locations.AddAsync(location);
             await _applicationDbContext.SaveChangesAsync();
             return location;
@@ -33,6 +46,12 @@ namespace FAM.Infrastructure.Repositories.Locations
                 return await _applicationDbContext.SaveChangesAsync() >0;
             }
             return false; 
+        }
+
+        public async Task<int> GetMaxSortOrderAsync()
+        {
+            return await _applicationDbContext.Locations.MaxAsync(ac => (int?)ac.SortOrder) ?? -1;
+
         }
 
         public async Task<bool> UpdateAsync(Location location)
