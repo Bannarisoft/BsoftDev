@@ -19,7 +19,9 @@ using Core.Application.AssetCategories.Command.CreateAssetCategories;
 using Core.Application.AssetCategories.Command.UpdateAssetCategories;
 using Core.Application.MiscMaster.Command.CreateMiscMaster;
 using FAM.API.Validation.MiscMaster;
-using Core.Application.MiscMaster.Command.UpdateMiscMaster;
+using Core.Application.MiscMaster.Command.UpdateMiscMaster;using Core.Application.Manufacture.Commands.UpdateManufacture;
+using FAM.API.Validation.Manufacture;
+using Core.Application.Manufacture.Commands.CreateManufacture;
 
 
 namespace FAM.API.Validation.Common
@@ -41,9 +43,9 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>(); 
         services.AddScoped<IValidator<CreateDepreciationGroupCommand>, CreateDepreciationGroupCommandValidator>();
         services.AddScoped<IValidator<UpdateDepreciationGroupCommand>, UpdateDepreciationGroupCommandValidator>();
-        services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
-        services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>();
-
+ services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
+        services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>();        services.AddScoped<IValidator<UpdateManufactureCommand>, UpdateManufactureCommandValidator>();
+        services.AddScoped<IValidator<CreateManufactureCommand>, CreateManufactureCommandValidator>();
     }  
     }
 }

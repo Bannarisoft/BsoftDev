@@ -10,7 +10,8 @@ namespace Core.Domain.Entities
         public string? Description { get; set; }
         public int CompanyId { get; set; }          
         public IList<UserRoleAllocation> UserRoleAllocations { get; set; }
-        public ICollection<RoleEntitlement> RoleEntitlements { get; set; } = new List<RoleEntitlement>();
+        
+        public IList<RoleModule> roleModules { get; set; }
 
 
     }

@@ -30,8 +30,7 @@ namespace Core.Application.DepreciationGroup.Commands.DeleteDepreciationGroup
         }
 
         public async Task<ApiResponseDTO<DepreciationGroupDTO>> Handle(DeleteDepreciationGroupCommand request, CancellationToken cancellationToken)
-        {
-             // Fetch the city to be deleted
+        {             
             var depreciationGroups = await _depreciationGroupQueryRepository.GetByIdAsync(request.Id);
             if (depreciationGroups is null || depreciationGroups.IsDeleted is BaseEntity.IsDelete.Deleted )
             {

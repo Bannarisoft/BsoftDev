@@ -76,7 +76,7 @@ namespace UserManagement.API.Controllers
                 data = result
             });   
         }        
-        [HttpPost("create")]   
+        [HttpPost]   
         public async Task<IActionResult> CreateAsync(CreateStateCommand  command)
         { 
             var validationResult = await _createStateCommandValidator.ValidateAsync(command);
@@ -98,15 +98,10 @@ namespace UserManagement.API.Controllers
             return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
             
         }
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateAsync(int stateId, UpdateStateCommand command)
-        {   
-            if (stateId != command.Id)
-            {
-                return BadRequest(new { Message = "State ID mismatch" });
-            }
+        [HttpPut]
+        public async Task<IActionResult> UpdateAsync(UpdateStateCommand command)
+        {           
             var validationResult = await _updateStateCommandValidator.ValidateAsync(command);
-
             if (!validationResult.IsValid)
             {                
                 return BadRequest(
@@ -140,7 +135,7 @@ namespace UserManagement.API.Controllers
             }
             return BadRequest( new { StatusCode=StatusCodes.Status400BadRequest, message = result.Message, errors = "" }); 
         }        
-        [HttpDelete("delete{id}")]   
+        [HttpDelete("{id}")]   
         public async Task<IActionResult> DeleteAsync(int id)
         {          
             if (id <= 0)

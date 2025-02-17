@@ -27,7 +27,9 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using Serilog;
 using Core.Application.Common.Interfaces.IMiscMaster;
-using FAM.Infrastructure.Repositories.MiscMaster;
+using FAM.Infrastructure.Repositories.MiscMaster;using FAM.Infrastructure.Repositories.Manufacture;
+using Core.Application.Common.Interfaces.IManufacture;
+using Core.Domain.Entities;
 
 namespace FAM.Infrastructure
 {
@@ -133,9 +135,9 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetGroupQueryRepository, AssetGroupQueryRepository>();
             services.AddScoped<IAssetCategoriesQueryRepository, AssetCategoriesQueryRepository>();
             services.AddScoped<IAssetCategoriesCommandRepository, AssetCategoriesCommandRepository>();
-            services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
-            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
-
+			services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
+            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();            services.AddScoped<IManufactureCommandRepository, ManufactureCommandRepository>();
+            services.AddScoped<IManufactureQueryRepository, ManufactureQueryRepository>();
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -147,12 +149,11 @@ namespace FAM.Infrastructure
 				typeof(AssetGroupProfile),
 				typeof(LocationProfile),
                 typeof(SubLocationProfile),
-                typeof(MiscTypeMasterProfile),
+                typeof(MisctypeMasterProfile),
+ 				typeof(MiscMasterProfile),
                 typeof(DepreciationGroupProfile),
-                typeof(AssetCategoriesProfile),                
-                typeof(MiscMasterProfile)
-
-
+                typeof(AssetCategoriesProfile),
+                typeof(ManufactureProfile)
             );
 
             return services;

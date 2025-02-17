@@ -53,7 +53,7 @@ namespace UserManagement.API.Controllers
         }
         
         [HttpPut("update")]
-        public async Task<IActionResult> Update([FromForm]  UpdateCompanySettingsCommand command)
+        public async Task<IActionResult> Update(UpdateCompanySettingsCommand command)
         {
             var validationResult = await _UpdateCompanySettingsCommand.ValidateAsync(command);
             if (!validationResult.IsValid)
@@ -66,17 +66,17 @@ namespace UserManagement.API.Controllers
                 });
             }
            
-            var companySettingsExists = await Mediator.Send(new GetCompanySettingByIdQuery { Id = command.Id });
+            // var companySettingsExists = await Mediator.Send(new GetCompanySettingByIdQuery { Id = command.Id });
 
-             if (companySettingsExists == null)
-             {
-                 return NotFound(new 
-                 { 
-                    StatusCode=StatusCodes.Status404NotFound, 
-                    message = $"Company Setting ID {command.Id} not found.", 
-                    errors = "" 
-                }); 
-             }
+            //  if (companySettingsExists == null)
+            //  {
+            //      return NotFound(new 
+            //      { 
+            //         StatusCode=StatusCodes.Status404NotFound, 
+            //         message = $"Company Setting ID {command.Id} not found.", 
+            //         errors = "" 
+            //     }); 
+            //  }
            var updatedCompany = await Mediator.Send(command);
 
             if (updatedCompany.IsSuccess)
@@ -94,6 +94,34 @@ namespace UserManagement.API.Controllers
                 StatusCode=StatusCodes.Status400BadRequest, 
                 message = updatedCompany.Message, 
                 errors = "" 
+            });
+        }
+           [HttpGet]
+        public async Task<IActionResult> GetByIdAsync()
+        {
+            
+            // if (id <= 0)
+            // {
+            //     return BadRequest(new 
+            //     { 
+            //         StatusCode=StatusCodes.Status400BadRequest,
+            //         Message = "Invalid Company Setting ID" 
+            //     });
+            // }
+
+            var company = await Mediator.Send(new GetCompanySettingByIdQuery() {  });
+            if (company == null)
+            {
+                return NotFound(new 
+                { 
+                    StatusCode=StatusCodes.Status404NotFound,
+                    Message = "Company Setting not found" 
+                });
+            }
+            return Ok(new 
+            {
+                StatusCode=StatusCodes.Status200OK,
+                data = company.Data
             });
         }
     }

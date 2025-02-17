@@ -7,6 +7,6 @@ namespace Core.Application.Common.Interfaces.ICompanySettings
 {
     public interface ICompanyQuerySettings
     {
-        Task<Core.Domain.Entities.CompanySettings> GetByIdAsync(int id);
+        Task<Core.Domain.Entities.CompanySettings> GetAsync();
     }
 }

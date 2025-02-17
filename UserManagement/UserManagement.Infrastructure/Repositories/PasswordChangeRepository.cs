@@ -23,13 +23,13 @@ namespace UserManagement.Infrastructure.Repositories
         }
 
 
-         public async Task<string> ChangePassword(int userId,string password, PasswordLog passwordLog)
+         public async Task<bool> ChangePassword(int userId,string password, PasswordLog passwordLog)
          {
             var existingUser = await _applicationDbContext.User
              .FirstOrDefaultAsync(u => u.UserId == userId);
                 if (existingUser == null || existingUser.IsFirstTimeUser == FirstTimeUserStatus.Yes)
                 {
-                    return "User not found or is a first-time user.";
+                    return false;
                 }
 
                 
@@ -51,13 +51,13 @@ namespace UserManagement.Infrastructure.Repositories
                     await _applicationDbContext.PasswordLogs.AddAsync(passwordLog);
                     await _applicationDbContext.SaveChangesAsync();
 
-                    return "Password changed successfully.";
+                    return true;
                 }
 
-                return "Try different password.";
+                return false;
         }
 
-        public async Task<string> FirstTimeUserChangePassword(int userId,PasswordLog passwordLog)
+        public async Task<bool> FirstTimeUserChangePassword(int userId,PasswordLog passwordLog)
         {
            
             var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
@@ -76,14 +76,14 @@ namespace UserManagement.Infrastructure.Repositories
         
                 if (changes > 0)
                 {
-                    return "Password changed successfully."; 
+                    return true; 
                 }
             }
             else
             {
-                return "User not found or is not a existing user.";
+                return false;
             }
-            return "Failed to save changes to the database.";
+            return false;
         }
 
 

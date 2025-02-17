@@ -8,9 +8,9 @@ namespace Core.Application.Common.Interfaces.IRoleEntitlement
 {
     public interface IRoleEntitlementQueryRepository
     {
-        Task<RoleEntitlement> GetByIdAsync(int Id);
+        Task<(Core.Domain.Entities.UserRole,List<Core.Domain.Entities.RoleModule>, List<Menu>,List<RoleMenu>)> GetByIdAsync(int Id);
         Task<Core.Domain.Entities.UserRole> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken);
         Task<List<RoleEntitlement>> GetRoleEntitlementsByRoleNameAsync(string roleName, CancellationToken cancellationToken);                      
-        Task<List<RoleEntitlement>> GetExistingRoleEntitlementsAsync(List<int> userRoleIds, List<int> moduleIds, List<int> menuIds, CancellationToken cancellationToken);
+        Task<List<RoleEntitlement>> GetExistingRoleEntitlementsAsync(List<int> userRoleIds,  List<int> menuIds, CancellationToken cancellationToken);
     }
 }

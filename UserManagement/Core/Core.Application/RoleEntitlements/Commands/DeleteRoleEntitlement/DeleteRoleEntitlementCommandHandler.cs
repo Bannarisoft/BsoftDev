@@ -33,49 +33,49 @@ namespace Core.Application.RoleEntitlements.Commands.DeleteRoleEntitlement
 
         public async Task<ApiResponseDTO<RoleEntitlementDto>> Handle(DeleteRoleEntitlementCommand request, CancellationToken cancellationToken)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request), "Request cannot be null.");
-            }
+            // if (request == null)
+            // {
+            //     throw new ArgumentNullException(nameof(request), "Request cannot be null.");
+            // }
 
-            // Fetch role entitlement by ID
-            var roleEntitlement = await _roleEntitlementQueryRepository.GetByIdAsync(request.Id);
-            if (roleEntitlement == null || roleEntitlement.IsDeleted == Enums.IsDelete.Deleted)
-            {
-                return new ApiResponseDTO<RoleEntitlementDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid RoleName. The specified RoleName does not exist."
-                };
-            }
+            // // Fetch role entitlement by ID
+            // var roleEntitlement = await _roleEntitlementQueryRepository.GetByIdAsync(request.Id);
+            // if (roleEntitlement == null || roleEntitlement.IsDeleted == Enums.IsDelete.Deleted)
+            // {
+            //     return new ApiResponseDTO<RoleEntitlementDto>
+            //     {
+            //         IsSuccess = false,
+            //         Message = "Invalid RoleName. The specified RoleName does not exist."
+            //     };
+            // }
 
-            // Soft Delete by setting IsActive = 0
-            // roleEntitlement.IsActive = Enums.Status.Inactive;
-            var roleEntitlementdata = _mapper.Map<RoleEntitlement>(request);
-            // Update the entity in the database
-            var updateResult = await _roleEntitlementCommandRepository.DeleteAsync(roleEntitlement.Id, roleEntitlementdata);
-            if (updateResult > 0)
-            {
-                var roleEntitlementDto = _mapper.Map<RoleEntitlementDto>(roleEntitlement);
+            // // Soft Delete by setting IsActive = 0
+            // // roleEntitlement.IsActive = Enums.Status.Inactive;
+            // var roleEntitlementdata = _mapper.Map<RoleEntitlement>(request);
+            // // Update the entity in the database
+            // var updateResult = await _roleEntitlementCommandRepository.DeleteAsync(roleEntitlement.Id, roleEntitlementdata);
+            // if (updateResult > 0)
+            // {
+            //     var roleEntitlementDto = _mapper.Map<RoleEntitlementDto>(roleEntitlement);
 
-                // Domain Event  
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "Delete",
-                    actionCode: roleEntitlementDto.RoleName,
-                    actionName: roleEntitlementDto.ModuleName,
-                    details: $"RoleEntitlement '{roleEntitlementDto.ModuleName}' was deleted.",
-                    module: "RoleEntitlement"
-                );
+            //     // Domain Event  
+            //     var domainEvent = new AuditLogsDomainEvent(
+            //         actionDetail: "Delete",
+            //         actionCode: roleEntitlementDto.RoleName,
+            //         actionName: roleEntitlementDto.ModuleName,
+            //         details: $"RoleEntitlement '{roleEntitlementDto.ModuleName}' was deleted.",
+            //         module: "RoleEntitlement"
+            //     );
 
-                await _mediator.Publish(domainEvent, cancellationToken);
+            //     await _mediator.Publish(domainEvent, cancellationToken);
 
-                return new ApiResponseDTO<RoleEntitlementDto>
-                {
-                    IsSuccess = true,
-                    Message = "RoleEntitlement deleted successfully.",
-                    Data = roleEntitlementDto
-                };
-            }
+            //     return new ApiResponseDTO<RoleEntitlementDto>
+            //     {
+            //         IsSuccess = true,
+            //         Message = "RoleEntitlement deleted successfully.",
+            //         Data = roleEntitlementDto
+            //     };
+            // }
 
             return new ApiResponseDTO<RoleEntitlementDto>
             {

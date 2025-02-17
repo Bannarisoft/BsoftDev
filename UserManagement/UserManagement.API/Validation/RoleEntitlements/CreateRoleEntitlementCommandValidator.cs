@@ -21,29 +21,29 @@ namespace UserManagement.API.Validation.RoleEntitlements
             {
                 switch (rule.Rule)
                 {
-                    case "NotEmpty":
-                        RuleFor(x => x.RoleName)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(CreateRoleEntitlementCommand.RoleName)} {rule.Error}");
-                        break; 
-                    case "ModuleId":
-                        RuleForEach(x => x.ModuleMenus).ChildRules(module =>
-                        {
-                            module.RuleFor(m => m.ModuleId)
-                                .GreaterThan(0)
-                                .WithMessage($"{rule.Error}");
+                    // case "NotEmpty":
+                    //     RuleFor(x => x.RoleName)
+                    //         .NotEmpty()
+                    //         .WithMessage($"{nameof(CreateRoleEntitlementCommand.RoleName)} {rule.Error}");
+                    //     break; 
+                    // case "ModuleId":
+                    //     RuleForEach(x => x.ModuleMenus).ChildRules(module =>
+                    //     {
+                    //         module.RuleFor(m => m.ModuleId)
+                    //             .GreaterThan(0)
+                    //             .WithMessage($"{rule.Error}");
 
-                            module.RuleForEach(m => m.Menus).ChildRules(menu =>
-                            {
-                                menu.RuleFor(me => me.MenuId)
-                                    .GreaterThan(0).WithMessage($"{rule.Error}");
-                            });
-                        });
-                        break;
+                    //         module.RuleForEach(m => m.Menus).ChildRules(menu =>
+                    //         {
+                    //             menu.RuleFor(me => me.MenuId)
+                    //                 .GreaterThan(0).WithMessage($"{rule.Error}");
+                    //         });
+                    //     });
+                    //     break;
                                   
-                        default:
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
-                        break;
+                    //     default:
+                    //     Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                    //     break;
                 }
             }
       }   

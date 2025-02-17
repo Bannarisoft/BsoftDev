@@ -11,24 +11,24 @@ namespace FAM.Infrastructure.Data
     {
         private readonly IIPAddressService _ipAddressService;
         private readonly ITimeZoneService _timeZoneService; 
- 
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions, IIPAddressService ipAddressService, ITimeZoneService timeZoneService) 
             : base(dbContextOptions)
         {  
             _ipAddressService = ipAddressService; 
             _timeZoneService = timeZoneService;              
                
-        } 
+        }
         
         public DbSet<AssetGroup> AssetGroup { get; set; } 
         public DbSet<AssetCategories> AssetCategories { get; set; }
         public DbSet<Location> Locations { get; set; }
-        public DbSet<SubLocation> SubLocations { get; set; }
-        public DbSet<MiscMaster> MiscMaster { get; set; } 
+        public DbSet<SubLocation> SubLocations { get; set; } 
+		public DbSet<MiscMaster> MiscMaster { get; set; } 
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<DepreciationGroups> DepreciationGroups { get; set; }
-
-
+        public DbSet<AssetSubCategories> AssetSubCategories { get; set; }
+		public DbSet<Manufactures> Manufactures { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,14 +37,13 @@ namespace FAM.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new AssetCategoriesConfiguration());
             modelBuilder.ApplyConfiguration(new LocationConfiguration());
             modelBuilder.ApplyConfiguration(new SubLocationConfiguration());
-            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+			modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new DepreciationGroupConfiguration());
-
-               
+            modelBuilder.ApplyConfiguration(new AssetSubCategoriesConfiguration());
+             modelBuilder.ApplyConfiguration(new ManufactureConfiguration());   
             base.OnModelCreating(modelBuilder);
         }
-
          public override int SaveChanges()
         {
             UpdateIpFields();            

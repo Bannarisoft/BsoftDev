@@ -10,8 +10,9 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
     public class CreateRoleEntitlementCommand : IRequest<ApiResponseDTO<int>>
     {
-        public required string RoleName { get; set; }
-        public List<ModuleMenuPermissionDto>? ModuleMenus { get; set; }
+        
+        public List<ModuleMenuPermissionDto> ModuleMenus { get; set; }
+        
 
     }
 
