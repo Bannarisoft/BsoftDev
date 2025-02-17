@@ -149,7 +149,7 @@ namespace FAM.Infrastructure
 				typeof(AssetGroupProfile),
 				typeof(LocationProfile),
                 typeof(SubLocationProfile),
-                typeof(MisctypeMasterProfile),
+                typeof(MiscTypeMasterProfile),
  				typeof(MiscMasterProfile),
                 typeof(DepreciationGroupProfile),
                 typeof(AssetCategoriesProfile),
