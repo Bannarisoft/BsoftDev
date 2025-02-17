@@ -35,6 +35,18 @@ namespace Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup
                     Message = "DepreciationGroup Code already exists."
                 };                 
             }
+
+            // ✅ Check if AssetGroupId exists before creating the record
+            var assetGroupExists = await _depreciationGroupRepository.ExistsByAssetGroupIdAsync(request.AssetGroupId);
+            if (!assetGroupExists)
+            {
+                return new ApiResponseDTO<DepreciationGroupDTO>
+                {
+                    IsSuccess = false,
+                    Message = $"AssetGroupId {request.AssetGroupId} does not exist."
+                };
+            }
+            
             var depreciationGroupEntity = _mapper.Map<DepreciationGroups>(request);            
             var result = await _depreciationGroupRepository.CreateAsync(depreciationGroupEntity);
             

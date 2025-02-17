@@ -27,9 +27,9 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
             // Fetch Company Name from DTO or Database
             var UnitName = request.UnitName;
             var assetGroupName = await _assetMasterGeneralRepository.GetAssetGroupNameById(request.AssetGroupId);
-            var assetSubCategoryName = await _assetMasterGeneralRepository.GetAssetSubCategoryNameById(request.AssetSubCategoryId);
+            var assetCategoryName = await _assetMasterGeneralRepository.GetAssetCategoryNameById(request.AssetSubCategoryId);
 
-            if (string.IsNullOrWhiteSpace(UnitName) || string.IsNullOrWhiteSpace(assetGroupName) || string.IsNullOrWhiteSpace(assetSubCategoryName))
+            if (string.IsNullOrWhiteSpace(UnitName) || string.IsNullOrWhiteSpace(assetGroupName) || string.IsNullOrWhiteSpace(assetCategoryName))
             {
                 return new ApiResponseDTO<AssetMasterGeneralDTO>
                 {
@@ -53,7 +53,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
             }
 
             // Generate Asset Code
-            var assetCode = $"{UnitName}/{assetGroupName}/{assetSubCategoryName}/{sequence}";
+            var assetCode = $"{UnitName}/{assetGroupName}/{assetCategoryName}/{sequence}";
 
             var assetEntity = _mapper.Map<AssetMasterGenerals>(request);     
             assetEntity.AssetCode = assetCode; // Assign generated AssetCode       

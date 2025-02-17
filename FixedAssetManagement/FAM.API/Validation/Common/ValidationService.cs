@@ -8,11 +8,13 @@ using Core.Application.SubLocation.Command.CreateSubLocation;
 using FAM.API.Validation.MiscTypeMaster;
 using Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster;
 using Core.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster;
-using FAM.API.Validation.DepreciationGroup;using Core.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster;
+using FAM.API.Validation.DepreciationGroup;
+using Core.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster;
 using FAM.API.Validation.DepreciationGroup;
 using Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup;
 using Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup;
-using Core.Application.AssetGroup.Command.CreateAssetGroup;using Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup;
+using Core.Application.AssetGroup.Command.CreateAssetGroup;
+using Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup;
 using Core.Application.AssetGroup.Command.CreateAssetGroup;
 using FAM.API.Validation.AssetGroup;
 using Core.Application.AssetGroup.Command.UpdateAssetGroup;
@@ -21,7 +23,8 @@ using Core.Application.AssetCategories.Command.CreateAssetCategories;
 using Core.Application.AssetCategories.Command.UpdateAssetCategories;
 using Core.Application.AssetSubCategories.Command.CreateAssetSubCategories;
 using Core.Application.AssetSubCategories.Command.UpdateAssetSubCategories;
-using FAM.API.Validation.AssetSubCategories;using Core.Application.MiscMaster.Command.CreateMiscMaster;
+using FAM.API.Validation.AssetSubCategories;
+using Core.Application.MiscMaster.Command.CreateMiscMaster;
 using FAM.API.Validation.MiscMaster;
 using Core.Application.MiscMaster.Command.UpdateMiscMaster;
 using Core.Application.Manufacture.Commands.UpdateManufacture;
@@ -30,6 +33,7 @@ using Core.Application.Manufacture.Commands.CreateManufacture;
 using FAM.API.Validation.AssetMaster.AssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral;
 
 
 
@@ -61,6 +65,7 @@ services.AddScoped<IValidator<UpdateManufactureCommand>, UpdateManufactureComman
         services.AddScoped<IValidator<CreateManufactureCommand>, CreateManufactureCommandValidator>();
         services.AddScoped<IValidator<CreateAssetMasterGeneralCommand>, CreateAssetMasterGeneralCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetMasterGeneralCommand>, UpdateAssetMasterGeneralCommandValidator>();
+        services.AddScoped<IValidator<UploadFileAssetMasterGeneralCommand>, UploadAssetMasterGeneralCommandValidator>();
     }  
     }
 }

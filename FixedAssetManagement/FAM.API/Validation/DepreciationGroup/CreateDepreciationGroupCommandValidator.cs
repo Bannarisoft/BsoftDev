@@ -65,7 +65,7 @@ namespace FAM.API.Validation.DepreciationGroup
                         .InclusiveBetween(1, int.MaxValue)
                         .WithMessage($"{nameof(CreateDepreciationGroupCommand.ResidualValue)} {rule.Error}");
                         RuleFor(x => x.UsefulLife)
-                        .InclusiveBetween(1, 100)
+                        .InclusiveBetween(1, 1000)
                         .WithMessage($"{nameof(CreateDepreciationGroupCommand.UsefulLife)} {rule.Error}");
                         break;
                     default:                        

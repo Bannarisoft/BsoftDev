@@ -1,10 +1,14 @@
 
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMasterGeneral;
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralAutoComplete;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById;
+using Core.Application.DepreciationGroup.Queries.GetAssetTypeQuery;
+using Core.Application.DepreciationGroup.Queries.GetWorkingStatusQuery;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -17,15 +21,16 @@ namespace FAM.API.Controllers.AssetMaster
     {
         private readonly IValidator<CreateAssetMasterGeneralCommand> _createAssetMasterGeneralCommandValidator;
          private readonly IValidator<UpdateAssetMasterGeneralCommand> _updateAssetMasterGeneralCommandValidator;
-         
+         private readonly IValidator<UploadFileAssetMasterGeneralCommand> _UploadFileCommandValidator;
          
        public AssetMasterGeneralController(ISender mediator, 
                              IValidator<CreateAssetMasterGeneralCommand> createAssetMasterGeneralCommandValidator, 
-                             IValidator<UpdateAssetMasterGeneralCommand> updateAssetMasterGeneralCommandValidator) 
+                             IValidator<UpdateAssetMasterGeneralCommand> updateAssetMasterGeneralCommandValidator, IValidator<UploadFileAssetMasterGeneralCommand> UploadFileCommandValidator) 
         : base(mediator)
         {        
             _createAssetMasterGeneralCommandValidator = createAssetMasterGeneralCommandValidator;    
-            _updateAssetMasterGeneralCommandValidator = updateAssetMasterGeneralCommandValidator;                 
+            _updateAssetMasterGeneralCommandValidator = updateAssetMasterGeneralCommandValidator;    
+             _UploadFileCommandValidator = UploadFileCommandValidator;             
         }
 
          [HttpGet]                
@@ -140,7 +145,7 @@ namespace FAM.API.Controllers.AssetMaster
                 });
                 
         }
-        [HttpDelete("   {id}")]        
+        [HttpDelete("{id}")]        
         public async Task<IActionResult> DeleteAsync(int id)
         {             
             if (id <= 0)
@@ -186,6 +191,101 @@ namespace FAM.API.Controllers.AssetMaster
                 message = result.Message,
                 data = result.Data
             });
-        }    
+        }  
+        [HttpGet("AssetType")]
+        public async Task<IActionResult> GetAssetTypes()
+        {
+            var result = await Mediator.Send(new GetAssetTypeQuery());
+
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Asset Types found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Asset Types fetched successfully.",
+                data = result.Data
+            });
+        } 
+        [HttpGet("WorkingStatus")]
+        public async Task<IActionResult> GetWorkingStatus()
+        {
+            var result = await Mediator.Send(new GetWorkingStatusQuery());
+
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Working Status found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Working Status fetched successfully.",
+                data = result.Data
+            });
+        } 
+         [HttpPost("upload-logo")]
+        public async Task<IActionResult> UploadLogo(UploadFileAssetMasterGeneralCommand uploadFileCommand)
+        {
+            var validationResult = await _UploadFileCommandValidator.ValidateAsync(uploadFileCommand);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest, 
+                    message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+            }
+            var file = await Mediator.Send(uploadFileCommand);
+            if (!file.IsSuccess)
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest, 
+                    message = file.Message, 
+                    errors = "" 
+                });
+            }
+           
+               
+           return Ok(new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                message = file.Message, 
+                data = file.Data,
+                errors = "" 
+            });
+              
+
+        }
+        [HttpDelete("delete-logo")]
+        public async Task<IActionResult> DeleteLogo(DeleteFileAssetMasterGeneralCommand deleteFileCommand)
+        {
+            var file = await Mediator.Send(deleteFileCommand);
+            if (!file.IsSuccess)
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest, 
+                    message = file.Message, 
+                    errors = "" 
+                });
+            }
+            return Ok(new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                message = file.Message, 
+                errors = "" 
+            });
+        }
     }
 }

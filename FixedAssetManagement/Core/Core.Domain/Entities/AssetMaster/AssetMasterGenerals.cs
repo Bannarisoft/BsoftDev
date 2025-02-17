@@ -16,16 +16,18 @@ namespace Core.Domain.Entities
         public AssetCategories AssetCategories { get; set; } = null!;
         public int AssetSubCategoryId { get; set; }
         public AssetSubCategories AssetSubCategories { get; set; } = null!;
-        public int AssetParentId { get; set; }
+        public int? AssetParentId { get; set; }
         public AssetMasterGenerals AssetParent { get; set; } = null!;
-        public ICollection<AssetMasterGenerals>? AssetMasterParent { get; set; }
-        public string? AssetType { get; set; }        
+        public ICollection<AssetMasterGenerals>? AssetChildren  { get; set; }        
+        public int? AssetType { get; set; }     
+        public MiscMaster? AssetMiscType { get; set; } = null!;       
         //End Foreign Key
         public string? MachineCode { get; set; }   
         public int? Quantity { get; set; }
         public int? UOMId { get; set; }
         public string? AssetDescription { get; set; }
-        public string? WorkingStatus { get; set; }
+        public int? WorkingStatus { get; set; }
+        public MiscMaster? AssetWorkType { get; set; } = null!;   
         public string? AssetImage { get; set; }
         public byte ISDepreciated { get; set; }
         public byte IsTangible { get; set; }        

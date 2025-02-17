@@ -56,16 +56,16 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         }
         public async Task<string?> GetAssetGroupNameById(int assetGroupId)
         {
-            return await _applicationDbContext.AssetCategories
+            return await _applicationDbContext.AssetGroup
                 .Where(a => a.Id == assetGroupId)
                 .Select(a => a.Code)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<string?> GetAssetSubCategoryNameById(int assetSubCategoryId)
+        public async Task<string?> GetAssetCategoryNameById(int assetCategoryId)
         {
-            return await _applicationDbContext.AssetSubCategories
-                .Where(a => a.Id == assetSubCategoryId)
+            return await _applicationDbContext.AssetCategories
+                .Where(a => a.Id == assetCategoryId)
                 .Select(a => a.Code)
                 .FirstOrDefaultAsync();
         }

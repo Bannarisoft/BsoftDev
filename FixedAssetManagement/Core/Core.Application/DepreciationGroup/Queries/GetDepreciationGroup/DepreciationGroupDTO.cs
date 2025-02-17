@@ -12,8 +12,9 @@ namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroup
         public string? BookType { get; set; }
         public string? DepreciationGroupName { get; set; }        
         public int? AssetGroupId { get; set; } 
+        public string? AssetGroupName { get; set; } 
         public int? UsefulLife { get; set; }
-        public int? DepreciationMethod { get; set; }
+        public string? DepreciationMethod { get; set; }
         public int? ResidualValue { get; set; }
         public int SortOrder { get; set; }
         public Status IsActive { get; set; }

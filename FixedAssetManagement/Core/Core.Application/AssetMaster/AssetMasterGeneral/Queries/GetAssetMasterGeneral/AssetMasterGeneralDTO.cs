@@ -8,13 +8,13 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
     {
         public int Id { get; set; }
         public int CompanyId { get; set; }       
-        public string? CompanyName { get; set; }     
+        //public string? CompanyName { get; set; }     
         public string? AssetCode { get; set; }        
         public string? AssetName { get; set; }                
         public int AssetGroupId { get; set; }        
         public int AssetCategoryId { get; set; }        
         public int AssetSubCategoryId { get; set; }        
-        public int AssetParentId { get; set; }        
+        public int? AssetParentId { get; set; }        
         public string? AssetType { get; set; }                
         public string? MachineCode { get; set; }   
         public int? Quantity { get; set; }

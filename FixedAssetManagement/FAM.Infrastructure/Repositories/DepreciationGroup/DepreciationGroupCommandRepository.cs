@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IDepreciationGroup;
+using Core.Domain.Common;
 using Core.Domain.Entities;
 using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +56,10 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
         public async Task<bool> ExistsByCodeAsync(string code)
         {
             return await _applicationDbContext.DepreciationGroups.AnyAsync(c => c.Code == code);
+        }
+        public async Task<bool> ExistsByAssetGroupIdAsync(int assetGroupId)
+        {
+            return await _applicationDbContext.AssetGroup.AnyAsync(ag => ag.Id == assetGroupId  && ag.IsDeleted==BaseEntity.IsDelete.NotDeleted  && ag.IsActive==BaseEntity.Status.Active);           
         }
 
         public async Task<int> GetMaxSortOrderAsync()

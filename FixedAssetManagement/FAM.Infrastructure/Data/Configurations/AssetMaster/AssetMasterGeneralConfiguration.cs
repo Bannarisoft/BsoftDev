@@ -35,6 +35,9 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 builder.Property(dg => dg.CompanyId)                
                 .HasColumnType("int")
                 .IsRequired(); 
+                builder.Property(dg => dg.UnitId)                
+                .HasColumnType("int")
+                .IsRequired(); 
 
                 builder.Property(dg => dg.AssetCode)                
                 .HasColumnType("varchar(50)")
@@ -69,16 +72,24 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .HasForeignKey(dg => dg.AssetSubCategoryId)                
                 .OnDelete(DeleteBehavior.Restrict); 
                 
-                builder.Property(dg => dg.AssetParentId)
-                .HasColumnType("int");                
+                 builder.Property(dg => dg.AssetParentId)
+                .HasColumnType("int")
+                .IsRequired(false); 
+
                 builder.HasOne(dg => dg.AssetParent)
-                .WithMany(ag => ag.AssetMasterParent)
-                .HasForeignKey(dg => dg.AssetParentId)                
-                .OnDelete(DeleteBehavior.Restrict); 
+                .WithMany(ag => ag.AssetChildren)
+                .HasForeignKey(dg => dg.AssetParentId)
+                .OnDelete(DeleteBehavior.Restrict);  // Prevent cyclic deletion 
 
                 builder.Property(b => b.AssetType)                
-                .HasColumnType("varchar(10)")
-                .IsRequired();
+                .HasColumnType("int")
+                .IsRequired(false);
+                
+                builder.HasOne(dg => dg.AssetMiscType)
+                .WithMany(mm => mm.AssetMiscTypeGenerals) 
+                .HasForeignKey(dg => dg.AssetType)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_AssetType_Misc");
 
                  builder.Property(b => b.MachineCode)                
                 .HasColumnType("varchar(50)");                
@@ -93,8 +104,15 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .IsRequired(); 
 
                 builder.Property(b => b.WorkingStatus)
-                .IsRequired()
-                .HasColumnType("varchar(10)");
+                .IsRequired(false)
+                .HasColumnType("int");
+
+                builder.HasOne(dg => dg.AssetWorkType)
+                  .WithMany(mm => mm.AssetWorkTypeGenerals) 
+                .HasForeignKey(dg => dg.WorkingStatus)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_WorkingStatus_Misc");
+                
 
                 builder.Property(c => c.IsTangible)                
                 .HasColumnType("bit")

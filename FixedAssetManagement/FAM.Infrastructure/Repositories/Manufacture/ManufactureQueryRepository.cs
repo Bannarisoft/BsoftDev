@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IManufacture;
+using Core.Domain.Common;
 using Core.Domain.Entities;
 using Dapper;
 
@@ -71,6 +72,21 @@ namespace FAM.Infrastructure.Repositories.Manufacture
                 throw new KeyNotFoundException($"Manufacture with ID {Id} not found.");
             }
             return manufacture;
+        }
+
+        public async Task<List<Core.Domain.Entities.MiscMaster>> GetManufactureTypeAsync()
+        {
+            const string query = @"
+            SELECT M.Id,MiscTypeMasterId,Code,M.Description,SortOrder,  M.IsActive
+            ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
+            FROM FixedAsset.MiscMaster M
+            INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeMasterId
+            WHERE (MiscTypeCode = @MiscTypeCode) 
+            AND  M.IsDeleted=0 and M.IsActive=1
+            ORDER BY M.ID DESC";          
+            var parameters = new { MiscTypeCode = MiscEnumEntity.Manufacture_ManufactureType.MiscCode };     
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+            return result.ToList();
         }
     }
 }

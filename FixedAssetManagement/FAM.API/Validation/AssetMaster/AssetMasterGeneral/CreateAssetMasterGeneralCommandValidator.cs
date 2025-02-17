@@ -34,10 +34,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                     case "NotEmpty":                        
                         RuleFor(x => x.AssetName)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetName)} {rule.Error}");
-                        RuleFor(x => x.AssetCode)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetCode)} {rule.Error}");
+                            .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetName)} {rule.Error}");                       
                         RuleFor(x => x.AssetGroupId)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetGroupId)} {rule.Error}");
@@ -69,10 +66,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                             .NotEmpty()                            
                             .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.WorkingStatus)} {rule.Error}");                                                    
                         break;
-                    case "MaxLength":                        
-                        RuleFor(x => x.AssetCode)
-                            .MaximumLength(assetMasterGeneralCodeMaxLength) 
-                            .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetCode)} {rule.Error} {assetMasterGeneralCodeMaxLength}");
+                    case "MaxLength":                                              
                         RuleFor(x => x.AssetName)
                             .MaximumLength(assetMasterGeneralNameMaxLength) 
                             .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetName)} {rule.Error} {assetMasterGeneralNameMaxLength}");                             

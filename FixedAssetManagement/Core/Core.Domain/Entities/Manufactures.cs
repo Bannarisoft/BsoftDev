@@ -6,7 +6,8 @@ namespace Core.Domain.Entities
     {      
         public string? Code { get; set; }        
         public string? ManufactureName { get; set; }                
-        public string? ManufactureType { get; set; }
+        public int? ManufactureType { get; set; }
+        public MiscMaster ManufactureTypes { get; set; } = null!;    
         public int CountryId { get; set; }        
         public int StateId { get; set; }        
         public int CityId { get; set; }        
