@@ -13,7 +13,6 @@ namespace Core.Application.Common.Mappings
 {
     public class MiscTypeMasterProfile  : Profile
     {
-
         public MiscTypeMasterProfile()
         {
                 CreateMap<Core.Domain.Entities.MiscTypeMaster,GetMiscTypeMasterDto>();
