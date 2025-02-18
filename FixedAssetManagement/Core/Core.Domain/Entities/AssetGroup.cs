@@ -13,6 +13,6 @@ namespace Core.Domain.Entities
         public int SortOrder { get; set; }
         public ICollection<DepreciationGroups>? DepreciationGroups { get; set; }
         public ICollection<AssetCategories>? AssetCategories { get; set; } 
-    
+        public ICollection<AssetMasterGenerals>? AssetMasterGeneral { get; set; }    
     }
 }

@@ -7,6 +7,7 @@ using Core.Application.Manufacture.Queries.GetManufacture;
 using Core.Application.Manufacture.Queries.GetManufactureById;
 using Core.Application.Manufacture.Commands.DeleteManufacture;
 using Core.Application.Manufacture.Queries.GetManufactureAutoComplete;
+using Core.Application.DepreciationGroup.Queries.GetManufactureTypeQuery;
 
 namespace FAM.API.Controllers
 {
@@ -186,6 +187,26 @@ namespace FAM.API.Controllers
                 message = result.Message,
                 data = result.Data
             });
-        }    
+        }
+        [HttpGet("ManufactureType")]
+        public async Task<IActionResult> GetManufactureTypes()
+        {
+            var result = await Mediator.Send(new GetManufactureTypeQuery());
+
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Manufacture Type found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Manufacture Type fetched successfully.",
+                data = result.Data
+            });
+        }     
     }
 }

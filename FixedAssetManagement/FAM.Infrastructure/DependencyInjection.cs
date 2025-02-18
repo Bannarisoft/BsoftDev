@@ -33,8 +33,11 @@ using FAM.Infrastructure.Repositories.MiscMaster;
 using FAM.Infrastructure.Repositories.Manufacture;
 using Core.Application.Common.Interfaces.IManufacture;
 using Core.Domain.Entities;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral;
 using Core.Application.Common.Interfaces.IUOM;
 using FAM.Infrastructure.Repositories.UOMs;
+using Core.Application.Common.Mappings.AssetMaster;
 
 namespace FAM.Infrastructure
 {
@@ -146,7 +149,8 @@ namespace FAM.Infrastructure
             services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();            
 			services.AddScoped<IManufactureCommandRepository, ManufactureCommandRepository>();
             services.AddScoped<IManufactureQueryRepository, ManufactureQueryRepository>();
-            services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
+ 			services.AddScoped<IAssetMasterGeneralCommandRepository, AssetMasterGeneralCommandRepository>();
+            services.AddScoped<IAssetMasterGeneralQueryRepository, AssetMasterGeneralQueryRepository>();            services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
             services.AddScoped<IUOMQueryRepository, UOMQueryRepository>();
 
             // Miscellaneous services
@@ -165,7 +169,8 @@ namespace FAM.Infrastructure
                 typeof(AssetCategoriesProfile),
 				typeof(AssetSubCategoriesProfile),
 				typeof(ManufactureProfile),
-                typeof(UOMProfile)
+                typeof(UOMProfile),
+                typeof(AssetMasterGeneralProfile)
             );
 
             return services;

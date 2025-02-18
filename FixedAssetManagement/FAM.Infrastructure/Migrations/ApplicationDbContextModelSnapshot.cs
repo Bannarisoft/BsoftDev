@@ -156,6 +156,122 @@ namespace FAM.Infrastructure.Migrations
                     b.ToTable("AssetGroup", "FixedAsset");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AssetCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("AssetDescription")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)");
+
+                    b.Property<int>("AssetGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AssetImage")
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("AssetImage");
+
+                    b.Property<string>("AssetName")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int?>("AssetParentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AssetSubCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AssetType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<bool>("ISDepreciated")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsTangible")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MachineCode")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UOMId")
+                        .HasColumnType("int")
+                        .HasColumnName("UOMId");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("WorkingStatus")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetCategoryId");
+
+                    b.HasIndex("AssetGroupId");
+
+                    b.HasIndex("AssetParentId");
+
+                    b.HasIndex("AssetSubCategoryId");
+
+                    b.HasIndex("AssetType");
+
+                    b.HasIndex("UOMId");
+
+                    b.HasIndex("WorkingStatus");
+
+                    b.ToTable("AssetMaster", "FixedAsset");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.AssetSubCategories", b =>
                 {
                     b.Property<int>("Id")
@@ -240,9 +356,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("AssetGroupId")
                         .HasColumnType("int");
 
-                    b.Property<string>("BookType")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
+                    b.Property<int?>("BookType")
+                        .HasColumnType("int");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -266,9 +381,8 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("DepreciationMethod")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
+                    b.Property<int?>("DepreciationMethod")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -301,6 +415,10 @@ namespace FAM.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssetGroupId");
+
+                    b.HasIndex("BookType");
+
+                    b.HasIndex("DepreciationMethod");
 
                     b.ToTable("DepreciationGroups", "FixedAsset");
                 });
@@ -433,9 +551,8 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("ManufactureType")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)");
+                    b.Property<int?>("ManufactureType")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
@@ -465,6 +582,8 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ManufactureType");
 
                     b.ToTable("Manufacture", "FixedAsset");
                 });
@@ -749,6 +868,64 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetGroup");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.AssetCategories", "AssetCategories")
+                        .WithMany("AssetMasterGeneral")
+                        .HasForeignKey("AssetCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroup")
+                        .WithMany("AssetMasterGeneral")
+                        .HasForeignKey("AssetGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetParent")
+                        .WithMany("AssetChildren")
+                        .HasForeignKey("AssetParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.AssetSubCategories", "AssetSubCategories")
+                        .WithMany("AssetMasterGeneral")
+                        .HasForeignKey("AssetSubCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "AssetMiscType")
+                        .WithMany("AssetMiscTypeGenerals")
+                        .HasForeignKey("AssetType")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_AssetType_Misc");
+
+                    b.HasOne("Core.Domain.Entities.UOM", "UomMaster")
+                        .WithMany("AssetGeneralsUom")
+                        .HasForeignKey("UOMId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_AssetUOM_UOMMaster");
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "AssetWorkType")
+                        .WithMany("AssetWorkTypeGenerals")
+                        .HasForeignKey("WorkingStatus")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkingStatus_Misc");
+
+                    b.Navigation("AssetCategories");
+
+                    b.Navigation("AssetGroup");
+
+                    b.Navigation("AssetMiscType");
+
+                    b.Navigation("AssetParent");
+
+                    b.Navigation("AssetSubCategories");
+
+                    b.Navigation("AssetWorkType");
+
+                    b.Navigation("UomMaster");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.AssetSubCategories", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetCategories", "AssetCategories")
@@ -768,7 +945,34 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "BookMiscType")
+                        .WithMany("BookType")
+                        .HasForeignKey("BookType")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_BookType_Misc");
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "DepMiscType")
+                        .WithMany("DepreciationMethod")
+                        .HasForeignKey("DepreciationMethod")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_DepreciationMethod_Misc");
+
                     b.Navigation("AssetGroup");
+
+                    b.Navigation("BookMiscType");
+
+                    b.Navigation("DepMiscType");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Manufactures", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "ManufactureTypes")
+                        .WithMany("Manufactures")
+                        .HasForeignKey("ManufactureType")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_ManufactureType_Misc");
+
+                    b.Navigation("ManufactureTypes");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
@@ -806,6 +1010,8 @@ namespace FAM.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.AssetCategories", b =>
                 {
+                    b.Navigation("AssetMasterGeneral");
+
                     b.Navigation("AssetSubCategories");
                 });
 
@@ -813,7 +1019,19 @@ namespace FAM.Infrastructure.Migrations
                 {
                     b.Navigation("AssetCategories");
 
+                    b.Navigation("AssetMasterGeneral");
+
                     b.Navigation("DepreciationGroups");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
+                {
+                    b.Navigation("AssetChildren");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetSubCategories", b =>
+                {
+                    b.Navigation("AssetMasterGeneral");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Location", b =>
@@ -823,12 +1041,27 @@ namespace FAM.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
+                    b.Navigation("AssetMiscTypeGenerals");
+
+                    b.Navigation("AssetWorkTypeGenerals");
+
+                    b.Navigation("BookType");
+
+                    b.Navigation("DepreciationMethod");
+
+                    b.Navigation("Manufactures");
+
                     b.Navigation("UOMs");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
                 {
                     b.Navigation("MiscMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.UOM", b =>
+                {
+                    b.Navigation("AssetGeneralsUom");
                 });
 #pragma warning restore 612, 618
         }

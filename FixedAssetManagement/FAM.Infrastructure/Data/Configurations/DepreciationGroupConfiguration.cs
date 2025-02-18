@@ -32,15 +32,11 @@ namespace FAM.Infrastructure.Data.Configurations
 
                 builder.Property(dg => dg.Code)                
                 .HasColumnType("varchar(10)")
-                .IsRequired();                
-      
-                builder.Property(dg => dg.BookType)                
-                .HasColumnType("varchar(50)")
-                .IsRequired();                
+                .IsRequired(); 
 
                 builder.Property(dg => dg.DepreciationGroupName)                
                 .HasColumnType("varchar(50)")
-                .IsRequired(); 
+                .IsRequired();                
 
                 builder.Property(dg => dg.AssetGroupId)
                 .HasColumnType("int")
@@ -52,13 +48,29 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasForeignKey(dg => dg.AssetGroupId)                
                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete
 
-                builder.Property(b => b.UsefulLife)                
+                builder.Property(dg => dg.BookType)                
                 .HasColumnType("int")
-                .IsRequired();
+                .IsRequired(false);   
+
+                 builder.HasOne(dg => dg.BookMiscType)
+                .WithMany(mm => mm.BookType) 
+                .HasForeignKey(dg => dg.BookType)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_BookType_Misc");                
 
                  builder.Property(b => b.DepreciationMethod)                
-                .HasColumnType("varchar(50)")
-                .IsRequired();
+                .HasColumnType("int")
+                .IsRequired(false);
+
+                builder.HasOne(dg => dg.DepMiscType)
+                .WithMany(mm => mm.DepreciationMethod) 
+                .HasForeignKey(dg => dg.DepreciationMethod)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_DepreciationMethod_Misc");
+
+                builder.Property(b => b.UsefulLife)                
+                .HasColumnType("int")
+                .IsRequired();                
                 
                  builder.Property(b => b.ResidualValue)                
                 .HasColumnType("int")

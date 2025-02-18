@@ -38,8 +38,14 @@ namespace FAM.Infrastructure.Data.Configurations
             .IsRequired();             
     
             builder.Property(dg => dg.ManufactureType)                
-            .HasColumnType("varchar(10)")
-            .IsRequired();                
+            .HasColumnType("int")
+            .IsRequired(false);        
+
+            builder.HasOne(dg => dg.ManufactureTypes)
+            .WithMany(mm => mm.Manufactures) 
+            .HasForeignKey(dg => dg.ManufactureType)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("FK_ManufactureType_Misc");        
            
             builder.Property(dg => dg.CountryId)
             .HasColumnType("int")

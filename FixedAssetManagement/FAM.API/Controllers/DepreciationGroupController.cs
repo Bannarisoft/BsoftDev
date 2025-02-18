@@ -1,9 +1,11 @@
 using Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup;
 using Core.Application.DepreciationGroup.Commands.DeleteDepreciationGroup;
 using Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup;
+using Core.Application.DepreciationGroup.Queries.GetBookTypeQuery;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationGroup;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationGroupAutoComplete;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationGroupById;
+using Core.Application.DepreciationGroup.Queries.GetDepreciationMethodQuery;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -128,7 +130,7 @@ namespace FAM.API.Controllers
                 return Ok(new 
                 {   StatusCode=StatusCodes.Status200OK,
                     message = result.Message, 
-                    City = result.Data
+                    asset = result.Data
                 });
             }
                 
@@ -139,7 +141,7 @@ namespace FAM.API.Controllers
                 });
                 
         }
-        [HttpDelete("   {id}")]        
+        [HttpDelete("{id}")]        
         public async Task<IActionResult> DeleteAsync(int id)
         {             
             if (id <= 0)
@@ -147,7 +149,7 @@ namespace FAM.API.Controllers
                 return BadRequest(new
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Invalid Country ID"
+                    message = "Invalid Asset ID"
                 });
             }            
               var result = await Mediator.Send(new DeleteDepreciationGroupCommand { Id = id });                 
@@ -185,6 +187,47 @@ namespace FAM.API.Controllers
                 message = result.Message,
                 data = result.Data
             });
-        }    
+        }
+       [HttpGet("bookType")]
+        public async Task<IActionResult> GetBookTypes()
+        {
+            var result = await Mediator.Send(new GetBookTypeQuery());
+
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Book Types found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Book Types fetched successfully.",
+                data = result.Data
+            });
+        }
+        [HttpGet("DepMethod")]
+        public async Task<IActionResult> GetDepreciationMethods()
+        {
+            var result = await Mediator.Send(new GetDepreciationMethodQuery());
+
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Depreciation Method Types found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Depreciation Method  fetched successfully.",
+                data = result.Data
+            });
+        }
+
     }
 }

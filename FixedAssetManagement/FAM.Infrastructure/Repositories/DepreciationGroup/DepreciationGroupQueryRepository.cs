@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IDepreciationGroup;
+using Core.Domain.Common;
 using Core.Domain.Entities;
 using Dapper;
 
@@ -21,13 +22,13 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
              var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
-                FROM FixedAsset.DepreciationGroup 
+                FROM FixedAsset.DepreciationGroups 
                 WHERE IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR DepreciationGroupName LIKE @Search)")}};
 
                 SELECT Id,Code,BookType,DepreciationGroupName,AssetGroupId,UsefulLife,DepreciationMethod,ResidualValue,SortOrder,  IsActive
                 ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
-                FROM FixedAsset.DepreciationGroup  WHERE IsDeleted = 0
+                FROM FixedAsset.DepreciationGroups  WHERE IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR DepreciationGroupName LIKE @Search )")}}
                 ORDER BY Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -51,7 +52,7 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
             const string query = @"
             SELECT Id,Code,BookType,DepreciationGroupName,AssetGroupId,UsefulLife,DepreciationMethod,ResidualValue,SortOrder,  IsActive
             ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
-            FROM FixedAsset.DepreciationGroup 
+            FROM FixedAsset.DepreciationGroups 
             WHERE (DepreciationGroupName LIKE @SearchPattern OR Code LIKE @SearchPattern) 
             AND  IsDeleted=0 and IsActive=1
             ORDER BY ID DESC";            
@@ -64,13 +65,43 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
             const string query = @"
             SELECT Id,Code,BookType,DepreciationGroupName,AssetGroupId,UsefulLife,DepreciationMethod,ResidualValue,SortOrder,  IsActive
             ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
-            FROM FixedAsset.DepreciationGroup WHERE Id = @depGroupId AND IsDeleted=0";
+            FROM FixedAsset.DepreciationGroups WHERE Id = @depGroupId AND IsDeleted=0";
             var depreciationGroups = await _dbConnection.QueryFirstOrDefaultAsync<DepreciationGroups>(query, new { depGroupId });           
             if (depreciationGroups is null)
             {
                 throw new KeyNotFoundException($"DepreciationGroup with ID {depGroupId} not found.");
             }
             return depreciationGroups;
+        }
+
+        public async Task<List<Core.Domain.Entities.MiscMaster>> GetDepreciationMethodAsync()
+        {
+            const string query = @"
+            SELECT M.Id,MiscTypeMasterId,Code,M.Description,SortOrder,  M.IsActive
+            ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
+            FROM FixedAsset.MiscMaster M
+            INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeMasterId
+            WHERE (MiscTypeCode = @MiscTypeCode) 
+            AND  M.IsDeleted=0 and M.IsActive=1
+            ORDER BY M.ID DESC";          
+            var parameters = new { MiscTypeCode = MiscEnumEntity.Depreciation_DepMethod.MiscCode };     
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+            return result.ToList();
+        }
+        
+        public async Task<List<Core.Domain.Entities.MiscMaster>> GetBookTypeAsync()
+        {
+            const string query = @"
+            SELECT M.Id,MiscTypeMasterId,Code,M.Description,SortOrder,  M.IsActive
+            ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
+            FROM FixedAsset.MiscMaster M
+            INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeMasterId
+            WHERE (MiscTypeCode = @MiscTypeCode) 
+            AND  M.IsDeleted=0 and M.IsActive=1
+            ORDER BY M.ID DESC";    
+            var parameters = new { MiscTypeCode = MiscEnumEntity.Depreciation_BookType.MiscCode };        
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+            return result.ToList();
         }
     }
 }
