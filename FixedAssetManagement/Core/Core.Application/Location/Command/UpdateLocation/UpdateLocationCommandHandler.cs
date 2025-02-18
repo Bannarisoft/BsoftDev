@@ -31,6 +31,26 @@ namespace Core.Application.Location.Command.UpdateLocation
                 {
                     return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Location already exists"};
                 }
+
+                     // Check for duplicate GroupName or SortOrder
+       var (isNameDuplicate, isSortOrderDuplicate) = await _locationCommandRepository
+                                .CheckForDuplicatesAsync(request.LocationName, request.SortOrder, request.Id);
+
+        if (isNameDuplicate || isSortOrderDuplicate)
+        {
+            string errorMessage = isNameDuplicate && isSortOrderDuplicate
+            ? "Both Location Name and Sort Order already exist."
+            : isNameDuplicate
+            ? "Location with the same LocationName already exists."
+            : "Location with the same Sort Order already exists.";
+
+            return new ApiResponseDTO<bool>
+            {
+                IsSuccess = false,
+                Message = errorMessage
+            };
+        }
+
                  var location  = _mapper.Map<Core.Domain.Entities.Location>(request);
          
                 var locationresult = await _locationCommandRepository.UpdateAsync(location);

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
 using FAM.Infrastructure.Data.Configurations;
-using FAM.Infrastructure.Data.Configurations.AssetMaster;
 
 namespace FAM.Infrastructure.Data
 {
@@ -30,7 +29,9 @@ namespace FAM.Infrastructure.Data
         public DbSet<DepreciationGroups> DepreciationGroups { get; set; }
         public DbSet<AssetSubCategories> AssetSubCategories { get; set; }
 		public DbSet<Manufactures> Manufactures { get; set; }
-        public DbSet<AssetMasterGenerals> AssetMasterGenerals { get; set; }
+		public DbSet<AssetMasterGenerals> AssetMasterGenerals { get; set; }
+        public DbSet<UOM> UOMs { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,7 +44,10 @@ namespace FAM.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new DepreciationGroupConfiguration());
             modelBuilder.ApplyConfiguration(new AssetSubCategoriesConfiguration());
             modelBuilder.ApplyConfiguration(new ManufactureConfiguration());   
-            modelBuilder.ApplyConfiguration(new AssetMasterGeneralConfiguration());   
+ 			modelBuilder.ApplyConfiguration(new AssetMasterGeneralConfiguration()); 
+            modelBuilder.ApplyConfiguration(new ManufactureConfiguration());
+            modelBuilder.ApplyConfiguration(new UOMConfiguration());   
+
             base.OnModelCreating(modelBuilder);
         }
          public override int SaveChanges()
