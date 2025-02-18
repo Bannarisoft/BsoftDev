@@ -101,7 +101,12 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 builder.Property(ag => ag.UOMId)
                 .HasColumnName("UOMId")
                 .HasColumnType("int")
-                .IsRequired(); 
+                .IsRequired(false); 
+                builder.HasOne(dg => dg.UomMaster)
+                .WithMany(mm => mm.AssetGeneralsUom) 
+                .HasForeignKey(dg => dg.UOMId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_AssetUOM_UOMMaster");
 
                 builder.Property(b => b.WorkingStatus)
                 .IsRequired(false)

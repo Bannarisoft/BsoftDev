@@ -25,6 +25,7 @@ namespace Core.Domain.Entities
         public string? MachineCode { get; set; }   
         public int? Quantity { get; set; }
         public int? UOMId { get; set; }
+        public UOM UomMaster { get; set; } = null!;
         public string? AssetDescription { get; set; }
         public int? WorkingStatus { get; set; }
         public MiscMaster? AssetWorkType { get; set; } = null!;   

@@ -60,8 +60,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
                     AssetImage = filePath,  // ✅ Store file path
                     AssetImageBase64 = base64Image  // ✅ Convert to Base64
                 };
-                existingAsset.AssetImage = fileName;  // ✅ Store only the filename, not full path
-                await _applicationDbContext.SaveChangesAsync();
+          //      existingAsset.AssetImage = fileName;  // ✅ Store only the filename, not full path
+        //        await _applicationDbContext.SaveChangesAsync();
                 return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = true, Data = response };
             }
             catch (Exception ex)

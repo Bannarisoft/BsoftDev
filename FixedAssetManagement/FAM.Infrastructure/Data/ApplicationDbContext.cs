@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
 using FAM.Infrastructure.Data.Configurations;
+using FAM.Infrastructure.Data.Configurations.AssetMaster;
 
 namespace FAM.Infrastructure.Data
 {

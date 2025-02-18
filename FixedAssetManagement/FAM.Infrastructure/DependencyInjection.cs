@@ -34,8 +34,10 @@ using FAM.Infrastructure.Repositories.Manufacture;
 using Core.Application.Common.Interfaces.IManufacture;
 using Core.Domain.Entities;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
-using FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral;using Core.Application.Common.Interfaces.IUOM;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral;
+using Core.Application.Common.Interfaces.IUOM;
 using FAM.Infrastructure.Repositories.UOMs;
+using Core.Application.Common.Mappings.AssetMaster;
 
 namespace FAM.Infrastructure
 {
@@ -167,7 +169,8 @@ namespace FAM.Infrastructure
                 typeof(AssetCategoriesProfile),
 				typeof(AssetSubCategoriesProfile),
 				typeof(ManufactureProfile),
-                typeof(UOMProfile)
+                typeof(UOMProfile),
+                typeof(AssetMasterGeneralProfile)
             );
 
             return services;
