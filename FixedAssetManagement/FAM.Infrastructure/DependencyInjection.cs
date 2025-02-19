@@ -38,6 +38,9 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral;
 using Core.Application.Common.Interfaces.IUOM;
 using FAM.Infrastructure.Repositories.UOMs;
 using Core.Application.Common.Mappings.AssetMaster;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetPurchase;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase;
+using Core.Application.Common.Mappings.AssetPurchase;
 
 namespace FAM.Infrastructure
 {
@@ -150,8 +153,10 @@ namespace FAM.Infrastructure
 			services.AddScoped<IManufactureCommandRepository, ManufactureCommandRepository>();
             services.AddScoped<IManufactureQueryRepository, ManufactureQueryRepository>();
  			services.AddScoped<IAssetMasterGeneralCommandRepository, AssetMasterGeneralCommandRepository>();
-            services.AddScoped<IAssetMasterGeneralQueryRepository, AssetMasterGeneralQueryRepository>();            services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
+            services.AddScoped<IAssetMasterGeneralQueryRepository, AssetMasterGeneralQueryRepository>();            
+            services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
             services.AddScoped<IUOMQueryRepository, UOMQueryRepository>();
+            services.AddScoped<IAssetPurchaseQueryRepository, AssetPurchaseQueryRepository>();
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -170,7 +175,8 @@ namespace FAM.Infrastructure
 				typeof(AssetSubCategoriesProfile),
 				typeof(ManufactureProfile),
                 typeof(UOMProfile),
-                typeof(AssetMasterGeneralProfile)
+                typeof(AssetMasterGeneralProfile),
+                typeof(AssetPurchaseProfile)
             );
 
             return services;
