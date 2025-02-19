@@ -28,12 +28,12 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMa
         public async Task<ApiResponseDTO<AssetMasterGeneralDTO>> Handle(DeleteAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         {
             var assetMasterGeneral = await _assetMasterGeneralQueryRepository.GetByIdAsync(request.Id);
-            if (assetMasterGeneral is null || assetMasterGeneral.IsDeleted is BaseEntity.IsDelete.Deleted )
+            if (assetMasterGeneral is null )
             {
                 return new ApiResponseDTO<AssetMasterGeneralDTO>
                 {
                     IsSuccess = false,
-                    Message = "Invalid AssetId. The specified AssetName does not exist or is inactive."
+                    Message = "Invalid AssetId."
                 };
             }
             var assetMasterDelete = _mapper.Map<AssetMasterGenerals>(request);      

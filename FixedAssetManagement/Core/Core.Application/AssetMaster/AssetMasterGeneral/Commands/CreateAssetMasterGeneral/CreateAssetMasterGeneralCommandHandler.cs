@@ -53,7 +53,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
             }
 
             // Generate Asset Code
-            var assetCode = $"{UnitName}/{assetGroupName}/{assetCategoryName}/{sequence}";
+            var assetCode = $"{UnitName}-{assetGroupName}-{assetCategoryName}-{sequence}";
 
             var assetEntity = _mapper.Map<AssetMasterGenerals>(request);     
             assetEntity.AssetCode = assetCode; // Assign generated AssetCode       

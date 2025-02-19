@@ -1,4 +1,5 @@
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
+using Core.Domain.Common;
 using Core.Domain.Entities;
 using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -79,6 +80,44 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 .OrderByDescending(a => a.AssetCode)
                 .Select(a => a.AssetCode)
                 .FirstOrDefaultAsync();
-        }       
+        }
+
+        public async Task<AssetMasterGenerals?> GetByAssetCodeAsync(string assetCode)
+        {
+            return await _applicationDbContext.AssetMasterGenerals
+                .FirstOrDefaultAsync(a => a.AssetCode == assetCode && a.IsDeleted == BaseEntity.IsDelete.NotDeleted && a.IsActive == BaseEntity.Status.Active );   
+        }
+        public async Task<bool> UpdateAssetImageAsync(int assetId, string imageName)
+        {
+            var asset = await _applicationDbContext.AssetMasterGenerals.FindAsync(assetId);
+            if (asset == null)
+            {
+                return false;  // Asset not found
+            }
+            // Store only relative path (e.g., "HomeTextile/HomeTextile-COMP-MOU-1.png")
+            asset.AssetImage = imageName.Replace(@"\", "/"); 
+
+            asset.AssetImage = imageName;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
+        public async Task<AssetMasterGenerals?> GetByAssetImageAsync(string assetImage)
+        {
+            return await _applicationDbContext.AssetMasterGenerals
+                .FirstOrDefaultAsync(a => a.AssetImage == assetImage);
+        }
+
+        public async Task<bool> RemoveAssetImageReferenceAsync(int assetId)
+        {
+            var asset = await _applicationDbContext.AssetMasterGenerals.FindAsync(assetId);
+            if (asset == null)
+            {
+                return false;  // Asset not found
+            }
+
+            asset.AssetImage = null;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }

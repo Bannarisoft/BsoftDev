@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral;
 using FAM.API.Validation.Common;
 using FluentValidation;
@@ -22,34 +18,32 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
             {
                 switch (rule.Rule)
                 {
-                    case "NotEmpty":                        
+                    case "NotEmpty":
                         RuleFor(x => x.File)
-                        .NotNull()
-                        .WithMessage($"{nameof(UploadFileAssetMasterGeneralCommand.File)} {rule.Error}")
-                        .NotEmpty()
-                        .WithMessage($"{nameof(UploadFileAssetMasterGeneralCommand.File)} {rule.Error}");
+                            .NotNull()
+                            .WithMessage($"{nameof(UploadFileAssetMasterGeneralCommand.File)} {rule.Error}")
+                            .NotEmpty()
+                            .WithMessage($"{nameof(UploadFileAssetMasterGeneralCommand.File)} {rule.Error}");
                         break;
                     case "FileValidation":
                         RuleFor(x => x.File)
-                        .Must(file => IsValidFileType(file, rule.allowedExtensions))
-                        .WithMessage($"{nameof(UploadFileAssetMasterGeneralCommand.File)} {rule.Error}")
-                        .Must(file => file.Length <= 2 * 1024 * 1024)
-                        .WithMessage($"{nameof(UploadFileAssetMasterGeneralCommand.File)} {rule.Error}");
-                        break;
+                            .Must(file => file != null && IsValidFileType(file, rule.allowedExtensions))
+                            .WithMessage($"{nameof(UploadFileAssetMasterGeneralCommand.File)} {rule.Error}")
+                            .Must(file => file != null && file.Length <= 2 * 1024 * 1024) // 2MB size limit
+                            .WithMessage($"{nameof(UploadFileAssetMasterGeneralCommand.File)} {rule.Error}");
+                        break;                   
                 }
-            }        }
-        private bool IsValidFileType(IFormFile file, List<string> allowedExtensions)
-        {           
-            foreach (var extension in allowedExtensions)
+            }        
+        }
+       private bool IsValidFileType(IFormFile file, List<string> allowedExtensions)
+        {
+            if (file == null || allowedExtensions == null || !allowedExtensions.Any())
             {
-                Console.WriteLine(extension);
-                
+                return false;
             }
-            
-            if (file == null) return false;
-        
+
             var fileExtension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
             return allowedExtensions.Contains(fileExtension);
         }
-        }
+    }
 }

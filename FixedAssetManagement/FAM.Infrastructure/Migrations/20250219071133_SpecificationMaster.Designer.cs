@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250219071133_SpecificationMaster")]
+    partial class SpecificationMaster
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -628,9 +631,9 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
-                    b.Property<int>("MiscTypeId")
+                    b.Property<int>("MiscTypeMasterId")
                         .HasColumnType("int")
-                        .HasColumnName("MiscTypeId");
+                        .HasColumnName("MiscTypeMasterId");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
@@ -652,7 +655,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MiscTypeId");
+                    b.HasIndex("MiscTypeMasterId");
 
                     b.ToTable("MiscMaster", "FixedAsset");
                 });
@@ -695,7 +698,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Property<string>("MiscTypeCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("MiscTypeCode");
 
                     b.Property<int?>("ModifiedBy")
@@ -1037,7 +1040,7 @@ namespace FAM.Infrastructure.Migrations
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
                         .WithMany("MiscMaster")
-                        .HasForeignKey("MiscTypeId")
+                        .HasForeignKey("MiscTypeMasterId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

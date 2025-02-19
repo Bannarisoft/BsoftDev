@@ -11,7 +11,7 @@ namespace FAM.Infrastructure.Repositories.AssetCategories
 {
     public class AssetCategoriesCommandRepository : IAssetCategoriesCommandRepository
     {
-         private readonly ApplicationDbContext _applicationDbContext;
+        private readonly ApplicationDbContext _applicationDbContext;
 
         public AssetCategoriesCommandRepository(ApplicationDbContext applicationDbContext)
         {

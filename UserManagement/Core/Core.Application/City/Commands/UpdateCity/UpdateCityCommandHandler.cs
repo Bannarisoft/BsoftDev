@@ -62,14 +62,14 @@ namespace Core.Application.City.Commands.UpdateCity
                 {
                     return new ApiResponseDTO<CityDto>
                     {
-                        IsSuccess = false,
+                        IsSuccess = true,
                         Message = "CityCode DeActivated."
                     };
                 }
                 else{
                     return new ApiResponseDTO<CityDto>
                     {
-                        IsSuccess = false,
+                        IsSuccess = true,
                         Message = "CityCode Activated."
                     }; 
                 }                                     

@@ -29,12 +29,12 @@ namespace Core.Application.Manufacture.Commands.DeleteManufacture
         public async Task<ApiResponseDTO<ManufactureDTO>> Handle(DeleteManufactureCommand request, CancellationToken cancellationToken)
         {
               var manufactures = await _manufactureQueryRepository.GetByIdAsync(request.Id);
-            if (manufactures is null || manufactures.IsDeleted is BaseEntity.IsDelete.Deleted )
+            if (manufactures is null )
             {
                 return new ApiResponseDTO<ManufactureDTO>
                 {
                     IsSuccess = false,
-                    Message = "Invalid ManufactureID. The specified Manufacture does not exist or is inactive."
+                    Message = "Invalid ManufactureID. "
                 };
             }
             var manufacturesDelete = _mapper.Map<Manufactures>(request);      

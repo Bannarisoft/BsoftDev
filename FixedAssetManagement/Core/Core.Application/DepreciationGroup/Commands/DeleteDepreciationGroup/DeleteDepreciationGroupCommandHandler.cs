@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IDepreciationGroup;
@@ -32,12 +28,12 @@ namespace Core.Application.DepreciationGroup.Commands.DeleteDepreciationGroup
         public async Task<ApiResponseDTO<DepreciationGroupDTO>> Handle(DeleteDepreciationGroupCommand request, CancellationToken cancellationToken)
         {             
             var depreciationGroups = await _depreciationGroupQueryRepository.GetByIdAsync(request.Id);
-            if (depreciationGroups is null || depreciationGroups.IsDeleted is BaseEntity.IsDelete.Deleted )
+            if (depreciationGroups is null )
             {
                 return new ApiResponseDTO<DepreciationGroupDTO>
                 {
                     IsSuccess = false,
-                    Message = "Invalid DepreciationGroupID. The specified GroupName does not exist or is inactive."
+                    Message = "Invalid DepreciationGroupID."
                 };
             }
             var depreciationGroupsDelete = _mapper.Map<DepreciationGroups>(request);      

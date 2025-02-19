@@ -35,7 +35,7 @@ namespace Core.Application.State.Commands.UpdateState
 
             var oldStateName = state.StateName;
             state.StateName = request.StateName;
-            if (state is null || state.IsDeleted != Domain.Enums.Common.Enums.IsDelete.Deleted)
+            if (state is null || state.IsDeleted is Enums.IsDelete.Deleted)
             {                
                 return new ApiResponseDTO<StateDto>
                 {
@@ -60,14 +60,14 @@ namespace Core.Application.State.Commands.UpdateState
                 {
                     return new ApiResponseDTO<StateDto>
                     {
-                        IsSuccess = false,
+                        IsSuccess = true,
                         Message = "StateCode DeActivated."
                     };
                 }
                 else{
                     return new ApiResponseDTO<StateDto>
                     {
-                        IsSuccess = false,
+                        IsSuccess = true,
                         Message = "StateCode Activated."
                     }; 
                 }                                     

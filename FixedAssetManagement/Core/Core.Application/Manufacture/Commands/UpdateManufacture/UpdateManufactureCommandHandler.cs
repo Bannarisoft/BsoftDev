@@ -53,14 +53,14 @@ namespace Core.Application.Manufacture.Commands.UpdateManufacture
                 {
                     return new ApiResponseDTO<ManufactureDTO>
                     {
-                        IsSuccess = false,
+                        IsSuccess = true,
                         Message = "Code DeActivated."
                     };
                 }
                 else{
                     return new ApiResponseDTO<ManufactureDTO>
                     {
-                        IsSuccess = false,
+                        IsSuccess = true,
                         Message = "Code Activated."
                     }; 
                 }                                     
