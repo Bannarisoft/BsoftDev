@@ -38,7 +38,9 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral;
 using Core.Application.Common.Interfaces.IUOM;
 using FAM.Infrastructure.Repositories.UOMs;
 using Core.Application.Common.Mappings.AssetMaster;
-using Core.Application.Common.Interfaces.ISpecificationMaster;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetPurchase;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase;
+using Core.Application.Common.Mappings.AssetPurchase;using Core.Application.Common.Interfaces.ISpecificationMaster;
 using FAM.Infrastructure.Repositories.SpecificationMaster;
 
 namespace FAM.Infrastructure
@@ -155,6 +157,7 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetMasterGeneralQueryRepository, AssetMasterGeneralQueryRepository>();            
             services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
             services.AddScoped<IUOMQueryRepository, UOMQueryRepository>();
+			services.AddScoped<IAssetPurchaseQueryRepository, AssetPurchaseQueryRepository>();
             services.AddScoped<ISpecificationMasterCommandRepository, SpecificationMasterCommandRepository>();
             services.AddScoped<ISpecificationMasterQueryRepository, SpecificationMasterQueryRepository>();
 
@@ -176,7 +179,8 @@ namespace FAM.Infrastructure
 				typeof(ManufactureProfile),
                 typeof(UOMProfile),
                 typeof(AssetMasterGeneralProfile),
-                typeof(SpecificationMasterProfile)
+                typeof(SpecificationMasterProfile),
+				typeof(AssetPurchaseProfile)
             );
 
             return services;

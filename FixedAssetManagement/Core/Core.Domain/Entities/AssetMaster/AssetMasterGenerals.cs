@@ -31,6 +31,7 @@ namespace Core.Domain.Entities
         public MiscMaster? AssetWorkType { get; set; } = null!;   
         public string? AssetImage { get; set; }
         public byte ISDepreciated { get; set; }
-        public byte IsTangible { get; set; }        
+        public byte IsTangible { get; set; }    
+        public ICollection<Core.Domain.Entities.AssetPurchase.AssetPurchase>? AssetPurchase { get; set; }     
     }
 }

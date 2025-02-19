@@ -8,6 +8,6 @@ namespace Core.Application.Units.Queries.GetUnits
     public class UnitAutoCompleteDTO
     {
          public int Id { get; set; }
-         public string UnitName { get; set; }
+         public string? UnitName { get; set; }
     }
 }
