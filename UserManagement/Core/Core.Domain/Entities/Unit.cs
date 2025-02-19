@@ -15,10 +15,11 @@ public int CompanyId { get; set; }
 public int DivisionId { get; set; }
 public string? UnitHeadName { get; set; }
 public string? CINNO {get; set;}
-
+public string? OldUnitId { get; set;}
 public  UnitAddress? UnitAddress { get; set; }
 public  UnitContacts? UnitContacts { get; set; }
-public IList<UserUnit> UserUnits { get; set; }
+public IList<UserUnit>? UserUnits { get; set; }
+ 
        
 }
 }

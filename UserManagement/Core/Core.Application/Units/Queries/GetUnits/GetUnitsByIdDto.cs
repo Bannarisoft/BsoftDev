@@ -15,6 +15,7 @@ namespace Core.Application.Units.Queries.GetUnits
     public int DivisionId { get; set; }
     public string? UnitHeadName { get; set; }
     public string? CINNO { get; set; }
+    public string? OldUnitId { get; set; }
     public Status  IsActive { get; set; }
     public IsDelete IsDeleted { get; set; }
     public UnitAddressDto? UnitAddressDto { get; set; } 
