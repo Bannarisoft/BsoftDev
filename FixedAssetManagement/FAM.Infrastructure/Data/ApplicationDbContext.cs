@@ -32,6 +32,7 @@ namespace FAM.Infrastructure.Data
 		public DbSet<Manufactures> Manufactures { get; set; }
 		public DbSet<AssetMasterGenerals> AssetMasterGenerals { get; set; }
         public DbSet<UOM> UOMs { get; set; }
+        public DbSet<SpecificationMasters> SpecificationMasters { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -48,6 +49,7 @@ namespace FAM.Infrastructure.Data
  			modelBuilder.ApplyConfiguration(new AssetMasterGeneralConfiguration()); 
             modelBuilder.ApplyConfiguration(new ManufactureConfiguration());
             modelBuilder.ApplyConfiguration(new UOMConfiguration());   
+            modelBuilder.ApplyConfiguration(new SpecificationMasterConfiguration());   
 
             base.OnModelCreating(modelBuilder);
         }

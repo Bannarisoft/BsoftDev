@@ -52,14 +52,14 @@ namespace Core.Application.Country.Commands.UpdateCountry
                 {
                     return new ApiResponseDTO<CountryDto>
                     {
-                        IsSuccess = false,
+                        IsSuccess = true,
                         Message = "CountryCode DeActivated."
                     };
                 }
                 else{
                     return new ApiResponseDTO<CountryDto>
                     {
-                        IsSuccess = false,
+                        IsSuccess = true,
                         Message = "CountryCode Activated."
                     }; 
                 }                                     

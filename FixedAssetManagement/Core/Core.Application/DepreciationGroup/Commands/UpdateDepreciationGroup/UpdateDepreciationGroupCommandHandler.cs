@@ -72,14 +72,14 @@ namespace Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup
                 {
                     return new ApiResponseDTO<DepreciationGroupDTO>
                     {
-                        IsSuccess = false,
+                        IsSuccess = true,
                         Message = "Code DeActivated."
                     };
                 }
                 else{
                     return new ApiResponseDTO<DepreciationGroupDTO>
                     {
-                        IsSuccess = false,
+                        IsSuccess = true,
                         Message = "Code Activated."
                     }; 
                 }                                     
