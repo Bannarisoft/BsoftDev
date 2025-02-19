@@ -35,7 +35,7 @@ namespace FAM.Infrastructure.Data.Configurations
             // Code column
              builder.Property(m => m.MiscTypeCode)
                 .HasColumnName("MiscTypeCode")
-                .HasColumnType("varchar(50)")
+                .HasColumnType("nvarchar(50)")
                 .IsRequired();
 
             // Description column

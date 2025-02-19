@@ -150,7 +150,8 @@ namespace FAM.Infrastructure
 			services.AddScoped<IManufactureCommandRepository, ManufactureCommandRepository>();
             services.AddScoped<IManufactureQueryRepository, ManufactureQueryRepository>();
  			services.AddScoped<IAssetMasterGeneralCommandRepository, AssetMasterGeneralCommandRepository>();
-            services.AddScoped<IAssetMasterGeneralQueryRepository, AssetMasterGeneralQueryRepository>();            services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
+            services.AddScoped<IAssetMasterGeneralQueryRepository, AssetMasterGeneralQueryRepository>();            
+            services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
             services.AddScoped<IUOMQueryRepository, UOMQueryRepository>();
 
             // Miscellaneous services
