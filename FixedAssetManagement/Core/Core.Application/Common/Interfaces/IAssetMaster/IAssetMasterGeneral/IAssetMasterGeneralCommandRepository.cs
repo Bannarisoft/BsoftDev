@@ -10,6 +10,10 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
         Task<string?> GetAssetGroupNameById(int assetGroupId);
         Task<string?> GetAssetCategoryNameById(int assetCategoryId);
         Task<string?> GetLatestAssetCode(int companyId,int unitId, int assetGroupId, int assetSubCategoryId);
+        Task<AssetMasterGenerals?> GetByAssetCodeAsync(string assetCode);
+        Task<bool> UpdateAssetImageAsync(int assetId, string imageName);
+        Task<AssetMasterGenerals?> GetByAssetImageAsync(string assetImage);
+        Task<bool> RemoveAssetImageReferenceAsync(int assetId);
 
     }
 }

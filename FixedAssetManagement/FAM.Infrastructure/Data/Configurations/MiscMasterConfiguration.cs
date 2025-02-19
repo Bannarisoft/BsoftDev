@@ -38,8 +38,8 @@ namespace FAM.Infrastructure.Data.Configurations
          // Properties
        // Properties
          // Properties
-            builder.Property(m => m.MiscTypeMasterId)  // Foreign Key column
-                .HasColumnName("MiscTypeMasterId")
+            builder.Property(m => m.MiscTypeId)  // Foreign Key column
+                .HasColumnName("MiscTypeId")
                 .HasColumnType("int")  // Set as int
                 .IsRequired();
 
@@ -91,7 +91,7 @@ namespace FAM.Infrastructure.Data.Configurations
        // Foreign Key Relationship
             builder.HasOne(m => m.MiscTypeMaster)
                 .WithMany(t => t.MiscMaster)
-                .HasForeignKey(m => m.MiscTypeMasterId) // Foreign Key property in MiscMaster
+                .HasForeignKey(m => m.MiscTypeId) // Foreign Key property in MiscMaster
                 .HasPrincipalKey(t => t.Id)  // Principal Key in MiscTypeMaster (Id)
                 .OnDelete(DeleteBehavior.Restrict); // Use .Cascade if needed                          
             

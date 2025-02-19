@@ -686,9 +686,9 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
-                    b.Property<int>("MiscTypeMasterId")
+                    b.Property<int>("MiscTypeId")
                         .HasColumnType("int")
-                        .HasColumnName("MiscTypeMasterId");
+                        .HasColumnName("MiscTypeId");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
@@ -710,7 +710,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MiscTypeMasterId");
+                    b.HasIndex("MiscTypeId");
 
                     b.ToTable("MiscMaster", "FixedAsset");
                 });
@@ -753,7 +753,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Property<string>("MiscTypeCode")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("MiscTypeCode");
 
                     b.Property<int?>("ModifiedBy")
@@ -771,6 +771,64 @@ namespace FAM.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MiscTypeMaster", "FixedAsset");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.SpecificationMasters", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<bool>("ISDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("SpecificationName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetGroupId");
+
+                    b.ToTable("SpecificationMaster", "FixedAsset");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.SubLocation", b =>
@@ -1037,11 +1095,22 @@ namespace FAM.Infrastructure.Migrations
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
                         .WithMany("MiscMaster")
-                        .HasForeignKey("MiscTypeMasterId")
+                        .HasForeignKey("MiscTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("MiscTypeMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.SpecificationMasters", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroupMaster")
+                        .WithMany("SpecificationMaster")
+                        .HasForeignKey("AssetGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssetGroupMaster");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.SubLocation", b =>
@@ -1080,6 +1149,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetMasterGeneral");
 
                     b.Navigation("DepreciationGroups");
+
+                    b.Navigation("SpecificationMaster");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>

@@ -29,9 +29,13 @@ using Core.Application.Manufacture.Commands.CreateManufacture;
 using FAM.API.Validation.AssetMaster.AssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
-using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral;using Core.Application.UOM.Command.CreateUOM;
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral;
+using Core.Application.UOM.Command.CreateUOM;
 using Core.Application.UOM.Command.UpdateUOM;
 using FAM.API.Validation.UOM;
+using Core.Application.SpecificationMaster.Commands.UpdateSpecificationMaster;
+using FAM.API.Validation.SpecificationMaster;
+using Core.Application.SpecificationMaster.Commands.CreateSpecificationMaster;
 
 
 namespace FAM.API.Validation.Common
@@ -65,8 +69,11 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<CreateManufactureCommand>, CreateManufactureCommandValidator>();
 		services.AddScoped<IValidator<CreateAssetMasterGeneralCommand>, CreateAssetMasterGeneralCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetMasterGeneralCommand>, UpdateAssetMasterGeneralCommandValidator>();
-        services.AddScoped<IValidator<UploadFileAssetMasterGeneralCommand>, UploadAssetMasterGeneralCommandValidator>();        services.AddScoped<IValidator<CreateUOMCommand>, CreateUOMCommandValidator>();
+        services.AddScoped<IValidator<UploadFileAssetMasterGeneralCommand>, UploadAssetMasterGeneralCommandValidator>();
+        services.AddScoped<IValidator<CreateUOMCommand>, CreateUOMCommandValidator>();
         services.AddScoped<IValidator<UpdateUOMCommand>, UpdateUOMCommandValidator>();
+        services.AddScoped<IValidator<UpdateSpecificationMasterCommand>, UpdateSpecificationMasterCommandValidator>();
+        services.AddScoped<IValidator<CreateSpecificationMasterCommand>, CreateSpecificationMasterCommandValidator>();
     }  
     }
 }

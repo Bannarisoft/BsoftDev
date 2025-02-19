@@ -228,6 +228,5 @@ namespace FAM.API.Controllers
                 data = result.Data
             });
         }
-
     }
 }
