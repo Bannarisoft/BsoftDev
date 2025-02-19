@@ -38,6 +38,8 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral;
 using Core.Application.Common.Interfaces.IUOM;
 using FAM.Infrastructure.Repositories.UOMs;
 using Core.Application.Common.Mappings.AssetMaster;
+using Core.Application.Common.Interfaces.ISpecificationMaster;
+using FAM.Infrastructure.Repositories.SpecificationMaster;
 
 namespace FAM.Infrastructure
 {
@@ -152,6 +154,8 @@ namespace FAM.Infrastructure
  			services.AddScoped<IAssetMasterGeneralCommandRepository, AssetMasterGeneralCommandRepository>();
             services.AddScoped<IAssetMasterGeneralQueryRepository, AssetMasterGeneralQueryRepository>();            services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
             services.AddScoped<IUOMQueryRepository, UOMQueryRepository>();
+            services.AddScoped<ISpecificationMasterCommandRepository, SpecificationMasterCommandRepository>();
+            services.AddScoped<ISpecificationMasterQueryRepository, SpecificationMasterQueryRepository>();
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -170,7 +174,8 @@ namespace FAM.Infrastructure
 				typeof(AssetSubCategoriesProfile),
 				typeof(ManufactureProfile),
                 typeof(UOMProfile),
-                typeof(AssetMasterGeneralProfile)
+                typeof(AssetMasterGeneralProfile),
+                typeof(SpecificationMasterProfile)
             );
 
             return services;
