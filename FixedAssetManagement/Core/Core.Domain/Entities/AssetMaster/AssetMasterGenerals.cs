@@ -1,5 +1,6 @@
 
 using Core.Domain.Common;
+using Core.Domain.Entities.AssetMaster;
 
 namespace Core.Domain.Entities
 {
@@ -11,7 +12,7 @@ namespace Core.Domain.Entities
         public string? AssetName { get; set; }        
         // Foreign Key
         public int AssetGroupId { get; set; }
-        public AssetGroup AssetGroup { get; set; } = null!;        
+        public AssetGroup AssetGroup { get; set; } = null!;
         public int AssetCategoryId { get; set; }
         public AssetCategories AssetCategories { get; set; } = null!;
         public int AssetSubCategoryId { get; set; }
@@ -32,5 +33,8 @@ namespace Core.Domain.Entities
         public string? AssetImage { get; set; }
         public byte ISDepreciated { get; set; }
         public byte IsTangible { get; set; }        
+
+        public ICollection<AssetSpecifications>? AssetSpecification { get; set; }    
+        
     }
 }
