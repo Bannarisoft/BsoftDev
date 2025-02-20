@@ -36,6 +36,9 @@ using FAM.API.Validation.UOM;
 using Core.Application.SpecificationMaster.Commands.UpdateSpecificationMaster;
 using FAM.API.Validation.SpecificationMaster;
 using Core.Application.SpecificationMaster.Commands.CreateSpecificationMaster;
+using Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSpecification;
+using Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSpecification;
+using FAM.API.Validation.AssetMaster.AssetSpecification;
 
 
 namespace FAM.API.Validation.Common
@@ -74,6 +77,8 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateUOMCommand>, UpdateUOMCommandValidator>();
         services.AddScoped<IValidator<UpdateSpecificationMasterCommand>, UpdateSpecificationMasterCommandValidator>();
         services.AddScoped<IValidator<CreateSpecificationMasterCommand>, CreateSpecificationMasterCommandValidator>();
+        services.AddScoped<IValidator<CreateAssetSpecificationCommand>, CreateAssetSpecificationCommandValidator>();
+        services.AddScoped<IValidator<UpdateAssetSpecificationCommand>, UpdateAssetSpecificationCommandValidator>();
     }  
     }
 }

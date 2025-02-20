@@ -77,10 +77,10 @@ namespace FAM.Infrastructure.Repositories.Manufacture
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetManufactureTypeAsync()
         {
             const string query = @"
-            SELECT M.Id,MiscTypeMasterId,Code,M.Description,SortOrder,  M.IsActive
+            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder,  M.IsActive
             ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
             FROM FixedAsset.MiscMaster M
-            INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeMasterId
+            INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeId
             WHERE (MiscTypeCode = @MiscTypeCode) 
             AND  M.IsDeleted=0 and M.IsActive=1
             ORDER BY M.ID DESC";          

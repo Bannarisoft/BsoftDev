@@ -1,4 +1,5 @@
 using Core.Domain.Common;
+using Core.Domain.Entities.AssetMaster;
 
 namespace Core.Domain.Entities
 {
@@ -16,6 +17,7 @@ namespace Core.Domain.Entities
         public string? PinCode { get; set; }        
         public string? PersonName { get; set; }        
         public string? PhoneNumber { get; set; }        
-        public string? Email { get; set; }                
+        public string? Email { get; set; }   
+        public ICollection<AssetSpecifications>? AssetSpecification { get; set; }               
     }
 }
