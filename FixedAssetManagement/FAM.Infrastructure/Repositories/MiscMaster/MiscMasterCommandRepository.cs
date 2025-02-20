@@ -39,7 +39,7 @@ namespace FAM.Infrastructure.Repositories.MiscMaster
             if (existingMiscMaster != null)
             {
                 existingMiscMaster.Code = miscMaster.Code;
-                existingMiscMaster.MiscTypeMasterId = miscMaster.MiscTypeMasterId;
+                existingMiscMaster.MiscTypeId = miscMaster.MiscTypeId;
                 existingMiscMaster.Description = miscMaster.Description; 
                 existingMiscMaster.SortOrder = miscMaster.SortOrder;              
                 existingMiscMaster.IsActive = miscMaster.IsActive;

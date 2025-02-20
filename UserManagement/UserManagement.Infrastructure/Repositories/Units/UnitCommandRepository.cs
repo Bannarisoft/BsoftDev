@@ -49,6 +49,7 @@ namespace UserManagement.Infrastructure.Repositories.Units
     existingUnit.UnitHeadName = unit.UnitHeadName;
     existingUnit.CINNO = unit.CINNO;
     existingUnit.IsActive = unit.IsActive;
+    existingUnit.OldUnitId=unit.OldUnitId;
 
     // Update the UnitAddress
     existingUnit.UnitAddress.CountryId = unit.UnitAddress.CountryId;

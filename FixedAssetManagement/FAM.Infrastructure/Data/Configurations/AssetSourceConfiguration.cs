@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -6,11 +10,11 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace FAM.Infrastructure.Data.Configurations
 {
-    public class MiscTypeMasterConfiguration : IEntityTypeConfiguration<MiscTypeMaster>
+    public class AssetSourceConfiguration  : IEntityTypeConfiguration<AssetSource>
     {
-        public void Configure(EntityTypeBuilder<MiscTypeMaster> builder)
+        public void Configure(EntityTypeBuilder<AssetSource> builder)
         {
-            // ValueConverter for Status (enum to bit)
+              // ValueConverter for Status (enum to bit)
             var statusConverter = new ValueConverter<Status, bool>(
                 v => v == Status.Active,                    // Convert to DB (1 for Active)
                 v => v ? Status.Active : Status.Inactive    // Convert to Entity
@@ -22,57 +26,51 @@ namespace FAM.Infrastructure.Data.Configurations
                 v => v ? IsDelete.Deleted : IsDelete.NotDeleted // Convert to Entity
             );
 
-             
-              builder.ToTable("MiscTypeMaster", "FixedAsset");
-
+            builder.ToTable("AssetSource", "FixedAsset");
                 // Primary Key
-            builder.HasKey(m => m.Id);
-            builder.Property(m => m.Id)
+                builder.HasKey(b => b.Id);
+                builder.Property(b => b.Id)
                 .HasColumnName("Id")
                 .HasColumnType("int")
                 .IsRequired();
-
-            // Code column
-             builder.Property(m => m.MiscTypeCode)
-                .HasColumnName("MiscTypeCode")
-                .HasColumnType("nvarchar(50)")
+                
+            builder.Property(ag => ag.SourceCode)
+                .HasColumnName("SourceCode")
+                .HasColumnType("varchar(50)")
+                .IsRequired();
+            
+            builder.Property(ag => ag.SourceName)
+                .HasColumnName("SourceName")
+                .HasColumnType("varchar(50)")
                 .IsRequired();
 
-            // Description column
-            builder.Property(m => m.Description)
-                .HasColumnName("Description")
-                .HasColumnType("varchar(250)")
-                .IsRequired();
-
-
-                 builder.Property(b => b.IsActive)
+             builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
                 .HasConversion(statusConverter)
                 .IsRequired();
 
-                 builder.Property(b => b.IsDeleted)
+            builder.Property(b => b.IsDeleted)
                 .HasColumnName("IsDeleted")
                 .HasColumnType("bit")
                 .HasConversion(isDeleteConverter)
                 .IsRequired();
 
 
-                builder.Property(b => b.CreatedByName)
+            builder.Property(b => b.CreatedByName)
                 .IsRequired()
                 .HasColumnType("varchar(50)");
 
     
-                builder.Property(b => b.CreatedIP)
+            builder.Property(b => b.CreatedIP)
                 .IsRequired()
                 .HasColumnType("varchar(255)");
 
-                builder.Property(b => b.ModifiedByName)
+            builder.Property(b => b.ModifiedByName)
                 .HasColumnType("varchar(50)");
 
-                builder.Property(b => b.ModifiedIP)
+            builder.Property(b => b.ModifiedIP)
                 .HasColumnType("varchar(255)");
-
 
         }
     }
