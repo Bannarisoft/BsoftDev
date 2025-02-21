@@ -20,6 +20,65 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
             _dbConnection = dbConnection;
         }
 
+        public async Task<(List<AssetPurchaseDetails>, int)> GetAllPurchaseDetails(int PageNumber, int PageSize, string? SearchTerm)
+        {
+            var query = $$"""
+             DECLARE @TotalCount INT;
+             SELECT @TotalCount = COUNT(*) 
+               FROM FixedAsset.AssetPurchaseDetails
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ItemName LIKE @Search OR GrnNo LIKE @Search)")}};
+
+                SELECT 
+                Id,
+                AssetId,
+                AssetSourceId,
+                BudgetType,
+                OldUnitId,
+                VendorCode,
+                VendorName,
+                PoDate,
+                PoNo,
+                PoSno,
+                ItemCode,
+                ItemName,
+                GrnNo,
+                GrnSno,
+                GrnDate,
+                QcCompleted,
+                AcceptedQty,
+                PurchaseValue,
+                GrnValue,
+                BillNo,
+                BillDate,
+                Uom,
+                BinLocation,
+                PjYear,
+                PjDocId,
+                PjDocSr,
+                PjDocNo,
+                CapitalizationDate
+            FROM FixedAsset.AssetPurchaseDetails 
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ItemName LIKE @Search OR GrnNo LIKE @Search )")}}
+                ORDER BY Id desc
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+                SELECT @TotalCount AS TotalCount;
+            """;
+
+            
+             var parameters = new
+                       {
+                           Search = $"%{SearchTerm}%",
+                           Offset = (PageNumber - 1) * PageSize,
+                           PageSize
+                       };
+
+             var assetpurchase = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var assetpurchaselist = (await assetpurchase.ReadAsync<Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails>()).ToList();
+             int totalCount = (await assetpurchase.ReadFirstAsync<int>());
+             return (assetpurchaselist, totalCount);
+        }
+
         public async Task<List<AssetGrnItem>> GetAssetGrnItem(int OldUnitId, int GrnNo)
         {
             const string query = @"
@@ -69,17 +128,28 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
             return grnList?.ToList() ?? new List<AssetGrnDetails>();
         }
 
-        public async Task<List<AssetGrn>> GetAssetGrnNo(int OldUnitId)
+    
+
+        public async Task<List<AssetGrn>> GetAssetGrnNo(int OldUnitId, string? SearchGrnNo)
         {
-             const string query = @"
-            SELECT DISTINCT grnno AS GrnNo, unitcode AS OldUnitId
-            FROM dbo.GetGRNDetails(@OldUnitId)";
+        var query = @"
+        SELECT DISTINCT grnno AS GrnNo, unitcode AS OldUnitId
+        FROM dbo.GetGRNDetails(@OldUnitId)";
 
-            var parameters = new { OldUnitId };
-            var grnList = await _dbConnection.QueryAsync<AssetGrn>(query, parameters);
-
-            return grnList?.ToList() ?? new List<AssetGrn>();
+        if (!string.IsNullOrWhiteSpace(SearchGrnNo))
+        {
+        query += " WHERE grnno LIKE @SearchGrnNo";
         }
+
+        var parameters = new 
+        { 
+        OldUnitId, 
+        SearchGrnNo = $"%{SearchGrnNo}%" // Enables partial search
+        };
+
+        var grnList = await _dbConnection.QueryAsync<AssetGrn>(query, parameters);
+        return grnList?.ToList() ?? new List<AssetGrn>();
+}
 
         public async Task<List<AssetSource>> GetAssetSources(string searchPattern)
         {
@@ -117,6 +187,17 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
 
             var assetSources = await _dbConnection.QueryAsync<Core.Domain.Entities.AssetPurchase.AssetUnit>(query, parameters);
             return assetSources.ToList();
+        }
+
+        public async Task<AssetPurchaseDetails?> GetByIdAsync(int Id)
+        {
+             const string query = @"
+                    SELECT * 
+                    FROM FixedAsset.AssetPurchaseDetails 
+                    WHERE Id = @Id";
+
+                    var assetPurchaseDetails = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails>(query, new { Id });
+                    return assetPurchaseDetails;
         }
     }
 }

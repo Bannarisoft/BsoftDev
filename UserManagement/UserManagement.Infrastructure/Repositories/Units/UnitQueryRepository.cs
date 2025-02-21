@@ -98,7 +98,7 @@ namespace UserManagement.Infrastructure.Repositories.Units
         return unit;
         }, 
     new { Id },
-    splitOn: "AddressLine1,Name");
+    splitOn: "CountryId,Name");
 
              return unitResponse.FirstOrDefault();
         }
