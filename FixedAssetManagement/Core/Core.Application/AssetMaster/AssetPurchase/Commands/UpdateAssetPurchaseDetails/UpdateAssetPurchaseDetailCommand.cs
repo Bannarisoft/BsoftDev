@@ -2,24 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Domain.Common;
+using Core.Application.Common.HttpResponse;
+using MediatR;
 
-namespace Core.Domain.Entities.AssetPurchase
+namespace Core.Application.AssetMaster.AssetPurchase.Commands.UpdateAssetPurchaseDetails
 {
-    public class AssetPurchase 
+    public class UpdateAssetPurchaseDetailCommand :IRequest<ApiResponseDTO<int>> 
     {
         public int Id { get; set; }
         public string? BudgetType { get; set; }
-        public string? OldUnitId { get; set; }
         public string? VendorCode { get; set; }
         public string? VendorName { get; set; }
         public DateTimeOffset PoDate { get; set; }
-        public string? PoNo { get; set; }
-        public string? PoSno { get; set; }
+        public int  PoNo { get; set; }
+        public int PoSno { get; set; }
         public string? ItemCode { get; set; }
         public string? ItemName { get; set; }
-        public string?  GrnNo { get; set; }
-        public string?  GrnSno { get; set; }
+        public int GrnNo { get; set; }
+        public int GrnSno { get; set; }
         public DateTimeOffset GrnDate { get; set; }
         public char? QcCompleted { get; set; }
         public decimal AcceptedQty { get; set; }
@@ -32,11 +32,7 @@ namespace Core.Domain.Entities.AssetPurchase
         public string? PjYear { get; set; }
         public string? PjDocId { get; set; }
         public string? PjDocSr { get; set;}
-        public string? PjDocNo { get; set; }
-        public int AssetMasterId { get; set; }        
-        public AssetMasterGenerals AssetMaster { get; set; } = null!;
-        public int AssetSourceId { get; set; }    
-        public AssetSource AssetSource { get; set; } = null!;
-
+        public int PjDocNo { get; set; }
+        public DateTimeOffset? CapitalizationDate { get; set; }
     }
 }

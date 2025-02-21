@@ -32,6 +32,6 @@ namespace Core.Domain.Entities
         public string? AssetImage { get; set; }
         public byte ISDepreciated { get; set; }
         public byte IsTangible { get; set; }    
-        public ICollection<Core.Domain.Entities.AssetPurchase.AssetPurchase>? AssetPurchase { get; set; }     
+        public ICollection<Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails>? AssetPurchase { get; set; }     
     }
 }

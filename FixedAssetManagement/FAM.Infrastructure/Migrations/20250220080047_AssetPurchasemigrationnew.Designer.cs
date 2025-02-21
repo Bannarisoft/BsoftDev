@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250220080047_AssetPurchasemigrationnew")]
+    partial class AssetPurchasemigrationnew
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -384,6 +387,9 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("char(1)")
                         .HasColumnName("QcCompleted");
 
+                    b.Property<int?>("UOMId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Uom")
                         .HasColumnType("nvarchar(10)")
                         .HasColumnName("Uom");
@@ -403,6 +409,8 @@ namespace FAM.Infrastructure.Migrations
                     b.HasIndex("AssetId");
 
                     b.HasIndex("AssetSourceId");
+
+                    b.HasIndex("UOMId");
 
                     b.ToTable("AssetPurchaseDetails", "FixedAsset");
                 });
@@ -1191,6 +1199,10 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.UOM", null)
+                        .WithMany("AssetPurchaseUom")
+                        .HasForeignKey("UOMId");
+
                     b.Navigation("Asset");
 
                     b.Navigation("AssetSource");
@@ -1352,6 +1364,8 @@ namespace FAM.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.UOM", b =>
                 {
                     b.Navigation("AssetGeneralsUom");
+
+                    b.Navigation("AssetPurchaseUom");
                 });
 #pragma warning restore 612, 618
         }

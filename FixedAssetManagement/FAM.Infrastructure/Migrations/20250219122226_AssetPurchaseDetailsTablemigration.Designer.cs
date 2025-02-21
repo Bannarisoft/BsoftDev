@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250219122226_AssetPurchaseDetailsTablemigration")]
+    partial class AssetPurchaseDetailsTablemigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -285,9 +288,9 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("decimal(18,3)")
                         .HasColumnName("AcceptedQty");
 
-                    b.Property<int>("AssetId")
+                    b.Property<int>("AssetMasterId")
                         .HasColumnType("int")
-                        .HasColumnName("AssetId");
+                        .HasColumnName("AssetMasterId");
 
                     b.Property<int>("AssetSourceId")
                         .HasColumnType("int")
@@ -310,7 +313,7 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("BudgetType");
 
-                    b.Property<DateTimeOffset?>("CapitalizationDate")
+                    b.Property<DateTimeOffset>("CapitalizationDate")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("CapitalizationDate");
 
@@ -384,6 +387,10 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("char(1)")
                         .HasColumnName("QcCompleted");
 
+                    b.Property<int>("UOMId")
+                        .HasColumnType("int")
+                        .HasColumnName("UOMId");
+
                     b.Property<string>("Uom")
                         .HasColumnType("nvarchar(10)")
                         .HasColumnName("Uom");
@@ -400,9 +407,11 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssetId");
+                    b.HasIndex("AssetMasterId");
 
                     b.HasIndex("AssetSourceId");
+
+                    b.HasIndex("UOMId");
 
                     b.ToTable("AssetPurchaseDetails", "FixedAsset");
                 });
@@ -1179,9 +1188,9 @@ namespace FAM.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "Asset")
+                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMaster")
                         .WithMany("AssetPurchase")
-                        .HasForeignKey("AssetId")
+                        .HasForeignKey("AssetMasterId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1191,9 +1200,17 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Asset");
+                    b.HasOne("Core.Domain.Entities.UOM", "UomMaster")
+                        .WithMany("AssetPurchaseUom")
+                        .HasForeignKey("UOMId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssetMaster");
 
                     b.Navigation("AssetSource");
+
+                    b.Navigation("UomMaster");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetSubCategories", b =>
@@ -1352,6 +1369,8 @@ namespace FAM.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.UOM", b =>
                 {
                     b.Navigation("AssetGeneralsUom");
+
+                    b.Navigation("AssetPurchaseUom");
                 });
 #pragma warning restore 612, 618
         }

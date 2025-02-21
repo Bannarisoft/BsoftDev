@@ -10,7 +10,7 @@ namespace Core.Domain.Entities
     { 
         public string? SourceCode { get; set; }
         public string? SourceName { get; set; }
-        public ICollection<Core.Domain.Entities.AssetPurchase.AssetPurchase>? AssetPurchase { get; set; }  
+        public ICollection<Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails>? AssetPurchase { get; set; }  
 
     }
 }
