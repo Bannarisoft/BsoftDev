@@ -1,5 +1,6 @@
 
 using Core.Domain.Common;
+using Core.Domain.Entities.AssetMaster;
 
 namespace Core.Domain.Entities
 {
