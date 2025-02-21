@@ -18,19 +18,19 @@ namespace FAM.API.Validation.AssetMaster.AssetPurchase
             var BudgetType = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("BudgetType") ?? 50;
             var VendorCode = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("VendorCode") ?? 50;
             var VendorName = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("VendorName") ?? 400;
-            var PoNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PoNo") ?? 4;
+            var PoNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PoNo") ?? 10;
             var PoSno = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PoSno") ?? 4;
             var ItemCode = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("ItemCode") ?? 100;
             var ItemName = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("ItemName") ?? 500;
-            var GrnNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("GrnNo") ?? 4;
+            var GrnNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("GrnNo") ?? 10;
             var GrnSno = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("GrnSno") ?? 4;
             var BillNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("BillNo") ?? 100;
             var Uom = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("Uom") ?? 20;
             var BinLocation = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("BinLocation") ?? 100;
-            var PjYear = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("BinLocation") ?? 8;
-            var PjDocId = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PjYear") ?? 40;
+            var PjYear = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PjYear") ?? 8;
+            var PjDocId = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PjDocId") ?? 40;
             var PjDocSr = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PjDocSr") ?? 40;
-            var PjDocNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PjDocNo") ?? 4;
+            var PjDocNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PjDocNo") ?? 10;
             _validationRules = ValidationRuleLoader.LoadValidationRules();
             if (_validationRules == null || !_validationRules.Any())
             {

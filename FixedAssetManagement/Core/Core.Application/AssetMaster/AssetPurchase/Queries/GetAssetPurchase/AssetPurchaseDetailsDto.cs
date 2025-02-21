@@ -7,6 +7,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetPurchase
 {
     public class AssetPurchaseDetailsDto
     {
+        public int Id { get; set; }
         public string? BudgetType { get; set; }
         public string? OldUnitId { get; set; }
         public string? VendorCode { get; set; }

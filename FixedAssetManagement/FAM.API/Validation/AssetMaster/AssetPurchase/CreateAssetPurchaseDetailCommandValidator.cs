@@ -18,11 +18,11 @@ namespace FAM.API.Validation.AssetMaster.AssetPurchase
             var OldUnitId = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("OldUnitId") ?? 2;
             var VendorCode = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("VendorCode") ?? 50;
             var VendorName = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("VendorName") ?? 400;
-            var PoNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PoNo") ?? 4;
+            var PoNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PoNo") ?? 10;
             var PoSno = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PoSno") ?? 4;
             var ItemCode = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("ItemCode") ?? 100;
             var ItemName = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("ItemName") ?? 500;
-            var GrnNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("GrnNo") ?? 4;
+            var GrnNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("GrnNo") ?? 10;
             var GrnSno = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("GrnSno") ?? 4;
             var BillNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("BillNo") ?? 100;
             var Uom = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("Uom") ?? 20;
@@ -30,9 +30,9 @@ namespace FAM.API.Validation.AssetMaster.AssetPurchase
             var PjYear = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("BinLocation") ?? 8;
             var PjDocId = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PjYear") ?? 40;
             var PjDocSr = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PjDocSr") ?? 40;
-            var PjDocNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PjDocNo") ?? 4;
-            var AssetId = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("AssetId") ?? 4;
-            var AssetSourceId = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("AssetSourceId") ?? 4;
+            var PjDocNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PjDocNo") ?? 10;
+            var AssetId = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("AssetId") ?? 10;
+            var AssetSourceId = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("AssetSourceId") ?? 10;
 
 
              // Load validation rules from JSON or another source
