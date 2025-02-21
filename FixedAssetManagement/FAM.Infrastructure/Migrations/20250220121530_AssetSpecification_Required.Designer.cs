@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250220121530_AssetSpecification_Required")]
+    partial class AssetSpecification_Required
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -344,64 +347,6 @@ namespace FAM.Infrastructure.Migrations
                     b.HasIndex("WorkingStatus");
 
                     b.ToTable("AssetMaster", "FixedAsset");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.AssetSource", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("SourceCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("SourceCode");
-
-                    b.Property<string>("SourceName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("SourceName");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AssetSource", "FixedAsset");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetSubCategories", b =>
@@ -760,9 +705,9 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
-                    b.Property<int>("MiscTypeId")
+                    b.Property<int>("MiscTypeMasterId")
                         .HasColumnType("int")
-                        .HasColumnName("MiscTypeId");
+                        .HasColumnName("MiscTypeMasterId");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
@@ -784,7 +729,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MiscTypeId");
+                    b.HasIndex("MiscTypeMasterId");
 
                     b.ToTable("MiscMaster", "FixedAsset");
                 });
@@ -827,7 +772,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Property<string>("MiscTypeCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("MiscTypeCode");
 
                     b.Property<int?>("ModifiedBy")
@@ -1195,7 +1140,7 @@ namespace FAM.Infrastructure.Migrations
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
                         .WithMany("MiscMaster")
-                        .HasForeignKey("MiscTypeId")
+                        .HasForeignKey("MiscTypeMasterId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

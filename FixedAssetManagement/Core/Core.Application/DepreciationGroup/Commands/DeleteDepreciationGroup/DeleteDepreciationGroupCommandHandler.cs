@@ -2,9 +2,7 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IDepreciationGroup;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationGroup;
-using Core.Domain.Common;
 using Core.Domain.Entities;
-using Core.Domain.Enums.Common;
 using Core.Domain.Events;
 using MediatR;
 
@@ -12,22 +10,22 @@ namespace Core.Application.DepreciationGroup.Commands.DeleteDepreciationGroup
 {
     public class DeleteDepreciationGroupCommandHandler : IRequestHandler<DeleteDepreciationGroupCommand, ApiResponseDTO<DepreciationGroupDTO>>
     {
-        private readonly IDepreciationGroupCommandRepository _depreciationGroupRepository;
+        private readonly IDepreciationGroupCommandRepository _depreciationRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
-        private readonly IDepreciationGroupQueryRepository _depreciationGroupQueryRepository;
+        private readonly IDepreciationGroupQueryRepository _depreciationQueryRepository;
         
-        public DeleteDepreciationGroupCommandHandler(IDepreciationGroupCommandRepository depreciationGroupRepository, IMapper mapper,  IMediator mediator,IDepreciationGroupQueryRepository depreciationGroupQueryRepository)
+        public DeleteDepreciationGroupCommandHandler(IDepreciationGroupCommandRepository depreciationRepository, IMapper mapper,  IMediator mediator,IDepreciationGroupQueryRepository depreciationQueryRepository)
         {
-            _depreciationGroupRepository = depreciationGroupRepository;
-             _mapper = mapper;        
+            _depreciationRepository = depreciationRepository;
+            _mapper = mapper;        
             _mediator = mediator;
-            _depreciationGroupQueryRepository=depreciationGroupQueryRepository;
+            _depreciationQueryRepository=depreciationQueryRepository;
         }
 
         public async Task<ApiResponseDTO<DepreciationGroupDTO>> Handle(DeleteDepreciationGroupCommand request, CancellationToken cancellationToken)
         {             
-            var depreciationGroups = await _depreciationGroupQueryRepository.GetByIdAsync(request.Id);
+            var depreciationGroups = await _depreciationQueryRepository.GetByIdAsync(request.Id);
             if (depreciationGroups is null )
             {
                 return new ApiResponseDTO<DepreciationGroupDTO>
@@ -36,16 +34,16 @@ namespace Core.Application.DepreciationGroup.Commands.DeleteDepreciationGroup
                     Message = "Invalid DepreciationGroupID."
                 };
             }
-            var depreciationGroupsDelete = _mapper.Map<DepreciationGroups>(request);      
-            var updateResult = await _depreciationGroupRepository.DeleteAsync(request.Id, depreciationGroupsDelete);
+            var depreciationDelete = _mapper.Map<DepreciationGroups>(request);      
+            var updateResult = await _depreciationRepository.DeleteAsync(request.Id, depreciationDelete);
             if (updateResult > 0)
             {
-                var depreciationGroupDto = _mapper.Map<DepreciationGroupDTO>(depreciationGroupsDelete);  
+                var depreciationGroupDto = _mapper.Map<DepreciationGroupDTO>(depreciationDelete);  
                 //Domain Event  
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Delete",
-                    actionCode: depreciationGroupsDelete.Code ?? string.Empty,
-                    actionName: depreciationGroupsDelete.DepreciationGroupName ?? string.Empty,
+                    actionCode: depreciationDelete.Code ?? string.Empty,
+                    actionName: depreciationDelete.DepreciationGroupName ?? string.Empty,
                     details: $"DepreciationGroup '{depreciationGroupDto.DepreciationGroupName}' was created. Code: {depreciationGroupDto.Code}",
                     module:"DepreciationGroup"
                 );               

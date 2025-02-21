@@ -5,9 +5,9 @@ using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
 using FAM.Infrastructure.Data.Configurations;
 using FAM.Infrastructure.Data.Configurations.AssetMaster;
+using Core.Domain.Entities.AssetMaster;
 using Core.Domain.Entities.AssetPurchase;
 using FAM.Infrastructure.Data.Configurations.AssetPurchase;
-
 namespace FAM.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContext
@@ -36,7 +36,8 @@ namespace FAM.Infrastructure.Data
         public DbSet<UOM> UOMs { get; set; }
 		public DbSet<AssetSource> AssetSource { get; set; }
         public DbSet<SpecificationMasters> SpecificationMasters { get; set; }
-        public DbSet<AssetPurchaseDetails> AssetPurchaseDetails { get; set; }
+public DbSet<AssetPurchaseDetails> AssetPurchaseDetails { get; set; }
+        public DbSet<AssetSpecifications> AssetSpecifications { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -54,8 +55,9 @@ namespace FAM.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new ManufactureConfiguration());
             modelBuilder.ApplyConfiguration(new UOMConfiguration());   
 			modelBuilder.ApplyConfiguration(new AssetSourceConfiguration());
-            modelBuilder.ApplyConfiguration(new SpecificationMasterConfiguration());  
-            modelBuilder.ApplyConfiguration(new AssetPurchaseDetailsConfiguration());  
+            modelBuilder.ApplyConfiguration(new SpecificationMasterConfiguration());   
+ 			modelBuilder.ApplyConfiguration(new AssetPurchaseDetailsConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetSpecificationConfiguration());   
 
             base.OnModelCreating(modelBuilder);
         }
