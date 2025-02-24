@@ -28,7 +28,7 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => IsDelete.NotDeleted));     
              
-            CreateMap<DepreciationGroups, DepreciationGroupAutoCompleteDTO>();    
+            CreateMap<DepreciationGroupDTO, DepreciationGroupAutoCompleteDTO>();    
             CreateMap<DepreciationGroups, DepreciationGroupDTO>();             
         }
     }

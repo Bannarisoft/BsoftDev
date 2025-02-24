@@ -1,3 +1,4 @@
+using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Domain.Entities;
 
 namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
@@ -12,8 +13,7 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
         Task<string?> GetLatestAssetCode(int companyId,int unitId, int assetGroupId, int assetSubCategoryId);
         Task<AssetMasterGenerals?> GetByAssetCodeAsync(string assetCode);
         Task<bool> UpdateAssetImageAsync(int assetId, string imageName);
-        Task<AssetMasterGenerals?> GetByAssetImageAsync(string assetImage);
+        Task<AssetMasterGeneralDTO?> GetByAssetImageAsync(string assetCode);
         Task<bool> RemoveAssetImageReferenceAsync(int assetId);
-
     }
 }

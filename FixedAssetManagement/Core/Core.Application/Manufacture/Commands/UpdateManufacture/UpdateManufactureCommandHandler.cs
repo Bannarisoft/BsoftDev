@@ -47,8 +47,9 @@ namespace Core.Application.Manufacture.Commands.UpdateManufacture
             }
             if (manufactures.IsActive != request.IsActive)
             {    
-                 manufactures.IsActive =  (BaseEntity.Status)request.IsActive;             
-                await _manufactureRepository.UpdateAsync(manufactures.Id, manufactures);
+                manufactures.IsActive =  (BaseEntity.Status)request.IsActive;             
+                var updatedAssetSpecification = _mapper.Map<Manufactures>(request); 
+                await _manufactureRepository.UpdateAsync(manufactures.Id, updatedAssetSpecification);
                 if (request.IsActive is 0)
                 {
                     return new ApiResponseDTO<ManufactureDTO>

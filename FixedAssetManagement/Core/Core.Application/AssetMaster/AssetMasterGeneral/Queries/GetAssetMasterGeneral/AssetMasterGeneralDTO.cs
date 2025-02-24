@@ -33,7 +33,14 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public int? ModifiedBy { get; set; }
         public DateTimeOffset?  ModifiedAt { get; set; }
         public string? ModifiedByName { get; set; }
-        public string? ModifiedIP { get; set; }               
-          
+        public string? ModifiedIP { get; set; }
+        public string? AssetGroupName { get; set; }
+        public string? AssetCategoryDesc { get; set; }
+        public string? AssetSubCategoryDesc { get; set; }
+        public string? UOMName { get; set; }
+        public string? WorkingStatusDesc { get; set; }
+        public string? AssetTypeDesc { get; set; } 
+        public string? ParentAssetDesc { get; set; } 
+        public IsDelete IsDeleted { get; set; }           
     }
 }

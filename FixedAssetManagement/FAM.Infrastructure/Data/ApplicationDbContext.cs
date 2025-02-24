@@ -35,7 +35,8 @@ namespace FAM.Infrastructure.Data
         public DbSet<UOM> UOMs { get; set; }
 		public DbSet<AssetSource> AssetSource { get; set; }
         public DbSet<SpecificationMasters> SpecificationMasters { get; set; }
-        public DbSet<AssetSpecifications> AssetSpecifications { get; set; }
+        public DbSet<AssetSpecifications> AssetSpecifications { get; set; }        
+        public DbSet<AssetWarranties> AssetWarranties { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -55,6 +56,7 @@ namespace FAM.Infrastructure.Data
 			modelBuilder.ApplyConfiguration(new AssetSourceConfiguration());
             modelBuilder.ApplyConfiguration(new SpecificationMasterConfiguration());   
             modelBuilder.ApplyConfiguration(new AssetSpecificationConfiguration());   
+            modelBuilder.ApplyConfiguration(new AssetWarrantyConfiguration());  
 
             base.OnModelCreating(modelBuilder);
         }

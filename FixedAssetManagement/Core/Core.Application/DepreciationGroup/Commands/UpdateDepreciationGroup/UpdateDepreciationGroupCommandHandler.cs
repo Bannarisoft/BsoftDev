@@ -66,8 +66,9 @@ namespace Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup
             }
             if (depreciationGroups.IsActive != request.IsActive)
             {    
-                 depreciationGroups.IsActive =  (BaseEntity.Status)request.IsActive;             
-                await _depreciationGroupRepository.UpdateAsync(depreciationGroups.Id, depreciationGroups);
+                depreciationGroups.IsActive =  (BaseEntity.Status)request.IsActive;             
+                var updatedDepreciation = _mapper.Map<DepreciationGroups>(request); 
+                await _depreciationGroupRepository.UpdateAsync(depreciationGroups.Id, updatedDepreciation);
                 if (request.IsActive is 0)
                 {
                     return new ApiResponseDTO<DepreciationGroupDTO>
