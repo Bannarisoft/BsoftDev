@@ -46,16 +46,12 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
 
                 builder.Property(al => al.CustodianId)
                      .HasColumnName("CustodianId")
-                   .HasColumnType("int")  // Set as int
+                   .HasColumnType("NVARCHAR(50)")  
                     .IsRequired();
 
                 builder.Property(al => al.UserID)
-                     .HasColumnName("UserID")
-                   .HasColumnType("int")  // Set as int
-                    .IsRequired();
-
-
-              
+                     .HasColumnName("UserId")
+                   .HasColumnType("NVARCHAR(50)");            
 
 
 
