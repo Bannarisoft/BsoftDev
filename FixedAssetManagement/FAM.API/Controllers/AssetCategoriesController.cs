@@ -17,14 +17,14 @@ using Microsoft.Extensions.Logging;
 namespace FAM.API.Controllers
 {
     [Route("api/[controller]")]
-    public class AssetCategories :  ApiControllerBase
+    public class AssetCategoriesController :  ApiControllerBase
     {
         private readonly IValidator<CreateAssetCategoriesCommand> _createassetcategoriescommandvalidator;
         private readonly IValidator<UpdateAssetCategoriesCommand> _updateassetcategoriescommandvalidator;
-        private readonly ILogger<AssetCategories> _logger;
+        private readonly ILogger<AssetCategoriesController> _logger;
          private readonly IMediator _mediator;
 
-        public AssetCategories(ILogger<AssetCategories> logger, IMediator mediator, IValidator<CreateAssetCategoriesCommand> createassetcategoriescommandvalidator,IValidator<UpdateAssetCategoriesCommand> updateassetcategoriescommandvalidator )
+        public AssetCategoriesController(ILogger<AssetCategoriesController> logger, IMediator mediator, IValidator<CreateAssetCategoriesCommand> createassetcategoriescommandvalidator,IValidator<UpdateAssetCategoriesCommand> updateassetcategoriescommandvalidator )
         : base(mediator)
         {
             _logger = logger;

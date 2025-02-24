@@ -1470,6 +1470,11 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
 
+                    b.Property<string>("OldUnitId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(10)")
+                        .HasColumnName("OldUnitId");
+
                     b.Property<string>("ShortName")
                         .IsRequired()
                         .HasColumnType("varchar(10)")

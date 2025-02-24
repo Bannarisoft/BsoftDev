@@ -38,10 +38,14 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral;
 using Core.Application.Common.Interfaces.IUOM;
 using FAM.Infrastructure.Repositories.UOMs;
 using Core.Application.Common.Mappings.AssetMaster;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetPurchase;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase;
+using Core.Application.Common.Mappings.AssetPurchase;
 using Core.Application.Common.Interfaces.ISpecificationMaster;
 using FAM.Infrastructure.Repositories.SpecificationMaster;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetLocation;
-using FAM.Infrastructure.Repositories.AssetMaster.AssetLocation;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetLocation;using FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetSpecification;
 
 namespace FAM.Infrastructure
 {
@@ -157,11 +161,13 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetMasterGeneralQueryRepository, AssetMasterGeneralQueryRepository>();            
             services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
             services.AddScoped<IUOMQueryRepository, UOMQueryRepository>();
+			services.AddScoped<IAssetPurchaseQueryRepository, AssetPurchaseQueryRepository>();
+            services.AddScoped<IAssetPurchaseCommandRepository, AssetPurchaseCommandRepository>();
             services.AddScoped<ISpecificationMasterCommandRepository, SpecificationMasterCommandRepository>();
             services.AddScoped<ISpecificationMasterQueryRepository, SpecificationMasterQueryRepository>();
-           
-            services.AddScoped<IAssetLocationQueryRepository , AssetLocationQueryRepository>();
-            services.AddScoped<IAssetLocationCommandRepository , AssetLocationCommandRepository>();
+			services.AddScoped<IAssetLocationQueryRepository , AssetLocationQueryRepository>();
+            services.AddScoped<IAssetLocationCommandRepository , AssetLocationCommandRepository>();			services.AddScoped<IAssetSpecificationCommandRepository, AssetSpecificationCommandRepository>();
+            services.AddScoped<IAssetSpecificationQueryRepository, AssetSpecificationQueryRepository>();
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -182,7 +188,9 @@ namespace FAM.Infrastructure
                 typeof(UOMProfile),
                 typeof(AssetMasterGeneralProfile),
                 typeof(SpecificationMasterProfile),
-                typeof(AssetLocationProfile)
+				typeof(AssetPurchaseProfile),
+ 				typeof(AssetSpecificationProfile),
+				typeof(AssetLocationProfile)
             );
 
             return services;

@@ -103,6 +103,12 @@ namespace UserManagement.Infrastructure.Data.Configurations
             builder.HasMany(u => u.UserUnits)
                 .WithOne(uu => uu.Unit)
                 .HasForeignKey(uu => uu.UnitId);
+           
+           builder.Property(u => u.OldUnitId)
+           .HasColumnName("OldUnitId")
+           .HasColumnType("nvarchar(10)")  // Changed from int to nvarchar(10)
+           .IsRequired();
+
         }
     }
 }

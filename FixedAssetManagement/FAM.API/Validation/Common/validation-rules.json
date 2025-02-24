@@ -55,6 +55,11 @@
         "error": " must be either 0 or 1."
     },
     {
+        "rule": "YesNoStatus",
+        "pattern":"^(Y|N)$",
+        "error": "must be either 'Y' or 'N'."
+    },
+    {
         "rule": "MobileNumber",  
         "pattern": "^[0-9]{10}$", 
         "error": " Mobile number must be exactly 10 digits."

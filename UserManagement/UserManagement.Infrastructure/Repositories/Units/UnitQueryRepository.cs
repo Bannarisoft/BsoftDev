@@ -36,7 +36,8 @@ namespace UserManagement.Infrastructure.Repositories.Units
             C.DivisionId,
             C.UnitHeadName,
             C.CINNO,
-            C.IsActive
+            C.IsActive,
+            C.OldUnitId
              FROM AppData.Unit C
               WHERE C.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (C.UnitName LIKE @Search OR C.ShortName LIKE @Search)")}}
@@ -71,6 +72,7 @@ namespace UserManagement.Infrastructure.Repositories.Units
             C.UnitHeadName,
             C.CINNO,
             C.IsActive,
+            C.OldUnitId,
             A.CountryId,
             A.StateId,
             A.CityId,
@@ -96,7 +98,7 @@ namespace UserManagement.Infrastructure.Repositories.Units
         return unit;
         }, 
     new { Id },
-    splitOn: "AddressLine1,Name");
+    splitOn: "CountryId,Name");
 
              return unitResponse.FirstOrDefault();
         }

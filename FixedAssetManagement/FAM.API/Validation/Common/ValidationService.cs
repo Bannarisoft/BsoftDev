@@ -38,8 +38,11 @@ using FAM.API.Validation.SpecificationMaster;
 using Core.Application.SpecificationMaster.Commands.CreateSpecificationMaster;
 using Core.Application.AssetLocation.Commands.CreateAssetLocation;
 using FAM.API.Validation.AssetMaster.AssetLocation;
-using Core.Application.AssetMaster.AssetLocation.Commands.UpdateAssetLocation;
-
+using Core.Application.AssetMaster.AssetLocation.Commands.UpdateAssetLocation;using Core.Application.AssetMaster.AssetPurchase.Commands.CreateAssetPurchaseDetails;
+using FAM.API.Validation.AssetMaster.AssetPurchase;
+using Core.Application.AssetMaster.AssetPurchase.Commands.UpdateAssetPurchaseDetails;using Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSpecification;
+using Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSpecification;
+using FAM.API.Validation.AssetMaster.AssetSpecification;
 
 
 namespace FAM.API.Validation.Common
@@ -78,9 +81,11 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateUOMCommand>, UpdateUOMCommandValidator>();
         services.AddScoped<IValidator<UpdateSpecificationMasterCommand>, UpdateSpecificationMasterCommandValidator>();
         services.AddScoped<IValidator<CreateSpecificationMasterCommand>, CreateSpecificationMasterCommandValidator>();
-        services.AddScoped<IValidator<CreateAssetLocationCommand>, CreateAssetLocationCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetLocationCommand>, UpdateAssetLocationCommandValidator>();
-        
+		services.AddScoped<IValidator<CreateAssetLocationCommand>, CreateAssetLocationCommandValidator>();
+        services.AddScoped<IValidator<UpdateAssetLocationCommand>, UpdateAssetLocationCommandValidator>();		services.AddScoped<IValidator<CreateAssetPurchaseDetailCommand>, CreateAssetPurchaseDetailCommandValidator>();
+        services.AddScoped<IValidator<UpdateAssetPurchaseDetailCommand>, UpdateAssetPurchaseDetailCommandValidator>();        
+		services.AddScoped<IValidator<CreateAssetSpecificationCommand>, CreateAssetSpecificationCommandValidator>();
+        services.AddScoped<IValidator<UpdateAssetSpecificationCommand>, UpdateAssetSpecificationCommandValidator>();
     }  
     }
 }
