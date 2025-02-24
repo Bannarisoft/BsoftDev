@@ -36,8 +36,9 @@ namespace FAM.Infrastructure.Data
         public DbSet<UOM> UOMs { get; set; }
 		public DbSet<AssetSource> AssetSource { get; set; }
         public DbSet<SpecificationMasters> SpecificationMasters { get; set; }
-public DbSet<AssetPurchaseDetails> AssetPurchaseDetails { get; set; }
+        public DbSet<AssetPurchaseDetails> AssetPurchaseDetails { get; set; }
         public DbSet<AssetSpecifications> AssetSpecifications { get; set; }
+        public DbSet<AssetAdditionalCost> AssetAdditionalCost { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -58,6 +59,7 @@ public DbSet<AssetPurchaseDetails> AssetPurchaseDetails { get; set; }
             modelBuilder.ApplyConfiguration(new SpecificationMasterConfiguration());   
  			modelBuilder.ApplyConfiguration(new AssetPurchaseDetailsConfiguration());
             modelBuilder.ApplyConfiguration(new AssetSpecificationConfiguration());   
+            modelBuilder.ApplyConfiguration(new AssetAdditionalCostConfiguration());   
 
             base.OnModelCreating(modelBuilder);
         }

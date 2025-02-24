@@ -25,7 +25,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetGRNItem
 
         public async Task<ApiResponseDTO<List<AssetGrnItemDto>>> Handle(GetAssetGrnItemQuery request, CancellationToken cancellationToken)
         {
-            var result = await _iAssetPurchaseQueryRepository.GetAssetGrnItem(request.OldUnitId, request.GrnNo);
+            var result = await _iAssetPurchaseQueryRepository.GetAssetGrnItem(request.OldUnitId,request.AssetSourceId ,request.GrnNo);
             var assetunits  = _mapper.Map<List<AssetGrnItemDto>>(result);
              //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(

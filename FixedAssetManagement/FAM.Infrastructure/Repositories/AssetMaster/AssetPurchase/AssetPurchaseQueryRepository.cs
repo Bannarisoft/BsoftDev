@@ -79,7 +79,10 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
              return (assetpurchaselist, totalCount);
         }
 
-        public async Task<List<AssetGrnItem>> GetAssetGrnItem(int OldUnitId, int GrnNo)
+       public async Task<List<AssetGrnItem>> GetAssetGrnItem(string OldUnitId,int AssetSourceId ,int GrnNo)
+        {
+            //Prime
+        if(AssetSourceId == 2)
         {
             const string query = @"
             SELECT grnslno as GrnSerialNo,idesc as ItemName
@@ -91,7 +94,36 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
             return grnList?.ToList() ?? new List<AssetGrnItem>();
         }
 
-        public async Task<List<AssetGrnDetails>> GetAssetGrnItemDetails(int OldUnitId, int GrnNo, int GrnSerialNo)
+        //Kalsofte
+        else if (AssetSourceId == 1)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@DivCode", OldUnitId.ToString(), DbType.String);
+            parameters.Add("@DocNo", GrnNo, DbType.Int32);
+            var grnList = await _dbConnection.QueryAsync<AssetGrnItem>(
+            "dbo.GetGRNByItemDivision", 
+            parameters, 
+            commandType: CommandType.StoredProcedure
+        );
+
+        if (!grnList.Any())
+        {
+        Console.WriteLine("No data returned from stored procedure!");
+        }
+
+        return grnList?.ToList() ?? new List<AssetGrnItem>();
+
+        }
+        else
+        {
+             return new List<AssetGrnItem>();
+        }
+        }
+
+        public async Task<List<AssetGrnDetails>> GetAssetGrnItemDetails(string OldUnitId,int AssetSourceId ,int GrnNo, int GrnSerialNo)
+        {
+             //Prime
+        if(AssetSourceId == 2)
         {
              const string query = @"
             SELECT
@@ -128,11 +160,39 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
             return grnList?.ToList() ?? new List<AssetGrnDetails>();
         }
 
-    
-
-        public async Task<List<AssetGrn>> GetAssetGrnNo(int OldUnitId, string? SearchGrnNo)
+        //Kalsofte
+        else if (AssetSourceId == 1)
+        { 
+            var parameters = new DynamicParameters();
+            parameters.Add("@OldUnitId ", OldUnitId.ToString(), DbType.String);
+            parameters.Add("@GrnNo", GrnNo, DbType.Int32);
+            parameters.Add("@GrnSno", GrnSerialNo, DbType.Int32);
+            var grnList = await _dbConnection.QueryAsync<AssetGrnDetails>(
+            "dbo.GetPurchaseDetailsKalsofte", 
+            parameters, 
+            commandType: CommandType.StoredProcedure
+        );
+        if (!grnList.Any())
         {
-        var query = @"
+        Console.WriteLine("No data returned from stored procedure!");
+        }
+
+        return grnList?.ToList() ?? new List<AssetGrnDetails>();
+        }
+        else
+        {
+            return new List<AssetGrnDetails>();
+        }
+        }
+
+    
+        public async Task<List<AssetGrn>> GetAssetGrnNo(string OldUnitId, int AssetSourceId,string? SearchGrnNo)
+        {
+
+        //Prime
+        if(AssetSourceId == 2)
+        {
+            var query = @"
         SELECT DISTINCT grnno AS GrnNo, unitcode AS OldUnitId
         FROM dbo.GetGRNDetails(@OldUnitId)";
 
@@ -146,10 +206,34 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
         OldUnitId, 
         SearchGrnNo = $"%{SearchGrnNo}%" // Enables partial search
         };
-
         var grnList = await _dbConnection.QueryAsync<AssetGrn>(query, parameters);
         return grnList?.ToList() ?? new List<AssetGrn>();
-}
+        }
+
+        //Kalsofte
+        else if (AssetSourceId == 1)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@DivCode", OldUnitId.ToString(), DbType.String);
+            parameters.Add("@DocNo", string.IsNullOrWhiteSpace(SearchGrnNo) ? (object)DBNull.Value : $"%{SearchGrnNo}%", DbType.String);
+            var grnList = await _dbConnection.QueryAsync<AssetGrn>(
+            "dbo.GetGRNByDivision", 
+            parameters, 
+            commandType: CommandType.StoredProcedure
+        );
+
+        if (!grnList.Any())
+        {
+        Console.WriteLine("No data returned from stored procedure!");
+        }
+
+        return grnList?.ToList() ?? new List<AssetGrn>();
+        }
+        else
+        {
+            return new List<AssetGrn>();
+        }
+        }   
 
         public async Task<List<AssetSource>> GetAssetSources(string searchPattern)
         {

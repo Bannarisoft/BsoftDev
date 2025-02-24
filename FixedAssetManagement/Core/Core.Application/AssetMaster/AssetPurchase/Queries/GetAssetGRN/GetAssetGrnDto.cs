@@ -7,7 +7,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries
 {
     public class GetAssetGrnDto
     {
-        public int OldUnitId { get; set; } 
+        public string? OldUnitId { get; set; } 
         public string? GrnNo { get; set; }
     }
 }

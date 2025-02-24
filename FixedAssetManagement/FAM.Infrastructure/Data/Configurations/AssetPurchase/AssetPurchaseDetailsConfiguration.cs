@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FAM.Infrastructure.Data.Configurations.AssetPurchase
 {
-    public class AssetPurchaseDetailsConfiguration :   IEntityTypeConfiguration<Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails>
+    public class AssetPurchaseDetailsConfiguration : IEntityTypeConfiguration<Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails>
     {
         public void Configure(EntityTypeBuilder<Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails> builder)
         {
