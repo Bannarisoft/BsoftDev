@@ -61,7 +61,7 @@ namespace Core.Application.AssetLocation.Commands.CreateAssetLocation
             }
 
             // Fetch newly created record
-            var createdAssetLocation = await _assetLocationQueryRepository.GetByIdAsync(result.Id);
+            var createdAssetLocation = await _assetLocationQueryRepository.GetByIdAsync(result.AssetId);
             var mappedResult = _mapper.Map<AssetLocationDto>(createdAssetLocation);
 
             // Publish domain event for auditing/logging
