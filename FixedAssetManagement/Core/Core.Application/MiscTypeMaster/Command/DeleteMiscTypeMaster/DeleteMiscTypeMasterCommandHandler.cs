@@ -46,10 +46,10 @@ namespace Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster
 
                  if(misctyperesult)
                 {
-                    return new ApiResponseDTO<GetMiscTypeMasterDto>{IsSuccess = true, Message = "Division deleted successfully."};
+                    return new ApiResponseDTO<GetMiscTypeMasterDto>{IsSuccess = true, Message = "MiscTypeMaster deleted successfully."};
                 }
 
-                return new ApiResponseDTO<GetMiscTypeMasterDto>{IsSuccess = false, Message = "Division not deleted."};
+                return new ApiResponseDTO<GetMiscTypeMasterDto>{IsSuccess = false, Message = "MiscTypeMaster not deleted."};
             
         }
     }

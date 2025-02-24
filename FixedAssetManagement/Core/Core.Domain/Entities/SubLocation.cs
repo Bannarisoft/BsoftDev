@@ -15,7 +15,11 @@ namespace Core.Domain.Entities
         public int DepartmentId { get; set; }
         public int LocationId { get; set; }
 
+
         public Location? Location { get; set; }
+        public SubLocation? subLocation{ get; set; } 
+
+
 
     }
 }

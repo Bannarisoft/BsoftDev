@@ -27,7 +27,7 @@ namespace FAM.Infrastructure.Repositories.MiscMaster
                 WHERE M.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (M.Code LIKE @Search)")}}; 
 
-                SELECT M.Id, M.MiscTypeMasterId, M.Code, M.Description, M.SortOrder, M.IsActive, M.IsDeleted, 
+                SELECT M.Id, M.MiscTypeId, M.Code, M.Description, M.SortOrder, M.IsActive, M.IsDeleted, 
                     M.CreatedBy, M.CreatedDate, M.CreatedByName, M.CreatedIP, M.ModifiedBy, M.ModifiedDate, 
                     M.ModifiedByName, M.ModifiedIP
                 FROM FixedAsset.MiscMaster M
@@ -61,7 +61,7 @@ namespace FAM.Infrastructure.Repositories.MiscMaster
             
             public async Task<Core.Domain.Entities.MiscMaster> GetByIdAsync(int id)
         {            
-           const string query = @" SELECT Id,MiscTypeMasterId,Code,Description,SortOrder,IsActive  FROM FixedAsset.MiscMaster          
+           const string query = @" SELECT Id,MiscTypeId,Code,Description,SortOrder,IsActive  FROM FixedAsset.MiscMaster          
              WHERE Id = @id AND IsDeleted = 0";                          
             return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MiscMaster>(query, new { id });
         } 

@@ -35,9 +35,9 @@ namespace FAM.API.Validation.MiscMaster
                         RuleFor(x => x.Description)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateMiscMasterCommand.Description)} {rule.Error}");
-                        RuleFor(x => x.MiscTypeMasterId)
+                        RuleFor(x => x.MiscTypeId)
                             .NotEmpty()
-                            .WithMessage($"{nameof(UpdateMiscMasterCommand.MiscTypeMasterId)} {rule.Error}");
+                            .WithMessage($"{nameof(UpdateMiscMasterCommand.MiscTypeId)} {rule.Error}");
                        
 
 
