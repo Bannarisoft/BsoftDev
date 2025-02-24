@@ -80,7 +80,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetLocation
             return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.AssetMaster.AssetLocation>(query, parameters);
         } 
 
-         public async Task<(List<Core.Domain.Entities.AssetMaster.Employee>, int)> GetAllCustodianAsync(int OldUnitId, int AssetSourceId, string? SearchEmployee)
+         public async Task<(List<Core.Domain.Entities.AssetMaster.Employee>, int)> GetAllCustodianAsync(string OldUnitId, string? SearchEmployee)
         {
               var query = $$"""
                             DECLARE @TotalCount INT;
@@ -104,8 +104,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetLocation
                 var parameters = new
                 {
                     Search = $"%{SearchEmployee}%",
-                   OldUnitId,
-                   AssetSourceId
+                   OldUnitId
+                   
                 };
 
         //         var employees = await _dbConnection.QueryMultipleAsync(query, parameters);

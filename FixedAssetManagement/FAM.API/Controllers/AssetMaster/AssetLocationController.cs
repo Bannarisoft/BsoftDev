@@ -160,13 +160,12 @@ namespace FAM.API.Controllers.AssetMaster
         }
         [HttpGet]  
         [Route("GetAllCustodian")]      
-         public async Task<IActionResult> GetAllCustodianAsync([FromQuery] int OldUnitId,[FromQuery] int AssetSourceId,[FromQuery] string? SearchEmployee = null)
+         public async Task<IActionResult> GetAllCustodianAsync([FromQuery] string OldUnitId,[FromQuery] string? SearchEmployee = null)
         {
            var custodian = await Mediator.Send(
             new GetCustodianQuery
             {
-                OldUnitId = OldUnitId, 
-                AssetSourceId = AssetSourceId, 
+                OldUnitId = OldUnitId,                 
                 SearchEmployee = SearchEmployee
               
             });

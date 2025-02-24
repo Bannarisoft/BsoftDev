@@ -28,7 +28,7 @@ namespace Core.Application.AssetMaster.AssetLocation.Queries.GetCustodian
         public async Task<ApiResponseDTO<List<GetCustodianDto>>> Handle(GetCustodianQuery request, CancellationToken cancellationToken)
         {
            
-           var (assetcustodian, totalCount) = await _assetLocationRepository.GetAllCustodianAsync(request.OldUnitId, request.AssetSourceId, request.SearchEmployee);
+           var (assetcustodian, totalCount) = await _assetLocationRepository.GetAllCustodianAsync(request.OldUnitId,  request.SearchEmployee);
 
             var assetMasterList = _mapper.Map<List<GetCustodianDto>>(assetcustodian);
 
@@ -37,8 +37,8 @@ namespace Core.Application.AssetMaster.AssetLocation.Queries.GetCustodian
                 actionDetail: "GetAll",
                 actionCode: "",        
                 actionName: "",
-                details: $"DepreciationGroup details was fetched.",
-                module:"DepreciationGroup"
+                details: $"Custodian details was fetched.",
+                module:"Custodian"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
             return new ApiResponseDTO<List<GetCustodianDto>>
