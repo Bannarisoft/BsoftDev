@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Domain.Common;
+using Core.Domain.Entities.AssetPurchase;
 
 namespace Core.Domain.Entities
 {
@@ -22,6 +23,7 @@ namespace Core.Domain.Entities
         public ICollection<AssetMasterGenerals>? AssetWorkTypeGenerals  { get; set; } 
         // Navigation Property for UOMs referencing this MiscMaster
         public ICollection<UOM> UOMs { get; set; } = new List<UOM>();
+        public ICollection<AssetAdditionalCost>? AssetAdditionalCost  { get; set; } 
                
     }
 }

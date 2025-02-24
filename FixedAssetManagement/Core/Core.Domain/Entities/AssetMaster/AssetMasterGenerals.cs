@@ -36,5 +36,8 @@ namespace Core.Domain.Entities
         public byte IsTangible { get; set; }    
         public ICollection<AssetPurchaseDetails>? AssetPurchase { get; set; }     
 		public ICollection<AssetSpecifications>? AssetSpecification { get; set; }
+
+        public ICollection<AssetAdditionalCost>? AssetAdditionalCost { get; set; }
+
     }
 }

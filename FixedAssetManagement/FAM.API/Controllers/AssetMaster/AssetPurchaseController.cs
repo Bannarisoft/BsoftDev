@@ -65,15 +65,19 @@ namespace FAM.API.Controllers.AssetPurchase
         }
 
 
-        [HttpGet("GetGrnNo/{oldUnitId}")]
-        public async Task<IActionResult> GetGrnNo(int oldUnitId, [FromQuery] string? searchGrnNo)
+         [HttpGet("GetGrnNo/{oldUnitId}/{assetSourceId}")]
+        public async Task<IActionResult> GetGrnNo(string oldUnitId,int assetSourceId, [FromQuery] string? searchGrnNo)
         {
-            if (oldUnitId <= 0)
+            if (oldUnitId == null)
             {
                 return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, Message = "Invalid OldUnitId" });
             }
+            if (assetSourceId > 2)
+            {
+                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, Message = "Invalid AssetSuourceId" });
+            }
 
-            var result = await _mediator.Send(new GetAssetGrnQuery { OldUnitId = oldUnitId, SearchGrnNo = searchGrnNo });
+            var result = await _mediator.Send(new GetAssetGrnQuery { OldUnitId = oldUnitId,AssetSourceId = assetSourceId ,SearchGrnNo = searchGrnNo });
 
             if (result == null || !result.IsSuccess || result.Data == null)
             {
@@ -82,10 +86,18 @@ namespace FAM.API.Controllers.AssetPurchase
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, Data = result.Data });
         }
-            [HttpGet("GetGrnItems/{oldUnitId}/{grnNo}")]
-            public async Task<IActionResult> GetGrnItems(int oldUnitId,  int grnNo)
+            [HttpGet("GetGrnItems/{oldUnitId}/{assetSourceId}/{grnNo}")]
+            public async Task<IActionResult> GetGrnItems(string oldUnitId, int assetSourceId,  int grnNo)
             {
-                var query = new GetAssetGrnItemQuery { OldUnitId = oldUnitId, GrnNo = grnNo };
+            if (oldUnitId == null)
+            {
+                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, Message = "Invalid OldUnitId" });
+            }
+            if (assetSourceId > 2)
+            {
+                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, Message = "Invalid AssetSuourceId" });
+            }
+                var query = new GetAssetGrnItemQuery { OldUnitId = oldUnitId,AssetSourceId = assetSourceId, GrnNo = grnNo };
                 var result = await _mediator.Send(query);
 
                 if (!result.IsSuccess)
@@ -94,10 +106,18 @@ namespace FAM.API.Controllers.AssetPurchase
                 return Ok(result);
             }
 
-            [HttpGet("GetGrnDetails/{oldUnitId}/{grnNo}/{grnSerialNo}")]
-            public async Task<IActionResult> GetGrnDetails(int oldUnitId,int grnNo, int grnSerialNo)
+            [HttpGet("GetGrnDetails/{oldUnitId}/{assetSourceId}/{grnNo}/{grnSerialNo}")]
+            public async Task<IActionResult> GetGrnDetails(string oldUnitId,int assetSourceId,int grnNo, int grnSerialNo)
             {
-                var query = new GetAssetDetailsQuery { OldUnitId = oldUnitId, GrnNo = grnNo, GrnSerialNo = grnSerialNo };
+                if (oldUnitId == null)
+                {
+                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, Message = "Invalid OldUnitId" });
+                }
+                if (assetSourceId > 2)
+                {
+                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, Message = "Invalid AssetSuourceId" });
+                }
+                var query = new GetAssetDetailsQuery { OldUnitId = oldUnitId,AssetSourceId = assetSourceId,GrnNo = grnNo, GrnSerialNo = grnSerialNo };
                 var result = await _mediator.Send(query);
 
                 if (!result.IsSuccess)
