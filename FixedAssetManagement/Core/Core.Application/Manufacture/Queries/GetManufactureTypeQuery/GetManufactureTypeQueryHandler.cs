@@ -1,6 +1,5 @@
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.IDepreciationGroup;
 using Core.Application.Common.Interfaces.IManufacture;
 using Core.Application.MiscMaster.Queries.GetMiscMaster;
 using MediatR;

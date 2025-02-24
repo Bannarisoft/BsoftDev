@@ -52,9 +52,9 @@ namespace Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSp
             }
             if (assetSpecifications.IsActive != request.IsActive)
             {    
-                 assetSpecifications.IsActive =  (BaseEntity.Status)request.IsActive;     
-                 var updatedAssetSpecification = _mapper.Map<AssetSpecifications>(request);                   
-                  await _assetSpecificationRepository.UpdateAsync(request.Id, updatedAssetSpecification);
+                assetSpecifications.IsActive =  (BaseEntity.Status)request.IsActive;     
+                var updatedAssetSpecification = _mapper.Map<AssetSpecifications>(request);                   
+                await _assetSpecificationRepository.UpdateAsync(request.Id, updatedAssetSpecification);
         
                 //await _assetSpecificationRepository.UpdateAsync(assetSpecifications.Id, assetSpecifications);
                 if (request.IsActive is 0)

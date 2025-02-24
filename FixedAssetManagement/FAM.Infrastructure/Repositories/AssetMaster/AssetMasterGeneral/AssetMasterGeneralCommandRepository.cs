@@ -1,3 +1,4 @@
+using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Domain.Common;
 using Core.Domain.Entities;
@@ -101,10 +102,19 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             await _applicationDbContext.SaveChangesAsync();
             return true;
         }
-        public async Task<AssetMasterGenerals?> GetByAssetImageAsync(string assetImage)
+        public async Task<AssetMasterGeneralDTO?> GetByAssetImageAsync(string assetCode)
         {
+           /*  return await _applicationDbContext.AssetMasterGenerals
+                .FirstOrDefaultAsync(a => a.AssetImage == assetCode); */
             return await _applicationDbContext.AssetMasterGenerals
-                .FirstOrDefaultAsync(a => a.AssetImage == assetImage);
+            .Where(a => a.AssetCode == assetCode)
+            .Select(a => new AssetMasterGeneralDTO
+            {
+                AssetCode = a.AssetCode,
+                AssetImage = a.AssetImage,
+                Id = a.Id,
+            })
+            .FirstOrDefaultAsync();
         }
 
         public async Task<bool> RemoveAssetImageReferenceAsync(int assetId)

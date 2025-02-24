@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IDepreciationGroup;
+using Core.Application.DepreciationGroup.Queries.GetDepreciationGroup;
 using Core.Domain.Common;
 using Core.Domain.Entities;
 using Dapper;
@@ -17,7 +14,7 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
         {
             _dbConnection = dbConnection;
         }     
-        public async Task<(List<DepreciationGroups>, int)> GetAllDepreciationGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<DepreciationGroupDTO>, int)> GetAllDepreciationGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
              var query = $$"""
                 DECLARE @TotalCount INT;
@@ -26,11 +23,16 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
                 WHERE IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR DepreciationGroupName LIKE @Search)")}};
 
-                SELECT Id,Code,BookType,DepreciationGroupName,AssetGroupId,UsefulLife,DepreciationMethod,ResidualValue,SortOrder,  IsActive
-                ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
-                FROM FixedAsset.DepreciationGroups  WHERE IsDeleted = 0
-                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR DepreciationGroupName LIKE @Search )")}}
-                ORDER BY Id desc
+                SELECT DG.Id,DG.Code,DG.BookType,DG.DepreciationGroupName,DG.AssetGroupId,DG.UsefulLife,DG.DepreciationMethod,DG.ResidualValue,DG.SortOrder,DG.IsActive
+                ,DG.CreatedBy,DG.CreatedDate,DG.CreatedByName,DG.CreatedIP,DG.ModifiedBy,DG.ModifiedDate,DG.ModifiedByName,DG.ModifiedIP
+                ,MM.description BookTypeDesc,M.description DepreciationMethodDesc,AG.GroupName AssetGroupName
+                FROM FixedAsset.DepreciationGroups DG
+                INNER JOIN FixedAsset.MiscMaster MM on MM.Id =DG.BookType
+                INNER JOIN FixedAsset.MiscMaster M on M.Id =DG.DepreciationMethod
+                INNER JOIN FixedAsset.AssetGroup AG on AG.Id=DG.AssetGroupId
+                WHERE DG.IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (DG.Code LIKE @Search OR DG.DepreciationGroupName LIKE @Search )")}}
+                ORDER BY DG.Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
                 SELECT @TotalCount AS TotalCount;
                 """;
@@ -42,31 +44,40 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
                        };
 
             var depreciationGroups = await _dbConnection.QueryMultipleAsync(query, parameters);
-            var depreciationGroupList = (await depreciationGroups.ReadAsync<DepreciationGroups>()).ToList();
+            var depreciationGroupList = (await depreciationGroups.ReadAsync<DepreciationGroupDTO>()).ToList();
             int totalCount = (await depreciationGroups.ReadFirstAsync<int>());             
             return (depreciationGroupList, totalCount);             
         }
 
-        public async Task<List<DepreciationGroups>> GetByDepreciationNameAsync(string searchPattern)
+        public async Task<List<DepreciationGroupDTO>> GetByDepreciationNameAsync(string searchPattern)
         {
             const string query = @"
-            SELECT Id,Code,BookType,DepreciationGroupName,AssetGroupId,UsefulLife,DepreciationMethod,ResidualValue,SortOrder,  IsActive
-            ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
-            FROM FixedAsset.DepreciationGroups 
-            WHERE (DepreciationGroupName LIKE @SearchPattern OR Code LIKE @SearchPattern) 
-            AND  IsDeleted=0 and IsActive=1
+            SELECT DG.Id,DG.Code,DG.BookType,DG.DepreciationGroupName,DG.AssetGroupId,DG.UsefulLife,DG.DepreciationMethod,DG.ResidualValue,DG.SortOrder,DG.IsActive
+            ,DG.CreatedBy,DG.CreatedDate,DG.CreatedByName,DG.CreatedIP,DG.ModifiedBy,DG.ModifiedDate,DG.ModifiedByName,DG.ModifiedIP
+            ,MM.description BookTypeDesc,M.description DepreciationMethodDesc,AG.GroupName AssetGroupName
+            FROM FixedAsset.DepreciationGroups DG
+            INNER JOIN FixedAsset.MiscMaster MM on MM.Id =DG.BookType
+            INNER JOIN FixedAsset.MiscMaster M on M.Id =DG.DepreciationMethod    
+            INNER JOIN FixedAsset.AssetGroup AG on AG.Id=DG.AssetGroupId        
+            WHERE (DG.DepreciationGroupName LIKE @SearchPattern OR DG.Code LIKE @SearchPattern) 
+            AND  DG.IsDeleted=0 and DG.IsActive=1
             ORDER BY ID DESC";            
-            var result = await _dbConnection.QueryAsync<DepreciationGroups>(query, new { SearchPattern = $"%{searchPattern}%" });
+            var result = await _dbConnection.QueryAsync<DepreciationGroupDTO>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();
         }
 
-        public async Task<DepreciationGroups> GetByIdAsync(int depGroupId)
+        public async Task<DepreciationGroupDTO> GetByIdAsync(int depGroupId)
         {
             const string query = @"
-            SELECT Id,Code,BookType,DepreciationGroupName,AssetGroupId,UsefulLife,DepreciationMethod,ResidualValue,SortOrder,  IsActive
-            ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
-            FROM FixedAsset.DepreciationGroups WHERE Id = @depGroupId AND IsDeleted=0";
-            var depreciationGroups = await _dbConnection.QueryFirstOrDefaultAsync<DepreciationGroups>(query, new { depGroupId });           
+            SELECT DG.Id,DG.Code,DG.BookType,DG.DepreciationGroupName,DG.AssetGroupId,DG.UsefulLife,DG.DepreciationMethod,DG.ResidualValue,DG.SortOrder,DG.IsActive
+            ,DG.CreatedBy,DG.CreatedDate,DG.CreatedByName,DG.CreatedIP,DG.ModifiedBy,DG.ModifiedDate,DG.ModifiedByName,DG.ModifiedIP
+            ,MM.description BookTypeDesc,M.description DepreciationMethodDesc,AG.GroupName AssetGroupName
+            FROM FixedAsset.DepreciationGroups DG
+            INNER JOIN FixedAsset.MiscMaster MM on MM.Id =DG.BookType
+            INNER JOIN FixedAsset.MiscMaster M on M.Id =DG.DepreciationMethod 
+            INNER JOIN FixedAsset.AssetGroup AG on AG.Id=DG.AssetGroupId
+            WHERE DG.Id = @depGroupId AND DG.IsDeleted=0";
+            var depreciationGroups = await _dbConnection.QueryFirstOrDefaultAsync<DepreciationGroupDTO>(query, new { depGroupId });           
             if (depreciationGroups is null)
             {
                 throw new KeyNotFoundException($"DepreciationGroup with ID {depGroupId} not found.");

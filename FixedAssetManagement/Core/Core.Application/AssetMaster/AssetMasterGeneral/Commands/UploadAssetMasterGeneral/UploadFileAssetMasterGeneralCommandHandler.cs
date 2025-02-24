@@ -51,8 +51,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
 
             // 🔹 Define Base Directory (Get parent directory)
             
-            //string baseDirectory = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "AssetImages");
-            string baseDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "AssetImages");
+            string baseDirectory = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "AssetImages");
+            //string baseDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "AssetImages");
             EnsureDirectoryExists(baseDirectory);
 
             // 🔹 Construct the required file path

@@ -45,6 +45,8 @@ using Core.Application.Common.Interfaces.ISpecificationMaster;
 using FAM.Infrastructure.Repositories.SpecificationMaster;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetSpecification;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty;
 
 namespace FAM.Infrastructure
 {
@@ -166,6 +168,9 @@ namespace FAM.Infrastructure
             services.AddScoped<ISpecificationMasterQueryRepository, SpecificationMasterQueryRepository>();
 			services.AddScoped<IAssetSpecificationCommandRepository, AssetSpecificationCommandRepository>();
             services.AddScoped<IAssetSpecificationQueryRepository, AssetSpecificationQueryRepository>();
+            services.AddScoped<IAssetWarrantyQueryRepository, AssetWarrantyQueryRepository>();
+            services.AddScoped<IAssetWarrantyCommandRepository, AssetWarrantyCommandRepository>();
+
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -187,7 +192,8 @@ namespace FAM.Infrastructure
                 typeof(AssetMasterGeneralProfile),
                 typeof(SpecificationMasterProfile),
 				typeof(AssetPurchaseProfile),
- 				typeof(AssetSpecificationProfile)
+ 				typeof(AssetSpecificationProfile),
+                typeof(AssetWarrantyProfile)
             );
 
             return services;
