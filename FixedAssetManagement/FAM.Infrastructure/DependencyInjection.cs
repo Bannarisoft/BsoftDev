@@ -163,6 +163,7 @@ namespace FAM.Infrastructure
             services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
             services.AddScoped<IUOMQueryRepository, UOMQueryRepository>();
 			services.AddScoped<IAssetPurchaseQueryRepository, AssetPurchaseQueryRepository>();
+            services.AddScoped<IAssetPurchaseCommandRepository, AssetPurchaseCommandRepository>();
             services.AddScoped<ISpecificationMasterCommandRepository, SpecificationMasterCommandRepository>();
             services.AddScoped<ISpecificationMasterQueryRepository, SpecificationMasterQueryRepository>();
 			services.AddScoped<IAssetSpecificationCommandRepository, AssetSpecificationCommandRepository>();

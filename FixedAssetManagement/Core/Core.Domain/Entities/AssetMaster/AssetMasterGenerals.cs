@@ -1,6 +1,7 @@
 
 using Core.Domain.Common;
 using Core.Domain.Entities.AssetMaster;
+using Core.Domain.Entities.AssetPurchase;
 
 namespace Core.Domain.Entities
 {
@@ -32,9 +33,12 @@ namespace Core.Domain.Entities
         public MiscMaster? AssetWorkType { get; set; } = null!;   
         public string? AssetImage { get; set; }
         public byte ISDepreciated { get; set; }
-        public byte IsTangible { get; set; }            
-        public ICollection<Core.Domain.Entities.AssetPurchase.AssetPurchase>? AssetPurchase { get; set; }     
+        public byte IsTangible { get; set; }    
+        public ICollection<AssetPurchaseDetails>? AssetPurchase { get; set; }     
 		public ICollection<AssetSpecifications>? AssetSpecification { get; set; }
-        public ICollection<AssetWarranties>? AssetWarranty { get; set; }
+		public ICollection<AssetWarranties>? AssetWarranty { get; set; }
+
+        public ICollection<AssetAdditionalCost>? AssetAdditionalCost { get; set; }
+
     }
 }

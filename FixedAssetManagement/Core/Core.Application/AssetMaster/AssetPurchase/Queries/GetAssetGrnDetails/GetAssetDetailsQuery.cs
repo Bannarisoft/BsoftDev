@@ -10,7 +10,8 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetGrnDetails
 {
     public class GetAssetDetailsQuery : IRequest<ApiResponseDTO<List<AssetGrnDetails>>>
     {
-        public int OldUnitId { get; set; } 
+        public string?  OldUnitId { get; set; } 
+        public int AssetSourceId { get; set; }
         public int GrnNo { get; set; } 
         public int GrnSerialNo { get; set; }
     }
