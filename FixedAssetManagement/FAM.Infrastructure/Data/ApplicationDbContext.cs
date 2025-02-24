@@ -37,6 +37,7 @@ namespace FAM.Infrastructure.Data
 		public DbSet<AssetSource> AssetSource { get; set; }
         public DbSet<SpecificationMasters> SpecificationMasters { get; set; }
 		public DbSet<AssetLocation> AssetLocations { get; set; }
+		public DbSet<AssetWarranties> AssetWarranties { get; set; }
         public DbSet<AssetPurchaseDetails> AssetPurchaseDetails { get; set; }
         public DbSet<AssetSpecifications> AssetSpecifications { get; set; }
         public DbSet<AssetAdditionalCost> AssetAdditionalCost { get; set; }
@@ -61,6 +62,7 @@ namespace FAM.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new SpecificationMasterConfiguration());   
  			modelBuilder.ApplyConfiguration(new AssetPurchaseDetailsConfiguration());
             modelBuilder.ApplyConfiguration(new AssetSpecificationConfiguration());   
+			modelBuilder.ApplyConfiguration(new AssetWarrantyConfiguration());
             modelBuilder.ApplyConfiguration(new AssetAdditionalCostConfiguration());   
 
             base.OnModelCreating(modelBuilder);

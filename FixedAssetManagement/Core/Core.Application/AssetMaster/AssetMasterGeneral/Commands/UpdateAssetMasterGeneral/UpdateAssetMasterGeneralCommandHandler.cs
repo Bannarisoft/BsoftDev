@@ -47,8 +47,9 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
             }
             if (assetMaster.IsActive != request.IsActive)
             {    
-                 assetMaster.IsActive =  (BaseEntity.Status)request.IsActive;             
-                await _assetMasterGeneralRepository.UpdateAsync(assetMaster.Id, assetMaster);
+                 assetMaster.IsActive =  (BaseEntity.Status)request.IsActive;   
+                 var updatedAssetMasterGeneral = _mapper.Map<AssetMasterGenerals>(request);           
+                await _assetMasterGeneralRepository.UpdateAsync(assetMaster.Id, updatedAssetMasterGeneral);
                 if (request.IsActive is 0)
                 {
                     return new ApiResponseDTO<AssetMasterGeneralDTO>

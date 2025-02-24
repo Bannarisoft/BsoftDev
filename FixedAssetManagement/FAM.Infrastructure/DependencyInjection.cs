@@ -43,9 +43,12 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase;
 using Core.Application.Common.Mappings.AssetPurchase;
 using Core.Application.Common.Interfaces.ISpecificationMaster;
 using FAM.Infrastructure.Repositories.SpecificationMaster;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetLocation;
-using FAM.Infrastructure.Repositories.AssetMaster.AssetLocation;using FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetLocation;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetSpecification;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty;
 
 namespace FAM.Infrastructure
 {
@@ -165,9 +168,13 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetPurchaseCommandRepository, AssetPurchaseCommandRepository>();
             services.AddScoped<ISpecificationMasterCommandRepository, SpecificationMasterCommandRepository>();
             services.AddScoped<ISpecificationMasterQueryRepository, SpecificationMasterQueryRepository>();
+			services.AddScoped<IAssetSpecificationCommandRepository, AssetSpecificationCommandRepository>();
 			services.AddScoped<IAssetLocationQueryRepository , AssetLocationQueryRepository>();
-            services.AddScoped<IAssetLocationCommandRepository , AssetLocationCommandRepository>();			services.AddScoped<IAssetSpecificationCommandRepository, AssetSpecificationCommandRepository>();
+            services.AddScoped<IAssetLocationCommandRepository , AssetLocationCommandRepository>();
             services.AddScoped<IAssetSpecificationQueryRepository, AssetSpecificationQueryRepository>();
+            services.AddScoped<IAssetWarrantyQueryRepository, AssetWarrantyQueryRepository>();
+            services.AddScoped<IAssetWarrantyCommandRepository, AssetWarrantyCommandRepository>();
+
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -190,6 +197,7 @@ namespace FAM.Infrastructure
                 typeof(SpecificationMasterProfile),
 				typeof(AssetPurchaseProfile),
  				typeof(AssetSpecificationProfile),
+                typeof(AssetWarrantyProfile),
 				typeof(AssetLocationProfile)
             );
 

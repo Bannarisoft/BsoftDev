@@ -232,7 +232,7 @@ namespace FAM.API.Controllers.AssetMaster
                 data = result.Data
             });
         } 
-         [HttpPost("upload-logo")]
+        [HttpPost("upload-logo")]
         public async Task<IActionResult> UploadLogo(UploadFileAssetMasterGeneralCommand uploadFileCommand)
         {
             var validationResult = await _UploadFileCommandValidator.ValidateAsync(uploadFileCommand);
