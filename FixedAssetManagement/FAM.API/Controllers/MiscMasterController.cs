@@ -83,7 +83,7 @@ namespace FAM.API.Controllers
             return NotFound( new { StatusCode=miscmaster.Message}) ;
         }
 
-          [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateMiscMasterCommand command)
         {
              var validationResult = await _miscMasterCommand.ValidateAsync(command);

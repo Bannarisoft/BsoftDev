@@ -156,6 +156,49 @@ namespace FAM.Infrastructure.Migrations
                     b.ToTable("AssetGroup", "FixedAsset");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int")
+                        .HasColumnName("AssetId");
+
+                    b.Property<int>("CustodianId")
+                        .HasColumnType("int")
+                        .HasColumnName("CustodianId");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("int")
+                        .HasColumnName("UserID");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("SubLocationId");
+
+                    b.ToTable("AssetLocation", "FixedAsset");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
                 {
                     b.Property<int>("Id")
@@ -467,6 +510,9 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LocationName")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -488,10 +534,15 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("SortOrder");
 
+                    b.Property<int>("SubLocationId")
+                        .HasColumnType("int");
+
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
 
                     b.ToTable("Location", "FixedAsset");
                 });
@@ -841,9 +892,14 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("subLocationId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("subLocationId");
 
                     b.ToTable("SubLocation", "FixedAsset");
                 });
@@ -924,6 +980,25 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("AssetGroup");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.SubLocation", "SubLocation")
+                        .WithMany()
+                        .HasForeignKey("SubLocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Location");
+
+                    b.Navigation("SubLocation");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
@@ -1022,6 +1097,15 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("DepMiscType");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Location", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Location", null)
+                        .WithMany("Locations")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Manufactures", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscMaster", "ManufactureTypes")
@@ -1063,7 +1147,13 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.SubLocation", "subLocation")
+                        .WithMany()
+                        .HasForeignKey("subLocationId");
+
                     b.Navigation("Location");
+
+                    b.Navigation("subLocation");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UOM", b =>
@@ -1107,6 +1197,8 @@ namespace FAM.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Location", b =>
                 {
+                    b.Navigation("Locations");
+
                     b.Navigation("SubLocations");
                 });
 

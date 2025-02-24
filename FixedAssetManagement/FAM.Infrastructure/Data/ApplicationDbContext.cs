@@ -5,6 +5,7 @@ using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
 using FAM.Infrastructure.Data.Configurations;
 using FAM.Infrastructure.Data.Configurations.AssetMaster;
+using Core.Domain.Entities.AssetMaster;
 
 namespace FAM.Infrastructure.Data
 {
@@ -33,6 +34,7 @@ namespace FAM.Infrastructure.Data
 		public DbSet<AssetMasterGenerals> AssetMasterGenerals { get; set; }
         public DbSet<UOM> UOMs { get; set; }
         public DbSet<SpecificationMasters> SpecificationMasters { get; set; }
+        public DbSet<AssetLocation> AssetLocations { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -49,7 +51,8 @@ namespace FAM.Infrastructure.Data
  			modelBuilder.ApplyConfiguration(new AssetMasterGeneralConfiguration()); 
             modelBuilder.ApplyConfiguration(new ManufactureConfiguration());
             modelBuilder.ApplyConfiguration(new UOMConfiguration());   
-            modelBuilder.ApplyConfiguration(new SpecificationMasterConfiguration());   
+            modelBuilder.ApplyConfiguration(new SpecificationMasterConfiguration());  
+            modelBuilder.ApplyConfiguration(new AssetLocationConfiguration()); 
 
             base.OnModelCreating(modelBuilder);
         }
