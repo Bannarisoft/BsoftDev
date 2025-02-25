@@ -25,6 +25,9 @@ namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroup
         public int? ModifiedBy { get; set; }
         public DateTimeOffset?  ModifiedAt { get; set; }
         public string? ModifiedByName { get; set; }
-        public string? ModifiedIP { get; set; }          
+        public string? ModifiedIP { get; set; }
+        public string? DepreciationMethodDesc { get; set; }
+        public string? BookTypeDesc { get; set; }  
+        public IsDelete IsDeleted { get; set; }      
     }
 }

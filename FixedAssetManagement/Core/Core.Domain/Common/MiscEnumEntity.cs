@@ -25,11 +25,16 @@ namespace Core.Domain.Common
         {
             public const string MiscCode = "ASSETTYPE";
         }
-
-        public static class Asset_CostType
+		public static class Asset_CostType
         {
             public const string MiscCode = "COSTTYPE";
+        }        public static class Asset_WarrantyType
+        {
+            public const string MiscCode = "WARRANTYTYPE";
         }
-       
+        public static class Asset_WarrantyClaimStatus
+        {
+            public const string MiscCode = "WARRANTYCLAIM";
+        }
     }
 }

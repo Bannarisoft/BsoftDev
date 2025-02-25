@@ -19,7 +19,7 @@ namespace UserManagement.API.Validation.UserRole
           public CreateRoleCommandValidator(MaxLengthProvider maxLengthProvider)
            {
 
-                    var DepartmentShortNameMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.UserRole>("RoleName") ?? 50;
+                   var DepartmentShortNameMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.UserRole>("RoleName") ?? 50;
                    var DepartmentDeptNameMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.UserRole>("Description") ?? 250;            
              _validationRules = ValidationRuleLoader.LoadValidationRules();
              if (_validationRules == null || !_validationRules.Any())

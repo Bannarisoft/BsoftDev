@@ -32,6 +32,11 @@ namespace Core.Application.Manufacture.Queries.GetManufacture
         public DateTimeOffset?  ModifiedAt { get; set; }
         public string? ModifiedByName { get; set; }
         public string? ModifiedIP { get; set; }   
+        public string? CountryName { get; set; }        
+        public string? StateName { get; set; }        
+        public string? CityName { get; set; }
+        public IsDelete IsDeleted { get; set; }
+        public string? ManufactureTypeDescription { get; set; }
         
     }
 }

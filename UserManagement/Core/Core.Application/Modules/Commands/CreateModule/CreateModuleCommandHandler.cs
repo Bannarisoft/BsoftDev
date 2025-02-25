@@ -54,7 +54,7 @@ namespace Core.Application.Modules.Commands.CreateModule
         var module = new Domain.Entities.Modules
         {
             ModuleName = request.ModuleName,
-            Menus = request.Menus.Select(menuName => new Menu { MenuName = menuName }).ToList()
+            Menus = request.Menus.Select(menuName => new Domain.Entities.Menu { MenuName = menuName }).ToList()
         };
         await _moduleRepository.AddModuleAsync(module);
         await _moduleRepository.SaveChangesAsync();

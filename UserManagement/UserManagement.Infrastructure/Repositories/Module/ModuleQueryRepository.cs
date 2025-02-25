@@ -28,14 +28,14 @@ namespace UserManagement.Infrastructure.Repositories.Module
 
             var moduleDictionary = new Dictionary<int, Modules>();
 
-            var result = await _dbConnection.QueryAsync<Modules, Menu, Modules>(
+            var result = await _dbConnection.QueryAsync<Modules, Core.Domain.Entities.Menu, Modules>(
                 sql,
                 (module, menu) =>
                 {
                     if (!moduleDictionary.TryGetValue(module.Id, out var currentModule))
                     {
                         currentModule = module;
-                        currentModule.Menus = new List<Menu>(); // Initialize list
+                        currentModule.Menus = new List<Core.Domain.Entities.Menu>(); // Initialize list
                         moduleDictionary.Add(module.Id, currentModule);
                     }
 

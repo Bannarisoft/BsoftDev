@@ -24,13 +24,13 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
 
         public async Task<ApiResponseDTO<bool>> Handle(DeleteFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(request.AssetImage))
+            if (string.IsNullOrWhiteSpace(request.AssetCode))
             {
                 return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Asset image path is required." };
             }
 
             // 🔹 Check if asset exists by image name
-            var existingAsset = await _assetMasterGeneralRepository.GetByAssetImageAsync(request.AssetImage);
+            var existingAsset = await _assetMasterGeneralRepository.GetByAssetImageAsync(request.AssetCode);
 
             if (existingAsset == null)
             {
@@ -38,7 +38,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
             }
 
             // 🔹 Delete the file
-            var deleteResult = await _fileUploadService.DeleteFileAsync(request.AssetImage);
+            var deleteResult = await _fileUploadService.DeleteFileAsync(existingAsset.AssetImage ?? string.Empty);
             if (!deleteResult)
             {
                 return new ApiResponseDTO<bool> { IsSuccess = false, Message = "File deletion failed." };
@@ -51,7 +51,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
                 return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Failed to update asset record." };
             }
 
-            _logger.LogInformation($"Asset image deleted: {request.AssetImage}");
+            _logger.LogInformation($"Asset image deleted: {request.AssetCode}");
 
             return new ApiResponseDTO<bool> { IsSuccess = true, Message = "File deleted successfully." };
         }

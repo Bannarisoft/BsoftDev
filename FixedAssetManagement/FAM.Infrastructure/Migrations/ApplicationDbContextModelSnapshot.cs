@@ -156,6 +156,51 @@ namespace FAM.Infrastructure.Migrations
                     b.ToTable("AssetGroup", "FixedAsset");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int")
+                        .HasColumnName("AssetId");
+
+                    b.Property<string>("CustodianId")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(50)")
+                        .HasColumnName("CustodianId");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(50)")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("SubLocationId");
+
+                    b.ToTable("AssetLocation", "FixedAsset");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetSpecifications", b =>
                 {
                     b.Property<int>("Id")
@@ -230,6 +275,134 @@ namespace FAM.Infrastructure.Migrations
                     b.ToTable("AssetSpecifications", "FixedAsset");
                 });
 
+modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContactPerson")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("Document")
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("Document");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTimeOffset>("EndDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MobileNumber")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("Period")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ServiceAddressLine1")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)");
+
+                    b.Property<string>("ServiceAddressLine2")
+                        .HasColumnType("varchar(250)");
+
+                    b.Property<int>("ServiceCityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ServiceClaimProcessDescription")
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<int?>("ServiceClaimStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ServiceContactPerson")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("ServiceCountryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ServiceEmail")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTimeOffset?>("ServiceLastClaimDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ServiceMobileNumber")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<string>("ServicePinCode")
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<int>("ServiceStateId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("WarrantyProvider")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)");
+
+                    b.Property<int>("WarrantyType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
+
+                    b.HasIndex("ServiceClaimStatus");
+
+                    b.HasIndex("WarrantyType");
+
+                    b.ToTable("AssetWarranty", "FixedAsset");
+                });
             modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
                 {
                     b.Property<int>("Id")
@@ -775,6 +948,9 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LocationName")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -796,10 +972,15 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("SortOrder");
 
+                    b.Property<int>("SubLocationId")
+                        .HasColumnType("int");
+
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
 
                     b.ToTable("Location", "FixedAsset");
                 });
@@ -1149,9 +1330,14 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("subLocationId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("subLocationId");
 
                     b.ToTable("SubLocation", "FixedAsset");
                 });
@@ -1234,6 +1420,25 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetGroup");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.SubLocation", "SubLocation")
+                        .WithMany()
+                        .HasForeignKey("SubLocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Location");
+
+                    b.Navigation("SubLocation");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetSpecifications", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
@@ -1260,6 +1465,33 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("SpecificationMaster");
                 });
 
+ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
+                        .WithMany("AssetWarranty")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscClaimStatus")
+                        .WithMany("WarrantyType")
+                        .HasForeignKey("ServiceClaimStatus")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_ClaimStatus_Misc");
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscWarrantyTypes")
+                        .WithMany("WarrantyClaim")
+                        .HasForeignKey("WarrantyType")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_WarrantyType_Misc");
+
+                    b.Navigation("AssetMasterId");
+
+                    b.Navigation("MiscClaimStatus");
+
+                    b.Navigation("MiscWarrantyTypes");
+                });
             modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetCategories", "AssetCategories")
@@ -1402,6 +1634,15 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("DepMiscType");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Location", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Location", null)
+                        .WithMany("Locations")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Manufactures", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscMaster", "ManufactureTypes")
@@ -1443,7 +1684,13 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.SubLocation", "subLocation")
+                        .WithMany()
+                        .HasForeignKey("subLocationId");
+
                     b.Navigation("Location");
+
+                    b.Navigation("subLocation");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UOM", b =>
@@ -1484,6 +1731,7 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetPurchase");
 
                     b.Navigation("AssetSpecification");
+ 					b.Navigation("AssetWarranty");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetSource", b =>
@@ -1500,6 +1748,8 @@ namespace FAM.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Location", b =>
                 {
+                    b.Navigation("Locations");
+
                     b.Navigation("SubLocations");
                 });
 
@@ -1523,6 +1773,9 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("Manufactures");
 
                     b.Navigation("UOMs");
+  					b.Navigation("WarrantyClaim");
+
+                    b.Navigation("WarrantyType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>

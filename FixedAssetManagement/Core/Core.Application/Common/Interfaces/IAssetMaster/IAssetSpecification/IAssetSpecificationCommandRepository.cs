@@ -8,5 +8,5 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetSpecification
         Task<int>  UpdateAsync(int assetId,AssetSpecifications assetSpecification);
         Task<int>  DeleteAsync(int assetId,AssetSpecifications assetSpecification);        
         Task<bool> ExistsByAssetSpecIdAsync(int? assetId,int? assetSpecId); 
-             }
+    }
 }

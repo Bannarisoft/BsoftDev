@@ -34,9 +34,9 @@ namespace FAM.API.Validation.MiscMaster
                         RuleFor(x => x.Description)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateMiscMasterCommand.Description)} {rule.Error}");
-                              RuleFor(x => x.MiscTypeMasterId)
+                              RuleFor(x => x.MiscTypeId)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateMiscMasterCommand.MiscTypeMasterId)} {rule.Error}");
+                            .WithMessage($"{nameof(CreateMiscMasterCommand.MiscTypeId)} {rule.Error}");
                         break;
                         case "MaxLength" :
                         RuleFor(x => x.Code)
