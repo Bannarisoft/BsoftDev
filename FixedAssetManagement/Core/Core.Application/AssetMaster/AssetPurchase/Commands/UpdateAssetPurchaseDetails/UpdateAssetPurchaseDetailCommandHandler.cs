@@ -52,7 +52,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Commands.UpdateAssetPurchas
             details: $"AssetPurchase details was updated",
             module: "AssetPurchaseDetails");
         await _mediator.Publish(domainEvent, cancellationToken);
-        return new ApiResponseDTO<int> { IsSuccess = true, Message = "Success.", Data = result };   
+        return new ApiResponseDTO<int> { IsSuccess = true, Message = "Asset Purchase Updated Successfully.", Data = result };   
 
         }
     }

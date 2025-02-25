@@ -278,7 +278,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
              const string query = @"
                     SELECT * 
                     FROM FixedAsset.AssetPurchaseDetails 
-                    WHERE Id = @Id";
+                    WHERE AssetId = @Id";
 
                     var assetPurchaseDetails = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails>(query, new { Id });
                     return assetPurchaseDetails;

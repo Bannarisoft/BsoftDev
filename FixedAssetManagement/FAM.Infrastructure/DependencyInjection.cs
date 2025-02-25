@@ -47,7 +47,8 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetLocation;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetLocation;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetSpecification;
-using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetAdditionalCost;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetAdditionalCost;using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty;
 
 namespace FAM.Infrastructure
@@ -172,7 +173,8 @@ namespace FAM.Infrastructure
 			services.AddScoped<IAssetLocationQueryRepository , AssetLocationQueryRepository>();
             services.AddScoped<IAssetLocationCommandRepository , AssetLocationCommandRepository>();
             services.AddScoped<IAssetSpecificationQueryRepository, AssetSpecificationQueryRepository>();
-            services.AddScoped<IAssetWarrantyQueryRepository, AssetWarrantyQueryRepository>();
+			services.AddScoped<IAssetAdditionalCostQueryRepository, AssetAdditionalCostQueryRepository>();
+            services.AddScoped<IAssetAdditionalCostCommandRepository, AssetAdditionalCostCommandRepository>();            services.AddScoped<IAssetWarrantyQueryRepository, AssetWarrantyQueryRepository>();
             services.AddScoped<IAssetWarrantyCommandRepository, AssetWarrantyCommandRepository>();
 
 
@@ -198,7 +200,8 @@ namespace FAM.Infrastructure
 				typeof(AssetPurchaseProfile),
  				typeof(AssetSpecificationProfile),
                 typeof(AssetWarrantyProfile),
-				typeof(AssetLocationProfile)
+				typeof(AssetLocationProfile),
+				typeof(AssetAdditionalCostProfile)
             );
 
             return services;

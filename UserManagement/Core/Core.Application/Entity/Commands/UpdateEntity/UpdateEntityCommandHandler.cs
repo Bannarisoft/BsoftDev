@@ -78,7 +78,7 @@ namespace Core.Application.Entity.Commands.UpdateEntity
             return new ApiResponseDTO<int>
             {
                 IsSuccess = true,
-                Message = "Success",
+                Message = "Entity Updated Successfully",
                 Data = result
             };
 

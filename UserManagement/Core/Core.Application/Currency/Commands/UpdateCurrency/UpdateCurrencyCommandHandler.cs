@@ -89,7 +89,7 @@ namespace Core.Application.Currency.Commands.UpdateCurrency
     return new ApiResponseDTO<int>
     {
         IsSuccess = true,
-        Message = "Success",
+        Message = "Curreny Updated Successfully",
         Data = result
     };
 }
