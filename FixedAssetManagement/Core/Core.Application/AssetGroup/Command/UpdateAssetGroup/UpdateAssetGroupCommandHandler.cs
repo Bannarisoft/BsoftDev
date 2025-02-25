@@ -78,7 +78,7 @@ namespace Core.Application.AssetGroup.Command.UpdateAssetGroup
             module: "AssetGroup");
         await _mediator.Publish(domainEvent, cancellationToken);
         _logger.LogInformation($"AssetGroupId {result} Updated successfully.");
-        return new ApiResponseDTO<int> { IsSuccess = true, Message = "Success.", Data = result };   
+        return new ApiResponseDTO<int> { IsSuccess = true, Message = "AssetGroup Updated Successfully.", Data = result };   
         }
     }
 }

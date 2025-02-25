@@ -25,5 +25,11 @@ namespace Core.Domain.Common
         {
             public const string MiscCode = "ASSETTYPE";
         }
+
+        public static class Asset_CostType
+        {
+            public const string MiscCode = "COSTTYPE";
+        }
+       
     }
 }

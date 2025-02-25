@@ -38,9 +38,13 @@ using FAM.API.Validation.SpecificationMaster;
 using Core.Application.SpecificationMaster.Commands.CreateSpecificationMaster;
 using Core.Application.AssetMaster.AssetPurchase.Commands.CreateAssetPurchaseDetails;
 using FAM.API.Validation.AssetMaster.AssetPurchase;
-using Core.Application.AssetMaster.AssetPurchase.Commands.UpdateAssetPurchaseDetails;using Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSpecification;
+using Core.Application.AssetMaster.AssetPurchase.Commands.UpdateAssetPurchaseDetails;
+using Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSpecification;
 using Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSpecification;
 using FAM.API.Validation.AssetMaster.AssetSpecification;
+using Core.Application.AssetMaster.AssetAdditionalCost.Commands.CreateAssetAdditionalCost;
+using FAM.API.Validation.AssetMaster.AssetAdditionalCost;
+using Core.Application.AssetMaster.AssetAdditionalCost.Commands.UpdateAssetAdditionalCost;
 
 
 namespace FAM.API.Validation.Common
@@ -80,8 +84,11 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateSpecificationMasterCommand>, UpdateSpecificationMasterCommandValidator>();
         services.AddScoped<IValidator<CreateSpecificationMasterCommand>, CreateSpecificationMasterCommandValidator>();
 		services.AddScoped<IValidator<CreateAssetPurchaseDetailCommand>, CreateAssetPurchaseDetailCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetPurchaseDetailCommand>, UpdateAssetPurchaseDetailCommandValidator>();        services.AddScoped<IValidator<CreateAssetSpecificationCommand>, CreateAssetSpecificationCommandValidator>();
+        services.AddScoped<IValidator<UpdateAssetPurchaseDetailCommand>, UpdateAssetPurchaseDetailCommandValidator>();        
+        services.AddScoped<IValidator<CreateAssetSpecificationCommand>, CreateAssetSpecificationCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetSpecificationCommand>, UpdateAssetSpecificationCommandValidator>();
+        services.AddScoped<IValidator<CreateAssetAdditionalCostCommand>, CreateAssetAdditionalCostCommandValidator>();
+        services.AddScoped<IValidator<UpdateAssetAdditionalCostCommand>, UpdateAssetAdditionalCostCommandValidator>();
     }  
     }
 }

@@ -71,7 +71,7 @@ namespace Core.Application.Currency.Commands.DeleteCurrency
             return new ApiResponseDTO<int>
             {
                 IsSuccess = true,
-                Message = "Success",
+                Message = "Curreny Soft Deleted Successfully",
                 Data = request.Id
             };
         
