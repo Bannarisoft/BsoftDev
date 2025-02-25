@@ -1,5 +1,6 @@
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities;
+using Core.Domain.Entities.AssetPurchase;
 using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral
@@ -8,19 +9,21 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
     {
         public int Id { get; set; }
         public int CompanyId { get; set; }       
-        //public string? CompanyName { get; set; }     
+        public int UnitId { get; set; }    
+        public string? CompanyName { get; set; }     
+        public string? UnitName { get; set; }     
         public string? AssetCode { get; set; }        
         public string? AssetName { get; set; }                
         public int AssetGroupId { get; set; }        
         public int AssetCategoryId { get; set; }        
         public int AssetSubCategoryId { get; set; }        
         public int? AssetParentId { get; set; }        
-        public string? AssetType { get; set; }                
+        public int? AssetType { get; set; }                
         public string? MachineCode { get; set; }   
         public int? Quantity { get; set; }
         public int? UOMId { get; set; }
         public string? AssetDescription { get; set; }
-        public string? WorkingStatus { get; set; }
+        public int? WorkingStatus { get; set; }
         public string? AssetImage { get; set; }
         public string? AssetImageBase64 { get; set; } 
         public bool? NonDepreciated { get; set; }
@@ -41,6 +44,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? WorkingStatusDesc { get; set; }
         public string? AssetTypeDesc { get; set; } 
         public string? ParentAssetDesc { get; set; } 
-        public IsDelete IsDeleted { get; set; }           
+        public IsDelete IsDeleted { get; set; }    
+         public List<AssetPurchaseDetails> AssetPurchase { get; set; }= new List<AssetPurchaseDetails>(); 
+         public List<Core.Domain.Entities.AssetMaster.AssetLocation> AssetLocations { get; set; }= new List<Core.Domain.Entities.AssetMaster.AssetLocation>();
     }
 }

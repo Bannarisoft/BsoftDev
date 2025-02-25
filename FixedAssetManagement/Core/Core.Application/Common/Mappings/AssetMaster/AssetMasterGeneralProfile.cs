@@ -1,10 +1,13 @@
 
 using AutoMapper;
+using Core.Application.AssetLocation.Queries.GetAssetLocation;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
+using Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetPurchase;
 using Core.Domain.Entities;
+using Core.Domain.Entities.AssetPurchase;
 using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.Common.Mappings.AssetMaster
@@ -26,6 +29,14 @@ namespace Core.Application.Common.Mappings.AssetMaster
              
             CreateMap<AssetMasterGeneralDTO,AssetMasterGeneralAutoCompleteDTO>();    
             CreateMap<AssetMasterGenerals, AssetMasterGeneralDTO>();             
+            // Mapping for the composite DTO with reverse mapping enabled.
+
+            // **Add these mappings to clear your error:**
+            CreateMap<AssetPurchaseDetailsDto, AssetPurchaseDetails>()
+                .ReverseMap();
+
+            CreateMap<AssetLocationDto, Core.Domain.Entities.AssetMaster.AssetLocation>()
+                .ReverseMap(); 
         }        
     }
 }

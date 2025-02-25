@@ -4,6 +4,7 @@ using Core.Domain.Common;
 using Core.Domain.Entities;
 using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 {
@@ -14,11 +15,16 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         {
             _applicationDbContext = applicationDbContext;            
         }
-        public async Task<AssetMasterGenerals> CreateAsync(AssetMasterGenerals assetMasterGeneral)
+        public async Task<AssetMasterGenerals> CreateAsync(AssetMasterGenerals assetMasterGeneral, CancellationToken cancellationToken)
         {
-            await _applicationDbContext.AssetMasterGenerals.AddAsync(assetMasterGeneral);
-            await _applicationDbContext.SaveChangesAsync();
-            return assetMasterGeneral;          
+            _applicationDbContext.AssetMasterGenerals.Add(assetMasterGeneral);
+            await _applicationDbContext.SaveChangesAsync(cancellationToken);
+            // Optionally, reload the entity to ensure all DB-generated values (like the Id) are populated.
+            await _applicationDbContext.Entry(assetMasterGeneral).ReloadAsync(cancellationToken);
+            return assetMasterGeneral;  
+           // await _applicationDbContext.AssetMasterGenerals.AddAsync(assetMasterGeneral);
+            //await _applicationDbContext.SaveChangesAsync();
+            //return assetMasterGeneral;          
         }
         public async Task<int> DeleteAsync(int Id, AssetMasterGenerals assetMaster)
         {
@@ -128,6 +134,39 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             asset.AssetImage = null;
             await _applicationDbContext.SaveChangesAsync();
             return true;
+        }
+        public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        {
+            return await _applicationDbContext.Database.BeginTransactionAsync(cancellationToken);
+        }
+
+        public async Task SaveChangesAsync(CancellationToken cancellationToken)
+        {
+            await _applicationDbContext.SaveChangesAsync(cancellationToken);
+        }
+         // New method: wraps the provided action in an execution strategy and transaction.
+        public async Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken cancellationToken)
+        {
+            // Get the execution strategy from the underlying DbContext.
+            var executionStrategy = _applicationDbContext.Database.CreateExecutionStrategy();
+
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using var transaction = await _applicationDbContext.Database.BeginTransactionAsync(cancellationToken);
+                try
+                {
+                    // Execute the provided operations.
+                    await action();
+
+                    // Commit the transaction.
+                    await transaction.CommitAsync(cancellationToken);
+                }
+                catch
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    throw;
+                }
+            });
         }
     }
 }
