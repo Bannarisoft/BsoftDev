@@ -46,6 +46,11 @@
         "Error": " must contain only numeric values."
     },
     {
+        "Rule": "NumericWithDecimal",
+        "pattern": "^[0-9]+(\\.[0-9]{1,3})?$",
+        "Error": " must contain only numeric values with up to 3 decimal places."
+    },
+    {
         "Rule": "NonNegativeInteger",
         "pattern": "^[0-9]+$",
         "Error": "must be a non-negative integer."

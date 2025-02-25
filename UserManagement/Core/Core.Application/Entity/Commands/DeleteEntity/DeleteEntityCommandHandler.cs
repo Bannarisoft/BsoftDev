@@ -67,7 +67,7 @@ namespace Core.Application.Entity.Commands.DeleteEntity
          return new ApiResponseDTO<int>
          {
              IsSuccess = true,
-             Message = "Success",
+             Message = "Entity Soft Deleted Successfully",
              Data = result
          };
    

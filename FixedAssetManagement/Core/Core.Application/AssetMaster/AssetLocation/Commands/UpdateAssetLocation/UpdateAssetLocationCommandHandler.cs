@@ -39,38 +39,28 @@ namespace Core.Application.AssetMaster.AssetLocation.Commands.UpdateAssetLocatio
                 Message = "AssetLocation not found."
             };
         }
-
-        // Update properties
-        assetLocation.UnitId = request.UnitId;
-        assetLocation.DepartmentId = request.DepartmentId;
-        assetLocation.LocationId = request.LocationId;
-        assetLocation.SubLocationId = request.SubLocationId;
-        assetLocation.CustodianId = request.CustodianId;
-        assetLocation.UserID = request.UserID;
-    
+       var assetLocationDto = _mapper.Map<AssetLocationDto>(request);
 
         var updateResult = await _assetLocationRepository.UpdateAsync(request.AssetId, assetLocation);
+   // Ensure updateResult has a meaningful property to use in actionName
+         var actionName = updateResult != null ? "Update Successful" : "Update Failed"; 
 
-        if (updateResult  is true)
-        {
-            var updatedAssetLocation = await _assetLocationQueryRepository.GetByIdAsync(request.AssetId);
-            var assetLocationDto = _mapper.Map<AssetLocationDto>(updatedAssetLocation);
+       var domainEvent = new AuditLogsDomainEvent(
+                        actionDetail: "Update",
+                        actionCode: assetLocationDto.AssetId.ToString(),
+                        actionName: actionName,
+                        details: $"AssetLocation '{assetLocationDto.Id}' was updated.",
+                        module:"AssetLocation"
+                    );               
+                    await _mediator.Publish(domainEvent, cancellationToken); 
+              
+                if(updateResult)
+                {
+                    return new ApiResponseDTO<AssetLocationDto>{IsSuccess = true, Message = "AssetLocation updated successfully."};
+                }
 
-            return new ApiResponseDTO<AssetLocationDto>
-            {
-                IsSuccess = true,
-                Message = "AssetLocation updated successfully.",
-                Data = assetLocationDto
-            };
-        }
-        else
-        {
-            return new ApiResponseDTO<AssetLocationDto>
-            {
-                IsSuccess = false,
-                Message = "AssetLocation update failed."
-            };
-        }
+                return new ApiResponseDTO<AssetLocationDto>{IsSuccess = false, Message = "AssetLocation not updated."};
+     
     }
 
     }

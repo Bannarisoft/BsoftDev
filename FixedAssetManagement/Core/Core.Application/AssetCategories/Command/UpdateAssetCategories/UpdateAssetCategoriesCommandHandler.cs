@@ -75,7 +75,7 @@ namespace Core.Application.AssetCategories.Command.UpdateAssetCategories
             module: "AssetCategory");
         await _mediator.Publish(domainEvent, cancellationToken);
      
-        return new ApiResponseDTO<int> { IsSuccess = true, Message = "Success.", Data = result };  
+        return new ApiResponseDTO<int> { IsSuccess = true, Message = "AssetCategory Updated Successfully.", Data = result };  
         }
     }      
     }
