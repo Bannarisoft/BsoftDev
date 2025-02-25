@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250224081343_ChangeColumnTypeToNVARCHAR")]
+    partial class ChangeColumnTypeToNVARCHAR
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -275,134 +278,6 @@ namespace FAM.Infrastructure.Migrations
                     b.ToTable("AssetSpecifications", "FixedAsset");
                 });
 
-modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ContactPerson")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<string>("Document")
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("Document");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<DateTimeOffset>("EndDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MobileNumber")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<int>("Period")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ServiceAddressLine1")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)");
-
-                    b.Property<string>("ServiceAddressLine2")
-                        .HasColumnType("varchar(250)");
-
-                    b.Property<int>("ServiceCityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ServiceClaimProcessDescription")
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<int?>("ServiceClaimStatus")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ServiceContactPerson")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<int>("ServiceCountryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ServiceEmail")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<DateTimeOffset?>("ServiceLastClaimDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ServiceMobileNumber")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<string>("ServicePinCode")
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<int>("ServiceStateId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("StartDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("WarrantyProvider")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)");
-
-                    b.Property<int>("WarrantyType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.HasIndex("ServiceClaimStatus");
-
-                    b.HasIndex("WarrantyType");
-
-                    b.ToTable("AssetWarranty", "FixedAsset");
-                });
             modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
                 {
                     b.Property<int>("Id")
@@ -1465,33 +1340,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                     b.Navigation("SpecificationMaster");
                 });
 
- modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
-                        .WithMany("AssetWarranty")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscClaimStatus")
-                        .WithMany("WarrantyType")
-                        .HasForeignKey("ServiceClaimStatus")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("FK_ClaimStatus_Misc");
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscWarrantyTypes")
-                        .WithMany("WarrantyClaim")
-                        .HasForeignKey("WarrantyType")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_WarrantyType_Misc");
-
-                    b.Navigation("AssetMasterId");
-
-                    b.Navigation("MiscClaimStatus");
-
-                    b.Navigation("MiscWarrantyTypes");
-                });
             modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetCategories", "AssetCategories")
@@ -1731,7 +1579,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                     b.Navigation("AssetPurchase");
 
                     b.Navigation("AssetSpecification");
- 					b.Navigation("AssetWarranty");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetSource", b =>
@@ -1773,9 +1620,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                     b.Navigation("Manufactures");
 
                     b.Navigation("UOMs");
-  					b.Navigation("WarrantyClaim");
-
-                    b.Navigation("WarrantyType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>

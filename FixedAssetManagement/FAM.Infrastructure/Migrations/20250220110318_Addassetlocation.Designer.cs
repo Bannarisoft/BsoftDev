@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250220110318_Addassetlocation")]
+    partial class Addassetlocation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -156,7 +159,7 @@ namespace FAM.Infrastructure.Migrations
                     b.ToTable("AssetGroup", "FixedAsset");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
+            modelBuilder.Entity("Core.Domain.Entities.AssetLocation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,11 +170,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("AssetId")
                         .HasColumnType("int")
                         .HasColumnName("AssetId");
-
-                    b.Property<string>("CustodianId")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(50)")
-                        .HasColumnName("CustodianId");
 
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int")
@@ -187,11 +185,6 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("UnitId");
 
-                    b.Property<string>("UserID")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(50)")
-                        .HasColumnName("UserId");
-
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
@@ -201,208 +194,6 @@ namespace FAM.Infrastructure.Migrations
                     b.ToTable("AssetLocation", "FixedAsset");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetSpecifications", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("ManufactureDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("ManufactureId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModelNumber")
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("SerialNumber")
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<int>("SpecificationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SpecificationValue")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.HasIndex("ManufactureId");
-
-                    b.HasIndex("SpecificationId");
-
-                    b.ToTable("AssetSpecifications", "FixedAsset");
-                });
-
-modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ContactPerson")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<string>("Document")
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("Document");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<DateTimeOffset>("EndDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MobileNumber")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<int>("Period")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ServiceAddressLine1")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)");
-
-                    b.Property<string>("ServiceAddressLine2")
-                        .HasColumnType("varchar(250)");
-
-                    b.Property<int>("ServiceCityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ServiceClaimProcessDescription")
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<int?>("ServiceClaimStatus")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ServiceContactPerson")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<int>("ServiceCountryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ServiceEmail")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<DateTimeOffset?>("ServiceLastClaimDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ServiceMobileNumber")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<string>("ServicePinCode")
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<int>("ServiceStateId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("StartDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("WarrantyProvider")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)");
-
-                    b.Property<int>("WarrantyType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.HasIndex("ServiceClaimStatus");
-
-                    b.HasIndex("WarrantyType");
-
-                    b.ToTable("AssetWarranty", "FixedAsset");
-                });
             modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
                 {
                     b.Property<int>("Id")
@@ -517,240 +308,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                     b.HasIndex("WorkingStatus");
 
                     b.ToTable("AssetMaster", "FixedAsset");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.AssetPurchase.AssetAdditionalCost", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,3)")
-                        .HasColumnName("Amount");
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int")
-                        .HasColumnName("AssetId");
-
-                    b.Property<int>("AssetSourceId")
-                        .HasColumnType("int")
-                        .HasColumnName("AssetSourceId");
-
-                    b.Property<int>("CostType")
-                        .HasColumnType("int")
-                        .HasColumnName("CostType");
-
-                    b.Property<string>("JournalNo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("JournalNo");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.HasIndex("AssetSourceId");
-
-                    b.HasIndex("CostType");
-
-                    b.ToTable("AssetAdditionalCost", "FixedAsset");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AcceptedQty")
-                        .HasColumnType("decimal(18,3)")
-                        .HasColumnName("AcceptedQty");
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int")
-                        .HasColumnName("AssetId");
-
-                    b.Property<int>("AssetSourceId")
-                        .HasColumnType("int")
-                        .HasColumnName("AssetSourceId");
-
-                    b.Property<DateTimeOffset>("BillDate")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("BillDate");
-
-                    b.Property<string>("BillNo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("BillNo");
-
-                    b.Property<string>("BinLocation")
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("BinLocation");
-
-                    b.Property<string>("BudgetType")
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("BudgetType");
-
-                    b.Property<DateTimeOffset?>("CapitalizationDate")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("CapitalizationDate");
-
-                    b.Property<DateTimeOffset>("GrnDate")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("GrnDate");
-
-                    b.Property<int>("GrnNo")
-                        .HasColumnType("int")
-                        .HasColumnName("GrnNo");
-
-                    b.Property<int>("GrnSno")
-                        .HasColumnType("int")
-                        .HasColumnName("GrnSno");
-
-                    b.Property<decimal>("GrnValue")
-                        .HasColumnType("decimal(18,3)")
-                        .HasColumnName("GrnValue");
-
-                    b.Property<string>("ItemCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("ItemCode");
-
-                    b.Property<string>("ItemName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(250)")
-                        .HasColumnName("ItemName");
-
-                    b.Property<string>("OldUnitId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("OldUnitId");
-
-                    b.Property<string>("PjDocId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("PjDocId");
-
-                    b.Property<int>("PjDocNo")
-                        .HasColumnType("int")
-                        .HasColumnName("PjDocNo");
-
-                    b.Property<string>("PjDocSr")
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("PjDocSr");
-
-                    b.Property<string>("PjYear")
-                        .IsRequired()
-                        .HasColumnType("varchar(8)")
-                        .HasColumnName("PjYear");
-
-                    b.Property<DateTimeOffset>("PoDate")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("PoDate");
-
-                    b.Property<int>("PoNo")
-                        .HasColumnType("int")
-                        .HasColumnName("PoNo");
-
-                    b.Property<int>("PoSno")
-                        .HasColumnType("int")
-                        .HasColumnName("PoSno");
-
-                    b.Property<decimal>("PurchaseValue")
-                        .HasColumnType("decimal(18,3)")
-                        .HasColumnName("PurchaseValue");
-
-                    b.Property<string>("QcCompleted")
-                        .IsRequired()
-                        .HasColumnType("char(1)")
-                        .HasColumnName("QcCompleted");
-
-                    b.Property<string>("Uom")
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("Uom");
-
-                    b.Property<string>("VendorCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("VendorCode");
-
-                    b.Property<string>("VendorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("VendorName");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.HasIndex("AssetSourceId");
-
-                    b.ToTable("AssetPurchaseDetails", "FixedAsset");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.AssetSource", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("SourceCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("SourceCode");
-
-                    b.Property<string>("SourceName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("SourceName");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AssetSource", "FixedAsset");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetSubCategories", b =>
@@ -948,7 +505,7 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
-                    b.Property<int>("LocationId")
+                    b.Property<int?>("LocationId")
                         .HasColumnType("int");
 
                     b.Property<string>("LocationName")
@@ -971,9 +528,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                     b.Property<int>("SortOrder")
                         .HasColumnType("int")
                         .HasColumnName("SortOrder");
-
-                    b.Property<int>("SubLocationId")
-                        .HasColumnType("int");
 
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
@@ -1420,7 +974,7 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                     b.Navigation("AssetGroup");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
+            modelBuilder.Entity("Core.Domain.Entities.AssetLocation", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Location", "Location")
                         .WithMany()
@@ -1439,59 +993,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                     b.Navigation("SubLocation");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetSpecifications", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
-                        .WithMany("AssetSpecification")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.Manufactures", "Manufacture")
-                        .WithMany("AssetSpecification")
-                        .HasForeignKey("ManufactureId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Core.Domain.Entities.SpecificationMasters", "SpecificationMaster")
-                        .WithMany("AssetSpecification")
-                        .HasForeignKey("SpecificationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AssetMasterId");
-
-                    b.Navigation("Manufacture");
-
-                    b.Navigation("SpecificationMaster");
-                });
-
- modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
-                        .WithMany("AssetWarranty")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscClaimStatus")
-                        .WithMany("WarrantyType")
-                        .HasForeignKey("ServiceClaimStatus")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("FK_ClaimStatus_Misc");
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscWarrantyTypes")
-                        .WithMany("WarrantyClaim")
-                        .HasForeignKey("WarrantyType")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_WarrantyType_Misc");
-
-                    b.Navigation("AssetMasterId");
-
-                    b.Navigation("MiscClaimStatus");
-
-                    b.Navigation("MiscWarrantyTypes");
-                });
             modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetCategories", "AssetCategories")
@@ -1550,52 +1051,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                     b.Navigation("UomMaster");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.AssetPurchase.AssetAdditionalCost", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "Asset")
-                        .WithMany("AssetAdditionalCost")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.AssetSource", "AssetSource")
-                        .WithMany("AssetAdditionalCost")
-                        .HasForeignKey("AssetSourceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "CostMiscType")
-                        .WithMany("AssetAdditionalCost")
-                        .HasForeignKey("CostType")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Asset");
-
-                    b.Navigation("AssetSource");
-
-                    b.Navigation("CostMiscType");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "Asset")
-                        .WithMany("AssetPurchase")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.AssetSource", "AssetSource")
-                        .WithMany("AssetPurchase")
-                        .HasForeignKey("AssetSourceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Asset");
-
-                    b.Navigation("AssetSource");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.AssetSubCategories", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetCategories", "AssetCategories")
@@ -1638,9 +1093,7 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Location", null)
                         .WithMany("Locations")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LocationId");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Manufactures", b =>
@@ -1724,21 +1177,7 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
                 {
-                    b.Navigation("AssetAdditionalCost");
-
                     b.Navigation("AssetChildren");
-
-                    b.Navigation("AssetPurchase");
-
-                    b.Navigation("AssetSpecification");
- 					b.Navigation("AssetWarranty");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.AssetSource", b =>
-                {
-                    b.Navigation("AssetAdditionalCost");
-
-                    b.Navigation("AssetPurchase");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetSubCategories", b =>
@@ -1753,15 +1192,8 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                     b.Navigation("SubLocations");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Manufactures", b =>
-                {
-                    b.Navigation("AssetSpecification");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
-                    b.Navigation("AssetAdditionalCost");
-
                     b.Navigation("AssetMiscTypeGenerals");
 
                     b.Navigation("AssetWorkTypeGenerals");
@@ -1773,19 +1205,11 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                     b.Navigation("Manufactures");
 
                     b.Navigation("UOMs");
-  					b.Navigation("WarrantyClaim");
-
-                    b.Navigation("WarrantyType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
                 {
                     b.Navigation("MiscMaster");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.SpecificationMasters", b =>
-                {
-                    b.Navigation("AssetSpecification");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UOM", b =>

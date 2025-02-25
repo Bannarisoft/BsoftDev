@@ -14,8 +14,14 @@ namespace Core.Domain.Entities
         public int UnitId { get; set; }
         public int DepartmentId { get; set; }
 
+        public int SubLocationId { get; set; }
+    
+        public int LocationId { get; set; }
+
          // One-to-Many Relationship with SubLocation
         public ICollection<SubLocation> SubLocations { get; set; } = new List<SubLocation>();
+
+        public ICollection<Location> Locations { get;} = new List<Location>();
 
     }
        
