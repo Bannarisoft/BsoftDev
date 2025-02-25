@@ -23,7 +23,7 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
             _dbConnection = dbConnection;   
 
         }
-        public async Task<(Core.Domain.Entities.UserRole,List<Core.Domain.Entities.RoleModule>, List<Menu>,List<RoleMenu>)> GetByIdAsync(int roleEntitlementId)
+        public async Task<(Core.Domain.Entities.UserRole,List<Core.Domain.Entities.RoleModule>, List<Core.Domain.Entities.Menu>,List<RoleMenu>)> GetByIdAsync(int roleEntitlementId)
         {
 
             var  query = @"
@@ -54,7 +54,7 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
             //  var parentIds = (await multi.ReadAsync<Menu>()).ToList();
 
              // Read All Child Menus
-             var allMenus = (await multi.ReadAsync<Menu>()).ToList();
+             var allMenus = (await multi.ReadAsync<Core.Domain.Entities.Menu>()).ToList();
 
              // Read RoleMenu Permissions
              var roleMenus = (await multi.ReadAsync<RoleMenu>()).ToList();
@@ -66,10 +66,10 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
             return (role, modules, menuHierarchy,roleMenus);
         }
         
-        private List<Menu> GetChildMenus( List<Menu> allMenus)
+        private List<Core.Domain.Entities.Menu> GetChildMenus( List<Core.Domain.Entities.Menu> allMenus)
         {
             var menuDict = allMenus.ToDictionary(m => m.Id);
-            List<Menu> rootMenus = new();
+            List<Core.Domain.Entities.Menu> rootMenus = new();
 
               foreach (var menu in allMenus)
               {
@@ -167,7 +167,7 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
         LEFT JOIN AppData.Modules m ON mn.ModuleId = m.Id
         WHERE ur.RoleName = @RoleName AND re.IsDeleted = 0";
 
-    var roleEntitlements = await _dbConnection.QueryAsync<RoleEntitlement, UserRole, Modules, Menu, RoleEntitlement>(
+    var roleEntitlements = await _dbConnection.QueryAsync<RoleEntitlement, UserRole, Modules, Core.Domain.Entities.Menu, RoleEntitlement>(
         query,
         (re, ur, m, mn) =>
         {

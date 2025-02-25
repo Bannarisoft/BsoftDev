@@ -27,7 +27,7 @@ namespace Core.Application.Common.Mappings
         CreateMap<Core.Domain.Entities.UserRole,RoleDto>();
         CreateMap<RoleModule,GetByIdModuleDTO>()
          .ForMember(dest => dest.ModuleId, opt => opt.MapFrom(src => src.ModuleId));
-         CreateMap<Menu,MenuDTO>()
+         CreateMap<Domain.Entities.Menu,MenuDTO>()
             .ForMember(dest => dest.ChildMenu, opt => opt.MapFrom(src => src.ChildMenus));
 
             CreateMap<Core.Domain.Entities.UserRole,RoleDto>()
