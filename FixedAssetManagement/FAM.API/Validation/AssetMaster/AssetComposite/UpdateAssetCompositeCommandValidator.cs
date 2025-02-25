@@ -20,15 +20,15 @@ namespace FAM.API.Validation.AssetMaster.AssetComposite
                 .NotNull().WithMessage("Asset master data is required.")
                 .SetValidator(masterValidator);
 
-            When(x => x.AssetComposite.AssetPurchaseDetails != null, () =>
+            When(x => x.AssetComposite.UpdateAssetPurchaseDetail != null, () =>
             {
-                RuleForEach(x => x.AssetComposite.AssetPurchaseDetailsUpdate)
+                RuleForEach(x => x.AssetComposite.UpdateAssetPurchaseDetail)
                     .SetValidator(purchaseValidator);
             });
 
-            When(x => x.AssetComposite.AssetLocation != null, () =>
+            When(x => x.AssetComposite.UpdateAssetLocation != null, () =>
             {
-                RuleForEach(x => x.AssetComposite.AssetLocationUpdate)
+                RuleForEach(x => x.AssetComposite.UpdateAssetLocation)
                     .SetValidator(locationValidator);
             });
         }

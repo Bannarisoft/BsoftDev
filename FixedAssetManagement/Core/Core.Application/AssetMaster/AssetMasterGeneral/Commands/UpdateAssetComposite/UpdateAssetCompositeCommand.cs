@@ -6,6 +6,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetCo
 {
     public class UpdateAssetCompositeCommand : IRequest<ApiResponseDTO<AssetMasterGeneralDTO>>
     {
-        public AssetCompositeDto AssetComposite { get; set; } = null!;
+        public UpdateAssetCompositeDto AssetComposite { get; set; } = null!;
     }
 }

@@ -39,7 +39,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetCo
             try
             {
                 // Retrieve the existing asset master using the ID from the update DTO.
-                var existingAsset = await _assetMasterQueryGeneralRepository.GetByIdAsync(request.AssetComposite.AssetMaster.Id);
+                var existingAsset = await _assetMasterQueryGeneralRepository.GetByIdAsync(request.AssetComposite.UpdateAssetMaster.Id);
                 if (existingAsset == null)
                 {
                     response.IsSuccess = false;
@@ -52,7 +52,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetCo
                 {
                     // Map the update command's master data into the existing asset.
                     // This will update only the matching properties.
-                    _mapper.Map(request.AssetComposite.AssetMaster, existingAsset);
+                    _mapper.Map(request.AssetComposite.UpdateAssetMaster, existingAsset);
 
                     // Handle child collections.
                     // Clear existing purchase details and re-add from the request.
@@ -61,9 +61,9 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetCo
                     else
                         existingAsset.AssetPurchase.Clear();
 
-                    if (request.AssetComposite.AssetPurchaseDetails != null)
+                    if (request.AssetComposite.UpdateAssetPurchaseDetail != null)
                     {
-                        foreach (var purchaseDto in request.AssetComposite.AssetPurchaseDetails)
+                        foreach (var purchaseDto in request.AssetComposite.UpdateAssetPurchaseDetail)
                         {
                             var purchaseDetail = _mapper.Map<AssetPurchaseDetails>(purchaseDto);
                             // Manually assign the asset Id
@@ -78,9 +78,9 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetCo
                     else
                         existingAsset.AssetLocations.Clear();
 
-                    if (request.AssetComposite.AssetLocation != null)
+                    if (request.AssetComposite.UpdateAssetLocation != null)
                     {
-                        foreach (var locationDto in request.AssetComposite.AssetLocation)
+                        foreach (var locationDto in request.AssetComposite.UpdateAssetLocation)
                         {
                             var locationDetail = _mapper.Map<Core.Domain.Entities.AssetMaster.AssetLocation>(locationDto);
                             locationDetail.AssetId = existingAsset.Id;
