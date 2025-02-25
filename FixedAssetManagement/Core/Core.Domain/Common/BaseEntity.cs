@@ -13,7 +13,12 @@ namespace Core.Domain.Common
             NotDeleted = 0,
             Deleted = 1
         }
-
+        public enum AssetStatus
+        {
+            Draft = 0,
+            Active = 1,
+            Archived = 2
+        }
          // Enum properties
         public Status IsActive { get; set; } = Status.Active; // Default Active
         public IsDelete IsDeleted { get; set; } = IsDelete.NotDeleted; // Default NotDeleted
