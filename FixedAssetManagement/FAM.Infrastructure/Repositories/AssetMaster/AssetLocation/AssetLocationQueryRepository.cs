@@ -81,55 +81,28 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetLocation
         } 
 
          public async Task<(List<Core.Domain.Entities.AssetMaster.Employee>, int)> GetAllCustodianAsync(string OldUnitId, string? SearchEmployee)
-        {
-              var query = $$"""
-                            DECLARE @TotalCount INT;
-                            SELECT @TotalCount = COUNT(*) 
-                            FROM [192.168.0.7].[PrimeERP_BASML_SPG].[dbo].[Hr_employee] 
-                            WHERE status = 'A' AND catcode = 1
-                            {{(string.IsNullOrEmpty(SearchEmployee) ? "" : "AND (Empcode LIKE @Search OR Empname LIKE @Search)")}}
-                            {{(OldUnitId == null ? "" : "AND unitcode = @OldUnitId")}};
+        {        
 
-                            SELECT Empcode, Empname
-                            FROM [192.168.0.7].[PrimeERP_BASML_SPG].[dbo].[Hr_employee] 
-                            WHERE status = 'A' AND catcode = 1
-                            {{(string.IsNullOrEmpty(SearchEmployee) ? "" : "AND (Empcode LIKE @Search OR Empname LIKE @Search)")}}
-                            {{(OldUnitId == null ? "" : "AND unitcode = @OldUnitId")}}
-                            ORDER BY Empcode ASC
-                            ;
+            var procedureName = "dbo.GetEmployeeByDivision";  // Name of the stored procedure
 
-                            SELECT @TotalCount AS TotalCount;
-                            """;
+            var parameters = new
+            {
+                DivCode = OldUnitId,   // Mapping OldUnitId to DivCode
+                EmpNo = SearchEmployee // Search criteria for employee
+            };
 
-                var parameters = new
-                {
-                    Search = $"%{SearchEmployee}%",
-                   OldUnitId
-                   
-                };
+            // Execute the stored procedure
+            var employees = await _dbConnection.QueryAsync<Employee>(
+                procedureName, 
+                parameters, 
+                commandType: CommandType.StoredProcedure
+            );
 
-        //         var employees = await _dbConnection.QueryMultipleAsync(query, parameters);
-        //         var employeeList = (await employees.ReadAsync<Core.Domain.Entities.AssetMaster.Employee>()).ToList();
-        //         int totalCount = await employees.ReadFirstAsync<int>();
-
-               
-
-        // return (employeeList, totalCount);
-
-
-        //    var parameters = new
-        // {
-        // OldUnitId,
-        // SearchGrnNo = $"%{SearchGrnNo}%" // Enables partial search
-        // };
-
-              var employees = await _dbConnection.QueryAsync<Employee>(query, parameters);
                 var employeeList = employees.ToList();
-                int totalCount = employeeList.Count;  // Or get total count from DB
+            int totalCount = employeeList.Count;  // Count employees from the result
 
-                return (employeeList, totalCount); 
-            // var grnList = await _dbConnection.QueryAsync<Employee>(query, parameters);
-            // return grnList?.ToList() ?? new List<Employee>();
+            return (employeeList, totalCount);  
+                    
         
 
         }
