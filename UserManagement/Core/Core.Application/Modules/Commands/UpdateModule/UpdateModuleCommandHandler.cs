@@ -60,7 +60,7 @@ namespace Core.Application.Modules.Commands.UpdateModule
     module.Menus.ToList().RemoveAll(m => menusToRemove.Contains(m.MenuName)); // Remove unwanted menus
     foreach (var menuName in menusToAdd)
     {
-        module.Menus.Add(new Menu { MenuName = menuName }); // Add new menus
+        module.Menus.Add(new Domain.Entities.Menu { MenuName = menuName }); // Add new menus
     }
 
     // Publish Domain Event
