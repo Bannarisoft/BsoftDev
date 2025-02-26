@@ -38,14 +38,17 @@ using FAM.API.Validation.SpecificationMaster;
 using Core.Application.SpecificationMaster.Commands.CreateSpecificationMaster;
 using Core.Application.AssetLocation.Commands.CreateAssetLocation;
 using FAM.API.Validation.AssetMaster.AssetLocation;
-using Core.Application.AssetMaster.AssetLocation.Commands.UpdateAssetLocation;using Core.Application.AssetMaster.AssetPurchase.Commands.CreateAssetPurchaseDetails;
+using Core.Application.AssetMaster.AssetLocation.Commands.UpdateAssetLocation;
+using Core.Application.AssetMaster.AssetPurchase.Commands.CreateAssetPurchaseDetails;
 using FAM.API.Validation.AssetMaster.AssetPurchase;
-using Core.Application.AssetMaster.AssetPurchase.Commands.UpdateAssetPurchaseDetails;using Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSpecification;
+using Core.Application.AssetMaster.AssetPurchase.Commands.UpdateAssetPurchaseDetails;
+using Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSpecification;
 using Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSpecification;
 using FAM.API.Validation.AssetMaster.AssetSpecification;
 using Core.Application.AssetMaster.AssetAdditionalCost.Commands.CreateAssetAdditionalCost;
 using FAM.API.Validation.AssetMaster.AssetAdditionalCost;
-using Core.Application.AssetMaster.AssetAdditionalCost.Commands.UpdateAssetAdditionalCost;using Core.Application.AssetMaster.AssetWarranty.Commands.CreateAssetWarranty;
+using Core.Application.AssetMaster.AssetAdditionalCost.Commands.UpdateAssetAdditionalCost;
+using Core.Application.AssetMaster.AssetWarranty.Commands.CreateAssetWarranty;
 using FAM.API.Validation.AssetMaster.AssetWarranty;
 using Core.Application.AssetMaster.AssetWarranty.Commands.UpdateAssetWarranty;
 using FAM.API.Validation.AssetMaster.AssetWaranty;
@@ -89,7 +92,8 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateSpecificationMasterCommand>, UpdateSpecificationMasterCommandValidator>();
         services.AddScoped<IValidator<CreateSpecificationMasterCommand>, CreateSpecificationMasterCommandValidator>();
 		services.AddScoped<IValidator<CreateAssetLocationCommand>, CreateAssetLocationCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetLocationCommand>, UpdateAssetLocationCommandValidator>();		services.AddScoped<IValidator<CreateAssetPurchaseDetailCommand>, CreateAssetPurchaseDetailCommandValidator>();
+        services.AddScoped<IValidator<UpdateAssetLocationCommand>, UpdateAssetLocationCommandValidator>();		
+        services.AddScoped<IValidator<CreateAssetPurchaseDetailCommand>, CreateAssetPurchaseDetailCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetPurchaseDetailCommand>, UpdateAssetPurchaseDetailCommandValidator>();        
 		services.AddScoped<IValidator<CreateAssetSpecificationCommand>, CreateAssetSpecificationCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetSpecificationCommand>, UpdateAssetSpecificationCommandValidator>();
@@ -97,7 +101,7 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateAssetAdditionalCostCommand>, UpdateAssetAdditionalCostCommandValidator>();
         services.AddScoped<IValidator<CreateAssetWarrantyCommand>, CreateAssetWarrantyCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetWarrantyCommand>, UpdateAssetWarrantyCommandValidator>();
-        services.AddScoped<IValidator<UploadFileAssetWarrantyCommand>, UploadAssetWarrantyCommandValidator>();
+        services.AddScoped<IValidator<UploadFileAssetWarrantyCommand>, UploadAssetWarrantyCommandValidator>();                
     }  
     }
 }

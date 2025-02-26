@@ -1,11 +1,14 @@
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Domain.Entities;
+using Core.Domain.Entities.AssetPurchase;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
 {
     public interface IAssetMasterGeneralCommandRepository
     {
-        Task<AssetMasterGenerals> CreateAsync(AssetMasterGenerals assetMasterGeneral);
+        //Task<AssetMasterGenerals> CreateAsync(AssetMasterGenerals assetMasterGeneral);
+        Task<AssetMasterGenerals> CreateAsync(AssetMasterGenerals assetMasterGeneral, CancellationToken cancellationToken);
         Task<int>  UpdateAsync(int depGroupId,AssetMasterGenerals assetMasterGeneral);
         Task<int>  DeleteAsync(int depGroupId,AssetMasterGenerals assetMasterGeneral);        
         Task<string?> GetAssetGroupNameById(int assetGroupId);
@@ -15,5 +18,12 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
         Task<bool> UpdateAssetImageAsync(int assetId, string imageName);
         Task<AssetMasterGeneralDTO?> GetByAssetImageAsync(string assetCode);
         Task<bool> RemoveAssetImageReferenceAsync(int assetId);
+        // Add a transaction method
+      /*   Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken);
+        Task SaveChangesAsync(CancellationToken cancellationToken);    
+        Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken cancellationToken);
+        Task AddAssetPurchaseDetailsAsync(List<AssetPurchaseDetails> assetPurchaseDetails, CancellationToken cancellationToken);
+        Task AddAssetLocationAsync(List<Core.Domain.Entities.AssetMaster.AssetLocation> assetLocations, CancellationToken cancellationToken);
+         */
     }
 }

@@ -96,9 +96,12 @@ namespace FAM.API.Validation.AssetMaster.AssetPurchase
                         RuleFor(x => x.PjDocNo)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.PjDocNo)} {rule.Error}");
-                          RuleFor(x => x.AssetId)
+                        When(x => x.AssetId != 0, () =>
+                        {
+                            RuleFor(x => x.AssetId)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.AssetId)} {rule.Error}"); 
+                            .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.AssetId)} is required.");
+                        });                                                
                         RuleFor(x => x.AssetSourceId)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.AssetSourceId)} {rule.Error}");

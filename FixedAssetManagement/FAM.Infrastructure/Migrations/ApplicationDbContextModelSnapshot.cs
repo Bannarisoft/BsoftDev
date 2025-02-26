@@ -278,6 +278,7 @@ namespace FAM.Infrastructure.Migrations
                     b.ToTable("AssetSpecifications", "FixedAsset");
                 });
 
+
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                 {
                     b.Property<int>("Id")
@@ -953,6 +954,7 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
+             
                     b.Property<string>("LocationName")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -982,6 +984,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                   
                     b.ToTable("Location", "FixedAsset");
                 });
 
@@ -1330,6 +1333,7 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
 
+                  
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
@@ -1424,12 +1428,14 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.Location", "Location")
+                     
                         .WithMany("AssetLocations")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.SubLocation", "SubLocation")
+                   
                         .WithMany("AssetSubLocation")
                         .HasForeignKey("SubLocationId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1468,6 +1474,7 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("SpecificationMaster");
                 });
 
+ 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
@@ -1723,6 +1730,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Navigation("AssetSpecification");
 
+
                     b.Navigation("AssetWarranty");
                 });
 
@@ -1765,6 +1773,7 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("Manufactures");
 
                     b.Navigation("UOMs");
+
 
                     b.Navigation("WarrantyClaim");
 

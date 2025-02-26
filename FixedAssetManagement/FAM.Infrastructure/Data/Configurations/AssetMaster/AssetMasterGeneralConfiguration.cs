@@ -1,4 +1,6 @@
 using Core.Domain.Entities;
+using Core.Domain.Entities.AssetMaster;
+using Core.Domain.Entities.AssetPurchase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -161,7 +163,8 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .HasColumnType("varchar(50)");
 
                 builder.Property(b => b.ModifiedIP)
-                .HasColumnType("varchar(50)");              
+                .HasColumnType("varchar(50)");   
+        
         }
     }
 }

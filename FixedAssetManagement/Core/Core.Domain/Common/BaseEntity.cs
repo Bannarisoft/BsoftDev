@@ -12,8 +12,7 @@ namespace Core.Domain.Common
         {
             NotDeleted = 0,
             Deleted = 1
-        }
-
+        }    
          // Enum properties
         public Status IsActive { get; set; } = Status.Active; // Default Active
         public IsDelete IsDeleted { get; set; } = IsDelete.NotDeleted; // Default NotDeleted
