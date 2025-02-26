@@ -46,7 +46,7 @@ namespace UserManagement.Infrastructure.Repositories.City
         }
         public async Task<bool> StateExistsAsync(int stateId)
         {        
-            return await _applicationDbContext.States.AnyAsync(s => s.Id == stateId  && s.IsDeleted == Enums.IsDelete.NotDeleted && s.IsActive == Enums.Status.Active);
+            return await _applicationDbContext.States.AnyAsync(s => s.Id == stateId  &&  s.IsActive == Enums.Status.Active);
         }
         public async Task<Cities> GetCityByNameAsync(string cityName,string cityCode, int stateId)
         {           
