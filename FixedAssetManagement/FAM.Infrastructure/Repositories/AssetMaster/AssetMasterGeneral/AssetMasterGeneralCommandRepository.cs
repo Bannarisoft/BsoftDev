@@ -2,6 +2,7 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGene
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Domain.Common;
 using Core.Domain.Entities;
+using Core.Domain.Entities.AssetPurchase;
 using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -17,14 +18,10 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         }
         public async Task<AssetMasterGenerals> CreateAsync(AssetMasterGenerals assetMasterGeneral, CancellationToken cancellationToken)
         {
-            _applicationDbContext.AssetMasterGenerals.Add(assetMasterGeneral);
-            await _applicationDbContext.SaveChangesAsync(cancellationToken);
-            // Optionally, reload the entity to ensure all DB-generated values (like the Id) are populated.
-            await _applicationDbContext.Entry(assetMasterGeneral).ReloadAsync(cancellationToken);
-            return assetMasterGeneral;  
-           // await _applicationDbContext.AssetMasterGenerals.AddAsync(assetMasterGeneral);
-            //await _applicationDbContext.SaveChangesAsync();
-            //return assetMasterGeneral;          
+           var entry =_applicationDbContext.Entry(assetMasterGeneral);
+            await _applicationDbContext.AssetMasterGenerals.AddAsync(assetMasterGeneral);
+            await _applicationDbContext.SaveChangesAsync();
+             return assetMasterGeneral;   
         }
         public async Task<int> DeleteAsync(int Id, AssetMasterGenerals assetMaster)
         {
@@ -135,7 +132,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             await _applicationDbContext.SaveChangesAsync();
             return true;
         }
-        public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+      /*   public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
         {
             return await _applicationDbContext.Database.BeginTransactionAsync(cancellationToken);
         }
@@ -168,5 +165,17 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 }
             });
         }
+
+        public async Task AddAssetPurchaseDetailsAsync(List<AssetPurchaseDetails> assetPurchaseDetails, CancellationToken cancellationToken)
+        {
+             _applicationDbContext.AssetPurchaseDetails.AddRange(assetPurchaseDetails);
+        await _applicationDbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task AddAssetLocationAsync(List<Core.Domain.Entities.AssetMaster.AssetLocation> assetLocations, CancellationToken cancellationToken)
+        {
+           _applicationDbContext.AssetLocations.AddRange(assetLocations);
+        await _applicationDbContext.SaveChangesAsync(cancellationToken);
+        } */
     }
 }

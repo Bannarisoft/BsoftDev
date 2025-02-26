@@ -28,14 +28,20 @@ namespace Core.Application.Common.Mappings.AssetMaster
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => IsDelete.NotDeleted));     
              
             CreateMap<AssetMasterGeneralDTO,AssetMasterGeneralAutoCompleteDTO>();    
-            CreateMap<AssetMasterGenerals, AssetMasterGeneralDTO>();             
+            CreateMap<AssetMasterGenerals, AssetMasterGeneralDTO>();  
+            
+            CreateMap<AssetMasterDto, AssetMasterGenerals>()
+            .ForMember(dest => dest.AssetPurchase, opt => opt.MapFrom(src => src.AssetPurchaseDetails))
+            .ForMember(dest => dest.AssetLocation, opt => opt.MapFrom(src => src.AssetLocation)) 
+            .ForMember(dest => dest.Id, opt => opt.Ignore());  
+                       
             // Mapping for the composite DTO with reverse mapping enabled.
 
             // **Add these mappings to clear your error:**
-            CreateMap<AssetPurchaseDetailsDto, AssetPurchaseDetails>()
+            CreateMap<AssetPurchaseCombineDto, AssetPurchaseDetails>()
                 .ReverseMap();
 
-            CreateMap<AssetLocationDto, Core.Domain.Entities.AssetMaster.AssetLocation>()
+            CreateMap<AssetLocationCombineDto, Core.Domain.Entities.AssetMaster.AssetLocation>()
                 .ReverseMap(); 
         }        
     }

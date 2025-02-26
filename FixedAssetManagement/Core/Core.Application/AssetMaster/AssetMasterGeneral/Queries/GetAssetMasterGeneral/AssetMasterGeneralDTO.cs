@@ -1,3 +1,5 @@
+using Core.Application.AssetLocation.Queries.GetAssetLocation;
+using Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetPurchase;
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities;
 using Core.Domain.Entities.AssetPurchase;
@@ -44,8 +46,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? WorkingStatusDesc { get; set; }
         public string? AssetTypeDesc { get; set; } 
         public string? ParentAssetDesc { get; set; } 
-        public IsDelete IsDeleted { get; set; }    
-         public List<AssetPurchaseDetails> AssetPurchase { get; set; }= new List<AssetPurchaseDetails>(); 
-         public List<Core.Domain.Entities.AssetMaster.AssetLocation> AssetLocations { get; set; }= new List<Core.Domain.Entities.AssetMaster.AssetLocation>();
+        public IsDelete IsDeleted { get; set; }           
     }
 }

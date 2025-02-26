@@ -47,15 +47,12 @@ using Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSpecif
 using FAM.API.Validation.AssetMaster.AssetSpecification;
 using Core.Application.AssetMaster.AssetAdditionalCost.Commands.CreateAssetAdditionalCost;
 using FAM.API.Validation.AssetMaster.AssetAdditionalCost;
-using Core.Application.AssetMaster.AssetAdditionalCost.Commands.UpdateAssetAdditionalCost;using Core.Application.AssetMaster.AssetWarranty.Commands.CreateAssetWarranty;
+using Core.Application.AssetMaster.AssetAdditionalCost.Commands.UpdateAssetAdditionalCost;
+using Core.Application.AssetMaster.AssetWarranty.Commands.CreateAssetWarranty;
 using FAM.API.Validation.AssetMaster.AssetWarranty;
 using Core.Application.AssetMaster.AssetWarranty.Commands.UpdateAssetWarranty;
 using FAM.API.Validation.AssetMaster.AssetWaranty;
 using Core.Application.AssetMaster.AssetWarranty.Commands.UploadAssetWarranty;
-using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetComposite;
-using FAM.API.Validation.AssetMaster;
-using FAM.API.Validation.AssetMaster.AssetComposite;
-using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetComposite;
 
 
 namespace FAM.API.Validation.Common
@@ -104,9 +101,7 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateAssetAdditionalCostCommand>, UpdateAssetAdditionalCostCommandValidator>();
         services.AddScoped<IValidator<CreateAssetWarrantyCommand>, CreateAssetWarrantyCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetWarrantyCommand>, UpdateAssetWarrantyCommandValidator>();
-        services.AddScoped<IValidator<UploadFileAssetWarrantyCommand>, UploadAssetWarrantyCommandValidator>();
-        services.AddScoped<IValidator<CreateAssetCompositeCommand>, CreateAssetCompositeCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetCompositeCommand>, UpdateAssetCompositeCommandValidator>();
+        services.AddScoped<IValidator<UploadFileAssetWarrantyCommand>, UploadAssetWarrantyCommandValidator>();                
     }  
     }
 }

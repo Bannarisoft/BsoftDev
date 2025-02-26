@@ -1,5 +1,6 @@
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Domain.Entities;
+using Core.Domain.Entities.AssetPurchase;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
@@ -18,10 +19,11 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
         Task<AssetMasterGeneralDTO?> GetByAssetImageAsync(string assetCode);
         Task<bool> RemoveAssetImageReferenceAsync(int assetId);
         // Add a transaction method
-        Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken);
+      /*   Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken);
         Task SaveChangesAsync(CancellationToken cancellationToken);    
         Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken cancellationToken);
-
-        
+        Task AddAssetPurchaseDetailsAsync(List<AssetPurchaseDetails> assetPurchaseDetails, CancellationToken cancellationToken);
+        Task AddAssetLocationAsync(List<Core.Domain.Entities.AssetMaster.AssetLocation> assetLocations, CancellationToken cancellationToken);
+         */
     }
 }

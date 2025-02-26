@@ -1,8 +1,6 @@
-using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetComposite;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAssetMasterGeneral;
-using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetComposite;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
@@ -23,23 +21,18 @@ namespace FAM.API.Controllers.AssetMaster
         private readonly IValidator<CreateAssetMasterGeneralCommand> _createAssetMasterGeneralCommandValidator;
         private readonly IValidator<UpdateAssetMasterGeneralCommand> _updateAssetMasterGeneralCommandValidator;
         private readonly IValidator<UploadFileAssetMasterGeneralCommand> _uploadFileCommandValidator;
-        private readonly IValidator<CreateAssetCompositeCommand> _createAssetCompositeCommandValidator;
-        private readonly IValidator<UpdateAssetCompositeCommand> _updateAssetCompositeCommandValidator;
 
         public AssetMasterGeneralController(
             ISender mediator, 
             IValidator<CreateAssetMasterGeneralCommand> createAssetMasterGeneralCommandValidator, 
             IValidator<UpdateAssetMasterGeneralCommand> updateAssetMasterGeneralCommandValidator, 
-            IValidator<UploadFileAssetMasterGeneralCommand> uploadFileCommandValidator,
-            IValidator<CreateAssetCompositeCommand> createAssetCompositeCommandValidator,
-            IValidator<UpdateAssetCompositeCommand> updateAssetCompositeCommandValidator) 
+            IValidator<UploadFileAssetMasterGeneralCommand> uploadFileCommandValidator
+            ) 
             : base(mediator)
         {        
             _createAssetMasterGeneralCommandValidator = createAssetMasterGeneralCommandValidator;    
             _updateAssetMasterGeneralCommandValidator = updateAssetMasterGeneralCommandValidator;     
             _uploadFileCommandValidator = uploadFileCommandValidator;       
-            _createAssetCompositeCommandValidator = createAssetCompositeCommandValidator;   
-            _updateAssetCompositeCommandValidator = updateAssetCompositeCommandValidator;
         }
 
         // GET: api/AssetMasterGeneral?PageNumber=1&PageSize=10&SearchTerm=...
@@ -125,81 +118,6 @@ namespace FAM.API.Controllers.AssetMaster
                 });
             } 
         }
-
-        // POST: api/AssetMasterGeneral/CreateComposite
-        // Endpoint for composite asset creation
-        [HttpPost("CreateComposite")]
-        public async Task<IActionResult> CreateCompositeAsset([FromBody] CreateAssetCompositeCommand command)
-        {
-            if (command == null)
-            {
-                return BadRequest(new 
-                { 
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Invalid composite asset data."
-                });
-            }
-             var validationResult = await _createAssetCompositeCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {   
-                return BadRequest(new 
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
-
-            var response = await Mediator.Send(command);
-             if (response.IsSuccess)
-            {
-                return Ok(new 
-                {   
-                    StatusCode = StatusCodes.Status200OK,
-                    message = response.Message, 
-                    asset = response.Data
-                });
-            }
-             return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = response.Message
-            });          
-        }
-       [HttpPut("UpdateComposite")]
-        public async Task<IActionResult> UpdateCompositeAsset([FromBody] UpdateAssetCompositeCommand command)
-        {
-            if (command == null)
-            {
-                return BadRequest(new 
-                { 
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Invalid composite asset data."
-                });
-            }
-
-            var validationResult = await _updateAssetCompositeCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
-
-            var response = await Mediator.Send(command);
-            
-            if (!response.IsSuccess)
-            {
-                return BadRequest(response);
-            }
-
-            return Ok(response);
-        }
-
-
         // PUT: api/AssetMasterGeneral
         [HttpPut]        
         public async Task<IActionResult> UpdateAsync(UpdateAssetMasterGeneralCommand command)
