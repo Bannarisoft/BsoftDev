@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250225124210_latestsnapshotassetlocationforeignkeyrelation")]
+    partial class latestsnapshotassetlocationforeignkeyrelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -278,7 +281,6 @@ namespace FAM.Infrastructure.Migrations
                     b.ToTable("AssetSpecifications", "FixedAsset");
                 });
 
-
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                 {
                     b.Property<int>("Id")
@@ -293,7 +295,6 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Property<string>("ContactPerson")
                         .IsRequired()
-                        
                         .HasColumnType("varchar(50)");
 
                     b.Property<int>("CreatedBy")
@@ -954,7 +955,6 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
-             
                     b.Property<string>("LocationName")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -984,7 +984,6 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                   
                     b.ToTable("Location", "FixedAsset");
                 });
 
@@ -1333,7 +1332,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
 
-                  
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
@@ -1428,14 +1426,12 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.Location", "Location")
-                     
                         .WithMany("AssetLocations")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.SubLocation", "SubLocation")
-                   
                         .WithMany("AssetSubLocation")
                         .HasForeignKey("SubLocationId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1474,7 +1470,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("SpecificationMaster");
                 });
 
- 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
@@ -1730,7 +1725,6 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Navigation("AssetSpecification");
 
-
                     b.Navigation("AssetWarranty");
                 });
 
@@ -1773,7 +1767,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("Manufactures");
 
                     b.Navigation("UOMs");
-
 
                     b.Navigation("WarrantyClaim");
 

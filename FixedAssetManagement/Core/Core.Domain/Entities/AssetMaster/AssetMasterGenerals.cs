@@ -34,10 +34,13 @@ namespace Core.Domain.Entities
         public string? AssetImage { get; set; }
         public byte ISDepreciated { get; set; }
         public byte IsTangible { get; set; }    
-        public ICollection<AssetPurchaseDetails>? AssetPurchase { get; set; } = new List<AssetPurchaseDetails>();    
+        public ICollection<AssetPurchaseDetails>? AssetPurchase { get; set; }     
 		public ICollection<AssetSpecifications>? AssetSpecification { get; set; }
 		public ICollection<AssetWarranties>? AssetWarranty { get; set; }
+
         public ICollection<AssetAdditionalCost>? AssetAdditionalCost { get; set; }
-         public ICollection<AssetLocation> AssetLocations { get; set; } = new List<AssetLocation>();
+
+        public AssetLocation? AssetLocation { get; set; } 
+
     }
 }

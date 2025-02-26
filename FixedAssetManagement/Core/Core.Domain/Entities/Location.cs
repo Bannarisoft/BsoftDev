@@ -1,4 +1,5 @@
 using Core.Domain.Common;
+using Core.Domain.Entities.AssetMaster;
 
 
 namespace Core.Domain.Entities
@@ -16,12 +17,12 @@ namespace Core.Domain.Entities
 
         public int SubLocationId { get; set; }
     
-        public int LocationId { get; set; }
+        
 
          // One-to-Many Relationship with SubLocation
         public ICollection<SubLocation> SubLocations { get; set; } = new List<SubLocation>();
 
-        public ICollection<Location> Locations { get;} = new List<Location>();
+        public ICollection<AssetLocation>? AssetLocations { get; set; }
 
     }
        

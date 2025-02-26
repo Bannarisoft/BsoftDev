@@ -17,6 +17,8 @@ namespace Core.Domain.Entities.AssetMaster
         public int SubLocationId { get; set; } 
         public int CustodianId { get; set; }
         public int UserID { get; set; }
+
+        public AssetMasterGenerals? Asset { get; set; }
         public Location? Location { get; set; }
         public SubLocation? SubLocation { get; set; }  
       

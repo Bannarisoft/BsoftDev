@@ -18,13 +18,20 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 builder.HasKey(al => al.Id); // Primary Key
 
                 // Foreign Key Relationships
+                // Configure the foreign key relationship
+               builder.HasOne(al => al.Asset)  
+                .WithOne(a => a.AssetLocation)  
+                .HasForeignKey<AssetLocation>(al => al.AssetId)  
+                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+
+
                 builder.HasOne(al => al.Location)
-                    .WithMany()  // If Location has a collection, use .WithMany(l => l.AssetLocations)
+                    .WithMany(l => l.AssetLocations)  // If Location has a collection, use .WithMany(l => l.AssetLocations)
                     .HasForeignKey(al => al.LocationId)
                     .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
 
                 builder.HasOne(al => al.SubLocation)
-                    .WithMany()
+                    .WithMany(l => l.AssetSubLocation)
                     .HasForeignKey(al => al.SubLocationId)
                     .OnDelete(DeleteBehavior.Restrict);
 
