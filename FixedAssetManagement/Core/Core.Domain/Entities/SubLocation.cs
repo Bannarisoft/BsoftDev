@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Domain.Common;
+using Core.Domain.Entities.AssetMaster;
 
 namespace Core.Domain.Entities
 {
@@ -14,10 +15,9 @@ namespace Core.Domain.Entities
         public int UnitId { get; set; }
         public int DepartmentId { get; set; }
         public int LocationId { get; set; }
-
-
-        public Location? Location { get; set; }
-        public SubLocation? subLocation{ get; set; } 
+        public Location? Location { get; set; } 
+        //AssetSubLocation from AssetLocation
+        public ICollection<AssetLocation>? AssetSubLocation{ get; set; } 
 
 
 
