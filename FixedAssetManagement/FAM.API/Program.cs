@@ -45,18 +45,19 @@ builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration,builder.Services);
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseDeveloperExceptionPage(); 
 
-}
-
+//}
+app.UsePathBase("/FAM");
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
 app.UseCors();// Enable CORS
