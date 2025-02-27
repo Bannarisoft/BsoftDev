@@ -44,7 +44,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
              int sequence = 1;
             if (!string.IsNullOrEmpty(latestAssetCode))
             {
-                var parts = latestAssetCode.Split('/');
+                var parts = latestAssetCode.Split('-');
                 if (parts.Length == 4 && int.TryParse(parts[3], out int lastSeq))
                 {
                     sequence = lastSeq + 1;

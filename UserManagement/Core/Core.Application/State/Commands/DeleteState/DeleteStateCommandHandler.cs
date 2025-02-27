@@ -36,8 +36,16 @@ namespace Core.Application.State.Commands.DeleteState
                     Message = "Invalid StateID. The specified State does not exist or is inactive."
                 };
             }        
-            var stateDelete = _mapper.Map<States>(request);              
-
+            var city = await _stateQueryRepository.GetCityByStateAsync(request.Id);            
+            if (city.Count>0)
+            {                
+                 return new ApiResponseDTO<StateDto>
+                {
+                    IsSuccess = false,
+                    Message = "City already exists for this State.Cannot delete the State."
+                };
+            }    
+            var stateDelete = _mapper.Map<States>(request); 
             var updateResult = await _stateRepository.DeleteAsync(request.Id, stateDelete);
             if (updateResult > 0)
             {

@@ -36,6 +36,55 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMa
                     Message = "Invalid AssetId."
                 };
             }
+            var assetChildDetails = await _assetMasterGeneralQueryRepository.GetAssetChildDetails(request.Id);            
+            if (assetChildDetails.AssetAmc>0)
+            {                
+                 return new ApiResponseDTO<AssetMasterGeneralDTO>
+                {
+                    IsSuccess = false,
+                    Message = "Amc Details available.Cannot delete the Asset ."
+                };
+            }  
+            else if (assetChildDetails.AssetLocation>0)
+            {                
+                 return new ApiResponseDTO<AssetMasterGeneralDTO>
+                {
+                    IsSuccess = false,
+                    Message = "Location Details available.Cannot delete the Asset ."
+                };
+            }
+            else if (assetChildDetails.AssetLocation>0)
+            {                
+                 return new ApiResponseDTO<AssetMasterGeneralDTO>
+                {
+                    IsSuccess = false,
+                    Message = "Location Details available.Cannot delete the Asset ."
+                };
+            }
+            else if (assetChildDetails.AssetPurchase>0)
+            {                
+                 return new ApiResponseDTO<AssetMasterGeneralDTO>
+                {
+                    IsSuccess = false,
+                    Message = "Purchase Details available.Cannot delete the Asset ."
+                };
+            }
+            else if (assetChildDetails.AssetWarranty>0)
+            {                
+                 return new ApiResponseDTO<AssetMasterGeneralDTO>
+                {
+                    IsSuccess = false,
+                    Message = "Warranty Details available.Cannot delete the Asset ."
+                };
+            }
+            else if (assetChildDetails.AssetSpec>0)
+            {                
+                 return new ApiResponseDTO<AssetMasterGeneralDTO>
+                {
+                    IsSuccess = false,
+                    Message = "Specification Details available.Cannot delete the Asset ."
+                };
+            }
             var assetMasterDelete = _mapper.Map<AssetMasterGenerals>(request);      
             var updateResult = await _assetMasterGeneralRepository.DeleteAsync(request.Id, assetMasterDelete);
             if (updateResult > 0)
