@@ -41,5 +41,6 @@ namespace Core.Domain.Entities
         public AssetLocation? AssetLocation { get; set; }        
         public  ICollection<AssetInsurance>? AssetInsurance { get; set; } 
 
+
     }
 }

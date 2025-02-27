@@ -1,16 +1,15 @@
-
-using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
-using Core.Application.Common.HttpResponse;
-using MediatR;
 using static Core.Domain.Common.BaseEntity;
 
-namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral
+namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral
 {
-    public class UpdateAssetMasterGeneralCommand : IRequest<ApiResponseDTO<AssetMasterUpdateDto>>     
+    public class AssetMasterUpdateDto
     {
-        public AssetMasterUpdateDto? AssetMaster { get; set; }
-       /*  public int Id { get; set; }       
-        public int CompanyId { get; set; }                    
+        public int Id { get; set; }
+        public int CompanyId { get; set; }
+        public string? CompanyName { get; set; }   
+        public string? AssetCode { get; set; }   
+        public int UnitId { get; set; }
+        public string? UnitName { get; set; } 
         public string? AssetName { get; set; }                
         public int AssetGroupId { get; set; }        
         public int AssetCategoryId { get; set; }        
@@ -24,7 +23,9 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
         public int? WorkingStatus { get; set; }
         public string? AssetImage { get; set; }
         public bool? NonDepreciated { get; set; }
-        public bool? Tangible { get; set; }
-        public Status IsActive { get; set; } */
+        public bool? Tangible { get; set; }      
+        public Status IsActive { get; set; }  
+        public AssetLocationCombineDto?  AssetLocation  { get; set; }
+        public ICollection<AssetPurchaseCombineDto>? AssetPurchaseDetails{ get; set; }    
     }
 }

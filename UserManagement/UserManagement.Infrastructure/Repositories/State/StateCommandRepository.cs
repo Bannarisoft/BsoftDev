@@ -49,7 +49,7 @@ namespace UserManagement.Infrastructure.Repositories.State
         }
         public async Task<bool> CountryExistsAsync(int countryId)
         {       
-            return await _applicationDbContext.Countries.AnyAsync(s => s.Id == countryId && s.IsDeleted == Enums.IsDelete.NotDeleted && s.IsActive == Enums.Status.Active);
+            return await _applicationDbContext.Countries.AnyAsync(s => s.Id == countryId && s.IsActive == Enums.Status.Active);
         }
         public async Task<States> GetStateByCodeAsync(string stateName,string stateCode, int countryId)
         {
