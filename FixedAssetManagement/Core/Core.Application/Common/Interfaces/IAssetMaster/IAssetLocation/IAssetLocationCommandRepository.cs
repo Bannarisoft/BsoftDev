@@ -9,6 +9,6 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetLocation
     {
         Task<Core.Domain.Entities.AssetMaster.AssetLocation> CreateAsync(Core.Domain.Entities.AssetMaster.AssetLocation assetLocation); 
 
-         Task<bool>  UpdateAsync(int Id,Core.Domain.Entities.AssetMaster.AssetLocation assetLocation);
+         Task<int>  UpdateAsync(int Id,Core.Domain.Entities.AssetMaster.AssetLocation assetLocation);
     }
 }

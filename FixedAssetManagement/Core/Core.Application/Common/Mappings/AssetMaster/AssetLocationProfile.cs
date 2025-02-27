@@ -18,7 +18,7 @@ namespace Core.Application.Common.Mappings
             CreateMap<Core.Domain.Entities.AssetMaster.AssetLocation,AssetLocationDto>();
 
             CreateMap<CreateAssetLocationCommand, Core.Domain.Entities.AssetMaster.AssetLocation>();
-            CreateMap<UpdateAssetLocationCommand, AssetLocationDto>() 
+            CreateMap<UpdateAssetLocationCommand, Core.Domain.Entities.AssetMaster.AssetLocation>() 
             .ForMember(dest => dest.AssetId, opt => opt.Ignore())  
             .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => src.UnitId))
             .ForMember(dest => dest.DepartmentId, opt => opt.MapFrom(src => src.DepartmentId))                
