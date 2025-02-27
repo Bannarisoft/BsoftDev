@@ -57,7 +57,6 @@ var app = builder.Build();
     app.UseDeveloperExceptionPage(); 
 
 //}
-app.UsePathBase("/FAM");
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
 app.UseCors();// Enable CORS

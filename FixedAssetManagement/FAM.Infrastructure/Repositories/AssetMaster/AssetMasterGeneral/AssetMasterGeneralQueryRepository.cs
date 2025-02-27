@@ -28,6 +28,14 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 ,AM.UOMId,AM.AssetDescription,AM.WorkingStatus,AM.AssetImage,AM.ISDepreciated,AM.IsTangible,AM.IsActive
                 ,AM.CreatedBy,AM.CreatedDate,AM.CreatedByName,AM.CreatedIP,AM.ModifiedBy,AM.ModifiedDate,AM.ModifiedByName,AM.ModifiedIP
                 ,AG.GroupName AssetGroupName,AC.CategoryName AssetCategoryDesc,A.Description AssetSubCategoryDesc,U.UOMName,MM.description WorkingStatusDesc,M.description AssetTypeDesc,isnull(AM1.AssetDescription,'') ParentAssetDesc
+                ,CAST(
+                    (CASE WHEN COUNT(AW.Id) > 0 THEN 1 ELSE 0 END + 
+                    CASE WHEN COUNT(ASP.Id) > 0 THEN 1 ELSE 0 END + 
+                    CASE WHEN COUNT(APD.Id) > 0 THEN 1 ELSE 0 END +
+                    CASE WHEN COUNT(AA.Id) > 0 THEN 1 ELSE 0 END + 
+                    CASE WHEN COUNT(AL.Id) > 0 THEN 1 ELSE 0 END
+                    ) AS FLOAT
+                )/5*100 AS CompletedPercentage
                 FROM FixedAsset.AssetMaster AM
                 INNER JOIN FixedAsset.AssetGroup AG on AG.Id=AM.AssetGroupId
                 INNER JOIN FixedAsset.AssetCategories AC on AC.Id=AM.AssetCategoryId
@@ -36,8 +44,17 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 INNER JOIN FixedAsset.MiscMaster MM on MM.Id =AM.WorkingStatus 
                 LEFT JOIN FixedAsset.MiscMaster M on M.Id =AM.AssetType
                 LEFT JOIN FixedAsset.AssetMaster AM1 on AM1.Id =AM.AssetParentId
+                LEFT JOIN [FixedAsset].[AssetLocation] AL ON AM.Id = AL.AssetId
+                LEFT JOIN [FixedAsset].[AssetPurchaseDetails] APD ON AM.Id = APD.AssetId
+                LEFT JOIN [FixedAsset].[AssetWarranty] AW ON AM.Id = AW.AssetId
+                LEFT JOIN [FixedAsset].[AssetSpecifications] ASP ON AM.Id = ASP.AssetId
+                LEFT JOIN [FixedAsset].[AssetAmc] AA ON AM.Id = AA.AssetId
                 WHERE AM.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (AssetCode LIKE @Search OR AssetName LIKE @Search )")}}
+                group by AM.Id,AM.CompanyId,AM.UnitId,AM.AssetCode,AM.AssetName,AM.AssetGroupId,AM.AssetCategoryId,AM.AssetSubCategoryId,AM.AssetParentId,AM.AssetType,AM.MachineCode,AM.Quantity
+                ,AM.UOMId,AM.AssetDescription,AM.WorkingStatus,AM.AssetImage,AM.ISDepreciated,AM.IsTangible,AM.IsActive
+                ,AM.CreatedBy,AM.CreatedDate,AM.CreatedByName,AM.CreatedIP,AM.ModifiedBy,AM.ModifiedDate,AM.ModifiedByName,AM.ModifiedIP
+                ,AG.GroupName ,AC.CategoryName ,A.Description ,U.UOMName,MM.description ,M.description ,AM1.AssetDescription
                 ORDER BY AM.Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
                 SELECT @TotalCount AS TotalCount;
@@ -126,6 +143,27 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             var parameters = new { MiscTypeCode = MiscEnumEntity.Asset_AssetType.MiscCode };        
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
             return result.ToList();
+        }
+
+        public async Task<AssetChildDetailsDto> GetAssetChildDetails(int assetId)
+        {
+            const string query = @"
+            SELECT AM.Id,AM.AssetCode,AM.AssetName,count(distinct AL.Id) AssetLocation,count( distinct APD.Id) AssetPurchase,count(distinct AW.Id) AssetWarranty
+            ,count(distinct ASP.Id)AssetSpec,count( distinct AA.Id)AssetAmc
+            FROM FixedAsset.AssetMaster AM                       
+            LEFT JOIN [FixedAsset].[AssetLocation] AL ON AM.Id = AL.AssetId
+            LEFT JOIN [FixedAsset].[AssetPurchaseDetails] APD ON AM.Id = APD.AssetId
+            LEFT JOIN [FixedAsset].[AssetWarranty] AW ON AM.Id = AW.AssetId
+            LEFT JOIN [FixedAsset].[AssetSpecifications] ASP ON AM.Id = ASP.AssetId
+            LEFT JOIN [FixedAsset].[AssetAmc] AA ON AM.Id = AA.AssetId
+            WHERE AM.Id = @assetId AND AM.IsDeleted=0
+            group by AM.Id,AM.AssetCode,AM.AssetName ";
+            var assetChildDetails = await _dbConnection.QueryFirstOrDefaultAsync<AssetChildDetailsDto>(query, new { assetId });           
+            if (assetChildDetails is null)
+            {
+                throw new KeyNotFoundException($"Asset with ID {assetId} not found.");
+            }
+            return assetChildDetails;
         }
     }
 }
