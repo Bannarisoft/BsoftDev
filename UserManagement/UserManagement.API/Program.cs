@@ -4,6 +4,7 @@ using UserManagement.API.Validation.Common;
 using UserManagement.API.Middleware;
 using UserManagement.API.Configurations;
 using Core.Domain.Entities;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,16 @@ builder.Host.ConfigureSerilog();
 // Add validation services
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
+
+// Configure MassTransit with RabbitMQ
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("rabbitmq://localhost");
+    });
+});
+
 // Register Services
 builder.Services.AddControllers();
 builder.Services.AddSwaggerDocumentation();

@@ -7,6 +7,8 @@ using FAM.API.Validation.Common;
 using FAM.API.Configurations;
 using FluentValidation;
 using FAM.API.Validation.DepreciationGroup;
+using MassTransit;
+using FAM.API.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +39,20 @@ builder.Host.ConfigureSerilog();
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
 
+// Configure MassTransit with RabbitMQ
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<UserCreatedEventConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("rabbitmq://localhost");
+        cfg.ReceiveEndpoint("user-created-queue", e =>
+        {
+            e.ConfigureConsumer<UserCreatedEventConsumer>(context);
+        });
+    });
+});
 //Add layer dependency & Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSwaggerDocumentation();
