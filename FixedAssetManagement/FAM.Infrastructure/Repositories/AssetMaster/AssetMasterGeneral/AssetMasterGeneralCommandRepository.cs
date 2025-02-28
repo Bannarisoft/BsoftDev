@@ -2,10 +2,8 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGene
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Domain.Common;
 using Core.Domain.Entities;
-using Core.Domain.Entities.AssetPurchase;
 using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 {
@@ -58,34 +56,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 return await _applicationDbContext.SaveChangesAsync();
             }
            return 0; 
-        }
-        public async Task<string?> GetAssetGroupNameById(int assetGroupId)
-        {
-            return await _applicationDbContext.AssetGroup
-                .Where(a => a.Id == assetGroupId)
-                .Select(a => a.Code)
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task<string?> GetAssetCategoryNameById(int assetCategoryId)
-        {
-            return await _applicationDbContext.AssetCategories
-                .Where(a => a.Id == assetCategoryId)
-                .Select(a => a.Code)
-                .FirstOrDefaultAsync();
-        }
-        public async Task<string?> GetLatestAssetCode(int companyId,int unitId, int assetGroupId, int assetSubCategoryId)
-        {
-            return await _applicationDbContext.AssetMasterGenerals
-                .Where(a =>   a.CompanyId == companyId
-                            && a.UnitId == unitId
-                            && a.AssetGroupId == assetGroupId 
-                            && a.AssetSubCategoryId == assetSubCategoryId)
-                .OrderByDescending(a => a.AssetCode)
-                .Select(a => a.AssetCode)
-                .FirstOrDefaultAsync();
-        }
-
+        }     
         public async Task<AssetMasterGenerals?> GetByAssetCodeAsync(string assetCode)
         {
             return await _applicationDbContext.AssetMasterGenerals
@@ -131,51 +102,6 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             asset.AssetImage = null;
             await _applicationDbContext.SaveChangesAsync();
             return true;
-        }
-      /*   public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        {
-            return await _applicationDbContext.Database.BeginTransactionAsync(cancellationToken);
-        }
-
-        public async Task SaveChangesAsync(CancellationToken cancellationToken)
-        {
-            await _applicationDbContext.SaveChangesAsync(cancellationToken);
-        }
-         // New method: wraps the provided action in an execution strategy and transaction.
-        public async Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken cancellationToken)
-        {
-            // Get the execution strategy from the underlying DbContext.
-            var executionStrategy = _applicationDbContext.Database.CreateExecutionStrategy();
-
-            await executionStrategy.ExecuteAsync(async () =>
-            {
-                using var transaction = await _applicationDbContext.Database.BeginTransactionAsync(cancellationToken);
-                try
-                {
-                    // Execute the provided operations.
-                    await action();
-
-                    // Commit the transaction.
-                    await transaction.CommitAsync(cancellationToken);
-                }
-                catch
-                {
-                    await transaction.RollbackAsync(cancellationToken);
-                    throw;
-                }
-            });
-        }
-
-        public async Task AddAssetPurchaseDetailsAsync(List<AssetPurchaseDetails> assetPurchaseDetails, CancellationToken cancellationToken)
-        {
-             _applicationDbContext.AssetPurchaseDetails.AddRange(assetPurchaseDetails);
-        await _applicationDbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task AddAssetLocationAsync(List<Core.Domain.Entities.AssetMaster.AssetLocation> assetLocations, CancellationToken cancellationToken)
-        {
-           _applicationDbContext.AssetLocations.AddRange(assetLocations);
-        await _applicationDbContext.SaveChangesAsync(cancellationToken);
-        } */
+        }    
     }
 }

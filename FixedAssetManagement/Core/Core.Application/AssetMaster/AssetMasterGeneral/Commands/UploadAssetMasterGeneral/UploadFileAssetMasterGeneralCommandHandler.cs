@@ -14,6 +14,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
         private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
+        private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly ILogger<UploadFileAssetMasterGeneralCommandHandler> _logger;
 
         public UploadFileAssetMasterGeneralCommandHandler(
@@ -21,12 +22,14 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             IMediator mediator,
             IMapper mapper,
             IAssetMasterGeneralCommandRepository assetMasterGeneralRepository,
+            IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository,
             ILogger<UploadFileAssetMasterGeneralCommandHandler> logger)
         {
             _fileUploadService = fileUploadService;
             _mediator = mediator;
             _mapper = mapper;
             _assetMasterGeneralRepository = assetMasterGeneralRepository;
+            _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
             _logger = logger;
         }
 
@@ -49,11 +52,13 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
                 return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "Asset not found." };
             }
 
-            // 🔹 Define Base Directory (Get parent directory)
-            
-            string baseDirectory = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "AssetImages");
-            //string baseDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "AssetImages");
-            EnsureDirectoryExists(baseDirectory);
+            // 🔹 Fetch Base Directory from Database
+            string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
+            if (string.IsNullOrWhiteSpace(baseDirectory))
+            {
+                _logger.LogError("Base directory path not found in database.");
+                return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "Base directory not configured." };
+            }
 
             // 🔹 Construct the required file path
             string companyFolder = Path.Combine(baseDirectory, request.CompanyName ?? string.Empty);
@@ -80,7 +85,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
                 string base64Image = Convert.ToBase64String(await File.ReadAllBytesAsync(filePath));
 
                 // ✅ Ensure the correct format before saving in DB
-                string formattedPath = filePath.Replace(@"\", "/");  
+                string formattedPath = filePath.Replace(@"\", "/");
 
                 // ✅ Update AssetImage field using repository
                 bool updateSuccess = await _assetMasterGeneralRepository.UpdateAssetImageAsync(existingAsset.Id, formattedPath);
@@ -103,14 +108,15 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
                 return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = $"File upload failed: {ex.Message}" };
             }
         }   
-        // ✅ Helper Method to Ensure Directory Exists
-        private void EnsureDirectoryExists(string path)
-        {
-            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
+
+            // ✅ Helper Method to Ensure Directory Exists
+            private void EnsureDirectoryExists(string path)
             {
-                Directory.CreateDirectory(path);
+                if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
             }
-        }
 
     }
 }

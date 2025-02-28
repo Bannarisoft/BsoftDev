@@ -12,8 +12,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public int Id { get; set; }
         public int CompanyId { get; set; }       
         public int UnitId { get; set; }    
-        public string? CompanyName { get; set; }     
-        public string? UnitName { get; set; }     
         public string? AssetCode { get; set; }        
         public string? AssetName { get; set; }                
         public int AssetGroupId { get; set; }        
