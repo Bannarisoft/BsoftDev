@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Domain.Entities.AssetMaster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using static Core.Domain.Common.BaseEntity;
 
 namespace FAM.Infrastructure.Data.Configurations.AssetMaster
 {
@@ -12,6 +10,21 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
     {
        public void Configure(EntityTypeBuilder<AssetInsurance> builder)
         {
+
+
+            // ValueConverter for Status (enum to bit)
+            var statusConverter = new ValueConverter<Status, bool>(
+                v => v == Status.Active,                    // Convert to DB (1 for Active)
+                v => v ? Status.Active : Status.Inactive    // Convert to Entity
+            );
+
+                // ValueConverter for IsDelete (enum to bit)
+            var isDeleteConverter = new ValueConverter<IsDelete, bool>(
+                v => v == IsDelete.Deleted,                 // Convert to DB (1 for Deleted)
+                v => v ? IsDelete.Deleted : IsDelete.NotDeleted // Convert to Entity
+            );
+
+            
            builder.ToTable("AssetInsurance", "FixedAsset");
 
             builder.HasKey(al => al.Id); // Primary Key            
@@ -22,12 +35,20 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete
 
             builder.Property(ai => ai.PolicyNo)               
-               .HasColumnType("varchar(50)")
+               .HasColumnType("nvarchar(50)")
                .IsRequired();
               
             builder.Property(ai => ai.StartDate)
-               .HasColumnType("datetime")
-               .IsRequired();;
+               .HasColumnType("datetimeoffset")
+               .IsRequired();
+
+            builder.Property(ai => ai.Insuranceperiod)
+                    .HasColumnType("int")
+                    .IsRequired();
+
+            builder.Property(ai => ai.EndDate)
+               .HasColumnType("datetimeoffset")
+               .IsRequired();
                
             builder.Property(ai => ai.PolicyAmount)
                 .HasColumnType("decimal(18,3)") // Defines precision and scale
@@ -44,15 +65,61 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .IsRequired(false);
 
             builder.Property(ai => ai.RenewedDate)
-                .HasColumnType("datetime")
+                .HasColumnType("datetimeoffset")
+                .IsRequired();           
+
+                builder.Property(ai => ai.InsuranceStatus)                
+                .HasColumnType("bit")
+                .HasConversion(
+                    v => v == 1, 
+                    v => v ? (byte)1 : (byte)0 
+                )
                 .IsRequired();
 
-            builder.Property(ai => ai.InsuranceStatus)
-                .HasColumnType("varchar(50)")
-                .HasMaxLength(50)
-                .IsRequired(false); 
+            builder.Property(b => b.IsActive)
+                .HasColumnName("IsActive")
+                .HasColumnType("bit")
+                .HasConversion(statusConverter)
+                .IsRequired();
+
+          builder.Property(b => b.IsDeleted)
+                .HasColumnName("IsDeleted")
+                .HasColumnType("bit")
+                .HasConversion(isDeleteConverter)
+                .IsRequired();
+
+        builder.Property(b => b.CreatedBy)        
+                .HasColumnType("int")
+                .IsRequired();
+
+        builder.Property(b => b.CreatedDate)        
+                .HasColumnType("datetimeoffset")                       
+                .IsRequired();    
+
+        builder.Property(b => b.CreatedByName)
+                .IsRequired()
+                .HasColumnType("varchar(50)");
+
+    
+        builder.Property(b => b.CreatedIP)
+                .IsRequired()
+                .HasColumnType("varchar(20)");
+
+        builder.Property(b => b.ModifiedBy)        
+                .HasColumnType("int");
+        
+
+        builder.Property(b => b.ModifiedDate)        
+                .HasColumnType("datetimeoffset");  
+
+        builder.Property(b => b.ModifiedByName)
+                .HasColumnType("varchar(50)");
+
+        builder.Property(b => b.ModifiedIP)
+                .HasColumnType("varchar(20)"); 
 
           
+
 
         }
 
