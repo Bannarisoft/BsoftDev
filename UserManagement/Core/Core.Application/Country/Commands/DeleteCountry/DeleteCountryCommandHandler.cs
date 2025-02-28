@@ -34,9 +34,18 @@ namespace Core.Application.Country.Commands.DeleteCountry
                     Message = "Invalid CountryID. The specified Country does not exist or is inactive."
                 };
             }         
-             var countryDelete = _mapper.Map<Countries>(request);   
 
-          
+            var state = await _countryQueryRepository.GetStateByCountryIdAsync(request.Id);            
+            if (state.Count>0)
+            {                
+                 return new ApiResponseDTO<CountryDto>
+                {
+                    IsSuccess = false,
+                    Message = "State already exists for this country.Cannot delete the country."
+                };
+            }
+                                    
+            var countryDelete = _mapper.Map<Countries>(request);
             var updateResult = await _countryRepository.DeleteAsync(request.Id, countryDelete);
             if (updateResult > 0)
             {

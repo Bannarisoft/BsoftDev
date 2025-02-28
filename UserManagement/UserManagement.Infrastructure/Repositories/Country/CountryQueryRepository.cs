@@ -71,5 +71,18 @@ namespace UserManagement.Infrastructure.Repositories.Country
             var result = await _dbConnection.QueryAsync<Countries>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();
         }
+
+        public async Task<List<Countries>> GetStateByCountryIdAsync(int countryId)
+        {
+            const string query = @"
+            SELECT Id, StateCode, StateName, IsActive,countryId,CreatedBy,CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedAt,ModifiedByName,ModifiedIP 
+            FROM AppData.State WHERE CountryId = @CountryId  AND IsDeleted=0";
+            var state = await _dbConnection.QueryAsync<Countries>(query, new { countryId });           
+            if (state is null)
+            {
+                throw new KeyNotFoundException($"State with ID {countryId} not found.");
+            }
+            return state.ToList();
+        }
     }
 }
