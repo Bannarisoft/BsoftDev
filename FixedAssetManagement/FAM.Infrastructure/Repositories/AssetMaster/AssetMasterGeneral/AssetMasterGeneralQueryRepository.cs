@@ -146,6 +146,20 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 commandType: CommandType.StoredProcedure);
             return result ?? string.Empty; // return an empty string if result is null
         }
-        
+
+        public async  Task<List<Core.Domain.Entities.MiscMaster>>GetAssetPattern()
+        {
+            const string query = @"
+            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder,  M.IsActive
+            ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP,MiscTypeCode
+            FROM FixedAsset.MiscMaster M
+            INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeId
+            WHERE (MiscTypeCode = @MiscTypeCode) 
+            AND  M.IsDeleted=0 and M.IsActive=1
+            ORDER BY M.ID DESC";    
+              var parameters = new { MiscTypeCode = MiscEnumEntity.Asset_CodePattern.MiscCode };        
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+            return result.ToList();        
+        }
     }
 }

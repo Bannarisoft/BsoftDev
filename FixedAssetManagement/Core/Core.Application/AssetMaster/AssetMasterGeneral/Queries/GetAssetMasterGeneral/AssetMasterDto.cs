@@ -28,5 +28,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public bool? Tangible { get; set; }        
         public AssetLocationCombineDto?  AssetLocation  { get; set; }
         public ICollection<AssetPurchaseCombineDto>? AssetPurchaseDetails{ get; set; }       
+        public ICollection<AssetAdditionalCostCombineDto>? AssetAssetAdditionalCost{ get; set; }       
+
     }
 }

@@ -36,5 +36,9 @@ namespace Core.Domain.Common
         {
             public const string MiscCode = "WARRANTYCLAIM";
         }
+        public static class Asset_CodePattern
+        {
+            public const string MiscCode = "ASSETCODE";
+        }
     }
 }
