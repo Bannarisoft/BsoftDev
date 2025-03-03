@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Domain.Common;
 
-namespace Core.Domain.Entities.AssetPurchase
+namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral
 {
-    public class AssetPurchaseDetails 
-    {
-        public int Id { get; set; }
+    public class AssetPurchaseCombineDto
+    {          
         public string? BudgetType { get; set; }
         public string? OldUnitId { get; set; }
         public string? VendorCode { get; set; }
@@ -33,12 +31,7 @@ namespace Core.Domain.Entities.AssetPurchase
         public string? PjDocId { get; set; }
         public string? PjDocSr { get; set;}
         public int PjDocNo { get; set; }
-        public int AssetId { get; set; }        
-        public AssetMasterGenerals Asset { get; set; }
-        public int AssetSourceId { get; set; }    
-        public AssetSource AssetSource { get; set; } = null!;
+        public int AssetSourceId { get; set; }   
         public DateTimeOffset? CapitalizationDate { get; set; }
-
-
     }
 }

@@ -14,11 +14,12 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         {
             _applicationDbContext = applicationDbContext;            
         }
-        public async Task<AssetMasterGenerals> CreateAsync(AssetMasterGenerals assetMasterGeneral)
+        public async Task<AssetMasterGenerals> CreateAsync(AssetMasterGenerals assetMasterGeneral, CancellationToken cancellationToken)
         {
+           var entry =_applicationDbContext.Entry(assetMasterGeneral);
             await _applicationDbContext.AssetMasterGenerals.AddAsync(assetMasterGeneral);
             await _applicationDbContext.SaveChangesAsync();
-            return assetMasterGeneral;          
+             return assetMasterGeneral;   
         }
         public async Task<int> DeleteAsync(int Id, AssetMasterGenerals assetMaster)
         {
@@ -55,34 +56,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 return await _applicationDbContext.SaveChangesAsync();
             }
            return 0; 
-        }
-        public async Task<string?> GetAssetGroupNameById(int assetGroupId)
-        {
-            return await _applicationDbContext.AssetGroup
-                .Where(a => a.Id == assetGroupId)
-                .Select(a => a.Code)
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task<string?> GetAssetCategoryNameById(int assetCategoryId)
-        {
-            return await _applicationDbContext.AssetCategories
-                .Where(a => a.Id == assetCategoryId)
-                .Select(a => a.Code)
-                .FirstOrDefaultAsync();
-        }
-        public async Task<string?> GetLatestAssetCode(int companyId,int unitId, int assetGroupId, int assetSubCategoryId)
-        {
-            return await _applicationDbContext.AssetMasterGenerals
-                .Where(a =>   a.CompanyId == companyId
-                            && a.UnitId == unitId
-                            && a.AssetGroupId == assetGroupId 
-                            && a.AssetSubCategoryId == assetSubCategoryId)
-                .OrderByDescending(a => a.AssetCode)
-                .Select(a => a.AssetCode)
-                .FirstOrDefaultAsync();
-        }
-
+        }     
         public async Task<AssetMasterGenerals?> GetByAssetCodeAsync(string assetCode)
         {
             return await _applicationDbContext.AssetMasterGenerals
@@ -128,6 +102,6 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             asset.AssetImage = null;
             await _applicationDbContext.SaveChangesAsync();
             return true;
-        }
+        }    
     }
 }

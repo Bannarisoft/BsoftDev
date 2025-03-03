@@ -29,12 +29,17 @@ namespace FAM.API.Validation.AssetMaster.AssetLocation
                 {
                     case "NotEmpty":
                         // Apply NotEmpty validation
-                        RuleFor(x => x.AssetId)
+                       /*  RuleFor(x => x.AssetId)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateAssetLocationCommand.AssetId)} {rule.Error}")
                              .Must(BeNumeric)
-                            .WithMessage($"{nameof(CreateAssetLocationCommand.AssetId)} must be a valid number.");
-
+                            .WithMessage($"{nameof(CreateAssetLocationCommand.AssetId)} must be a valid number."); */
+                        When(x => x.AssetId != 0, () =>
+                        {
+                            RuleFor(x => x.AssetId)
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateAssetLocationCommand.AssetId)} is required.");
+                        });     
                         RuleFor(x => x.UnitId)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateAssetLocationCommand.UnitId)} {rule.Error}")
