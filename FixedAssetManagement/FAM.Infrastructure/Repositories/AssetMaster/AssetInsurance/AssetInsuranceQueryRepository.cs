@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Core.Application.AssetMaster.AssetInsurance.Queries.GetAssetInsurance;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetInsurance;
 using Dapper;
 
@@ -14,20 +16,55 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetInsurance
           public AssetInsuranceQueryRepository(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
+        }              
+    
+    public async Task<(List<Core.Domain.Entities.AssetMaster.AssetInsurance>, int)> GetAllAssetInsuranceAsync(int PageNumber, int PageSize, string? SearchTerm)
+        {
+                        var query = $$"""
+                    DECLARE @TotalCount INT;
+                    SELECT @TotalCount = COUNT(*) 
+                    FROM FixedAsset.AssetInsurance 
+                    WHERE IsDeleted = 0
+                    {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (PolicyNo LIKE @Search OR VendorCode LIKE @Search)")}};
+
+                    SELECT Id, AssetId, PolicyNo, StartDate, InsurancePeriod, EndDate, PolicyAmount, VendorCode, 
+                        RenewalStatus, RenewedDate, CreatedBy, IsActive, IsDeleted
+                    FROM FixedAsset.AssetInsurance
+                    WHERE IsDeleted = 0
+                    {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (PolicyNo LIKE @Search OR VendorCode LIKE @Search)")}}
+                    ORDER BY Id DESC
+                    OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+                    SELECT @TotalCount AS TotalCount;
+                """;
+                            var parameters = new
+                    {
+                        Search = $"%{SearchTerm}%",
+                        Offset = (PageNumber - 1) * PageSize,
+                        PageSize
+                    };
+
+                    var assetInsuranceData = await _dbConnection.QueryMultipleAsync(query, parameters);
+                    var assetInsuranceList = (await assetInsuranceData.ReadAsync<Core.Domain.Entities.AssetMaster.AssetInsurance>()).ToList();
+                    int totalCount = await assetInsuranceData.ReadFirstAsync<int>();
+
+                    return (assetInsuranceList, totalCount);          
         }
 
-        
 
         public async Task<Core.Domain.Entities.AssetMaster.AssetInsurance> GetByAssetIdAsync(int id)
             {
                 const string query = @"
                     SELECT Id, AssetId,PolicyNo,StartDate, 
                         Insuranceperiod,  EndDate, PolicyAmount, VendorCode, RenewalStatus, 
-                        RenewedDate, InsuranceStatus  FROM FixedAsset.AssetInsurance 
-                    WHERE Id = @id";
+                        RenewedDate, IsActive  FROM FixedAsset.AssetInsurance 
+                    WHERE Id = @id AND IsDeleted = 0";
 
                 return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.AssetMaster.AssetInsurance>(query, new { id });
             }
+
+          
+
 
     }
 }

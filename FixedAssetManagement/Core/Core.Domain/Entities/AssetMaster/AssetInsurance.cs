@@ -4,7 +4,7 @@ namespace Core.Domain.Entities.AssetMaster
 {
     public class AssetInsurance  : BaseEntity
     {
-        public int Id { get; set; }
+        public new int Id { get; set; }
         public int  AssetId { get; set; }
          public AssetMasterGenerals? AssetMaster  { get; set; }         
         public string? PolicyNo { get; set; }       
@@ -15,7 +15,7 @@ namespace Core.Domain.Entities.AssetMaster
         public string? VendorCode { get; set; }
         public string? RenewalStatus { get; set; }
         public DateTimeOffset RenewedDate { get; set; }
-        public byte? InsuranceStatus { get; set; }        
+             
     
     }
 }

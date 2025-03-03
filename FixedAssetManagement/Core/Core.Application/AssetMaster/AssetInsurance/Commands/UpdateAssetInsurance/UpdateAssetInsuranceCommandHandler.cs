@@ -28,7 +28,7 @@ namespace Core.Application.AssetMaster.AssetInsurance.Commands.UpdateAssetInsura
      public async Task<ApiResponseDTO<bool>> Handle(UpdateAssetInsuranceCommand request, CancellationToken cancellationToken)
     {
 
-        var assetInsurance = await _assetInsuranceQueryRepository.GetByAssetIdAsync(request.AssetId);
+        var assetInsurance = await _assetInsuranceQueryRepository.GetByAssetIdAsync(request.Id);
                  if (assetInsurance == null)
                 {
                     return new ApiResponseDTO<bool>
@@ -38,13 +38,13 @@ namespace Core.Application.AssetMaster.AssetInsurance.Commands.UpdateAssetInsura
                     };
                 }
                  var mAssetInsurancemap  = _imapper.Map<Core.Domain.Entities.AssetMaster.AssetInsurance>(request);         
-                var AssetInsuranceresult = await _assetInsuranceCommandRepository.UpdateAsync(request.AssetId, mAssetInsurancemap);                
+                var AssetInsuranceresult = await _assetInsuranceCommandRepository.UpdateAsync(request.Id, mAssetInsurancemap);                
 
                     var domainEvent = new AuditLogsDomainEvent(
                         actionDetail: "Update",
                         actionCode: mAssetInsurancemap.AssetId.ToString(),
                         actionName: mAssetInsurancemap.PolicyNo,
-                        details: $"AssetInsurance '{mAssetInsurancemap.AssetId}' was updated.",
+                        details: $"AssetInsurance '{mAssetInsurancemap.Id}' was updated.",
                         module:"AssetInsurance"
                     );    
 

@@ -66,15 +66,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
 
             builder.Property(ai => ai.RenewedDate)
                 .HasColumnType("datetimeoffset")
-                .IsRequired();           
-
-                builder.Property(ai => ai.InsuranceStatus)                
-                .HasColumnType("bit")
-                .HasConversion(
-                    v => v == 1, 
-                    v => v ? (byte)1 : (byte)0 
-                )
-                .IsRequired();
+                .IsRequired();                          
 
             builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")

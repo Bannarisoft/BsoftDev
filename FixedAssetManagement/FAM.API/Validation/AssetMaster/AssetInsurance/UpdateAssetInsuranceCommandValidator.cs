@@ -39,8 +39,12 @@ namespace FAM.API.Validation.AssetMaster.AssetInsurance
                             .GreaterThan(x => x.StartDate).WithMessage("End date must be after start date.");
 
                         RuleFor(x => x.PolicyAmount)
-                            .NotEmpty().WithMessage("Policy amount is required.")
-                            .Matches("^\\d+(\\.\\d{1,2})?$").WithMessage("Invalid policy amount format.");
+                            .Must(value => value >= 0) // Ensure it's a valid decimal value
+                            .WithMessage("PolicyAmount must be a positive number.");
+
+                        RuleFor(x => x.PolicyAmount)
+                            .ScalePrecision(2, 18) // Allows up to 2 decimal places
+                            .WithMessage("PolicyAmount must have up to 2 decimal places.");    
 
                         RuleFor(x => x.VendorCode)
                             .NotEmpty().WithMessage("Vendor code is required.");
@@ -51,8 +55,7 @@ namespace FAM.API.Validation.AssetMaster.AssetInsurance
                         RuleFor(x => x.RenewalStatus)
                             .NotEmpty().WithMessage("Renewal status is required.");
 
-                        RuleFor(x => x.InsuranceStatus)
-                            .NotEmpty().WithMessage("Insurance status is required.");
+                       
                         break;
 
                 }
