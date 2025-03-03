@@ -48,8 +48,11 @@ using Core.Application.Common.Interfaces.IAssetMaster.IAssetLocation;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetLocation;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetSpecification;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetAdditionalCost;
-using FAM.Infrastructure.Repositories.AssetMaster.AssetAdditionalCost;using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetAdditionalCost;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetAmc;
 
 namespace FAM.Infrastructure
 {
@@ -174,8 +177,12 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetLocationCommandRepository , AssetLocationCommandRepository>();
             services.AddScoped<IAssetSpecificationQueryRepository, AssetSpecificationQueryRepository>();
 			services.AddScoped<IAssetAdditionalCostQueryRepository, AssetAdditionalCostQueryRepository>();
-            services.AddScoped<IAssetAdditionalCostCommandRepository, AssetAdditionalCostCommandRepository>();            services.AddScoped<IAssetWarrantyQueryRepository, AssetWarrantyQueryRepository>();
+            services.AddScoped<IAssetAdditionalCostCommandRepository, AssetAdditionalCostCommandRepository>();            
+            services.AddScoped<IAssetWarrantyQueryRepository, AssetWarrantyQueryRepository>();
             services.AddScoped<IAssetWarrantyCommandRepository, AssetWarrantyCommandRepository>();
+            services.AddScoped<IAssetAmcQueryRepository, AssetAmcQueryRepository>();
+            services.AddScoped<IAssetAmcCommandRepository, AssetAmcCommandRepository>();
+
 
 
             // Miscellaneous services
@@ -201,7 +208,9 @@ namespace FAM.Infrastructure
  				typeof(AssetSpecificationProfile),
                 typeof(AssetWarrantyProfile),
 				typeof(AssetLocationProfile),
-				typeof(AssetAdditionalCostProfile)
+				typeof(AssetAdditionalCostProfile),
+                typeof(AssetAmcProfile)
+
             );
 
             return services;
