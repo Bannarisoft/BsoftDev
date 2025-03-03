@@ -5,20 +5,31 @@ using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMassTransit(x =>
+builder.Services.AddMassTransit(cfg =>
 {
-    x.AddConsumer<UserCreatedEventConsumer>();
-
-    x.UsingRabbitMq((context, cfg) =>
+    cfg.UsingRabbitMq((context, config) =>
     {
-        cfg.Host("rabbitmq://localhost");
-
-        cfg.ReceiveEndpoint("user-created-queue", e =>
-        {
-            e.ConfigureConsumer<UserCreatedEventConsumer>(context);
-        });
+        config.Host("rabbitmq://localhost");
+        config.ConfigureEndpoints(context);
     });
 });
+
+builder.Services.AddMassTransitHostedService();
+
+// builder.Services.AddMassTransit(x =>
+// {
+//     x.AddConsumer<UserCreatedEventConsumer>();
+
+//     x.UsingRabbitMq((context, cfg) =>
+//     {
+//         cfg.Host("rabbitmq://localhost");
+
+//         cfg.ReceiveEndpoint("user-created-queue", e =>
+//         {
+//             e.ConfigureConsumer<UserCreatedEventConsumer>(context);
+//         });
+//     });
+// });
 
 builder.Services.AddControllers();
 var app = builder.Build();

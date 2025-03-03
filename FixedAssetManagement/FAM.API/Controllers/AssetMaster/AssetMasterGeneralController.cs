@@ -1,3 +1,4 @@
+using Contracts.Events;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAssetMasterGeneral;
@@ -9,6 +10,7 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGene
 using Core.Application.DepreciationGroup.Queries.GetAssetTypeQuery;
 using Core.Application.DepreciationGroup.Queries.GetWorkingStatusQuery;
 using FluentValidation;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,34 +23,37 @@ namespace FAM.API.Controllers.AssetMaster
         private readonly IValidator<CreateAssetMasterGeneralCommand> _createAssetMasterGeneralCommandValidator;
         private readonly IValidator<UpdateAssetMasterGeneralCommand> _updateAssetMasterGeneralCommandValidator;
         private readonly IValidator<UploadFileAssetMasterGeneralCommand> _uploadFileCommandValidator;
+        private readonly IPublishEndpoint _publishEndpoint;
 
         public AssetMasterGeneralController(
-            ISender mediator, 
-            IValidator<CreateAssetMasterGeneralCommand> createAssetMasterGeneralCommandValidator, 
-            IValidator<UpdateAssetMasterGeneralCommand> updateAssetMasterGeneralCommandValidator, 
-            IValidator<UploadFileAssetMasterGeneralCommand> uploadFileCommandValidator
-            ) 
+            ISender mediator,
+            IValidator<CreateAssetMasterGeneralCommand> createAssetMasterGeneralCommandValidator,
+            IValidator<UpdateAssetMasterGeneralCommand> updateAssetMasterGeneralCommandValidator,
+            IValidator<UploadFileAssetMasterGeneralCommand> uploadFileCommandValidator,
+            IPublishEndpoint publishEndpoint
+            )
             : base(mediator)
-        {        
-            _createAssetMasterGeneralCommandValidator = createAssetMasterGeneralCommandValidator;    
-            _updateAssetMasterGeneralCommandValidator = updateAssetMasterGeneralCommandValidator;     
-            _uploadFileCommandValidator = uploadFileCommandValidator;       
+        {
+            _createAssetMasterGeneralCommandValidator = createAssetMasterGeneralCommandValidator;
+            _updateAssetMasterGeneralCommandValidator = updateAssetMasterGeneralCommandValidator;
+            _uploadFileCommandValidator = uploadFileCommandValidator;
+            _publishEndpoint = publishEndpoint;
         }
 
         // GET: api/AssetMasterGeneral?PageNumber=1&PageSize=10&SearchTerm=...
-        [HttpGet]                
+        [HttpGet]
         public async Task<IActionResult> GetAllAssetMasterGeneralAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
-        {            
+        {
             var assetMaster = await Mediator.Send(
                 new GetAssetMasterGeneralQuery
                 {
-                    PageNumber = PageNumber, 
-                    PageSize = PageSize, 
+                    PageNumber = PageNumber,
+                    PageSize = PageSize,
                     SearchTerm = SearchTerm
                 });
-            return Ok(new 
-            { 
-                StatusCode = StatusCodes.Status200OK, 
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
                 message = assetMaster.Message,
                 data = assetMaster.Data.ToList(),
                 TotalCount = assetMaster.TotalCount,
@@ -58,70 +63,80 @@ namespace FAM.API.Controllers.AssetMaster
         }
 
         // GET by ID: api/AssetMasterGeneral/5
-        [HttpGet("{id}")]          
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             if (id <= 0)
             {
-                return BadRequest(new 
-                { 
+                return BadRequest(new
+                {
                     StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Invalid Asset ID" 
+                    message = "Invalid Asset ID"
                 });
             }
-            var result = await Mediator.Send(new GetAssetMasterGeneralByIdQuery { Id = id });            
+            var result = await Mediator.Send(new GetAssetMasterGeneralByIdQuery { Id = id });
             if (result is null)
-            {                
-                return NotFound(new 
-                { 
+            {
+                return NotFound(new
+                {
                     StatusCode = StatusCodes.Status404NotFound,
-                    message = $"AssetId {id} not found", 
+                    message = $"AssetId {id} not found",
                 });
             }
-            return Ok(new 
+            return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data = result.Data
-            });   
+            });
         }
 
         // POST: api/AssetMasterGeneral
-        [HttpPost]               
+        [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateAssetMasterGeneralCommand command)
-        { 
+        {
             var validationResult = await _createAssetMasterGeneralCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
                 return BadRequest(new
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed", 
+                    message = "Validation failed",
                     errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
                 });
-            }        
+            }
+            //Saga implementation
+            var assetId = Guid.NewGuid();
+
+            await _publishEndpoint.Publish<IAssetAssigned>(new
+            {
+                AssetId = assetId,
+                // UserId = command.userId
+            });
+            // _logger.LogInformation($"Publishing IAssetAssigned for AssetId: {AssetId}, AssetName: {command.AssetName}");
+            //Saga implementation end
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
-                return Ok(new 
-                { 
+                return Ok(new
+                {
                     StatusCode = StatusCodes.Status201Created,
-                    message = result.Message, 
+                    message = result.Message,
                     data = result.Data
                 });
-            }  
+            }
             else
-            {      
-                return BadRequest(new 
-                { 
+            {
+                return BadRequest(new
+                {
                     StatusCode = StatusCodes.Status400BadRequest,
                     message = result.Message
                 });
-            } 
+            }
         }
         // PUT: api/AssetMasterGeneral
-        [HttpPut]        
+        [HttpPut]
         public async Task<IActionResult> UpdateAsync(UpdateAssetMasterGeneralCommand command)
-        {         
+        {
             var validationResult = await _updateAssetMasterGeneralCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
@@ -131,14 +146,14 @@ namespace FAM.API.Controllers.AssetMaster
                     message = "Validation failed",
                     errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
                 });
-            }            
+            }
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
-                return Ok(new 
-                {   
+                return Ok(new
+                {
                     StatusCode = StatusCodes.Status200OK,
-                    message = result.Message, 
+                    message = result.Message,
                     asset = result.Data
                 });
             }
@@ -150,9 +165,9 @@ namespace FAM.API.Controllers.AssetMaster
         }
 
         // DELETE: api/AssetMasterGeneral/5
-        [HttpDelete("{id}")]        
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
-        {             
+        {
             if (id <= 0)
             {
                 return BadRequest(new
@@ -160,12 +175,12 @@ namespace FAM.API.Controllers.AssetMaster
                     StatusCode = StatusCodes.Status400BadRequest,
                     message = "Invalid Asset ID"
                 });
-            }            
-            var result = await Mediator.Send(new DeleteAssetMasterGeneralCommand { Id = id });                 
+            }
+            var result = await Mediator.Send(new DeleteAssetMasterGeneralCommand { Id = id });
             if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
+            {
+                return NotFound(new
+                {
                     StatusCode = StatusCodes.Status404NotFound,
                     message = result.Message
                 });
@@ -179,17 +194,17 @@ namespace FAM.API.Controllers.AssetMaster
         }
 
         // GET: api/AssetMasterGeneral/by-name?name=...
-        [HttpGet("by-name")]  
+        [HttpGet("by-name")]
         public async Task<IActionResult> GetAssetName([FromQuery] string? name)
-        {          
+        {
             var result = await Mediator.Send(new GetAssetMasterGeneralAutoCompleteQuery { SearchPattern = name });
             if (!result.IsSuccess)
             {
-                return NotFound(new 
-                { 
+                return NotFound(new
+                {
                     StatusCode = StatusCodes.Status404NotFound,
                     message = result.Message
-                }); 
+                });
             }
             return Ok(new
             {
@@ -248,27 +263,27 @@ namespace FAM.API.Controllers.AssetMaster
             var validationResult = await _uploadFileCommandValidator.ValidateAsync(uploadFileCommand);
             if (!validationResult.IsValid)
             {
-                return BadRequest(new 
-                { 
-                    StatusCode = StatusCodes.Status400BadRequest, 
-                    message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
                 });
             }
             var file = await Mediator.Send(uploadFileCommand);
             if (!file.IsSuccess)
             {
-                return BadRequest(new 
-                { 
-                    StatusCode = StatusCodes.Status400BadRequest, 
-                    message = file.Message, 
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = file.Message,
                     errors = ""
                 });
             }
-            return Ok(new 
-            { 
-                StatusCode = StatusCodes.Status200OK, 
-                message = file.Message, 
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = file.Message,
                 data = file.Data,
                 errors = ""
             });
@@ -281,17 +296,17 @@ namespace FAM.API.Controllers.AssetMaster
             var file = await Mediator.Send(deleteFileCommand);
             if (!file.IsSuccess)
             {
-                return BadRequest(new 
-                { 
-                    StatusCode = StatusCodes.Status400BadRequest, 
-                    message = file.Message, 
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = file.Message,
                     errors = ""
                 });
             }
-            return Ok(new 
-            { 
-                StatusCode = StatusCodes.Status200OK, 
-                message = file.Message, 
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = file.Message,
                 errors = ""
             });
         }

@@ -16,6 +16,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
+    <ProjectReference Include="..\SagaOrchestrator\SagaOrchestrator.csproj" />
+
   </ItemGroup>
 
 </Project>

@@ -33,33 +33,48 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 // Configure Serilog
-builder.Host.ConfigureSerilog(); 
+builder.Host.ConfigureSerilog();
 
 // Add validation services
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
 
 // Configure MassTransit with RabbitMQ
-builder.Services.AddMassTransit(x =>
+builder.Services.AddMassTransit(cfg =>
 {
-    x.AddConsumer<UserCreatedEventConsumer>();
-
-    x.UsingRabbitMq((context, cfg) =>
+    cfg.UsingRabbitMq((context, config) =>
     {
-        cfg.Host("rabbitmq://localhost");
-        cfg.ReceiveEndpoint("user-created-queue", e =>
-        {
-            e.ConfigureConsumer<UserCreatedEventConsumer>(context);
-        });
+        config.Host("rabbitmq://localhost");
+        config.ConfigureEndpoints(context);
     });
 });
+
+builder.Services.AddMassTransitHostedService();
+// builder.Services.AddMassTransit(cfg =>
+// {
+//     cfg.AddConsumer<FixedAssetConsumer>();
+
+//     cfg.UsingRabbitMq((context, config) =>
+//     {
+//         config.Host("rabbitmq://localhost", h =>
+//         {
+//             h.Username("guest");
+//             h.Password("guest");
+//         });
+
+//         config.ReceiveEndpoint("user-created-queue", e =>
+//         {
+//             e.ConfigureConsumer<FixedAssetConsumer>(context);
+//         });
+//     });
+// });
 //Add layer dependency & Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructureServices(builder.Configuration,builder.Services);
+builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
@@ -68,16 +83,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage(); 
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseDeveloperExceptionPage();
 
 //}
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
 app.UseCors();// Enable CORS
 app.UseAuthentication();
-app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
+app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();

@@ -8,8 +8,6 @@ using Core.Application.Common.HttpResponse;
 using Serilog;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces;
-using MassTransit;
-using Contracts.Events;
 
 
 
@@ -24,9 +22,9 @@ namespace Core.Application.Users.Commands.CreateUser
         private readonly IUserQueryRepository _userQueryRepository;
         private readonly IEmailService _emailService;
         private readonly ISmsService _smsService;
-        private readonly IBus _bus; // MassTransit Bus
 
-        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator, ILogger<CreateUserCommandHandler> logger, IEmailService emailService, ISmsService smsService, IUserQueryRepository userQueryRepository, IBus bus)
+
+        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator, ILogger<CreateUserCommandHandler> logger, IEmailService emailService, ISmsService smsService, IUserQueryRepository userQueryRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
@@ -35,7 +33,6 @@ namespace Core.Application.Users.Commands.CreateUser
             _userQueryRepository = userQueryRepository;
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _smsService = smsService ?? throw new ArgumentNullException(nameof(smsService));
-            _bus = bus ?? throw new ArgumentNullException(nameof(bus)); // Assign MassTransit bus
 
         }
 
@@ -100,17 +97,6 @@ namespace Core.Application.Users.Commands.CreateUser
                   _logger.LogWarning("Failed to send login notification email to {Email}.", createdUser.EmailId);
               } 
    */
-            // Publish event to RabbitMQ for Saga Orchestration
-            var userCreatedEvent = new UserCreatedEvent
-            {
-                UserId = createdUser.Id,
-                UserName = createdUser.UserName,
-                Email = createdUser.EmailId
-            };
-            _logger.LogInformation("Publishing UserCreatedEvent: {UserId}", userCreatedEvent.UserId);
-            await _bus.Publish(userCreatedEvent, cancellationToken);
-            _logger.LogInformation("UserCreatedEvent successfully published.");
-
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(

@@ -18,20 +18,38 @@ builder.Configuration
 
 
 // Configure Serilog
-builder.Host.ConfigureSerilog(); 
+builder.Host.ConfigureSerilog();
 
 // Add validation services
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
 
-// Configure MassTransit with RabbitMQ
-builder.Services.AddMassTransit(x =>
+builder.Services.AddMassTransit(cfg =>
 {
-    x.UsingRabbitMq((context, cfg) =>
+    cfg.UsingRabbitMq((context, config) =>
     {
-        cfg.Host("rabbitmq://localhost");
+        config.Host("rabbitmq://localhost");
+        config.ConfigureEndpoints(context);
     });
 });
+
+builder.Services.AddMassTransitHostedService();
+
+// builder.Services.AddMassTransit(busConfig =>
+// {
+//     busConfig.SetKebabCaseEndpointNameFormatter();
+
+//     busConfig.UsingRabbitMq((context, cfg) =>
+//     {
+//         cfg.Host("localhost", "/", h =>
+//         {
+//             h.Username("guest");
+//             h.Password("guest");
+//         });
+
+//         cfg.ConfigureEndpoints(context);
+//     });
+// });
 
 // Register Services
 builder.Services.AddControllers();
@@ -47,16 +65,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline. 
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage(); 
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseDeveloperExceptionPage();
 //}
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
 app.UseCors();// Enable CORS
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
-app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
+app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
