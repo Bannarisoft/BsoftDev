@@ -12,47 +12,22 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
     {
         private readonly IMapper _mapper;
         private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
+        private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly IMediator _mediator;
 
-        public CreateAssetMasterGeneralCommandHandler(IMapper mapper, IAssetMasterGeneralCommandRepository assetMasterGeneralRepository, IMediator mediator)
+        public CreateAssetMasterGeneralCommandHandler(IMapper mapper, IAssetMasterGeneralCommandRepository assetMasterGeneralRepository, IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository,IMediator mediator)
         {
             _mapper = mapper;
             _assetMasterGeneralRepository = assetMasterGeneralRepository;
+            _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
             _mediator = mediator;    
         } 
 
-
         public async Task<ApiResponseDTO<AssetMasterDto>> Handle(CreateAssetMasterGeneralCommand request, CancellationToken cancellationToken)
-        { 
-            var UnitName = request.AssetMaster?.UnitName; // Accessing UnitName from the AssetMaster DTO
-            var assetGroupName = await _assetMasterGeneralRepository.GetAssetGroupNameById(request.AssetMaster.AssetGroupId);
-            var assetCategoryName = await _assetMasterGeneralRepository.GetAssetCategoryNameById(request.AssetMaster.AssetSubCategoryId);
-
-            if (string.IsNullOrWhiteSpace(UnitName) || string.IsNullOrWhiteSpace(assetGroupName) || string.IsNullOrWhiteSpace(assetCategoryName))
-            {
-                return new ApiResponseDTO<AssetMasterDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid data: Company, Asset Group, or Asset SubCategory is missing."
-                };
-            }
-
+        {             
             // Get latest AssetCode
-            var latestAssetCode = await _assetMasterGeneralRepository.GetLatestAssetCode(request.AssetMaster.CompanyId,request.AssetMaster.UnitId, request.AssetMaster.AssetGroupId, request.AssetMaster.AssetSubCategoryId);
-
-            // Extract sequence number
-             int sequence = 1;
-            if (!string.IsNullOrEmpty(latestAssetCode))
-            {
-                var parts = latestAssetCode.Split('-');
-                if (parts.Length == 4 && int.TryParse(parts[3], out int lastSeq))
-                {
-                    sequence = lastSeq + 1;
-                }
-            }
-
-            // Generate Asset Code
-            var assetCode = $"{UnitName}-{assetGroupName}-{assetCategoryName}-{sequence}";
+            var latestAssetCode = await _assetMasterGeneralQueryRepository.GetLatestAssetCode(request.AssetMaster.CompanyId,request.AssetMaster.UnitId, request.AssetMaster.AssetGroupId, request.AssetMaster.AssetCategoryId,request.AssetMaster.AssetLocation.DepartmentId,request.AssetMaster.AssetLocation.LocationId);
+            var assetCode=latestAssetCode;
             var assetEntity  = _mapper.Map<AssetMasterGenerals>(request.AssetMaster);            
             assetEntity.AssetCode = assetCode; // Assign generated AssetCode       
             var result = await _assetMasterGeneralRepository.CreateAsync(assetEntity, cancellationToken);

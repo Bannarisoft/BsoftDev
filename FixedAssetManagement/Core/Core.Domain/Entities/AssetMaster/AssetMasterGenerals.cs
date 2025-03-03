@@ -38,9 +38,6 @@ namespace Core.Domain.Entities
 		public ICollection<AssetSpecifications>? AssetSpecification { get; set; }
 		public ICollection<AssetWarranties>? AssetWarranty { get; set; }
         public ICollection<AssetAdditionalCost>? AssetAdditionalCost { get; set; }
-        public AssetLocation? AssetLocation { get; set; }        
-        public  ICollection<AssetInsurance>? AssetInsurance { get; set; } 
-
-
-    }
-}
+        public AssetLocation? AssetLocation { get; set; }      
+ 		public ICollection<AssetAmc>? AssetAmc { get; set; }    }
+		public  ICollection<AssetInsurance>? AssetInsurance { get; set; }}

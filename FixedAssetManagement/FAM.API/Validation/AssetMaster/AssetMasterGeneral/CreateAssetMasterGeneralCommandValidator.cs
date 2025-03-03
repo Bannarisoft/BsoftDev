@@ -1,6 +1,7 @@
 
 
 using Core.Application.AssetLocation.Commands.CreateAssetLocation;
+using Core.Application.AssetMaster.AssetAdditionalCost.Commands.CreateAssetAdditionalCost;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetPurchase.Commands.CreateAssetPurchaseDetails;
 using Core.Domain.Entities;
@@ -41,7 +42,9 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
             var PjDocNo = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("PjDocNo") ?? 10;
             var AssetId = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("AssetId") ?? 10;
             var AssetSourceId = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("AssetSourceId") ?? 10;
-
+            
+            var JournalNo = maxLengthProvider.GetMaxLength<Core.Domain.Entities.AssetPurchase.AssetAdditionalCost>("JournalNo") ?? 100;
+            var CostType = maxLengthProvider.GetMaxLength<Core.Domain.Entities.AssetPurchase.AssetAdditionalCost>("CostType") ?? 10;
 
             // Load validation rules from JSON or another source
             _validationRules = ValidationRuleLoader.LoadValidationRules();
@@ -90,7 +93,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                             .NotEmpty()                            
                             .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.WorkingStatus)} {rule.Error}");   
                         //Location
-                      RuleFor(x => x.AssetMaster.AssetLocation.UnitId)
+                        RuleFor(x => x.AssetMaster.AssetLocation.UnitId)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateAssetLocationCommand.UnitId)} {rule.Error}")                            
                             .WithMessage($"{nameof(CreateAssetLocationCommand.UnitId)} must be a valid number.");
@@ -106,6 +109,20 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateAssetLocationCommand.SubLocationId)} {rule.Error}")                            
                             .WithMessage($"{nameof(CreateAssetLocationCommand.SubLocationId)} must be a valid number.");
+                        //Additional Cost
+                         RuleForEach(x => x.AssetMaster.AssetAssetAdditionalCost)
+                            .ChildRules(additionalCost =>
+                            {
+                                additionalCost.RuleFor(x => x.JournalNo)
+                                    .NotEmpty()
+                                    .WithMessage($"{nameof(CreateAssetAdditionalCostCommand.JournalNo)} {rule.Error}");
+                                additionalCost.RuleFor(x => x.CostType)
+                                    .NotEmpty()
+                                    .WithMessage($"{nameof(CreateAssetAdditionalCostCommand.CostType)} {rule.Error}");
+                                additionalCost.RuleFor(x => x.Amount)
+                                    .NotEmpty()
+                                    .WithMessage($"{nameof(CreateAssetAdditionalCostCommand.Amount)} {rule.Error}");
+                            });
                         //Purchase
                         RuleForEach(x => x.AssetMaster.AssetPurchaseDetails)
                             .ChildRules(purchase =>
@@ -162,7 +179,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                                     .NotEmpty()
                                     .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.AssetSourceId)} {rule.Error}");
                             });
-                        break;
+                            break;
                     case "MaxLength":                                              
                         RuleFor(x => x.AssetMaster.AssetName)
                             .MaximumLength(assetMasterGeneralNameMaxLength) 
@@ -173,6 +190,18 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                         RuleFor(x => x.AssetMaster.AssetDescription)
                             .MaximumLength(assetMasterGeneralMachineCodeMaxLength) 
                             .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.MachineCode)} {rule.Error} {assetMasterGeneralMachineCodeMaxLength}");
+                        //Additional Cost
+                        RuleForEach(x => x.AssetMaster.AssetAssetAdditionalCost)
+                            .ChildRules(additionalCost =>
+                            {
+                                additionalCost.RuleFor(x => x.JournalNo)
+                                    .MaximumLength(JournalNo)
+                                .WithMessage($"{nameof(CreateAssetAdditionalCostCommand.JournalNo)} {rule.Error}{JournalNo}");
+                                additionalCost.RuleFor(x => x.CostType.ToString())
+                                    .MaximumLength(CostType)
+                                .WithMessage($"{nameof(CreateAssetAdditionalCostCommand.CostType)} {rule.Error}{CostType}");
+                            });                       
+                        //Purchase 
                         RuleForEach(x => x.AssetMaster.AssetPurchaseDetails)
                             .ChildRules(purchase =>
                             {
@@ -204,37 +233,46 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                                      .MaximumLength(BillNo)
                                     .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.BillNo)} {rule.Error}{BillNo}");
                      
-                    purchase.RuleFor(x => x.PjYear.ToString())
-                                     .MaximumLength(PjYear)
-                                    .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.PjYear)} {rule.Error}{PjYear}");
-                     purchase.RuleFor(x => x.PjDocId.ToString())
-                                     .MaximumLength(PjDocId)
-                                    .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.PjDocId)} {rule.Error}{PjDocId}");
-                     purchase.RuleFor(x => x.PjDocNo.ToString())
-                                     .MaximumLength(PjDocNo)
-                                    .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.PjDocNo)} {rule.Error}{PjDocNo}");
-                      purchase.RuleFor(x => x.AssetSourceId.ToString())
-                                     .MaximumLength(AssetSourceId)
-                                    .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.AssetSourceId)} {rule.Error}{AssetSourceId}");
-                            });                                          
+                                purchase.RuleFor(x => x.PjYear.ToString())
+                                                .MaximumLength(PjYear)
+                                                .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.PjYear)} {rule.Error}{PjYear}");
+                                purchase.RuleFor(x => x.PjDocId.ToString())
+                                                .MaximumLength(PjDocId)
+                                                .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.PjDocId)} {rule.Error}{PjDocId}");
+                                purchase.RuleFor(x => x.PjDocNo.ToString())
+                                                .MaximumLength(PjDocNo)
+                                                .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.PjDocNo)} {rule.Error}{PjDocNo}");
+                                purchase.RuleFor(x => x.AssetSourceId.ToString())
+                                                .MaximumLength(AssetSourceId)
+                                                .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.AssetSourceId)} {rule.Error}{AssetSourceId}");
+                        });                                          
                         break;          
                     case "NumericOnly":       
                         RuleFor(x => x.AssetMaster.Quantity)
-                        .InclusiveBetween(1, int.MaxValue)
-                        .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.Quantity)} {rule.Error}");                       
+                            .InclusiveBetween(1, int.MaxValue)
+                            .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.Quantity)} {rule.Error}");                                                
+                        break;
+                    case "NumericWithDecimal":
+                        RuleForEach(x => x.AssetMaster.AssetAssetAdditionalCost)
+                            .ChildRules(additionalCost =>
+                            {                               
+                                additionalCost.RuleFor(x => x.Amount.ToString())
+                                .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                                .WithMessage($"{nameof(CreateAssetAdditionalCostCommand.Amount)} {rule.Error}");
+                            });                        
                         break;
                     case "YesNoStatus":
-                      RuleForEach(x => x.AssetMaster.AssetPurchaseDetails)
+                        RuleForEach(x => x.AssetMaster.AssetPurchaseDetails)
                             .ChildRules(purchase =>
                             {
                                  purchase.RuleFor(x => x.QcCompleted)
                                       .NotEmpty()
-                        .Must(value => value.HasValue && System.Text.RegularExpressions.Regex.IsMatch(value.Value.ToString(), rule.Pattern))
-                        .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.QcCompleted)} {rule.Error}");
+                                .Must(value => value.HasValue && System.Text.RegularExpressions.Regex.IsMatch(value.Value.ToString(), rule.Pattern))
+                                .WithMessage($"{nameof(CreateAssetPurchaseDetailCommand.QcCompleted)} {rule.Error}");
                             });                              
                          break;   
                     default:                        
-                        break;
+                    break;
                 }
             }
         }

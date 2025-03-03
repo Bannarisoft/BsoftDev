@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250226120725_AssetAmcTablemigration")]
+    partial class AssetAmcTablemigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -245,87 +248,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.ToTable("AssetAmc", "FixedAsset");
                 });
-modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<DateTimeOffset>("EndDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<byte?>("InsuranceStatus")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("Insuranceperiod")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<decimal?>("PolicyAmount")
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<string>("PolicyNo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("RenewalStatus")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset>("RenewedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("StartDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("VendorCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.ToTable("AssetInsurance", "FixedAsset");
-                });
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
                 {
                     b.Property<int>("Id")
@@ -447,7 +370,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.ToTable("AssetSpecifications", "FixedAsset");
                 });
-
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                 {
@@ -1123,7 +1045,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
-             
                     b.Property<string>("LocationName")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -1153,7 +1074,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.HasKey("Id");
 
-                   
                     b.ToTable("Location", "FixedAsset");
                 });
 
@@ -1502,7 +1422,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
 
-                  
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
@@ -1614,32 +1533,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.Navigation("RenewalStatusMiscType");
                 });
-modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMaster")
-                        .WithMany("AssetInsurance")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AssetMaster");
-                });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
                 {
@@ -1650,14 +1543,12 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.Location", "Location")
-                     
                         .WithMany("AssetLocations")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.SubLocation", "SubLocation")
-                   
                         .WithMany("AssetSubLocation")
                         .HasForeignKey("SubLocationId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1696,7 +1587,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                     b.Navigation("SpecificationMaster");
                 });
 
- 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
@@ -1948,13 +1838,11 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.Navigation("AssetChildren");
 
-					b.Navigation("AssetInsurance");
                     b.Navigation("AssetLocation");
 
                     b.Navigation("AssetPurchase");
 
                     b.Navigation("AssetSpecification");
-
 
                     b.Navigation("AssetWarranty");
                 });
@@ -2002,7 +1890,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                     b.Navigation("Manufactures");
 
                     b.Navigation("UOMs");
-
 
                     b.Navigation("WarrantyClaim");
 

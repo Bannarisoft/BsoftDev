@@ -52,7 +52,8 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetAdditionalCost;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetInsurance;
-using FAM.Infrastructure.Repositories.AssetMaster.AssetInsurance;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetInsurance;using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetAmc;
 
 namespace FAM.Infrastructure
 {
@@ -180,8 +181,10 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetAdditionalCostCommandRepository, AssetAdditionalCostCommandRepository>();            
             services.AddScoped<IAssetWarrantyQueryRepository, AssetWarrantyQueryRepository>();
             services.AddScoped<IAssetWarrantyCommandRepository, AssetWarrantyCommandRepository>();
-            services.AddScoped<IAssetInsuranceCommandRepository, AssetInsuranceCommandRepository>();
-            services.AddScoped<IAssetInsuranceQueryRepository, AssetInsuranceQueryRepository>();
+			services.AddScoped<IAssetInsuranceCommandRepository, AssetInsuranceCommandRepository>();
+            services.AddScoped<IAssetInsuranceQueryRepository, AssetInsuranceQueryRepository>();            services.AddScoped<IAssetAmcQueryRepository, AssetAmcQueryRepository>();
+            services.AddScoped<IAssetAmcCommandRepository, AssetAmcCommandRepository>();
+
 
 
             // Miscellaneous services
@@ -208,7 +211,9 @@ namespace FAM.Infrastructure
                 typeof(AssetWarrantyProfile),
 				typeof(AssetLocationProfile),
 				typeof(AssetAdditionalCostProfile),
-                typeof(AssetInsuranceProfile)
+				typeof(AssetInsuranceProfile),
+                typeof(AssetAmcProfile)
+
             );
 
             return services;
