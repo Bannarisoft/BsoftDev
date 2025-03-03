@@ -4,6 +4,7 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMaster
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral;
+using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetCodePattern;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralAutoComplete;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById;
@@ -252,6 +253,26 @@ namespace FAM.API.Controllers.AssetMaster
             {
                 StatusCode = StatusCodes.Status200OK,
                 message = "Working Status fetched successfully.",
+                data = result.Data
+            });
+        }
+        // GET: api/AssetMasterGeneral/AssetType
+        [HttpGet("AssetCodePattern")]
+        public async Task<IActionResult> GetAssetCodePattern()
+        {
+            var result = await Mediator.Send(new GetAssetCodePatternQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Asset Pattern found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Asset Pattern fetched successfully.",
                 data = result.Data
             });
         }

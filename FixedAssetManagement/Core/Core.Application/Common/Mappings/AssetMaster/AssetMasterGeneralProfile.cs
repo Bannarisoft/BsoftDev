@@ -33,6 +33,7 @@ namespace Core.Application.Common.Mappings.AssetMaster
             CreateMap<AssetMasterDto, AssetMasterGenerals>()
             .ForMember(dest => dest.AssetPurchase, opt => opt.MapFrom(src => src.AssetPurchaseDetails))
             .ForMember(dest => dest.AssetLocation, opt => opt.MapFrom(src => src.AssetLocation)) 
+            .ForMember(dest => dest.AssetAdditionalCost, opt => opt.MapFrom(src => src.AssetAssetAdditionalCost)) 
             .ForMember(dest => dest.Id, opt => opt.Ignore());  
                        
             // Mapping for the composite DTO with reverse mapping enabled.
@@ -42,6 +43,8 @@ namespace Core.Application.Common.Mappings.AssetMaster
                 .ReverseMap();
 
             CreateMap<AssetLocationCombineDto, Core.Domain.Entities.AssetMaster.AssetLocation>()
+                .ReverseMap(); 
+             CreateMap<AssetAdditionalCostCombineDto, Core.Domain.Entities.AssetPurchase.AssetAdditionalCost>()
                 .ReverseMap(); 
         }        
     }
