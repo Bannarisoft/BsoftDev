@@ -41,6 +41,7 @@ namespace Core.Domain.Entities
         public ICollection<AssetAdditionalCost>? AssetAdditionalCost { get; set; }
 
         public AssetLocation? AssetLocation { get; set; } 
+        public ICollection<AssetAmc>? AssetAmc { get; set; }
 
     }
 }

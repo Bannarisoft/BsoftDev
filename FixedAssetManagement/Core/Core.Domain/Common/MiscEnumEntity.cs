@@ -36,5 +36,15 @@ namespace Core.Domain.Common
         {
             public const string MiscCode = "WARRANTYCLAIM";
         }
+        public static class Asset_AmcRenewStatus
+        {
+            public const string MiscCode = "RENEWSTATUS";
+        }
+        public static class Asset_AmcCoverageScope
+        {
+            public const string MiscCode = "COVERAGESCOPE";
+        }
+
+
     }
 }
