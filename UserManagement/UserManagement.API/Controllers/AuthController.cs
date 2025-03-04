@@ -89,7 +89,6 @@ namespace UserManagement.API.Controllers
       
                 // Retrieve max login attempts from AdminSecuritySettings            
                 var user = await _userQueryRepository.GetByUsernameAsync(username);
-                int companyId = user?.CompanyId??0;
                 const int adminSecuritySettingId = 18; // Replace with the actual ID for your settings
     //          var adminSettings = await _mediator.Send(new GetAdminSecuritySettingsByIdQuery { Id = companyId });         
                 var adminSettings = await _mediator.Send(new GetAdminSecuritySettingsByIdQuery { Id = adminSecuritySettingId });                        
