@@ -20,18 +20,19 @@ namespace Core.Domain.Entities
     public string? UserName { get; set; }
     public FirstTimeUserStatus IsFirstTimeUser { get; set; } 
     public string? PasswordHash { get; set; }
-    public int UserType { get; set; }
+    public int? UserType { get; set; }
     public string? Mobile { get; set; }
     public string? EmailId { get; set; }
-    public int CompanyId { get; set; }
-    public int UnitId { get; set; }
-    public int DivisionId { get; set; }
+    public int? DivisionId { get; set; }
     
     public IList<UserRoleAllocation>? UserRoleAllocations { get; set; }
 
      public ICollection<PasswordLog>? Passwords { get; set; }
      public IList<UserCompany>? UserCompanies { get; set; }
      public IList<UserUnit> UserUnits { get; set; }
+     public int? EntityId { get; set; }
+     public Entity? Entity { get; set; }
+     public UserGroupUsers? UserGroupUsers { get; set; }
 
     public void SetPassword(string password)
     {
