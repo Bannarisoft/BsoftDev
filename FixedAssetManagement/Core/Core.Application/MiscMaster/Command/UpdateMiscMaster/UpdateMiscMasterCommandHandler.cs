@@ -37,12 +37,8 @@ namespace Core.Application.MiscMaster.Command.UpdateMiscMaster
                 if (existingMisctype != null)
                 {
                     return new ApiResponseDTO<bool>{IsSuccess = false, Message = "MiscMaster already exists"};
-                }
-              
-
-                 var miscmaster  = _imapper.Map<Core.Domain.Entities.MiscMaster>(request);
-
-         
+                }              
+                 var miscmaster  = _imapper.Map<Core.Domain.Entities.MiscMaster>(request);         
                 var MiscMasterresult = await _miscMasterCommandRepository.UpdateAsync(request.Id, miscmaster);                
 
                     var domainEvent = new AuditLogsDomainEvent(

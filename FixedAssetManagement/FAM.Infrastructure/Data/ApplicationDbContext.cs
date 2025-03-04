@@ -41,6 +41,8 @@ namespace FAM.Infrastructure.Data
         public DbSet<AssetPurchaseDetails> AssetPurchaseDetails { get; set; }
         public DbSet<AssetSpecifications> AssetSpecifications { get; set; }
         public DbSet<AssetAdditionalCost> AssetAdditionalCost { get; set; }
+		public DbSet<AssetInsurance> AssetInsurance { get; set; }
+        public DbSet<AssetAmc> AssetAmc { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -64,6 +66,8 @@ namespace FAM.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new AssetSpecificationConfiguration());   
 			modelBuilder.ApplyConfiguration(new AssetWarrantyConfiguration());
             modelBuilder.ApplyConfiguration(new AssetAdditionalCostConfiguration());   
+			modelBuilder.ApplyConfiguration(new AssetInsuranceConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetAmcConfiguration()); 
 
             base.OnModelCreating(modelBuilder);
         }

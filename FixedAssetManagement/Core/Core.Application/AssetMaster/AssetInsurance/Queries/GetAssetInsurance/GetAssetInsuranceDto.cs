@@ -2,30 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Domain.Entities.AssetPurchase;
+using static Core.Domain.Common.BaseEntity;
 
-namespace Core.Domain.Entities
+namespace Core.Application.AssetMaster.AssetInsurance.Queries.GetAssetInsurance
 {
-    public class Insurance 
+    public class GetAssetInsuranceDto
     {
-        public int  AssetId { get; set; }
-         public AssetMasterGenerals AssetMasterId { get; set; } = null!;
+        public int Id { get; set; }
+        public int  AssetId { get; set; }       
         public string? PolicyNo { get; set; }       
         public DateTimeOffset StartDate { get; set; }
+        public string? Insuranceperiod { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public string? PolicyAmount { get; set; }
-        public int VendorId { get; set; }
-        public DateTimeOffset NextRenewalDate { get; set; }
-
+        public string? VendorCode { get; set; }
         public string? RenewalStatus { get; set; }
-
         public DateTimeOffset RenewedDate { get; set; }
-        public string? InsuranceStatus { get; set; }
-
-       
-
-        
-
+        public Status IsActive { get; set; }
 
         
     }
