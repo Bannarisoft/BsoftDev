@@ -25,7 +25,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetLocation
             return assetLocation;     
         }
 
-        public async Task<bool> UpdateAsync(int id, Core.Domain.Entities.AssetMaster.AssetLocation assetLocation)
+        public async Task<int> UpdateAsync(int id, Core.Domain.Entities.AssetMaster.AssetLocation assetLocation)
         {
             var existingAssetLocation = await _applicationDbContext.AssetLocations.FirstOrDefaultAsync(a => a.AssetId == id);
 
@@ -41,10 +41,10 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetLocation
                
 
                 _applicationDbContext.AssetLocations.Update(existingAssetLocation);
-                return await _applicationDbContext.SaveChangesAsync() > 0;
+                return await _applicationDbContext.SaveChangesAsync() ;
             }
             
-            return false;
+            return 0;
         }
 
 

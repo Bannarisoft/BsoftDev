@@ -53,6 +53,9 @@ using FAM.API.Validation.AssetMaster.AssetWarranty;
 using Core.Application.AssetMaster.AssetWarranty.Commands.UpdateAssetWarranty;
 using FAM.API.Validation.AssetMaster.AssetWaranty;
 using Core.Application.AssetMaster.AssetWarranty.Commands.UploadAssetWarranty;
+using Core.Application.AssetMaster.AssetInsurance.Commands.CreateAssetInsurance;
+using Core.Application.AssetMaster.AssetInsurance.Commands.UpdateAssetInsurance;
+using FAM.API.Validation.AssetMaster.AssetInsurance;
 
 
 namespace FAM.API.Validation.Common
@@ -101,7 +104,9 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateAssetAdditionalCostCommand>, UpdateAssetAdditionalCostCommandValidator>();
         services.AddScoped<IValidator<CreateAssetWarrantyCommand>, CreateAssetWarrantyCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetWarrantyCommand>, UpdateAssetWarrantyCommandValidator>();
-        services.AddScoped<IValidator<UploadFileAssetWarrantyCommand>, UploadAssetWarrantyCommandValidator>();                
+        services.AddScoped<IValidator<UploadFileAssetWarrantyCommand>, UploadAssetWarrantyCommandValidator>();
+        services.AddScoped<IValidator<CreateAssetInsuranceCommand>, CreateAssetInsuranceCommandValidator>();
+        services.AddScoped<IValidator<UpdateAssetInsuranceCommand>, UpdateAssetInsuranceCommandValidator>();                    
     }  
     }
 }

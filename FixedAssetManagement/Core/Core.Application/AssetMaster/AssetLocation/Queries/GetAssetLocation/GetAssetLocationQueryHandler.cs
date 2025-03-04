@@ -33,8 +33,8 @@ namespace Core.Application.AssetLocation.Queries.GetAssetLocation
                 actionDetail: "GetAll",
                 actionCode: "",        
                 actionName: "",
-                details: $"DepreciationGroup details was fetched.",
-                module:"DepreciationGroup"
+                details: $"Asset Location details was fetched.",
+                module:"Asset Location"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
             return new ApiResponseDTO<List<AssetLocationDto>>

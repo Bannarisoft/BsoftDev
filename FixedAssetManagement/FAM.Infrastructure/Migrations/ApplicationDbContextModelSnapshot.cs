@@ -156,6 +156,176 @@ namespace FAM.Infrastructure.Migrations
                     b.ToTable("AssetGroup", "FixedAsset");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetAmc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CoverageType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset>("EndDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("FreeServiceCount")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("Period")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RenewalStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("RenewedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("VendorCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("VendorEmail")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("VendorName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("VendorPhone")
+                        .HasColumnType("nvarchar(40)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
+
+                    b.HasIndex("CoverageType");
+
+                    b.HasIndex("RenewalStatus");
+
+                    b.ToTable("AssetAmc", "FixedAsset");
+                });
+modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTimeOffset>("EndDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte?>("InsuranceStatus")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("Insuranceperiod")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<decimal?>("PolicyAmount")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<string>("PolicyNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("RenewalStatus")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset>("RenewedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("VendorCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
+
+                    b.ToTable("AssetInsurance", "FixedAsset");
+                });
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
                 {
                     b.Property<int>("Id")
@@ -293,7 +463,6 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Property<string>("ContactPerson")
                         .IsRequired()
-                        
                         .HasColumnType("varchar(50)");
 
                     b.Property<int>("CreatedBy")
@@ -1419,6 +1588,59 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetGroup");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetAmc", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterAmcId")
+                        .WithMany("AssetAmc")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "CoverageMiscType")
+                        .WithMany("AssetAmcCoverageType")
+                        .HasForeignKey("CoverageType")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "RenewalStatusMiscType")
+                        .WithMany("AssetAmcRenewStatus")
+                        .HasForeignKey("RenewalStatus")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssetMasterAmcId");
+
+                    b.Navigation("CoverageMiscType");
+
+                    b.Navigation("RenewalStatusMiscType");
+                });
+modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMaster")
+                        .WithMany("AssetInsurance")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssetMaster");
+                });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "Asset")
@@ -1722,8 +1944,11 @@ namespace FAM.Infrastructure.Migrations
                 {
                     b.Navigation("AssetAdditionalCost");
 
+                    b.Navigation("AssetAmc");
+
                     b.Navigation("AssetChildren");
 
+					b.Navigation("AssetInsurance");
                     b.Navigation("AssetLocation");
 
                     b.Navigation("AssetPurchase");
@@ -1761,6 +1986,10 @@ namespace FAM.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.Navigation("AssetAdditionalCost");
+
+                    b.Navigation("AssetAmcCoverageType");
+
+                    b.Navigation("AssetAmcRenewStatus");
 
                     b.Navigation("AssetMiscTypeGenerals");
 
