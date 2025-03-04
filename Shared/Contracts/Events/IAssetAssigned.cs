@@ -7,6 +7,7 @@ namespace Contracts.Events
 {
     public interface IAssetAssigned
     {
+        Guid CorrelationId { get; }
         Guid AssetId { get; }
         Guid UserId { get; }
     }

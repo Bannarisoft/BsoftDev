@@ -7,7 +7,7 @@ namespace Contracts.Events
 {
     public interface IAssetReleased
     {
-        Guid AssetId { get; }
+        Guid CorrelationId { get; }
         Guid UserId { get; }
     }
 }

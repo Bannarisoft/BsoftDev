@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SagaOrchestrator.API.Consumers
 {
-    public class UserCreatedEventConsumer : IConsumer<UserCreatedEvent>
+    public class UserCreatedEventConsumer : IConsumer<IUserCreated>
     {
         private readonly ILogger<UserCreatedEventConsumer> _logger;
         public UserCreatedEventConsumer(ILogger<UserCreatedEventConsumer> logger)
@@ -16,7 +16,7 @@ namespace SagaOrchestrator.API.Consumers
             _logger = logger;
         }
 
-        public async Task Consume(ConsumeContext<UserCreatedEvent> context)
+        public async Task Consume(ConsumeContext<IUserCreated> context)
         {
             _logger.LogInformation($"UserCreatedEvent received: {context.Message.UserId}");
             await Task.CompletedTask;

@@ -1,14 +1,9 @@
 using Core.Application;
 using FAM.Infrastructure;
-using Serilog;
-using Microsoft.IdentityModel.Logging;
-using Serilog.Events;
 using FAM.API.Validation.Common;
 using FAM.API.Configurations;
-using FluentValidation;
-using FAM.API.Validation.DepreciationGroup;
 using MassTransit;
-using FAM.API.Consumers;
+using Contracts.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,14 +37,21 @@ validationService.AddValidationServices(builder.Services);
 // Configure MassTransit with RabbitMQ
 builder.Services.AddMassTransit(cfg =>
 {
+    cfg.AddConsumer<UserCreatedConsumer>();
+
     cfg.UsingRabbitMq((context, config) =>
     {
         config.Host("rabbitmq://localhost");
-        config.ConfigureEndpoints(context);
+
+        config.ReceiveEndpoint("user-created-event-queue", ep =>
+        {
+            ep.ConfigureConsumeTopology = false;
+            ep.Bind<UserCreatedEvent>();
+            ep.ConfigureConsumer<UserCreatedConsumer>(context);
+        });
     });
 });
 
-builder.Services.AddMassTransitHostedService();
 // builder.Services.AddMassTransit(cfg =>
 // {
 //     cfg.AddConsumer<FixedAssetConsumer>();
@@ -96,4 +98,5 @@ app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
+app.MapGet("/", () => "Fixed Asset Management Running");
 app.Run();

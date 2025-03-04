@@ -1,39 +1,46 @@
 using MassTransit;
-using SagaOrchestrator.API.Consumers;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Contracts.Events;
+using SagaOrchestrator.Application; // Ensure correct reference
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add MassTransit & RabbitMQ
 builder.Services.AddMassTransit(cfg =>
 {
+    cfg.SetKebabCaseEndpointNameFormatter();
+
+    // Register the Saga State Machine and MongoDB Repository
+    cfg.AddSagaStateMachine<UserAssetStateMachine, UserAssetState>()
+        .MongoDbRepository(r =>
+        {
+            r.Connection = "mongodb://localhost:27017";
+            r.DatabaseName = "saga_state";
+        });
+
     cfg.UsingRabbitMq((context, config) =>
     {
         config.Host("rabbitmq://localhost");
+
+        config.ReceiveEndpoint("user-created-event-queue", ep =>
+        {
+            ep.ConfigureConsumeTopology = false;
+            ep.Bind<UserCreatedEvent>();
+            ep.ConfigureSaga<UserAssetState>(context);
+        });
+
         config.ConfigureEndpoints(context);
     });
 });
 
-builder.Services.AddMassTransitHostedService();
-
-// builder.Services.AddMassTransit(x =>
-// {
-//     x.AddConsumer<UserCreatedEventConsumer>();
-
-//     x.UsingRabbitMq((context, cfg) =>
-//     {
-//         cfg.Host("rabbitmq://localhost");
-
-//         cfg.ReceiveEndpoint("user-created-queue", e =>
-//         {
-//             e.ConfigureConsumer<UserCreatedEventConsumer>(context);
-//         });
-//     });
-// });
-
+// Register Controllers
 builder.Services.AddControllers();
+
 var app = builder.Build();
 
+// Middleware Setup
 app.UseRouting();
 app.MapControllers();
+
 app.Run();

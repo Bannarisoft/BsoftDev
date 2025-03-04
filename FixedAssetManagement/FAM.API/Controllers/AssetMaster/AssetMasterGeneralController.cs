@@ -106,13 +106,13 @@ namespace FAM.API.Controllers.AssetMaster
                 });
             }
             //Saga implementation
-            var assetId = Guid.NewGuid();
+            // var assetId = Guid.NewGuid();
 
-            await _publishEndpoint.Publish<IAssetAssigned>(new
-            {
-                AssetId = assetId,
-                // UserId = command.userId
-            });
+            // await _publishEndpoint.Publish<IAssetAssigned>(new
+            // {
+            //     AssetId = assetId,
+            //     // UserId = command.userId
+            // });
             // _logger.LogInformation($"Publishing IAssetAssigned for AssetId: {AssetId}, AssetName: {command.AssetName}");
             //Saga implementation end
             var result = await Mediator.Send(command);

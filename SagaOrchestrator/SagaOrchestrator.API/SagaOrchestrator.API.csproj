@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="MassTransit" Version="8.0.0" />
+    <PackageReference Include="MassTransit.MongoDb" Version="8.0.0" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
     <PackageReference Include="RabbitMQ.Client" Version="7.1.1" />
@@ -17,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\SagaOrchestrator\SagaOrchestrator.csproj" />
+    <ProjectReference Include="..\SagaOrchestrator.Application\SagaOrchestrator.Application.csproj" />
 
   </ItemGroup>
 

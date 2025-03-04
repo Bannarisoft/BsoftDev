@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  microservice-a:
+    build:
+      context: .
+      dockerfile: UserManagement/Dockerfile
+    container_name: usermanagement-a
+    ports:
+      - "5174:5174"
+    depends_on:
+      - rabbitmq
+
+  microservice-b:
+    build:
+      context: .
+      dockerfile: FixedAssetManagement/Dockerfile
+    container_name: fixedassetmanagement-b
+    ports:
+      - "5194:5194"
+    depends_on:
+      - rabbitmq
+
+  microservice-c:
+    build:
+      context: .
+      dockerfile: SagaOrchestrator/Dockerfile
+    container_name: sagaorchestrator-c
+    ports:
+      - "5192:5192"
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"

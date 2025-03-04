@@ -2,16 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Contracts.Events;
+using MassTransit;
 
 namespace SagaOrchestrator.Application
 {
-    public class UserAssetState : SagaStateMachineInstance
+    public class UserAssetState : SagaStateMachineInstance, ISagaVersion
     {
         public Guid CorrelationId { get; set; }
         public int CurrentState { get; set; }
         public Guid UserId { get; set; }
         public Guid AssetId { get; set; }
         public DateTime CreatedAt { get; set; }
+        // Required by ISagaVersion
+        public int Version { get; set; }
     }
 
     public class UserAssetStateMachine : MassTransitStateMachine<UserAssetState>
@@ -20,7 +24,7 @@ namespace SagaOrchestrator.Application
         public State AssetAssigned { get; private set; }
         public State AssetReleased { get; private set; }
 
-        public Event<IUserCreated> UserCreatedEvent { get; private set; }
+        public Event<UserCreatedEvent> UserCreatedEvent { get; private set; }
         public Event<IAssetAssigned> AssetAssignedEvent { get; private set; }
         public Event<IAssetReleased> AssetReleasedEvent { get; private set; }
 
@@ -28,9 +32,12 @@ namespace SagaOrchestrator.Application
         {
             InstanceState(x => x.CurrentState);
 
-            Event(() => UserCreatedEvent, x => x.CorrelateById(m => m.Message.UserId));
-            Event(() => AssetAssignedEvent, x => x.CorrelateById(m => m.Message.UserId));
-            Event(() => AssetReleasedEvent, x => x.CorrelateById(m => m.Message.UserId));
+            // Event(() => UserCreatedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
+            // Event(() => AssetAssignedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
+            // Event(() => AssetReleasedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
+            Event(() => UserCreatedEvent, x => x.CorrelateBy((state, context) => state.CorrelationId == context.Message.UserId)
+                                      .SelectId(context => context.Message.UserId));
+
 
             Initially(
                 When(UserCreatedEvent)
