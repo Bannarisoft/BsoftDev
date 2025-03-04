@@ -75,7 +75,6 @@ namespace UserManagement.Infrastructure.Repositories.Users
                                 ur.UserType,
                                 ur.Mobile,
                                 ur.EmailId,
-                                ur.UnitId,
                                 ur.IsFirstTimeUser,
                                 ur.IsDeleted
                 FROM AppSecurity.Users ur
@@ -123,7 +122,6 @@ namespace UserManagement.Infrastructure.Repositories.Users
                     ur.UserType,
                     ur.Mobile,
                     ur.EmailId,
-                    ur.UnitId,
                     ur.UserId,
                     ur.IsFirstTimeUser,
                     ur.IsDeleted,
