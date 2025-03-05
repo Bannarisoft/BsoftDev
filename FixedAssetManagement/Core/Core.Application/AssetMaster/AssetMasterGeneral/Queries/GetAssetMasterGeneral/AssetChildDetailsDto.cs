@@ -15,6 +15,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public int AssetWarranty { get; set; }
         public int AssetSpec { get; set; }
         public int AssetAmc { get; set; }
+        public int AssetAdditionalCost { get; set; }
+        public int AssetInsurance { get; set; }
 
     }
 }
