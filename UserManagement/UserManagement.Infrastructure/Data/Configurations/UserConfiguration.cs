@@ -47,17 +47,17 @@ namespace UserManagement.Infrastructure.Data.Configurations
             builder.Property(u => u.FirstName)
                 .HasColumnName("FirstName")
                 .HasColumnType("varchar(50)")
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(u => u.LastName)
                 .HasColumnName("LastName")
                 .HasColumnType("varchar(50)")
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(u => u.UserName)
                 .HasColumnName("UserName")
                 .HasColumnType("varchar(50)")
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(u => u.IsActive)
                 .HasColumnName("IsActive")
@@ -74,37 +74,37 @@ namespace UserManagement.Infrastructure.Data.Configurations
             builder.Property(u => u.PasswordHash)
                 .HasColumnName("PasswordHash")
                 .HasColumnType("varchar(255)")
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(u => u.UserType)
                 .HasColumnName("UserType")
                 .HasColumnType("int")
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(u => u.Mobile)
                 .HasColumnName("Mobile")
                 .HasColumnType("varchar(20)")
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(u => u.EmailId)
                 .HasColumnName("EmailId")
                 .HasColumnType("varchar(100)")
                 .IsRequired();
 
-            builder.Property(u => u.CompanyId)
-                .HasColumnName("CompanyId")
-                .HasColumnType("int")
-                .IsRequired();
+            // builder.Property(u => u.CompanyId)
+            //     .HasColumnName("CompanyId")
+            //     .HasColumnType("int")
+            //     .IsRequired();
 
-            builder.Property(u => u.UnitId)
-                .HasColumnName("UnitId")
-                .HasColumnType("int")
-                .IsRequired();
+            // builder.Property(u => u.UnitId)
+            //     .HasColumnName("UnitId")
+            //     .HasColumnType("int")
+            //     .IsRequired();
 
             builder.Property(u => u.DivisionId)
                 .HasColumnName("DivisionId")
                 .HasColumnType("int")
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(u => u.IsDeleted)
             .HasColumnName("IsDeleted")
@@ -126,10 +126,6 @@ namespace UserManagement.Infrastructure.Data.Configurations
             builder.Property(b => b.ModifiedIP)
             .HasColumnType("varchar(255)");
 
-            // builder.Property(u => u.UserRoleId)
-            //     .HasColumnName("UserRoleId")
-            //     .HasColumnType("int")
-            //     .IsRequired();
 
             builder.HasMany(u => u.UserRoleAllocations)
                 .WithOne()

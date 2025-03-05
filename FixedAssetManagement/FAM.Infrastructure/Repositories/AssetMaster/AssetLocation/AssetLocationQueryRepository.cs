@@ -107,5 +107,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetLocation
 
         }
 
+     
+
     }
 }

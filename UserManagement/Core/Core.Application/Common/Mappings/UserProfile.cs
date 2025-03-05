@@ -17,8 +17,7 @@ public class UserProfile : Profile
         .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations))
         .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
         .ForMember(dest => dest.IsFirstTimeUser, opt => opt.MapFrom(src => FirstTimeUserStatus.Yes))
-        .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
-        .ForMember(dest => dest.CompanyId, opt => opt.Ignore());
+        .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
         CreateMap<UserCompanyDTO, UserCompany>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())

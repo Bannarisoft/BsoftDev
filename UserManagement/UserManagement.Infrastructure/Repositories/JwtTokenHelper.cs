@@ -47,7 +47,7 @@ namespace UserManagement.Infrastructure.Repositories
             } 
         }
 
-      public string GenerateToken(string username, int userId, int usertype, IEnumerable<string> roles,string mobile,string email,int unitId,List<UserCompany> companyId, out string jti)
+      public string GenerateToken(string username, int userId, int usertype, IEnumerable<string> roles,string mobile,string email,List<UserCompany> companyId, out string jti)
         {
             jti = Guid.NewGuid().ToString();            
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
@@ -65,7 +65,6 @@ namespace UserManagement.Infrastructure.Repositories
                 new Claim("usertype", usertype.ToString()),
                 new Claim("mobile", mobile.ToString()),
                 new Claim("email", email.ToString()),
-                new Claim("unitId", unitId.ToString()),
                 new Claim("companyId", JsonSerializer.Serialize(companyId)),
                 new Claim(JwtRegisteredClaimNames.Jti, jti),
                 new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(currentTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
