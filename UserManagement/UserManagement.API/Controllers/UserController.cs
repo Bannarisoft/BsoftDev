@@ -132,14 +132,7 @@ namespace UserManagement.API.Controllers
                     errors = validationResult.Errors.Select(e => e.ErrorMessage)
                 });
             }
-            // await _publishEndpoint.Publish(new UserCreatedEvent(userId, createUserCommand.UserName, createUserCommand.EmailId));
-            // _logger.LogInformation($"Publishing UserCreatedEvent for UserId: {userId}, UserName: {createUserCommand.UserName}, Email: {createUserCommand.EmailId}");
-            // await _publishEndpoint.Publish(new UserCreatedEvent
-            // {
-            //     UserId = userId,
-            //     UserName = createUserCommand.UserName,
-            //     Email = createUserCommand.EmailId
-            // });
+
             var userId = Guid.NewGuid();
             var userCreatedEvent = new UserCreatedEvent(
                 CorrelationId: Guid.NewGuid(),   // Create a new CorrelationId
