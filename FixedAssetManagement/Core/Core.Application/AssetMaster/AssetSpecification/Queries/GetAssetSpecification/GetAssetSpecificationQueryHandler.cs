@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecification
 {    
-    public class GetAssetSpecificationQueryHandler : IRequestHandler<GetAssetSpecificationQuery, ApiResponseDTO<List<AssetSpecificationDTO>>>
+    public class GetAssetSpecificationQueryHandler : IRequestHandler<GetAssetSpecificationQuery, ApiResponseDTO<List<AssetSpecificationJsonDto>>>
     {
         private readonly IAssetSpecificationQueryRepository _assetSpecificationRepository;
         private readonly IMapper _mapper;
@@ -18,10 +18,10 @@ namespace Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecif
             _mapper = mapper;
             _mediator = mediator;
         }        
-        public async Task<ApiResponseDTO<List<AssetSpecificationDTO>>> Handle(GetAssetSpecificationQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<AssetSpecificationJsonDto>>> Handle(GetAssetSpecificationQuery request, CancellationToken cancellationToken)
         {
             var (assetSpecification, totalCount) = await _assetSpecificationRepository.GetAllAssetSpecificationAsync(request.PageNumber, request.PageSize, request.SearchTerm);
-            var assetSpecificationList = _mapper.Map<List<AssetSpecificationDTO>>(assetSpecification);
+            var assetSpecificationList = _mapper.Map<List<AssetSpecificationJsonDto>>(assetSpecification);
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -32,7 +32,7 @@ namespace Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecif
                 module:"Asset Specification"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<AssetSpecificationDTO>>
+            return new ApiResponseDTO<List<AssetSpecificationJsonDto>>
             {
                 IsSuccess = true,
                 Message = "Success",

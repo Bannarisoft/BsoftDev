@@ -52,8 +52,17 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetAdditionalCost;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetInsurance;
-using FAM.Infrastructure.Repositories.AssetMaster.AssetInsurance;using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
+
+using FAM.Infrastructure.Repositories.AssetMaster.AssetInsurance;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetAmc;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransfer;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetDisposal;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetDisposal;
+
+using Core.Application.Common.Interfaces.IDepreciationDetail;
+using FAM.Infrastructure.Repositories.DepreciationDetail;
 
 namespace FAM.Infrastructure
 {
@@ -182,9 +191,17 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetWarrantyQueryRepository, AssetWarrantyQueryRepository>();
             services.AddScoped<IAssetWarrantyCommandRepository, AssetWarrantyCommandRepository>();
 			services.AddScoped<IAssetInsuranceCommandRepository, AssetInsuranceCommandRepository>();
-            services.AddScoped<IAssetInsuranceQueryRepository, AssetInsuranceQueryRepository>();            services.AddScoped<IAssetAmcQueryRepository, AssetAmcQueryRepository>();
-            services.AddScoped<IAssetAmcCommandRepository, AssetAmcCommandRepository>();
 
+            services.AddScoped<IAssetInsuranceQueryRepository, AssetInsuranceQueryRepository>();            
+            services.AddScoped<IAssetAmcQueryRepository, AssetAmcQueryRepository>();
+            services.AddScoped<IAssetAmcCommandRepository, AssetAmcCommandRepository>();
+            services.AddScoped<IAssetTransferQueryRepository, AssetTransferQueryRepository>();
+            
+            services.AddScoped<IAssetDisposalQueryRepository, AssetDisposalQueryRepository>();
+            services.AddScoped<IAssetDisposalCommandRepository, AssetDisposalCommandRepository>();
+
+			 services.AddScoped<IDepreciationDetailCommandRepository, DepreciationDetailCommandRepository>();
+            services.AddScoped<IDepreciationDetailQueryRepository, DepreciationDetailQueryRepository>();
 
 
             // Miscellaneous services
@@ -212,7 +229,12 @@ namespace FAM.Infrastructure
 				typeof(AssetLocationProfile),
 				typeof(AssetAdditionalCostProfile),
 				typeof(AssetInsuranceProfile),
-                typeof(AssetAmcProfile)
+
+
+                typeof(AssetTransferProfile),
+                typeof(AssetAmcProfile),
+                typeof(AssetDisposalProfile),
+ 				typeof(DepreciationDetailProfile)
 
             );
 

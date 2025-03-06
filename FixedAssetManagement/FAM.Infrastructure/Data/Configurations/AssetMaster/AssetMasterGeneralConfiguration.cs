@@ -137,7 +137,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .IsRequired()
                 .HasColumnType("varchar(250)");
 
-                 builder.Property(ca => ca.AssetImage)
+                builder.Property(ca => ca.AssetImage)
                 .HasColumnName("AssetImage")
                 .HasColumnType("nvarchar(255)");
 
