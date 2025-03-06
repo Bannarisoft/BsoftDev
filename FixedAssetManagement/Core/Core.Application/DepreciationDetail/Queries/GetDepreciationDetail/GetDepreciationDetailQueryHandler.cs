@@ -1,26 +1,26 @@
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.IDepreciationCalculation;
+using Core.Application.Common.Interfaces.IDepreciationDetail;
 using Core.Domain.Events;
 using MediatR;
 
-namespace Core.Application.DepreciationCalculation.Queries.GetDepreciationCalculation
+namespace Core.Application.DepreciationDetail.Queries.GetDepreciationDetail
 {
-    public class GetDepreciationCalculationQueryHandler : IRequestHandler<GetDepreciationCalculationQuery, ApiResponseDTO<List<DepreciationDto>>>
+    public class GetDepreciationDetailQueryHandler : IRequestHandler<GetDepreciationDetailQuery, ApiResponseDTO<List<DepreciationDto>>>
     {
-        private readonly IDepreciationCalculationQueryRepository _depreciationCalculationRepository;
+        private readonly IDepreciationDetailQueryRepository _depreciationDetailRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
 
-        public GetDepreciationCalculationQueryHandler(IDepreciationCalculationQueryRepository depreciationCalculationRepository , IMapper mapper, IMediator mediator)
+        public GetDepreciationDetailQueryHandler(IDepreciationDetailQueryRepository depreciationDetailRepository , IMapper mapper, IMediator mediator)
         {
-            _depreciationCalculationRepository = depreciationCalculationRepository;
+            _depreciationDetailRepository = depreciationDetailRepository;
             _mapper = mapper;
             _mediator = mediator;
         }        
-        public async Task<ApiResponseDTO<List<DepreciationDto>>> Handle(GetDepreciationCalculationQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<DepreciationDto>>> Handle(GetDepreciationDetailQuery request, CancellationToken cancellationToken)
         {
-            var (assetSpecification, totalCount) = await _depreciationCalculationRepository.CalculateDepreciationAsync(request.CompanyId,request.UnitId, request.StartDate,request.EndDate,request.PageNumber, request.PageSize, request.SearchTerm);
+            var (assetSpecification, totalCount) = await _depreciationDetailRepository.CalculateDepreciationAsync(request.companyId,request.unitId,request.finYear, request.startDate,request.endDate,request.depreciationType,request.PageNumber, request.PageSize, request.SearchTerm);
             var assetSpecificationList = _mapper.Map<List<DepreciationDto>>(assetSpecification);
 
             //Domain Event
@@ -43,4 +43,5 @@ namespace Core.Application.DepreciationCalculation.Queries.GetDepreciationCalcul
             };            
         }
     }
+  
 }

@@ -1,5 +1,5 @@
 
-namespace Core.Application.DepreciationCalculation.Queries.GetDepreciationCalculation
+namespace Core.Application.DepreciationDetail.Queries.GetDepreciationDetail
 {
     public class DepreciationDto 
     {
