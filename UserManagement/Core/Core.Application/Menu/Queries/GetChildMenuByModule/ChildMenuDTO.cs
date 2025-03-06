@@ -10,5 +10,6 @@ namespace Core.Application.Menu.Queries.GetChildMenuByModule
         public int Id { get; set; }
         public string MenuName { get; set; }
         public int ParentId { get; set; }
+        public string MenuUrl { get; set; }
     }
 }

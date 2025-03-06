@@ -21,6 +21,8 @@ namespace Core.Domain.Entities
     public byte IsForcePasswordChangeOnFirstLogin { get; set; }
     public int PasswordResetCodeExpiryMinutes { get; set; }
     public byte IsCaptchaEnabledOnLogin { get; set; }
+    public int? EntityId { get; set; }
+    public Entity? entity { get; set; }
       
     }
 }        

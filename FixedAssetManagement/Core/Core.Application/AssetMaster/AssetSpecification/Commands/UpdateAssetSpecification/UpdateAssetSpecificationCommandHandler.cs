@@ -14,7 +14,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSpecification
 {
-    public class UpdateAssetSpecificationCommandHandler  : IRequestHandler<UpdateAssetSpecificationCommand, ApiResponseDTO<AssetSpecificationDTO>>
+    public class UpdateAssetSpecificationCommandHandler  : IRequestHandler<UpdateAssetSpecificationCommand, ApiResponseDTO<AssetSpecificationJsonDto>>
     {
         private readonly IAssetSpecificationCommandRepository _assetSpecificationRepository;
         private readonly IAssetSpecificationQueryRepository _assetSpecificationQueryRepository;
@@ -29,98 +29,84 @@ namespace Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSp
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<AssetSpecificationDTO>> Handle(UpdateAssetSpecificationCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<AssetSpecificationJsonDto>> Handle(UpdateAssetSpecificationCommand request, CancellationToken cancellationToken)
+    {
+        var assetSpecifications = await _assetSpecificationQueryRepository.GetByIdAsync(request.Id);
+        
+        if (assetSpecifications is null)
         {
-            var assetSpecifications = await _assetSpecificationQueryRepository.GetByIdAsync(request.Id);
-            if (assetSpecifications is null)
-            return new ApiResponseDTO<AssetSpecificationDTO>
+            return new ApiResponseDTO<AssetSpecificationJsonDto>
             {
                 IsSuccess = false,
                 Message = "Invalid DepreciationGroupID. The specified Name does not exist or is inactive."
             };
-           
-            var oldAssetSpecification= assetSpecifications.SpecificationId;
-            assetSpecifications.SpecificationId = request.SpecificationId;
-
-            if (assetSpecifications is null || assetSpecifications.IsDeleted is BaseEntity.IsDelete.Deleted )
-            {
-                return new ApiResponseDTO<AssetSpecificationDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid Specification Id. The specified Id does not exist or is deleted."
-                };
-            }
-            if (assetSpecifications.IsActive != request.IsActive)
-            {    
-                assetSpecifications.IsActive =  (BaseEntity.Status)request.IsActive;     
-                var updatedAssetSpecification = _mapper.Map<AssetSpecifications>(request);                   
-                await _assetSpecificationRepository.UpdateAsync(request.Id, updatedAssetSpecification);
-        
-                //await _assetSpecificationRepository.UpdateAsync(assetSpecifications.Id, assetSpecifications);
-                if (request.IsActive is 0)
-                {
-                    return new ApiResponseDTO<AssetSpecificationDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "Code DeActivated."
-                    };
-                }
-                else{
-                    return new ApiResponseDTO<AssetSpecificationDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "Code Activated."
-                    }; 
-                }                                     
-            }
-
-            var assetSpecificationExistsByName = await _assetSpecificationRepository.ExistsByAssetSpecIdAsync(request.AssetId, request.SpecificationId);
-            if (assetSpecificationExistsByName)
-            {                                   
-                return new ApiResponseDTO<AssetSpecificationDTO>
-                {
-                    IsSuccess = false,
-                    Message = $"Asset Specification already exists and is {(BaseEntity.Status) request.IsActive}."
-                };                     
-            }
-            var updatedAssetSpecEntity = _mapper.Map<AssetSpecifications>(request);                   
-            var updateResult = await _assetSpecificationRepository.UpdateAsync(request.Id, updatedAssetSpecEntity);            
-
-            var updatedAssetSpec =  await _assetSpecificationQueryRepository.GetByIdAsync(request.Id);    
-            if (updatedAssetSpec != null)
-            {
-                var AssetSpecDto = _mapper.Map<AssetSpecificationDTO>(updatedAssetSpec);
-                //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "Update",
-                    actionCode: AssetSpecDto.AssetId.ToString(),
-                    actionName: AssetSpecDto.SpecificationId.ToString(),
-                    details: $"AssetSpecification '{oldAssetSpecification}' was updated to '{AssetSpecDto.SpecificationValue}'.  Code: {AssetSpecDto.SpecificationId}",
-                    module:"AssetSpecification"
-                );            
-                await _mediator.Publish(domainEvent, cancellationToken);
-                if(updateResult>0)
-                {
-                    return new ApiResponseDTO<AssetSpecificationDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "AssetSpecification updated successfully.",
-                        Data = AssetSpecDto
-                    };
-                }
-                return new ApiResponseDTO<AssetSpecificationDTO>
-                {
-                    IsSuccess = false,
-                    Message = "AssetSpecification not updated."
-                };                
-            }
-            else
-            {
-                return new ApiResponseDTO<AssetSpecificationDTO>{
-                    IsSuccess = false,
-                    Message = "AssetSpecification not found."
-                };
-            }
         }
+
+        // ✅ Get first specification safely
+        var oldAssetSpecification = assetSpecifications.Specifications.FirstOrDefault()?.SpecificationId;
+
+        // ✅ Update the first specification if exists
+        if (assetSpecifications.Specifications.Any())
+        {
+            assetSpecifications.Specifications[0].SpecificationId = request.SpecificationId;
+        }
+
+        if (assetSpecifications.IsActive != request.IsActive)
+        {    
+            assetSpecifications.IsActive = (BaseEntity.Status)request.IsActive;     
+            var updatedAssetSpecification = _mapper.Map<AssetSpecifications>(request);                   
+            await _assetSpecificationRepository.UpdateAsync(request.Id, updatedAssetSpecification);
+
+            return new ApiResponseDTO<AssetSpecificationJsonDto>
+            {
+                IsSuccess = true,
+                Message = request.IsActive == 0 ? "Code DeActivated." : "Asset Specification Details updated."                
+            };
+        }
+
+        var assetSpecificationExistsByName = await _assetSpecificationRepository.ExistsByAssetSpecIdAsync(request.AssetId, request.SpecificationId);
+        if (assetSpecificationExistsByName)
+        {                                   
+            return new ApiResponseDTO<AssetSpecificationJsonDto>
+            {
+                IsSuccess = false,
+                Message = $"Asset Specification already exists and is {(BaseEntity.Status)request.IsActive}."
+            };                     
+        }
+
+        var updatedAssetSpecEntity = _mapper.Map<AssetSpecifications>(request);                   
+        var updateResult = await _assetSpecificationRepository.UpdateAsync(request.Id, updatedAssetSpecEntity);            
+
+        var updatedAssetSpec = await _assetSpecificationQueryRepository.GetByIdAsync(request.Id);    
+
+        if (updatedAssetSpec != null)
+        {
+            var AssetSpecDto = _mapper.Map<AssetSpecificationJsonDto>(updatedAssetSpec);
+            
+            // ✅ Publish domain event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "Update",
+                actionCode: AssetSpecDto.AssetId.ToString(),
+                actionName: oldAssetSpecification?.ToString() ?? "N/A",
+                details: $"AssetSpecification '{oldAssetSpecification}' was updated to '{AssetSpecDto.Specifications.FirstOrDefault()?.SpecificationValue}'. Code: {request.SpecificationId}",
+                module: "AssetSpecification"
+            );            
+            await _mediator.Publish(domainEvent, cancellationToken);
+
+            return new ApiResponseDTO<AssetSpecificationJsonDto>
+            {
+                IsSuccess = true,
+                Message = "AssetSpecification updated successfully.",
+                Data = AssetSpecDto
+            };
+        }
+
+        return new ApiResponseDTO<AssetSpecificationJsonDto>
+        {
+            IsSuccess = false,
+            Message = "AssetSpecification not updated."
+        };
+    }
+
     }
 }

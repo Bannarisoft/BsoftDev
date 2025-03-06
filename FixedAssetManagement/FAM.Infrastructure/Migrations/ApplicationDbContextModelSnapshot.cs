@@ -245,7 +245,81 @@ namespace FAM.Infrastructure.Migrations
 
                     b.ToTable("AssetAmc", "FixedAsset");
                 });
-modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetDisposal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AssetPurchaseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal>("DisposalAmount")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<DateTimeOffset>("DisposalDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DisposalReason")
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("DisposalType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId")
+                        .IsUnique();
+
+                    b.HasIndex("AssetPurchaseId")
+                        .IsUnique();
+
+                    b.HasIndex("DisposalType")
+                        .IsUnique();
+
+                    b.ToTable("AssetDisposal", "FixedAsset");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -272,9 +346,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.Property<DateTimeOffset>("EndDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<byte?>("InsuranceStatus")
-                        .HasColumnType("tinyint");
 
                     b.Property<int>("Insuranceperiod")
                         .HasColumnType("int");
@@ -326,6 +397,7 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.ToTable("AssetInsurance", "FixedAsset");
                 });
+
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
                 {
                     b.Property<int>("Id")
@@ -447,7 +519,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.ToTable("AssetSpecifications", "FixedAsset");
                 });
-
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                 {
@@ -598,6 +669,9 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                         .IsRequired()
                         .HasColumnType("varchar(250)");
 
+                    b.Property<int?>("AssetDisposalMasterId")
+                        .HasColumnType("int");
+
                     b.Property<int>("AssetGroupId")
                         .HasColumnType("int");
 
@@ -679,6 +753,8 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.HasIndex("AssetCategoryId");
 
+                    b.HasIndex("AssetDisposalMasterId");
+
                     b.HasIndex("AssetGroupId");
 
                     b.HasIndex("AssetParentId");
@@ -747,6 +823,9 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                     b.Property<decimal>("AcceptedQty")
                         .HasColumnType("decimal(18,3)")
                         .HasColumnName("AcceptedQty");
+
+                    b.Property<int?>("AssetDisposalPurchaseId")
+                        .HasColumnType("int");
 
                     b.Property<int>("AssetId")
                         .HasColumnType("int")
@@ -862,6 +941,8 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                         .HasColumnName("VendorName");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssetDisposalPurchaseId");
 
                     b.HasIndex("AssetId");
 
@@ -1123,7 +1204,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
-             
                     b.Property<string>("LocationName")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -1153,7 +1233,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.HasKey("Id");
 
-                   
                     b.ToTable("Location", "FixedAsset");
                 });
 
@@ -1257,6 +1336,9 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AssetMiscDisposalTypeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)")
@@ -1312,6 +1394,8 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                         .HasColumnName("sortOrder");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssetMiscDisposalTypeId");
 
                     b.HasIndex("MiscTypeId");
 
@@ -1502,7 +1586,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
 
-                  
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
@@ -1614,7 +1697,35 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.Navigation("RenewalStatusMiscType");
                 });
-modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetDisposal", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterDisposal")
+                        .WithOne()
+                        .HasForeignKey("Core.Domain.Entities.AssetMaster.AssetDisposal", "AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails", "AssetPurchaseDetails")
+                        .WithOne()
+                        .HasForeignKey("Core.Domain.Entities.AssetMaster.AssetDisposal", "AssetPurchaseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "AssetMiscDisposalType")
+                        .WithOne()
+                        .HasForeignKey("Core.Domain.Entities.AssetMaster.AssetDisposal", "DisposalType")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssetMasterDisposal");
+
+                    b.Navigation("AssetMiscDisposalType");
+
+                    b.Navigation("AssetPurchaseDetails");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMaster")
                         .WithMany("AssetInsurance")
@@ -1625,22 +1736,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                     b.Navigation("AssetMaster");
                 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetLocation", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "Asset")
@@ -1650,14 +1745,12 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.Location", "Location")
-                     
                         .WithMany("AssetLocations")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.SubLocation", "SubLocation")
-                   
                         .WithMany("AssetSubLocation")
                         .HasForeignKey("SubLocationId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1696,7 +1789,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                     b.Navigation("SpecificationMaster");
                 });
 
- 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
@@ -1732,6 +1824,10 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                         .HasForeignKey("AssetCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.AssetMaster.AssetDisposal", "AssetDisposalMaster")
+                        .WithMany()
+                        .HasForeignKey("AssetDisposalMasterId");
 
                     b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroup")
                         .WithMany("AssetMasterGeneral")
@@ -1769,6 +1865,8 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                         .HasConstraintName("FK_WorkingStatus_Misc");
 
                     b.Navigation("AssetCategories");
+
+                    b.Navigation("AssetDisposalMaster");
 
                     b.Navigation("AssetGroup");
 
@@ -1812,6 +1910,10 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
             modelBuilder.Entity("Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails", b =>
                 {
+                    b.HasOne("Core.Domain.Entities.AssetMaster.AssetDisposal", "AssetDisposalPurchase")
+                        .WithMany()
+                        .HasForeignKey("AssetDisposalPurchaseId");
+
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "Asset")
                         .WithMany("AssetPurchase")
                         .HasForeignKey("AssetId")
@@ -1825,6 +1927,8 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                         .IsRequired();
 
                     b.Navigation("Asset");
+
+                    b.Navigation("AssetDisposalPurchase");
 
                     b.Navigation("AssetSource");
                 });
@@ -1840,6 +1944,24 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                     b.Navigation("AssetCategories");
                 });
 
+modelBuilder.Entity("Core.Domain.Entities.DepreciationDetails", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroup")
+                        .WithMany("DepreciationDetails")
+                        .HasForeignKey("AssetGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
+                        .WithMany("DepreciationDetails")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssetGroup");
+
+                    b.Navigation("AssetMasterId");
+                });
             modelBuilder.Entity("Core.Domain.Entities.DepreciationGroups", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroup")
@@ -1880,11 +2002,17 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
+                    b.HasOne("Core.Domain.Entities.AssetMaster.AssetDisposal", "AssetMiscDisposalType")
+                        .WithMany()
+                        .HasForeignKey("AssetMiscDisposalTypeId");
+
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
                         .WithMany("MiscMaster")
                         .HasForeignKey("MiscTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("AssetMiscDisposalType");
 
                     b.Navigation("MiscTypeMaster");
                 });
@@ -1935,6 +2063,7 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.Navigation("AssetMasterGeneral");
 
+b.Navigation("DepreciationDetails");
                     b.Navigation("DepreciationGroups");
 
                     b.Navigation("SpecificationMaster");
@@ -1948,15 +2077,16 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
 
                     b.Navigation("AssetChildren");
 
-					b.Navigation("AssetInsurance");
+                    b.Navigation("AssetInsurance");
+
                     b.Navigation("AssetLocation");
 
                     b.Navigation("AssetPurchase");
 
                     b.Navigation("AssetSpecification");
 
-
                     b.Navigation("AssetWarranty");
+b.Navigation("DepreciationDetails");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetSource", b =>
@@ -2002,7 +2132,6 @@ modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                     b.Navigation("Manufactures");
 
                     b.Navigation("UOMs");
-
 
                     b.Navigation("WarrantyClaim");
 

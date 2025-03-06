@@ -15,5 +15,6 @@ namespace Core.Domain.Entities
         public ICollection<AssetCategories>? AssetCategories { get; set; } 
         public ICollection<AssetMasterGenerals>? AssetMasterGeneral { get; set; }  
         public ICollection<SpecificationMasters>? SpecificationMaster { get; set; }      
+        public  ICollection<DepreciationDetails>? DepreciationDetails { get; set; }
     }
 }
