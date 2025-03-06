@@ -58,6 +58,9 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetAmc;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetDisposal;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetDisposal;
 
+using Core.Application.Common.Interfaces.IDepreciationDetail;
+using FAM.Infrastructure.Repositories.DepreciationDetail;
+
 namespace FAM.Infrastructure
 {
     public static class DependencyInjection
@@ -191,6 +194,8 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetDisposalQueryRepository, AssetDisposalQueryRepository>();
             services.AddScoped<IAssetDisposalCommandRepository, AssetDisposalCommandRepository>();
 
+			 services.AddScoped<IDepreciationDetailCommandRepository, DepreciationDetailCommandRepository>();
+            services.AddScoped<IDepreciationDetailQueryRepository, DepreciationDetailQueryRepository>();
 
 
             // Miscellaneous services
@@ -219,7 +224,8 @@ namespace FAM.Infrastructure
 				typeof(AssetAdditionalCostProfile),
 				typeof(AssetInsuranceProfile),
                 typeof(AssetAmcProfile),
-                typeof(AssetDisposalProfile)
+                typeof(AssetDisposalProfile),
+ 				typeof(DepreciationDetailProfile)
 
             );
 

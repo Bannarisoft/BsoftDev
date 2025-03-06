@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250306062442_depreciationdetail")]
+    partial class depreciationdetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,79 +247,6 @@ namespace FAM.Infrastructure.Migrations
                     b.HasIndex("RenewalStatus");
 
                     b.ToTable("AssetAmc", "FixedAsset");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetDisposal", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AssetPurchaseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<decimal>("DisposalAmount")
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<DateTimeOffset>("DisposalDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("DisposalReason")
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<int>("DisposalType")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId")
-                        .IsUnique();
-
-                    b.HasIndex("AssetPurchaseId")
-                        .IsUnique();
-
-                    b.HasIndex("DisposalType")
-                        .IsUnique();
-
-                    b.ToTable("AssetDisposal", "FixedAsset");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
@@ -669,9 +599,6 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(250)");
 
-                    b.Property<int?>("AssetDisposalMasterId")
-                        .HasColumnType("int");
-
                     b.Property<int>("AssetGroupId")
                         .HasColumnType("int");
 
@@ -753,8 +680,6 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasIndex("AssetCategoryId");
 
-                    b.HasIndex("AssetDisposalMasterId");
-
                     b.HasIndex("AssetGroupId");
 
                     b.HasIndex("AssetParentId");
@@ -823,9 +748,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<decimal>("AcceptedQty")
                         .HasColumnType("decimal(18,3)")
                         .HasColumnName("AcceptedQty");
-
-                    b.Property<int?>("AssetDisposalPurchaseId")
-                        .HasColumnType("int");
 
                     b.Property<int>("AssetId")
                         .HasColumnType("int")
@@ -941,8 +863,6 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnName("VendorName");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AssetDisposalPurchaseId");
 
                     b.HasIndex("AssetId");
 
@@ -1079,6 +999,111 @@ namespace FAM.Infrastructure.Migrations
                     b.HasIndex("AssetCategoriesId");
 
                     b.ToTable("AssetSubCategories", "FixedAsset");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.DepreciationDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("AssetValue")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<DateTimeOffset>("CapitalizationDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("ClosingValue")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("DaysOpening")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DaysUsed")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DepreciationValue")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<DateTimeOffset>("EndDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("ExpiryDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Finyear")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<bool>("ISLocked")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal>("OpeningValue")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal>("ResidualValue")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsefulLifeDays")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetGroupId");
+
+                    b.HasIndex("AssetId");
+
+                    b.ToTable("DepreciationDetail", "FixedAsset");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.DepreciationGroups", b =>
@@ -1336,9 +1361,6 @@ namespace FAM.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AssetMiscDisposalTypeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)")
@@ -1394,8 +1416,6 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnName("sortOrder");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AssetMiscDisposalTypeId");
 
                     b.HasIndex("MiscTypeId");
 
@@ -1698,33 +1718,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("RenewalStatusMiscType");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetDisposal", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterDisposal")
-                        .WithOne()
-                        .HasForeignKey("Core.Domain.Entities.AssetMaster.AssetDisposal", "AssetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails", "AssetPurchaseDetails")
-                        .WithOne()
-                        .HasForeignKey("Core.Domain.Entities.AssetMaster.AssetDisposal", "AssetPurchaseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "AssetMiscDisposalType")
-                        .WithOne()
-                        .HasForeignKey("Core.Domain.Entities.AssetMaster.AssetDisposal", "DisposalType")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AssetMasterDisposal");
-
-                    b.Navigation("AssetMiscDisposalType");
-
-                    b.Navigation("AssetPurchaseDetails");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetInsurance", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMaster")
@@ -1825,10 +1818,6 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.AssetMaster.AssetDisposal", "AssetDisposalMaster")
-                        .WithMany()
-                        .HasForeignKey("AssetDisposalMasterId");
-
                     b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroup")
                         .WithMany("AssetMasterGeneral")
                         .HasForeignKey("AssetGroupId")
@@ -1865,8 +1854,6 @@ namespace FAM.Infrastructure.Migrations
                         .HasConstraintName("FK_WorkingStatus_Misc");
 
                     b.Navigation("AssetCategories");
-
-                    b.Navigation("AssetDisposalMaster");
 
                     b.Navigation("AssetGroup");
 
@@ -1910,10 +1897,6 @@ namespace FAM.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.AssetMaster.AssetDisposal", "AssetDisposalPurchase")
-                        .WithMany()
-                        .HasForeignKey("AssetDisposalPurchaseId");
-
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "Asset")
                         .WithMany("AssetPurchase")
                         .HasForeignKey("AssetId")
@@ -1927,8 +1910,6 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Asset");
-
-                    b.Navigation("AssetDisposalPurchase");
 
                     b.Navigation("AssetSource");
                 });
@@ -1944,7 +1925,7 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetCategories");
                 });
 
-modelBuilder.Entity("Core.Domain.Entities.DepreciationDetails", b =>
+            modelBuilder.Entity("Core.Domain.Entities.DepreciationDetails", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroup")
                         .WithMany("DepreciationDetails")
@@ -1962,6 +1943,7 @@ modelBuilder.Entity("Core.Domain.Entities.DepreciationDetails", b =>
 
                     b.Navigation("AssetMasterId");
                 });
+
             modelBuilder.Entity("Core.Domain.Entities.DepreciationGroups", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroup")
@@ -2002,17 +1984,11 @@ modelBuilder.Entity("Core.Domain.Entities.DepreciationDetails", b =>
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.AssetMaster.AssetDisposal", "AssetMiscDisposalType")
-                        .WithMany()
-                        .HasForeignKey("AssetMiscDisposalTypeId");
-
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
                         .WithMany("MiscMaster")
                         .HasForeignKey("MiscTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("AssetMiscDisposalType");
 
                     b.Navigation("MiscTypeMaster");
                 });
@@ -2063,7 +2039,8 @@ modelBuilder.Entity("Core.Domain.Entities.DepreciationDetails", b =>
 
                     b.Navigation("AssetMasterGeneral");
 
-b.Navigation("DepreciationDetails");
+                    b.Navigation("DepreciationDetails");
+
                     b.Navigation("DepreciationGroups");
 
                     b.Navigation("SpecificationMaster");
@@ -2086,7 +2063,8 @@ b.Navigation("DepreciationDetails");
                     b.Navigation("AssetSpecification");
 
                     b.Navigation("AssetWarranty");
-b.Navigation("DepreciationDetails");
+
+                    b.Navigation("DepreciationDetails");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetSource", b =>

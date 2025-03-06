@@ -44,7 +44,7 @@ namespace FAM.Infrastructure.Data
 		public DbSet<AssetInsurance> AssetInsurance { get; set; }
         public DbSet<AssetAmc> AssetAmc { get; set; }
         public DbSet<AssetDisposal> AssetDisposal { get; set; }
-
+ 		public DbSet<DepreciationDetails> DepreciationDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -70,7 +70,7 @@ namespace FAM.Infrastructure.Data
 			modelBuilder.ApplyConfiguration(new AssetInsuranceConfiguration());
             modelBuilder.ApplyConfiguration(new AssetAmcConfiguration()); 
             modelBuilder.ApplyConfiguration(new AssetDisposalConfiguration());
-
+ 			modelBuilder.ApplyConfiguration(new DepreciationDetailConfiguration()); 
 
             base.OnModelCreating(modelBuilder);
         }
