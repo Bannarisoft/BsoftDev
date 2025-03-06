@@ -29,5 +29,6 @@ namespace Core.Domain.Entities
         public ICollection<AssetAdditionalCost>? AssetAdditionalCost  { get; set; } 
         public ICollection<AssetAmc>? AssetAmcRenewStatus  { get; set; } 
         public ICollection<AssetAmc>? AssetAmcCoverageType  { get; set; } 
+        public AssetDisposal? AssetMiscDisposalType { get; set; } 
     }
 }
