@@ -46,6 +46,11 @@ namespace Core.Domain.Common
         }
         public static class Asset_AmcCoverageScope
         {
-            public const string MiscCode = "COVERAGESCOPE";
-        }    }
+        public const string MiscCode = "COVERAGESCOPE";
+        }
+        public static class Asset_DisposeType
+        {
+        public const string MiscCode = "DISPOSALTYPE";
+        }       
+    }
 }

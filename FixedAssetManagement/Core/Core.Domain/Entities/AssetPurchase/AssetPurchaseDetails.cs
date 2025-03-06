@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Domain.Common;
+using Core.Domain.Entities.AssetMaster;
 
 namespace Core.Domain.Entities.AssetPurchase
 {
@@ -34,10 +35,13 @@ namespace Core.Domain.Entities.AssetPurchase
         public string? PjDocSr { get; set;}
         public int PjDocNo { get; set; }
         public int AssetId { get; set; }        
-        public AssetMasterGenerals Asset { get; set; }
+        public AssetMasterGenerals? Asset { get; set; }
         public int AssetSourceId { get; set; }    
         public AssetSource AssetSource { get; set; } = null!;
         public DateTimeOffset? CapitalizationDate { get; set; }
+        public AssetDisposal? AssetDisposalPurchase { get; set; } 
+
+
 
 
     }
