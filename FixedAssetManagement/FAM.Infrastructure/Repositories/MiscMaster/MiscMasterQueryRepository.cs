@@ -33,7 +33,7 @@ namespace FAM.Infrastructure.Repositories.MiscMaster
                 FROM FixedAsset.MiscMaster M
                 WHERE M.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (M.Code LIKE @Search)")}}
-                ORDER BY M.Id DESC
+                ORDER BY M.SortOrder 
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
                 SELECT @TotalCount AS TotalCount;
@@ -62,7 +62,7 @@ namespace FAM.Infrastructure.Repositories.MiscMaster
             public async Task<Core.Domain.Entities.MiscMaster> GetByIdAsync(int id)
         {            
            const string query = @" SELECT Id,MiscTypeId,Code,Description,SortOrder,IsActive  FROM FixedAsset.MiscMaster          
-             WHERE Id = @id AND IsDeleted = 0";                          
+             WHERE Id = @id AND IsDeleted = 0 ";                          
             return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MiscMaster>(query, new { id });
         } 
 
