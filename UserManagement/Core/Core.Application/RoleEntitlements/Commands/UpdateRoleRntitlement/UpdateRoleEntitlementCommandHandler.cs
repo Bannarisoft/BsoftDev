@@ -36,9 +36,33 @@ namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
     public async Task<ApiResponseDTO<bool>> Handle(UpdateRoleEntitlementCommand request, CancellationToken cancellationToken)
     {
         
-        IList<RoleModule> roleEntitlements = _mapper.Map<IList<RoleModule>>(request.ModuleMenus);
+        var roleId = request.RoleId;
+
+                     var roleModules = request.RoleModules.Select(dto => {
+                         var entity = _mapper.Map<RoleModule>(dto);
+                         entity.RoleId = roleId;  
+                         return entity;
+                     }).ToList();
+
+                     var roleParents = request.RoleParents.Select(dto => {
+                         var entity = _mapper.Map<RoleParent>(dto);
+                         entity.RoleId = roleId; 
+                         return entity;
+                     }).ToList();
+
+                     var roleChildren = request.RoleChildren.Select(dto => {
+                         var entity = _mapper.Map<RoleChild>(dto);
+                         entity.RoleId = roleId; 
+                         return entity;
+                     }).ToList();
+
+                     var roleMenuPrivileges = request.RoleMenuPrivileges.Select(dto => {
+                         var entity = _mapper.Map<RoleMenuPrivileges>(dto);
+                         entity.RoleId = roleId; 
+                         return entity;
+                     }).ToList();
             
-            var  role = await _roleEntitlementCommanderepository.UpdateRoleEntitlementsAsync(request.RoleId,roleEntitlements, cancellationToken);
+            var  role = await _roleEntitlementCommanderepository.UpdateRoleEntitlementsAsync(request.RoleId,roleModules,roleParents,roleChildren,roleMenuPrivileges, cancellationToken);
 
         if (!role)
         {

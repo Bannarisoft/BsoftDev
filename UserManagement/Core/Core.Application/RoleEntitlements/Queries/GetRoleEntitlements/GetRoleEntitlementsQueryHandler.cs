@@ -28,20 +28,22 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlements
     public async Task<List<RoleEntitlementDto>> Handle(GetRoleEntitlementsQuery request, CancellationToken cancellationToken)
     {
         // Fetch role entitlements from the repository
-        var roleEntitlements = await _repository.GetRoleEntitlementsByRoleNameAsync(request.RoleName, cancellationToken);
+        // var roleEntitlements = await _repository.GetRoleEntitlementsByRoleNameAsync(request.RoleName, cancellationToken);
 
-                    //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "Create",
-                    actionCode: request.RoleName,
-                    actionName: request.RoleName,
-                    details: $"RoleEntitlement '{request.RoleName}' was created. RoleName: {request.RoleName}",
-                    module:"RoleEntitlement"
-                );
-                await _mediator.Publish(domainEvent, cancellationToken);
+        //             //Domain Event
+        //         var domainEvent = new AuditLogsDomainEvent(
+        //             actionDetail: "Create",
+        //             actionCode: request.RoleName,
+        //             actionName: request.RoleName,
+        //             details: $"RoleEntitlement '{request.RoleName}' was created. RoleName: {request.RoleName}",
+        //             module:"RoleEntitlement"
+        //         );
+        //         await _mediator.Publish(domainEvent, cancellationToken);
 
-        // Map the result to RoleEntitlementDto
-        return _mapper.Map<List<RoleEntitlementDto>>(roleEntitlements);
+        // // Map the result to RoleEntitlementDto
+        // return _mapper.Map<List<RoleEntitlementDto>>(roleEntitlements);
+
+        return new List<RoleEntitlementDto>();
     }
 
     }

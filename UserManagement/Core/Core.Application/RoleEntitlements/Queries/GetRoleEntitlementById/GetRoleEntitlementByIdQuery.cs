@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById
 {
-    public class GetRoleEntitlementByIdQuery: IRequest<ApiResponseDTO<RoleEntitlementDto>>
+    public class GetRoleEntitlementByIdQuery: IRequest<ApiResponseDTO<GetByIdRoleEntitlementDTO>>
     {
         public int Id { get; set; }
         

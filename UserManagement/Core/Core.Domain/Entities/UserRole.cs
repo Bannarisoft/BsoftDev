@@ -12,6 +12,10 @@ namespace Core.Domain.Entities
         public IList<UserRoleAllocation> UserRoleAllocations { get; set; }
         
         public IList<RoleModule> roleModules { get; set; }
+        public IList<RoleParent> roleParents { get; set; }
+        public IList<RoleChild> roleChildren { get; set; }
+        public IList<RoleMenuPrivileges> roleMenuPrivileges { get; set; }
+
 
 
     }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlements
+namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
-    public class MenuPermissionDto
+    public class RoleMenuPrivilegesDTO
     {
       public int MenuId { get; set; }
       public bool CanView { get; set; }
@@ -14,6 +14,5 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlements
       public bool CanDelete { get; set; }
       public bool CanExport { get; set; }
       public bool CanApprove { get; set; }
-
     }
 }
