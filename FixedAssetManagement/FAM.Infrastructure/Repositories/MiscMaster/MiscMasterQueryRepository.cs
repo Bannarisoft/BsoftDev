@@ -33,7 +33,7 @@ namespace FAM.Infrastructure.Repositories.MiscMaster
                 FROM FixedAsset.MiscMaster M
                 WHERE M.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (M.Code LIKE @Search)")}}
-                ORDER BY M.Id DESC
+                ORDER BY M.SortOrder 
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
                 SELECT @TotalCount AS TotalCount;

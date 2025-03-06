@@ -231,7 +231,7 @@ namespace FAM.Infrastructure
 				typeof(AssetInsuranceProfile),
 
 
-                typeof(AssetTransferProfile)
+                typeof(AssetTransferProfile),
                 typeof(AssetAmcProfile),
                 typeof(AssetDisposalProfile),
  				typeof(DepreciationDetailProfile)
