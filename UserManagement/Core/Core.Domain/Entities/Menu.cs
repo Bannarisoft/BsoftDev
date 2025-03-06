@@ -18,7 +18,10 @@ namespace Core.Domain.Entities
     public string MenuIcon { get; set; }
     public int SortOrder  { get; set; }
     public Modules? Module { get; set; }
-    public IList<RoleMenu> RoleMenus { get; set; }
+    public IList<RoleMenuPrivileges> RoleMenus { get; set; }
+    public IList<RoleParent> RoleParents { get; set; }
+    public IList<RoleChild> RoleChildren { get; set; }
+
 
     }
 }

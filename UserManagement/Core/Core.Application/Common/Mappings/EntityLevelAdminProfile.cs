@@ -23,9 +23,9 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
             CreateMap<ResetPasswordCommand, User>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.UserName, opt => opt.Ignore())
-            .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
+            .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)))
+            .ForMember(dest => dest.IsFirstTimeUser, opt => opt.MapFrom(src => FirstTimeUserStatus.No));
         }
     }
 }
