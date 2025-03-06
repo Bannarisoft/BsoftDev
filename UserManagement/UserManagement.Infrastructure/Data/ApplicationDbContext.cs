@@ -53,6 +53,8 @@ namespace UserManagement.Infrastructure.Data
         public DbSet<UserUnit> UserUnit { get; set; }
         public DbSet<RoleMenu> RoleMenus { get; set; } 
         public DbSet<RoleModule> RoleModules { get; set; }
+        public DbSet<UserGroup> UserGroup { get; set; }
+        public DbSet<UserGroupUsers> UserGroupUsers { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -92,6 +94,8 @@ namespace UserManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UserUnitConfiguration());
             modelBuilder.ApplyConfiguration(new RoleMenuConfiguration());
             modelBuilder.ApplyConfiguration(new RoleModuleConfiguration());
+            modelBuilder.ApplyConfiguration(new UserGroupConfiguration());
+            modelBuilder.ApplyConfiguration(new UserGroupUsersConfiguration());
             
                
             base.OnModelCreating(modelBuilder);

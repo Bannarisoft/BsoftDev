@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserManagement.Infrastructure.Data;
 
 #nullable disable
 
-namespace UserManagement.Infrastructure.Migrations
+namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250303094022_entityadmin")]
+    partial class entityadmin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1612,6 +1615,10 @@ namespace UserManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int")
+                        .HasColumnName("CompanyId");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -1626,7 +1633,7 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int?>("DivisionId")
+                    b.Property<int>("DivisionId")
                         .HasColumnType("int")
                         .HasColumnName("DivisionId");
 
@@ -1635,10 +1642,8 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("EmailId");
 
-                    b.Property<int?>("EntityId")
-                        .HasColumnType("int");
-
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("FirstName");
 
@@ -1661,10 +1666,12 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("IsFirstTimeUser");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("LastName");
 
                     b.Property<string>("Mobile")
+                        .IsRequired()
                         .HasColumnType("varchar(20)")
                         .HasColumnName("Mobile");
 
@@ -1681,20 +1688,24 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("PasswordHash")
+                        .IsRequired()
                         .HasColumnType("varchar(255)")
                         .HasColumnName("PasswordHash");
 
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("UserName");
 
-                    b.Property<int?>("UserType")
+                    b.Property<int>("UserType")
                         .HasColumnType("int")
                         .HasColumnName("UserType");
 
                     b.HasKey("UserId");
-
-                    b.HasIndex("EntityId");
 
                     b.ToTable("Users", "AppSecurity");
                 });
@@ -1727,91 +1738,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserCompany", "AppSecurity");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.UserGroup", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("GroupCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("GroupCode");
-
-                    b.Property<string>("GroupName")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("GroupName");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserGroup", "AppSecurity");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.UserGroupUsers", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("UserGroupId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserGroupId");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserGroupId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("UserGroupUsers", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
@@ -2180,15 +2106,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("Unit");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.User", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.Entity", "Entity")
-                        .WithMany()
-                        .HasForeignKey("EntityId");
-
-                    b.Navigation("Entity");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.UserCompany", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Company", "company")
@@ -2206,25 +2123,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("company");
 
                     b.Navigation("user");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.UserGroupUsers", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.UserGroup", "UserGroup")
-                        .WithMany("UserGroupUsers")
-                        .HasForeignKey("UserGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.User", "User")
-                        .WithOne("UserGroupUsers")
-                        .HasForeignKey("Core.Domain.Entities.UserGroupUsers", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-
-                    b.Navigation("UserGroup");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRoleAllocation", b =>
@@ -2356,16 +2254,9 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.Navigation("UserCompanies");
 
-                    b.Navigation("UserGroupUsers");
-
                     b.Navigation("UserRoleAllocations");
 
                     b.Navigation("UserUnits");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.UserGroup", b =>
-                {
-                    b.Navigation("UserGroupUsers");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>

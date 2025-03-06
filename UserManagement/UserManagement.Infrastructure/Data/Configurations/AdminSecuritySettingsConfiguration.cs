@@ -88,6 +88,16 @@ namespace UserManagement.Infrastructure.Data.Configurations
             )
             .IsRequired();
 
+             builder.Property(p => p.EntityId)
+            .HasColumnName("EntityId")
+            .HasColumnType("int")
+            .IsRequired(false);
+
+            builder.HasOne(p => p.entity)
+                .WithOne(e => e.AdminSecuritySettings)
+                .HasForeignKey<AdminSecuritySettings>(p => p.EntityId)
+                .OnDelete(DeleteBehavior.SetNull);
+
 
 
     }
