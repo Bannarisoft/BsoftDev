@@ -44,7 +44,8 @@ namespace FAM.Infrastructure.Data
 		public DbSet<AssetInsurance> AssetInsurance { get; set; }
         public DbSet<AssetAmc> AssetAmc { get; set; }
         public DbSet<AssetDisposal> AssetDisposal { get; set; }
-
+        public DbSet<AssetTransferIssueHdr> AssetTransferIssueHdr { get; set; }
+        public DbSet<AssetTransferIssueDtl> AssetTransferIssueDtl { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -70,6 +71,8 @@ namespace FAM.Infrastructure.Data
 			modelBuilder.ApplyConfiguration(new AssetInsuranceConfiguration());
             modelBuilder.ApplyConfiguration(new AssetAmcConfiguration()); 
             modelBuilder.ApplyConfiguration(new AssetDisposalConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetTransferIssueHdrConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetTransferIssueDtlConfiguration());
 
 
             base.OnModelCreating(modelBuilder);
