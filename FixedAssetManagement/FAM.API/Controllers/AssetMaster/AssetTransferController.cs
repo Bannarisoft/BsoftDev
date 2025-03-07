@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecificationById;
-using Core.Application.AssetMaster.AssetTransfer.Queries.GetAssetTransfered;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

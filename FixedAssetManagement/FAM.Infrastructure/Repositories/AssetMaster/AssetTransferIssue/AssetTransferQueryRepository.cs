@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Application.AssetMaster.AssetTransfer.Queries.GetAssetTransfered;
-using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransfer;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
 using Dapper;
 
-namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer
+namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
 {
     public class AssetTransferQueryRepository : IAssetTransferQueryRepository
     {

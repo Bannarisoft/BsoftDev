@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Core.Application.AssetMaster.AssetTransfer.Queries.GetAssetTransfered;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 
 namespace Core.Application.Common.Mappings.AssetMaster
 {
@@ -13,7 +13,7 @@ namespace Core.Application.Common.Mappings.AssetMaster
         public AssetTransferProfile()
         {
 
-             CreateMap<Core.Domain.Entities.AssetMaster.AssetTransfer, AssetTransferDto>(); 
+             CreateMap<Core.Domain.Entities.AssetMaster.AssetTransferIssue, AssetTransferDto>(); 
             
         }
         

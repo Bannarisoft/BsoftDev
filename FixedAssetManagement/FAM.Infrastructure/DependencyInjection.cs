@@ -56,13 +56,13 @@ using Core.Application.Common.Interfaces.IAssetMaster.IAssetInsurance;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetInsurance;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetAmc;
-using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransfer;
-using FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetDisposal;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetDisposal;
 
 using Core.Application.Common.Interfaces.IDepreciationDetail;
 using FAM.Infrastructure.Repositories.DepreciationDetail;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue;
 
 namespace FAM.Infrastructure
 {
