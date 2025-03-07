@@ -11,5 +11,6 @@ namespace Core.Application.Menu.Queries.GetChildMenuByModule
         public string MenuName { get; set; }
         public int ParentId { get; set; }
         public string MenuUrl { get; set; }
+        public int ModuleId { get; set; }
     }
 }

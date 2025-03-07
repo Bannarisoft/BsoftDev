@@ -20,45 +20,35 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
     }
 
   
-    public async Task<IList<RoleModule>> AddRoleEntitlementsAsync(IList<RoleModule> roleEntitlements, CancellationToken cancellationToken)
+    public async Task<bool> AddRoleEntitlementsAsync(IList<RoleModule> roleModules,IList<RoleParent> roleParents,IList<RoleChild> roleChildren,IList<RoleMenuPrivileges> roleMenuPrivileges, CancellationToken cancellationToken)
     {
-        await _applicationDbContext.RoleModules.AddRangeAsync(roleEntitlements, cancellationToken);
-                      await _applicationDbContext.SaveChangesAsync();
-                      return roleEntitlements;
-        
+        await _applicationDbContext.RoleModules.AddRangeAsync(roleModules);
+        await _applicationDbContext.RoleParent.AddRangeAsync(roleParents);
+        await _applicationDbContext.RoleChild.AddRangeAsync(roleChildren);
+        await _applicationDbContext.RoleMenuPrivileges.AddRangeAsync(roleMenuPrivileges);
+
+       return await _applicationDbContext.SaveChangesAsync() >0;
+                        
     }
 
-    public async Task<bool> UpdateRoleEntitlementsAsync(int roleId, IList<RoleModule> roleEntitlements, CancellationToken cancellationToken)
+    public async Task<bool> UpdateRoleEntitlementsAsync(int roleId, IList<RoleModule> roleModules,IList<RoleParent> roleParents,IList<RoleChild> roleChildren,IList<RoleMenuPrivileges> roleMenuPrivileges, CancellationToken cancellationToken)
     {
     
-         var existingRoleModules  = await _applicationDbContext.RoleModules
-                                    .Where(re => re.RoleId == roleId)
-                                    .ToListAsync(cancellationToken);
+             _applicationDbContext.RoleModules.RemoveRange(_applicationDbContext.RoleModules.Where(x => x.RoleId == roleId));
+             _applicationDbContext.RoleParent.RemoveRange(_applicationDbContext.RoleParent.Where(x => x.RoleId == roleId));
+             _applicationDbContext.RoleChild.RemoveRange(_applicationDbContext.RoleChild.Where(x => x.RoleId == roleId));
+             _applicationDbContext.RoleMenuPrivileges.RemoveRange(_applicationDbContext.RoleMenuPrivileges.Where(x => x.RoleId == roleId));
 
-         
-          if (existingRoleModules.Any())
-          {
-              var roleModuleIds = existingRoleModules.Select(rm => rm.Id).ToList();
-
-              var roleMenusToRemove = await _applicationDbContext.RoleMenus
-                  .Where(rm => roleModuleIds.Contains(rm.RoleModuleId))
-                  .ToListAsync(cancellationToken);
-
-              if (roleMenusToRemove.Any())
-              {
-                  _applicationDbContext.RoleMenus.RemoveRange(roleMenusToRemove);
-              }
-
-
-             _applicationDbContext.RoleModules.RemoveRange(existingRoleModules);
-        }
+             await _applicationDbContext.SaveChangesAsync();
+        
 
                 
-         await _applicationDbContext.RoleModules.AddRangeAsync(roleEntitlements, cancellationToken);
-                 
+             await _applicationDbContext.RoleModules.AddRangeAsync(roleModules);
+             await _applicationDbContext.RoleParent.AddRangeAsync(roleParents);
+             await _applicationDbContext.RoleChild.AddRangeAsync(roleChildren);
+             await _applicationDbContext.RoleMenuPrivileges.AddRangeAsync(roleMenuPrivileges);
 
-    
-         return await _applicationDbContext.SaveChangesAsync(cancellationToken)>0;
+           return  await _applicationDbContext.SaveChangesAsync()>0;
 
     
     }

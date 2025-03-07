@@ -27,8 +27,9 @@ namespace Core.Application.Common.Mappings.AssetMaster
             .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => (Status)src.IsActive));
 
-            CreateMap<AssetSpecificationDTO, AssetSpecificationAutoCompleteDTO>();
+            CreateMap<AssetSpecificationJsonDto, AssetSpecificationAutoCompleteDTO>();
             CreateMap<AssetSpecifications, AssetSpecificationDTO>();      
+            CreateMap<AssetSpecificationJsonDto, AssetSpecificationDTO>();
         }       
     }
 }

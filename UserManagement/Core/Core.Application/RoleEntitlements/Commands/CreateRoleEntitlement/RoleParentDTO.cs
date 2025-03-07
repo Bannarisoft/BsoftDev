@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlements
+namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 {
-    public class GetByIdChildMenuDTO
+    public class RoleParentDTO
     {
-        public int MenuId { get; set; }
         public int ParentId { get; set; }
     }
 }

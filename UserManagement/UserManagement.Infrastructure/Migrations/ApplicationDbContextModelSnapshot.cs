@@ -1137,6 +1137,29 @@ namespace UserManagement.Infrastructure.Migrations
                     b.ToTable("PasswordLog", "AppSecurity");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.RoleChild", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MenuId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RoleChild", "AppSecurity");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.RoleEntitlement", b =>
                 {
                     b.Property<int>("Id")
@@ -1220,7 +1243,7 @@ namespace UserManagement.Infrastructure.Migrations
                     b.ToTable("RoleEntitlements", "AppSecurity");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.RoleMenu", b =>
+            modelBuilder.Entity("Core.Domain.Entities.RoleMenuPrivileges", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1249,16 +1272,16 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Property<int>("MenuId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RoleModuleId")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MenuId");
 
-                    b.HasIndex("RoleModuleId");
+                    b.HasIndex("RoleId");
 
-                    b.ToTable("RoleMenu", "AppSecurity");
+                    b.ToTable("RoleMenuPrivilege", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.RoleModule", b =>
@@ -1282,6 +1305,29 @@ namespace UserManagement.Infrastructure.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("RoleModule", "AppSecurity");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.RoleParent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MenuId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RoleParent", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.States", b =>
@@ -2090,6 +2136,25 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.RoleChild", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Menu", "Menu")
+                        .WithMany("RoleChildren")
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.UserRole", "Role")
+                        .WithMany("roleChildren")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Menu");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.RoleEntitlement", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Menu", "Menu")
@@ -2109,7 +2174,7 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("UserRole");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.RoleMenu", b =>
+            modelBuilder.Entity("Core.Domain.Entities.RoleMenuPrivileges", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Menu", "Menu")
                         .WithMany("RoleMenus")
@@ -2117,15 +2182,15 @@ namespace UserManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.RoleModule", "RoleModule")
-                        .WithMany("RoleMenus")
-                        .HasForeignKey("RoleModuleId")
+                    b.HasOne("Core.Domain.Entities.UserRole", "UserRole")
+                        .WithMany("roleMenuPrivileges")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Menu");
 
-                    b.Navigation("RoleModule");
+                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.RoleModule", b =>
@@ -2143,6 +2208,25 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Module");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.RoleParent", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Menu", "Menu")
+                        .WithMany("RoleParents")
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.UserRole", "Role")
+                        .WithMany("roleParents")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Menu");
 
                     b.Navigation("Role");
                 });
@@ -2321,7 +2405,11 @@ namespace UserManagement.Infrastructure.Migrations
                 {
                     b.Navigation("ChildMenus");
 
+                    b.Navigation("RoleChildren");
+
                     b.Navigation("RoleMenus");
+
+                    b.Navigation("RoleParents");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Modules", b =>
@@ -2329,11 +2417,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("Menus");
 
                     b.Navigation("RoleModules");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.RoleModule", b =>
-                {
-                    b.Navigation("RoleMenus");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.States", b =>
@@ -2372,7 +2455,13 @@ namespace UserManagement.Infrastructure.Migrations
                 {
                     b.Navigation("UserRoleAllocations");
 
+                    b.Navigation("roleChildren");
+
+                    b.Navigation("roleMenuPrivileges");
+
                     b.Navigation("roleModules");
+
+                    b.Navigation("roleParents");
                 });
 #pragma warning restore 612, 618
         }

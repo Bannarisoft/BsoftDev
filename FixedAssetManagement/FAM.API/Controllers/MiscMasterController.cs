@@ -179,7 +179,7 @@ namespace FAM.API.Controllers
                 Errors = "" 
             });
         }
-        [ HttpDelete]
+        [ HttpDelete("{id}")]
           public async Task<IActionResult> Delete(int id)
         {
            

@@ -2096,6 +2096,24 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetCategories");
                 });
 
+modelBuilder.Entity("Core.Domain.Entities.DepreciationDetails", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroup")
+                        .WithMany("DepreciationDetails")
+                        .HasForeignKey("AssetGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
+                        .WithMany("DepreciationDetails")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssetGroup");
+
+                    b.Navigation("AssetMasterId");
+                });
             modelBuilder.Entity("Core.Domain.Entities.DepreciationGroups", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroup")
@@ -2197,6 +2215,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Navigation("AssetMasterGeneral");
 
+b.Navigation("DepreciationDetails");
                     b.Navigation("DepreciationGroups");
 
                     b.Navigation("SpecificationMaster");
@@ -2224,6 +2243,7 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetSpecification");
 
                     b.Navigation("AssetWarranty");
+b.Navigation("DepreciationDetails");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetSource", b =>

@@ -85,6 +85,22 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMa
                     Message = "Specification Details available.Cannot delete the Asset ."
                 };
             }
+            else if (assetChildDetails.AssetAdditionalCost>0)
+            {                
+                 return new ApiResponseDTO<AssetMasterGeneralDTO>
+                {
+                    IsSuccess = false,
+                    Message = "Additional Cost Details available.Cannot delete the Asset ."
+                };
+            }
+            else if (assetChildDetails.AssetInsurance>0)
+            {                
+                 return new ApiResponseDTO<AssetMasterGeneralDTO>
+                {
+                    IsSuccess = false,
+                    Message = "Insurance Details available.Cannot delete the Asset ."
+                };
+            }
             var assetMasterDelete = _mapper.Map<AssetMasterGenerals>(request);      
             var updateResult = await _assetMasterGeneralRepository.DeleteAsync(request.Id, assetMasterDelete);
             if (updateResult > 0)
