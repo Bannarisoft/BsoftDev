@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IUser;
+using Core.Application.Common.Utilities;
 using MediatR;
 
 namespace Core.Application.EntityLevelAdmin.Commands.ResetPassword
@@ -24,7 +26,8 @@ namespace Core.Application.EntityLevelAdmin.Commands.ResetPassword
         }
         public async Task<ApiResponseDTO<bool>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
-              var existingUser = await _userQueryRepository.GetByIdAsync(request.Id);
+             
+              var existingUser = await _userQueryRepository.GetByUsernameAsync(request.Email);
             if (existingUser == null)
             {
                 return new ApiResponseDTO<bool>
@@ -36,7 +39,7 @@ namespace Core.Application.EntityLevelAdmin.Commands.ResetPassword
             }
             _mapper.Map(request, existingUser);
 
-             var RowsUpdated = await _userRepository.UpdateAsync(request.Id, existingUser);
+             var RowsUpdated = await _userRepository.SetAdminPassword(request.UserId, existingUser);
              if(RowsUpdated > 0)
              {
                  return new ApiResponseDTO<bool>

@@ -1,19 +1,18 @@
-using MediatR;
-using Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Application.Common.HttpResponse;
+using Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
 
-namespace Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement
+namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById
 {
-    public class UpdateRoleEntitlementCommand : IRequest<ApiResponseDTO<bool>>
+    public class GetByIdRoleEntitlementDTO
     {
         public int RoleId { get; set; }
      public IList<RoleModuleDTO> RoleModules { get; set; }
      public IList<RoleParentDTO> RoleParents { get; set; }
      public IList<RoleChildDTO> RoleChildren { get; set; }
      public IList<RoleMenuPrivilegesDTO> RoleMenuPrivileges { get; set; }
+        
     }
 }

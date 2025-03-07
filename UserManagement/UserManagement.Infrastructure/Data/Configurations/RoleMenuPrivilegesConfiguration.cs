@@ -8,16 +8,16 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace UserManagement.Infrastructure.Data.Configurations
 {
-    public class RoleMenuConfiguration : IEntityTypeConfiguration<RoleMenu>
+    public class RoleMenuPrivilegesConfiguration : IEntityTypeConfiguration<RoleMenuPrivileges>
     {
-        public void Configure(EntityTypeBuilder<RoleMenu> builder)
+        public void Configure(EntityTypeBuilder<RoleMenuPrivileges> builder)
         {
-            builder.ToTable("RoleMenu", "AppSecurity");
+            builder.ToTable("RoleMenuPrivilege", "AppSecurity");
             builder.HasKey(rm => rm.Id);
             builder.Property(rm => rm.Id)
             .ValueGeneratedOnAdd();
 
-            builder.Property(rm => rm.RoleModuleId)
+            builder.Property(rm => rm.RoleId)
             .IsRequired()
             .HasColumnType("int");
 
@@ -47,9 +47,9 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .WithMany(m => m.RoleMenus)
                 .HasForeignKey(rm => rm.MenuId);
 
-                builder.HasOne(rm => rm.RoleModule)
-                .WithMany(ur => ur.RoleMenus)
-                .HasForeignKey(rm => rm.RoleModuleId)
+                builder.HasOne(rm => rm.UserRole)
+                .WithMany(ur => ur.roleMenuPrivileges)
+                .HasForeignKey(rm => rm.RoleId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }

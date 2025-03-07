@@ -60,6 +60,8 @@ using UserManagement.API.Validation.Languages;
 using Core.Application.Currency.Commands.UpdateCurrency;
 using Core.Application.Language.Commands.UpdateLanguage;
 using Core.Application.Companies.Commands.UploadFileCompany;
+using Core.Application.EntityLevelAdmin.Commands.ResetPassword;
+using UserManagement.API.Validation.Admin;
 namespace UserManagement.API.Validation.Common
 {
     public class ValidationService
@@ -108,6 +110,7 @@ namespace UserManagement.API.Validation.Common
         services.AddScoped<IValidator<UpdateCurrencyCommand>, UpdateCurrencyCommandValidator>();
         services.AddScoped<IValidator<UpdateLanguageCommand>, UpdateLanguageCommandValidator>();
         services.AddScoped<IValidator<UploadFileCompanyCommand>, UploadCompanyCommandValidator>();
+        services.AddScoped<IValidator<ResetPasswordCommand>, SetAdminPasswordCommandValidator>();
          }  
     }
 }
