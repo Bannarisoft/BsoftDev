@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250306115719_AssetTransferTablesmigration")]
+    partial class AssetTransferTablesmigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2096,24 +2099,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetCategories");
                 });
 
-modelBuilder.Entity("Core.Domain.Entities.DepreciationDetails", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroup")
-                        .WithMany("DepreciationDetails")
-                        .HasForeignKey("AssetGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterId")
-                        .WithMany("DepreciationDetails")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AssetGroup");
-
-                    b.Navigation("AssetMasterId");
-                });
             modelBuilder.Entity("Core.Domain.Entities.DepreciationGroups", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetGroup", "AssetGroup")
@@ -2215,7 +2200,6 @@ modelBuilder.Entity("Core.Domain.Entities.DepreciationDetails", b =>
 
                     b.Navigation("AssetMasterGeneral");
 
-b.Navigation("DepreciationDetails");
                     b.Navigation("DepreciationGroups");
 
                     b.Navigation("SpecificationMaster");
@@ -2243,7 +2227,6 @@ b.Navigation("DepreciationDetails");
                     b.Navigation("AssetSpecification");
 
                     b.Navigation("AssetWarranty");
-b.Navigation("DepreciationDetails");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetSource", b =>
