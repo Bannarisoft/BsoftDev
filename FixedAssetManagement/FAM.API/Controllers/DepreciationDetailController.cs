@@ -4,6 +4,8 @@ using System.Globalization;
 using Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail;
 using Core.Application.DepreciationDetail.Commands.DeleteDepreciationDetail;
 using Core.Application.DepreciationDetail.Queries.GetDepreciationDetail;
+using Core.Application.DepreciationDetail.Queries.GetDepreciationMethod;
+using Core.Application.DepreciationDetail.Queries.GetDepreciationPeriod;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -97,19 +99,7 @@ namespace FAM.API.Controllers
         }        
         [HttpDelete]        
         public async Task<IActionResult> DeleteAsync(DeleteDepreciationDetailCommand  command)
-        {       
-           /*  if (!DateTimeOffset.TryParseExact(startDate, new[] { "yyyy-MM-dd", "dd-MM-yyyy", "MM-dd-yyyy" }, 
-                CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var parsedStartDate))
-            {
-                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = "Invalid startDate format. Use yyyy-MM-dd." });
-            }
-
-            if (!DateTimeOffset.TryParseExact(endDate, new[] { "yyyy-MM-dd", "dd-MM-yyyy", "MM-dd-yyyy" }, 
-                CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var parsedEndDate))
-            {
-                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = "Invalid endDate format. Use yyyy-MM-dd." });
-            }
-                  */   
+        {             
             var result = await Mediator.Send(new DeleteDepreciationDetailCommand { companyId=command.companyId,unitId=command.unitId,finYear=command.finYear,depreciationType=command.depreciationType,depreciationPeriod=command.depreciationPeriod});                 
             if (!result.IsSuccess)
             {                
@@ -126,6 +116,44 @@ namespace FAM.API.Controllers
                 message = result.Message
             });
         }
-                         
+            // GET: api/AssetMasterGeneral/WorkingStatus
+        [HttpGet("DeprecationPeriod")]
+        public async Task<IActionResult> GetDepreciationPeriod()
+        {
+            var result = await Mediator.Send(new GetDepreciationQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Working Status found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Working Status fetched successfully.",
+                data = result.Data
+            });
+        }  
+        [HttpGet("DeprecationMethod")]
+        public async Task<IActionResult> GetDepreciationMethod()
+        {
+            var result = await Mediator.Send(new GetDepreciationMethodQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Working Status found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Working Status fetched successfully.",
+                data = result.Data
+            });
+        }                 
     }
 }
