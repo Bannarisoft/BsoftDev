@@ -95,6 +95,34 @@ namespace UserManagement.Infrastructure.Repositories.UserRoles
                 var userRoles = await _dbConnection.QueryAsync<UserRole>(query, parameters);
                 return userRoles.ToList();
             }
+              public async Task<bool>SoftDeleteValidation(int Id)
+            {
+                                const string query = @"
+                           SELECT 1 
+                           FROM [AppSecurity].[RoleModule] 
+                           WHERE RoleId = @Id ;
+                    
+                           SELECT 1 
+                           FROM [AppSecurity].[RoleParent]
+                           WHERE RoleId = @Id ;
+                           
+                            SELECT 1 
+                           FROM [AppSecurity].[RoleChild]
+                           WHERE RoleId = @Id ;
+                           
+                           SELECT 1 
+                           FROM [AppSecurity].[RoleMenuPrivilege]
+                           WHERE RoleId = @Id ;";
+                    
+                       using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+                    
+                       var RoleModuleExists = await multi.ReadFirstOrDefaultAsync<int?>();  
+                       var RoleParentExists = await multi.ReadFirstOrDefaultAsync<int?>();
+                       var RoleChildExists = await multi.ReadFirstOrDefaultAsync<int?>();
+                       var RoleMenuPrivilegeExists = await multi.ReadFirstOrDefaultAsync<int?>();
+                    
+                       return RoleModuleExists.HasValue || RoleParentExists.HasValue || RoleChildExists.HasValue || RoleMenuPrivilegeExists.HasValue;
+            }
 
    
     }

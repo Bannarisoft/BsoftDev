@@ -23,6 +23,7 @@ namespace UserManagement.API.Controllers
     {
         private readonly IValidator<CreateEntityCommand> _createEntityCommandValidator;
         private readonly IValidator<UpdateEntityCommand> _updateEntityCommandValidator;
+        private readonly IValidator<DeleteEntityCommand> _deleteEntityCommandValidator;
         private readonly ApplicationDbContext _dbContext;
         private readonly IMediator _mediator;
 
@@ -30,7 +31,8 @@ namespace UserManagement.API.Controllers
         public EntityController(IMediator mediator, 
                              IValidator<CreateEntityCommand> createEntityCommandValidator, 
                              IValidator<UpdateEntityCommand> updateEntityCommandValidator,ApplicationDbContext dbContext, 
-                             ILogger<EntityController> logger) 
+                             ILogger<EntityController> logger,
+                             IValidator<DeleteEntityCommand> deleteEntityCommandValidator) 
         : base(mediator)
         {
             _createEntityCommandValidator = createEntityCommandValidator;    
@@ -38,6 +40,7 @@ namespace UserManagement.API.Controllers
             _dbContext = dbContext; 
             _mediator = mediator; 
             _logger = logger;
+            _deleteEntityCommandValidator = deleteEntityCommandValidator;
         }
         
 [HttpGet]
@@ -218,9 +221,18 @@ public async Task<IActionResult> UpdateAsync( UpdateEntityCommand updateEntityCo
 [HttpDelete("{id}")]
 public async Task<IActionResult> DeleteEntityAsync(int id)
 {
-
+        var command = new DeleteEntityCommand { EntityId = id };
+       var validationResult = await  _deleteEntityCommandValidator.ValidateAsync(command);
+         if (!validationResult.IsValid)
+          {
+              return BadRequest(new
+              {
+                  message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                  statusCode = StatusCodes.Status400BadRequest
+              });
+          }
         // Process the delete command
-        var result = await _mediator.Send(new DeleteEntityCommand { EntityId = id });
+        var result = await _mediator.Send(command);
 
         if (result.IsSuccess) 
         {

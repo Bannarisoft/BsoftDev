@@ -23,7 +23,7 @@ namespace UserManagement.API.Controllers
     {
          private readonly IValidator<CreateRoleCommand> _createRoleCommandValidator;
         private readonly IValidator<UpdateRoleCommand> _updateRoleCommandValidator;
-         private readonly ApplicationDbContext _dbContext;
+         private readonly IValidator<DeleteRoleCommand> _deleteRoleCommandValidator;
          private readonly ILogger<UserRoleController> _logger;
 
          private readonly IUserCommandRepository  _userCommandRepository;
@@ -31,12 +31,12 @@ namespace UserManagement.API.Controllers
         IUserCommandRepository userCommandRepository,
         IValidator<UpdateRoleCommand> updateRoleCommandValidator, 
         ILogger<UserRoleController> logger,
-        ApplicationDbContext dbContext ) : base(mediator)
+        IValidator<DeleteRoleCommand> deleteRoleCommandValidator ) : base(mediator)
         {
             _createRoleCommandValidator= createRoleCommandValidator;
             _updateRoleCommandValidator= updateRoleCommandValidator;
             _userCommandRepository= userCommandRepository;
-             _dbContext = dbContext; 
+            _deleteRoleCommandValidator= deleteRoleCommandValidator;
              _logger = logger;
 
         }
@@ -181,9 +181,19 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> DeleteAsync( int id )
         {
               _logger.LogInformation($"Delete User Role request started with ID: {id}");
-
+              
+            var command = new DeleteRoleCommand { Id = id };
+             var validationResult = await  _deleteRoleCommandValidator.ValidateAsync(command);
+               if (!validationResult.IsValid)
+                {
+                    return BadRequest(new
+                    {
+                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                        statusCode = StatusCodes.Status400BadRequest
+                    });
+                } 
                 // Check if the department exists
-                var userRole = await Mediator.Send(new GetRoleByIdQuery { Id = id });
+                var userRole = await Mediator.Send(command);
                 if (userRole == null)
                 {
                     _logger.LogWarning($"User Role with ID {id} not found.");
