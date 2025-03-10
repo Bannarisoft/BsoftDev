@@ -21,10 +21,10 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlements
         // public bool CanApprove { get; set; }
         // public IsDelete IsDeleted { get; set; } 
         // public Status IsActive { get; set; }
-        public RoleDto Role { get; set; }
-        public List<GetByIdModuleDTO> Modules { get; set; }
-        public List<MenuDTO> ParentMenu { get; set; }
-         public List<GetByIdPermissionDTO> Permissions { get; set; }
+        // public RoleDto Role { get; set; }
+        // public List<GetByIdModuleDTO> Modules { get; set; }
+        // public List<MenuDTO> ParentMenu { get; set; }
+        //  public List<GetByIdPermissionDTO> Permissions { get; set; }
 
 
     }

@@ -27,12 +27,12 @@ namespace Core.Application.Companies.Commands.CreateCompany
 
         public async Task<ApiResponseDTO<int>> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
         {
-            var existingCompany = await _companyQueryRepository.GetByCompanynameAsync(request.Company.CompanyName);
+            // var existingCompany = await _companyQueryRepository.GetByCompanynameAsync(request.Company.CompanyName);
 
-              if (existingCompany != null)
-              {
-                  return new ApiResponseDTO<int>{IsSuccess = false, Message = "Company already exists"};
-              }
+            //   if (existingCompany != null)
+            //   {
+            //       return new ApiResponseDTO<int>{IsSuccess = false, Message = "Company already exists"};
+            //   }
              var company  = _imapper.Map<Company>(request.Company);
            
             

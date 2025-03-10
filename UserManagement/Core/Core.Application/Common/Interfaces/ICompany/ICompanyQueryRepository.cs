@@ -13,6 +13,8 @@ namespace Core.Application.Common.Interfaces.ICompany
         Task<Company> GetByIdAsync(int id);
         Task<List<Company>> GetCompany(string searchPattern);
         Task<Company?> GetByCompanynameAsync(string name,int? id = null);
+        Task<bool> CompanyExistsAsync(string companyName);
+        Task<bool> SoftDeleteValidation(int Id); 
        
     }
 }

@@ -60,6 +60,15 @@ using UserManagement.API.Validation.Languages;
 using Core.Application.Currency.Commands.UpdateCurrency;
 using Core.Application.Language.Commands.UpdateLanguage;
 using Core.Application.Companies.Commands.UploadFileCompany;
+using Core.Application.EntityLevelAdmin.Commands.ResetPassword;
+using UserManagement.API.Validation.Admin;
+using Core.Application.Entity.Commands.DeleteEntity;
+using Core.Application.State.Commands.DeleteState;
+using Core.Application.Companies.Commands.DeleteCompany;
+using Core.Application.Modules.Commands.DeleteModule;
+using Core.Application.UserRole.Commands.DeleteRole;
+using Core.Application.Country.Commands.DeleteCountry;
+using Core.Application.Divisions.Commands.DeleteDivision;
 namespace UserManagement.API.Validation.Common
 {
     public class ValidationService
@@ -108,6 +117,14 @@ namespace UserManagement.API.Validation.Common
         services.AddScoped<IValidator<UpdateCurrencyCommand>, UpdateCurrencyCommandValidator>();
         services.AddScoped<IValidator<UpdateLanguageCommand>, UpdateLanguageCommandValidator>();
         services.AddScoped<IValidator<UploadFileCompanyCommand>, UploadCompanyCommandValidator>();
+        services.AddScoped<IValidator<ResetPasswordCommand>, SetAdminPasswordCommandValidator>();
+        services.AddScoped<IValidator<DeleteEntityCommand>, DeleteEntityCommandValidator>();
+        services.AddScoped<IValidator<DeleteStateCommand>, DeleteStateCommandValidator>();
+        services.AddScoped<IValidator<DeleteCompanyCommand>, DeleteCompanyCommandValidator>();
+        services.AddScoped<IValidator<DeleteModuleCommand>, DeleteModuleCommandValidator>();
+        services.AddScoped<IValidator<DeleteRoleCommand>, DeleteRoleCommandValidator>();
+        services.AddScoped<IValidator<DeleteCountryCommand>, DeleteCountryCommandValidator>();
+        services.AddScoped<IValidator<DeleteDivisionCommand>, DeleteDivisionCommandValidator>();
          }  
     }
 }

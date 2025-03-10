@@ -43,6 +43,7 @@ namespace Core.Domain.Entities
 		public  ICollection<AssetInsurance>? AssetInsurance { get; set; }
         public AssetDisposal? AssetDisposalMaster { get; set; } 
 		public  ICollection<DepreciationDetails>? DepreciationDetails { get; set; }
+        public AssetTransferIssueDtl? AssetTransferIssueMaster { get; set; } 
 
     }
 }

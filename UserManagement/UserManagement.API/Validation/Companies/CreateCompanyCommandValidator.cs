@@ -6,19 +6,23 @@ using UserManagement.API.Validation.Common;
 using Core.Application.Companies.Commands.CreateCompany;
 using Core.Domain.Entities;
 using FluentValidation;
+using Core.Application.Common.Interfaces.ICompany;
 
 namespace UserManagement.API.Validation.Companies
 {
     public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyCommand>
     {
          private readonly List<ValidationRule> _validationRules;
+         private readonly ICompanyQueryRepository _companyRepository;
 
-        public CreateCompanyCommandValidator(MaxLengthProvider maxLengthProvider)
+        public CreateCompanyCommandValidator(MaxLengthProvider maxLengthProvider,ICompanyQueryRepository companyService)
         {
             var companyNameMaxLength = maxLengthProvider.GetMaxLength<Company>("CompanyName") ?? 50;
             var LegalNameMaxLength = maxLengthProvider.GetMaxLength<Company>("LegalName") ?? 50;
+
             
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _companyRepository = companyService;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -28,16 +32,10 @@ namespace UserManagement.API.Validation.Companies
                 switch (rule.Rule)
                 {
                     case "NotEmpty":
-                        // Apply NotEmpty validation
-                        // RuleFor(x => x.Company.File)
-                        //     .NotNull()
-                        //     .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}")
-                        //     .NotEmpty()
-                        //     .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}");
 
                              RuleFor(x => x.Company.CompanyName)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateCompanyCommand.Company.CompanyName)} {rule.Error}");
+                            .WithMessage($"{rule.Error}");
 
                         RuleFor(x => x.Company.LegalName)
                             .NotEmpty()
@@ -77,13 +75,7 @@ namespace UserManagement.API.Validation.Companies
                             .WithMessage($"{nameof(CreateCompanyCommand.Company.CompanyContact.Phone)} {rule.Error}");
                         break;
 
-                    // case "FileValidation":
-                    // RuleFor(x => x.Company.File)
-                    // .Must(file => IsValidFileType(file, rule.allowedExtensions))
-                    // .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}")
-                    // .Must(file => file.Length <= 2 * 1024 * 1024)
-                    // .WithMessage($"{nameof(CreateCompanyCommand.Company.File)} {rule.Error}");
-                    // break;
+                    
 
                      case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values
@@ -153,13 +145,18 @@ namespace UserManagement.API.Validation.Companies
 
                         case "Email":
                         RuleFor(x => x.Company.CompanyContact.Email)
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                        .EmailAddress()
                         .WithMessage($"{nameof(CreateCompanyCommand.Company.CompanyContact.Email)} {rule.Error}");
                         break;
+                        case "AlreadyExists":
+                           RuleFor(x => x.Company.CompanyName)
+                           .MustAsync(async (companyName, cancellation) => !await _companyRepository.CompanyExistsAsync(companyName))
+                           .WithName("Company Name")
+                            .WithMessage($"{rule.Error}");
+                            break;
                    
                     default:
-                        // Handle unknown rule (log or throw)
-                        //Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                       
                         break;
                 }
             }
@@ -167,20 +164,7 @@ namespace UserManagement.API.Validation.Companies
             
          
         }
-            //  private bool IsValidFileType(IFormFile file, List<string> allowedExtensions)
-            //     {
-            //         Console.WriteLine(file.FileName);
-            //         foreach (var extension in allowedExtensions)
-            //         {
-            //             Console.WriteLine(extension);
-                        
-            //         }
-                    
-            //         if (file == null) return false;
-                
-            //         var fileExtension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
-            //         return allowedExtensions.Contains(fileExtension);
-            //     }
+          
 
     }
 }

@@ -18,15 +18,18 @@ namespace UserManagement.API.Controllers
     public class StateController : ApiControllerBase
     {
          private readonly IValidator<CreateStateCommand> _createStateCommandValidator;
-         private readonly IValidator<UpdateStateCommand> _updateStateCommandValidator;         
+         private readonly IValidator<UpdateStateCommand> _updateStateCommandValidator;    
+         private readonly IValidator<DeleteStateCommand> _deleteStateCommandValidator;     
          
         public StateController(ISender mediator, 
                                 IValidator<CreateStateCommand> createStateCommandValidator, 
-                                IValidator<UpdateStateCommand> updateStateCommandValidator) 
+                                IValidator<UpdateStateCommand> updateStateCommandValidator, 
+                                IValidator<DeleteStateCommand> deleteStateCommandValidator) 
             : base(mediator)
         {        
             _createStateCommandValidator = createStateCommandValidator;    
-            _updateStateCommandValidator = updateStateCommandValidator;     
+            _updateStateCommandValidator = updateStateCommandValidator;  
+            _deleteStateCommandValidator = deleteStateCommandValidator;   
             
         }
         [HttpGet]
@@ -137,7 +140,18 @@ namespace UserManagement.API.Controllers
         }        
         [HttpDelete("{id}")]   
         public async Task<IActionResult> DeleteAsync(int id)
-        {          
+        {  
+            
+              var command = new DeleteStateCommand { Id = id };
+             var validationResult = await  _deleteStateCommandValidator.ValidateAsync(command);
+               if (!validationResult.IsValid)
+                {
+                    return BadRequest(new
+                    {
+                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                        statusCode = StatusCodes.Status400BadRequest
+                    });
+                }        
             if (id <= 0)
             {
                 return BadRequest(new
@@ -146,7 +160,7 @@ namespace UserManagement.API.Controllers
                     message = "Invalid Country ID"
                 });
             }            
-              var result = await Mediator.Send(new DeleteStateCommand { Id = id });                 
+              var result = await Mediator.Send(command);                 
             if (!result.IsSuccess)
             {                
                 return NotFound(new 

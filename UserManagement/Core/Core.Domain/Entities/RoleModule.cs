@@ -12,7 +12,6 @@ namespace Core.Domain.Entities
         public UserRole Role { get; set; }
         public int ModuleId { get; set; }
         public Modules Module { get; set; }
-        public IList<RoleMenu> RoleMenus { get; set; }
         // public RoleMenu ChildMenu { get; set; } 
     }
 }

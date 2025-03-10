@@ -23,7 +23,7 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
             _dbConnection = dbConnection;   
 
         }
-        public async Task<(Core.Domain.Entities.UserRole,List<Core.Domain.Entities.RoleModule>, List<Core.Domain.Entities.Menu>,List<RoleMenu>)> GetByIdAsync(int roleEntitlementId)
+        public async Task<(Core.Domain.Entities.UserRole,IList<RoleModule>,IList<RoleParent>,IList<RoleChild>,IList<RoleMenuPrivileges>)> GetByIdAsync(int roleEntitlementId)
         {
 
             var  query = @"
@@ -31,79 +31,41 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
 
                 SELECT Id,ModuleId FROM [AppSecurity].[RoleModule] WHERE RoleId=@RoleEntitlementId
 
-                SELECT m.Id,m.MenuName,m.ModuleId,m.ParentId FROM [AppData].[Menus] m
-                Inner join [AppSecurity].[RoleMenu] rmenu ON rmenu.MenuId=m.Id
-                Inner join [AppSecurity].[RoleModule] rm ON rm.Id=rmenu.RoleModuleId
-                 WHERE   rm.RoleId = @RoleEntitlementId
+                SELECT m.Id AS MenuId,m.MenuName,m.ModuleId,m.ParentId FROM [AppData].[Menus] m
+                Inner join [AppSecurity].[RoleParent] rp ON rp.MenuId=m.Id
+                 WHERE   rp.RoleId = @RoleEntitlementId
+
+                 SELECT m.Id AS MenuId,m.MenuName,m.ModuleId,m.ParentId FROM [AppData].[Menus] m
+                Inner join [AppSecurity].[RoleChild] rc ON rc.MenuId=m.Id
+                 WHERE   rc.RoleId = @RoleEntitlementId
                 
-                SELECT rmenu.Id,rmenu.RoleModuleId,rmenu.MenuId,rmenu.CanView,rmenu.CanAdd,rmenu.CanUpdate,rmenu.CanDelete,rmenu.CanApprove,rmenu.CanExport,rmenu.CanView  FROM   [AppSecurity].[RoleModule] rm
-	             Inner join [AppSecurity].[RoleMenu] rmenu ON rm.Id=rmenu.RoleModuleId
-                 WHERE rm.RoleId = @RoleEntitlementId
+                SELECT rmenu.Id,rmenu.RoleId,rmenu.MenuId,rmenu.CanView,rmenu.CanAdd,rmenu.CanUpdate,rmenu.CanDelete,rmenu.CanApprove,rmenu.CanExport,rmenu.CanView  FROM   [AppData].[Menus] m
+	             Inner join [AppSecurity].[RoleMenuPrivilege] rmenu ON rmenu.MenuId=m.Id
+                 WHERE rmenu.RoleId = @RoleEntitlementId
                 
                  ";
 
                     using var multi = await _dbConnection.QueryMultipleAsync(query, new { RoleEntitlementId = roleEntitlementId });
 
             
-           var role = await multi.ReadFirstOrDefaultAsync<UserRole>();
+              var role = await multi.ReadFirstOrDefaultAsync<UserRole>();
 
-             // Read Modules
+             
              var modules = (await multi.ReadAsync<Core.Domain.Entities.RoleModule>()).ToList();
 
-             // Read Parent Menus (Menus with ParentId = 0)
-            //  var parentIds = (await multi.ReadAsync<Menu>()).ToList();
+             
+              var parentmenu = (await multi.ReadAsync<RoleParent>()).ToList();
 
-             // Read All Child Menus
-             var allMenus = (await multi.ReadAsync<Core.Domain.Entities.Menu>()).ToList();
+             
+             var ChildMenus = (await multi.ReadAsync<RoleChild>()).ToList();
 
-             // Read RoleMenu Permissions
-             var roleMenus = (await multi.ReadAsync<RoleMenu>()).ToList();
+             
+             var roleMenusPrivileges = (await multi.ReadAsync<RoleMenuPrivileges>()).ToList();
            
-            var menuHierarchy = GetChildMenus(allMenus.ToList());
-          
            
-
-            return (role, modules, menuHierarchy,roleMenus);
+            return (role, modules, parentmenu,ChildMenus,roleMenusPrivileges);
         }
         
-        private List<Core.Domain.Entities.Menu> GetChildMenus( List<Core.Domain.Entities.Menu> allMenus)
-        {
-            var menuDict = allMenus.ToDictionary(m => m.Id);
-            List<Core.Domain.Entities.Menu> rootMenus = new();
-
-              foreach (var menu in allMenus)
-              {
-                  if (menu.ParentId != 0 && menuDict.ContainsKey(menu.ParentId))
-                  {
-                      menuDict[menu.ParentId].ChildMenus.Add(menu);
-                  }
-                  else
-                  {
-                      rootMenus.Add(menu);
-                  }
-              }
-              return rootMenus;
-            // var childMenus = allMenus.Where(m => m.ParentId == menuid && m.ModuleId == moduleId).ToList();
-
-            // foreach (var child in childMenus)
-            // {
-            //     // Assign RoleMenu Permissions
-            //     var permissions = roleMenus.Where(rm => rm.MenuId == child.Id && rm.RoleModuleId == RoleModuleId).ToList();
-                
-
-            //     if (permissions.Any())
-            //     {
-            //         child.RoleMenus = permissions;
-                    
-                  
-            //     }
-
-            //     // Recursively Assign Nested Child Menus (Grandchildren)
-                
-            // }
-
-            // return childMenus;
-        }
 
 
         public async Task<List<RoleEntitlement>> GetExistingRoleEntitlementsAsync(List<int> userRoleIds,  List<int> menuIds, CancellationToken cancellationToken)
@@ -148,39 +110,39 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
         return userRole ?? new UserRole();
         }
 
-        public async Task<List<RoleEntitlement>> GetRoleEntitlementsByRoleNameAsync(string roleName, CancellationToken cancellationToken)
-        {
-        // return await _applicationDbContext.RoleEntitlements
-        //     .Where(re => re.UserRole.RoleName == roleName)
-        //     .Include(re => re.Module)
-        //     .Include(re => re.Menu)
-        //     .ToListAsync(cancellationToken);
-        const string query = @"
-        SELECT re.Id, re.IsActive, re.CreatedBy, re.CreatedAt, re.CreatedByName, re.CreatedIP, 
-               re.ModifiedBy, re.ModifiedAt, re.ModifiedByName, re.ModifiedIP, 
-               ur.Id AS UserRoleId, ur.RoleName, 
-               re.ModuleId, m.ModuleName, 
-               re.MenuId, mn.MenuName
-        FROM AppSecurity.RoleEntitlements re
-        INNER JOIN AppSecurity.UserRole ur ON re.UserRoleId = ur.Id
-        LEFT JOIN AppData.Menus mn ON re.MenuId = mn.Id
-        LEFT JOIN AppData.Modules m ON mn.ModuleId = m.Id
-        WHERE ur.RoleName = @RoleName AND re.IsDeleted = 0";
+    //     public async Task<List<RoleEntitlement>> GetRoleEntitlementsByRoleNameAsync(string roleName, CancellationToken cancellationToken)
+    //     {
+    //     // return await _applicationDbContext.RoleEntitlements
+    //     //     .Where(re => re.UserRole.RoleName == roleName)
+    //     //     .Include(re => re.Module)
+    //     //     .Include(re => re.Menu)
+    //     //     .ToListAsync(cancellationToken);
+    //     const string query = @"
+    //     SELECT re.Id, re.IsActive, re.CreatedBy, re.CreatedAt, re.CreatedByName, re.CreatedIP, 
+    //            re.ModifiedBy, re.ModifiedAt, re.ModifiedByName, re.ModifiedIP, 
+    //            ur.Id AS UserRoleId, ur.RoleName, 
+    //            re.ModuleId, m.ModuleName, 
+    //            re.MenuId, mn.MenuName
+    //     FROM AppSecurity.RoleEntitlements re
+    //     INNER JOIN AppSecurity.UserRole ur ON re.UserRoleId = ur.Id
+    //     LEFT JOIN AppData.Menus mn ON re.MenuId = mn.Id
+    //     LEFT JOIN AppData.Modules m ON mn.ModuleId = m.Id
+    //     WHERE ur.RoleName = @RoleName AND re.IsDeleted = 0";
 
-    var roleEntitlements = await _dbConnection.QueryAsync<RoleEntitlement, UserRole, Modules, Core.Domain.Entities.Menu, RoleEntitlement>(
-        query,
-        (re, ur, m, mn) =>
-        {
-            re.UserRole = ur;
-            mn.Module = m;
-            re.Menu = mn;
-            return re;
-        },
-        new { RoleName = roleName },
-        splitOn: "UserRoleId,ModuleId,MenuId"
-    );
+    // var roleEntitlements = await _dbConnection.QueryAsync<RoleEntitlement, UserRole, Modules, Core.Domain.Entities.Menu, RoleEntitlement>(
+    //     query,
+    //     (re, ur, m, mn) =>
+    //     {
+    //         re.UserRole = ur;
+    //         mn.Module = m;
+    //         re.Menu = mn;
+    //         return re;
+    //     },
+    //     new { RoleName = roleName },
+    //     splitOn: "UserRoleId,ModuleId,MenuId"
+    // );
 
-    return roleEntitlements.ToList();
-    }
+    // return roleEntitlements.ToList();
+    // }
     }
 }

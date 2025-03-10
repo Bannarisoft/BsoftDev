@@ -33,9 +33,7 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .WithMany(ur => ur.RoleModules)
                 .HasForeignKey(rm => rm.ModuleId);
 
-                 builder.HasMany(ur => ur.RoleMenus)
-                .WithOne(rm => rm.RoleModule)
-                .HasForeignKey(ura => ura.RoleModuleId);
+              
         }
     }
 }
