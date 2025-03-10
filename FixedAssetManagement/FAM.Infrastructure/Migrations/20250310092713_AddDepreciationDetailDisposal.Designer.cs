@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250310092713_AddDepreciationDetailDisposal")]
+    partial class AddDepreciationDetailDisposal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1138,10 +1141,10 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<decimal>("DepreciationValue")
                         .HasColumnType("decimal(18,3)");
 
-                    b.Property<decimal?>("DisposalAmount")
+                    b.Property<decimal>("DisposalAmount")
                         .HasColumnType("decimal(18,3)");
 
-                    b.Property<DateTimeOffset?>("DisposedDate")
+                    b.Property<DateTimeOffset>("DisposedDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset>("EndDate")

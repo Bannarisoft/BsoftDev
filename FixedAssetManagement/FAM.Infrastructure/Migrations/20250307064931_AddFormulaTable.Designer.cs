@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250307064931_AddFormulaTable")]
+    partial class AddFormulaTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1128,21 +1131,12 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("DaysUsed")
                         .HasColumnType("int");
 
-                    b.Property<int>("DepreciationPeriod")
-                        .HasColumnType("int");
-
                     b.Property<string>("DepreciationType")
                         .IsRequired()
                         .HasColumnType("varchar(10)");
 
                     b.Property<decimal>("DepreciationValue")
                         .HasColumnType("decimal(18,3)");
-
-                    b.Property<decimal?>("DisposalAmount")
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<DateTimeOffset?>("DisposedDate")
-                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset>("EndDate")
                         .HasColumnType("datetimeoffset");
@@ -1195,8 +1189,6 @@ namespace FAM.Infrastructure.Migrations
                     b.HasIndex("AssetGroupId");
 
                     b.HasIndex("AssetId");
-
-                    b.HasIndex("DepreciationPeriod");
 
                     b.ToTable("DepreciationDetail", "FixedAsset");
                 });
@@ -1310,7 +1302,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Property<string>("FormulaText")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("nvarchar(255)")
                         .HasColumnName("FormulaText");
 
                     b.Property<bool>("IsActive")
@@ -2134,17 +2126,9 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "DepMiscType")
-                        .WithMany("DepreciationPeriod")
-                        .HasForeignKey("DepreciationPeriod")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("AssetGroup");
 
                     b.Navigation("AssetMasterId");
-
-                    b.Navigation("DepMiscType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.DepreciationGroups", b =>
@@ -2315,8 +2299,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("BookType");
 
                     b.Navigation("DepreciationMethod");
-
-                    b.Navigation("DepreciationPeriod");
 
                     b.Navigation("Manufactures");
 
