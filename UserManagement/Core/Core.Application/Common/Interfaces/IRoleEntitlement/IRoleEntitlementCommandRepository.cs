@@ -8,7 +8,7 @@ namespace Core.Application.Common.Interfaces.IRoleEntitlement
 {
     public interface IRoleEntitlementCommandRepository
     {        
-        Task<bool> AddRoleEntitlementsAsync(IList<RoleModule> roleModules,IList<RoleParent> roleParents,IList<RoleChild> roleChildren,IList<RoleMenuPrivileges> roleMenuPrivileges, CancellationToken cancellationToken);     
+        Task<bool> AddRoleEntitlementsAsync(int roleId,IList<RoleModule> roleModules,IList<RoleParent> roleParents,IList<RoleChild> roleChildren,IList<RoleMenuPrivileges> roleMenuPrivileges, CancellationToken cancellationToken);     
         Task <bool> UpdateRoleEntitlementsAsync(int roleId, IList<RoleModule> roleModules,IList<RoleParent> roleParents,IList<RoleChild> roleChildren,IList<RoleMenuPrivileges> roleMenuPrivileges, CancellationToken cancellationToken);
         Task<int>  DeleteAsync(int roleId,RoleEntitlement RoleEntitlement);
                // Add these new method definitions
