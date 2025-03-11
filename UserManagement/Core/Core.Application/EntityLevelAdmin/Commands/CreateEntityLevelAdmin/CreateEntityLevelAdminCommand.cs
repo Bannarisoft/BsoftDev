@@ -7,9 +7,10 @@ using MediatR;
 
 namespace Core.Application.EntityLevelAdmin.Commands.CreateEntityLevelAdmin
 {
-    public class CreateEntityLevelAdminCommand : IRequest<ApiResponseDTO<bool>>
+    public class CreateEntityLevelAdminCommand : IRequest<ApiResponseDTO<int>>
     {
         public string Email { get; set; }
         public int EntityId { get; set; }
+        public int CompanyId { get; set; }
     }
 }

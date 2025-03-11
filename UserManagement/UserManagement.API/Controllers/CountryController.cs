@@ -16,15 +16,18 @@ namespace UserManagement.API.Controllers
     public class CountryController : ApiControllerBase
     {
          private readonly IValidator<CreateCountryCommand> _createCountryCommandValidator;
-         private readonly IValidator<UpdateCountryCommand> _updateCountryCommandValidator;         
+         private readonly IValidator<UpdateCountryCommand> _updateCountryCommandValidator;  
+         private readonly IValidator<DeleteCountryCommand> _deleteCountryCommandValidator;       
          
        public CountryController(ISender mediator, 
                              IValidator<CreateCountryCommand> createCountryCommandValidator, 
-                             IValidator<UpdateCountryCommand> updateCountryCommandValidator) 
+                             IValidator<UpdateCountryCommand> updateCountryCommandValidator, 
+                             IValidator<DeleteCountryCommand> deleteCountryCommandValidator) 
          : base(mediator)
         {        
             _createCountryCommandValidator = createCountryCommandValidator;    
-            _updateCountryCommandValidator = updateCountryCommandValidator;    
+            _updateCountryCommandValidator = updateCountryCommandValidator;   
+            _deleteCountryCommandValidator = deleteCountryCommandValidator; 
              
         }
         [HttpGet]        
@@ -148,6 +151,16 @@ namespace UserManagement.API.Controllers
         [HttpDelete("{id}")]   
         public async Task<IActionResult> DeleteAsync(int id)
         {
+             var command = new DeleteCountryCommand { Id = id };
+             var validationResult = await  _deleteCountryCommandValidator.ValidateAsync(command);
+               if (!validationResult.IsValid)
+                {
+                    return BadRequest(new
+                    {
+                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                        statusCode = StatusCodes.Status400BadRequest
+                    });
+                } 
             if (id <= 0)
             {
                 return BadRequest(new
@@ -156,7 +169,7 @@ namespace UserManagement.API.Controllers
                     message = "Invalid Country ID"
                 });
             }            
-              var result = await Mediator.Send(new DeleteCountryCommand { Id = id });                 
+              var result = await Mediator.Send(command);                 
             if (!result.IsSuccess)
             {                
                 return NotFound(new 

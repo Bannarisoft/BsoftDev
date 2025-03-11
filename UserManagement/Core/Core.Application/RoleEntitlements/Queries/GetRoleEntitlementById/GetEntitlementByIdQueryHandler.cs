@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IRoleEntitlement;
+using Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
 using Core.Application.RoleEntitlements.Queries.GetRoleEntitlements;
 using Core.Domain.Entities;
 using Core.Domain.Events;
@@ -12,7 +13,7 @@ using MediatR;
 
 namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById
 {
-    public class GetEntitlementByIdQueryHandler : IRequestHandler<GetRoleEntitlementByIdQuery, ApiResponseDTO<RoleEntitlementDto>>
+    public class GetEntitlementByIdQueryHandler : IRequestHandler<GetRoleEntitlementByIdQuery, ApiResponseDTO<GetByIdRoleEntitlementDTO>>
     {
         private readonly IRoleEntitlementQueryRepository _roleEntitlementRepository;
         private readonly IMapper _mapper;
@@ -24,24 +25,11 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<RoleEntitlementDto>> Handle(GetRoleEntitlementByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<GetByIdRoleEntitlementDTO>> Handle(GetRoleEntitlementByIdQuery request, CancellationToken cancellationToken)
         {
-              var (userRole, roleModules, parentMenus, roleMenus) = await _roleEntitlementRepository.GetByIdAsync(request.Id);
+              var (roleId, roleModules, parentMenus, childMenus, roleMenuPrivileges) = await _roleEntitlementRepository.GetByIdAsync(request.Id);
 
-            var roleMap = _mapper.Map<RoleDto>(userRole);
-            var roleModuleMap = _mapper.Map<List<GetByIdModuleDTO>>(roleModules);
-              var mappedChildMenus = _mapper.Map<List<MenuDTO>>(parentMenus);
-              var permissions = _mapper.Map<List<GetByIdPermissionDTO>>(roleMenus);
-
-             
-             var roleEntitlementDto = new RoleEntitlementDto
-             {
-                 Role = roleMap,
-                 Modules = roleModuleMap,
-                 ParentMenu = mappedChildMenus,
-                 Permissions = permissions
-             };
-            // var roleEntitlementDto = _mapper.Map<RoleEntitlementDto>(roleEntitlement);
+            
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetById",
@@ -51,12 +39,14 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById
                 module:"RoleEntitlement"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<RoleEntitlementDto>
-            {
-                IsSuccess = true,
-                Message = "RoleEntitlement fetched successfully",
-                Data = roleEntitlementDto
-            };           
+           var result = _mapper.Map<GetByIdRoleEntitlementDTO>((roleId.Id, roleModules, parentMenus, childMenus, roleMenuPrivileges));
+
+                 return new ApiResponseDTO<GetByIdRoleEntitlementDTO>
+                 {
+                     IsSuccess = true,
+                     Message = "Role Entitlement data retrieved successfully",
+                     Data = result
+                 };          
 
         }
      

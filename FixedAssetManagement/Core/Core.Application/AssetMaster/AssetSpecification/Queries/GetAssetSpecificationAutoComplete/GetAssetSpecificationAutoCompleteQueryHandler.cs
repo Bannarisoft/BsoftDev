@@ -8,7 +8,7 @@
 
     namespace Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecificationAutoComplete
     {
-        public class GetAssetSpecificationAutoCompleteQueryHandler : IRequestHandler<GetAssetSpecificationAutoCompleteQuery, ApiResponseDTO<List<AssetSpecificationAutoCompleteDTO>>>
+        public class GetAssetSpecificationAutoCompleteQueryHandler : IRequestHandler<GetAssetSpecificationAutoCompleteQuery, ApiResponseDTO<List<AssetSpecificationJsonDto>>>
         {
             private readonly IAssetSpecificationQueryRepository _assetSpecificationRepository;
             private readonly IMapper _mapper;
@@ -21,18 +21,18 @@
                 _mediator = mediator;
             }
 
-            public async Task<ApiResponseDTO<List<AssetSpecificationAutoCompleteDTO>>> Handle(GetAssetSpecificationAutoCompleteQuery request, CancellationToken cancellationToken)
+            public async Task<ApiResponseDTO<List<AssetSpecificationJsonDto>>> Handle(GetAssetSpecificationAutoCompleteQuery request, CancellationToken cancellationToken)
             {
                 var result = await _assetSpecificationRepository.GetByAssetSpecificationNameAsync(request.SearchPattern ?? string.Empty);
                 if (result is null || result.Count is 0)
                 {
-                    return new ApiResponseDTO<List<AssetSpecificationAutoCompleteDTO>>
+                    return new ApiResponseDTO<List<AssetSpecificationJsonDto>>
                     {
                         IsSuccess = false,
                         Message = "No SpecificationMaster found matching the search pattern."
                     };
                 }
-                var specificationMasterDto = _mapper.Map<List<AssetSpecificationAutoCompleteDTO>>(result);
+                var specificationMasterDto = _mapper.Map<List<AssetSpecificationJsonDto>>(result);
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetAutoComplete",
@@ -42,7 +42,7 @@
                     module:"Asset Specification"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return new ApiResponseDTO<List<AssetSpecificationAutoCompleteDTO>>
+                return new ApiResponseDTO<List<AssetSpecificationJsonDto>>
                 {
                     IsSuccess = true,
                     Message = "Success",

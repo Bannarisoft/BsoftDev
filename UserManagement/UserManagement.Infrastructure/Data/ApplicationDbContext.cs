@@ -51,10 +51,12 @@ namespace UserManagement.Infrastructure.Data
         public DbSet<Language> Languages { get; set; }
         public DbSet<FinancialYear> FinancialYear { get; set;}
         public DbSet<UserUnit> UserUnit { get; set; }
-        public DbSet<RoleMenu> RoleMenus { get; set; } 
+        public DbSet<RoleMenuPrivileges> RoleMenuPrivileges { get; set; } 
         public DbSet<RoleModule> RoleModules { get; set; }
         public DbSet<UserGroup> UserGroup { get; set; }
         public DbSet<UserGroupUsers> UserGroupUsers { get; set; }
+        public DbSet<RoleParent> RoleParent { get; set; }
+        public DbSet<RoleChild> RoleChild { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -92,10 +94,12 @@ namespace UserManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new CompanySettingsConfiguration());
             modelBuilder.ApplyConfiguration(new LanguageConfiguration());
             modelBuilder.ApplyConfiguration(new UserUnitConfiguration());
-            modelBuilder.ApplyConfiguration(new RoleMenuConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleMenuPrivilegesConfiguration());
             modelBuilder.ApplyConfiguration(new RoleModuleConfiguration());
             modelBuilder.ApplyConfiguration(new UserGroupConfiguration());
             modelBuilder.ApplyConfiguration(new UserGroupUsersConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleParentConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleChildConfiguration());
             
                
             base.OnModelCreating(modelBuilder);

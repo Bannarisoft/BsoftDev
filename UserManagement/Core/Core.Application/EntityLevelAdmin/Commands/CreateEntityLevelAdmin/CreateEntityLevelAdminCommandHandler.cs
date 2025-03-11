@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.EntityLevelAdmin.Commands.CreateEntityLevelAdmin
 {
-    public class CreateEntityLevelAdminCommandHandler : IRequestHandler<CreateEntityLevelAdminCommand, ApiResponseDTO<bool>>
+    public class CreateEntityLevelAdminCommandHandler : IRequestHandler<CreateEntityLevelAdminCommand, ApiResponseDTO<int>>
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
@@ -24,12 +24,12 @@ namespace Core.Application.EntityLevelAdmin.Commands.CreateEntityLevelAdmin
             _mapper = mapper;
             _userQueryRepository = userQueryRepository;
         }
-        public async Task<ApiResponseDTO<bool>> Handle(CreateEntityLevelAdminCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<int>> Handle(CreateEntityLevelAdminCommand request, CancellationToken cancellationToken)
         {
             var existingUser = await _userQueryRepository.GetByUsernameAsync(request.Email);
             if (existingUser != null)
             {
-                return new ApiResponseDTO<bool>
+                return new ApiResponseDTO<int>
                 {
                     IsSuccess = false,
                     Message = "User already exists."
@@ -45,7 +45,7 @@ namespace Core.Application.EntityLevelAdmin.Commands.CreateEntityLevelAdmin
 
               if (createdUser == null)
             {
-                return new ApiResponseDTO<bool>
+                return new ApiResponseDTO<int>
                 {
                     IsSuccess = false,
                     Message = "Failed to create user. Please try again."
@@ -60,10 +60,11 @@ namespace Core.Application.EntityLevelAdmin.Commands.CreateEntityLevelAdmin
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-             return new ApiResponseDTO<bool>
+             return new ApiResponseDTO<int>
             {
                 IsSuccess = true,
-                Message = "Entity Level Admin created successfully"
+                Message = "Entity Level Admin created successfully",
+                Data = createdUser.UserId
             };
         }
     }

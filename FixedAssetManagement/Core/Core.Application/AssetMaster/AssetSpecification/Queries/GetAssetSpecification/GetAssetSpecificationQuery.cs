@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecification
 {
-    public class GetAssetSpecificationQuery : IRequest<ApiResponseDTO<List<AssetSpecificationDTO>>>
+    public class GetAssetSpecificationQuery : IRequest<ApiResponseDTO<List<AssetSpecificationJsonDto>>>
     {
         public int PageNumber { get; set; }
         public int PageSize { get; set; } 

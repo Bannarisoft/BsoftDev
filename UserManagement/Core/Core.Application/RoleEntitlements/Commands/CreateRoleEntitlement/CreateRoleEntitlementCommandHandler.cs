@@ -41,8 +41,32 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
 
                 _logger.LogInformation("Starting role entitlement creation process for RoleName: {RoleName}");
                 
-               IList<RoleModule> roleEntitlements = _mapper.Map<IList<RoleModule>>(request.ModuleMenus);
-                await _roleEntitlementCommandrepository.AddRoleEntitlementsAsync(roleEntitlements, cancellationToken);
+               var roleId = request.RoleId;
+
+                     var roleModules = request.RoleModules.Select(dto => {
+                         var entity = _mapper.Map<RoleModule>(dto);
+                         entity.RoleId = roleId;  
+                         return entity;
+                     }).ToList();
+
+                     var roleParents = request.RoleParents.Select(dto => {
+                         var entity = _mapper.Map<RoleParent>(dto);
+                         entity.RoleId = roleId; 
+                         return entity;
+                     }).ToList();
+
+                     var roleChildren = request.RoleChildren.Select(dto => {
+                         var entity = _mapper.Map<RoleChild>(dto);
+                         entity.RoleId = roleId; 
+                         return entity;
+                     }).ToList();
+
+                     var roleMenuPrivileges = request.RoleMenuPrivileges.Select(dto => {
+                         var entity = _mapper.Map<RoleMenuPrivileges>(dto);
+                         entity.RoleId = roleId; 
+                         return entity;
+                     }).ToList();
+                await _roleEntitlementCommandrepository.AddRoleEntitlementsAsync(roleId,roleModules,roleParents,roleChildren,roleMenuPrivileges, cancellationToken);
 
                     // Domain Event for Audit Logs
                     var domainEvent = new AuditLogsDomainEvent(

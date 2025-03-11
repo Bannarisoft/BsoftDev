@@ -27,20 +27,20 @@ namespace UserManagement.API.Controllers
     // }
     private readonly IValidator<CreateModuleCommand> _createModuleCommandValidator;
          private readonly IValidator<UpdateModuleCommand> _updateModuleCommandValidator;
-         private readonly ApplicationDbContext _dbContext;
+         private readonly IValidator<DeleteModuleCommand> _deleteModuleCommandValidator;
          private readonly ILogger<ModulesController> _logger;
 
          
        public ModulesController(ISender mediator, 
                              IValidator<CreateModuleCommand> createModuleCommandValidator, 
                              IValidator<UpdateModuleCommand> updateModuleCommandValidator, 
-                             ApplicationDbContext dbContext,
-                             ILogger<ModulesController> logger) 
+                             ILogger<ModulesController> logger,
+                             IValidator<DeleteModuleCommand> deleteModuleCommandValidator) 
          : base(mediator)
         {        
             _createModuleCommandValidator = createModuleCommandValidator;
             _updateModuleCommandValidator = updateModuleCommandValidator;    
-            _dbContext = dbContext;  
+            _deleteModuleCommandValidator = deleteModuleCommandValidator;
             _logger = logger;
 
              
@@ -141,6 +141,17 @@ namespace UserManagement.API.Controllers
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteModule(int id)
     {
+         var command = new DeleteModuleCommand { ModuleId = id };
+             var validationResult = await  _deleteModuleCommandValidator.ValidateAsync(command);
+               if (!validationResult.IsValid)
+                {
+                    return BadRequest(new
+                    {
+                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                        statusCode = StatusCodes.Status400BadRequest
+                    });
+                } 
+          
         if (id <= 0)
         {
             return BadRequest(new
@@ -149,7 +160,7 @@ namespace UserManagement.API.Controllers
                 message = "Invalid Module ID"
             });
         }
-        var result = await Mediator.Send(new DeleteModuleCommand { ModuleId= id });                 
+        var result = await Mediator.Send(command);                 
             if (!result.IsSuccess)
             {          
                  _logger.LogWarning($"Deletion failed for module {id}: {result?.Message ?? "Unknown error"}.");

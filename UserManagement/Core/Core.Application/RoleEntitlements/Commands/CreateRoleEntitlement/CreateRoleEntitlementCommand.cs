@@ -1,4 +1,4 @@
-using Core.Application.RoleEntitlements.Queries.GetRoleEntitlements;
+using Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,11 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
     public class CreateRoleEntitlementCommand : IRequest<ApiResponseDTO<int>>
     {
         
-        public List<ModuleMenuPermissionDto> ModuleMenus { get; set; }
+         public int RoleId { get; set; }
+     public IList<RoleModuleDTO> RoleModules { get; set; }
+     public IList<RoleParentDTO> RoleParents { get; set; }
+     public IList<RoleChildDTO> RoleChildren { get; set; }
+     public IList<RoleMenuPrivilegesDTO> RoleMenuPrivileges { get; set; }
         
 
     }

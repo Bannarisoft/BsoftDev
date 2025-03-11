@@ -104,6 +104,21 @@ namespace UserManagement.Infrastructure.Repositories.Module
 
             var modules = await _dbConnection.QueryAsync<Modules>(query, parameters);
             return modules.ToList();
-        } 
+        }
+
+        
+          public async Task<bool>SoftDeleteValidation(int Id)
+            {
+                                const string query = @"
+                           SELECT 1 
+                           FROM [AppData].[Menus] 
+                    WHERE ModuleId = @Id AND  AND IsDeleted = 0;";
+                    
+                       using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+                    
+                       var MenuExists = await multi.ReadFirstOrDefaultAsync<int?>();  
+                    
+                       return MenuExists.HasValue ;
+            }
     }
 }

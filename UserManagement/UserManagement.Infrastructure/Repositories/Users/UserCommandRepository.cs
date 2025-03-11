@@ -105,6 +105,21 @@ namespace UserManagement.Infrastructure.Repositories
             });
       
         }
+
+        public async Task<int> SetAdminPassword(int userId, User user)
+        {
+             var existingUser = await _applicationDbContext.User
+                    .FirstOrDefaultAsync(u => u.UserId == userId);
+                    if (existingUser != null)
+                    {
+                        existingUser.PasswordHash = user.PasswordHash;
+
+                          _applicationDbContext.User.Update(existingUser);
+                        return await _applicationDbContext.SaveChangesAsync();
+                    }
+                return 0;
+        }
+
         public async Task<int> UpdateAsync(int userId, User user)
         {
             var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);

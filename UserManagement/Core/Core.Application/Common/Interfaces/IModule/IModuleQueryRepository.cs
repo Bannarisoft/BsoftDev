@@ -11,5 +11,6 @@ namespace Core.Application.Common.Interfaces.IModule
     Task<Core.Domain.Entities.Modules> GetModuleByIdAsync(int id);
     Task<(List<Core.Domain.Entities.Modules>,int)> GetAllModulesAsync(int PageNumber, int PageSize, string? SearchTerm);   
     Task<List<Core.Domain.Entities.Modules>> GetModule(string searchPattern); 
+    Task<bool> SoftDeleteValidation(int Id); 
     }
 }

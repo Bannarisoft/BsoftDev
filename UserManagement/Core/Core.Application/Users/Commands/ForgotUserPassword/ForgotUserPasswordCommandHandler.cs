@@ -90,7 +90,7 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
             var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId); 
 
             // Store verification code in memory
-            ForgotPasswordCache.CodeStorage[user.UserName] = new VerificationCodeDetails
+            ForgotPasswordCache.CodeStorage[request.UserName] = new VerificationCodeDetails
             {
                 Code = verificationCode,
                 ExpiryTime = currentTime.AddMinutes(expiryMinutes)
@@ -98,7 +98,7 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
 
             // Schedule Hangfire job to remove the code after expiry
             Hangfire.BackgroundJob.Schedule(
-            () => ForgotPasswordCache.RemoveVerificationCode(user.UserName), 
+            () => ForgotPasswordCache.RemoveVerificationCode(request.UserName), 
             TimeSpan.FromMinutes(expiryMinutes)
             );
 

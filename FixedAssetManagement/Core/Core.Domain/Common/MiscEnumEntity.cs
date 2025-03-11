@@ -51,6 +51,18 @@ namespace Core.Domain.Common
         public static class Asset_DisposeType
         {
         public const string MiscCode = "DISPOSALTYPE";
-        }       
+        }
+        public static class AssetTransferIssue_Type
+        {
+        public const string MiscCode = "ASSETISSUETYPE";
+        } 
+        public static class DeprecationPeriod
+        {
+        public const string MiscCode = "DEPPERIOD";
+        }     
+        public static class DeprecationMethod
+        {
+        public const string MiscCode = "DEPMETHOD";
+        }                
     }
 }

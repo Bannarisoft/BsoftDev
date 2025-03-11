@@ -99,7 +99,7 @@ public class RoleEntitlementsController : ApiControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateRoleEntitlement(UpdateRoleEntitlementCommand command)
     {
-          if (command.ModuleMenus.Any(mm => mm.RoleId != command.RoleId))
+          if (command.RoleId != command.RoleId)
          {
              return BadRequest(new 
              {

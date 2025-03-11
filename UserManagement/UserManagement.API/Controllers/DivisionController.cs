@@ -25,11 +25,13 @@ namespace UserManagement.API.Controllers
     {
         private readonly IValidator<CreateDivisionCommand> _createDivisionCommandValidator;
         private readonly IValidator<UpdateDivisionCommand> _updateDivisionCommandValidator;
-        public DivisionController(ISender mediator,IValidator<CreateDivisionCommand> createDivisionCommandValidator,IValidator<UpdateDivisionCommand> updateDivisionCommandValidator) 
+        private readonly IValidator<DeleteDivisionCommand> _deleteDivisionCommandValidator;
+        public DivisionController(ISender mediator,IValidator<CreateDivisionCommand> createDivisionCommandValidator,IValidator<UpdateDivisionCommand> updateDivisionCommandValidator,IValidator<DeleteDivisionCommand> deleteDivisionCommandValidator) 
         : base(mediator)
         {
             _createDivisionCommandValidator = createDivisionCommandValidator;
             _updateDivisionCommandValidator = updateDivisionCommandValidator;
+            _deleteDivisionCommandValidator = deleteDivisionCommandValidator;
         }
          [HttpGet]
         public async Task<IActionResult> GetAllDivisionsAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -124,8 +126,17 @@ namespace UserManagement.API.Controllers
         
         public async Task<IActionResult> Delete(int id)
         {
-           
-           var updatedDivision = await Mediator.Send(new DeleteDivisionCommand { Id = id });
+            var command = new DeleteDivisionCommand { Id = id };
+             var validationResult = await  _deleteDivisionCommandValidator.ValidateAsync(command);
+               if (!validationResult.IsValid)
+                {
+                    return BadRequest(new
+                    {
+                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                        statusCode = StatusCodes.Status400BadRequest
+                    });
+                }
+           var updatedDivision = await Mediator.Send(command);
 
            if(updatedDivision.IsSuccess)
            {
