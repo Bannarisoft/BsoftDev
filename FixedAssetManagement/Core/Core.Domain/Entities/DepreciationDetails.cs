@@ -26,5 +26,10 @@ namespace Core.Domain.Entities
         public decimal DepreciationValue { get; set; }   
         public decimal ClosingValue { get; set; }   
         public byte IsLocked { get; set; }
+        public int? DepreciationPeriod { get; set; }        
+        public MiscMaster DepMiscType { get; set; } = null!;  
+        public DateTimeOffset? DisposedDate { get; set; }    
+        public decimal? DisposalAmount { get; set; }   
+
     }
 }

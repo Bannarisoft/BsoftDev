@@ -112,6 +112,23 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("decimal(18,3)")
                 .IsRequired(); 
 
+                builder.Property(dg => dg.DepreciationPeriod)                
+                .HasColumnType("int")
+                .IsRequired(); 
+                  // Configure Foreign Key Relationship
+                builder.HasOne(dg => dg.DepMiscType)
+                .WithMany(ag => ag.DepreciationPeriod)
+                .HasForeignKey(dg => dg.DepreciationPeriod)                
+                .OnDelete(DeleteBehavior.Restrict); 
+
+                builder.Property(dg => dg.DisposedDate)                
+                .HasColumnType("datetimeoffset");
+                
+
+                builder.Property(dg => dg.DisposalAmount)                
+                .HasColumnType("decimal(18,3)")
+                .IsRequired(false); 
+
                 builder.Property(c => c.IsLocked)                
                 .HasColumnType("bit")
                 .HasConversion(

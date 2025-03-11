@@ -1,9 +1,8 @@
 using Core.Application.Common.Interfaces.IDepreciationDetail;
+using Core.Domain.Common;
 using Core.Domain.Entities;
 using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading.Tasks;
 
 namespace FAM.Infrastructure.Repositories.DepreciationDetail
 {
@@ -17,19 +16,22 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
         }
 
         
-        public async Task<int> DeleteAsync(int companyId, int unitId, string finYear, DateTimeOffset startDate, DateTimeOffset endDate, string depreciationType)
+        public async Task<int> DeleteAsync(int companyId, int unitId, string finYear, string depreciationType,int depreciationPeriod)
         {
-            var entity = await _applicationDbContext.DepreciationDetails
-                .FirstOrDefaultAsync(d => d.CompanyId == companyId &&
-                                          d.UnitId == unitId &&
+            var depreciationDetails = await _applicationDbContext.DepreciationDetails
+                .Where(d => d.CompanyId == companyId &&
+                                           (unitId == 0 || d.UnitId == unitId) &&
                                           d.Finyear == finYear &&
-                                          d.StartDate == startDate &&
-                                          d.EndDate == endDate && d.DepreciationType==depreciationType);
-            if (entity != null)
-            {
-                _applicationDbContext.DepreciationDetails.Remove(entity);
+                                          d.DepreciationPeriod == depreciationPeriod && d.DepreciationType==depreciationType ).ToListAsync();        
+            if (depreciationDetails != null)
+            {                 
+                foreach (var detail in depreciationDetails)
+                {
+                    detail.IsDeleted = BaseEntity.IsDelete.Deleted;
+                }
+
                 return await _applicationDbContext.SaveChangesAsync();
-            }
+            }   
             return 0;
         }
     }
