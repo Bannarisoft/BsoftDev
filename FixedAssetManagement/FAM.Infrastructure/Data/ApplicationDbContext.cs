@@ -75,6 +75,7 @@ namespace FAM.Infrastructure.Data
  			modelBuilder.ApplyConfiguration(new DepreciationDetailConfiguration()); 
             modelBuilder.ApplyConfiguration(new AssetTransferIssueHdrConfiguration());
             modelBuilder.ApplyConfiguration(new AssetTransferIssueDtlConfiguration());
+			modelBuilder.ApplyConfiguration(new FormulaTableConfiguration()); 
 
             base.OnModelCreating(modelBuilder);
         }
