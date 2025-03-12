@@ -214,6 +214,7 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetTransferIssueApprovalQueryRepository, AssetTransferIssueQueryRepository>();
             services.AddScoped<IAssetTransferIssueApprovalCommandRepository, AssetTransferIssueCommandRepository>();
             services.AddScoped<IAssetTransferReceiptQueryRepository, AssetTransferReceiptQueryRepository>();
+            services.AddScoped<IAssetTransferReceiptCommandRepository, AssetTransferReceiptCommandRepository>();
 
 
 
@@ -246,9 +247,9 @@ namespace FAM.Infrastructure
                 typeof(AssetTransferProfile),
                 typeof(AssetAmcProfile),
                 typeof(AssetDisposalProfile),
-
  				typeof(DepreciationDetailProfile),
-                typeof(AssetIssueTransferApproval)
+                typeof(AssetIssueTransferApproval),
+                typeof(AssetTransferReceiptProfile)
 
             );
 

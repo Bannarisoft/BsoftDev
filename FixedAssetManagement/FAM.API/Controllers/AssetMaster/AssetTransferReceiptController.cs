@@ -4,7 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAssetTransferIssueById;
+using Core.Application.AssetMaster.AssetTransferReceipt.Command.CreateAssetTransferReceipt;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptPending;
+using Core.Application.Common.HttpResponse;
+using Core.Domain.Entities.AssetMaster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -47,6 +50,21 @@ namespace FAM.API.Controllers.AssetMaster
                 PageNumber = assetamc.PageNumber,
                 PageSize = assetamc.PageSize
             });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAsync(CreateAssetTransferReceiptCommand  createAssetTransferReceiptCommand)
+        {
+            if (createAssetTransferReceiptCommand == null)
+                return BadRequest(new ApiResponseDTO<AssetTransferReceiptHdr>
+                {
+                    IsSuccess = false,
+                    Message = "Invalid request data"
+                });
+            var response = await Mediator.Send(createAssetTransferReceiptCommand);
+            if (!response.IsSuccess)
+                return BadRequest(response);
+            return Ok(response);
         }
 
       

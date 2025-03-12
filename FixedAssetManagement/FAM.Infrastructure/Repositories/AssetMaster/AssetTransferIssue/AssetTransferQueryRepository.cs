@@ -22,7 +22,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
         }
         
 
-         public async Task<(List<AssetTransferDto>, int)> GetAllAsync(int PageNumber, int PageSize, string? SearchTerm)        
+        public async Task<(List<AssetTransferDto>, int)> GetAllAsync(int PageNumber, int PageSize, string? SearchTerm)        
         {
           var query = $$"""
         DECLARE @TotalCount INT;
