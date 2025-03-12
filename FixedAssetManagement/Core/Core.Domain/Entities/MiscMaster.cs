@@ -32,6 +32,7 @@ namespace Core.Domain.Entities
         public ICollection<AssetAmc>? AssetAmcCoverageType  { get; set; } 
         public AssetDisposal? AssetMiscDisposalType { get; set; } 
         public ICollection<AssetTransferIssueHdr>? AssetTransferIssueType  { get; set; } 
+        public ICollection<AssetTransferReceiptHdr>? AssetTransferReceiptHdr  { get; set; }
 		public  ICollection<DepreciationDetails>? DepreciationPeriod { get; set; }
     }
 }

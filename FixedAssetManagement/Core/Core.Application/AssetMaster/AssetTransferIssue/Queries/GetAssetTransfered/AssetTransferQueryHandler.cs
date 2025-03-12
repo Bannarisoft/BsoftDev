@@ -13,7 +13,7 @@ namespace Core.Application.AssetMaster.AssetTransfer.Queries.GetAssetTransfered
 {
     public class AssetTransferQueryHandler : IRequestHandler<AssetTransferQuery,  ApiResponseDTO<List<AssetTransferDto>>>
     {
-         private readonly IAssetTransferQueryRepository _assetTransferQueryRepository;
+        private readonly IAssetTransferQueryRepository _assetTransferQueryRepository;
         private readonly IMapper _mapper;        
         private readonly IMediator _mediator; 
         public AssetTransferQueryHandler( IAssetTransferQueryRepository assetTransferQueryRepository, IMapper mapper, IMediator mediator)

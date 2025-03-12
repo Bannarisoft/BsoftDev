@@ -18,6 +18,7 @@ namespace Core.Domain.Entities
         public Location? Location { get; set; } 
         //AssetSubLocation from AssetLocation
         public ICollection<AssetLocation>? AssetSubLocation{ get; set; } 
+        public ICollection<AssetTransferReceiptDtl>? AssetTransferReceiptSubLocation{ get; set; } 
 
 
 
