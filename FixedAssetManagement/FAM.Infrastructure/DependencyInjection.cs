@@ -69,6 +69,7 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue;
 using FAM.Infrastructure.Repositories.AssetTransferIssueApproval;
 using Core.Application.Common.Interfaces.IAssetTransferReceipt;
 using FAM.Infrastructure.Repositories.AssetTransferReceipt;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer;
 
 namespace FAM.Infrastructure
 {
