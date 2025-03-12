@@ -26,6 +26,7 @@ namespace Core.Domain.Entities
         public decimal OpeningValue { get; set; }   
         public decimal DepreciationValue { get; set; }   
         public decimal ClosingValue { get; set; }   
+        public decimal NetValue { get; set; }   
         public byte IsLocked { get; set; }
         public int? DepreciationPeriod { get; set; }        
         public MiscMaster DepMiscType { get; set; } = null!;  

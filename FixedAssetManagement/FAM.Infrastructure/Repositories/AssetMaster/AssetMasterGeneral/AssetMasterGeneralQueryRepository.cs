@@ -102,31 +102,30 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             return result.ToList();
         }
 
-        public async Task<AssetChildDetailsDto> GetAssetChildDetails(int assetId)
+        public async Task<bool> GetAssetChildDetails(int assetId)
         {
             const string query = @"
-            SELECT AM.Id,AM.AssetCode,AM.AssetName,count(distinct AL.Id) AssetLocation,count( distinct APD.Id) AssetPurchase,
-            count(distinct AW.Id) AssetWarranty,count(distinct ASP.Id)AssetSpec,count( distinct AA.Id)AssetAmc,
-            count(distinct AI.Id) AssetInsurance,count(distinct AC.Id) AssetAdditionalCost,count(distinct AD.Id) AssetDisposal
-            ,count(distinct DD.Id) AssetDepreciation
-            FROM FixedAsset.AssetMaster AM                       
-            LEFT JOIN [FixedAsset].[AssetLocation] AL ON AM.Id = AL.AssetId 
-            LEFT JOIN [FixedAsset].[AssetPurchaseDetails] APD ON AM.Id = APD.AssetId 
-            LEFT JOIN [FixedAsset].[AssetWarranty] AW ON AM.Id = AW.AssetId and AW.IsDeleted=0
-            LEFT JOIN [FixedAsset].[AssetSpecifications] ASP ON AM.Id = ASP.AssetId and AM.IsDeleted=0
-            LEFT JOIN [FixedAsset].[AssetAmc] AA ON AM.Id = AA.AssetId and AA.IsDeleted=0
-            LEFT JOIN [FixedAsset].[AssetInsurance] AI ON AM.Id = AI.AssetId and AI.IsDeleted=0
-            LEFT JOIN [FixedAsset].[AssetAdditionalCost] AC ON AM.Id = AC.AssetId and AM.IsDeleted=0
-            LEFT JOIN [FixedAsset].[AssetDisposal] AD ON AM.Id = AD.AssetId and AM.IsDeleted=0
-            LEFT JOIN [FixedAsset].[DepreciationDetail] DD ON AM.Id = DD.AssetId 
-            WHERE AM.Id = assetId AND AM.IsDeleted=0    
-            group by AM.Id,AM.AssetCode,AM.AssetName ";
-            var assetChildDetails = await _dbConnection.QueryFirstOrDefaultAsync<AssetChildDetailsDto>(query, new { assetId });           
-            if (assetChildDetails is null)
-            {
-                throw new KeyNotFoundException($"Asset with ID {assetId} not found.");
-            }
-            return assetChildDetails;
+                    SELECT 1 FROM [FixedAsset].[AssetLocation] WHERE AssetId = @Id AND IsDeleted = 0;
+                    SELECT 1 FROM [FixedAsset].[AssetPurchaseDetails] WHERE AssetId = @Id AND IsDeleted = 0;
+                    SELECT 1 FROM [FixedAsset].[AssetWarranty] WHERE AssetId = @Id AND IsDeleted = 0;
+                    SELECT 1 FROM [FixedAsset].[AssetSpecifications] WHERE AssetId = @Id AND IsDeleted = 0;
+                    SELECT 1 FROM [FixedAsset].[AssetAmc] WHERE AssetId = @Id AND IsDeleted = 0;
+                    SELECT 1 FROM [FixedAsset].[AssetInsurance] WHERE AssetId = @Id AND IsDeleted = 0;
+                    SELECT 1 FROM [FixedAsset].[AssetAdditionalCost] WHERE AssetId = @Id AND IsDeleted = 0;
+                    SELECT 1 FROM [FixedAsset].[AssetDisposal] WHERE AssetId = @Id AND IsDeleted = 0;
+                    SELECT 1 FROM [FixedAsset].[DepreciationDetail] WHERE AssetId = @Id AND IsDeleted = 0;";
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = assetId });
+                    
+            var locationExists = await multi.ReadFirstOrDefaultAsync<int?>();  
+            var purchaseExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var warrantyExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var specExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var amcExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var insuranceExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var additionalCostExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var depreciationExists = await multi.ReadFirstOrDefaultAsync<int?>();
+        
+            return locationExists.HasValue || purchaseExists.HasValue || warrantyExists.HasValue  || specExists.HasValue  || amcExists.HasValue || insuranceExists.HasValue || additionalCostExists.HasValue || depreciationExists.HasValue ; 
         }
 
         public async Task<string?> GetLatestAssetCode(int companyId, int unitId, int assetGroupId, int assetCategoryId, int DepartmentId, int LocationId)

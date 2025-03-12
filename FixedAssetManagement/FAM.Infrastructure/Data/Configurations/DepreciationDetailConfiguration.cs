@@ -107,6 +107,11 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("decimal(18,3)")
                 .IsRequired(); 
 
+                builder.Property(dg => dg.NetValue)                
+                .HasColumnType("decimal(18,3)")
+                .IsRequired()
+                .HasDefaultValue(0);
+
                 builder.Property(dg => dg.DepreciationPeriod)                
                 .HasColumnType("int")
                 .IsRequired(); 

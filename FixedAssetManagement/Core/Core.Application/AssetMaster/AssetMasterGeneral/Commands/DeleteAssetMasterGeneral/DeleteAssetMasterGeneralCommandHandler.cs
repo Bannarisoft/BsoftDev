@@ -35,91 +35,11 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMa
                     IsSuccess = false,
                     Message = "Invalid AssetId."
                 };
-            }
-            var assetChildDetails = await _assetMasterGeneralQueryRepository.GetAssetChildDetails(request.Id);            
-            if (assetChildDetails.AssetAmc>0)
-            {                
-                 return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Amc Details available.Cannot delete the Asset ."
-                };
-            }  
-            else if (assetChildDetails.AssetLocation>0)
-            {                
-                 return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Location Details available.Cannot delete the Asset ."
-                };
-            }
-            else if (assetChildDetails.AssetLocation>0)
-            {                
-                 return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Location Details available.Cannot delete the Asset ."
-                };
-            }
-            else if (assetChildDetails.AssetPurchase>0)
-            {                
-                 return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Purchase Details available.Cannot delete the Asset ."
-                };
-            }
-            else if (assetChildDetails.AssetWarranty>0)
-            {                
-                 return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Warranty Details available.Cannot delete the Asset ."
-                };
-            }
-            else if (assetChildDetails.AssetSpec>0)
-            {                
-                 return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Specification Details available.Cannot delete the Asset ."
-                };
-            }
-            else if (assetChildDetails.AssetAdditionalCost>0)
-            {                
-                 return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Additional Cost Details available.Cannot delete the Asset ."
-                };
-            }
-            else if (assetChildDetails.AssetInsurance>0)
-            {                
-                 return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Insurance Details available.Cannot delete the Asset ."
-                };
-            }
-            else if (assetChildDetails.AssetDisposal>0)
-            {                
-                 return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Disposal Details available.Cannot delete the Asset ."
-                };
-            }
-            else if (assetChildDetails.AssetDepreciation>0)
-            {                
-                 return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Depreciation Details available.Cannot delete the Asset ."
-                };
-            }
+            }            
             var assetMasterDelete = _mapper.Map<AssetMasterGenerals>(request);      
             var updateResult = await _assetMasterGeneralRepository.DeleteAsync(request.Id, assetMasterDelete);
-            if (updateResult > 0)
+            
+            if (updateResult)
             {
                 var assetMasterDto = _mapper.Map<AssetMasterGeneralDTO>(assetMasterDelete);  
                 //Domain Event  
