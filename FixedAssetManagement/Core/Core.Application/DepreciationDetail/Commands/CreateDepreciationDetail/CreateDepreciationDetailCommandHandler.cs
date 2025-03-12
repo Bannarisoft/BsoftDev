@@ -30,7 +30,7 @@ namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
         {
             // Check if Depreciation already exists
             var exists = await _depreciationDetailQueryRepository.ExistDataAsync(
-                request.companyId, request.unitId, request.finYear??string.Empty,  request.depreciationType??string.Empty,  request.depreciationPeriod
+                request.companyId, request.unitId, request.finYear??string.Empty,  request.depreciationType,  request.depreciationPeriod
             );
 
             if (exists)

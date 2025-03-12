@@ -9,7 +9,8 @@ namespace Core.Domain.Entities
         public string? Finyear { get; set; }        
         public DateTimeOffset? StartDate { get; set; }    
         public DateTimeOffset? EndDate { get; set; }                    
-        public string? DepreciationType { get; set; }
+        public int DepreciationType { get; set; }
+        public MiscMaster DepType { get; set; } = null!;  
         public int? AssetId { get; set; }          
         public AssetMasterGenerals AssetMasterId { get; set; } = null!;      
         // Foreign Key

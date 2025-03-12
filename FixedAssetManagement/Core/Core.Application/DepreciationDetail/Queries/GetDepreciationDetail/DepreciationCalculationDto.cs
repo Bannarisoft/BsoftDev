@@ -8,6 +8,6 @@ namespace Core.Application.DepreciationDetail.Queries.GetDepreciationDetail
         public string? finYear { get; set; } 
         public DateTimeOffset? startDate { get; set; }   
         public DateTimeOffset? endDate { get; set; }   
-        public string? depreciationType { get; set; }
+        public int depreciationType { get; set; }
     }
 }

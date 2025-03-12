@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250311111155_RemoveDepreciationDetailIsactiveIsDelete")]
+    partial class RemoveDepreciationDetailIsactiveIsDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1247,8 +1250,9 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("DepreciationPeriod")
                         .HasColumnType("int");
 
-                    b.Property<int>("DepreciationType")
-                        .HasColumnType("int");
+                    b.Property<string>("DepreciationType")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)");
 
                     b.Property<decimal>("DepreciationValue")
                         .HasColumnType("decimal(18,3)");
@@ -1306,8 +1310,6 @@ namespace FAM.Infrastructure.Migrations
                     b.HasIndex("AssetId");
 
                     b.HasIndex("DepreciationPeriod");
-
-                    b.HasIndex("DepreciationType");
 
                     b.ToTable("DepreciationDetail", "FixedAsset");
                 });
@@ -1414,11 +1416,6 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Description");
-
                     b.Property<string>("FormulaName")
                         .IsRequired()
                         .HasColumnType("varchar(25)")
@@ -1446,11 +1443,6 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("Type");
 
                     b.HasKey("Id");
 
@@ -2297,19 +2289,11 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "DepType")
-                        .WithMany("DepType")
-                        .HasForeignKey("DepreciationType")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("AssetGroup");
 
                     b.Navigation("AssetMasterId");
 
                     b.Navigation("DepMiscType");
-
-                    b.Navigation("DepType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.DepreciationGroups", b =>
@@ -2485,8 +2469,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetWorkTypeGenerals");
 
                     b.Navigation("BookType");
-
-                    b.Navigation("DepType");
 
                     b.Navigation("DepreciationMethod");
 

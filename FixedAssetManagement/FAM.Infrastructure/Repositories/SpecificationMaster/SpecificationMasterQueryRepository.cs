@@ -65,7 +65,7 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
             var specificationMaster = await _dbConnection.QueryFirstOrDefaultAsync<SpecificationMasters>(query, new { specId });           
             if (specificationMaster is null)
             {
-                throw new KeyNotFoundException($"Specufication with ID {specId} not found.");
+                throw new KeyNotFoundException($"Specification with ID {specId} not found.");
             }
             return specificationMaster;
         }

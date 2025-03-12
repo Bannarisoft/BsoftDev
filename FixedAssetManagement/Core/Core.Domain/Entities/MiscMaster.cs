@@ -33,5 +33,6 @@ namespace Core.Domain.Entities
         public AssetDisposal? AssetMiscDisposalType { get; set; } 
         public ICollection<AssetTransferIssueHdr>? AssetTransferIssueType  { get; set; } 
 		public  ICollection<DepreciationDetails>? DepreciationPeriod { get; set; }
+        public  ICollection<DepreciationDetails>? DepType { get; set; }
     }
 }
