@@ -101,6 +101,22 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMa
                     Message = "Insurance Details available.Cannot delete the Asset ."
                 };
             }
+            else if (assetChildDetails.AssetDisposal>0)
+            {                
+                 return new ApiResponseDTO<AssetMasterGeneralDTO>
+                {
+                    IsSuccess = false,
+                    Message = "Disposal Details available.Cannot delete the Asset ."
+                };
+            }
+            else if (assetChildDetails.AssetDepreciation>0)
+            {                
+                 return new ApiResponseDTO<AssetMasterGeneralDTO>
+                {
+                    IsSuccess = false,
+                    Message = "Depreciation Details available.Cannot delete the Asset ."
+                };
+            }
             var assetMasterDelete = _mapper.Map<AssetMasterGenerals>(request);      
             var updateResult = await _assetMasterGeneralRepository.DeleteAsync(request.Id, assetMasterDelete);
             if (updateResult > 0)

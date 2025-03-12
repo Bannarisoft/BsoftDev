@@ -107,7 +107,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             const string query = @"
             SELECT AM.Id,AM.AssetCode,AM.AssetName,count(distinct AL.Id) AssetLocation,count( distinct APD.Id) AssetPurchase,
             count(distinct AW.Id) AssetWarranty,count(distinct ASP.Id)AssetSpec,count( distinct AA.Id)AssetAmc,
-            count(distinct AI.Id) AssetInsurance,count(distinct AC.Id) AssetAdditionalCost
+            count(distinct AI.Id) AssetInsurance,count(distinct AC.Id) AssetAdditionalCost,count(distinct AD.Id) AssetDisposal
+            ,count(distinct DD.Id) AssetDepreciation
             FROM FixedAsset.AssetMaster AM                       
             LEFT JOIN [FixedAsset].[AssetLocation] AL ON AM.Id = AL.AssetId 
             LEFT JOIN [FixedAsset].[AssetPurchaseDetails] APD ON AM.Id = APD.AssetId 
@@ -116,7 +117,9 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             LEFT JOIN [FixedAsset].[AssetAmc] AA ON AM.Id = AA.AssetId and AA.IsDeleted=0
             LEFT JOIN [FixedAsset].[AssetInsurance] AI ON AM.Id = AI.AssetId and AI.IsDeleted=0
             LEFT JOIN [FixedAsset].[AssetAdditionalCost] AC ON AM.Id = AC.AssetId and AM.IsDeleted=0
-            WHERE AM.Id = assetId AND AM.IsDeleted=0
+            LEFT JOIN [FixedAsset].[AssetDisposal] AD ON AM.Id = AD.AssetId and AM.IsDeleted=0
+            LEFT JOIN [FixedAsset].[DepreciationDetail] DD ON AM.Id = DD.AssetId 
+            WHERE AM.Id = assetId AND AM.IsDeleted=0    
             group by AM.Id,AM.AssetCode,AM.AssetName ";
             var assetChildDetails = await _dbConnection.QueryFirstOrDefaultAsync<AssetChildDetailsDto>(query, new { assetId });           
             if (assetChildDetails is null)

@@ -17,6 +17,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public int AssetAmc { get; set; }
         public int AssetAdditionalCost { get; set; }
         public int AssetInsurance { get; set; }
-
+        public int AssetDisposal { get; set; } 
+        public int AssetDepreciation { get; set; } 
     }
 }

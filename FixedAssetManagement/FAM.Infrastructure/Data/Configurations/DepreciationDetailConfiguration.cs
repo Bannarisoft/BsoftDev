@@ -3,8 +3,6 @@
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using static Core.Domain.Common.BaseEntity;
 
 namespace FAM.Infrastructure.Data.Configurations
 {
@@ -12,8 +10,6 @@ namespace FAM.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<DepreciationDetails> builder)
         {
-             
-
                 builder.ToTable("DepreciationDetail", "FixedAsset");
                 builder.Ignore(b => b.IsActive);
                 builder.Ignore(b => b.IsDeleted);
