@@ -154,7 +154,7 @@ namespace UserManagement.API.Validation.Companies
 
                         case "Email":
                         RuleFor(x => x.Company.CompanyContact.Email)
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                        .EmailAddress()
                         .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyContact.Email)} {rule.Error}");
                         break;
 

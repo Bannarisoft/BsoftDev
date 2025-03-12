@@ -1,8 +1,11 @@
 
 
+using System.Globalization;
 using Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail;
 using Core.Application.DepreciationDetail.Commands.DeleteDepreciationDetail;
 using Core.Application.DepreciationDetail.Queries.GetDepreciationDetail;
+using Core.Application.DepreciationDetail.Queries.GetDepreciationMethod;
+using Core.Application.DepreciationDetail.Queries.GetDepreciationPeriod;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -16,20 +19,51 @@ namespace FAM.API.Controllers
          public DepreciationDetailController(ISender mediator) 
         : base(mediator) { }
         [HttpGet]
-        public async Task<IActionResult> DepreciationCalculateAsync([FromQuery] int companyId,int unitId,string finYear ,DateTimeOffset startDate,DateTimeOffset endDate,string depreciationType,int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
+        public async Task<IActionResult> DepreciationCalculateAsync( [FromQuery] int companyId, 
+        [FromQuery] int unitId, 
+        [FromQuery] string finYear,
+        [FromQuery] string? startDate,
+        [FromQuery] string? endDate,
+        [FromQuery] string depreciationType,
+        [FromQuery] int pageNumber,
+        [FromQuery] int pageSize,
+        [FromQuery] string? searchTerm,
+        [FromQuery] int depreciationPeriod)
         { 
+            // Convert string dates to DateTimeOffset?
+    DateTimeOffset? parsedStartDate = null;
+    DateTimeOffset? parsedEndDate = null;
+
+    if (!string.IsNullOrWhiteSpace(startDate))  // Allow null or empty values
+    {
+        if (!DateTimeOffset.TryParse(startDate, out var parsedDate))
+        {
+            return BadRequest(new { message = "Invalid startDate format. Use yyyy-MM-dd." });
+        }
+        parsedStartDate = parsedDate;
+    }
+
+    if (!string.IsNullOrWhiteSpace(endDate))  // Allow null or empty values
+    {
+        if (!DateTimeOffset.TryParse(endDate, out var parsedDate))
+        {
+            return BadRequest(new { message = "Invalid endDate format. Use yyyy-MM-dd." });
+        }
+        parsedEndDate = parsedDate;
+    }
              var assetMaster = await Mediator.Send(
                 new GetDepreciationDetailQuery
                 {
                     companyId=companyId,
                     unitId=unitId,
                     finYear=finYear,
-                    startDate=startDate,
-                    endDate=endDate,
+                    startDate=parsedStartDate,
+                    endDate=parsedEndDate,
                     depreciationType=depreciationType,
-                    PageNumber = PageNumber, 
-                    PageSize = PageSize, 
-                    SearchTerm = SearchTerm
+                    PageNumber = pageNumber, 
+                    PageSize = pageSize, 
+                    SearchTerm = searchTerm,                    
+                    depreciationPeriod=depreciationPeriod
                 });
             return Ok(new 
             { 
@@ -62,22 +96,14 @@ namespace FAM.API.Controllers
                     message = result.Message
                 });
             } 
-        } 
-          [HttpDelete("{id}")]        
-        public async Task<IActionResult> DeleteAsync(int id)
+        }        
+        [HttpDelete]        
+        public async Task<IActionResult> DeleteAsync(DeleteDepreciationDetailCommand  command)
         {             
-            if (id <= 0)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Invalid Asset ID"
-                });
-            }            
-              var result = await Mediator.Send(new DeleteDepreciationDetailCommand { Id = id });                 
+            var result = await Mediator.Send(new DeleteDepreciationDetailCommand { companyId=command.companyId,unitId=command.unitId,finYear=command.finYear,depreciationType=command.depreciationType,depreciationPeriod=command.depreciationPeriod});                 
             if (!result.IsSuccess)
             {                
-                return NotFound(new 
+                return NotFound(new     
                 { 
                     StatusCode = StatusCodes.Status404NotFound,
                     message = result.Message
@@ -86,10 +112,48 @@ namespace FAM.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data =$"DepreciationGroup ID {id} Deleted" ,
+                data =$"Depreciation Details Deleted" ,
                 message = result.Message
             });
         }
-                         
+            // GET: api/AssetMasterGeneral/WorkingStatus
+        [HttpGet("DeprecationPeriod")]
+        public async Task<IActionResult> GetDepreciationPeriod()
+        {
+            var result = await Mediator.Send(new GetDepreciationQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Working Status found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Working Status fetched successfully.",
+                data = result.Data
+            });
+        }  
+        [HttpGet("DeprecationMethod")]
+        public async Task<IActionResult> GetDepreciationMethod()
+        {
+            var result = await Mediator.Send(new GetDepreciationMethodQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Working Status found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Working Status fetched successfully.",
+                data = result.Data
+            });
+        }                 
     }
 }

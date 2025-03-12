@@ -95,6 +95,23 @@ namespace UserManagement.Infrastructure.Repositories
                 throw new KeyNotFoundException($"State with ID {countryId} not found.");
             }
             return state.ToList();
-        }        
+        }   
+        public async Task<bool>SoftDeleteValidation(int Id)
+        {
+            const string query = @"
+                    SELECT * 
+                    FROM [AppData].[City] 
+                    WHERE StateId = @Id AND IsDeleted = 1";
+                    var cities = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.Cities>(query, new { Id });
+
+            if (cities != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }     
     }
 }

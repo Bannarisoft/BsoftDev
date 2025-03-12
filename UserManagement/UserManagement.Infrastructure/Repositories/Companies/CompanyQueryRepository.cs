@@ -144,5 +144,35 @@ namespace UserManagement.Infrastructure.Repositories.Companies
             var result = await _dbConnection.QueryAsync<Company>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();
         }
+        public async Task<bool> CompanyExistsAsync(string companyName)
+          {
+              var sql = "SELECT COUNT(1) FROM AppData.Company WHERE CompanyName = @CompanyName";
+                var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { CompanyName = companyName });
+                return count > 0;
+          }
+            public async Task<bool>SoftDeleteValidation(int Id)
+            {
+                                const string query = @"
+                           SELECT 1 
+                           FROM [AppData].[CompanySetting] 
+                           WHERE CompanyId = @Id AND IsDeleted = 0;
+                    
+                           SELECT 1 
+                           FROM [AppData].[Division]
+                           WHERE CompanyId = @Id AND IsDeleted = 0;
+                           
+                           SELECT 1 
+                           FROM [AppData].[Unit]
+                           WHERE CompanyId = @Id AND IsDeleted = 0;";
+                    
+                       using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+                    
+                       var companySettingExists = await multi.ReadFirstOrDefaultAsync<int?>();  
+                       var divisionExists = await multi.ReadFirstOrDefaultAsync<int?>();
+                       var unitExists = await multi.ReadFirstOrDefaultAsync<int?>();
+                    
+                       return companySettingExists.HasValue || divisionExists.HasValue || unitExists.HasValue;
+            }
+        
     }
 }

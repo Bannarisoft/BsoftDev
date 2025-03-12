@@ -6,6 +6,7 @@ using System.Data;
 using Dapper;
 using Core.Application.Entity.Queries.GetEntityLastCode;
 using Microsoft.Data.SqlClient;
+using UserManagement.Infrastructure.Migrations;
 
 namespace UserManagement.Infrastructure.Repositories.Entities
 {
@@ -105,6 +106,30 @@ namespace UserManagement.Infrastructure.Repositories.Entities
                     var entityGroup = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.Entity>(query, new { Id });
                     return entityGroup;
         }
+
+          public async Task<bool>SoftDeleteValidation(int Id)
+            {
+                                const string query = @"
+                           SELECT 1 
+                           FROM AppSecurity.AdminSecuritySettings 
+                    WHERE EntityId = @Id AND IsDeleted = 0;
+                    
+                           SELECT 1 
+                           FROM [AppSecurity].[Users]
+                           WHERE EntityId = @Id AND IsDeleted = 0;
+                           
+                           SELECT 1 
+                           FROM [AppData].[Company]
+                           WHERE EntityId = @Id AND IsDeleted = 0;";
+                    
+                       using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+                    
+                       var AdminSecurityExists = await multi.ReadFirstOrDefaultAsync<int?>();  
+                       var UserExists = await multi.ReadFirstOrDefaultAsync<int?>();
+                       var CompanyExists = await multi.ReadFirstOrDefaultAsync<int?>();
+                    
+                       return UserExists.HasValue || AdminSecurityExists.HasValue || CompanyExists.HasValue;
+            }
 
         
 

@@ -20,8 +20,15 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
     }
 
   
-    public async Task<bool> AddRoleEntitlementsAsync(IList<RoleModule> roleModules,IList<RoleParent> roleParents,IList<RoleChild> roleChildren,IList<RoleMenuPrivileges> roleMenuPrivileges, CancellationToken cancellationToken)
+    public async Task<bool> AddRoleEntitlementsAsync(int roleId,IList<RoleModule> roleModules,IList<RoleParent> roleParents,IList<RoleChild> roleChildren,IList<RoleMenuPrivileges> roleMenuPrivileges, CancellationToken cancellationToken)
     {
+          _applicationDbContext.RoleModules.RemoveRange(_applicationDbContext.RoleModules.Where(x => x.RoleId == roleId));
+             _applicationDbContext.RoleParent.RemoveRange(_applicationDbContext.RoleParent.Where(x => x.RoleId == roleId));
+             _applicationDbContext.RoleChild.RemoveRange(_applicationDbContext.RoleChild.Where(x => x.RoleId == roleId));
+             _applicationDbContext.RoleMenuPrivileges.RemoveRange(_applicationDbContext.RoleMenuPrivileges.Where(x => x.RoleId == roleId));
+
+             await _applicationDbContext.SaveChangesAsync();
+             
         await _applicationDbContext.RoleModules.AddRangeAsync(roleModules);
         await _applicationDbContext.RoleParent.AddRangeAsync(roleParents);
         await _applicationDbContext.RoleChild.AddRangeAsync(roleChildren);

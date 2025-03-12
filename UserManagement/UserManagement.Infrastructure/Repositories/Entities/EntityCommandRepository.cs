@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using UserManagement.Infrastructure.Data;
 using Core.Domain.Entities;
 using Core.Application.Common.Interfaces.IEntity;
+using static Core.Domain.Enums.Common.Enums;
 
 
 namespace UserManagement.Infrastructure.Repositories.Entities
@@ -93,6 +94,7 @@ public async Task<int> DeleteEntityAsync(int id, Entity entity)
     {
         return await _applicationDbContext.Entity.AnyAsync(c => c.EntityName == name && c.Id != id);
     }
-    
+
+      
     }
 }
