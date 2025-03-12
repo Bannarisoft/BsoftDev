@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
 {
-    public class CreateDepreciationDetailCommandHandler : IRequestHandler<CreateDepreciationDetailCommand, ApiResponseDTO<DepreciationDto>>
+    public class CreateDepreciationDetailCommandHandler : IRequestHandler<CreateDepreciationDetailCommand, ApiResponseDTO<List<DepreciationDto>>>
     {
         private readonly IMapper _mapper;
         private readonly IDepreciationDetailQueryRepository _depreciationDetailQueryRepository;
@@ -26,27 +26,28 @@ namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
             _mediator = mediator;
         }
 
-     public async Task<ApiResponseDTO<DepreciationDto>> Handle(CreateDepreciationDetailCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<DepreciationDto>>> Handle(CreateDepreciationDetailCommand request, CancellationToken cancellationToken)
         {
             // Check if Depreciation already exists
             var exists = await _depreciationDetailQueryRepository.ExistDataAsync(
-                request.companyId, request.unitId, request.finYear, request.startDate, request.endDate,request.depreciationType);
+                request.companyId, request.unitId, request.finYear??string.Empty,  request.depreciationType??string.Empty,  request.depreciationPeriod
+            );
 
             if (exists)
             {
-                return new ApiResponseDTO<DepreciationDto>
+                return new ApiResponseDTO<List<DepreciationDto>>
                 {
                     IsSuccess = false,
                     Message = "Depreciation details already exist for the given parameters."
                 };
             }
 
-            // Insert into database using stored procedure or EF Core
-            var result = await _depreciationDetailQueryRepository.CreateAsync(
+            // Call CreateAsync and get the string message
+            var depreciationList = await _depreciationDetailQueryRepository.CreateAsync(
                 request.companyId,
                 request.unitId,
-                request.finYear,
-                request.startDate,request.endDate,request.depreciationType
+                request.finYear,               
+                request.depreciationType ,request.depreciationPeriod            
             );
 
             // Domain Event for Audit Logging
@@ -60,25 +61,14 @@ namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            // ✅ FIX: Map to `DepreciationDto`, NOT `DepreciationCalculationDto`
-            var depreciationDTO = _mapper.Map<DepreciationDto>(result);
-
-            if (depreciationDTO != null)
+            return new ApiResponseDTO<List<DepreciationDto>>
             {
-                return new ApiResponseDTO<DepreciationDto>
-                {
-                    IsSuccess = true,
-                    Message = "Depreciation details created successfully.",
-                    Data = depreciationDTO
-                };
-            }
-
-            return new ApiResponseDTO<DepreciationDto>
-            {
-                IsSuccess = false,
-                Message = "Depreciation details could not be created."
+                IsSuccess = true,
+                Message = "Success",
+                Data = depreciationList // ✅ Returning stored procedure message
             };
         }
+
 
     }
 }

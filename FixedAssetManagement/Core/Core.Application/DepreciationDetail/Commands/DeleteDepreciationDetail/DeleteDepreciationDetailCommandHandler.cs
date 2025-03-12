@@ -1,7 +1,66 @@
+using AutoMapper;
+using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.IDepreciationDetail;
+using Core.Application.DepreciationDetail.Queries.GetDepreciationDetail;
+using Core.Domain.Entities;
+using Core.Domain.Events;
+using MediatR;
+
 namespace Core.Application.DepreciationDetail.Commands.DeleteDepreciationDetail
 {
-    public class DeleteDepreciationDetailCommandHandler
+    public class DeleteDepreciationDetailCommandHandler : IRequestHandler<DeleteDepreciationDetailCommand, ApiResponseDTO<DepreciationDto>>
     {
-        
+        private readonly IDepreciationDetailCommandRepository _depreciationRepository;
+        private readonly IDepreciationDetailQueryRepository _depreciationQueryRepository;
+        private readonly IMapper _mapper;
+        private readonly IMediator _mediator; 
+                
+        public DeleteDepreciationDetailCommandHandler(IDepreciationDetailCommandRepository depreciationRepository, IMapper mapper,  IMediator mediator,IDepreciationDetailQueryRepository depreciationQueryRepository)
+        {
+            _depreciationRepository = depreciationRepository;
+            _mapper = mapper;        
+            _mediator = mediator;            
+            _depreciationQueryRepository=depreciationQueryRepository;
+        }
+
+        public async Task<ApiResponseDTO<DepreciationDto>> Handle(DeleteDepreciationDetailCommand request, CancellationToken cancellationToken)
+        {             
+            
+            var depreciationGroups = await _depreciationQueryRepository.ExistDataAsync(request.companyId,request.unitId, request.finYear??string.Empty, request.depreciationType??string.Empty,request.depreciationPeriod);
+            if (depreciationGroups)
+            {
+                return new ApiResponseDTO<DepreciationDto>
+                {
+                    IsSuccess = false,
+                    Message = "Depreciation details is locked."
+                };
+            }
+            var depreciationDelete = _mapper.Map<DepreciationDetails>(request);      
+            var updateResult = await _depreciationRepository.DeleteAsync(request.companyId, request.unitId, request.finYear??string.Empty, request.depreciationType??string.Empty,request.depreciationPeriod);
+            if (updateResult > 0)
+            {
+                var depreciationGroupDto = _mapper.Map<DepreciationDto>(depreciationDelete);  
+                //Domain Event  
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Delete",
+                    actionCode: depreciationDelete.Finyear ?? string.Empty,
+                    actionName: depreciationDelete.DepreciationType ?? string.Empty,
+                    details: $"Depreciation Details '{depreciationGroupDto.Company}' was Deleted. Code: {depreciationGroupDto.Unit}",
+                    module:"DepreciationDetail"
+                );               
+                await _mediator.Publish(domainEvent, cancellationToken);                 
+                return new ApiResponseDTO<DepreciationDto>
+                {
+                    IsSuccess = true,
+                    Message = "Depreciation deleted successfully.",
+                    Data = depreciationGroupDto
+                };
+            }
+            return new ApiResponseDTO<DepreciationDto>
+            {
+                IsSuccess = false,
+                Message = "Depreciation deletion failed."                             
+            };           
+        }
     }
 }

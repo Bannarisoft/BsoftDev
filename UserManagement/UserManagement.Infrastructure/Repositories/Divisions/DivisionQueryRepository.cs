@@ -108,5 +108,19 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
             var divisions = await _dbConnection.QueryAsync<Division>(query, parameters);
             return divisions.ToList();
         }
+           public async Task<bool>SoftDeleteValidation(int Id)
+            {
+                                const string query = @"
+                           SELECT 1 
+                           FROM [AppData].[Unit] 
+                           WHERE DivisionId = @Id AND IsDeleted = 0;";
+                    
+                       using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+                    
+                       
+                       var divisionExists = await multi.ReadFirstOrDefaultAsync<int?>();
+                    
+                       return divisionExists.HasValue ;
+            }
     }
 }

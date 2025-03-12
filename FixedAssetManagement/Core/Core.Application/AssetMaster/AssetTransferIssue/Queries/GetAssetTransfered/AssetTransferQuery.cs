@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.Common.HttpResponse;
 using MediatR;
 
-namespace Core.Application.AssetMaster.AssetTransfer.Queries.GetAssetTransfered
+namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered
 {
     public class AssetTransferQuery :  IRequest<ApiResponseDTO<List<AssetTransferDto>>>
     {

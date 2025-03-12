@@ -66,7 +66,7 @@ namespace Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement
                          entity.RoleId = roleId; 
                          return entity;
                      }).ToList();
-                await _roleEntitlementCommandrepository.AddRoleEntitlementsAsync(roleModules,roleParents,roleChildren,roleMenuPrivileges, cancellationToken);
+                await _roleEntitlementCommandrepository.AddRoleEntitlementsAsync(roleId,roleModules,roleParents,roleChildren,roleMenuPrivileges, cancellationToken);
 
                     // Domain Event for Audit Logs
                     var domainEvent = new AuditLogsDomainEvent(

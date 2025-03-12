@@ -81,6 +81,7 @@ namespace FAM.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new AssetTransferIssueDtlConfiguration());
             modelBuilder.ApplyConfiguration(new AssetTransferReceiptHdrConfiguration());
             modelBuilder.ApplyConfiguration(new AssetTransferReceiptDtlConfiguration());
+			modelBuilder.ApplyConfiguration(new FormulaTableConfiguration()); 
 
 
             base.OnModelCreating(modelBuilder);

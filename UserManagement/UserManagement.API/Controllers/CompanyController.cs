@@ -22,13 +22,15 @@ namespace UserManagement.API.Controllers
         private readonly IValidator<CreateCompanyCommand>  _CreateCompanyCommandvalidator;
         private readonly IValidator<UpdateCompanyCommand> _UpdateCompanyCommandvalidator;
         private readonly IValidator<UploadFileCompanyCommand> _UploadFileCompanyCommandvalidator;
+        private readonly IValidator<DeleteCompanyCommand> _DeleteCompanyCommandvalidator;
 
-        public CompanyController(ISender mediator, IValidator<CreateCompanyCommand> createCompanyCommandValidator, IValidator<UpdateCompanyCommand> updateCompanyCommandValidator, IValidator<UploadFileCompanyCommand> uploadFileCompanyCommandvalidator) 
+        public CompanyController(ISender mediator, IValidator<CreateCompanyCommand> createCompanyCommandValidator, IValidator<UpdateCompanyCommand> updateCompanyCommandValidator, IValidator<UploadFileCompanyCommand> uploadFileCompanyCommandvalidator, IValidator<DeleteCompanyCommand> deleteCompanyCommandvalidator) 
         : base(mediator)
         {
             _CreateCompanyCommandvalidator = createCompanyCommandValidator;
             _UpdateCompanyCommandvalidator = updateCompanyCommandValidator;
             _UploadFileCompanyCommandvalidator = uploadFileCompanyCommandvalidator;
+            _DeleteCompanyCommandvalidator = deleteCompanyCommandvalidator;
         }
         
         [HttpGet]
@@ -163,7 +165,17 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
            
-           var updatedCompany = await Mediator.Send(new DeleteCompanyCommand { Id = id });
+             var command = new DeleteCompanyCommand { Id = id };
+             var validationResult = await  _DeleteCompanyCommandvalidator.ValidateAsync(command);
+               if (!validationResult.IsValid)
+                {
+                    return BadRequest(new
+                    {
+                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                        statusCode = StatusCodes.Status400BadRequest
+                    });
+                }
+           var updatedCompany = await Mediator.Send(command);
 
             if(updatedCompany.IsSuccess)
             {
