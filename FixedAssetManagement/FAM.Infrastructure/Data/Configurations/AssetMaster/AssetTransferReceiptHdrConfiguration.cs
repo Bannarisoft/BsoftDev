@@ -26,7 +26,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
 
              // One-to-One: AssetTransferId with AssetTransferIssueHdr
             builder.HasOne(x => x.AssetTransferIssueHdr)
-                   .WithOne()
+                   .WithOne(y => y.AssetTransferReceiptHdr)
                    .HasForeignKey<AssetTransferReceiptHdr>(x => x.AssetTransferId)
                    .OnDelete(DeleteBehavior.Restrict);
 
