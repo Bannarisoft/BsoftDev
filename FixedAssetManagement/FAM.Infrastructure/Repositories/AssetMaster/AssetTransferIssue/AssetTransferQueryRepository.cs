@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCategory;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
 using Dapper;
@@ -46,9 +49,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
     {
         Search = $"%{SearchTerm}%",
         Offset = (PageNumber - 1) * PageSize,
-        PageSize
-       
-        
+        PageSize               
     };
 
     var assetTransfer = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -57,20 +58,54 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
 
     return (assetTransferList, totalCount);
    }
+      public async Task<AssetTransferJsonDto> GetAssetTransferByIdAsync(int assetTransferId)
+    {
+        const string query = @"
+            SELECT Id as AssetTransferId , DocDate, TransferType, FromUnitId, ToUnitId, FromDepartmentId, ToDepartmentId, 
+                   FromCustodianId, ToCustodianId, Status, FromCustodianName, ToCustodianName
+            FROM FixedAsset.AssetTransferIssueHdr
+            WHERE Id = @AssetTransferId AND Status = 'Pending'
+            FOR JSON PATH, INCLUDE_NULL_VALUES;
 
-        // public async Task<AssetTransferDto> GetByIdAsync(int assetId)
-        // {
-        //     const string query = @"
-        //    select a.id,a.AssetCategoryId,a.AssetName ,  a.UnitId,b.DepartmentId,b.CustodianId,b.UserID,b.UnitId,b.LocationId,b.SubLocationId,, a.IsDeleted
-        //     from  FixedAsset.AssetMaster  a 
-        //     inner join  FixedAsset.AssetLocation b 
-        //     on a.Id=b.AssetId where a.id = @assetId AND A.IsDeleted=0";
-        //     var assetSpecifications = await _dbConnection.QueryFirstOrDefaultAsync<AssetTransferDto>(query, new { assetId });           
-        //     if (assetSpecifications is null)
-        //     {
-        //         throw new KeyNotFoundException($"AssetSpecifications with ID {assetId} not found.");
-        //     }
-        //     return assetSpecifications;
-        // }
+            SELECT AssetId, AssetValue 
+            FROM FixedAsset.AssetTransferIssueDtl
+            WHERE AssetTransferId = @AssetTransferId
+            FOR JSON PATH, INCLUDE_NULL_VALUES;
+        ";
+
+        using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { assetTransferId });
+
+        string headerJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+        string detailsJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+
+        if (string.IsNullOrWhiteSpace(headerJson))
+        {
+            return null;
+        }
+
+        var header = JsonSerializer.Deserialize<List<AssetTransferJsonDto>>(headerJson, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        })?.FirstOrDefault();
+
+        var details = JsonSerializer.Deserialize<List<AssetTransferDetailJsonDto>>(detailsJson ?? "[]", new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (header != null)
+        {
+            header.AssetTransferDetails = details ?? new List<AssetTransferDetailJsonDto>();
+        }
+
+        return header;
+    }
+
+    public async Task<List<GetAssetMasterDto>> GetAssetsByCategoryAsync(int assetCategoryId)
+    {         
+            const string query = @"SELECT Id as AssetId, AssetName FROM FixedAsset.AssetMaster WHERE AssetCategoryId = @assetCategoryId";                          
+            var result = await _dbConnection.QueryAsync<GetAssetMasterDto>(query, new { assetCategoryId });         
+            return result.ToList();      
+    }
     }
 }

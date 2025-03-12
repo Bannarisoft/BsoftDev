@@ -54,13 +54,29 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .HasColumnType("int")
                 .IsRequired(); 
 
+            builder.Property(b => b.FromCustodianName)
+                .IsRequired()
+                .HasColumnType("nvarchar(100)");    
+
             builder.Property(dg => dg.ToCustodianId)
                 .HasColumnType("int")
-                .IsRequired(); 
+                .IsRequired();
+
+            builder.Property(b => b.ToCustodianName)
+                .IsRequired()
+                .HasColumnType("nvarchar(100)");    
 
             builder.Property(b => b.Status)
                 .IsRequired()
                 .HasColumnType("varchar(20)");
+
+            builder.Property(b => b.AckStatus)                              
+                .HasColumnType("bit")
+                .HasConversion(
+                    v => v == 1, 
+                    v => v ? (byte)1 : (byte)0 
+                )
+                .IsRequired();  
 
             builder.Property(b => b.CreatedBy)
                 .IsRequired()

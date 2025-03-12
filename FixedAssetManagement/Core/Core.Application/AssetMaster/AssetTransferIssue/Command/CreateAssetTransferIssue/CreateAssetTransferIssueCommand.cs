@@ -2,27 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
+using Core.Application.Common.HttpResponse;
+using Core.Domain.Entities.AssetMaster;
+using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Command.CreateAssetTransferIssue
 {
-    public class CreateAssetTransferIssueCommand  
+    public class CreateAssetTransferIssueCommand   : IRequest<ApiResponseDTO<int>> 
     {
-        
-       public int AssetTransferId { get; set; }
 
-       public DateTimeOffset DocDate { get; set; }
-        public int? TransferType { get; set; }      
-        public int FromUnitId { get; set; }
-        public int ToUnitId { get; set; }
-        public int FromDepartmentId  { get; set; }
-        public int ToDepartmentId  { get; set; }
-        public int FromCustodianId  { get; set; }
-        public int ToCustodianId  { get; set; }
-        public string? Status { get; set; }
-       
-   
-        
-
-
+      public AssetTransferIssueHdrDto? AssetTransferIssueHdrDto { get; set; }
     }
 }

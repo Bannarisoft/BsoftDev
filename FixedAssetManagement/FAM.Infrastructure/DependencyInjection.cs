@@ -63,6 +63,7 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetDisposal;
 using Core.Application.Common.Interfaces.IDepreciationDetail;
 using FAM.Infrastructure.Repositories.DepreciationDetail;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer;
 
 namespace FAM.Infrastructure
 {
@@ -196,6 +197,7 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetAmcQueryRepository, AssetAmcQueryRepository>();
             services.AddScoped<IAssetAmcCommandRepository, AssetAmcCommandRepository>();
             services.AddScoped<IAssetTransferQueryRepository, AssetTransferQueryRepository>();
+            services.AddScoped<IAssetTransferCommandRepository, AssetTransferCommandRepository>();
             
             services.AddScoped<IAssetDisposalQueryRepository, AssetDisposalQueryRepository>();
             services.AddScoped<IAssetDisposalCommandRepository, AssetDisposalCommandRepository>();
