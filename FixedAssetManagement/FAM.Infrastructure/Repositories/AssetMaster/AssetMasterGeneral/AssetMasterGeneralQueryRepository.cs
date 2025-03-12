@@ -167,5 +167,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
             return result.ToList();        
         }
+
+        
     }
 }

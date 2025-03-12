@@ -24,6 +24,10 @@ namespace Core.Domain.Entities
 
         public ICollection<AssetLocation>? AssetLocations { get; set; }
 
+        public ICollection<AssetTransferReceiptDtl>? AssetTransferReceiptLocation { get; set; }
+
+
+
     }
        
    

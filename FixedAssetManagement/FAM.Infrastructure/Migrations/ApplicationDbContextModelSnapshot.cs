@@ -540,8 +540,9 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssetId")
-                        .IsUnique();
+
+
+                    b.HasIndex("AssetId");
 
                     b.HasIndex("AssetTransferId");
 
@@ -556,6 +557,9 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnName("Id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AckStatus")
+                        .HasColumnType("bit");
 
                     b.Property<string>("AuthorizedBy")
                         .HasColumnType("varchar(50)");
@@ -590,6 +594,10 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("FromCustodianId")
                         .HasColumnType("int");
 
+                    b.Property<string>("FromCustodianName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("FromDepartmentId")
                         .HasColumnType("int");
 
@@ -615,6 +623,10 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("ToCustodianId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ToCustodianName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("ToDepartmentId")
                         .HasColumnType("int");
 
@@ -626,9 +638,129 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssetTransferReceiptHdrId1");
+
                     b.HasIndex("TransferType");
 
                     b.ToTable("AssetTransferIssueHdr", "FixedAsset");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetTransferReceiptDtl", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AssetReceiptId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserID")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
+
+                    b.HasIndex("AssetReceiptId");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("SubLocationId");
+
+                    b.ToTable("AssetTransferReceiptDtl", "FixedAsset");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetTransferReceiptHdr", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetTransferId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AuthorizedBy")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("AuthorizedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset>("AuthorizedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("AuthorizedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset>("DocDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("FromCustodianId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FromCustodianName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("FromDepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FromUnitId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GatePassNo")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Sdcno")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("ToCustodianId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ToCustodianName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ToDepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ToUnitId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransferType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetTransferId")
+                        .IsUnique();
+
+                    b.HasIndex("TransferType");
+
+                    b.ToTable("AssetTransferReceiptHdr", "FixedAsset");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
@@ -800,8 +932,7 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("AssetSubCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AssetTransferIssueMasterId")
-                        .HasColumnType("int");
+
 
                     b.Property<int?>("AssetType")
                         .HasColumnType("int");
@@ -875,7 +1006,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasIndex("AssetSubCategoryId");
 
-                    b.HasIndex("AssetTransferIssueMasterId");
+
 
                     b.HasIndex("AssetType");
 
@@ -2089,9 +2220,11 @@ namespace FAM.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetTransferIssueDtl", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterTransferIssue")
-                        .WithOne()
-                        .HasForeignKey("Core.Domain.Entities.AssetMaster.AssetTransferIssueDtl", "AssetId")
-                        .OnDelete(DeleteBehavior.Restrict)
+
+
+                        .WithMany("AssetTransferIssueMaster")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr", "AssetTransferIssueHdr")
@@ -2107,13 +2240,73 @@ namespace FAM.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr", b =>
                 {
+                    b.HasOne("Core.Domain.Entities.AssetMaster.AssetTransferReceiptHdr", "AssetTransferReceiptHdr")
+                        .WithMany()
+                        .HasForeignKey("AssetTransferReceiptHdrId1");
+
                     b.HasOne("Core.Domain.Entities.MiscMaster", "TransferTypeIssueMiscType")
                         .WithMany("AssetTransferIssueType")
                         .HasForeignKey("TransferType")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("AssetTransferReceiptHdr");
+
                     b.Navigation("TransferTypeIssueMiscType");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetTransferReceiptDtl", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterTransferReceipt")
+                        .WithMany("AssetTransferReceiptMaster")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.AssetMaster.AssetTransferReceiptHdr", "AssetTransferReceiptHdr")
+                        .WithMany("AssetTransferReceiptDtl")
+                        .HasForeignKey("AssetReceiptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Location", "Location")
+                        .WithMany("AssetTransferReceiptLocation")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.SubLocation", "SubLocation")
+                        .WithMany("AssetTransferReceiptSubLocation")
+                        .HasForeignKey("SubLocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssetMasterTransferReceipt");
+
+                    b.Navigation("AssetTransferReceiptHdr");
+
+                    b.Navigation("Location");
+
+                    b.Navigation("SubLocation");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetTransferReceiptHdr", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr", "AssetTransferIssueHdr")
+                        .WithOne()
+                        .HasForeignKey("Core.Domain.Entities.AssetMaster.AssetTransferReceiptHdr", "AssetTransferId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "TransferTypeReceiptMiscType")
+                        .WithMany("AssetTransferReceiptHdr")
+                        .HasForeignKey("TransferType")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssetTransferIssueHdr");
+
+                    b.Navigation("TransferTypeReceiptMiscType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
@@ -2173,9 +2366,7 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.AssetMaster.AssetTransferIssueDtl", "AssetTransferIssueMaster")
-                        .WithMany()
-                        .HasForeignKey("AssetTransferIssueMasterId");
+
 
                     b.HasOne("Core.Domain.Entities.MiscMaster", "AssetMiscType")
                         .WithMany("AssetMiscTypeGenerals")
@@ -2207,7 +2398,7 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Navigation("AssetSubCategories");
 
-                    b.Navigation("AssetTransferIssueMaster");
+
 
                     b.Navigation("AssetWorkType");
 
@@ -2276,6 +2467,8 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Navigation("AssetCategories");
                 });
+
+
 
             modelBuilder.Entity("Core.Domain.Entities.DepreciationDetails", b =>
                 {
@@ -2413,6 +2606,8 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Navigation("AssetMasterGeneral");
 
+
+
                     b.Navigation("DepreciationDetails");
 
                     b.Navigation("DepreciationGroups");
@@ -2423,6 +2618,11 @@ namespace FAM.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr", b =>
                 {
                     b.Navigation("AssetTransferIssueDtl");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetTransferReceiptHdr", b =>
+                {
+                    b.Navigation("AssetTransferReceiptDtl");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMasterGenerals", b =>
@@ -2441,7 +2641,13 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Navigation("AssetSpecification");
 
+                    b.Navigation("AssetTransferReceiptMaster");
+
+                    b.Navigation("AssetTransferIssueMaster");
+
                     b.Navigation("AssetWarranty");
+
+
 
                     b.Navigation("DepreciationDetails");
                 });
@@ -2462,6 +2668,8 @@ namespace FAM.Infrastructure.Migrations
                 {
                     b.Navigation("AssetLocations");
 
+                    b.Navigation("AssetTransferReceiptLocation");
+
                     b.Navigation("SubLocations");
                 });
 
@@ -2481,6 +2689,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetMiscTypeGenerals");
 
                     b.Navigation("AssetTransferIssueType");
+
+                    b.Navigation("AssetTransferReceiptHdr");
 
                     b.Navigation("AssetWorkTypeGenerals");
 
@@ -2514,6 +2724,8 @@ namespace FAM.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.SubLocation", b =>
                 {
                     b.Navigation("AssetSubLocation");
+
+                    b.Navigation("AssetTransferReceiptSubLocation");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UOM", b =>
