@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Core.Domain.Entities.AssetMaster
 {
-    public class AssetTransfer
+    public class AssetTransferIssue
     {
 
         public int assetId { get; set; }
