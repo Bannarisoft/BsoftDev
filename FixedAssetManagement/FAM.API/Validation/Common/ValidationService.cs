@@ -59,6 +59,8 @@ using FAM.API.Validation.AssetMaster.AssetInsurance;
 using Core.Application.AssetMaster.AssetDisposal.Command.CreateAssetDisposal;
 using FAM.API.Validation.AssetMaster.AssetDisposal;
 using Core.Application.AssetMaster.AssetDisposal.Command.UpdateAssetDisposal;
+using Core.Application.AssetMaster.AssetTranferIssueApproval.Commands.UpdateAssetTranferIssueApproval;
+using FAM.API.Validation.AssetMaster.AssetTransferIssueApproval;
 
 
 namespace FAM.API.Validation.Common
@@ -111,7 +113,8 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<CreateAssetInsuranceCommand>, CreateAssetInsuranceCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetInsuranceCommand>, UpdateAssetInsuranceCommandValidator>();
         services.AddScoped<IValidator<CreateAssetDisposalCommand>, CreateAssetDisposalCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetDisposalCommand>, UpdateAssetDisposalCommandValidator>();                 
+        services.AddScoped<IValidator<UpdateAssetDisposalCommand>, UpdateAssetDisposalCommandValidator>();  
+        services.AddScoped<IValidator<UpdateAssetTranferIssueApprovalCommand>, UpdateAssetTransferIssueApprovalValidator>();                
     }  
     }
 }

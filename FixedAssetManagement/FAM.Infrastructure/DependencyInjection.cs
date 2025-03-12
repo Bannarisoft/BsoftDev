@@ -63,6 +63,10 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetDisposal;
 
 using Core.Application.Common.Interfaces.IDepreciationDetail;
 using FAM.Infrastructure.Repositories.DepreciationDetail;
+using Core.Application.Common.Interfaces.IAssetTransferIssueApproval;
+using FAM.Infrastructure.Repositories.AssetTransferIssueApproval;
+using Core.Application.Common.Interfaces.IAssetTransferReceipt;
+using FAM.Infrastructure.Repositories.AssetTransferReceipt;
 
 namespace FAM.Infrastructure
 {
@@ -200,8 +204,13 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetDisposalQueryRepository, AssetDisposalQueryRepository>();
             services.AddScoped<IAssetDisposalCommandRepository, AssetDisposalCommandRepository>();
 
-			 services.AddScoped<IDepreciationDetailCommandRepository, DepreciationDetailCommandRepository>();
+			services.AddScoped<IDepreciationDetailCommandRepository, DepreciationDetailCommandRepository>();
             services.AddScoped<IDepreciationDetailQueryRepository, DepreciationDetailQueryRepository>();
+            services.AddScoped<IAssetTransferIssueApprovalQueryRepository, AssetTransferIssueQueryRepository>();
+            services.AddScoped<IAssetTransferIssueApprovalCommandRepository, AssetTransferIssueCommandRepository>();
+            services.AddScoped<IAssetTransferReceiptQueryRepository, AssetTransferReceiptQueryRepository>();
+
+
 
 
             // Miscellaneous services
@@ -234,7 +243,8 @@ namespace FAM.Infrastructure
                 typeof(AssetTransferProfile),
                 typeof(AssetAmcProfile),
                 typeof(AssetDisposalProfile),
- 				typeof(DepreciationDetailProfile)
+ 				typeof(DepreciationDetailProfile),
+                typeof(AssetIssueTransferApproval)
 
             );
 

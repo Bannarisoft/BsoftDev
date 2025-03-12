@@ -47,6 +47,10 @@ namespace FAM.Infrastructure.Data
  		public DbSet<DepreciationDetails> DepreciationDetails { get; set; }
         public DbSet<AssetTransferIssueHdr> AssetTransferIssueHdr { get; set; }
         public DbSet<AssetTransferIssueDtl> AssetTransferIssueDtl { get; set; }
+        public DbSet<AssetTransferReceiptHdr> AssetTransferReceiptHdr { get; set; }
+        public DbSet<AssetTransferReceiptDtl> AssetTransferReceiptDtl { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,6 +79,9 @@ namespace FAM.Infrastructure.Data
  			modelBuilder.ApplyConfiguration(new DepreciationDetailConfiguration()); 
             modelBuilder.ApplyConfiguration(new AssetTransferIssueHdrConfiguration());
             modelBuilder.ApplyConfiguration(new AssetTransferIssueDtlConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetTransferReceiptHdrConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetTransferReceiptDtlConfiguration());
+
 
             base.OnModelCreating(modelBuilder);
         }

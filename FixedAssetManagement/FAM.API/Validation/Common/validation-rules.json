@@ -27,7 +27,7 @@
     },
     {
         "Rule": "AlphabeticOnly", 
-        "pattern": "^[A-Za-z]+$",        
+        "pattern": "^[A-Za-z ]+$",        
         "Error": " must contain only alphabetic characters."
     },
     {
