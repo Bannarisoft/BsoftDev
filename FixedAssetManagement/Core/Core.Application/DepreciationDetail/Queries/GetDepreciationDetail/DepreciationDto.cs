@@ -26,6 +26,6 @@ namespace Core.Application.DepreciationDetail.Queries.GetDepreciationDetail
         public string? DepreciationType { get; set; }  
         public DateTimeOffset StartDate { get; set; }   
         public DateTimeOffset EndDate { get; set; }   
-        public decimal NetAssetValue { get; set; } 
+        public decimal NetValue { get; set; } 
     }
 }

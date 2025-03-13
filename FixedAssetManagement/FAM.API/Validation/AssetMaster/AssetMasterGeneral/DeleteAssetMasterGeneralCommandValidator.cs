@@ -36,8 +36,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                       .MustAsync(async (Id, cancellation) => !await _assetQueryRepository.GetAssetChildDetails(Id))
                         .WithMessage($"{rule.Error}");
                         break;
-                    default:
-                        
+                    default:                        
                         break;
                 }
             }

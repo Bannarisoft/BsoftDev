@@ -49,15 +49,16 @@ namespace Core.Application.DepreciationDetail.Commands.UpdateDepreciationDetail
                 };
             }
             
-            var depreciationDelete = _mapper.Map<DepreciationDetails>(request);      
+            var depreciationUpdate = _mapper.Map<DepreciationDetails>(request);      
             var updateResult = await _depreciationRepository.UpdateAsync(request.companyId, request.unitId, request.finYear??string.Empty, request.depreciationType,request.depreciationPeriod);
             if (updateResult > 0)
             {
-                var depreciationGroupDto = _mapper.Map<DepreciationDto>(depreciationDelete);  
+                var depreciationGroupDto = _mapper.Map<DepreciationDto>(depreciationUpdate);  
                 //Domain Event  
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: depreciationDelete.Finyear ?? string.Empty,
+                    actionCode: depreciationUpdate
+                    .Finyear ?? string.Empty,
                     actionName: "Update",
                     details: $"Depreciation Details '{depreciationGroupDto.Company}' was Deleted. Code: {depreciationGroupDto.Unit}",
                     module:"DepreciationDetail"

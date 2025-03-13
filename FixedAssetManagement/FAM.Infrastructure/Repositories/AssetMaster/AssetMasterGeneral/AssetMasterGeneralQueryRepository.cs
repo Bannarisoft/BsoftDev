@@ -105,15 +105,15 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         public async Task<bool> GetAssetChildDetails(int assetId)
         {
             const string query = @"
-                    SELECT 1 FROM [FixedAsset].[AssetLocation] WHERE AssetId = @Id AND IsDeleted = 0;
-                    SELECT 1 FROM [FixedAsset].[AssetPurchaseDetails] WHERE AssetId = @Id AND IsDeleted = 0;
+                    SELECT 1 FROM [FixedAsset].[AssetLocation] WHERE AssetId = @Id ;
+                    SELECT 1 FROM [FixedAsset].[AssetPurchaseDetails] WHERE AssetId = @Id ;
                     SELECT 1 FROM [FixedAsset].[AssetWarranty] WHERE AssetId = @Id AND IsDeleted = 0;
                     SELECT 1 FROM [FixedAsset].[AssetSpecifications] WHERE AssetId = @Id AND IsDeleted = 0;
                     SELECT 1 FROM [FixedAsset].[AssetAmc] WHERE AssetId = @Id AND IsDeleted = 0;
                     SELECT 1 FROM [FixedAsset].[AssetInsurance] WHERE AssetId = @Id AND IsDeleted = 0;
-                    SELECT 1 FROM [FixedAsset].[AssetAdditionalCost] WHERE AssetId = @Id AND IsDeleted = 0;
+                    SELECT 1 FROM [FixedAsset].[AssetAdditionalCost] WHERE AssetId = @Id ;
                     SELECT 1 FROM [FixedAsset].[AssetDisposal] WHERE AssetId = @Id AND IsDeleted = 0;
-                    SELECT 1 FROM [FixedAsset].[DepreciationDetail] WHERE AssetId = @Id AND IsDeleted = 0;";
+                    SELECT 1 FROM [FixedAsset].[DepreciationDetail] WHERE AssetId = @Id ";
             using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = assetId });
                     
             var locationExists = await multi.ReadFirstOrDefaultAsync<int?>();  

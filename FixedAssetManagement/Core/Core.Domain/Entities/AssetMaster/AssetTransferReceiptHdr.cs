@@ -9,7 +9,7 @@ namespace Core.Domain.Entities.AssetMaster
     {
         public int Id {get;set;}
         public int AssetTransferId { get; set; }        
-        public AssetTransferIssueHdr AssetTransferIssueHdr { get; set; } = null!; 
+        public AssetTransferIssueHdr AssetTransferIssueHdr { get; set; } 
         public DateTimeOffset DocDate { get; set; }
         public int? TransferType { get; set; }        
         public MiscMaster TransferTypeReceiptMiscType { get; set; } = null!;  
