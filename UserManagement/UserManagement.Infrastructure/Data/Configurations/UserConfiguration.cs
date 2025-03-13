@@ -91,20 +91,6 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(100)")
                 .IsRequired();
 
-            // builder.Property(u => u.CompanyId)
-            //     .HasColumnName("CompanyId")
-            //     .HasColumnType("int")
-            //     .IsRequired();
-
-            // builder.Property(u => u.UnitId)
-            //     .HasColumnName("UnitId")
-            //     .HasColumnType("int")
-            //     .IsRequired();
-
-            builder.Property(u => u.DivisionId)
-                .HasColumnName("DivisionId")
-                .HasColumnType("int")
-                .IsRequired(false);
 
             builder.Property(u => u.IsDeleted)
             .HasColumnName("IsDeleted")
@@ -127,13 +113,13 @@ namespace UserManagement.Infrastructure.Data.Configurations
             .HasColumnType("varchar(255)");
 
 
-            builder.HasMany(u => u.UserRoleAllocations)
-                .WithOne()
-                .HasForeignKey(ura => ura.UserId);
+            // builder.HasMany(u => u.UserRoleAllocations)
+            //     .WithOne()
+            //     .HasForeignKey(ura => ura.UserId);
 
-                  builder.HasMany(u => u.UserUnits)
-                .WithOne()
-                .HasForeignKey(u => u.UserId);
+            //       builder.HasMany(u => u.UserUnits)
+            //     .WithOne()
+            //     .HasForeignKey(u => u.UserId);
 
 
             

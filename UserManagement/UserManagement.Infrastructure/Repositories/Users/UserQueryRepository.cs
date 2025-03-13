@@ -113,7 +113,6 @@ namespace UserManagement.Infrastructure.Repositories.Users
              const string query = @"
              SELECT ur.Id,
                     ur.UserId,
-                    ur.DivisionId,
                     ur.FirstName,
                     ur.LastName,
                     ur.UserName,
@@ -127,22 +126,25 @@ namespace UserManagement.Infrastructure.Repositories.Users
                     ur.IsDeleted,
                     ura.UserRoleId,
                     uc.CompanyId,
-                    uu.UnitId 
+                    uu.UnitId,
+                    ud.DivisionId 
                     FROM AppSecurity.Users ur
                 Left JOIN AppSecurity.UserRoleAllocation ura ON   ur.UserId = ura.UserId and ura.IsActive = 1
                 Left JOIN AppSecurity.UserCompany uc ON uc.UserId = ur.UserId and uc.IsActive = 1
                 Left JOIN AppSecurity.UserUnit uu ON uu.UserId = ur.UserId and uu.IsActive = 1
+                Left Join [AppSecurity].[UserDivision] ud on ud.UserId = ur.UserId and ud.IsActive = 1
                 WHERE  ur.IsDeleted = 0 and ur.UserId = @UserId";
-          var userResponse = await _dbConnection.QueryAsync<User, Core.Domain.Entities.UserRoleAllocation, UserCompany, UserUnit,User>(query, 
-          (user, userRole, userCompany, userUnit) =>
+          var userResponse = await _dbConnection.QueryAsync<User, Core.Domain.Entities.UserRoleAllocation, UserCompany, UserUnit,UserDivision,User>(query, 
+          (user, userRole, userCompany, userUnit,userDivision) =>
           {
               user.UserRoleAllocations = new List<Core.Domain.Entities.UserRoleAllocation> { userRole };
               user.UserCompanies = new List<UserCompany> { userCompany };
               user.UserUnits = new List<UserUnit> { userUnit };
+              user.userDivisions = new List<UserDivision> { userDivision };
               return user;
               }, 
           new { userId },
-          splitOn: "UserRoleId,CompanyId,UnitId");
+          splitOn: "UserRoleId,CompanyId,UnitId,DivisionId");
 
             var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
             return await policyWrap.ExecuteAsync(async () =>
@@ -216,6 +218,19 @@ namespace UserManagement.Infrastructure.Repositories.Users
                 });
 
         }
+          public async Task<bool> AlreadyExistsAsync(string username, int? id = null)
+          {
+              var query = "SELECT COUNT(1) FROM [AppSecurity].[Users] WHERE UserName = @UserName AND IsDeleted = 0";
+                var parameters = new DynamicParameters(new { Username = username });
+
+             if (id is not null)
+             {
+                 query += " AND UserId != @Id";
+                 parameters.Add("Id", id);
+             }
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+          }
         
     }
 }

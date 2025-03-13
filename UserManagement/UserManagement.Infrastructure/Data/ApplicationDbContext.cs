@@ -57,6 +57,7 @@ namespace UserManagement.Infrastructure.Data
         public DbSet<UserGroupUsers> UserGroupUsers { get; set; }
         public DbSet<RoleParent> RoleParent { get; set; }
         public DbSet<RoleChild> RoleChild { get; set; }
+        public DbSet<UserDivision> UserDivision {get; set;}
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -100,6 +101,7 @@ namespace UserManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UserGroupUsersConfiguration());
             modelBuilder.ApplyConfiguration(new RoleParentConfiguration());
             modelBuilder.ApplyConfiguration(new RoleChildConfiguration());
+            modelBuilder.ApplyConfiguration(new UserDivisionConfiguration());
             
                
             base.OnModelCreating(modelBuilder);

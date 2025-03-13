@@ -103,13 +103,14 @@ namespace UserManagement.Infrastructure.Repositories.Units
              return unitResponse.FirstOrDefault();
         }
 
-        public async Task<List<Unit>> GetUnit(string searchPattern)
+        public async Task<List<Unit>> GetUnit(string searchPattern, int userId)
         {
              const string query = @"
                 SELECT 
-                Id, 
-                UnitName
-            FROM AppData.Unit where IsDeleted = 0 and UnitName like @SearchPattern";
+                U.Id, 
+                U.UnitName
+            FROM AppData.Unit U
+            Inner join [AppSecurity].[UserUnit] UU on UU.UnitId = U.Id where IsDeleted = 0 and UnitName like @SearchPattern and UU.UserId = @UserId and UU.IsActive = 1";
                 
             
             var result = await _dbConnection.QueryAsync<Unit>(query, new { SearchPattern = $"%{searchPattern}%" });

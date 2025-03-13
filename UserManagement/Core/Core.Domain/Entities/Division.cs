@@ -10,6 +10,7 @@ namespace Core.Domain.Entities
         public string ShortName { get; set; }
         public string Name { get; set; }
         public int CompanyId { get; set; }
+        public IList<UserDivision> UserDivisions { get; set; }
         
     }
 }

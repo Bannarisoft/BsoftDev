@@ -86,6 +86,10 @@
     {
         "rule": "SoftDelete",      
         "error": "Cannot delete the relationship as it is active with another table."
+    },
+    {
+        "rule": "NotFound",      
+        "error": "{PropertyName} not found."
     }
     
     
