@@ -66,7 +66,6 @@ namespace UserManagement.Infrastructure.Repositories.Users
 
                 SELECT DISTINCT ur.Id,
                                 ur.UserId,
-                                ur.DivisionId,
                                 ur.FirstName,
                                 ur.LastName,
                                 ur.UserName,
