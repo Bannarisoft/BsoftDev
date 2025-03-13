@@ -40,7 +40,16 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("nvarchar(max)")
                 .IsRequired();   
 
-                  builder.Property(b => b.IsActive)                
+                 builder.Property(ag => ag.Description)
+                .HasColumnName("Description")
+                .HasColumnType("varchar(250)");
+                
+
+                 builder.Property(ag => ag.Type)
+                .HasColumnName("Type")
+                .HasColumnType("varchar(50)");                
+
+                builder.Property(b => b.IsActive)                
                 .HasColumnType("bit")
                 .HasConversion(statusConverter)
                 .IsRequired();
