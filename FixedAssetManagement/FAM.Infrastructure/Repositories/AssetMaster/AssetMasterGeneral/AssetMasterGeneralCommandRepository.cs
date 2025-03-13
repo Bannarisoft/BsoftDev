@@ -21,15 +21,15 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             await _applicationDbContext.SaveChangesAsync();
              return assetMasterGeneral;   
         }
-        public async Task<int> DeleteAsync(int Id, AssetMasterGenerals assetMaster)
+        public async Task<bool> DeleteAsync(int Id, AssetMasterGenerals assetMaster)
         {
             var assetMasterToDelete = await _applicationDbContext.AssetMasterGenerals.FirstOrDefaultAsync(u => u.Id == Id);
             if (assetMasterToDelete != null)
             {
                 assetMasterToDelete.IsDeleted = assetMaster.IsDeleted;              
-                return await _applicationDbContext.SaveChangesAsync();
+                return await _applicationDbContext.SaveChangesAsync()>0;
             }
-            return 0;
+            return false;
         }
         public async Task<int> UpdateAsync(int Id, AssetMasterGenerals assetMaster)
         {

@@ -37,9 +37,9 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
             
         // One-to-one relationship with AssetMasterGenerals
         builder.HasOne(x => x.AssetMasterTransferIssue)
-            .WithOne()
-            .HasForeignKey<AssetTransferIssueDtl>(x => x.AssetId)
-            .OnDelete(DeleteBehavior.Restrict); // Prevent accidental deletions
+             .WithMany(hdr => hdr.AssetTransferIssueMaster) // One AssetTransferIssueDtl has many AssetId
+            .HasForeignKey(dtl => dtl.AssetId) 
+            .OnDelete(DeleteBehavior.Cascade); // Delete details if header is deleted
 
         builder.Property(dg => dg.AssetValue)                
                 .HasColumnType("decimal(18,3)")                

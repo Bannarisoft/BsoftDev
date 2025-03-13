@@ -22,18 +22,21 @@ namespace FAM.API.Controllers.AssetMaster
         private readonly IValidator<CreateAssetMasterGeneralCommand> _createAssetMasterGeneralCommandValidator;
         private readonly IValidator<UpdateAssetMasterGeneralCommand> _updateAssetMasterGeneralCommandValidator;
         private readonly IValidator<UploadFileAssetMasterGeneralCommand> _uploadFileCommandValidator;
+        private readonly IValidator<DeleteAssetMasterGeneralCommand> _deleteAssetMasterGeneralCommandValidator;
 
         public AssetMasterGeneralController(
             ISender mediator, 
             IValidator<CreateAssetMasterGeneralCommand> createAssetMasterGeneralCommandValidator, 
             IValidator<UpdateAssetMasterGeneralCommand> updateAssetMasterGeneralCommandValidator, 
-            IValidator<UploadFileAssetMasterGeneralCommand> uploadFileCommandValidator
+            IValidator<UploadFileAssetMasterGeneralCommand> uploadFileCommandValidator,
+            IValidator<DeleteAssetMasterGeneralCommand> deleteAssetMasterGeneralCommandValidator
             ) 
             : base(mediator)
         {        
             _createAssetMasterGeneralCommandValidator = createAssetMasterGeneralCommandValidator;    
             _updateAssetMasterGeneralCommandValidator = updateAssetMasterGeneralCommandValidator;     
             _uploadFileCommandValidator = uploadFileCommandValidator;       
+            _deleteAssetMasterGeneralCommandValidator = deleteAssetMasterGeneralCommandValidator;   
         }
 
         // GET: api/AssetMasterGeneral?PageNumber=1&PageSize=10&SearchTerm=...
@@ -153,29 +156,34 @@ namespace FAM.API.Controllers.AssetMaster
         // DELETE: api/AssetMasterGeneral/5
         [HttpDelete("{id}")]        
         public async Task<IActionResult> DeleteAsync(int id)
-        {             
-            if (id <= 0)
-            {
-                return BadRequest(new
+        {       
+            var command = new DeleteAssetMasterGeneralCommand { Id = id };
+            var validationResult = await  _deleteAssetMasterGeneralCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
                 {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Invalid Asset ID"
-                });
-            }            
-            var result = await Mediator.Send(new DeleteAssetMasterGeneralCommand { Id = id });                 
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
+                    return BadRequest(new
+                    {
+                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                        statusCode = StatusCodes.Status400BadRequest
+                    });
+                }
+           var deleteCompany = await Mediator.Send(command);
+
+            if(deleteCompany.IsSuccess)
+            {
+                return Ok(new 
+                {
+                    StatusCode=StatusCodes.Status200OK,
+                    message = deleteCompany.Message,
+                    errors = ""
                 });
             }
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status200OK,
-                data = $"DepreciationGroup ID {id} Deleted",
-                message = result.Message
+            
+            return BadRequest(new 
+            { 
+                StatusCode=StatusCodes.Status400BadRequest, 
+                message = deleteCompany.Message, 
+                errors = "" 
             });
         }
 

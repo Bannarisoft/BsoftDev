@@ -27,7 +27,7 @@
     },
     {
         "Rule": "AlphabeticOnly", 
-        "pattern": "^[A-Za-z]+$",        
+        "pattern": "^[A-Za-z ]+$",        
         "Error": " must contain only alphabetic characters."
     },
     {
@@ -103,7 +103,14 @@
         "rule": "Telephone",
         "pattern": "^(\\+\\d{1,3}[- ]?)?\\d{10}$", 
         "error": " must be a valid telephone number with 10 digits and optional country code."
+    },
+    {
+        "rule": "AlreadyExists",      
+        "error": "{PropertyName} already exists."
+    },
+    {
+        "rule": "SoftDelete",      
+        "error": "Cannot delete the relationship as it is active with another table."
     }
-    
     
 ]

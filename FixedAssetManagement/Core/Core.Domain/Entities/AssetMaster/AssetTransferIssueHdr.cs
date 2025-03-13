@@ -17,8 +17,11 @@ namespace Core.Domain.Entities.AssetMaster
         public int FromDepartmentId  { get; set; } 
         public int ToDepartmentId  { get; set; } 
         public int FromCustodianId  { get; set; } 
+        public string? FromCustodianName { get; set; }
         public int ToCustodianId  { get; set; } 
+        public string? ToCustodianName { get; set; }
         public string? Status { get; set; } 
+        public byte AckStatus { get; set; }
         public int CreatedBy { get; set; }
         public DateTimeOffset? CreatedDate { get; set; }
         public string? CreatedByName { get; set; }
@@ -31,7 +34,12 @@ namespace Core.Domain.Entities.AssetMaster
         public DateTimeOffset? AuthorizedDate { get; set; }
         public string? AuthorizedByName { get; set; }
         public string? AuthorizedIP { get; set; }
-        public ICollection<AssetTransferIssueDtl>? AssetTransferIssueDtl  { get; set; } 
+
+    
+     public ICollection<AssetTransferIssueDtl>? AssetTransferIssueDtl { get; set; } 
+    
+        public AssetTransferReceiptHdr AssetTransferReceiptHdr { get; set; } 
+ 
        
     }
 }
