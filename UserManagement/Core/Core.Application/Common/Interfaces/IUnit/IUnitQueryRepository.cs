@@ -9,7 +9,7 @@ namespace Core.Application.Common.Interfaces.IUnit
     {
        Task<(List<Unit>,int)> GetAllUnitsAsync(int PageNumber, int PageSize, string? SearchTerm);
        Task<Unit> GetByIdAsync(int Id);     
-       Task<List<Unit>> GetUnit(string searchPattern);              
+       Task<List<Unit>> GetUnit(string searchPattern,int userId);              
     }
     
    

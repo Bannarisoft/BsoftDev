@@ -6,6 +6,7 @@ using Core.Application.Common.Interfaces.ICompany;
 using Core.Domain.Entities;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
+using Core.Application.Common.Interfaces;
 
 
 namespace Core.Application.Companies.Queries.GetCompanyAutoComplete
@@ -15,17 +16,19 @@ namespace Core.Application.Companies.Queries.GetCompanyAutoComplete
         private readonly ICompanyQueryRepository _companyRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-         public GetCompanyAutoCompleteQueryHandler(ICompanyQueryRepository companyRepository, IMapper mapper, IMediator mediator)
+        private readonly IIPAddressService _ipAddressService;
+         public GetCompanyAutoCompleteQueryHandler(ICompanyQueryRepository companyRepository, IMapper mapper, IMediator mediator,IIPAddressService ipAddressService)
          {
              _companyRepository = companyRepository;
              _mapper =mapper;
              _mediator = mediator;
+             _ipAddressService = ipAddressService;
          }  
           public async Task<ApiResponseDTO<List<CompanyAutoCompleteDTO>>> Handle(GetCompanyAutoCompleteQuery request, CancellationToken cancellationToken)
           {
                
-
-              var result = await _companyRepository.GetCompany(request.SearchPattern);
+            var userId = _ipAddressService.GetUserId();
+              var result = await _companyRepository.GetCompany(userId,request.SearchPattern);
               var company = _mapper.Map<List<CompanyAutoCompleteDTO>>(result);
               //Domain Event
                  var domainEvent = new AuditLogsDomainEvent(

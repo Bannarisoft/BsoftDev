@@ -13,8 +13,11 @@ public class UserProfile : Profile
     public UserProfile()
     {
         CreateMap<CreateUserCommand, User>()
+        .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
+        .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)))
         .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
         .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations))
+        .ForMember(dest => dest.userDivisions, opt => opt.MapFrom(src => src.userDivisions))
         .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
         .ForMember(dest => dest.IsFirstTimeUser, opt => opt.MapFrom(src => FirstTimeUserStatus.Yes))
         .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
@@ -37,6 +40,12 @@ public class UserProfile : Profile
             .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => src.UnitId))
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
 
+              CreateMap<UserDivisionDTO, UserDivision>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.UserId, opt => opt.Ignore())
+            .ForMember(dest => dest.DivisionId, opt => opt.MapFrom(src => src.DivisionId))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
+
         CreateMap<User, UserDto>()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id));
             // .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
@@ -44,8 +53,10 @@ public class UserProfile : Profile
             // .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.UserUnits));
 
         CreateMap<UpdateUserCommand, User>()
+        .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.PasswordHash)))
         .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
         .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations))
+        .ForMember(dest => dest.userDivisions, opt => opt.MapFrom(src => src.userDivisions))
         .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.userUnits))
         .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
         .ForMember(dest => dest.IsFirstTimeUser, opt => opt.Ignore())
@@ -64,12 +75,16 @@ public class UserProfile : Profile
         CreateMap<UserUnit, UserUnitDTO>()
             .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => src.UnitId));
 
+            CreateMap<UserDivision, UserDivisionDTO>()
+            .ForMember(dest => dest.DivisionId, opt => opt.MapFrom(src => src.DivisionId));
+
             CreateMap<User, UserByIdDTO>()
             .ForMember(dest => dest.UserId, opt => opt.Ignore()) 
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
             .ForMember(dest => dest.userRoleAllocations, opt => opt.MapFrom(src => src.UserRoleAllocations))
-            .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.UserUnits));
+            .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.UserUnits))
+            .ForMember(dest => dest.userDivisions, opt => opt.MapFrom(src => src.userDivisions));
             CreateMap<User, UserAutoCompleteDto>();
 
             CreateMap<PasswordLogDTO, PasswordLog>();

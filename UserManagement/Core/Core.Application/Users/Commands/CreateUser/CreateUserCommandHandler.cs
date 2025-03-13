@@ -40,25 +40,9 @@ namespace Core.Application.Users.Commands.CreateUser
         {
             _logger.LogInformation("Starting user creation process for Username: {Username}", request.UserName);
             
-           var existingUser = await _userQueryRepository.GetByUsernameAsync(request.UserName);
-            if (existingUser != null)
-            {
-                return new ApiResponseDTO<UserDto>
-                {
-                    IsSuccess = false,
-                    Message = "User already exists."
-                    
-                };
-            }
-             // Generate a new GUID for the user
-            var userId = Guid.NewGuid();
 
             // Use AutoMapper to map CreateUserCommand to User entity
             var userEntity = _mapper.Map<User>(request);
-            userEntity.Id = userId; // Assign the new GUID to the user entity
-
-            // Hash and set the password
-            userEntity.SetPassword(request.Password);
 
             // Save the user to the repository
             var createdUser = await _userRepository.CreateAsync(userEntity);
@@ -73,30 +57,7 @@ namespace Core.Application.Users.Commands.CreateUser
                 };
             }                
             _logger.LogInformation("User successfully created for Username: {Username}", createdUser.UserName);
-          /*         // Attempt to send the email notification
-           bool emailSent = false;
-            try
-            {
-                emailSent = await _emailService.SendEmailAsync(
-                    createdUser.EmailId,
-                    "Login Credentials",
-                    $"Dear {createdUser.UserName},<br/><br/>We are pleased to inform you that your login was created successfully.<br/><br/>Please use the below login credentials to access your account: <br/><strong>Username:</strong> {createdUser.UserName}"
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("An error occurred while sending the email: {ErrorMessage}", ex.Message);
-            }
-
-            if (emailSent)
-            {
-                _logger.LogInformation("Login notification email sent to {Email}.", createdUser.EmailId);
-            }
-            else
-            {
-                _logger.LogWarning("Failed to send login notification email to {Email}.", createdUser.EmailId);
-            } 
- */
+         
           
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
