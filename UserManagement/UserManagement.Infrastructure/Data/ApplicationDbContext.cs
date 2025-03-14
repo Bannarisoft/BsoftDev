@@ -54,7 +54,6 @@ namespace UserManagement.Infrastructure.Data
         public DbSet<RoleMenuPrivileges> RoleMenuPrivileges { get; set; } 
         public DbSet<RoleModule> RoleModules { get; set; }
         public DbSet<UserGroup> UserGroup { get; set; }
-        public DbSet<UserGroupUsers> UserGroupUsers { get; set; }
         public DbSet<RoleParent> RoleParent { get; set; }
         public DbSet<RoleChild> RoleChild { get; set; }
         public DbSet<UserDivision> UserDivision {get; set;}
@@ -98,7 +97,6 @@ namespace UserManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new RoleMenuPrivilegesConfiguration());
             modelBuilder.ApplyConfiguration(new RoleModuleConfiguration());
             modelBuilder.ApplyConfiguration(new UserGroupConfiguration());
-            modelBuilder.ApplyConfiguration(new UserGroupUsersConfiguration());
             modelBuilder.ApplyConfiguration(new RoleParentConfiguration());
             modelBuilder.ApplyConfiguration(new RoleChildConfiguration());
             modelBuilder.ApplyConfiguration(new UserDivisionConfiguration());

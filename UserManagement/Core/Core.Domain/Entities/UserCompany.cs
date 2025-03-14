@@ -12,7 +12,6 @@ namespace Core.Domain.Entities
         public User user { get; set; }
         public int CompanyId { get; set; }
         public Company company { get; set; }
-
         public byte IsActive { get; set; }
     }
 }

@@ -91,6 +91,11 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(100)")
                 .IsRequired();
 
+                  builder.Property(u => u.UserGroupId)
+                .HasColumnName("UserGroupId")
+                .HasColumnType("int")
+                .IsRequired(false);
+
 
             builder.Property(u => u.IsDeleted)
             .HasColumnName("IsDeleted")
@@ -113,14 +118,10 @@ namespace UserManagement.Infrastructure.Data.Configurations
             .HasColumnType("varchar(255)");
 
 
-            // builder.HasMany(u => u.UserRoleAllocations)
-            //     .WithOne()
-            //     .HasForeignKey(ura => ura.UserId);
-
-            //       builder.HasMany(u => u.UserUnits)
-            //     .WithOne()
-            //     .HasForeignKey(u => u.UserId);
-
+                builder.HasOne(ug => ug.UserGroup)
+            .WithMany(ug => ug.Users)
+            .HasForeignKey(ug => ug.UserGroupId)
+            .OnDelete(DeleteBehavior.Restrict);
 
             
 
