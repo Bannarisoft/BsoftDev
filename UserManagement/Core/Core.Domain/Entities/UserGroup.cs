@@ -11,7 +11,7 @@ namespace Core.Domain.Entities
         public int Id { get; set; }
         public string GroupCode { get; set; }
         public string GroupName { get; set; }
-        public List<UserGroupUsers> UserGroupUsers { get; set; }
+        public List<User> Users { get; set; }
        
     }
 }

@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserManagement.Infrastructure.Data;
 
 #nullable disable
 
-namespace UserManagement.Infrastructure.Migrations
+namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250313071825_userdivision")]
+    partial class userdivision
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1726,10 +1729,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("PasswordHash");
 
-                    b.Property<int?>("UserGroupId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserGroupId");
-
                     b.Property<string>("UserName")
                         .HasColumnType("varchar(50)")
                         .HasColumnName("UserName");
@@ -1741,8 +1740,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.HasKey("UserId");
 
                     b.HasIndex("EntityId");
-
-                    b.HasIndex("UserGroupId");
 
                     b.ToTable("Users", "AppSecurity");
                 });
@@ -1863,6 +1860,33 @@ namespace UserManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserGroup", "AppSecurity");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.UserGroupUsers", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserGroupId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserGroupId");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserGroupId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserGroupUsers", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
@@ -2275,14 +2299,7 @@ namespace UserManagement.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("EntityId");
 
-                    b.HasOne("Core.Domain.Entities.UserGroup", "UserGroup")
-                        .WithMany("Users")
-                        .HasForeignKey("UserGroupId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Entity");
-
-                    b.Navigation("UserGroup");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserCompany", b =>
@@ -2321,6 +2338,25 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("division");
 
                     b.Navigation("user");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.UserGroupUsers", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.UserGroup", "UserGroup")
+                        .WithMany("UserGroupUsers")
+                        .HasForeignKey("UserGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.User", "User")
+                        .WithOne("UserGroupUsers")
+                        .HasForeignKey("Core.Domain.Entities.UserGroupUsers", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserGroup");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRoleAllocation", b =>
@@ -2456,6 +2492,8 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.Navigation("UserCompanies");
 
+                    b.Navigation("UserGroupUsers");
+
                     b.Navigation("UserRoleAllocations");
 
                     b.Navigation("UserUnits");
@@ -2465,7 +2503,7 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.UserGroup", b =>
                 {
-                    b.Navigation("Users");
+                    b.Navigation("UserGroupUsers");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>

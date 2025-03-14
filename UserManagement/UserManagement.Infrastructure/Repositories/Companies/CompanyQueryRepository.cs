@@ -130,18 +130,25 @@ namespace UserManagement.Infrastructure.Repositories.Companies
 
         }
         
-         public async Task<List<Company>>  GetCompany(string searchPattern = null)
+         public async Task<List<Company>>  GetCompany(int userId,string searchPattern = null)
         {
              
 
             const string query = @"
                 SELECT 
-                Id, 
-                CompanyName
-            FROM AppData.Company where IsDeleted = 0 and CompanyName like @SearchPattern";
+                C.Id, 
+                C.CompanyName
+            FROM AppData.Company C
+            Inner JOIN [AppSecurity].[UserCompany] UC ON UC.CompanyId = C.Id 
+            where IsDeleted = 0 and CompanyName like @SearchPattern and UC.UserId = @UserId  and UC.IsActive = 1"; 
                 
             
-            var result = await _dbConnection.QueryAsync<Company>(query, new { SearchPattern = $"%{searchPattern}%" });
+            var result = await _dbConnection.QueryAsync<Company>(query, new 
+            { 
+                SearchPattern = $"%{searchPattern}%",
+                 UserId = userId
+            
+             });
             return result.ToList();
         }
         public async Task<bool> CompanyExistsAsync(string companyName)

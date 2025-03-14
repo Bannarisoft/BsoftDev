@@ -196,9 +196,9 @@ namespace UserManagement.API.Controllers
     }
 
        [HttpGet("by-name")]
-        public async Task<IActionResult> GetUnit([FromQuery] string? unitname)
+        public async Task<IActionResult> GetUnit([FromQuery] string? unitname,int? CompanyId)
         {
-            var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = unitname??string.Empty});
+            var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = unitname??string.Empty, CompanyId = CompanyId??0 });
              _logger.LogInformation("Search pattern: {SearchPattern}", unitname);
             if(units.IsSuccess)
             {
