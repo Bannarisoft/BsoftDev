@@ -22,14 +22,14 @@ namespace UserManagement.Infrastructure.Repositories.Profile
                   SELECT 
                       U.Id, 
                       U.UnitName,
-                      U.DivisionId,
                       U.OldUnitId,
+                      U.DivisionId,
                       U.CompanyId,
                       D.Id as DivisionId, 
-                      D.Name as DivisionName,
-                      D.ShortName as DivisionShortName,
+                      D.Name as Name,
+                      D.ShortName as ShortName,
                       C.Id as CompanyId,
-                      C.Name as CompanyName
+                      C.CompanyName
                   FROM AppData.Unit U
                   INNER JOIN [AppSecurity].[UserUnit] UU ON UU.UnitId = U.Id 
                   INNER JOIN [AppData].[Division] D ON D.Id = U.DivisionId
