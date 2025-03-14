@@ -64,6 +64,9 @@ using Core.Application.Common.Interfaces.IFinancialYear;
 using UserManagement.Infrastructure.Repositories.FinancialYear;
 using Core.Application.Common.Interfaces.IMenu;
 using UserManagement.Infrastructure.Repositories.Menu;
+using Core.Application.Common.Interfaces.IProfile;
+using AutoMapper;
+using UserManagement.Infrastructure.Repositories.Profile;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
@@ -216,6 +219,8 @@ namespace UserManagement.Infrastructure
             services.AddScoped<ILanguageCommand, LanguageCommandRepository>();
             services.AddScoped<ILanguageQuery, LanguageQueryRepository>(); 
             services.AddScoped<IMenuQuery, MenuQueryRepository>();
+            services.AddScoped<IProfileQuery, ProfileQueryRepository>();
+            services.AddScoped<IProfileCommand, ProfileCommandRepository>();
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();            

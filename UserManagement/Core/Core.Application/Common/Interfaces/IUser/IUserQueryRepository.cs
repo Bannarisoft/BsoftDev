@@ -16,6 +16,7 @@ namespace Core.Application.Common.Interfaces.IUser
         Task<List<string>> GetUserRolesAsync(int userId);
         Task<User?> GetByUsernameAsync(string? username,int? id = null);
         Task<bool> AlreadyExistsAsync(string username,int? id = null);
+        Task<User?> GetByUserByUnit(int UserId,int UnitId);
   
     }
 
