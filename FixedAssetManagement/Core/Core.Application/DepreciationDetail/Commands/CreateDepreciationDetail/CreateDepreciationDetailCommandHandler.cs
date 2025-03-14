@@ -27,7 +27,7 @@ namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
         {
             // Check if Depreciation already exists
             var exists = await _depreciationDetailQueryRepository.ExistDataAsync(
-                request.companyId, request.unitId, request.finYear??string.Empty,  request.depreciationType,  request.depreciationPeriod
+                request.companyId, request.unitId, request.finYearId,  request.depreciationType,  request.depreciationPeriod
             );
 
             if (exists)
@@ -43,7 +43,7 @@ namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
             var depreciationList = await _depreciationDetailQueryRepository.CreateAsync(
                 request.companyId,
                 request.unitId,
-                request.finYear ??string.Empty,               
+                request.finYearId,               
                 request.depreciationType ,request.depreciationPeriod            
             );
 
@@ -51,8 +51,8 @@ namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
                 actionCode: request.companyId.ToString(),
-                actionName: request.finYear ?? string.Empty,
-                details: $"Depreciation detail for finYear {request.finYear} was created.",
+                actionName: request.finYearId.ToString(),
+                details: $"Depreciation detail for finYear {request.finYearId} was created.",
                 module: "Depreciation"
             );
 
