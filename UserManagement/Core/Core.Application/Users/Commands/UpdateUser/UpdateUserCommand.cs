@@ -22,6 +22,7 @@ namespace Core.Application.Users.Commands.UpdateUser
     public int UserType { get; set; }
     public string Mobile { get; set; }
     public string EmailId { get; set; }
+    public int UserGroupId { get; set; }
     public List<UserDivisionDTO> userDivisions { get; set; }
     public List<UserCompanyDTO> UserCompanies  { get; set; }
     public List<UserRoleAllocationDTO> userRoleAllocations { get; set; }
