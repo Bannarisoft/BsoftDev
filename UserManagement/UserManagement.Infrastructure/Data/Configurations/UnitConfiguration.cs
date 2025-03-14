@@ -109,6 +109,16 @@ namespace UserManagement.Infrastructure.Data.Configurations
            .HasColumnType("nvarchar(10)")  // Changed from int to nvarchar(10)
            .IsRequired();
 
+            builder.HasOne(s => s.Division)
+                .WithMany(c => c.Units)
+                .HasForeignKey(s => s.DivisionId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+                 builder.HasOne(s => s.Company)
+                .WithMany(c => c.Units)
+                .HasForeignKey(s => s.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
         }
     }
 }
