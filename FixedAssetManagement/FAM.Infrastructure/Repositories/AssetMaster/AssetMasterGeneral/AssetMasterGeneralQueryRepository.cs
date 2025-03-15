@@ -140,7 +140,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
                 "dbo.FAM_GetAssetCode", 
                 parameters, 
-                commandType: CommandType.StoredProcedure);
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 120);
             return newAssetCode; 
         }
 
