@@ -29,6 +29,8 @@ namespace Core.Domain.Entities
         public  CompanyContact CompanyContact { get; set; }
         public IList<UserCompany> UserCompanies { get; set; }
         public CompanySettings CompanySettings { get; set; }
+        public IList<Unit> Units { get; set; }
+        public IList<Division> Divisions  { get; set; }
 
           
     }

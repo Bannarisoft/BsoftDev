@@ -66,6 +66,11 @@ namespace UserManagement.Infrastructure.Data.Configurations
 
             builder.Property(b => b.ModifiedIP)
             .HasColumnType("varchar(255)");
+
+              builder.HasOne(s => s.Company)
+                .WithMany(c => c.Divisions)
+                .HasForeignKey(s => s.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict); 
         }
     }
 }

@@ -230,6 +230,26 @@ namespace UserManagement.Infrastructure.Repositories.Users
                 var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
                 return count > 0;
           }
+          public async Task<User?> GetByUserByUnit(int UserId,int UnitId)
+          {
+            const string query = @"
+                SELECT U.UserId, U.UserName,U.Mobile,U.EmailId
+                FROM AppSecurity.Users U
+                Inner join [AppSecurity].[UserUnit] UU on UU.UserId = U.UserId
+                Inner join [AppData].[Unit] U1 on U1.Id = UU.UnitId
+                Inner join [AppData].[Division] D on D.Id = U1.DivisionId
+                Inner join [AppData].[Company] C on C.Id = U1.CompanyId
+                WHERE U.IsDeleted = 0 AND U.UserId = @UserId and UU.UnitId = @UnitId";
+                
+            
+            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new
+             {
+                 UserId,
+                 UnitId
+             });
+            
+            
+          }
         
     }
 }
