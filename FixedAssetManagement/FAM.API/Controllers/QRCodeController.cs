@@ -1,16 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.QRCode;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Core.Application.QRCode;
 
-namespace FAM.API.Controllers
+namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class QRCodeController  : ControllerBase
+    public class QRCodeController : ControllerBase
     {
         private readonly IMediator _mediator;
 
@@ -19,15 +15,18 @@ namespace FAM.API.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("generate")]
-        public async Task<IActionResult> GenerateQRCode([FromBody] GenerateQRCodeCommand command)
+        [HttpPost("print")]
+        public async Task<IActionResult> PrintQRCode([FromBody] PrintQRCodeCommand command)
         {
-            if (string.IsNullOrEmpty(command.Content))
-                return BadRequest("Content is required to generate QR code.");
+            if (string.IsNullOrEmpty(command.Content) || string.IsNullOrEmpty(command.PrinterName))
+                return BadRequest("Content and Printer Name are required.");
 
-            var qrCodeBytes = await _mediator.Send(command);
+            bool result = await _mediator.Send(command);
 
-            return File(qrCodeBytes, "image/png"); // ✅ Returns PNG image
+            if (result)
+                return Ok("✅ QR Code sent to Zebra Printer successfully.");
+            else
+                return StatusCode(500, "❌ Failed to print QR Code.");
         }
     }
 }
