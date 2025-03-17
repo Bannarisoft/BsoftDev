@@ -11,7 +11,7 @@ namespace Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecif
         public int AssetId { get; set; }
         public string? AssetName { get; set; }
         public string AssetCode { get; set; }
-        public string? ManufactureName { get; set; }
+        /* public string? ManufactureName { get; set; } */
         public Status IsActive { get; set; }
         public List<SpecificationDTO> Specifications { get; set; } = new List<SpecificationDTO>();
     }
@@ -20,8 +20,8 @@ namespace Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecif
     {
         public int SpecificationId { get; set; }
         public string? SpecificationName { get; set; }
-        public string? SpecificationValue { get; set; }
+        public string? SpecificationValue { get; set; }/* 
         public string? SerialNumber { get; set; }
-        public string? ModelNumber { get; set; }
+        public string? ModelNumber { get; set; } */
     }
 }

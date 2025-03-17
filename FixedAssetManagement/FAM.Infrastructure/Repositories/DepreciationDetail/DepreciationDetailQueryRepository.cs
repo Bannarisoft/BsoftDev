@@ -22,12 +22,12 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             _ipAddressService = ipAddressService;
         }
     
-        public async Task<(List<DepreciationDto>, int)> CalculateDepreciationAsync(int companyId,int unitId,string finYear, DateTimeOffset? startDate, DateTimeOffset? endDate,int depreciationType, int PageNumber, int PageSize, string? SearchTerm,int depreciationPeriod)
+        public async Task<(List<DepreciationDto>, int)> CalculateDepreciationAsync(int companyId,int unitId,int finYearId, DateTimeOffset? startDate, DateTimeOffset? endDate,int depreciationType, int PageNumber, int PageSize, string? SearchTerm,int depreciationPeriod)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", companyId);
             parameters.Add("@UnitId", unitId);
-            parameters.Add("@Finyear", finYear);
+            parameters.Add("@Finyear", finYearId);
             parameters.Add("@StartDate", startDate);
             parameters.Add("@EndDate", endDate);
             parameters.Add("@Type", depreciationType);            
@@ -48,7 +48,7 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             return (depreciationList, totalCount);   
         }
 
-        public async Task<List<DepreciationDto>> CreateAsync(int companyId, int unitId, string finYear,  int depreciationType,int depreciationPeriod)
+        public async Task<List<DepreciationDto>> CreateAsync(int companyId, int unitId, int finYearId,  int depreciationType,int depreciationPeriod)
         {
             int userId = _ipAddressService.GetUserId();
             string username = _ipAddressService.GetUserName();
@@ -57,7 +57,7 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", companyId);
             parameters.Add("@UnitId", unitId);
-            parameters.Add("@Finyear", finYear);
+            parameters.Add("@Finyear", finYearId);
             parameters.Add("@StartDate", null);
             parameters.Add("@EndDate", null);
             parameters.Add("@Type", depreciationType);
@@ -78,42 +78,53 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
                 commandType: CommandType.StoredProcedure
             );          
             (List<DepreciationDto> depreciationList, _) = await CalculateDepreciationAsync(
-                    companyId, unitId, finYear, null, null, depreciationType,0,0, null,depreciationPeriod
+                    companyId, unitId, finYearId, null, null, depreciationType,0,0, null,depreciationPeriod
                 );
             return depreciationList;
         } 
 
-        public async Task<bool> ExistDataAsync(int companyId, int unitId, string finYear, int depreciationType,int depreciationPeriod)
+        public async Task<bool> ExistDataAsync(int companyId, int unitId, int finYearId, int depreciationType,int depreciationPeriod)
         {
             return await _applicationDbContext.DepreciationDetails
                 .Where(d => d.CompanyId == companyId &&
-                            d.Finyear == finYear &&
+                            d.Finyear == finYearId &&
                             d.DepreciationPeriod == depreciationPeriod &&
                             d.DepreciationType == depreciationType &&                                                    
                             (unitId == 0 || d.UnitId == unitId)) 
                 .AnyAsync();
         }
-        public async Task<bool> ExistDataLockedAsync(int companyId, int unitId, string finYear, int depreciationType,int depreciationPeriod)
+        public async Task<bool> ExistDataLockedAsync(int companyId, int unitId, int finYearId, int depreciationType,int depreciationPeriod)
         {
             return await _applicationDbContext.DepreciationDetails
                 .Where(d => d.CompanyId == companyId &&
-                            d.Finyear == finYear &&
+                            d.Finyear == finYearId &&
                             d.DepreciationPeriod == depreciationPeriod &&
                             d.DepreciationType == depreciationType &&  d.IsLocked ==1 &&                                             
                             (unitId == 0 || d.UnitId == unitId)) 
                 .AnyAsync();
         }
 
-        public async Task<List<DepreciationAbstractDto>> GetDepreciationAbstractAsync(int companyId, int unitId, string finYear, int depreciationPeriod, int depreciationType)
+        public async Task<List<DepreciationAbstractDto>> GetDepreciationAbstractAsync(int companyId, int unitId, int finYearId, DateTimeOffset? startDate,DateTimeOffset? endDate,int depreciationPeriod, int depreciationType)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", companyId);
             parameters.Add("@UnitId", unitId);
-            parameters.Add("@Finyear", finYear);
+            parameters.Add("@Finyear", finYearId);
+            parameters.Add("@StartDate", startDate);
+            parameters.Add("@EndDate", endDate);
+            parameters.Add("@Type", depreciationType);     
+            parameters.Add("@Save", 0); 
             parameters.Add("@Period", depreciationPeriod);
-            parameters.Add("@Type", depreciationType);                        
+            parameters.Add("@PageNumber", 0);     
+            parameters.Add("@PageSize", 0);     
+            parameters.Add("@SearchTerm", "");     
+            parameters.Add("@AssetId", 0);     
+            parameters.Add("@CreatedBy", 0);     
+            parameters.Add("@CreatedByName", "");     
+            parameters.Add("@CreatedIP", "");
+            parameters.Add("@Consolidate", 1);                                
 
-            var result = await _dbConnection.QueryAsync<DepreciationAbstractDto>("dbo.FAM_DepreciationAbstract_rpt", parameters, commandType: CommandType.StoredProcedure);
+            var result = await _dbConnection.QueryAsync<DepreciationAbstractDto>("dbo.FAM_DepreciationCalculation", parameters, commandType: CommandType.StoredProcedure);
             return result.ToList();
         }
 

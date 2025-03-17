@@ -46,7 +46,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
         {
             const string query = @"
                 SELECT (SELECT AM.Id AS AssetId,AM.AssetCode,AM.AssetName,MM.ManufactureName,(
-                SELECT A.Id AS SpecificationId,A.SpecificationValue,A.SerialNumber,A.ModelNumber,SM.SpecificationName 
+                SELECT A.Id AS SpecificationId,A.SpecificationValue,SM.SpecificationName 
                 FROM FixedAsset.AssetSpecifications A
                 INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = A.SpecificationId
                 WHERE A.AssetId = AM.Id AND A.IsDeleted = 0 
@@ -79,7 +79,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
         {
             const string query = @"
                 SELECT AM.Id AS AssetId,AM.AssetCode,AM.AssetName,MM.ManufactureName,(
-                SELECT A.Id AS SpecificationId,A.SpecificationValue,A.SerialNumber,A.ModelNumber,SM.SpecificationName
+                SELECT A.Id AS SpecificationId,A.SpecificationValue,SM.SpecificationName
                 FROM FixedAsset.AssetSpecifications A
                 INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = A.SpecificationId
                 WHERE A.AssetId = AM.Id AND A.IsDeleted = 0 FOR JSON PATH ) AS Specifications
