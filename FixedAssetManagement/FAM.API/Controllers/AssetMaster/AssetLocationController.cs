@@ -8,6 +8,7 @@ using Core.Application.AssetLocation.Queries.GetAssetLocation;
 using Core.Application.AssetLocation.Queries.GetAssetLocationById;
 using Core.Application.AssetMaster.AssetLocation.Commands.UpdateAssetLocation;
 using Core.Application.AssetMaster.AssetLocation.Queries.GetCustodian;
+using Core.Application.AssetMaster.AssetLocation.Queries.GetSubLocationById;
 using Core.Application.AssetSubCategories.Queries.GetAssetSubCategoriesById;
 using FAM.API.Validation.AssetMaster.AssetLocation;
 using FAM.Infrastructure.Data;
@@ -177,6 +178,22 @@ namespace FAM.API.Controllers.AssetMaster
                 data = custodian.Data,
                 SearchEmployee = SearchEmployee
             });
+        }
+
+        [HttpGet("AssetSubLocation/{id}/")]
+        public async Task<IActionResult>GetSubLocationByIdAsync(int id)
+        {
+           
+            var assetLocation = await Mediator.Send(new GetSubLocationByIdQuery() { Id = id });
+
+           
+             if(assetLocation.IsSuccess && assetLocation.Data != null)
+            {
+                
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetLocation.Data,message = assetLocation.Message });
+            }
+            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetLocation.Message });
+
         }
          
 

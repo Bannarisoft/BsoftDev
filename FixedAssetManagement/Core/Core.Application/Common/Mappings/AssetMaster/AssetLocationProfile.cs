@@ -3,6 +3,7 @@ using Core.Application.AssetLocation.Commands.CreateAssetLocation;
 using Core.Application.AssetLocation.Queries.GetAssetLocation;
 using Core.Application.AssetMaster.AssetLocation.Commands.UpdateAssetLocation;
 using Core.Application.AssetMaster.AssetLocation.Queries.GetCustodian;
+using Core.Application.AssetMaster.AssetLocation.Queries.GetSubLocationById;
 
 namespace Core.Application.Common.Mappings
 {
@@ -27,6 +28,8 @@ namespace Core.Application.Common.Mappings
             CreateMap<Core.Domain.Entities.AssetMaster.Employee,GetCustodianDto>()           
             .ForMember(dest => dest.CustodianId, opt => opt.MapFrom(src => src.Empcode))
             .ForMember(dest => dest.CustodianName, opt => opt.MapFrom(src => src.Empname));
+
+            CreateMap<Core.Domain.Entities.SubLocation, GetAssetSubLocationDto>();
 
            
                 
