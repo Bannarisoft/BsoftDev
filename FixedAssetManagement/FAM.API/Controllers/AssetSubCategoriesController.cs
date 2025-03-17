@@ -8,6 +8,7 @@ using Core.Application.AssetSubCategories.Command.DeleteAssetSubCategories;
 using Core.Application.AssetSubCategories.Command.UpdateAssetSubCategories;
 using Core.Application.AssetSubCategories.Queries.GetAssetSubCategories;
 using Core.Application.AssetSubCategories.Queries.GetAssetSubCategoriesAutoComplete;
+using Core.Application.AssetSubCategories.Queries.GetAssetSubCategoriesByCategoryId;
 using Core.Application.AssetSubCategories.Queries.GetAssetSubCategoriesById;
 using FAM.Infrastructure.Data;
 using FluentValidation;
@@ -183,6 +184,22 @@ public async Task<IActionResult> DeleteAssetSubCategoriesAsync(int id)
         });
    
 }
+
+        [HttpGet("Category/{AssetCategoriesId}")]
+        [ActionName(nameof(GetAssetSubCategoryBasedonCategoryId))]
+        public async Task<IActionResult> GetAssetSubCategoryBasedonCategoryId(int AssetCategoriesId)
+        {
+            var assetsubcategory = await Mediator.Send(new GetAssetSubCategoriesByCategoryIdQuery() { AssetCategoriesId = AssetCategoriesId});
+          
+            if(assetsubcategory.IsSuccess)
+            {
+                
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetsubcategory.Data,message = assetsubcategory.Message });
+            }
+            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetsubcategory.Message });
+           
+        }
+
 
        
     }
