@@ -313,8 +313,7 @@ namespace FAM.Infrastructure.Migrations
                     b.HasIndex("AssetPurchaseId")
                         .IsUnique();
 
-                    b.HasIndex("DisposalType")
-                        .IsUnique();
+                    b.HasIndex("DisposalType");
 
                     b.ToTable("AssetDisposal", "FixedAsset");
                 });
@@ -478,15 +477,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTimeOffset?>("ManufactureDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("ManufactureId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModelNumber")
-                        .HasColumnType("varchar(100)");
-
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
@@ -499,9 +489,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("SerialNumber")
-                        .HasColumnType("varchar(100)");
-
                     b.Property<int>("SpecificationId")
                         .HasColumnType("int");
 
@@ -512,8 +499,6 @@ namespace FAM.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssetId");
-
-                    b.HasIndex("ManufactureId");
 
                     b.HasIndex("SpecificationId");
 
@@ -1378,9 +1363,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("ExpiryDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Finyear")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)");
+                    b.Property<int>("Finyear")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsLocked")
                         .HasColumnType("bit");
@@ -2126,8 +2110,8 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.MiscMaster", "AssetMiscDisposalType")
-                        .WithOne("AssetMiscDisposalType")
-                        .HasForeignKey("Core.Domain.Entities.AssetMaster.AssetDisposal", "DisposalType")
+                        .WithMany("AssetMiscDisposalType")
+                        .HasForeignKey("DisposalType")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -2184,11 +2168,6 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.Manufactures", "Manufacture")
-                        .WithMany("AssetSpecification")
-                        .HasForeignKey("ManufactureId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Core.Domain.Entities.SpecificationMasters", "SpecificationMaster")
                         .WithMany("AssetSpecification")
                         .HasForeignKey("SpecificationId")
@@ -2196,8 +2175,6 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("AssetMasterId");
-
-                    b.Navigation("Manufacture");
 
                     b.Navigation("SpecificationMaster");
                 });
@@ -2570,8 +2547,7 @@ namespace FAM.Infrastructure.Migrations
                 {
                     b.Navigation("AssetTransferIssueDtl");
 
-                    b.Navigation("AssetTransferReceiptHdr")
-                        .IsRequired();
+                    b.Navigation("AssetTransferReceiptHdr");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetTransferReceiptHdr", b =>
@@ -2630,11 +2606,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetTransferReceiptLocation");
 
                     b.Navigation("SubLocations");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Manufactures", b =>
-                {
-                    b.Navigation("AssetSpecification");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>

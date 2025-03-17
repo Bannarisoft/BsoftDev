@@ -8,14 +8,14 @@ namespace Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecif
         public int AssetId { get; set; }
         public string? AssetName { get; set; }
         public string? AssetCode { get; set; }
-        public int ManufactureId { get; set; }
+      /*   public int ManufactureId { get; set; }
         public string? ManufactureName { get; set; }
-        public DateTimeOffset? ManufactureDate { get; set; } 
+        public DateTimeOffset? ManufactureDate { get; set; }  */
         public int SpecificationId { get; set; }        
         public string? SpecificationName { get; set; }
-        public string? SpecificationValue { get; set; }
+        public string? SpecificationValue { get; set; }/* 
         public string? SerialNumber { get; set; }
-        public string? ModelNumber { get; set; }
+        public string? ModelNumber { get; set; } */
         public Status IsActive { get; set; }
         public IsDelete IsDeleted { get; set; }
         public int CreatedBy { get; set; }

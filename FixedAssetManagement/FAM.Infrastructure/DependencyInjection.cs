@@ -70,6 +70,8 @@ using FAM.Infrastructure.Repositories.AssetTransferIssueApproval;
 using Core.Application.Common.Interfaces.IAssetTransferReceipt;
 using FAM.Infrastructure.Repositories.AssetTransferReceipt;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer;
+using Core.Application.Common.Interfaces.IExcelImport;
+using FAM.Infrastructure.Repositories.ExcelImport;
 
 namespace FAM.Infrastructure
 {
@@ -198,27 +200,22 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetWarrantyQueryRepository, AssetWarrantyQueryRepository>();
             services.AddScoped<IAssetWarrantyCommandRepository, AssetWarrantyCommandRepository>();
 			services.AddScoped<IAssetInsuranceCommandRepository, AssetInsuranceCommandRepository>();
-
             services.AddScoped<IAssetInsuranceQueryRepository, AssetInsuranceQueryRepository>();            
             services.AddScoped<IAssetAmcQueryRepository, AssetAmcQueryRepository>();
             services.AddScoped<IAssetAmcCommandRepository, AssetAmcCommandRepository>();
             services.AddScoped<IAssetTransferQueryRepository, AssetTransferQueryRepository>();
-            services.AddScoped<IAssetTransferCommandRepository, AssetTransferCommandRepository>();
-            
+            services.AddScoped<IAssetTransferCommandRepository, AssetTransferCommandRepository>();            
             services.AddScoped<IAssetDisposalQueryRepository, AssetDisposalQueryRepository>();
             services.AddScoped<IAssetDisposalCommandRepository, AssetDisposalCommandRepository>();
-
-
 			services.AddScoped<IDepreciationDetailCommandRepository, DepreciationDetailCommandRepository>();
             services.AddScoped<IDepreciationDetailQueryRepository, DepreciationDetailQueryRepository>();
             services.AddScoped<IAssetTransferIssueApprovalQueryRepository, AssetTransferIssueQueryRepository>();
             services.AddScoped<IAssetTransferIssueApprovalCommandRepository, AssetTransferIssueCommandRepository>();
             services.AddScoped<IAssetTransferReceiptQueryRepository, AssetTransferReceiptQueryRepository>();
             services.AddScoped<IAssetTransferReceiptCommandRepository, AssetTransferReceiptCommandRepository>();
-
-
-
-
+            services.AddScoped<IExcelImportCommandRepository, ExcelImportCommandRepository>();
+            services.AddScoped<IExcelImportQueryRepository, ExcelImportCommandQueryRepository>();
+            
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
             services.AddTransient<IFileUploadService, FileUploadRepository>();
@@ -250,9 +247,7 @@ namespace FAM.Infrastructure
  				typeof(DepreciationDetailProfile),
                 typeof(AssetIssueTransferApproval),
                 typeof(AssetTransferReceiptProfile)
-
             );
-
             return services;
         }
     }

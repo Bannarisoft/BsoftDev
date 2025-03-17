@@ -7,6 +7,7 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
 {
     public class AssetTransferReceiptPendingDto
     {
+     
         public int AssetTransferId {get;set;}
         public DateTimeOffset DocDate { get; set; }
         public string? AssetCode { get; set; }

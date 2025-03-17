@@ -37,7 +37,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .HasForeignKey(dg => dg.AssetId)                
                 .OnDelete(DeleteBehavior.Restrict); 
 
-                builder.Property(dg => dg.ManufactureId)                
+/*                 builder.Property(dg => dg.ManufactureId)                
                 .HasColumnType("int")
                 .IsRequired(false);
                 
@@ -48,7 +48,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .OnDelete(DeleteBehavior.Restrict); 
 
                 builder.Property(dg => dg.ManufactureDate)                                
-                .IsRequired(false);                
+                .IsRequired(false);    */             
                     
                 builder.Property(dg => dg.SpecificationId)
                 .HasColumnType("int")
@@ -63,13 +63,13 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .HasColumnType("varchar(100)")
                 .IsRequired();     
 
-                builder.Property(dg => dg.SerialNumber)                
+                /* builder.Property(dg => dg.SerialNumber)                
                 .HasColumnType("varchar(100)")
                 .IsRequired(false);  
 
                 builder.Property(dg => dg.ModelNumber)                
                 .HasColumnType("varchar(100)")
-                .IsRequired(false);  
+                .IsRequired(false);   */
 
                 builder.Property(b => b.IsActive)                
                 .HasColumnType("bit")

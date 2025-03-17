@@ -30,7 +30,7 @@ namespace Core.Application.DepreciationDetail.Commands.UpdateDepreciationDetail
         public async Task<ApiResponseDTO<DepreciationDto>> Handle(UpdateDepreciationDetailCommand request, CancellationToken cancellationToken)
         {             
             
-            var depreciationLocked = await _depreciationQueryRepository.ExistDataLockedAsync(request.companyId,request.unitId, request.finYear??string.Empty, request.depreciationType,request.depreciationPeriod);
+            var depreciationLocked = await _depreciationQueryRepository.ExistDataLockedAsync(request.companyId,request.unitId, request.finYearId, request.depreciationType,request.depreciationPeriod);
             if (depreciationLocked==true)
             {
                 return new ApiResponseDTO<DepreciationDto>
@@ -39,7 +39,7 @@ namespace Core.Application.DepreciationDetail.Commands.UpdateDepreciationDetail
                     Message = "Already depreciation details Locked."
                 };
             }
-            var depreciationGroups = await _depreciationQueryRepository.ExistDataAsync(request.companyId,request.unitId, request.finYear??string.Empty, request.depreciationType,request.depreciationPeriod);
+            var depreciationGroups = await _depreciationQueryRepository.ExistDataAsync(request.companyId,request.unitId, request.finYearId, request.depreciationType,request.depreciationPeriod);
             if (depreciationGroups==false)
             {
                 return new ApiResponseDTO<DepreciationDto>
@@ -50,15 +50,14 @@ namespace Core.Application.DepreciationDetail.Commands.UpdateDepreciationDetail
             }
             
             var depreciationUpdate = _mapper.Map<DepreciationDetails>(request);      
-            var updateResult = await _depreciationRepository.UpdateAsync(request.companyId, request.unitId, request.finYear??string.Empty, request.depreciationType,request.depreciationPeriod);
+            var updateResult = await _depreciationRepository.UpdateAsync(request.companyId, request.unitId, request.finYearId, request.depreciationType,request.depreciationPeriod);
             if (updateResult > 0)
             {
                 var depreciationGroupDto = _mapper.Map<DepreciationDto>(depreciationUpdate);  
                 //Domain Event  
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: depreciationUpdate
-                    .Finyear ?? string.Empty,
+                    actionCode: depreciationUpdate.Finyear.ToString() ??string.Empty,
                     actionName: "Update",
                     details: $"Depreciation Details '{depreciationGroupDto.Company}' was Deleted. Code: {depreciationGroupDto.Unit}",
                     module:"DepreciationDetail"

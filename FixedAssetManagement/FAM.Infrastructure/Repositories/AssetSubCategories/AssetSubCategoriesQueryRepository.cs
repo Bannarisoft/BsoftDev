@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.AssetSubCategories.Queries.GetAssetSubCategories;
 using Core.Application.Common.Interfaces.IAssetSubCategories;
 using Dapper;
 
@@ -82,6 +83,24 @@ namespace FAM.Infrastructure.Repositories.AssetSubCategories
                     WHERE Id = @Id AND IsDeleted = 0";
                     var assetSubCategories = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.AssetSubCategories>(query, new { Id });
                     return assetSubCategories;
+        }
+
+        public async Task<List<AssetSubCategoriesAutoCompleteDto?>> GetSubcategoriesByAssetCategoryIdAsync(int AssetCategoriesId)
+        {
+             const string query = @"
+                    SELECT 
+                    b.Id,
+                    b.SubCategoryName 
+                    from 
+                    FixedAsset.AssetCategories a INNER JOIN FixedAsset.AssetSubCategories b 
+                    on a.Id=b.AssetCategoriesId 
+                    and b.IsDeleted=0 
+                    and a.IsDeleted=0 
+                    and a.Id=@AssetCategoriesId ";
+
+            var assetsubCategories = await _dbConnection.QueryAsync<AssetSubCategoriesAutoCompleteDto>(query, new { AssetCategoriesId });
+
+            return assetsubCategories.ToList(); // Ensure it returns a List
         }
     }
 }

@@ -8,6 +8,6 @@ namespace Core.Application.Common.Interfaces.IAssetTransferReceipt
 {
     public interface IAssetTransferReceiptCommandRepository
     {
-        Task<int> CreateAsync(AssetTransferReceiptHdr assetTransferReceiptHdr);
+        Task<int> CreateAsync(AssetTransferReceiptHdr assetTransferReceiptHdr,AssetTransferIssueHdr assetTransferIssueHdr,List<Core.Domain.Entities.AssetMaster.AssetLocation> assetLocation);
     }
 }

@@ -67,6 +67,8 @@ using UserManagement.Infrastructure.Repositories.Menu;
 using Core.Application.Common.Interfaces.IProfile;
 using AutoMapper;
 using UserManagement.Infrastructure.Repositories.Profile;
+using Core.Application.Common.Interfaces.IUserGroup;
+using UserManagement.Infrastructure.Repositories.UserGroup;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
@@ -221,7 +223,9 @@ namespace UserManagement.Infrastructure
             services.AddScoped<IMenuQuery, MenuQueryRepository>();
             services.AddScoped<IProfileQuery, ProfileQueryRepository>();
             services.AddScoped<IProfileCommand, ProfileCommandRepository>();
-
+            services.AddScoped<IUserGroupQueryRepository, UserGroupQueryRepository>();
+            
+            
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();            
             services.AddTransient<IFileUploadService, FileUploadRepository>();
