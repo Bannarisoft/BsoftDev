@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAssetTransferIssueById;
+using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptPending;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered
 {
@@ -24,6 +26,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransf
     
     // List of assets associated with this transfer
     public List<AssetTransferIssueDtlDto>? AssetTransferIssueDtls { get; set; }
-    
+    public AssetTransferIssueHdrIdDto? AssetTransferIssueHdr { get; set; }
+
     }
 }
