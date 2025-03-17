@@ -15,5 +15,7 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetLocation
             Task<(List<Core.Domain.Entities.AssetMaster.Employee>,int)> GetAllCustodianAsync(string OldUnitId, string? SearchTerm);
 
 
+             Task<List<Core.Domain.Entities.SubLocation>>  GetSublocationByIdAsync(int id); 
+
     }
 }

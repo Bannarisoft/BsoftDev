@@ -64,6 +64,8 @@ using Core.Application.AssetMaster.AssetTransferIssue.Command.CreateAssetTransfe
 using FAM.API.Validation.AssetMaster.AssetTransferIssueApproval;
 using FAM.API.Validation.AssetMaster.AssetTransferIssue;
 using Core.Application.AssetMaster.AssetTransferIssue.Command.UpdateAssetTransferIssue;
+using FAM.API.Validation.AssetMaster.AssetTransferReceipt;
+using Core.Application.AssetMaster.AssetTransferReceipt.Command.CreateAssetTransferReceipt;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMasterGeneral;
 
 
@@ -123,6 +125,7 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<UpdateAssetTranferIssueApprovalCommand>, UpdateAssetTransferIssueApprovalValidator>();                
         services.AddScoped<IValidator<CreateAssetTransferIssueCommand>, CreateAssetTransferIssueCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetTransferIssueCommand>, UpdateAssetTransferIssueCommandValidator>();
+        services.AddScoped<IValidator<CreateAssetTransferReceiptCommand>, CreateAssetTransferReceiptCommandValidator>();
 
     }  
     }

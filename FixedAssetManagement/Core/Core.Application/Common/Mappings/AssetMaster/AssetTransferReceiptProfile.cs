@@ -14,8 +14,21 @@ namespace Core.Application.Common.Mappings.AssetMaster
         {
             
             CreateMap<AssetTransferReceiptHdrDto, Core.Domain.Entities.AssetMaster.AssetTransferReceiptHdr>()
-             .ForMember(dest => dest.AssetTransferReceiptDtl, opt => opt.MapFrom(src => src.AssetTransferReceiptDtl));
+            .ForMember(dest => dest.AssetTransferReceiptDtl, opt => opt.MapFrom(src => src.AssetTransferReceiptDtl))
+            .ForMember(dest => dest.AssetTransferIssueHdr, opt => opt.Ignore()) ;
             CreateMap<AssetTransferReceiptDtlDto, Core.Domain.Entities.AssetMaster.AssetTransferReceiptDtl>();
+            
+
+             CreateMap<AssetTransferReceiptDtlDto, Core.Domain.Entities.AssetMaster.AssetLocation>()
+            .ForMember(dest => dest.AssetId, opt => opt.MapFrom(src => src.AssetId))
+            .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => src.LocationId))
+            .ForMember(dest => dest.SubLocationId, opt => opt.MapFrom(src => src.SubLocationId))
+            .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => Convert.ToInt32(src.UserID)));
+
+
+            CreateMap<AssetTransferIssueHdrIdDto, AssetTransferIssueHdr>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.AssetTransferId))
+            .ForMember(dest => dest.AckStatus, opt => opt.MapFrom(src => (byte)1));  // Ensure AckStatus is always 1
         }
     }
 }

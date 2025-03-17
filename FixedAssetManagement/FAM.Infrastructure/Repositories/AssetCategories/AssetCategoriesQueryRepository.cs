@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.AssetCategories.Queries.GetAssetCategories;
 using Core.Application.Common.Interfaces.IAssetCategories;
 using Dapper;
 
@@ -76,6 +77,25 @@ namespace FAM.Infrastructure.Repositories.AssetCategories
             return assetCategories.ToList();
         }
 
+        public async Task<List<AssetCategoriesAutoCompleteDto?>> GetByAssetgroupIdAsync(int AssetGroupId)
+        {
+            const string query = @"
+            SELECT 
+                    b.Id,
+                    b.CategoryName 
+                    from 
+                    FixedAsset.AssetGroup a INNER JOIN FixedAsset.AssetCategories b 
+                    on a.Id=b.AssetGroupId 
+                    and  b.IsDeleted=0 
+                    and a.IsDeleted=0 and a.Id=@AssetGroupId ";
+
+            var assetCategories = await _dbConnection.QueryAsync<AssetCategoriesAutoCompleteDto>(query, new { AssetGroupId });
+
+            return assetCategories.ToList(); // Ensure it returns a List
+        }
+
+    
+
         public async Task<Core.Domain.Entities.AssetCategories?> GetByIdAsync(int Id)
         {
             const string query = @"
@@ -85,5 +105,7 @@ namespace FAM.Infrastructure.Repositories.AssetCategories
                     var assetCategories = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.AssetCategories>(query, new { Id });
                     return assetCategories;
         }
+
+    
     }
 }

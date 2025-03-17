@@ -31,6 +31,20 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Command.CreateAssetT
         }
         public async Task<ApiResponseDTO<int>> Handle(CreateAssetTransferReceiptCommand request, CancellationToken cancellationToken)
         {
+              var ToCustodianId = request.AssetTransferReceiptHdrDto.ToCustodianId;
+              var ToUnitId = request.AssetTransferReceiptHdrDto.ToUnitId;
+              var ToDepartmentId = request.AssetTransferReceiptHdrDto.ToDepartmentId;
+
+                     var assetLocation = request.AssetTransferReceiptHdrDto.AssetTransferReceiptDtl.Select(dto => {
+                         var entity = _imapper.Map<Core.Domain.Entities.AssetMaster.AssetLocation>(dto);
+                         entity.CustodianId = ToCustodianId;
+                         entity.UnitId = ToUnitId;
+                         entity.DepartmentId = ToDepartmentId;  
+                         return entity;
+                     }).ToList();
+
+               
+
             string currentIp = _ipAddressService.GetSystemIPAddress();
             int userId = _ipAddressService.GetUserId();
             string username = _ipAddressService.GetUserName();
@@ -38,11 +52,14 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Command.CreateAssetT
             var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
             // :small_blue_diamond: Map Command to Entity
              var assetTransferReceiptHdr = _imapper.Map<Core.Domain.Entities.AssetMaster.AssetTransferReceiptHdr>(request.AssetTransferReceiptHdrDto);
+             var assetTransferissueHdr = _imapper.Map<Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr>(request.AssetTransferReceiptHdrDto.AssetTransferIssueHdr);
+             
+            
              assetTransferReceiptHdr.AuthorizedIP = currentIp;
              assetTransferReceiptHdr.AuthorizedDate = currentTime;
              assetTransferReceiptHdr.AuthorizedBy = userId;
              assetTransferReceiptHdr.AuthorizedByName = username;
-              var result =  await _iassettransferreceiptcommandrepository.CreateAsync(assetTransferReceiptHdr);
+            var result =  await _iassettransferreceiptcommandrepository.CreateAsync(assetTransferReceiptHdr,assetTransferissueHdr,assetLocation);
               //Domain Event
                   var domainEvent = new AuditLogsDomainEvent(
                       actionDetail: "Create",
@@ -58,7 +75,7 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Command.CreateAssetT
                        {
                            IsSuccess = true,
                            Message = "Asset Transfer Receipt created successfully",
-                           Data = result
+                           Data = assetTransferReceiptHdr.Id
                       };
                  }
                  return new ApiResponseDTO<int>
