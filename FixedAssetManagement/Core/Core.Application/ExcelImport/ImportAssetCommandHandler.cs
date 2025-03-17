@@ -112,8 +112,63 @@ namespace Core.Application.ExcelImport
                             {
                                 throw new Exception($"Invalid Asset Company Name '{getCompany}' at Excel Row {currentRow}");
                             }
+                            //AssetParentId
+                            int? assetParentId;
+                            string assetParent = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty;   
+                            if (assetParent == string.Empty)
+                            {
+                                assetParentId = (int?)null;
+                            }                          
+                            else{
+                                assetParentId = await _assetRepository.GetAssetIdByNameAsync(assetParent);
+                            }
+                            /*  //AssetManufacturer
+                            int? assetManufacturerId;
+                            string assetManufacturer = worksheet.Cells[row, 34].Value?.ToString() ?? string.Empty;   
+                            if (assetManufacturer == string.Empty)
+                            {
+                                assetManufacturerId =null;
+                            }                          
+                            else{
+                                assetManufacturerId = await _assetRepository.GetManufacturerIdByNameAsync(assetManufacturer);
+                            } */
+                            var assetSpecifications = new List<AssetSpecificationCombineDto>();
+                            // Parse and validate modalNumber
+                            string? modalNumber = string.IsNullOrWhiteSpace(worksheet.Cells[row, 35].Value?.ToString()) ? null : worksheet.Cells[row, 35].Value?.ToString()?.Trim();
+                            int? modalNumberId = modalNumber == null ? null : 9; // Assign SpecificationId only if modalNumber exists
+
+                           // Parse and validate serialNumber
+                            string? serialNumber = string.IsNullOrWhiteSpace(worksheet.Cells[row, 36].Value?.ToString()) ? null : worksheet.Cells[row, 36].Value?.ToString()?.Trim();
+                            int? serialNumberId = serialNumber == null ? null : 8; // Assign SpecificationId only if serialNumber exists
+                             // Parse and validate Make
+                            string? make = string.IsNullOrWhiteSpace(worksheet.Cells[row, 34].Value?.ToString()) ? null : worksheet.Cells[row, 34].Value?.ToString()?.Trim();
+                            int? makeId = serialNumber == null ? null : 7; // Assign SpecificationId only if serialNumber exists                            
+                            if (modalNumber != null)
+                            {
+                                assetSpecifications.Add(new AssetSpecificationCombineDto  
+                                {               
+                                    SpecificationId = modalNumberId,
+                                    SpecificationValue = modalNumber                                    
+                                });
+                            }
+                            if (make != null)
+                            {
+                                assetSpecifications.Add(new AssetSpecificationCombineDto  
+                                {               
+                                    SpecificationId = makeId,
+                                    SpecificationValue = make                                    
+                                });
+                            }                            
+                            if (serialNumber != null)
+                            {
+                                assetSpecifications.Add(new AssetSpecificationCombineDto  
+                                {               
+                                    SpecificationId = serialNumberId,
+                                    SpecificationValue = serialNumber                                    
+                                });
+                            }
                             var amount = decimal.TryParse(worksheet.Cells[row, 31].Value?.ToString(), out decimal parsedAmount) ? parsedAmount : 0;
-                            int? assetParentId = int.TryParse(worksheet.Cells[row, 10].Value?.ToString(), out int parsedAssetParentId)? parsedAssetParentId : (int?)null; 
+                            //int? assetParentId = int.TryParse(worksheet.Cells[row, 10].Value?.ToString(), out int parsedAssetParentId)? parsedAssetParentId : (int?)null; 
 
                             var assetDto = new AssetMasterDto
                             {
@@ -169,7 +224,7 @@ namespace Core.Application.ExcelImport
                                         BudgetType="CAPIT",
                                     }
                                 },                                  
-                                AssetAssetAdditionalCost = amount > 0  
+                                AssetAdditionalCost = amount > 0  
                                  ? new List<AssetAdditionalCostCombineDto>  
                                 {                                    
                                         new AssetAdditionalCostCombineDto  
@@ -180,8 +235,9 @@ namespace Core.Application.ExcelImport
                                             AssetSourceId=2                              
                                         }
                                     }
-                                 : null // ✅ Set to null if amount <= 0
-                                };                            
+                                 : null ,
+                                AssetSpecification = assetSpecifications.Count > 0 ? assetSpecifications : null  
+                            };                            
                             assetsDto.Add(assetDto);
                         }
                         catch (Exception ex)

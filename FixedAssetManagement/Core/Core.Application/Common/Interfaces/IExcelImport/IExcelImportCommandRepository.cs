@@ -15,5 +15,7 @@ namespace Core.Application.Common.Interfaces.IExcelImport
         Task<int?> GetAssetUOMIdByNameAsync(string assetGroupName);
         Task<int?> GetAssetLocationIdByNameAsync(string locationName);
         Task<int?> GetAssetSubLocationIdByNameAsync(string subLocationName);
+        Task<int?> GetAssetIdByNameAsync(string assetCode);
+        Task<int?> GetManufacturerIdByNameAsync(string manufacture);
     }
 }

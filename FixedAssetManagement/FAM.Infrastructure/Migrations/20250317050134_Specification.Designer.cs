@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250317050134_Specification")]
+    partial class Specification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -478,6 +481,12 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<DateTimeOffset?>("ManufactureDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("ManufactureId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
@@ -500,6 +509,8 @@ namespace FAM.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssetId");
+
+                    b.HasIndex("ManufactureId");
 
                     b.HasIndex("SpecificationId");
 
@@ -2169,6 +2180,11 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.Manufactures", "Manufacture")
+                        .WithMany("AssetSpecification")
+                        .HasForeignKey("ManufactureId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Core.Domain.Entities.SpecificationMasters", "SpecificationMaster")
                         .WithMany("AssetSpecification")
                         .HasForeignKey("SpecificationId")
@@ -2176,6 +2192,8 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("AssetMasterId");
+
+                    b.Navigation("Manufacture");
 
                     b.Navigation("SpecificationMaster");
                 });
@@ -2608,6 +2626,11 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetTransferReceiptLocation");
 
                     b.Navigation("SubLocations");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Manufactures", b =>
+                {
+                    b.Navigation("AssetSpecification");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>

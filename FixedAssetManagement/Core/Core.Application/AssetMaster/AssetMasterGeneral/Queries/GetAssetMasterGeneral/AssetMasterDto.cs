@@ -29,7 +29,8 @@
             public bool? Active { get; set; }        
             public AssetLocationCombineDto?  AssetLocation  { get; set; }
             public ICollection<AssetPurchaseCombineDto>? AssetPurchaseDetails{ get; set; }       
-            public ICollection<AssetAdditionalCostCombineDto>? AssetAssetAdditionalCost{ get; set; }       
+            public ICollection<AssetAdditionalCostCombineDto>? AssetAdditionalCost{ get; set; }       
+            public ICollection<AssetSpecificationCombineDto>? AssetSpecification{ get; set; } 
 
         }
     }

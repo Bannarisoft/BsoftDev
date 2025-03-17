@@ -28,7 +28,7 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
         {
             await _applicationDbContext.SaveChangesAsync();
         }
-        public async Task<bool> ImportAssetsAsync(List<AssetMasterDto> assetDtos, CancellationToken cancellationToken)
+        public async Task<bool> ImportAssetsAsync(List<AssetMasterDto> assetDto, CancellationToken cancellationToken)
         {
             var strategy = _applicationDbContext.Database.CreateExecutionStrategy();
 
@@ -38,7 +38,7 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
                 {
                     try
                     {
-                        foreach (var assetDto in assetDtos)
+                        foreach (var assetDto in assetDto)
                         {
                             var command = new CreateAssetMasterGeneralCommand { AssetMaster = assetDto };
 
@@ -70,19 +70,13 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
                 }
             });
         }
-
-
-
-
         // ✅ CreateAsync - Handles Single Asset Insert
         public async Task<AssetMasterGenerals?> CreateAsync(AssetMasterGenerals asset)
         {
             await _applicationDbContext.AssetMasterGenerals.AddAsync(asset);
             await _applicationDbContext.SaveChangesAsync();
-            return asset; // ✅ Return the inserted entity
+            return asset; 
         }
-
-
         public async Task<int?> GetAssetGroupIdByNameAsync(string assetGroupName)
         {
             var trimmedAssetGroupName = assetGroupName?.Trim(); // ✅ Trim input
@@ -90,7 +84,7 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
                 .Where(a => a.GroupName.Trim() == trimmedAssetGroupName && a.IsDeleted == 0) // ✅ Trim from DB column for safety
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
-            return assetGroup == 0 ? null : assetGroup; // ✅ Return null if not found
+            return assetGroup == 0 ? null : assetGroup; 
         }
 
         public async Task<int?> GetAssetCategoryIdByNameAsync(string assetCategoryName)
@@ -99,7 +93,7 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
             .Where(a => a.CategoryName == assetCategoryName  && a.IsDeleted == 0)
             .Select(a => a.Id)
             .FirstOrDefaultAsync();        
-            return assetCategory == 0 ? null : assetCategory; // Return null if not found
+            return assetCategory == 0 ? null : assetCategory;
         }
 
         public async Task<int?> GetAssetSubCategoryIdByNameAsync(string assetSubCategoryName)
@@ -108,7 +102,7 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
             .Where(a => a.SubCategoryName == assetSubCategoryName  && a.IsDeleted == 0) 
             .Select(a => a.Id)
             .FirstOrDefaultAsync();        
-            return assetSubCategory == 0 ? null : assetSubCategory; // Return null if not found
+            return assetSubCategory == 0 ? null : assetSubCategory; 
         }
 
         public async Task<int?> GetAssetUOMIdByNameAsync(string assetUOMName)
@@ -117,29 +111,43 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
             .Where(a => a.UOMName == assetUOMName  && a.IsDeleted == 0)
             .Select(a => a.Id)
             .FirstOrDefaultAsync();        
-            return assetUOM == 0 ? null : assetUOM; // Return null if not found
+            return assetUOM == 0 ? null : assetUOM;
         }
 
         public async Task<int?> GetAssetLocationIdByNameAsync(string locationName)
         {
-            
             var assetLocation = await _applicationDbContext.Locations
             .Where(a => a.LocationName == locationName  && a.IsDeleted == 0)
             .Select(a => a.Id)
             .FirstOrDefaultAsync();        
-            return assetLocation == 0 ? null : assetLocation; // Return null if not found
+            return assetLocation == 0 ? null : assetLocation; 
         }
 
         public async Task<int?> GetAssetSubLocationIdByNameAsync(string subLocationName)
         {
-            
             var assetSubLocation= await _applicationDbContext.SubLocations
             .Where(a => a.SubLocationName == subLocationName  && a.IsDeleted == 0)
             .Select(a => a.Id)
             .FirstOrDefaultAsync();        
-            return assetSubLocation == 0 ? null : assetSubLocation; // Return null if not found
+            return assetSubLocation == 0 ? null : assetSubLocation; 
         }
 
-      
+        public async Task<int?> GetAssetIdByNameAsync(string assetCode)
+        {
+            var assetMaster = await _applicationDbContext.AssetMasterGenerals
+            .Where(a => a.AssetCode == assetCode  && a.IsDeleted == 0)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();        
+            return assetMaster == 0 ? null : assetMaster;
+        }
+
+        public async Task<int?> GetManufacturerIdByNameAsync(string manufacture)
+        {
+            var assetManufacturer = await _applicationDbContext.Manufactures
+            .Where(a => a.ManufactureName == manufacture  && a.IsDeleted == 0)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();        
+            return assetManufacturer == 0 ? null : assetManufacturer; 
+        }
     }
 }
