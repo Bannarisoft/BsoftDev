@@ -29,7 +29,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetCodePa
             var assetCodePattern = MiscEnumEntity.Asset_CodePattern.MiscCode;
 
             // Add AssetCodePattern to each item in the list
-            assetCodeList.ForEach(x => x.MiscTypeCode = assetCodePattern);
+            assetCodeList.ForEach(x => x.Code = assetCodePattern);
             return new ApiResponseDTO<List<GetMiscMasterDto>>
             {
                 IsSuccess = true,
