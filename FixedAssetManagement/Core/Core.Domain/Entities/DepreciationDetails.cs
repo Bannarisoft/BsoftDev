@@ -6,7 +6,7 @@ namespace Core.Domain.Entities
     {        
         public int CompanyId { get; set; } 
         public int UnitId { get; set; } 
-        public string? Finyear { get; set; }        
+        public int? Finyear { get; set; }        
         public DateTimeOffset? StartDate { get; set; }    
         public DateTimeOffset? EndDate { get; set; }                    
         public int DepreciationType { get; set; }

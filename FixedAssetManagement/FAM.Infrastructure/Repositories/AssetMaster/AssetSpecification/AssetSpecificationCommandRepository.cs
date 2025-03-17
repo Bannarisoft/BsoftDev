@@ -36,13 +36,9 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
             if (existingAssetSpecGroup != null)
             {
                 existingAssetSpecGroup.AssetId = assetSpecifications.AssetId;
-                existingAssetSpecGroup.ManufactureId = assetSpecifications.ManufactureId;                
-                existingAssetSpecGroup.ManufactureDate = assetSpecifications.ManufactureDate;
                 existingAssetSpecGroup.IsActive = assetSpecifications.IsActive;
                 existingAssetSpecGroup.SpecificationId = assetSpecifications.SpecificationId;
                 existingAssetSpecGroup.SpecificationValue = assetSpecifications.SpecificationValue;
-                existingAssetSpecGroup.SerialNumber = assetSpecifications.SerialNumber;
-                existingAssetSpecGroup.ModelNumber = assetSpecifications.ModelNumber;
                 _applicationDbContext.AssetSpecifications.Update(existingAssetSpecGroup);
                 return await _applicationDbContext.SaveChangesAsync();
             }

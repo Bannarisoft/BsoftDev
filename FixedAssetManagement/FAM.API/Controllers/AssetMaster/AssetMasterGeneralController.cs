@@ -9,10 +9,11 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGene
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById;
 using Core.Application.DepreciationGroup.Queries.GetAssetTypeQuery;
 using Core.Application.DepreciationGroup.Queries.GetWorkingStatusQuery;
+using Core.Application.ExcelImport;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-
+using Swashbuckle.AspNetCore.Annotations;
 namespace FAM.API.Controllers.AssetMaster
 {
     [ApiController]
@@ -323,6 +324,20 @@ namespace FAM.API.Controllers.AssetMaster
                 message = file.Message, 
                 errors = ""
             });
+        }
+        //Excel Import
+        [HttpPost("import")]
+        public async Task<IActionResult> Import([FromForm] ImportAssetDto dto)
+        {
+            if (dto.File == null || dto.File.Length == 0)
+                return BadRequest("Please upload a valid Excel file.");
+
+            var result = await Mediator.Send(new ImportAssetCommand(dto));
+
+            if (result)
+                return Ok("File uploaded and data saved successfully.");
+            else
+                return StatusCode(500, "An error occurred while processing the file.");
         }
     }
 }

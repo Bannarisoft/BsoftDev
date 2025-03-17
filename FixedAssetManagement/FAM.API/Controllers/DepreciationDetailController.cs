@@ -23,7 +23,7 @@ namespace FAM.API.Controllers
         [HttpGet]
         public async Task<IActionResult> DepreciationCalculateAsync( [FromQuery] int companyId, 
         [FromQuery] int unitId, 
-        [FromQuery] string finYear,
+        [FromQuery] int finYearId,
         [FromQuery] string? startDate,
         [FromQuery] string? endDate,
         [FromQuery] int depreciationType,
@@ -58,7 +58,7 @@ namespace FAM.API.Controllers
                 {
                     companyId=companyId,
                     unitId=unitId,
-                    finYear=finYear,
+                    finYearId=finYearId,
                     startDate=parsedStartDate,
                     endDate=parsedEndDate,
                     depreciationType=depreciationType,
@@ -79,14 +79,36 @@ namespace FAM.API.Controllers
         }
          [HttpGet("Abstract")]
         public async Task<IActionResult> DepreciationAbstractAsync( [FromQuery] int companyId, 
-        [FromQuery] int unitId,[FromQuery] string finYear,[FromQuery] int depreciationPeriod,[FromQuery] int depreciationType)
-        {             
+        [FromQuery] int unitId,[FromQuery] int finYearId,[FromQuery] string? startDate,[FromQuery] string? endDate,[FromQuery] int depreciationPeriod,[FromQuery] int depreciationType)
+        {            
+            DateTimeOffset? parsedStartDate = null;
+            DateTimeOffset? parsedEndDate = null;
+
+            if (!string.IsNullOrWhiteSpace(startDate))  // Allow null or empty values
+            {
+                if (!DateTimeOffset.TryParse(startDate, out var parsedDate))
+                {
+                    return BadRequest(new { message = "Invalid startDate format. Use yyyy-MM-dd." });
+                }
+                parsedStartDate = parsedDate;
+            }
+
+            if (!string.IsNullOrWhiteSpace(endDate))  // Allow null or empty values
+            {
+                if (!DateTimeOffset.TryParse(endDate, out var parsedDate))
+                {
+                    return BadRequest(new { message = "Invalid endDate format. Use yyyy-MM-dd." });
+                }
+                parsedEndDate = parsedDate;
+            } 
              var assetMaster = await Mediator.Send(
                 new GetDepreciationAbstractQuery
                 {
                     companyId=companyId,
                     unitId=unitId,
-                    finYear=finYear,
+                    finYearId=finYearId,
+                    startDate=parsedStartDate,
+                    endDate=parsedEndDate,
                     depreciationPeriod=depreciationPeriod,
                     depreciationType=depreciationType                    
                 });
@@ -122,7 +144,7 @@ namespace FAM.API.Controllers
         [HttpDelete]        
         public async Task<IActionResult> DeleteAsync(DeleteDepreciationDetailCommand  command)
         {             
-            var result = await Mediator.Send(new DeleteDepreciationDetailCommand { companyId=command.companyId,unitId=command.unitId,finYear=command.finYear,depreciationType=command.depreciationType,depreciationPeriod=command.depreciationPeriod});                 
+            var result = await Mediator.Send(new DeleteDepreciationDetailCommand { companyId=command.companyId,unitId=command.unitId,finYearId=command.finYearId,depreciationType=command.depreciationType,depreciationPeriod=command.depreciationPeriod});                 
             if (!result.IsSuccess)
             {                
                 return NotFound(new     
@@ -141,7 +163,7 @@ namespace FAM.API.Controllers
          [HttpPut]        
         public async Task<IActionResult> UpdateAsync(DeleteDepreciationDetailCommand  command)
         {             
-            var result = await Mediator.Send(new UpdateDepreciationDetailCommand { companyId=command.companyId,unitId=command.unitId,finYear=command.finYear,depreciationType=command.depreciationType,depreciationPeriod=command.depreciationPeriod});                 
+            var result = await Mediator.Send(new UpdateDepreciationDetailCommand { companyId=command.companyId,unitId=command.unitId,finYearId=command.finYearId,depreciationType=command.depreciationType,depreciationPeriod=command.depreciationPeriod});                 
             if (!result.IsSuccess)
             {                
                 return NotFound(new     

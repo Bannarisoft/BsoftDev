@@ -16,12 +16,12 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
         }
 
         
-        public async Task<int> DeleteAsync(int companyId, int unitId, string finYear, int depreciationType,int depreciationPeriod)
+        public async Task<int> DeleteAsync(int companyId, int unitId, int finYearId, int depreciationType,int depreciationPeriod)
         {
             var depreciationDetails = await _applicationDbContext.DepreciationDetails
                 .Where(d => d.CompanyId == companyId &&
                                            (unitId == 0 || d.UnitId == unitId) &&
-                                          d.Finyear == finYear &&
+                                          d.Finyear == finYearId &&
                                           d.DepreciationPeriod == depreciationPeriod && d.DepreciationType==depreciationType ).ToListAsync();        
             if (depreciationDetails != null)
             {
@@ -31,12 +31,12 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             return 0;
         }
 
-        public async Task<int> UpdateAsync(int companyId, int unitId, string finYear, int depreciationType, int depreciationPeriod)
+        public async Task<int> UpdateAsync(int companyId, int unitId, int finYearId, int depreciationType, int depreciationPeriod)
         {
             var depreciationDetails = await _applicationDbContext.DepreciationDetails
                 .Where(d => d.CompanyId == companyId &&
                                            (unitId == 0 || d.UnitId == unitId) &&
-                                          d.Finyear == finYear &&
+                                          d.Finyear == finYearId &&
                                           d.DepreciationPeriod == depreciationPeriod && d.DepreciationType==depreciationType ).ToListAsync();        
             if (depreciationDetails != null)
             {                 

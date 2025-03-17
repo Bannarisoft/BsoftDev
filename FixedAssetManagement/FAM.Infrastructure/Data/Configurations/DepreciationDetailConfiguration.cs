@@ -28,8 +28,8 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired(); 
 
-                builder.Property(dg => dg.Finyear)                
-                .HasColumnType("varchar(10)")
+                builder.Property(dg => dg.Finyear )                
+                .HasColumnType("int")
                 .IsRequired(); 
 
                  builder.Property(dg => dg.StartDate)                

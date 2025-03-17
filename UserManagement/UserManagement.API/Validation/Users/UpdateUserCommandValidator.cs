@@ -74,12 +74,7 @@ namespace UserManagement.API.Validation.Users
                         .WithMessage($"{nameof(UpdateUserCommand.PasswordHash)} {rule.Error}");
                         break;  
                     
-                    case "UserType":
-                        RuleFor(x => x.UserType)
-                            .InclusiveBetween(1, 2) // Assuming UserType should be between 1 and 2
-                            .WithMessage($"{nameof(UpdateUserCommand.UserType)} {rule.Error}");
-                        break;   
-                         case "AlreadyExists":
+                    case "AlreadyExists":
                            RuleFor(x =>  new { x.UserName, x.UserId })
                            .MustAsync(async (user, cancellation) => 
                         !await _userQueryRepository.AlreadyExistsAsync(user.UserName, user.UserId))             

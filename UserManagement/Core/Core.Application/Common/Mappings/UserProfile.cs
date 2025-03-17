@@ -20,7 +20,8 @@ public class UserProfile : Profile
         .ForMember(dest => dest.userDivisions, opt => opt.MapFrom(src => src.userDivisions))
         .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
         .ForMember(dest => dest.IsFirstTimeUser, opt => opt.MapFrom(src => FirstTimeUserStatus.Yes))
-        .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+        .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
+        .ForMember(dest => dest.UserType, opt => opt.MapFrom(src => 1));
 
         CreateMap<UserCompanyDTO, UserCompany>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -60,7 +61,8 @@ public class UserProfile : Profile
         .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.userUnits))
         .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
         .ForMember(dest => dest.IsFirstTimeUser, opt => opt.Ignore())
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
+        .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive))
+        .ForMember(dest => dest.UserType, opt => opt.MapFrom(src => 1));            
 
         CreateMap<DeleteUserCommand, User>()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId)) // Map UserRoleId to Id
