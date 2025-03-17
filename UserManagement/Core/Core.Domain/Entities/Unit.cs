@@ -12,7 +12,9 @@ public string? UnitName { get; set; }
 
 public string? ShortName { get; set; }
 public int CompanyId { get; set; }
+public Company Company { get; set; }
 public int DivisionId { get; set; }
+public Division Division { get; set; }
 public string? UnitHeadName { get; set; }
 public string? CINNO {get; set;}
 public string? OldUnitId { get; set;}

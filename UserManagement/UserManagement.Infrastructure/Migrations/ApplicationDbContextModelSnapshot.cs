@@ -744,6 +744,8 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompanyId");
+
                     b.ToTable("Division", "AppData");
                 });
 
@@ -1546,6 +1548,10 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("DivisionId");
+
                     b.ToTable("Unit", "AppData");
                 });
 
@@ -1672,10 +1678,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int?>("DivisionId")
-                        .HasColumnType("int")
-                        .HasColumnName("DivisionId");
-
                     b.Property<string>("EmailId")
                         .IsRequired()
                         .HasColumnType("varchar(100)")
@@ -1730,6 +1732,10 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("PasswordHash");
 
+                    b.Property<int?>("UserGroupId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserGroupId");
+
                     b.Property<string>("UserName")
                         .HasColumnType("varchar(50)")
                         .HasColumnName("UserName");
@@ -1741,6 +1747,8 @@ namespace UserManagement.Infrastructure.Migrations
                     b.HasKey("UserId");
 
                     b.HasIndex("EntityId");
+
+                    b.HasIndex("UserGroupId");
 
                     b.ToTable("Users", "AppSecurity");
                 });
@@ -1773,6 +1781,36 @@ namespace UserManagement.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserCompany", "AppSecurity");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.UserDivision", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DivisionId")
+                        .HasColumnType("int")
+                        .HasColumnName("DivisionId");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DivisionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserDivision", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserGroup", b =>
@@ -1831,33 +1869,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserGroup", "AppSecurity");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.UserGroupUsers", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("UserGroupId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserGroupId");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserGroupId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("UserGroupUsers", "AppSecurity");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
@@ -2106,6 +2117,17 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("company");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Division", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Company", "Company")
+                        .WithMany("Divisions")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Menu", "Parent")
@@ -2242,6 +2264,25 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("Countries");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Unit", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Company", "Company")
+                        .WithMany("Units")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Division", "Division")
+                        .WithMany("Units")
+                        .HasForeignKey("DivisionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Division");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.UnitAddress", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Unit", "Unit")
@@ -2270,7 +2311,14 @@ namespace UserManagement.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("EntityId");
 
+                    b.HasOne("Core.Domain.Entities.UserGroup", "UserGroup")
+                        .WithMany("Users")
+                        .HasForeignKey("UserGroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Entity");
+
+                    b.Navigation("UserGroup");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserCompany", b =>
@@ -2292,23 +2340,23 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("user");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.UserGroupUsers", b =>
+            modelBuilder.Entity("Core.Domain.Entities.UserDivision", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.UserGroup", "UserGroup")
-                        .WithMany("UserGroupUsers")
-                        .HasForeignKey("UserGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("Core.Domain.Entities.Division", "division")
+                        .WithMany("UserDivisions")
+                        .HasForeignKey("DivisionId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.User", "User")
-                        .WithOne("UserGroupUsers")
-                        .HasForeignKey("Core.Domain.Entities.UserGroupUsers", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("Core.Domain.Entities.User", "user")
+                        .WithMany("userDivisions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("division");
 
-                    b.Navigation("UserGroup");
+                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRoleAllocation", b =>
@@ -2369,6 +2417,10 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("CompanySettings")
                         .IsRequired();
 
+                    b.Navigation("Divisions");
+
+                    b.Navigation("Units");
+
                     b.Navigation("UserCompanies");
                 });
 
@@ -2381,6 +2433,13 @@ namespace UserManagement.Infrastructure.Migrations
                 {
                     b.Navigation("CompanySettings")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Division", b =>
+                {
+                    b.Navigation("Units");
+
+                    b.Navigation("UserDivisions");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Entity", b =>
@@ -2439,16 +2498,16 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.Navigation("UserCompanies");
 
-                    b.Navigation("UserGroupUsers");
-
                     b.Navigation("UserRoleAllocations");
 
                     b.Navigation("UserUnits");
+
+                    b.Navigation("userDivisions");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserGroup", b =>
                 {
-                    b.Navigation("UserGroupUsers");
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>

@@ -197,7 +197,7 @@ namespace UserManagement.API.Controllers
          [HttpGet("by-name")]
         public async Task<IActionResult> GetCompany([FromQuery] string? name)
         {
-           
+            
             var companies = await Mediator.Send(new GetCompanyAutoCompleteQuery {SearchPattern = name});
             return Ok(new 
             { StatusCode=StatusCodes.Status200OK, 

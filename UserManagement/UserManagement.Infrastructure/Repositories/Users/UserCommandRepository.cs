@@ -61,13 +61,6 @@ namespace UserManagement.Infrastructure.Repositories
             });
 
 
-        // Fallback policy: Return 0 or a default value in case of failure
-            //   _fallbackPolicy = Policy
-            //     .Handle<Exception>()
-            //     .FallbackAsync(async (cancellationToken) =>
-            //     {
-            //         Log.Warning("Executing fallback policy due to a failure.");
-            //     });
         }
 
           public async Task<User> CreateAsync(User user)
@@ -129,6 +122,7 @@ namespace UserManagement.Infrastructure.Repositories
                     .Include(uc => uc.UserCompanies)
                     .Include(ur => ur.UserRoleAllocations)
                     .Include(uu => uu.UserUnits)
+                    .Include(ud => ud.userDivisions)
                     .FirstOrDefaultAsync(u => u.UserId == userId);
                     if (existingUser != null)
                     {
@@ -140,10 +134,6 @@ namespace UserManagement.Infrastructure.Repositories
                         existingUser.UserType = user.UserType;
                         existingUser.Mobile = user.Mobile;
                         existingUser.EmailId = user.EmailId;
-                        // existingUser.CompanyId = user.CompanyId;
-                        existingUser.DivisionId = user.DivisionId;
-                        // existingUser.UnitId = user.UnitId;
-                        // existingUser.UserRoleId = user.UserRoleId;
                         existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
                         existingUser.IsActive = user.IsActive;
 
@@ -202,6 +192,26 @@ namespace UserManagement.Infrastructure.Repositories
                               {
                                   UserId = existingUser.UserId,
                                   UnitId = newUnitId,
+                                  IsActive = 1
+                              });
+                          }
+
+                           var updatedDivisionIds = user.userDivisions.Select(ur => ur.DivisionId).ToList();
+                          foreach (var existingDivision in existingUser.userDivisions)
+                          {
+                              existingDivision.IsActive = updatedDivisionIds.Contains(existingDivision.DivisionId) ? (byte)1 : (byte)0;
+                          }
+
+                          var newDivisionIds = updatedDivisionIds
+                              .Where(id => !existingUser.userDivisions.Any(ur => ur.DivisionId == id))
+                              .ToList();
+
+                          foreach (var newDivisionId in newDivisionIds)
+                          {
+                              existingUser.userDivisions.Add(new Core.Domain.Entities.UserDivision
+                              {
+                                  UserId = existingUser.UserId,
+                                  DivisionId = newDivisionId,
                                   IsActive = 1
                               });
                           }

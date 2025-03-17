@@ -24,8 +24,10 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
         }
         
 
+
          public async Task<(List<AssetTransferDto>, int)> GetAllAsync(int PageNumber, int PageSize ,string? SearchTerm, DateTimeOffset? FromDate , DateTimeOffset? ToDate )        
         {
+
                 var query = $$"""
             DECLARE @TotalCount INT;
             SELECT @TotalCount = COUNT(*) 
@@ -34,6 +36,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
              {{(FromDate.HasValue ? "AND DocDate >= @FromDate" : "")}}
             {{(ToDate.HasValue ? "AND DocDate <= @ToDate" : "")}}
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(Id AS NVARCHAR) LIKE @Search)") }};
+
 
             SELECT Id, DocDate, TransferType, FromUnitId, ToUnitId, 
                 FromDepartmentId, ToDepartmentId, FromCustodianId, ToCustodianId, 
@@ -49,8 +52,10 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
             ORDER BY Id DESC
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
+
             SELECT @TotalCount AS TotalCount;
             """;
+
 
             var parameters = new
             {  
@@ -61,9 +66,11 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                 PageSize               
             };
 
+
             var assetTransfers = await _dbConnection.QueryMultipleAsync(query, parameters);
             var assetTransferList = (await assetTransfers.ReadAsync<AssetTransferDto>()).ToList();
             int totalCount = await assetTransfers.ReadFirstAsync<int>();
+
 
             return (assetTransferList, totalCount);
    }
@@ -189,4 +196,5 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                         return result.ToList();      
                 }   
     }
+
 }

@@ -9,5 +9,6 @@ namespace Core.Application.Units.Queries.GetUnits
     {
          public int Id { get; set; }
          public string? UnitName { get; set; }
+         public int DivisionId { get; set; }
     }
 }
