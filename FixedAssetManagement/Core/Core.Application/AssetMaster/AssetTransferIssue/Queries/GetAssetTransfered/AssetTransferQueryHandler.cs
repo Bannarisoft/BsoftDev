@@ -25,16 +25,16 @@ namespace Core.Application.AssetMaster.AssetTransfer.Queries.GetAssetTransfered
          public  async Task<ApiResponseDTO<List<AssetTransferDto>>> Handle(AssetTransferQuery request, CancellationToken cancellationToken)        
         {
            // var (assetInsurance, totalCount) = await _assetInsuranceQueryRepository.GetAllAssetInsuranceAsync(request.PageNumber, request.PageSize, request.SearchTerm);
-            var (assetInsurance, totalCount)  = await _assetTransferQueryRepository.GetAllAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+            var (assetTransferList, totalCount)  = await _assetTransferQueryRepository.GetAllAsync(request.PageNumber, request.PageSize, request.SearchTerm ,request.FromDate, request.ToDate);
           //  var totalCount = assetInsurance.Count;
-            var assetinsuranceList = _mapper.Map<List<AssetTransferDto>>(assetInsurance);
+            var AssetTransferList = _mapper.Map<List<AssetTransferDto>>(assetTransferList);
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetAll",
                 actionCode: "",        
                 actionName: "",
-                details: $"Asset Insurance details was fetched.",
+                details: $"Asset Transfer    details was fetched.",
                 module:"Asset Insurance"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
@@ -42,7 +42,7 @@ namespace Core.Application.AssetMaster.AssetTransfer.Queries.GetAssetTransfered
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = assetinsuranceList,
+                Data = AssetTransferList,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize                
