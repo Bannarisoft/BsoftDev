@@ -56,9 +56,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Command.UpdateAssetTra
                 }
 
                 // 🔹 Convert DTO to Domain Entity
-                var assetTransferIssueHdr = _mapper.Map<Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr>(request.AssetTransferHdr);
-
-                
+                var assetTransferIssueHdr = _mapper.Map<Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr>(request.AssetTransferHdr);                
                 assetTransferIssueHdr.ModifiedDate = _timeZoneService.GetCurrentTime(_timeZoneService.GetSystemTimeZone());
                 assetTransferIssueHdr.ModifiedBy = _ipAddressService.GetUserId();
                 assetTransferIssueHdr.ModifiedByName = _ipAddressService.GetUserName();
@@ -81,75 +79,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Command.UpdateAssetTra
                 {
                     IsSuccess = false,
                     Message = "Asset Transfer update failed"
-                };
-            // Validate Request
-        //     var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        //     if (!validationResult.IsValid)
-        //     {
-        //         return new ApiResponseDTO<int>
-        //         {
-        //             IsSuccess = false,
-        //             Message = "Validation failed",
-        //             Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
-        //         };
-        //     }
-
-        //     // Retrieve Existing Record from Query Repository
-        //     var existingRecord = await _assetTransferQueryRepository.GetAssetTransferByIdAsync(request.assetTransferJsonDto.AssetTransferId);
-            
-        //     if (existingRecord == null)
-        //     {
-        //         return new ApiResponseDTO<int>
-        //         {
-        //             IsSuccess = false,
-        //             Message = "Asset Transfer Issue not found."
-        //         };
-        //     }
-
-        //     // Get System Details
-        //     string currentIp = _ipAddressService.GetSystemIPAddress();
-        //     int userId = _ipAddressService.GetUserId();
-        //     string username = _ipAddressService.GetUserName();
-        //     var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
-        //     var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
-
-        //     // Map Changes
-        //    // var existingRecord = _mapper.Map<AssetTransferIssueHdr>(existingRecordDto);
-        //     var updatedEntity = _mapper.Map(request.assetTransferJsonDto, existingRecord);
-        //     updatedEntity.ModifiedIP = currentIp;
-        //     updatedEntity.ModifiedDate = currentTime;
-        //     updatedEntity.ModifiedBy = userId;
-        //     updatedEntity.ModifiedByName = username;
-
-        //     // Save Changes in Command Repository
-        //     var result = await _assetTransferCommandRepository.UpdateAssetTransferAsync(updatedEntity);
-
-        //     // Publish Event
-        //     var domainEvent = new AuditLogsDomainEvent(
-        //         actionDetail: "Update",
-        //         actionCode: updatedEntity.AssetTransferId.ToString(),
-        //         actionName: "Asset Transfer",
-        //         details: $"Asset Transfer '{updatedEntity.AssetTransferId}' was updated.",
-        //         module: "Asset Transfer"
-        //     );
-
-        //     await _mediator.Publish(domainEvent, cancellationToken);
-
-        //     // Return Response
-        //     if (result > 0)
-        //     {
-        //         return new ApiResponseDTO<int>
-        //         {
-        //             IsSuccess = true,
-        //             Message = "Asset Transfer updated successfully",
-        //             Data = result
-        //         };
-        //     }
-        //     return new ApiResponseDTO<int>
-        //     {
-        //         IsSuccess = false,
-        //         Message = "Asset Transfer update failed"
-        //     };
+                };           
         }
 
         // public Task<ApiResponseDTO<int>> Handle(UpdateAssetTransferIssueCommand request, CancellationToken cancellationToken)
