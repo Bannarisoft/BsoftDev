@@ -8,6 +8,7 @@ using Core.Application.AssetCategories.Command.DeleteAssetCategories;
 using Core.Application.AssetCategories.Command.UpdateAssetCategories;
 using Core.Application.AssetCategories.Queries.GetAssetCategories;
 using Core.Application.AssetCategories.Queries.GetAssetCategoriesAutoComplete;
+using Core.Application.AssetCategories.Queries.GetAssetCategoriesByAssetGroupId;
 using Core.Application.AssetCategories.Queries.GetAssetCategoriesById;
 using FluentValidation;
 using MediatR;
@@ -177,6 +178,21 @@ public async Task<IActionResult> DeleteAssetCategoriesAsync(int id)
         });
    
 }
+
+        [HttpGet("group/{AssetGroupId}")]
+        [ActionName(nameof(GetAssetCategoryBasedonGroupId))]
+        public async Task<IActionResult> GetAssetCategoryBasedonGroupId(int AssetGroupId)
+        {
+            var assetcategory = await Mediator.Send(new GetAssetCategoriesByAssetGroupIdQuery() { AssetGroupId = AssetGroupId});
+          
+            if(assetcategory.IsSuccess)
+            {
+                
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetcategory.Data,message = assetcategory.Message });
+            }
+            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetcategory.Message });
+           
+        }
 
 
     }

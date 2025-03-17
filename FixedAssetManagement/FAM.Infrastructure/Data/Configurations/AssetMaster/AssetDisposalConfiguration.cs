@@ -60,10 +60,10 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .HasColumnType("int")                
                 .IsRequired();
 
-            // One-to-One: MiscMaster (DisposalType)
+            // One-to-Many: MiscMaster (DisposalType)
             builder.HasOne(ad => ad.AssetMiscDisposalType)
-                   .WithOne(ad => ad.AssetMiscDisposalType)
-                   .HasForeignKey<AssetDisposal>(ad => ad.DisposalType)
+                   .WithMany(ad => ad.AssetMiscDisposalType)
+                   .HasForeignKey(ad => ad.DisposalType)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(dg => dg.DisposalReason)
