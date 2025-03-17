@@ -1,37 +1,38 @@
-using Infrastructure.Printing;
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Core.Application.QRCode;
 using MediatR;
 
-namespace Core.Application.QRCode
+namespace Application.Features.QRCode.Handlers
 {
-    public class PrintQRCodeCommandHandler  : IRequestHandler<PrintQRCodeCommand, bool>
+    public class PrintQRCodeCommandHandler : IRequestHandler<PrintQRCodeCommand, bool>
     {
         public async Task<bool> Handle(PrintQRCodeCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                // 🔥 ZPL Format for QR Code (Zebra Label Printing)
-                string zpl = $@"
-^XA
-^FO50,50^BQN,2,10
-^FDLA,{request.Content}^FS
-^XZ";
+                // ✅ Generate CPCL Command for Citizen Printer
+                string cpcl = $@"
+! 0 200 200 400 1
+TEXT 4 0 50 50 QR Code:
+B QR 50 100 M 2 U 6
+{request.Content}
+ENDQR
+PRINT
+";
 
-                // ✅ Send ZPL Data to the Zebra Printer
-                SendToPrinter(request.PrinterName, zpl);
-                
-                return true;
+                byte[] cpclBytes = Encoding.ASCII.GetBytes(cpcl);
+
+                // ✅ Send to Citizen Printer
+                return RawPrinterHelper.SendToPrinter(request.PrinterName, cpclBytes);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("❌ Error Printing QR Code: " + ex.Message);
+                Console.WriteLine($"❌ Error Printing: {ex.Message}");
                 return false;
             }
-        }
-
-        private void SendToPrinter(string printerName, string zplData)
-        {
-            byte[] zplBytes = System.Text.Encoding.ASCII.GetBytes(zplData);
-            RawPrinterHelper.SendToPrinter(printerName, zplBytes);
         }
     }
 }

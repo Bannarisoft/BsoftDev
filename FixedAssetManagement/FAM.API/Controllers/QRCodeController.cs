@@ -15,7 +15,7 @@ namespace WebAPI.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("print")]
+          [HttpPost("print")]
         public async Task<IActionResult> PrintQRCode([FromBody] PrintQRCodeCommand command)
         {
             if (string.IsNullOrEmpty(command.Content) || string.IsNullOrEmpty(command.PrinterName))
@@ -24,7 +24,7 @@ namespace WebAPI.Controllers
             bool result = await _mediator.Send(command);
 
             if (result)
-                return Ok("✅ QR Code sent to Zebra Printer successfully.");
+                return Ok("✅ QR Code sent to Citizen Printer successfully.");
             else
                 return StatusCode(500, "❌ Failed to print QR Code.");
         }
