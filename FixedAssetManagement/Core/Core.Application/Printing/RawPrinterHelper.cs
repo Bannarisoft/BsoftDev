@@ -1,99 +1,97 @@
 using System;
 using System.Runtime.InteropServices;
 
-public class RawPrinterHelper
+namespace Infrastructure.Printing
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct DOCINFOA
+    public class RawPrinterHelper
     {
-        [MarshalAs(UnmanagedType.LPStr)]
-        public string pDocName;
+        [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool OpenPrinter(string pPrinterName, out IntPtr hPrinter, IntPtr pDefault);
 
-        [MarshalAs(UnmanagedType.LPStr)]
-        public string pOutputFile;
+        [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool ClosePrinter(IntPtr hPrinter);
 
-        [MarshalAs(UnmanagedType.LPStr)]
-        public string pDataType;
-    }
+        [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool StartDocPrinter(IntPtr hPrinter, int level, ref DOCINFOA pDocInfo);
 
-    [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
-    public static extern bool OpenPrinter(string pPrinterName, out IntPtr hPrinter, IntPtr pDefault);
+        [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool EndDocPrinter(IntPtr hPrinter);
 
-    [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
-    public static extern bool ClosePrinter(IntPtr hPrinter);
+        [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool StartPagePrinter(IntPtr hPrinter);
 
-    [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
-    public static extern bool StartDocPrinter(IntPtr hPrinter, int level, ref DOCINFOA pDocInfo);
+        [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool EndPagePrinter(IntPtr hPrinter);
 
-    [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
-    public static extern bool EndDocPrinter(IntPtr hPrinter);
+        [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool WritePrinter(IntPtr hPrinter, byte[] pBuf, int cdBuf, out int pcWritten);
 
-    [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
-    public static extern bool StartPagePrinter(IntPtr hPrinter);
-
-    [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
-    public static extern bool EndPagePrinter(IntPtr hPrinter);
-
-    [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
-    public static extern bool WritePrinter(IntPtr hPrinter, byte[] pBuf, int cdBuf, out int pcWritten);
-
-    public static bool SendToPrinter(string printerName, byte[] rawBytes)
-    {
-        IntPtr hPrinter;
-
-        if (!OpenPrinter(printerName, out hPrinter, IntPtr.Zero))
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public class DOCINFOA
         {
-            Console.WriteLine($"❌ Failed to open printer: {printerName}");
-            return false;
+            public string pDocName;
+            public string pOutputFile;
+            public string pDataType;
         }
 
-        try
+        public static bool SendToPrinter(string printerName, byte[] rawBytes)
         {
-            DOCINFOA docInfo = new DOCINFOA
-            {
-                pDocName = "Zebra Print Job",
-                pOutputFile = null,
-                pDataType = "RAW"
-            };
+            IntPtr hPrinter;
 
-            if (!StartDocPrinter(hPrinter, 1, ref docInfo))
+            if (!OpenPrinter(printerName, out hPrinter, IntPtr.Zero))
             {
-                Console.WriteLine("❌ Failed to start document.");
+                Console.WriteLine($"❌ Failed to open printer: {printerName}");
                 return false;
             }
 
             try
             {
-                if (!StartPagePrinter(hPrinter))
+                DOCINFOA docInfo = new DOCINFOA
                 {
-                    Console.WriteLine("❌ Failed to start page.");
+                    pDocName = "Print Job",
+                    pOutputFile = null,
+                    pDataType = "RAW"
+                };
+
+                if (!StartDocPrinter(hPrinter, 1, ref docInfo))
+                {
+                    Console.WriteLine("❌ Failed to start document.");
                     return false;
                 }
 
                 try
                 {
-                    if (!WritePrinter(hPrinter, rawBytes, rawBytes.Length, out _))
+                    if (!StartPagePrinter(hPrinter))
                     {
-                        Console.WriteLine("❌ Failed to write data.");
+                        Console.WriteLine("❌ Failed to start page.");
                         return false;
+                    }
+
+                    try
+                    {
+                        if (!WritePrinter(hPrinter, rawBytes, rawBytes.Length, out _))
+                        {
+                            Console.WriteLine("❌ Failed to write data.");
+                            return false;
+                        }
+                    }
+                    finally
+                    {
+                        EndPagePrinter(hPrinter);
                     }
                 }
                 finally
                 {
-                    EndPagePrinter(hPrinter);
+                    EndDocPrinter(hPrinter);
                 }
             }
             finally
             {
-                EndDocPrinter(hPrinter);
+                ClosePrinter(hPrinter);
             }
-        }
-        finally
-        {
-            ClosePrinter(hPrinter);
-        }
 
-        Console.WriteLine("✅ Print job sent successfully.");
-        return true;
+            Console.WriteLine("✅ Print job sent successfully.");
+            return true;
+        }
     }
 }

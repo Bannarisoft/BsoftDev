@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Application.QRCode;
+using Infrastructure.Printing;
 using MediatR;
 
 namespace Application.Features.QRCode.Handlers
@@ -13,20 +14,14 @@ namespace Application.Features.QRCode.Handlers
         {
             try
             {
-                // ✅ Generate CPCL Command for Citizen Printer
-                string cpcl = $@"
-! 0 200 200 400 1
-TEXT 4 0 50 50 QR Code:
-B QR 50 100 M 2 U 6
-{request.Content}
-ENDQR
-PRINT
-";
+                if (string.IsNullOrEmpty(request.Content) || string.IsNullOrEmpty(request.PrinterName))
+                    throw new ArgumentException("Printer name and content are required.");
 
-                byte[] cpclBytes = Encoding.ASCII.GetBytes(cpcl);
+                // Convert content to ASCII bytes
+                byte[] printData = Encoding.ASCII.GetBytes(request.Content);
 
-                // ✅ Send to Citizen Printer
-                return RawPrinterHelper.SendToPrinter(request.PrinterName, cpclBytes);
+                // Send to printer
+                return RawPrinterHelper.SendToPrinter(request.PrinterName, printData);
             }
             catch (Exception ex)
             {
