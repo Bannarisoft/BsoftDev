@@ -23,7 +23,6 @@ namespace Core.Domain.Entities
     public int? UserType { get; set; }
     public string? Mobile { get; set; }
     public string? EmailId { get; set; }
-    public int? DivisionId { get; set; }
     
     public IList<UserRoleAllocation>? UserRoleAllocations { get; set; }
 
@@ -32,7 +31,9 @@ namespace Core.Domain.Entities
      public IList<UserUnit> UserUnits { get; set; }
      public int? EntityId { get; set; }
      public Entity? Entity { get; set; }
-     public UserGroupUsers? UserGroupUsers { get; set; }
+     public int? UserGroupId { get; set; }
+     public UserGroup? UserGroup { get; set; }
+     public IList<UserDivision> userDivisions { get; set; }
 
     public void SetPassword(string password)
     {

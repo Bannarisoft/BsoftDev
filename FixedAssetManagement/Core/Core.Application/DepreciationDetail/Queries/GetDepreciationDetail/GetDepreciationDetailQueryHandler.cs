@@ -20,7 +20,7 @@ namespace Core.Application.DepreciationDetail.Queries.GetDepreciationDetail
         }        
         public async Task<ApiResponseDTO<List<DepreciationDto>>> Handle(GetDepreciationDetailQuery request, CancellationToken cancellationToken)
         {
-            var (assetSpecification, totalCount) = await _depreciationDetailRepository.CalculateDepreciationAsync(request.companyId,request.unitId,request.finYear, request.startDate,request.endDate,request.depreciationType,request.PageNumber, request.PageSize, request.SearchTerm,request.depreciationPeriod);
+            var (assetSpecification, totalCount) = await _depreciationDetailRepository.CalculateDepreciationAsync(request.companyId,request.unitId,request.finYear ??string.Empty, request.startDate,request.endDate,request.depreciationType,request.PageNumber, request.PageSize, request.SearchTerm,request.depreciationPeriod);
             var assetSpecificationList = _mapper.Map<List<DepreciationDto>>(assetSpecification);
 
             //Domain Event

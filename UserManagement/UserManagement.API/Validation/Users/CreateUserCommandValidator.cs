@@ -6,18 +6,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UserManagement.API.Validation.Common;
+using Core.Application.Common.Interfaces.IUser;
 
 namespace UserManagement.API.Validation.Users
 {
     public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
     {
         private readonly List<ValidationRule> _validationRules;
+        private readonly IUserQueryRepository _userQueryRepository;
 
-        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider)
+        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userRepository)
         {
            var MaxLen = maxLengthProvider.GetMaxLength<User>("FirstName") ?? 25;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _userQueryRepository = userRepository;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -79,6 +82,12 @@ namespace UserManagement.API.Validation.Users
                             .InclusiveBetween(1, 2) // Assuming UserType should be between 1 and 2
                             .WithMessage($"{nameof(CreateUserCommand.UserType)} {rule.Error}");
                         break;
+                         case "AlreadyExists":
+                           RuleFor(x => x.UserName)
+                           .MustAsync(async (UserName, cancellation) => !await _userQueryRepository.AlreadyExistsAsync(UserName))
+                           .WithName("User Name")
+                            .WithMessage($"{rule.Error}");
+                            break;
 
                     default:                        
                         break;

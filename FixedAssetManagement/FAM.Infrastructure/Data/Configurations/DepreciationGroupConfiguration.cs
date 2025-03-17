@@ -69,8 +69,13 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasConstraintName("FK_DepreciationMethod_Misc");
 
                 builder.Property(b => b.UsefulLife)                
-                .HasColumnType("int")
-                .IsRequired();                
+                .HasColumnType("decimal(10,2)")
+                .IsRequired();    
+
+                builder.Property(b => b.DepreciationRate)                
+                .HasColumnType("decimal(5,2)")
+                .IsRequired()
+                .HasDefaultValue(0);       
                 
                  builder.Property(b => b.ResidualValue)                
                 .HasColumnType("int")

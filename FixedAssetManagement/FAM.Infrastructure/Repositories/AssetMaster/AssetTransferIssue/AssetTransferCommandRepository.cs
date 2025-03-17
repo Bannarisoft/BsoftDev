@@ -35,6 +35,14 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer
                 }
                 public async Task<AssetTransferIssueDtl> CreateAssetTransferIssueAsync(AssetTransferIssueDtl  assetTransferIssueDtl)
                 {
+
+                 // Check if the asset already exists in the transfer issue details table
+                        var existingAsset = await _applicationDbContext.AssetTransferIssueDtl
+                            .FirstOrDefaultAsync(a => a.AssetId == assetTransferIssueDtl.AssetId);
+                     if (existingAsset != null)
+                        {
+                            throw new Exception($"Asset with ID {assetTransferIssueDtl.AssetId} is already in transfer.");
+                        }
                     _applicationDbContext.AssetTransferIssueDtl.Add(assetTransferIssueDtl);
                     await _applicationDbContext.SaveChangesAsync();
                     return assetTransferIssueDtl;
@@ -43,6 +51,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer
 
                 public async Task<bool> UpdateAssetTransferAsync(AssetTransferIssueHdr assetTransferIssueHdr)
                 {
+
+
                     // 🔹 Find the existing record
                     var existingRecord = await _applicationDbContext.AssetTransferIssueHdr   
                         .FirstOrDefaultAsync(h => h.Id == assetTransferIssueHdr.Id);
@@ -70,35 +80,10 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer
                     
                    await _applicationDbContext.AssetTransferIssueDtl.AddRangeAsync(assetTransferIssueHdr.AssetTransferIssueDtl);
                    
-                    return await _applicationDbContext.SaveChangesAsync()>0;
+                   return await _applicationDbContext.SaveChangesAsync()>0;
 
                     
                 }
-                private void UpdateAssetTransferIssueDetails(AssetTransferIssueHdr existingRecord, ICollection<AssetTransferIssueDtl> updatedDetails)
-                {
-                    if (updatedDetails == null)
-                        return;
-
-                    // 🔹 Get existing details from DB
-                    var existingDetails = existingRecord.AssetTransferIssueDtl.ToList();
-
-                    // 🔹 Identify and remove deleted details
-                    foreach (var existingDetail in existingDetails)
-                    {
-                        if (!updatedDetails.Any(d => d.Id == existingDetail.Id))
-                        {
-                            _applicationDbContext.AssetTransferIssueDtl.Remove(existingDetail); // Remove detail
-                        }
-                    }
-
-                    // 🔹 Identify and add new details
-                    foreach (var newDetail in updatedDetails)
-                    {
-                        if (newDetail.Id == 0) // If ID is 0, it's a new entry
-                        {
-                            existingRecord.AssetTransferIssueDtl.Add(newDetail);
-                        }
-                    }
-                }
+              
     }   
 }

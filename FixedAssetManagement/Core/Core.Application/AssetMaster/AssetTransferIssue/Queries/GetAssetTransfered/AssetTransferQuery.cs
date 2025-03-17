@@ -13,5 +13,8 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransf
         public int PageNumber { get; set; }
         public int PageSize { get; set; } 
         public string? SearchTerm { get; set; }
+
+        public DateTimeOffset? FromDate { get; set; }
+        public DateTimeOffset? ToDate { get; set; }
     }
 }

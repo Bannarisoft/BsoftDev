@@ -23,8 +23,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransf
     public int ModifiedBy { get; set; }
     public string? ModifiedByName { get; set; }
     public DateTimeOffset ModifiedDate { get; set; }
-    // public string CreatedIP { get; set; }
-    // public string CreatedByName { get; set; }   
+    
     public List<AssetTransferDetailJsonDto>? AssetTransferDetails { get; set; }
     }
 }

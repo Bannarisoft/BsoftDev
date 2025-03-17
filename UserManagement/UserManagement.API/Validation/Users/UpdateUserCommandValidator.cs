@@ -2,18 +2,21 @@ using FluentValidation;
 using Core.Domain.Entities;
 using Core.Application.Users.Commands.UpdateUser;
 using UserManagement.API.Validation.Common;
+using Core.Application.Common.Interfaces.IUser;
 
 namespace UserManagement.API.Validation.Users
 {
     public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
     {
         private readonly List<ValidationRule> _validationRules;
+        private readonly IUserQueryRepository _userQueryRepository;
 
-        public UpdateUserCommandValidator(MaxLengthProvider maxLengthProvider)
+        public UpdateUserCommandValidator(MaxLengthProvider maxLengthProvider,IUserQueryRepository userRepository)
         {
             var MaxLen = maxLengthProvider.GetMaxLength<User>("FirstName") ?? 25;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _userQueryRepository = userRepository;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -75,7 +78,14 @@ namespace UserManagement.API.Validation.Users
                         RuleFor(x => x.UserType)
                             .InclusiveBetween(1, 2) // Assuming UserType should be between 1 and 2
                             .WithMessage($"{nameof(UpdateUserCommand.UserType)} {rule.Error}");
-                        break;               
+                        break;   
+                         case "AlreadyExists":
+                           RuleFor(x =>  new { x.UserName, x.UserId })
+                           .MustAsync(async (user, cancellation) => 
+                        !await _userQueryRepository.AlreadyExistsAsync(user.UserName, user.UserId))             
+                           .WithName("User Name")
+                            .WithMessage($"{rule.Error}");
+                            break;            
                     default:
                         // Handle unknown rule (log or throw)
                         // Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");

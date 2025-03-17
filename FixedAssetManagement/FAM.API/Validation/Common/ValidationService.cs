@@ -66,6 +66,7 @@ using FAM.API.Validation.AssetMaster.AssetTransferIssue;
 using Core.Application.AssetMaster.AssetTransferIssue.Command.UpdateAssetTransferIssue;
 using FAM.API.Validation.AssetMaster.AssetTransferReceipt;
 using Core.Application.AssetMaster.AssetTransferReceipt.Command.CreateAssetTransferReceipt;
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMasterGeneral;
 
 
 namespace FAM.API.Validation.Common
@@ -99,6 +100,7 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<CreateManufactureCommand>, CreateManufactureCommandValidator>();
 		services.AddScoped<IValidator<CreateAssetMasterGeneralCommand>, CreateAssetMasterGeneralCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetMasterGeneralCommand>, UpdateAssetMasterGeneralCommandValidator>();
+        services.AddScoped<IValidator<DeleteAssetMasterGeneralCommand>, DeleteAssetMasterGeneralCommandValidator>();
         services.AddScoped<IValidator<UploadFileAssetMasterGeneralCommand>, UploadAssetMasterGeneralCommandValidator>();
         services.AddScoped<IValidator<CreateUOMCommand>, CreateUOMCommandValidator>();
         services.AddScoped<IValidator<UpdateUOMCommand>, UpdateUOMCommandValidator>();

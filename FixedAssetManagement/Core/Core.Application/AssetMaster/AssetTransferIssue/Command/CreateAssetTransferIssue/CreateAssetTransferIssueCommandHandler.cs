@@ -43,8 +43,8 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Command.CreateAssetTra
                     return new ApiResponseDTO<int>
                     {
                         IsSuccess = false,
-                        Message = "Validation failed"
-                      //  Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                        Message = "Validation failed",
+                        Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
                     };
                 }
                 

@@ -13,6 +13,7 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue
         Task<AssetTransferIssueDtl> CreateAssetTransferIssueAsync(AssetTransferIssueDtl assetTransferIssueDtl);
 
         Task<bool> UpdateAssetTransferAsync(AssetTransferIssueHdr assetTransferIssueHdr);
+        
      //   Task<AssetTransferIssueDtl> UpdateAssetTransferAsync(AssetTransferIssueDtl assetTransferIssueDtl);
 
 

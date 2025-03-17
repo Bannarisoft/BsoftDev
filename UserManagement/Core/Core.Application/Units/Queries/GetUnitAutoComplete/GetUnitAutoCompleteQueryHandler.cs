@@ -8,6 +8,7 @@ using Core.Domain.Events;
 
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
+using Core.Application.Common.Interfaces;
 
 namespace Core.Application.Units.Queries.GetUnitAutoComplete
 {
@@ -20,19 +21,22 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
 
         private readonly ILogger<GetUnitAutoCompleteQueryHandler> _logger;
 
-
-        public GetUnitAutoCompleteQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper, IMediator mediator,ILogger<GetUnitAutoCompleteQueryHandler> logger)
+        private readonly IIPAddressService _ipAddressService;
+        public GetUnitAutoCompleteQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper, IMediator mediator,ILogger<GetUnitAutoCompleteQueryHandler> logger,IIPAddressService ipAddressService)
         {
              _unitRepository = unitRepository;
             _mapper = mapper;
             _mediator = mediator;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<ApiResponseDTO<List<UnitAutoCompleteDTO>>> Handle(GetUnitAutoCompleteQuery request, CancellationToken cancellationToken)
         {     
            _logger.LogInformation($"Search pattern started: {request.SearchPattern}");
-            var result = await _unitRepository.GetUnit(request.SearchPattern);
+
+           var userId = _ipAddressService.GetUserId();
+            var result = await _unitRepository.GetUnit(request.SearchPattern,userId,request.CompanyId);
               if (result is null || !result.Any() || result.Count == 0) 
                 {
                       _logger.LogWarning($"No Unit Record {request.SearchPattern} not found in DB.");
