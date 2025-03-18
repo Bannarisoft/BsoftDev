@@ -23,6 +23,8 @@ namespace Core.Application.Users.Queries.GetUsers
     // public int UserRoleId { get; set; }
     public FirstTimeUserStatus IsFirstTimeUser { get; set; }
     public IsDelete IsDeleted { get; set; } 
+    
+    public int? UserGroupId { get; set; }
     //  public List<UserCompanyDTO> UserCompanies  { get; set; }
     // public List<UserRoleAllocationDTO> userRoleAllocations { get; set; }
     // public List<UserUnitDTO> UserUnits { get; set; }

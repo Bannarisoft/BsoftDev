@@ -75,8 +75,9 @@ namespace UserManagement.Infrastructure.Repositories.Users
                                 ur.Mobile,
                                 ur.EmailId,
                                 ur.IsFirstTimeUser,
-                                ur.IsDeleted
+                                ur.IsDeleted,UG.Id AS UserGroupId
                 FROM AppSecurity.Users ur
+                left join AppSecurity.UserGroup UG on UG.Id=ur.UserGroupId and UG.IsActive=1
                 WHERE ur.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ur.FirstName LIKE @Search OR ur.LastName LIKE @Search OR ur.UserName LIKE @Search)")}}
                 ORDER BY ur.UserId desc
@@ -106,53 +107,90 @@ namespace UserManagement.Infrastructure.Repositories.Users
                     });
         }
 
-        public async Task<User?> GetByIdAsync(int userId)
+     public async Task<User?> GetByIdAsync(int userId)
+{
+    const string query = @"
+        SELECT ur.Id,
+               ur.UserId,
+               ur.FirstName,
+               ur.LastName,
+               ur.UserName,
+               ur.IsActive,
+               ur.PasswordHash,
+               ur.UserType,
+               ur.Mobile,
+               ur.EmailId,
+               ur.IsFirstTimeUser,
+               ur.IsDeleted,
+               ura.UserRoleId,
+               uc.CompanyId,
+               uu.UnitId,
+               ud.DivisionId,
+               UG.Id AS UserGroupId
+        FROM AppSecurity.Users ur
+        LEFT JOIN AppSecurity.UserRoleAllocation ura ON ur.UserId = ura.UserId AND ura.IsActive = 1
+        LEFT JOIN AppSecurity.UserCompany uc ON uc.UserId = ur.UserId AND uc.IsActive = 1
+        LEFT JOIN AppSecurity.UserUnit uu ON uu.UserId = ur.UserId AND uu.IsActive = 1
+        LEFT JOIN AppSecurity.UserDivision ud ON ud.UserId = ur.UserId AND ud.IsActive = 1
+        LEFT JOIN AppSecurity.UserGroup UG ON UG.Id = ur.UserGroupId AND UG.IsActive = 1
+        WHERE ur.IsDeleted = 0 AND ur.UserId = @UserId";
+
+    var userDictionary = new Dictionary<int, User>();
+
+    var userResponse = await _dbConnection.QueryAsync<User,Core.Domain.Entities.UserRoleAllocation, UserCompany, UserUnit, UserDivision, int?, User>(
+        query,
+        (user, userRole, userCompany, userUnit, userDivision, userGroupId) =>
         {
+            if (!userDictionary.TryGetValue(user.UserId, out var existingUser))
+            {
+                existingUser = user;
+                existingUser.UserRoleAllocations = new List<Core.Domain.Entities.UserRoleAllocation>();
+                existingUser.UserCompanies = new List<UserCompany>();
+                existingUser.UserUnits = new List<UserUnit>();
+                existingUser.UserDivisions = new List<UserDivision>();
+                userDictionary[user.UserId] = existingUser;
+            }
 
-             const string query = @"
-             SELECT ur.Id,
-                    ur.UserId,
-                    ur.FirstName,
-                    ur.LastName,
-                    ur.UserName,
-                    ur.IsActive,
-                    ur.PasswordHash,
-                    ur.UserType,
-                    ur.Mobile,
-                    ur.EmailId,
-                    ur.UserId,
-                    ur.IsFirstTimeUser,
-                    ur.IsDeleted,
-                    ura.UserRoleId,
-                    uc.CompanyId,
-                    uu.UnitId,
-                    ud.DivisionId 
-                    FROM AppSecurity.Users ur
-                Left JOIN AppSecurity.UserRoleAllocation ura ON   ur.UserId = ura.UserId and ura.IsActive = 1
-                Left JOIN AppSecurity.UserCompany uc ON uc.UserId = ur.UserId and uc.IsActive = 1
-                Left JOIN AppSecurity.UserUnit uu ON uu.UserId = ur.UserId and uu.IsActive = 1
-                Left Join [AppSecurity].[UserDivision] ud on ud.UserId = ur.UserId and ud.IsActive = 1
-                WHERE  ur.IsDeleted = 0 and ur.UserId = @UserId";
-          var userResponse = await _dbConnection.QueryAsync<User, Core.Domain.Entities.UserRoleAllocation, UserCompany, UserUnit,UserDivision,User>(query, 
-          (user, userRole, userCompany, userUnit,userDivision) =>
-          {
-              user.UserRoleAllocations = new List<Core.Domain.Entities.UserRoleAllocation> { userRole };
-              user.UserCompanies = new List<UserCompany> { userCompany };
-              user.UserUnits = new List<UserUnit> { userUnit };
-              user.userDivisions = new List<UserDivision> { userDivision };
-              return user;
-              }, 
-          new { userId },
-          splitOn: "UserRoleId,CompanyId,UnitId,DivisionId");
+            // ✅ Append user roles
+            if (userRole != null && !existingUser.UserRoleAllocations.Any(ur => ur.UserRoleId == userRole.UserRoleId))
+            {
+                existingUser.UserRoleAllocations.Add(userRole);
+            }
 
-            var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
-            return await policyWrap.ExecuteAsync(async () =>
-                        {
-                        return userResponse.FirstOrDefault();
-            });
-            // const string query = "SELECT * FROM AppSecurity.Users WHERE UserId = @UserId";
-            // return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { userId });
-        }
+            // ✅ Append user companies
+            if (userCompany != null && !existingUser.UserCompanies.Any(uc => uc.CompanyId == userCompany.CompanyId))
+            {
+                existingUser.UserCompanies.Add(userCompany);
+            }
+
+            // ✅ Append user units
+            if (userUnit != null && !existingUser.UserUnits.Any(uu => uu.UnitId == userUnit.UnitId))
+            {
+                existingUser.UserUnits.Add(userUnit);
+            }
+
+            // ✅ Append user divisions
+            if (userDivision != null && !existingUser.UserDivisions.Any(ud => ud.DivisionId == userDivision.DivisionId))
+            {
+                existingUser.UserDivisions.Add(userDivision);
+            }
+
+            // ✅ Assign UserGroupId
+            if (userGroupId.HasValue)
+            {
+                existingUser.UserGroupId = userGroupId.Value;
+            }
+
+            return existingUser;
+        },
+        new { userId },
+        splitOn: "UserRoleId,CompanyId,UnitId,DivisionId,UserGroupId" // ✅ Added UserGroupId here
+    );
+
+    return userResponse.FirstOrDefault();
+}
+
+
 
         public async Task<User?> GetByUsernameAsync(string? username, int? id = null)
         {
