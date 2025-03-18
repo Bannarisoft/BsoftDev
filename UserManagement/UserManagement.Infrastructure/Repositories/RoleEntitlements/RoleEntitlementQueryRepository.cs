@@ -124,7 +124,7 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
 
     SELECT 
         M.Id, M.ModuleName,
-        Menu.Id, Menu.MenuName, Menu.ParentId,
+        Menu.Id, Menu.MenuName,Menu.MenuUrl, Menu.ParentId,
         RMP.Id, RMP.MenuId, RMP.CanAdd, RMP.CanView, RMP.CanApprove, RMP.CanDelete, RMP.CanExport, RMP.CanUpdate
     FROM [AppData].[Modules] M
     INNER JOIN [AppSecurity].[RoleModule] RM ON M.Id = RM.ModuleId
