@@ -12,5 +12,6 @@ namespace Core.Application.Common.Interfaces.IRoleEntitlement
         Task<Core.Domain.Entities.UserRole> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken);
         // Task<List<RoleEntitlement>> GetRoleEntitlementsByRoleNameAsync(string roleName, CancellationToken cancellationToken);                      
         Task<List<RoleEntitlement>> GetExistingRoleEntitlementsAsync(List<int> userRoleIds,  List<int> menuIds, CancellationToken cancellationToken);
+        Task<List<Core.Domain.Entities.Modules>> GetRolePrivileges(int userid, CancellationToken cancellationToken);
     }
 }
