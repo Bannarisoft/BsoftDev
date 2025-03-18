@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Core.Application.RoleEntitlements.Commands.DeleteRoleEntitlement;
 using Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById;
+using Core.Application.RoleEntitlements.Queries.GetRolePrivileges;
 
 namespace UserManagement.API.Controllers
 {
@@ -124,6 +125,23 @@ public class RoleEntitlementsController : ApiControllerBase
             message = response.Message
         }); 
     }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllRolePrivilegesAsync([FromQuery] int UserId)
+        {
+           var roleprivileges = await Mediator.Send(
+            new GetRolePrivilegesQuery
+           {
+                UserId = UserId
+            });
+            
+           
+            return Ok( new 
+            { 
+                StatusCode=StatusCodes.Status200OK,
+                 data = roleprivileges.Data.ToList()
+                 });
+        }
     // [HttpDelete("{id}")]        
     //     public async Task<IActionResult> DeleteAsync(int id)
     //     {
