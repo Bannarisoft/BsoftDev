@@ -130,8 +130,8 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
     INNER JOIN [AppSecurity].[RoleModule] RM ON M.Id = RM.ModuleId
     INNER JOIN [AppSecurity].[UserRoleAllocation] URA ON URA.UserRoleId = RM.RoleId AND URA.IsActive = 1
     INNER JOIN [AppData].[Menus] Menu ON Menu.ModuleId = M.Id
-	INNER JOIN #MENUPERMISSION PM ON PM.MenuId=Menu.Id
-    LEFT JOIN [AppSecurity].[RoleMenuPrivilege] RMP ON RMP.MenuId = Menu.Id
+	INNER JOIN #MENUPERMISSION PM ON PM.MenuId=Menu.Id AND PM.RoleId=URA.UserRoleId
+    LEFT JOIN [AppSecurity].[RoleMenuPrivilege] RMP ON RMP.MenuId = Menu.Id AND RMP.RoleId=URA.UserRoleId
     WHERE URA.UserId = @UserId AND M.IsDeleted = 0
     ORDER BY Menu.ParentId, Menu.Id;"; 
 
