@@ -28,5 +28,6 @@ namespace Core.Application.Users.Queries.GetUsers
      public List<UserCompanyDTO> UserCompanies  { get; set; }
     public List<UserRoleAllocationDTO> userRoleAllocations { get; set; }
     public List<UserUnitDTO> UserUnits { get; set; }
+    public int? UserGroupId { get; set; }
     }
 }
