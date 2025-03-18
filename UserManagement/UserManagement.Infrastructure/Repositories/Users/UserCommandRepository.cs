@@ -65,13 +65,13 @@ namespace UserManagement.Infrastructure.Repositories
 
           public async Task<User> CreateAsync(User user)
             {
-                   var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
-                  return await policyWrap.ExecuteAsync(async () =>
-                  {       
+                //    var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
+                //   return await policyWrap.ExecuteAsync(async () =>
+                //   {       
                       await _applicationDbContext.User.AddAsync(user);
                       await _applicationDbContext.SaveChangesAsync();
                       return user;
-                  });
+                //   });
 
             }
         
