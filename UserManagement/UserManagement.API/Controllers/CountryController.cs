@@ -27,8 +27,7 @@ namespace UserManagement.API.Controllers
         {        
             _createCountryCommandValidator = createCountryCommandValidator;    
             _updateCountryCommandValidator = updateCountryCommandValidator;   
-            _deleteCountryCommandValidator = deleteCountryCommandValidator; 
-             
+            _deleteCountryCommandValidator = deleteCountryCommandValidator;              
         }
         [HttpGet]        
         public async Task<IActionResult> GetAllCountriesAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
