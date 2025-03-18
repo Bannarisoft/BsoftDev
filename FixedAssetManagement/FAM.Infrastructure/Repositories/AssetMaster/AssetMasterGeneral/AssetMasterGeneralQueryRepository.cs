@@ -4,6 +4,7 @@ using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Domain.Common;
 using Core.Domain.Entities;
 using Dapper;
+using Newtonsoft.Json;
 
 namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 {
@@ -26,7 +27,19 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             var assetMasterList = (await multiResult.ReadAsync<AssetMasterGeneralDTO>()).ToList();
             // Read the second result set (Total Record Count)
             int totalCount = await multiResult.ReadFirstAsync<int>();
-            return (assetMasterList, totalCount);            
+            // Deserialize JSON for Specifications
+            foreach (var asset in assetMasterList)
+            {
+                if (!string.IsNullOrEmpty(asset.SpecificationsJson))
+                {
+                    asset.Specifications = JsonConvert.DeserializeObject<List<AssetSpecificationDTO>>(asset.SpecificationsJson);
+                }
+                else
+                {
+                    asset.Specifications = new List<AssetSpecificationDTO>();
+                }
+            }
+            return (assetMasterList, totalCount);          
         }
         public async Task<List<AssetMasterGeneralDTO>> GetByAssetNameAsync(string searchPattern)
         {
@@ -49,28 +62,46 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             return result.ToList();
         }
 
-        public async Task<AssetMasterGeneralDTO> GetByIdAsync(int depGroupId)
+       public async Task<AssetMasterGeneralDTO> GetByIdAsync(int depGroupId)
         {
             const string query = @"            
-            SELECT AM.Id,AM.CompanyId,AM.UnitId,AM.AssetCode,AM.AssetName,AM.AssetGroupId,AM.AssetCategoryId,AM.AssetSubCategoryId,AM.AssetParentId,AM.AssetType,AM.MachineCode,AM.Quantity
-            ,AM.UOMId,AM.AssetDescription,AM.WorkingStatus,AM.AssetImage,AM.ISDepreciated,AM.IsTangible,AM.IsActive
-            ,AM.CreatedBy,AM.CreatedDate,AM.CreatedByName,AM.CreatedIP,AM.ModifiedBy,AM.ModifiedDate,AM.ModifiedByName,AM.ModifiedIP
-            ,AG.GroupName AssetGroupName,AC.CategoryName AssetCategoryDesc,A.Description AssetSubCategoryDesc,U.UOMName,MM.description WorkingStatusDesc,M.description AssetTypeDesc,isnull(AM1.AssetDescription,'') ParentAssetDesc
+            SELECT AM.Id, AM.CompanyId, AM.UnitId, AM.AssetCode, AM.AssetName, AM.AssetGroupId, AM.AssetCategoryId, AM.AssetSubCategoryId, AM.AssetParentId, 
+                AM.AssetType, AM.MachineCode, AM.Quantity, AM.UOMId, AM.AssetDescription, AM.WorkingStatus, AM.AssetImage, AM.ISDepreciated, AM.IsTangible, 
+                AM.IsActive, AM.CreatedBy, AM.CreatedDate, AM.CreatedByName, AM.CreatedIP, AM.ModifiedBy, AM.ModifiedDate, AM.ModifiedByName, AM.ModifiedIP,
+                AG.GroupName AS AssetGroupName, AC.CategoryName AS AssetCategoryDesc, A.Description AS AssetSubCategoryDesc, U.UOMName, 
+                MM.Description AS WorkingStatusDesc, M.Description AS AssetTypeDesc, ISNULL(AM1.AssetDescription, '') AS ParentAssetDesc,
+                (SELECT A.Id AS SpecificationId, A.SpecificationValue, SM.SpecificationName 
+                    FROM FixedAsset.AssetSpecifications AS A
+                    INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = A.SpecificationId    
+                    WHERE A.AssetId = AM.Id AND A.IsDeleted = 0 
+                    FOR JSON PATH) AS SpecificationsJson   
             FROM FixedAsset.AssetMaster AM
-            INNER JOIN FixedAsset.AssetGroup AG on AG.Id=AM.AssetGroupId
-            INNER JOIN FixedAsset.AssetCategories AC on AC.Id=AM.AssetCategoryId
-            INNER JOIN FixedAsset.AssetSubCategories A on A.Id=AM.AssetSubCategoryId
-            INNER JOIN FixedAsset.UOM U on U.Id=AM.UOMId
-            INNER JOIN FixedAsset.MiscMaster MM on MM.Id =AM.WorkingStatus
-            LEFT JOIN FixedAsset.MiscMaster M on M.Id =AM.AssetType
-            LEFT JOIN FixedAsset.AssetMaster AM1 on AM1.Id =AM.AssetParentId
-            WHERE AM.Id = @depGroupId AND AM.IsDeleted=0";
-            var depreciationGroups = await _dbConnection.QueryFirstOrDefaultAsync<AssetMasterGeneralDTO>(query, new { depGroupId });           
-            if (depreciationGroups is null)
+            INNER JOIN FixedAsset.AssetGroup AG ON AG.Id = AM.AssetGroupId
+            INNER JOIN FixedAsset.AssetCategories AC ON AC.Id = AM.AssetCategoryId
+            INNER JOIN FixedAsset.AssetSubCategories A ON A.Id = AM.AssetSubCategoryId
+            INNER JOIN FixedAsset.UOM U ON U.Id = AM.UOMId
+            INNER JOIN FixedAsset.MiscMaster MM ON MM.Id = AM.WorkingStatus
+            LEFT JOIN FixedAsset.MiscMaster M ON M.Id = AM.AssetType
+            LEFT JOIN FixedAsset.AssetMaster AM1 ON AM1.Id = AM.AssetParentId
+            WHERE AM.Id = @depGroupId AND AM.IsDeleted = 0";
+
+            var assetMaster = await _dbConnection.QueryFirstOrDefaultAsync<AssetMasterGeneralDTO>(query, new { depGroupId });
+
+            if (assetMaster is null)
             {
                 throw new KeyNotFoundException($"DepreciationGroup with ID {depGroupId} not found.");
             }
-            return depreciationGroups;
+
+            // 🔹 Deserialize JSON directly for the single object
+            if (!string.IsNullOrEmpty(assetMaster.SpecificationsJson))
+            {
+                assetMaster.Specifications = JsonConvert.DeserializeObject<List<AssetSpecificationDTO>>(assetMaster.SpecificationsJson) ?? new();
+            }
+            else
+            {
+                assetMaster.Specifications = new List<AssetSpecificationDTO>();
+            }
+            return assetMaster;
         }
 
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetWorkingStatusAsync()
