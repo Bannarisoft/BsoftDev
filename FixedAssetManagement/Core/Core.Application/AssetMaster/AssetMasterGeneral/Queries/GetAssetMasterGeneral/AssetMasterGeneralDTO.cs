@@ -46,5 +46,13 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? ParentAssetDesc { get; set; } 
         public IsDelete IsDeleted { get; set; }           
         public Decimal CompletedPercentage { get; set; }  
+        public string? SpecificationsJson { get; set; }
+        public List<AssetSpecificationDTO>? Specifications { get; set; }
+    }
+    public class AssetSpecificationDTO
+    {
+        public int SpecificationId { get; set; }
+        public string? SpecificationName { get; set; }
+        public string? SpecificationValue { get; set; }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 
 namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptPending
 {
@@ -20,11 +21,11 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
         public string? ToCustodianName { get; set; }
         public string? Sdcno { get; set; }
         public string? GatePassNo  { get; set; }
-        public int? AuthorizedBy { get; set; }
-        public DateTimeOffset? AuthorizedDate { get; set; }
-        public string? AuthorizedByName { get; set; }
-        public string? AuthorizedIP { get; set; }
+       
         public string? Remarks { get; set; }
         public List<AssetTransferReceiptDtlDto>? AssetTransferReceiptDtl { get; set; }
+        public AssetTransferIssueHdrIdDto? AssetTransferIssueHdr { get; set; } 
+    
+
     }
 }
