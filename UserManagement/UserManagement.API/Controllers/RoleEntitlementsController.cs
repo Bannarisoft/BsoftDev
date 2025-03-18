@@ -126,8 +126,8 @@ public class RoleEntitlementsController : ApiControllerBase
         }); 
     }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllRolePrivilegesAsync([FromQuery] int UserId)
+        [HttpGet("roleprivileges/{UserId}")]
+        public async Task<IActionResult> GetAllRolePrivilegesAsync(int UserId)
         {
            var roleprivileges = await Mediator.Send(
             new GetRolePrivilegesQuery
