@@ -26,26 +26,18 @@ namespace Core.Application.Users.Commands.ChangeUserPassword
 
         public async Task<ApiResponseDTO<string>> Handle(ChangeUserPasswordCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userQueryRepository.GetByIdAsync(request.UserId);
+            
             var passwordLog = _imapper.Map<PasswordLog>(request);
-            if ( BCrypt.Net.BCrypt.Verify(request.OldPassword, user.PasswordHash))
-            {
-                if (request.NewPassword == request.OldPassword)
-                {
-                    return new ApiResponseDTO<string> { IsSuccess = false, Message = "New password cannot be the same as the old password." };
-                }
+            
                 passwordLog.PasswordHash = await _ichangePassword.PasswordEncode(request.NewPassword);
                 var changedPassword = await _ichangePassword.ChangePassword(request.UserId,request.NewPassword,passwordLog);
 
                 if (!changedPassword)
                 {
-                    return new ApiResponseDTO<string> { IsSuccess = false, Message = "Password change failed." };
+                    return new ApiResponseDTO<string> { IsSuccess = false, Message = "Try a different Password" };
                 }
                 return new ApiResponseDTO<string> { IsSuccess = true, Message = "Password changed successfully."};
-            }
             
-
-            return new ApiResponseDTO<string> { IsSuccess = false, Message = "Old password is incorrect." };
         }
     }
 }

@@ -22,13 +22,14 @@ namespace Core.Domain.Entities
     public string? PasswordHash { get; set; }
     public int? UserType { get; set; }
     public string? Mobile { get; set; }
-    public string? EmailId { get; set; }
+    public string? EmailId { get; set; }    
     
     public IList<UserRoleAllocation>? UserRoleAllocations { get; set; }
 
      public ICollection<PasswordLog>? Passwords { get; set; }
      public IList<UserCompany>? UserCompanies { get; set; }
-     public IList<UserUnit> UserUnits { get; set; }
+    
+     public IList<UserUnit>? UserUnits { get; set; }
      public int? EntityId { get; set; }
      public Entity? Entity { get; set; }
      public int? UserGroupId { get; set; }

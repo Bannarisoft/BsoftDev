@@ -224,6 +224,7 @@ namespace UserManagement.Infrastructure
             services.AddScoped<IProfileQuery, ProfileQueryRepository>();
             services.AddScoped<IProfileCommand, ProfileCommandRepository>();
             services.AddScoped<IUserGroupQueryRepository, UserGroupQueryRepository>();
+            services.AddScoped<IUserGroupCommandRepository, UserGroupCommandRepository>();
             
             
             // Miscellaneous services

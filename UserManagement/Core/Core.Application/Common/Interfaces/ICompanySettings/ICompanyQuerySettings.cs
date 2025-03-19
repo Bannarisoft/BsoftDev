@@ -8,5 +8,6 @@ namespace Core.Application.Common.Interfaces.ICompanySettings
     public interface ICompanyQuerySettings
     {
         Task<Core.Domain.Entities.CompanySettings> GetAsync();
+        Task<bool> AlreadyExistsAsync(int CompanyId, int? id = null);
     }
 }

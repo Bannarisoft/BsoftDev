@@ -503,6 +503,8 @@ namespace UserManagement.Infrastructure.Migrations
                     b.HasIndex("LanguageId")
                         .IsUnique();
 
+                    b.HasIndex("CompanyId", "CurrencyId", "FinancialYearId", "LanguageId");
+
                     b.ToTable("CompanySetting", "AppData");
                 });
 

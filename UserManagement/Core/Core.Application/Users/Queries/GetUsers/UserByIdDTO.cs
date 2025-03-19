@@ -21,12 +21,12 @@ namespace Core.Application.Users.Queries.GetUsers
     public int UserType { get; set; }
     public string Mobile { get; set; }
     public string EmailId { get; set; }
-    public int CompanyId { get; set; }
     public List<UserDivisionDTO> userDivisions { get; set; }
     public FirstTimeUserStatus IsFirstTimeUser { get; set; }
     public IsDelete IsDeleted { get; set; } 
      public List<UserCompanyDTO> UserCompanies  { get; set; }
     public List<UserRoleAllocationDTO> userRoleAllocations { get; set; }
     public List<UserUnitDTO> UserUnits { get; set; }
+    public int? UserGroupId { get; set; }
     }
 }

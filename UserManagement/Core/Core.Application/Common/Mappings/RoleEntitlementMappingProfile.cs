@@ -1,6 +1,7 @@
 using AutoMapper;
 using Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
 using Core.Application.RoleEntitlements.Commands.DeleteRoleEntitlement;
+using Core.Application.RoleEntitlements.Commands.GetRolePrivileges;
 using Core.Application.RoleEntitlements.Commands.UpdateRoleRntitlement;
 using Core.Application.RoleEntitlements.Queries.GetRoleEntitlementById;
 using Core.Application.RoleEntitlements.Queries.GetRoleEntitlements;
@@ -46,6 +47,15 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.RoleParents, opt => opt.MapFrom(src => src.RoleParents))
             .ForMember(dest => dest.RoleChildren, opt => opt.MapFrom(src => src.RoleChildren))
             .ForMember(dest => dest.RoleMenuPrivileges, opt => opt.MapFrom(src => src.RoleMenuPrivileges));
+
+              CreateMap<Core.Domain.Entities.Modules, ModuleDTO>()
+            .ForMember(dest => dest.Menus, opt => opt.MapFrom(src => src.Menus));
+
+            CreateMap<Core.Domain.Entities.Menu, RoleMenuDTO>()
+            .ForMember(dest => dest.ChildMenus, opt => opt.MapFrom(src => src.ChildMenus))
+            .ForMember(dest => dest.MenuPrivileages, opt => opt.MapFrom(src => src.RoleMenus));
+
+            CreateMap<Core.Domain.Entities.RoleMenuPrivileges, MenuPrivileageDTO>();
         
         // CreateMap<Core.Domain.Entities.UserRole,RoleDto>();
         // CreateMap<RoleModule,GetByIdModuleDTO>()
