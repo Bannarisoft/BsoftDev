@@ -288,6 +288,31 @@ namespace UserManagement.Infrastructure.Repositories.Users
             
             
           }
+            public async Task<bool> ValidateUsernameAsync(string? username, int? id = null)
+          {
+              var query = "SELECT COUNT(1) FROM AppSecurity.Users WHERE UserName = @Username AND IsDeleted = 0";
+               var condition = id is not null ? "AND UserId != @Id" : "";
+               query = string.Format(query, condition);
+
+               var parameters = new DynamicParameters(new { Username = username });
+               if (id is not null) parameters.Add("Id", id);
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+          }
+                public async Task<bool> ValidateUserActiveAsync(string? username, int? id = null)
+          {
+              var query = "SELECT COUNT(1) FROM AppSecurity.Users WHERE UserName = @Username AND IsActive = 1";
+               var condition = id is not null ? "AND UserId != @Id" : "";
+               query = string.Format(query, condition);
+
+               var parameters = new DynamicParameters(new { Username = username });
+               if (id is not null) parameters.Add("Id", id);
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+          }
+          
+             
+          
         
     }
 }

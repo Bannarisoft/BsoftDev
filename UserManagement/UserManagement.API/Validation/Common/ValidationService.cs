@@ -69,6 +69,8 @@ using Core.Application.Modules.Commands.DeleteModule;
 using Core.Application.UserRole.Commands.DeleteRole;
 using Core.Application.Country.Commands.DeleteCountry;
 using Core.Application.Divisions.Commands.DeleteDivision;
+using Core.Application.Users.Commands.ForgotUserPassword;
+using Core.Application.Users.Commands.ResetUserPassword;
 using Core.Application.UserGroup.Commands.CreateUserGroup;
 using Core.Application.UserGroup.Commands.UpdateUesrGroup;
 using Core.Application.UserGroup.Commands.DeleteUserGroup;
@@ -128,10 +130,13 @@ namespace UserManagement.API.Validation.Common
         services.AddScoped<IValidator<DeleteModuleCommand>, DeleteModuleCommandValidator>();
         services.AddScoped<IValidator<DeleteRoleCommand>, DeleteRoleCommandValidator>();
         services.AddScoped<IValidator<DeleteCountryCommand>, DeleteCountryCommandValidator>();
+
         services.AddScoped<IValidator<DeleteDivisionCommand>, DeleteDivisionCommandValidator>();        
         services.AddScoped<IValidator<CreateUserGroupCommand>, CreateUserGroupCommandValidator>();
         services.AddScoped<IValidator<UpdateUserGroupCommand>, UpdateUserGroupCommandValidator>();
         services.AddScoped<IValidator<DeleteUserGroupCommand>, DeleteUserGroupCommandValidator>();
+        services.AddScoped<IValidator<ForgotUserPasswordCommand>, ForgotPasswordCommandValidator>();
+        services.AddScoped<IValidator<ResetUserPasswordCommand>, ResetUserPasswordCommandValidator>();
          }  
     }
 }

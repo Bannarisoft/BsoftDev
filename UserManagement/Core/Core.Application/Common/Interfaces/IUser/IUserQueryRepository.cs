@@ -17,6 +17,8 @@ namespace Core.Application.Common.Interfaces.IUser
         Task<User?> GetByUsernameAsync(string? username,int? id = null);
         Task<bool> AlreadyExistsAsync(string username,int? id = null);
         Task<User?> GetByUserByUnit(int UserId,int UnitId);
+        Task<bool> ValidateUsernameAsync(string? username, int? id = null);
+        Task<bool> ValidateUserActiveAsync(string? username, int? id = null);
   
     }
 

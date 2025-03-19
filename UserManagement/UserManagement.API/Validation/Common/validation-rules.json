@@ -90,7 +90,24 @@
     {
         "rule": "NotFound",      
         "error": "{PropertyName} not found."
+    },
+    {
+        "rule": "PasswordHistory",      
+        "error": "Password cannot be the same as the last passwords."
+    },
+    {
+        "rule": "FirsttimeUser",      
+        "error": "First time user cannot be update the password."
+    },
+    {
+        "rule": "OldPassword",      
+        "error": "Old password is incorrect."
+    },
+    {
+        "rule": "InActive",      
+        "error": "User is inactive."
     }
+    
     
     
 ]

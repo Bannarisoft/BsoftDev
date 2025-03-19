@@ -51,32 +51,11 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
 
         public async Task<ApiResponseDTO<ForgotPasswordResponse>> Handle(ForgotUserPasswordCommand request, CancellationToken cancellationToken)
         {
-            // Validate input
-            if (string.IsNullOrWhiteSpace(request.UserName))
-            {
-                _logger.LogWarning("Username is required.");
-                return new ApiResponseDTO<ForgotPasswordResponse>{ IsSuccess = false, Message ="Username is required." };
-            }
+           
 
             // Fetch user details
             var user = await _userQueryRepository.GetByUsernameAsync(request.UserName);
-            if (user == null)
-            {
-                _logger.LogWarning($"Username '{request.UserName}' does not exist.");
-                return new ApiResponseDTO<ForgotPasswordResponse>{ IsSuccess = false, Message ="Username does not exist." };
-                
-            }
-
-            if (user.IsDeleted == Enums.IsDelete.Deleted)
-            {
-                _logger.LogWarning($"Username '{request.UserName}' is deleted. Contact admin.");
-                return new ApiResponseDTO<ForgotPasswordResponse>{ IsSuccess = false, Message ="The account is deleted. Contact admin." };
-            }
-            if (user.IsActive == Enums.Status.Inactive)
-            {
-                _logger.LogWarning($"Username '{request.UserName}' is inactive. Contact admin.");
-                return new ApiResponseDTO<ForgotPasswordResponse>{ IsSuccess = false, Message ="The account is inactive. Contact admin." };
-            }
+           
             if (string.IsNullOrEmpty(user.Mobile) || string.IsNullOrEmpty(user.EmailId))
             {
                 _logger.LogWarning($"Username '{request.UserName}' does not have a registered email or mobile.");
@@ -102,27 +81,7 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
             TimeSpan.FromMinutes(expiryMinutes)
             );
 
-          /*    //Email
-            bool emailSent = false;
-            emailSent = await _emailService.SendEmailAsync(
-            request.Email??string.Empty,
-            "Password Reset Verification Code",                
-            request.HtmlContent??string.Empty,
-            "Gmail"
-            );
-            if (emailSent)
-            {
-                _logger.LogInformation("Verification Code email sent to {Email}.", request.Email);
-            }
-            else
-            {
-                _logger.LogWarning("Failed to send Verification Code notification email to {Email}.", request.Email);
-            }
-            _logger.LogInformation("Verification Code sent successfully.", request.UserName); */
- 
-
-
-            //SMS
+        
             bool smsSent = false;          
             smsSent = await _smsService.SendSmsAsync(
                 user.EmailId,                     

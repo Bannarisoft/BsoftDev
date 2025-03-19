@@ -5,16 +5,19 @@ using System.Threading.Tasks;
 using UserManagement.API.Validation.Common;
 using Core.Application.CompanySettings.Commands.CreateCompanySettings;
 using FluentValidation;
+using Core.Application.Common.Interfaces.ICompanySettings;
 
 namespace UserManagement.API.Validation.CompanySettings
 {
     public class CreateCompanySettingsCommandValidator : AbstractValidator<CreateCompanySettingsCommand>
     {
         private readonly List<ValidationRule> _validationRules;
+        private readonly ICompanyQuerySettings _icompanyQuerySettings;
 
-        public CreateCompanySettingsCommandValidator( MaxLengthProvider maxLengthProvider)
+        public CreateCompanySettingsCommandValidator( MaxLengthProvider maxLengthProvider, ICompanyQuerySettings icompanyQuerySettings)
         {
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _icompanyQuerySettings = icompanyQuerySettings;
             if (_validationRules == null || !_validationRules.Any())    
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -142,6 +145,14 @@ namespace UserManagement.API.Validation.CompanySettings
                         RuleFor(x => x.CaptchaOnLogin)
                         .Must(value => value == 0 || value == 1) 
                         .WithMessage($"{nameof(CreateCompanySettingsCommand.CaptchaOnLogin)} {rule.Error}");
+                     break;
+                       case "AlreadyExists":
+                           RuleFor(x => x.CompanyId)
+                           .MustAsync(async (CompanyId, cancellation) => !await _icompanyQuerySettings.AlreadyExistsAsync(CompanyId))
+                           .WithName("Company")
+                            .WithMessage($"{rule.Error}");
+                            break;
+                     default:
                      break;
                 }           
             }  
