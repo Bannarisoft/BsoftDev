@@ -69,7 +69,7 @@ namespace FAM.API.Controllers.AssetMaster
                  return Ok(result);
               }     
 
-        [HttpPost("create")]
+        [HttpPost]
        // public async Task<ActionResult<ApiResponseDTO<AssetTransferIssueHdr>>> CreateAssetTransfer([FromBody] CreateAssetTransferIssueCommand command)
          public async Task<IActionResult> CreateAsync(CreateAssetTransferIssueCommand  command)
         { 
@@ -111,7 +111,7 @@ namespace FAM.API.Controllers.AssetMaster
                  return Ok(result);
               }
 
-        [HttpPut("Put")]
+        [HttpPut]
         public async Task<IActionResult> UpdateAssetTransferIssue([FromBody] UpdateAssetTransferIssueCommand command)
         {
 
