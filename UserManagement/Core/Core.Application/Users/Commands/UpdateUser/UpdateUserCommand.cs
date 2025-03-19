@@ -18,8 +18,6 @@ namespace Core.Application.Users.Commands.UpdateUser
     public string LastName { get; set; }
     public string UserName { get; set; }
     public byte IsActive { get; set; }
-    public string PasswordHash { get; set; }
-    
     public string Mobile { get; set; }
     public string EmailId { get; set; }
     public int UserGroupId { get; set; }

@@ -54,7 +54,7 @@ public class UserProfile : Profile
             // .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.UserUnits));
 
         CreateMap<UpdateUserCommand, User>()
-        .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.PasswordHash)))
+        .ForMember(dest => dest.PasswordHash, opt =>  opt.Ignore())
         .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
         .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations))
         .ForMember(dest => dest.userDivisions, opt => opt.MapFrom(src => src.userDivisions))

@@ -151,6 +151,15 @@ namespace UserManagement.Infrastructure.Repositories
             if (userAgent.Contains("Opera") || userAgent.Contains("OPR")) return "Opera";
             return "Unknown Browser";
         }
+           public int? GetCompanyId()
+          {
+              var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("CompanyId")?.Value;
+        
+              if (int.TryParse(claim, out int companyId))
+                  return companyId;
+        
+              return null;
+          }
       
     }    
 }

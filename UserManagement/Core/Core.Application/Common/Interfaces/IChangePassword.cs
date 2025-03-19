@@ -14,6 +14,10 @@ namespace Core.Application.Common.Interfaces
         Task<string> GenerateVerificationCode(int length);
         Task<string> ResetUserPassword(int userId,PasswordLog passwordLog);
         Task<bool> PasswordLog(PasswordLog passwordLog);
+        Task<bool> ValidatePassword(int userId,string password);
+        Task<bool> ValidateFirstTimeUser(int userId);
+        Task<string?> GetUserPasswordHashAsync(int userId);
+        Task<bool> ValidatePasswordbyUserName(string username,string password);
 
 
         
