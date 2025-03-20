@@ -167,6 +167,13 @@ namespace UserManagement.Infrastructure.Repositories
         
               return GroupCode;
           }
+          public int GetEntityId()
+            {
+              var EntityId = _httpContextAccessor.HttpContext?.User?.FindFirst("EntityId")?.Value;
+        
+        
+              return EntityId != null ? Convert.ToInt32(EntityId) : 0;
+          }
       
     }    
 }

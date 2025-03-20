@@ -45,14 +45,32 @@ namespace UserManagement.API.Validation.Users
                         .WithMessage($"{nameof(ChangeUserPasswordCommand.UserId)} {rule.Error}");
                         break;
 
-                    case "Password":
-                     RuleFor(x => x.NewPassword)
-                     .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                     .WithMessage($"{nameof(ChangeUserPasswordCommand.NewPassword)} {rule.Error}");
-                     RuleFor(x => x.OldPassword)
-                     .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                     .WithMessage($"{nameof(ChangeUserPasswordCommand.OldPassword)} {rule.Error}");
-                     break;
+                    case "PasswordMaxLength":
+                        RuleFor(x => x.NewPassword)
+                        .Length(8,10)
+                        .WithMessage($"{nameof(ChangeUserPasswordCommand.NewPassword)} {rule.Error}"); 
+                        break;
+                    case "UpperCase":
+                        RuleFor(x => x.NewPassword)
+                        .Matches(@"[A-Z]+")
+                        .WithMessage($"{nameof(ChangeUserPasswordCommand.NewPassword)} {rule.Error}");
+                        break;
+                    case "LowerCase":
+                        RuleFor(x => x.NewPassword)
+                        .Matches(@"[a-z]+")
+                        .WithMessage($"{nameof(ChangeUserPasswordCommand.NewPassword)} {rule.Error}");
+                        break;
+                    case "Numeric":
+                        RuleFor(x => x.NewPassword)
+                        .Matches(@"[0-9]+")
+                        .WithMessage($"{nameof(ChangeUserPasswordCommand.NewPassword)} {rule.Error}");
+                        break;
+                    case "SpecialCharacter":
+                        RuleFor(x => x.NewPassword)
+                        .Matches(@"[!@#$%^&*(),.?""{}|<>]")
+                        .WithMessage($"{nameof(ChangeUserPasswordCommand.NewPassword)} {rule.Error}");
+                        break;
+                        
                        case "PasswordHistory":
                          RuleFor(x => x.NewPassword)
                       .MustAsync(async (command,newPassword, cancellation) => 

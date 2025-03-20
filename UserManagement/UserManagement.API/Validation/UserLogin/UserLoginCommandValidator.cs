@@ -60,7 +60,7 @@ namespace UserManagement.API.Validation.UserLogin
                            .MustAsync(async (Username, cancellation) => 
                         await _companyQuerySettings.BeforeLoginNotFoundValidation(Username))             
                            .WithName("User Name")
-                            .WithMessage("User Company Settings not found");
+                            .WithMessage("User Admin Settings not found");
                             break;
                     case "UserSession":
                            RuleFor(x => x.Username )
