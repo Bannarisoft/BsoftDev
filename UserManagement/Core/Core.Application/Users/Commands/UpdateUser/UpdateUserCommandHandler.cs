@@ -35,16 +35,7 @@ namespace Core.Application.Users.Commands.UpdateUser
             
 
             var existingUser = await _userQueryRepository.GetByIdAsync(request.UserId);
-            if (existingUser == null)
-            {
-                _logger.LogWarning("User with UserId: {UserId} not found.", request.UserId);
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "User not found.",
-                    Data = false
-                };
-            }
+           
 
             var OldUserName = existingUser.UserName;
             existingUser.UserName = request.UserName;

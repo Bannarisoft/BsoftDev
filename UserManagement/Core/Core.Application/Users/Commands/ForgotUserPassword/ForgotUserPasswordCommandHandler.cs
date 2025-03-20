@@ -56,11 +56,6 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
             // Fetch user details
             var user = await _userQueryRepository.GetByUsernameAsync(request.UserName);
            
-            if (string.IsNullOrEmpty(user.Mobile) || string.IsNullOrEmpty(user.EmailId))
-            {
-                _logger.LogWarning($"Username '{request.UserName}' does not have a registered email or mobile.");
-                return new ApiResponseDTO<ForgotPasswordResponse>{ IsSuccess = false, Message ="Mobile number and email address are required for verification code." };
-            }
 
             // Generate verification code
             string verificationCode = await _changePasswordService.GenerateVerificationCode(6);
