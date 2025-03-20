@@ -21,38 +21,6 @@ namespace FAM.Infrastructure.Services
             return Task.FromResult(true);
         }
 
-        // public Task<string> GetFileSession()
-        // {
-        //     var context = _httpContextAccessor.HttpContext;
-        
-        //     if (context != null && context.Session != null)
-        //     {
-        //         var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value; 
-        //         var key = $"Companylogo-{userId}";
-        //         Console.WriteLine("GetFileSession");
-        //         Console.WriteLine(key);
-        //         return Task.FromResult(context.Session.GetString(key) ?? "Not Found");
-        //     }
-        //     return Task.FromResult("Not Found");
-        // }
-
-        // public Task<bool> SetFileSession( string value)
-        // {
-        //     var context = _httpContextAccessor.HttpContext;
-        //     if (context != null && context.Session != null)
-        //      {
-        //         var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //         var key = $"Companylogo-{userId}";
-        //         Console.WriteLine("SetFileSession");
-        //         Console.WriteLine(key);
-        //          context.Session.SetString(key, value);
-
-        //          return Task.FromResult(true);
-        //      }
-
-        //      return Task.FromResult(false);
-        // }
-
         public async Task<(bool IsSuccess, string FilePath, string logoBase64)> UploadFileAsync(IFormFile file, string uploadPath)
         {
             

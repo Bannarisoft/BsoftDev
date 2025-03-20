@@ -62,7 +62,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             return result.ToList();
         }
 
-       public async Task<AssetMasterGeneralDTO> GetByIdAsync(int depGroupId)
+       public async Task<AssetMasterGeneralDTO> GetByIdAsync(int assetId)
         {
             const string query = @"            
             SELECT AM.Id, AM.CompanyId, AM.UnitId, AM.AssetCode, AM.AssetName, AM.AssetGroupId, AM.AssetCategoryId, AM.AssetSubCategoryId, AM.AssetParentId, 
@@ -83,13 +83,13 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             INNER JOIN FixedAsset.MiscMaster MM ON MM.Id = AM.WorkingStatus
             LEFT JOIN FixedAsset.MiscMaster M ON M.Id = AM.AssetType
             LEFT JOIN FixedAsset.AssetMaster AM1 ON AM1.Id = AM.AssetParentId
-            WHERE AM.Id = @depGroupId AND AM.IsDeleted = 0";
+            WHERE AM.Id = @assetId AND AM.IsDeleted = 0";
 
-            var assetMaster = await _dbConnection.QueryFirstOrDefaultAsync<AssetMasterGeneralDTO>(query, new { depGroupId });
+            var assetMaster = await _dbConnection.QueryFirstOrDefaultAsync<AssetMasterGeneralDTO>(query, new { assetId });
 
             if (assetMaster is null)
             {
-                throw new KeyNotFoundException($"DepreciationGroup with ID {depGroupId} not found.");
+                throw new KeyNotFoundException($"DepreciationGroup with ID {assetId} not found.");
             }
 
             // 🔹 Deserialize JSON directly for the single object
@@ -199,6 +199,30 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             return result.ToList();        
         }
 
-        
+        public async Task<AssetMasterGeneralDTO> GetByParentIdAsync(int assetTypeId)
+        {
+              const string query = @"            
+            SELECT AM.Id, AM.AssetCode, AM.AssetName
+            FROM FixedAsset.AssetMaster AM           
+            WHERE AM.Id = @depGroupId AND AM.IsDeleted = 0";
+
+            var assetMaster = await _dbConnection.QueryFirstOrDefaultAsync<AssetMasterGeneralDTO>(query, new { assetTypeId });
+
+            if (assetMaster is null)
+            {
+                throw new KeyNotFoundException($"DepreciationGroup with ID {assetTypeId} not found.");
+            }
+
+            // 🔹 Deserialize JSON directly for the single object
+            if (!string.IsNullOrEmpty(assetMaster.SpecificationsJson))
+            {
+                assetMaster.Specifications = JsonConvert.DeserializeObject<List<AssetSpecificationDTO>>(assetMaster.SpecificationsJson) ?? new();
+            }
+            else
+            {
+                assetMaster.Specifications = new List<AssetSpecificationDTO>();
+            }
+            return assetMaster;
+        }
     }
 }
