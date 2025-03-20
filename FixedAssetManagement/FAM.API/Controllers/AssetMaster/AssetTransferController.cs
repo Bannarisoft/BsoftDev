@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FAM.API.Controllers.AssetMaster
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AssetTransferController : ApiControllerBase
     
     {

@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FAM.API.Controllers.AssetMaster
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AssetInsuranceController : ApiControllerBase
     {        
         private  readonly IValidator<CreateAssetInsuranceCommand>  _createAssetInsuranceCommandValidator;
