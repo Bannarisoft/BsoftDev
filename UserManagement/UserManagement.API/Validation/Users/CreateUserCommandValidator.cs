@@ -56,7 +56,8 @@ namespace UserManagement.API.Validation.Users
 
                              RuleFor(x => x.UserName)
                             .MaximumLength(MaxLen) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateUserCommand.UserName)} {rule.Error} {MaxLen}"); 
+                            .WithMessage($"{nameof(CreateUserCommand.UserName)} {rule.Error} {MaxLen}");
+
                         break; 
                          
                     case "Email":
@@ -70,12 +71,6 @@ namespace UserManagement.API.Validation.Users
                         .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
                         .WithMessage($"{nameof(CreateUserCommand.Mobile)} {rule.Error}"); 
                         break; 
-
-                    case "Password":
-                        RuleFor(x => x.Password)
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
-                        break; 
                         
                     case "AlreadyExists":
                            RuleFor(x => x.UserName)
@@ -83,6 +78,31 @@ namespace UserManagement.API.Validation.Users
                            .WithName("User Name")
                             .WithMessage($"{rule.Error}");
                             break;
+                    case "PasswordMaxLength":
+                        RuleFor(x => x.Password)
+                        .Length(8,10)
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}"); 
+                        break;
+                    case "UpperCase":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[A-Z]+")
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
+                        break;
+                        case "LowerCase":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[a-z]+")
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
+                        break;
+                         case "Numeric":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[0-9]+")
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
+                        break;
+                         case "SpecialCharacter":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[!@#$%^&*(),.?""{}|<>]")
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
+                        break;
 
                     default:                        
                         break;

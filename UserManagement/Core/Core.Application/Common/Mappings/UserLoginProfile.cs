@@ -8,7 +8,7 @@ namespace Core.Application.Common.Mappings
     {
         public UserLoginProfile()
          {
-             CreateMap<LoginRequest, UserLoginCommand>();
+             
          }
     }
 }
