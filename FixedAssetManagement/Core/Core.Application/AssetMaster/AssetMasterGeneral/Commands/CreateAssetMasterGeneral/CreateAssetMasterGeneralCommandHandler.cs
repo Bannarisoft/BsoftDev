@@ -45,6 +45,28 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
             var assetMasterDTO = _mapper.Map<AssetMasterDto>(result);
             if (result.Id > 0)
             {
+
+                  string tempFilePath = request.AssetMaster.AssetImage; // Path of the uploaded file with TEMP_ prefix
+
+                if (!string.IsNullOrEmpty(tempFilePath) && File.Exists(tempFilePath))
+                {
+                    string directory = Path.GetDirectoryName(tempFilePath) ?? string.Empty;
+                    string newFileName = $"{result.AssetCode}{Path.GetExtension(tempFilePath)}"; // Rename as AssetCode
+                    string newFilePath = Path.Combine(directory, newFileName);
+
+                    try
+                    {
+                        File.Move(tempFilePath, newFilePath); // Rename the file
+                        assetEntity.AssetImage = newFilePath.Replace(@"\", "/"); // Update the path in the database
+                        await _assetMasterGeneralRepository.UpdateAsync(result.Id, assetEntity); // Save changes to DB
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log error
+                        Console.WriteLine($"Failed to rename file: {ex.Message}");
+                    }
+                }
+                
                 return new ApiResponseDTO<AssetMasterDto>{
                     IsSuccess = true, 
                     Message = "AssetMasterGeneral created successfully.",

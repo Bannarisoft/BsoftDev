@@ -8,8 +8,8 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
     public interface IAssetMasterGeneralCommandRepository
     {
         Task<AssetMasterGenerals> CreateAsync(AssetMasterGenerals assetMasterGeneral, CancellationToken cancellationToken);
-        Task<int>  UpdateAsync(int depGroupId,AssetMasterGenerals assetMasterGeneral);
-        Task<bool>  DeleteAsync(int depGroupId,AssetMasterGenerals assetMasterGeneral);        
+        Task<int>  UpdateAsync(int assetId,AssetMasterGenerals assetMasterGeneral);
+        Task<bool>  DeleteAsync(int assetId,AssetMasterGenerals assetMasterGeneral);        
         Task<AssetMasterGenerals?> GetByAssetCodeAsync(string assetCode);
         Task<bool> UpdateAssetImageAsync(int assetId, string imageName);
         Task<AssetMasterGeneralDTO?> GetByAssetImageAsync(string assetCode);

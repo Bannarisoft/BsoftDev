@@ -6,18 +6,28 @@ using UserManagement.API.Configurations;
 using Core.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
+// Load the environment (Development or Testing)
+var environment = Environment.GetEnvironmentVariable("APP_SETTINGS_PATH");
 
-builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+// If environment is null or empty, set default to "Development"
+if (string.IsNullOrWhiteSpace(environment))
+{      
+    environment = "Development";
+    Environment.SetEnvironmentVariable("APP_SETTINGS_PATH", environment, EnvironmentVariableTarget.User);
+}
+
+
+builder.Configuration    
+    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
     .AddJsonFile("settings/emailsetting.json", optional: false, reloadOnChange: true)
-    .AddJsonFile("settings/smssetting.json", optional: false, reloadOnChange: true)
-    .AddJsonFile("settings/serilogsetting.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("settings/smssetting.json", optional: false, reloadOnChange: true)    
+    .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true) 
     .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 
 // Configure Serilog
-builder.Host.ConfigureSerilog(); 
+builder.Host.ConfigureSerilog(builder.Configuration); 
 
 // Add validation services
 var validationService = new ValidationService();

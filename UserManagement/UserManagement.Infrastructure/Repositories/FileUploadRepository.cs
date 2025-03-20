@@ -56,7 +56,7 @@ namespace UserManagement.Infrastructure.Repositories
         public async Task<(bool IsSuccess, string FilePath, string logoBase64)> UploadFileAsync(IFormFile file, string uploadPath)
         {
             
-              string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
 
         
             string tempPath = Path.Combine(uploadPath, "temp");

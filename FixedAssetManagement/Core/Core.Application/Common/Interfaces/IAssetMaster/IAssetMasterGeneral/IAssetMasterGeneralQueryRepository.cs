@@ -6,6 +6,7 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
     public interface IAssetMasterGeneralQueryRepository
     {
         Task<AssetMasterGeneralDTO>  GetByIdAsync(int assetId);
+        Task<AssetMasterGeneralDTO>  GetByParentIdAsync(int assetTypeId);
         Task<(List<AssetMasterGeneralDTO>,int)> GetAllAssetAsync(int PageNumber, int PageSize, string? SearchTerm);        
         Task<List<AssetMasterGeneralDTO>> GetByAssetNameAsync(string assetName);    
         Task<List<Core.Domain.Entities.MiscMaster>> GetAssetTypeAsync();     

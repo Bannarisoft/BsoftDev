@@ -33,13 +33,14 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             _logger = logger;
         }
 
-       public async Task<ApiResponseDTO<AssetMasterGeneralDTO>> Handle(UploadFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<AssetMasterGeneralDTO>> Handle(UploadFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         {
             if (request.File == null || request.File.Length == 0)
             {
                 return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "No file uploaded" };
             }
-
+             /*       // Get latest AssetCode
+            
             if (string.IsNullOrWhiteSpace(request.AssetCode))
             {
                 return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "AssetCode is required for file naming." };
@@ -50,16 +51,21 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             if (existingAsset == null)
             {
                 return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "Asset not found." };
-            }
+            } */
+            
+            /*       // 🔹 Define Base Directory as "D:\AssetImages"
+            string baseDirectory = @"D:\BSOFTImages\Asset\AssetImage";
+            EnsureDirectoryExists(baseDirectory);
+            */
 
-            // 🔹 Fetch Base Directory from Database
+             // 🔹 Fetch Base Directory from Database
             string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
             if (string.IsNullOrWhiteSpace(baseDirectory))
             {
                 _logger.LogError("Base directory path not found in database.");
                 return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "Base directory not configured." };
             }
-
+            
             // 🔹 Construct the required file path
             string companyFolder = Path.Combine(baseDirectory, request.CompanyName ?? string.Empty);
             EnsureDirectoryExists(companyFolder);
@@ -68,8 +74,9 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             EnsureDirectoryExists(unitFolder);
 
             string fileExtension = Path.GetExtension(request.File.FileName);
-            string fileName = $"{request.AssetCode}{fileExtension}";  // ✅ Example: HomeTextile-COMP-MOU-1.png
-            string filePath = Path.Combine(unitFolder, fileName);
+            //string fileName = $"{request.AssetCode}{fileExtension}";
+            string dummyFileName = $"TEMP_{Guid.NewGuid()}{fileExtension}";
+            string filePath = Path.Combine(unitFolder, dummyFileName);
 
             try
             {
@@ -86,14 +93,15 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
 
                 // ✅ Ensure the correct format before saving in DB
                 string formattedPath = filePath.Replace(@"\", "/");
+                
 
-                // ✅ Update AssetImage field using repository
+  /*               // ✅ Update AssetImage field using repository
                 bool updateSuccess = await _assetMasterGeneralRepository.UpdateAssetImageAsync(existingAsset.Id, formattedPath);
                 if (!updateSuccess)
                 {
                     return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "Failed to update asset image." };
                 }
-
+ */
                 var response = new AssetMasterGeneralDTO
                 {
                     AssetImage = formattedPath,  // ✅ Correctly formatted file path
@@ -108,15 +116,13 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
                 return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = $"File upload failed: {ex.Message}" };
             }
         }   
-
-            // ✅ Helper Method to Ensure Directory Exists
-            private void EnsureDirectoryExists(string path)
+        private void EnsureDirectoryExists(string path)
+        {
+            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
             {
-                if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
+                Directory.CreateDirectory(path);
             }
+        }
 
     }
 }
