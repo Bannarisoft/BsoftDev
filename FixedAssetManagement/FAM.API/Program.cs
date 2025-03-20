@@ -5,7 +5,7 @@ using FAM.API.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var environment = Environment.GetEnvironmentVariable("APP_SETTINGS_PATH");
+var environment = Environment.GetEnvironmentVariable("APP_SETTINGS_PATH") ?? "Development";
 
 // If environment is null or empty, set default to "Development"
 if (string.IsNullOrWhiteSpace(environment))
@@ -14,13 +14,13 @@ if (string.IsNullOrWhiteSpace(environment))
     Environment.SetEnvironmentVariable("APP_SETTINGS_PATH", environment, EnvironmentVariableTarget.User);
 }
 
-// Load Serilog configuration from appsettings.json
+
+// Load configuration files based on the environment
 builder.Configuration
     .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)    
-    .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true) 
+    .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: true, reloadOnChange: true) 
     .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
-
 // Configure Serilog
 builder.Host.ConfigureSerilog(builder.Configuration); 
 
@@ -39,11 +39,15 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
 
 // Configure the HTTP request pipeline
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseDeveloperExceptionPage();
+//app.UseDeveloperExceptionPage();
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors();
