@@ -3,6 +3,7 @@ using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
+using MaintenanceManagement.Infrastructure.Data.Configurations;
 
 
 namespace MaintenanceManagement.Infrastructure.Data
@@ -21,15 +22,19 @@ namespace MaintenanceManagement.Infrastructure.Data
         }
         
         // public DbSet<AssetGroup> AssetGroup { get; set; } 
+        public DbSet<MachineGroup> MachineGroup { get ; set; }
        
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            // modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
+        {            
+         //  modelBuilder.ApplyConfiguration(new MachineGroupConfiguration());
+           modelBuilder.ApplyConfiguration( new MachineGroupConfiguration());
 
             base.OnModelCreating(modelBuilder);
+
+             
         }
          public override int SaveChanges()
         {

@@ -7,6 +7,7 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetCodePatter
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralAutoComplete;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById;
+using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetParentMaster;
 using Core.Application.DepreciationGroup.Queries.GetAssetTypeQuery;
 using Core.Application.DepreciationGroup.Queries.GetWorkingStatusQuery;
 using Core.Application.ExcelImport;
@@ -229,7 +230,26 @@ namespace FAM.API.Controllers.AssetMaster
                 data = result.Data
             });
         }
-
+     // GET: api/AssetMasterGeneral/WorkingStatus
+        [HttpGet("ParentAsset")]
+        public async Task<IActionResult> GetParentAsset([FromQuery] string assetType)
+        {
+             var result = await Mediator.Send(new GetAssetParentMasterQuery { AssetType = assetType });
+            if (!result.IsSuccess)
+            {
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                }); 
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = result.Message,
+                data = result.Data
+            });
+        }
         // GET: api/AssetMasterGeneral/WorkingStatus
         [HttpGet("WorkingStatus")]
         public async Task<IActionResult> GetWorkingStatus()

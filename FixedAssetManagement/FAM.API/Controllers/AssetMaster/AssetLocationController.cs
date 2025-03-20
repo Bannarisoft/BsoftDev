@@ -19,7 +19,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FAM.API.Controllers.AssetMaster
 {
-    [Route("[controller]")]
+   [Route("api/[controller]")]
     public class AssetLocationController : ApiControllerBase
     {  
          private  readonly IValidator<CreateAssetLocationCommand>  _createAssetLocationCommandValidator;
@@ -160,8 +160,8 @@ namespace FAM.API.Controllers.AssetMaster
             });
         }
         [HttpGet]  
-        [Route("GetAllCustodian")]      
-         public async Task<IActionResult> GetAllCustodianAsync([FromQuery] string OldUnitId,[FromQuery] string? SearchEmployee = null)
+        [Route("GetAllCustodian/{OldUnitId}")]      
+         public async Task<IActionResult> GetAllCustodianAsync( string OldUnitId, string? SearchEmployee = null)
         {
            var custodian = await Mediator.Send(
             new GetCustodianQuery
@@ -180,7 +180,7 @@ namespace FAM.API.Controllers.AssetMaster
             });
         }
 
-        [HttpGet("AssetSubLocation/{id}/")]
+        [HttpGet("AssetSubLocation/{id}")]
         public async Task<IActionResult>GetSubLocationByIdAsync(int id)
         {
            
