@@ -61,7 +61,7 @@ namespace UserManagement.API.Validation.Users
                          
                     case "Email":
                         RuleFor(x => x.EmailId)
-                            .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                            .EmailAddress()
                             .WithMessage($"{nameof(UpdateUserCommand.EmailId)} {rule.Error}");   
                         break; 
 
