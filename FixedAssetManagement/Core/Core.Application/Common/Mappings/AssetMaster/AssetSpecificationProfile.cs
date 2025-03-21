@@ -19,9 +19,6 @@ namespace Core.Application.Common.Mappings.AssetMaster
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))            
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted)); 
 
-          /*   CreateMap<UpdateAssetSpecificationCommand, AssetSpecifications>()
-            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => IsDelete.NotDeleted));    */  
 
             CreateMap<UpdateAssetSpecificationCommand, AssetSpecifications>()
             .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())

@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Manufacture.Commands.UpdateManufacture
 {
-    public class UpdateManufactureCommandHandler : IRequestHandler<UpdateManufactureCommand, ApiResponseDTO<ManufactureDTO>>
+    public class UpdateManufactureCommandHandler : IRequestHandler<UpdateManufactureCommand, ApiResponseDTO<bool>>
     {
         private readonly IManufactureCommandRepository _manufactureRepository;
         private readonly IManufactureQueryRepository _manufactureQueryRepository;
@@ -25,95 +25,59 @@ namespace Core.Application.Manufacture.Commands.UpdateManufacture
             manufactureQueryRepository;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<ManufactureDTO>> Handle(UpdateManufactureCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<bool>> Handle(UpdateManufactureCommand request, CancellationToken cancellationToken)
         {
             var manufactures = await _manufactureQueryRepository.GetByIdAsync(request.Id);
             if (manufactures is null)
-            return new ApiResponseDTO<ManufactureDTO>
+            return new ApiResponseDTO<bool>
             {
                 IsSuccess = false,
-                Message = "Invalid ManufactureId. The specified Name does not exist or is inactive."
+                Message = "Invalid ManufactureId. The specified Name does not exist."
             };
             var oldManufactureName = manufactures.ManufactureName;
             manufactures.ManufactureName = request.ManufactureName;
 
             if (manufactures is null || manufactures.IsDeleted is BaseEntity.IsDelete.Deleted )
             {
-                return new ApiResponseDTO<ManufactureDTO>
+                return new ApiResponseDTO<bool>
                 {
                     IsSuccess = false,
                     Message = "Invalid ManufactureID. The specified ManufactureName does not exist or is deleted."
                 };
-            }
-            if (manufactures.IsActive != request.IsActive)
-            {    
-                manufactures.IsActive =  (BaseEntity.Status)request.IsActive;             
-                var updatedAssetSpecification = _mapper.Map<Manufactures>(request); 
-                await _manufactureRepository.UpdateAsync(manufactures.Id, updatedAssetSpecification);
-                if (request.IsActive is 0)
-                {
-                    return new ApiResponseDTO<ManufactureDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "Code DeActivated."
-                    };
-                }
-                else{
-                    return new ApiResponseDTO<ManufactureDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "Code Activated."
-                    }; 
-                }                                     
-            }
+            }        
+            var manufactureExists = await _manufactureRepository.ExistsByCodeAsync(request.Code??string.Empty,request.Id);
 
-            var manufacturesExistsByName = await _manufactureRepository.ExistsByCodeAsync(request.Code??string.Empty);
-            if (manufacturesExistsByName)
-            {                                   
-                return new ApiResponseDTO<ManufactureDTO>
-                {
-                    IsSuccess = false,
-                    Message = $"Code already exists and is {(BaseEntity.Status) request.IsActive}."
-                };                     
-            }
-            var updatedManufactures = _mapper.Map<Manufactures>(request);                   
-            var updateResult = await _manufactureRepository.UpdateAsync(request.Id, updatedManufactures);            
-
-            var updatedManufacture =  await _manufactureQueryRepository.GetByIdAsync(request.Id);    
-            if (updatedManufacture != null)
+            if (manufactureExists)
             {
-                var manufactureDto = _mapper.Map<ManufactureDTO>(updatedManufacture);
+                return new ApiResponseDTO<bool> {
+                    IsSuccess = false, 
+                    Message = "Manufacture Code already exists."
+                };                             
+            }
+
+            var updatedManufactures = _mapper.Map<Manufactures>(request);                   
+            var updateResult = await _manufactureRepository.UpdateAsync(updatedManufactures);            
+            
+                         
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: manufactureDto.Code ?? string.Empty,
-                    actionName: manufactureDto.ManufactureName ?? string.Empty,                            
-                    details: $"Manufacture '{oldManufactureName}' was updated to '{manufactureDto.ManufactureName}'.  Code: {manufactureDto.Code}",
+                    actionCode: request.Code ?? string.Empty,
+                    actionName: request.ManufactureName ?? string.Empty,                            
+                    details: $"Manufacture '{oldManufactureName}' was updated to '{request.ManufactureName}'.  Code: {request.Code}",
                     module:"Manufacture"
                 );            
                 await _mediator.Publish(domainEvent, cancellationToken);
-                if(updateResult>0)
-                {
-                    return new ApiResponseDTO<ManufactureDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "Manufacture updated successfully.",
-                        Data = manufactureDto
-                    };
+                if (updateResult)
+                { 
+                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Manufacture updated successfully."};
                 }
-                return new ApiResponseDTO<ManufactureDTO>
+            
+                return new ApiResponseDTO<bool>
                 {
                     IsSuccess = false,
                     Message = "Manufacture not updated."
                 };                
             }
-            else
-            {
-                return new ApiResponseDTO<ManufactureDTO>{
-                    IsSuccess = false,
-                    Message = "Manufacture not found."
-                };
-            }
-        }
     }
 }

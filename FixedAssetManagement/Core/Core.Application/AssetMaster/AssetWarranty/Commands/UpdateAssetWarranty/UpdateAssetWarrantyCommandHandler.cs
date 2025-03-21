@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Commands.UpdateAssetWarranty
 {
-    public class UpdateAssetWarrantyCommandHandler : IRequestHandler<UpdateAssetWarrantyCommand, ApiResponseDTO<AssetWarrantyDTO>>
+    public class UpdateAssetWarrantyCommandHandler : IRequestHandler<UpdateAssetWarrantyCommand, ApiResponseDTO<bool>>
     {
         private readonly IAssetWarrantyCommandRepository _assetWarrantyRepository;
         private readonly IAssetWarrantyQueryRepository _assetWarrantyQueryRepository;
@@ -24,97 +24,40 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.UpdateAssetWarrant
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<AssetWarrantyDTO>> Handle(UpdateAssetWarrantyCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<bool>> Handle(UpdateAssetWarrantyCommand request, CancellationToken cancellationToken)
         {
             var assetWarranty = await _assetWarrantyQueryRepository.GetByIdAsync(request.Id);
             if (assetWarranty is null)
-            return new ApiResponseDTO<AssetWarrantyDTO>
+            return new ApiResponseDTO<bool>
             {
                 IsSuccess = false,
-                Message = "Invalid DepreciationGroupID. The specified Name does not exist or is inactive."
+                Message = "Invalid DepreciationGroupID. The specified Name does not exist "
             };
            
-            var oldAssetWarranty= assetWarranty.Id;
-            assetWarranty.Id = request.Id;
-
-            if (assetWarranty is null || assetWarranty.IsDeleted is BaseEntity.IsDelete.Deleted )
-            {
-                return new ApiResponseDTO<AssetWarrantyDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid Warranty Id. The specified Id does not exist or is deleted."
-                };
-            }
-            if (assetWarranty.IsActive != request.IsActive)
-            {    
-                assetWarranty.IsActive =  (BaseEntity.Status)request.IsActive;     
-                var updatedAssetWarranty = _mapper.Map<AssetWarranties>(request);                   
-                await _assetWarrantyRepository.UpdateAsync(request.Id, updatedAssetWarranty);
+            var oldAssetWarranty= assetWarranty.Id;            
         
-                if (request.IsActive is 0)
-                {
-                    return new ApiResponseDTO<AssetWarrantyDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "Code DeActivated."
-                    };
-                }
-                else{
-                    return new ApiResponseDTO<AssetWarrantyDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "Code Activated."
-                    }; 
-                }                                     
-            }
-
-            var assetWarrantyExistsByName = await _assetWarrantyRepository.ExistsByAssetIdAsync(request.AssetId);
-            if (assetWarrantyExistsByName)
-            {                                   
-                return new ApiResponseDTO<AssetWarrantyDTO>
-                {
-                    IsSuccess = false,
-                    Message = $"Asset Warranty already exists and is {(BaseEntity.Status) request.IsActive}."
-                };                     
-            }
+           
             var updatedAssetSpecEntity = _mapper.Map<AssetWarranties>(request);                   
-            var updateResult = await _assetWarrantyRepository.UpdateAsync(request.Id, updatedAssetSpecEntity);            
+            var updateResult = await _assetWarrantyRepository.UpdateAsync(updatedAssetSpecEntity);            
 
-            var updatedAssetSpec =  await _assetWarrantyQueryRepository.GetByIdAsync(request.Id);    
-            if (updatedAssetSpec != null)
-            {
-                var AssetSpecDto = _mapper.Map<AssetWarrantyDTO>(updatedAssetSpec);
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: AssetSpecDto.AssetId.ToString(),
-                    actionName: AssetSpecDto.WarrantyType.ToString() ?? string.Empty,
-                    details: $"AssetWarranty '{oldAssetWarranty}' was updated to '{AssetSpecDto.Description}'",
+                    actionCode: request.AssetId.ToString(),
+                    actionName: request.WarrantyType.ToString() ?? string.Empty,
+                    details: $"AssetWarranty '{oldAssetWarranty}' was updated to '{request.Description}'",
                     module:"AssetWarranty"
                 );            
                 await _mediator.Publish(domainEvent, cancellationToken);
-                if(updateResult>0)
+                if(updateResult)
                 {
-                    return new ApiResponseDTO<AssetWarrantyDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "AssetWarranty updated successfully.",
-                        Data = AssetSpecDto
-                    };
+                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Asset Warranty updated successfully."};
                 }
-                return new ApiResponseDTO<AssetWarrantyDTO>
+                return new ApiResponseDTO<bool>
                 {
                     IsSuccess = false,
                     Message = "AssetWarranty not updated."
                 };                
-            }
-            else
-            {
-                return new ApiResponseDTO<AssetWarrantyDTO>{
-                    IsSuccess = false,
-                    Message = "AssetWarranty not found."
-                };
-            }
-        }
+            }           
     }
 }

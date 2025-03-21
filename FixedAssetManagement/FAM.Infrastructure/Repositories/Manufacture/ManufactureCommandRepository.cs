@@ -28,9 +28,9 @@ namespace FAM.Infrastructure.Repositories.Manufacture
             }
             return 0;
         }
-        public async Task<int> UpdateAsync(int id, Manufactures manufacture)
+        public async Task<bool> UpdateAsync( Manufactures manufacture)
         {
-            var existingManufacture = await _applicationDbContext.Manufactures.FirstOrDefaultAsync(u => u.Id == id);    
+            var existingManufacture = await _applicationDbContext.Manufactures.FirstOrDefaultAsync(u => u.Id == manufacture.Id);    
             if (existingManufacture != null)
             {
                 existingManufacture.Code = manufacture.Code;
@@ -45,15 +45,21 @@ namespace FAM.Infrastructure.Repositories.Manufacture
                 existingManufacture.PinCode = manufacture.PinCode;
                 existingManufacture.PersonName = manufacture.PersonName;
                 existingManufacture.PhoneNumber = manufacture.PhoneNumber;
-                existingManufacture.Email = manufacture.Email;
+                existingManufacture.Email = manufacture.Email;                
                 _applicationDbContext.Manufactures.Update(existingManufacture);
-                return await _applicationDbContext.SaveChangesAsync();
+                return await _applicationDbContext.SaveChangesAsync()>0;
             }
-           return 0; 
+           return false; 
         }
-        public async Task<bool> ExistsByCodeAsync(string code)
+        public async Task<bool> ExistsByCodeAsync(string code,int? Id=null)
         {
-            return await _applicationDbContext.Manufactures.AnyAsync(c => c.Code == code);
+            if (Id is not null)
+            {
+                return await _applicationDbContext.Manufactures.AnyAsync(c => c.Code == code && c.Id != Id);
+            }
+            else{
+                return await _applicationDbContext.Manufactures.AnyAsync(c => c.Code == code);
+            }
         }  
     }
 }

@@ -24,9 +24,9 @@ namespace Core.Application.Common.Mappings
                 .ForMember(dest => dest.DepreciationMethod, opt => opt.MapFrom(src => src.DepMiscType.Description))
                 .ForMember(dest => dest.AssetGroupName, opt => opt.MapFrom(src => src.AssetGroup.GroupName));
 
-            CreateMap<UpdateDepreciationGroupCommand, DepreciationGroups>()
-            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => IsDelete.NotDeleted));     
+            CreateMap<UpdateDepreciationGroupCommand, DepreciationGroups>()            
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => (Status)src.IsActive))
+            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore());    
              
             CreateMap<DepreciationGroupDTO, DepreciationGroupAutoCompleteDTO>();    
             CreateMap<DepreciationGroups, DepreciationGroupDTO>();             

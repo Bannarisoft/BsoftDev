@@ -94,7 +94,7 @@ namespace FAM.Infrastructure.Repositories.UOMs
                 const string query = @"
                 SELECT DISTINCT mm.Id, CAST(mm.Code AS NVARCHAR(255)) AS UomType
                 FROM FixedAsset.UOM um
-                INNER JOIN FixedAsset.MiscMaster mm ON um.UOMTypeId = mm.MiscTypeMasterId
+                INNER JOIN FixedAsset.MiscMaster mm ON um.UOMTypeId = mm.MiscTypeId
                 WHERE um.IsDeleted = 0 AND mm.Code LIKE @SearchPattern";
                 
             var uoms = await _dbConnection.QueryAsync<UOMTypeAutoCompleteDto>(query, new { SearchPattern = $"%{searchPattern}%" });

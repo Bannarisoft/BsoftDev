@@ -6,6 +6,7 @@ namespace Core.Application.Common.Interfaces.ISpecificationMaster
     {
         Task<SpecificationMasters>  GetByIdAsync(int specId);
         Task<(List<SpecificationMasters>,int)> GetAllSpecificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm);        
-        Task<List<SpecificationMasters>> GetBySpecificationNameAsync(string specificationName);        
+        Task<List<SpecificationMasters>> GetBySpecificationNameAsync(string specificationName);  
+        Task<bool> SoftDeleteValidation(int Id);      
     }
 }

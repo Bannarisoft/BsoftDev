@@ -69,5 +69,16 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
             }
             return specificationMaster;
         }
+        public async Task<bool> SoftDeleteValidation(int Id)
+        {
+            const string query = @"
+                SELECT 1 
+                FROM FixedAsset.SpecificationMaster SM
+                inner join  FixedAsset.AssetSpecifications AP on AP.SpecificationId = SM.Id
+                WHERE SM.Id = @Id AND   AP.IsDeleted = 0;";        
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });        
+            var SpecificationExists = await multi.ReadFirstOrDefaultAsync<int?>();          
+            return SpecificationExists.HasValue ;
+        }
     }
 }
