@@ -190,14 +190,14 @@ namespace UserManagement.Infrastructure.Repositories
                  INNER JOIN [AppSecurity].[UserGroup] UG ON UG.Id = U.UserGroupId
                  WHERE U.Username = @Username AND U.IsDeleted = 0 )
 
-               IF @GroupCode = 'ENT_ADM_USR' || @GroupCode = 'ENT_ADM'
+               IF @GroupCode = 'ENT_ADM_USR' OR @GroupCode = 'ENT_ADM'
                BEGIN
                  SET @EntityId = (SELECT TOP 1 U.EntityId FROM [AppSecurity].[Users] U
                     WHERE U.Username = @Username AND U.IsDeleted = 0 )
 
                  SELECT TOP 1 PasswordHistoryCount  FROM [AppSecurity].[AdminSecuritySettings] WHERE EntityId = @EntityId AND IsDeleted = 0
                END
-               ELSE IF @GroupCode = 'COMP_ADM_USR' || @GroupCode = 'COMP_ADM'
+               ELSE IF @GroupCode = 'COMP_ADM_USR' OR @GroupCode = 'COMP_ADM'
                BEGIN
 
                 SET @CompanyId = (SELECT TOP 1 UC.CompanyId FROM [AppSecurity].[Users] U
