@@ -50,19 +50,7 @@ namespace Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSp
         {
             assetSpecifications.Specifications[0].SpecificationId = request.SpecificationId;
         }
-
-        if (assetSpecifications.IsActive != request.IsActive)
-        {    
-            assetSpecifications.IsActive = (BaseEntity.Status)request.IsActive;     
-            var updatedAssetSpecification = _mapper.Map<AssetSpecifications>(request);                   
-            await _assetSpecificationRepository.UpdateAsync(request.Id, updatedAssetSpecification);
-
-            return new ApiResponseDTO<AssetSpecificationJsonDto>
-            {
-                IsSuccess = true,
-                Message = request.IsActive == 0 ? "Code DeActivated." : "Asset Specification Details updated."                
-            };
-        }
+       
 
         var assetSpecificationExistsByName = await _assetSpecificationRepository.ExistsByAssetSpecIdAsync(request.AssetId, request.SpecificationId);
         if (assetSpecificationExistsByName)

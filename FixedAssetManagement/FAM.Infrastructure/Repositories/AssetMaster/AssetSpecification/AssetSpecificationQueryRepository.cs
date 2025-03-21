@@ -104,6 +104,18 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
             })?.FirstOrDefault();
 
             return assetSpecification ?? throw new KeyNotFoundException($"AssetSpecifications with ID {assetId} not found.");
-        }       
+        }
+
+        public async Task<bool> SoftDeleteValidation(int Id)
+        {
+            const string query = @"
+                SELECT 1 AM.Id
+                FROM FixedAsset.AssetMaster AM
+                inner join  FixedAsset.AssetSpecifications AP on AP.AssetId = AM.Id
+                WHERE AP.Id = @Id AND   AM.IsDeleted = 0;";        
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });        
+            var warrantyExists = await multi.ReadFirstOrDefaultAsync<int?>();          
+            return warrantyExists.HasValue ;
+        }
     }
 }

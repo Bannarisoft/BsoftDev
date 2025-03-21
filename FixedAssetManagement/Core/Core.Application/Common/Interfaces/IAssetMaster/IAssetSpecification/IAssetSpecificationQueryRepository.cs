@@ -7,7 +7,7 @@
         {
             Task<AssetSpecificationJsonDto>  GetByIdAsync(int assetId);
             Task<(List<AssetSpecificationJsonDto>,int)> GetAllAssetSpecificationAsync(int PageNumber, int PageSize, string? SearchTerm);        
-            Task<List<AssetSpecificationJsonDto>> GetByAssetSpecificationNameAsync(string assetName);    
-
+            Task<List<AssetSpecificationJsonDto>> GetByAssetSpecificationNameAsync(string assetName);   
+            Task<bool> SoftDeleteValidation(int Id);
         }
     }

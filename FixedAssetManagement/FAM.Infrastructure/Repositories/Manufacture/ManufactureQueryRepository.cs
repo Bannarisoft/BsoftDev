@@ -72,7 +72,7 @@ namespace FAM.Infrastructure.Repositories.Manufacture
             return result.ToList();
         }
 
-        public async Task<ManufactureDTO> GetByIdAsync(int Id)
+        public async Task<Manufactures> GetByIdAsync(int Id)
         {
             const string query = @"
             SELECT M.Id,M.Code,ManufactureName,ManufactureType,M.CountryId,M.StateId,CityId,AddressLine1,AddressLine2,PinCode,PersonName,PhoneNumber,Email,  M.IsActive
@@ -84,7 +84,7 @@ namespace FAM.Infrastructure.Repositories.Manufacture
             INNER JOIN Bannari.AppData.State S on S.Id=M.StateId
             INNER JOIN Bannari.AppData.City CS on CS.Id=M.CityId 
             WHERE M.Id = @Id AND M.IsDeleted=0";
-            var manufacture = await _dbConnection.QueryFirstOrDefaultAsync<ManufactureDTO>(query, new { Id });           
+            var manufacture = await _dbConnection.QueryFirstOrDefaultAsync<Manufactures>(query, new { Id });           
             if (manufacture is null)
             {
                 throw new KeyNotFoundException($"Manufacture with ID {Id} not found.");

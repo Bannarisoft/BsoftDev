@@ -31,9 +31,9 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             }
             return false;
         }
-        public async Task<int> UpdateAsync(int Id, AssetMasterGenerals assetMaster)
+        public async Task<int> UpdateAsync(AssetMasterGenerals assetMaster)
         {
-            var existingDepGroup = await _applicationDbContext.AssetMasterGenerals.FirstOrDefaultAsync(u => u.Id == Id);    
+            var existingDepGroup = await _applicationDbContext.AssetMasterGenerals.FirstOrDefaultAsync(u => u.Id == assetMaster.Id);    
             if (existingDepGroup != null)
             {                
                 existingDepGroup.AssetName = assetMaster.AssetName;                
@@ -52,6 +52,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 existingDepGroup.AssetImage = assetMaster.AssetImage;
                 existingDepGroup.ISDepreciated = assetMaster.ISDepreciated;
                 existingDepGroup.IsTangible = assetMaster.IsTangible;
+                existingDepGroup.IsActive = assetMaster.IsActive;
                 _applicationDbContext.AssetMasterGenerals.Update(existingDepGroup);
                 return await _applicationDbContext.SaveChangesAsync();
             }

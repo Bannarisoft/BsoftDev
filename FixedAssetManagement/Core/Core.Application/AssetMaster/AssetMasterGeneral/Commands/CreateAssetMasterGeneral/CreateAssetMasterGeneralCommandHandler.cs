@@ -58,7 +58,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
                     {
                         File.Move(tempFilePath, newFilePath); // Rename the file
                         assetEntity.AssetImage = newFilePath.Replace(@"\", "/"); // Update the path in the database
-                        await _assetMasterGeneralRepository.UpdateAsync(result.Id, assetEntity); // Save changes to DB
+                        await _assetMasterGeneralRepository.UpdateAsync(assetEntity); // Save changes to DB
                     }
                     catch (Exception ex)
                     {

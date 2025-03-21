@@ -25,9 +25,9 @@ namespace Core.Application.Common.Mappings.AssetMaster
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))            
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted)); 
 
-            CreateMap<UpdateAssetMasterGeneralCommand, AssetMasterGenerals>()
-            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => IsDelete.NotDeleted));     
+             CreateMap<UpdateAssetMasterGeneralCommand, AssetMasterGenerals>()
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.AssetMaster.IsActive ==1 ? Status.Active : Status.Inactive))
+            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore());
              
             CreateMap<AssetMasterGeneralDTO,AssetMasterGeneralAutoCompleteDTO>();    
             CreateMap<AssetMasterGenerals, AssetMasterGeneralDTO>();  

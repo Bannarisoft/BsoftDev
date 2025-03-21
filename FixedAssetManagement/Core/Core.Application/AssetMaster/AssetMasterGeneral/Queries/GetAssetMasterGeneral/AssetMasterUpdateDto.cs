@@ -24,7 +24,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? AssetImage { get; set; }
         public bool? NonDepreciated { get; set; }
         public bool? Tangible { get; set; }      
-        public Status IsActive { get; set; }  
+        public byte IsActive { get; set; }  
         public AssetLocationCombineDto?  AssetLocation  { get; set; }
         public ICollection<AssetPurchaseCombineDto>? AssetPurchaseDetails{ get; set; }    
     }
