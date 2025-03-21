@@ -13,6 +13,7 @@ namespace Core.Application.Common.Interfaces.IUserSession
         Task UpdateSessionAsync(UserSessions session);
         Task DeactivateUserSessionsAsync(int userId);
         Task<UserSessions> GetSessionByUserIdAsync(int userId);    
-        Task DeactivateExpiredSessionsAsync();            
+        Task DeactivateExpiredSessionsAsync();
+        Task<bool> ValidateUserSession(string username  );            
     }
 }

@@ -31,11 +31,31 @@ namespace UserManagement.API.Validation.Users
                             .WithMessage($"{nameof(FirstTimeUserPasswordCommand.UserId)} {rule.Error}");
                         break;
 
-                    case "Password":
-                     RuleFor(x => x.Password)
-                     .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                     .WithMessage($"{nameof(FirstTimeUserPasswordCommand.Password)} {rule.Error}");
-                     break;
+                    case "PasswordMaxLength":
+                        RuleFor(x => x.Password)
+                        .Length(8,10)
+                        .WithMessage($"{nameof(FirstTimeUserPasswordCommand.Password)} {rule.Error}"); 
+                        break;
+                    case "UpperCase":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[A-Z]+")
+                        .WithMessage($"{nameof(FirstTimeUserPasswordCommand.Password)} {rule.Error}");
+                        break;
+                        case "LowerCase":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[a-z]+")
+                        .WithMessage($"{nameof(FirstTimeUserPasswordCommand.Password)} {rule.Error}");
+                        break;
+                         case "Numeric":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[0-9]+")
+                        .WithMessage($"{nameof(FirstTimeUserPasswordCommand.Password)} {rule.Error}");
+                        break;
+                         case "SpecialCharacter":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[!@#$%^&*(),.?""{}|<>]")
+                        .WithMessage($"{nameof(FirstTimeUserPasswordCommand.Password)} {rule.Error}");
+                        break;
                      case "NumericOnly":
                         RuleFor(x => x.UserId)
                         .InclusiveBetween(1, int.MaxValue)

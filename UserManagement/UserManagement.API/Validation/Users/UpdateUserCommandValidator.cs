@@ -79,7 +79,14 @@ namespace UserManagement.API.Validation.Users
                         !await _userQueryRepository.AlreadyExistsAsync(user.UserName, user.UserId))             
                            .WithName("User Name")
                             .WithMessage($"{rule.Error}");
-                            break;            
+                            break;  
+                    case "NotFound":
+                           RuleFor(x => x.UserId )
+                           .MustAsync(async (UserId, cancellation) => 
+                        await _userQueryRepository.NotFoundAsync(UserId))             
+                           .WithName("User Id")
+                            .WithMessage($"{rule.Error}");
+                            break;          
                     default:
                         // Handle unknown rule (log or throw)
                         // Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");

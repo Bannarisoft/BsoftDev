@@ -11,6 +11,7 @@ using Core.Domain.Events;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.SwitchProfile.Commands.SwitchProfileByUnit
 {
@@ -38,6 +39,7 @@ namespace Core.Application.SwitchProfile.Commands.SwitchProfileByUnit
         public async Task<ApiResponseDTO<SwitchProfileByUnitDTO>> Handle(SwitchProfileByUnitCommand request, CancellationToken cancellationToken)
         {
             var userId = _ipAddressService.GetUserId();
+            var groupCode = _ipAddressService.GetGroupcode();
             
             var user = await _userQueryRepository.GetByUserByUnit(userId,request.UnitId);
             if (user == null)
@@ -48,7 +50,7 @@ namespace Core.Application.SwitchProfile.Commands.SwitchProfileByUnit
                     Message = "User does not exist."
                 };
             }
-            var token = _jwtTokenHelper.GenerateToken(user.UserName,userId,user.Mobile,user.EmailId,request.CompanyId,request.DivisionId,request.UnitId , out var jti);   
+            var token = _jwtTokenHelper.GenerateToken(user.UserName,userId,user.Mobile,user.EmailId,user.IsFirstTimeUser.ToString(),user.EntityId ?? 0,groupCode,request.CompanyId,request.DivisionId,request.UnitId , out var jti);   
            
             var httpContext = _httpContextAccessor.HttpContext;
             var browserInfo = httpContext?.Request.Headers["User-Agent"].ToString();

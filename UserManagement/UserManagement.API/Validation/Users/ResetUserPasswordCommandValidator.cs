@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IUser;
+using Core.Application.Common.Utilities;
 using Core.Application.Users.Commands.ResetUserPassword;
 using FluentValidation;
 using UserManagement.API.Validation.Common;
@@ -13,10 +15,14 @@ namespace UserManagement.API.Validation.Users
     {
         private readonly List<ValidationRule> _validationRules;
         private readonly IChangePassword _ichangePassword;
-        public ResetUserPasswordCommandValidator( IChangePassword ichangePassword)
+           private readonly IUserQueryRepository _userQueryRepository;
+        private readonly ITimeZoneService _timeZoneService;
+        public ResetUserPasswordCommandValidator( IChangePassword ichangePassword,IUserQueryRepository userQueryRepository,ITimeZoneService timeZoneService)
         {
             _validationRules = ValidationRuleLoader.LoadValidationRules();
             _ichangePassword = ichangePassword;
+            _userQueryRepository = userQueryRepository;
+            _timeZoneService = timeZoneService;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -35,13 +41,36 @@ namespace UserManagement.API.Validation.Users
                             .WithMessage($"{nameof(ResetUserPasswordCommand.Password)} {rule.Error}");
                      
                         break;
-                         case "PasswordHistory":
+                    case "PasswordHistory":
                          RuleFor(x => x.Password)
-                      .MustAsync(async (command,Password, cancellation) => 
-                    !await _ichangePassword.ValidatePasswordbyUserName(command.UserName, Password))
+                        .MustAsync(async (command,Password, cancellation) => 
+                          !await _ichangePassword.ValidatePasswordbyUserName(command.UserName, Password))
                         .WithMessage($"{rule.Error}");
                         break;
-
+                          case "NotFound":
+                         RuleFor(x => x.UserName)
+                        .MustAsync((userName, cancellation) =>
+                        IsUserValid(userName))
+                        .WithMessage($"{rule.Error}");
+                        break;
+                    case "ExpiredVerificationCode":
+                         RuleFor(x => x.UserName)
+                         .MustAsync((userName, cancellation) => 
+                            IsVerificationCodeValid(userName))
+                            .WithMessage($"{rule.Error}");
+                        break;
+                    case "InvalidVerificationCode":
+                         RuleFor(x => x.VerificationCode)
+                         .MustAsync((request, verificationCode, cancellation) =>
+                            IsVerificationCodeCorrect(request.UserName, verificationCode))
+                        .WithMessage($"{rule.Error}");
+                        break;
+                        case "PasswordCompare":
+                         RuleFor(x => x.VerificationCode)
+                        .MustAsync(async (command, password, cancellation) =>
+                            !await IsNewPasswordSameAsOldPassword(command.UserName, password))
+                        .WithMessage($"{rule.Error}");
+                        break;
                          default:
                        
                         break;
@@ -49,5 +78,53 @@ namespace UserManagement.API.Validation.Users
                 
             }
         }
+          private async Task<bool> IsVerificationCodeValid(string userName)
+          {
+              var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+              var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
+         
+              if (!ForgotPasswordCache.CodeStorage.TryGetValue(userName, out var verificationCodeDetails))
+              {
+                  return false;
+              }
+         
+              // Check if the verification code has expired
+              if (verificationCodeDetails.ExpiryTime < currentTime)
+              {
+                  // Remove expired code from the cache
+                  ForgotPasswordCache.CodeStorage.Remove(userName);
+                  return false;
+              }
+         
+              return true;
+          }
+
+    
+           private async Task<bool> IsVerificationCodeCorrect(string userName, string verificationCode)
+           {
+               if (ForgotPasswordCache.CodeStorage.TryGetValue(userName, out var verificationCodeDetails))
+               {
+                   return verificationCodeDetails.Code == verificationCode;
+               }
+               return false;
+           }
+
+           
+           private async Task<bool> IsUserValid(string userName)
+           {
+               var user = await _userQueryRepository.GetByUsernameAsync(userName);
+               return user != null;
+           }
+
+           
+           private async Task<bool> IsNewPasswordSameAsOldPassword(string userName, string newPassword)
+           {
+               var user = await _userQueryRepository.GetByUsernameAsync(userName);
+               if (user != null)
+               {
+                   return BCrypt.Net.BCrypt.Verify(newPassword, user.PasswordHash);
+               }
+               return false;
+           }
     }
 }
