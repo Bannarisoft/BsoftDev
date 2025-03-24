@@ -18,7 +18,7 @@ namespace MaintenanceManagement.Infrastructure
 
             // Build configuration
             IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../FAM.Api"))
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../MaintenanceManagement.Api"))
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
