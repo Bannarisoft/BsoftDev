@@ -77,50 +77,29 @@ namespace UserManagement.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices
             (this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
+        {
+                
+             var environmentSetup = new EnvironmentSetup(configuration);
+    environmentSetup.SetupEnvironmentVariables();
+
+    var connectionString = configuration.GetConnectionString("DefaultConnection")
+                                        .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER"))
+                                        .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID"))
+                                        .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD"));
+
+    var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
+                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER"))
+                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID"))
+                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD"));
+
+            if (string.IsNullOrWhiteSpace(connectionString))
             {
-                var encryptionKey = configuration["Encryption:AESKey"];
-
-            if (string.IsNullOrWhiteSpace(encryptionKey))
-                throw new InvalidOperationException("Encryption key is missing in appsettings.json.");
-
-            // Get encrypted values from environment variables or appsettings.json
-            var encryptedPassword = FetchOrSetEnvironmentVariable("DATABASE_PASSWORD", configuration["Encryption:DefaultEncryptedPassword"]);
-            var encryptedServer = FetchOrSetEnvironmentVariable("DATABASE_SERVER", configuration["Encryption:DefaultEncryptedServer"]);
-            var encryptedUserId = FetchOrSetEnvironmentVariable("DATABASE_USERID", configuration["Encryption:DefaultEncryptedUserId"]);
-
-            // Check if any of the encrypted values are null or empty
-            if (string.IsNullOrWhiteSpace(encryptedPassword))
-                throw new InvalidOperationException("Encrypted password is missing.");
-
-            if (string.IsNullOrWhiteSpace(encryptedServer))
-                throw new InvalidOperationException("Encrypted server is missing.");
-
-            if (string.IsNullOrWhiteSpace(encryptedUserId))
-                throw new InvalidOperationException("Encrypted userId is missing.");
-
-            // Decrypt all the values
-            var decryptedPassword = Decrypt(encryptedPassword, encryptionKey);
-            var decryptedServer = Decrypt(encryptedServer, encryptionKey);
-            var decryptedUserId = Decrypt(encryptedUserId, encryptionKey);
-
-            // Replace placeholders in connection strings
-            var connectionString = configuration.GetConnectionString("DefaultConnection")
-                                               .Replace("{SERVER}", decryptedServer)
-                                               .Replace("{USER_ID}", decryptedUserId)
-                                               .Replace("{ENC_PASSWORD}", decryptedPassword);
-
-            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
-                                                        .Replace("{SERVER}", decryptedServer)
-                                                        .Replace("{USER_ID}", decryptedUserId)
-                                                        .Replace("{ENC_PASSWORD}", decryptedPassword);
-                if (string.IsNullOrWhiteSpace(connectionString))
-                {
-                    throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
-                } 
-                if (string.IsNullOrWhiteSpace(HangfireConnectionString))
-                {
-                    throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
-                }
+                throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
+            } 
+            if (string.IsNullOrWhiteSpace(HangfireConnectionString))
+            {
+                throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
+            }
 
             // Register ApplicationDbContext with SQL Server
            /*  services.AddDbContext<ApplicationDbContext>(options =>
@@ -296,50 +275,6 @@ namespace UserManagement.Infrastructure
             );
 
             return services;
-        }
-          // ✅ AES Decryption Method
-        private static string Decrypt(string encryptedText, string key)
-        {
-            try
-            {
-                byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-                byte[] iv = new byte[16]; // AES IV
-
-                using (Aes aes = Aes.Create())
-                {
-                    aes.Key = keyBytes;
-                    aes.IV = iv;
-                    using (var decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
-                    {
-                        byte[] encryptedBytes = Convert.FromBase64String(encryptedText);
-                        byte[] decryptedBytes = decryptor.TransformFinalBlock(encryptedBytes, 0, encryptedBytes.Length);
-                        return Encoding.UTF8.GetString(decryptedBytes);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Decryption failed: {ex.Message}");
-                return "Decryption Failed!";
-            }
-        }
-          // Method to fetch or set environment variables
-        private static string FetchOrSetEnvironmentVariable(string variableName, string defaultValue)
-        {
-            var value = Environment.GetEnvironmentVariable(variableName);
-            if (string.IsNullOrWhiteSpace(value))
-            {                
-                
-                if (string.IsNullOrWhiteSpace(defaultValue))
-                    throw new InvalidOperationException($"{variableName} is missing and no default value is provided.");
-
-                // Set the environment variable
-                Environment.SetEnvironmentVariable(variableName, defaultValue, EnvironmentVariableTarget.User);                
-                
-                // Return the default value for further processing
-                value = defaultValue;
-            }
-            return value;
-        }
+        }      
     }
 }

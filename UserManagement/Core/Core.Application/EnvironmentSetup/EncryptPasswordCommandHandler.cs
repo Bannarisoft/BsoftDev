@@ -1,8 +1,11 @@
-
-using FAM.Application.Common;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Core.Application.Common;
 using MediatR;
 
-namespace Core.Application.Common.Security
+namespace Core.Application.EnvironmentSetup
 {
     public class EncryptPasswordCommandHandler : IRequestHandler<EncryptPasswordCommand, string>
     {

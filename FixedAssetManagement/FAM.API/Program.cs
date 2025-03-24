@@ -15,8 +15,6 @@
     }
 
 
-
-
     // Load configuration files based on the environment
     builder.Configuration
         .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)    
