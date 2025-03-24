@@ -4,11 +4,11 @@ using System.Text;
 
 namespace FAM.Application.Common
 {
-    public class AesEncryptionService
+    public class EnvironmentEncryptionService
     {
         private readonly string _encryptionKey;
 
-        public AesEncryptionService()
+        public EnvironmentEncryptionService()
         {
             // Fetch Encryption Key from Environment Variable or use a default secure key
             _encryptionKey = Environment.GetEnvironmentVariable("ENCRYPTION_KEY") ?? "MySuperSecureKey1234567890123456";

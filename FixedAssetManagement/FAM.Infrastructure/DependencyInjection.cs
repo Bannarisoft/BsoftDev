@@ -234,11 +234,12 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetTransferReceiptCommandRepository, AssetTransferReceiptCommandRepository>();
             services.AddScoped<IExcelImportCommandRepository, ExcelImportCommandRepository>();
             services.AddScoped<IExcelImportQueryRepository, ExcelImportCommandQueryRepository>();
-            services.AddSingleton<AesEncryptionService>();
+            
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
+            services.AddSingleton<EnvironmentEncryptionService>();
 
             // AutoMapper profiles
             services.AddAutoMapper(
