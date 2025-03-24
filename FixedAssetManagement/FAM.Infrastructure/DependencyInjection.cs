@@ -327,7 +327,7 @@ namespace FAM.Infrastructure
                     throw new InvalidOperationException($"{variableName} is missing and no default value is provided.");
 
                 // Set the environment variable
-                Environment.SetEnvironmentVariable(variableName, defaultValue, EnvironmentVariableTarget.User);                
+                Environment.SetEnvironmentVariable(variableName, defaultValue, EnvironmentVariableTarget.Process);                
                 
                 // Return the default value for further processing
                 value = defaultValue;
