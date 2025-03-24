@@ -71,6 +71,7 @@ using Core.Application.Common.Interfaces.IUserGroup;
 using UserManagement.Infrastructure.Repositories.UserGroup;
 using System.Text;
 using System.Security.Cryptography;
+using Core.Application.Common;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
@@ -257,6 +258,7 @@ namespace UserManagement.Infrastructure
             services.Configure<SmsSettings>(configuration.GetSection("SmsSettings"));
             services.AddSingleton<IEmailService,EmailService>();            
             services.AddSingleton<ISmsService, SmsService>();
+            services.AddSingleton<EnvironmentEncryptionService>();
 
             // AutoMapper profiles
             services.AddAutoMapper(

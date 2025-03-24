@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Core.Application.EnvironmentSetup;
+using Core.Application.Common.EnvironmentSetup;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,7 +34,7 @@ namespace UserManagement.API.Controllers
 //            string connectionString = $"Server={request.Server};Database=FixedAsset;User Id={request.UserId};Password={encryptedPassword};Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=true;";
 
                 // Load `appSettingsPath` from Environment Variable
-            var appSettingsPath = Environment.GetEnvironmentVariable("APP_SETTINGS_PATH");
+            var appSettingsPath = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
             if (string.IsNullOrWhiteSpace(appSettingsPath))
             {
@@ -43,7 +43,7 @@ namespace UserManagement.API.Controllers
                 appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{environment}.json");
 
                 // Set `APP_SETTINGS_PATH` Environment Variable
-                Environment.SetEnvironmentVariable("APP_SETTINGS_PATH", appSettingsPath, EnvironmentVariableTarget.User);
+                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", appSettingsPath, EnvironmentVariableTarget.User);
             }
 
             if (!System.IO.File.Exists($"appsettings.{appSettingsPath}.json"))
