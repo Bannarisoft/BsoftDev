@@ -36,7 +36,6 @@ namespace Core.Application.EventHandlers
                 CreatedBy =userIdString,
                 CreatedByName=_ipAddressService.GetUserName(),
             };
-
             await _mongoDbContext.GetCollection<dynamic>("AuditLogs").InsertOneAsync(auditLog, cancellationToken: cancellationToken);
         }
     }
