@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Core.Application.Security
+namespace Core.Application.EnvironmentSetup
 {
     public class EncryptPasswordCommand : IRequest<string>
     {

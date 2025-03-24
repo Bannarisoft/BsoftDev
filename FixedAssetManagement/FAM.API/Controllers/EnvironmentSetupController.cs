@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Core.Application.Common.Security;
+using Core.Application.Common.EnvironmentSetup;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,12 +7,12 @@ namespace FAM.API.Controllers
 {
     [Route("api/security")]
     [ApiController]
-    public class SecurityController : ControllerBase
+    public class EnvironmentSetupController : ControllerBase
     {
         private readonly IMediator _mediator;
         private readonly IConfiguration _configuration;
 
-        public SecurityController(IMediator mediator, IConfiguration configuration)
+        public EnvironmentSetupController(IMediator mediator, IConfiguration configuration)
         {
             _mediator = mediator;
             _configuration = configuration;

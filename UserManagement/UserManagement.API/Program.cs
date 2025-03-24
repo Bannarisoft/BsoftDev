@@ -6,16 +6,14 @@ using UserManagement.API.Configurations;
 using Core.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
-// Load the environment (Development or Testing)
-var environment = Environment.GetEnvironmentVariable("APP_SETTINGS_PATH");
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
-// If environment is null or empty, set default to "Development"
-if (string.IsNullOrWhiteSpace(environment))
-{      
-    environment = "Development";
-    Environment.SetEnvironmentVariable("APP_SETTINGS_PATH", environment, EnvironmentVariableTarget.User);
-}
-
+    // If environment is null or empty, set default to "Development"
+    if (string.IsNullOrWhiteSpace(environment))
+    {      
+        environment = "Development";
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
+    }
 
 builder.Configuration    
     .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
