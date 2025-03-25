@@ -6,6 +6,7 @@ namespace Core.Application.SpecificationMaster.Queries.GetSpecificationMasterAut
 {
     public class GetSpecificationMasterAutoCompleteQuery : IRequest<ApiResponseDTO<List<SpecificationMasterAutoCompleteDTO>>>    
     {
+        public int? AssetGroupId { get; set; }
          public string? SearchPattern { get; set; }
     }
 }
