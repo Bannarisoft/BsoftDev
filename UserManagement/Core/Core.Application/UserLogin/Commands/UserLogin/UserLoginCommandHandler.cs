@@ -51,14 +51,6 @@ namespace Core.Application.UserLogin.Commands.UserLogin
         {
             _logger.LogInformation("Handling user login request for Username: {Username}", request.Username);
 
-             if (_userLockoutInfo.TryGetValue(request.Username, out var lockoutInfo) && lockoutInfo.IsLocked)
-            {
-                 return new ApiResponseDTO<LoginResponse>
-                    {
-                        IsSuccess = false,
-                        Message = $"User is locked. Try again after {lockoutInfo.UnlockTime:G}."
-                    };
-            }
                         
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
             var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
@@ -139,22 +131,8 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                 }
             };
         } 
-         private void UnlockUser(string username)
-        {
-            if (_userLockoutInfo.TryGetValue(username, out var userInfo))
-            {
-                userInfo.IsLocked = false;
-                userInfo.Attempts = 0;
-                userInfo.UnlockTime = null;
-
-                _logger.LogInformation("User {Username} has been unlocked automatically by Hangfire.", username);
-            }
-            else
-            {
-                _logger.LogWarning("Attempted to unlock user {Username}, but no lockout info was found.", username);
-            }
-        }  
-        private async Task<(int,int)> loginAttemptSession(string username, DateTime currentTime)
+      
+        public async Task<(int,int)> loginAttemptSession(string username, DateTime currentTime)
         {
               
                 if (!_userLockoutInfo.ContainsKey(username))
@@ -179,9 +157,9 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                     // Lock the user
                     userInfo.IsLocked = true; 
                     userInfo.UnlockTime = currentTime.AddMinutes(companySettings.AutoReleaseTime);
-
+                    _userRepository.lockUser(username);
                     // Schedule Hangfire job to unlock user
-                    BackgroundJob.Schedule(() => UnlockUser(username), TimeSpan.FromMinutes(companySettings.AutoReleaseTime));
+                    BackgroundJob.Schedule<IUserCommandRepository>(service =>service.UnlockUser(username), TimeSpan.FromMinutes(companySettings.AutoReleaseTime));
 
                     _logger.LogWarning("User {Username} is locked due to too many invalid login attempts.", username);
 

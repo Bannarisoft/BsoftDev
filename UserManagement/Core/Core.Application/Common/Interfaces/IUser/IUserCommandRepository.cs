@@ -13,6 +13,8 @@ namespace Core.Application.Common.Interfaces.IUser
         Task<int> UpdateAsync(int userId,User user);
         Task<bool> DeleteAsync(int userId,User user);   
         Task<int> SetAdminPassword(int userId,User user);
+        Task<bool> UnlockUser(string username);
+        Task<bool> lockUser(string username);
     }
 
 }

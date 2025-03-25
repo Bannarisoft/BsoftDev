@@ -19,6 +19,7 @@ namespace Core.Domain.Entities
         public string ShortName { get; set; }
         public string DeptName { get; set; }
         public int CompanyId { get; set; }
+        public IList<UserDepartment> userDepartments { get; set; }
                   
 
     }

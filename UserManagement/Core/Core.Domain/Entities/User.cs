@@ -22,7 +22,8 @@ namespace Core.Domain.Entities
     public string? PasswordHash { get; set; }
     public int? UserType { get; set; }
     public string? Mobile { get; set; }
-    public string? EmailId { get; set; }    
+    public string? EmailId { get; set; } 
+    public byte IsLocked  { get; set; }   
     
     public IList<UserRoleAllocation>? UserRoleAllocations { get; set; }
 
@@ -35,6 +36,7 @@ namespace Core.Domain.Entities
      public int? UserGroupId { get; set; }
      public UserGroup? UserGroup { get; set; }
      public IList<UserDivision> userDivisions { get; set; }
+     public IList<UserDepartment> userDepartments { get; set; }
 
     public void SetPassword(string password)
     {

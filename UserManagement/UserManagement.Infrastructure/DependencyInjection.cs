@@ -82,7 +82,7 @@ namespace UserManagement.Infrastructure
         {
                 
              var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
-            var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);;
+            var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
