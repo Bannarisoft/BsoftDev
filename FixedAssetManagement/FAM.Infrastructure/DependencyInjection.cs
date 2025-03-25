@@ -75,28 +75,17 @@ using FAM.Infrastructure.Repositories.ExcelImport;
 using FAM.Application.Common;
 using System.Text;
 using System.Security.Cryptography;
+using FAM.Infrastructure.Helpers;
 
 namespace FAM.Infrastructure
 {
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
-        {
-           
+        {           
 
-             var environmentSetup = new EnvironmentSetup(configuration);
-    environmentSetup.SetupEnvironmentVariables();
-
-    var connectionString = configuration.GetConnectionString("DefaultConnection")
-                                        .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER"))
-                                        .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID"))
-                                        .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD"));
-
-    var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
-                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER"))
-                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID"))
-                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD"));
-
+            var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
+            var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);
 
             //var connectionString = configuration.GetConnectionString("DefaultConnection");
             //var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");

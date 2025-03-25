@@ -7,7 +7,8 @@ using Core.Application.Common.Interfaces;
 using UserManagement.Infrastructure.Repositories;
 using MongoDB.Driver;
 using Microsoft.AspNetCore.Http;
-using UserManagement.Infrastructure.Services;  // Ensure this is included if needed for IHttpContextAccessor
+using UserManagement.Infrastructure.Services;
+using UserManagement.Infrastructure.Helpers;  // Ensure this is included if needed for IHttpContextAccessor
 
 namespace UserManagement.Infrastructure
 {
@@ -20,11 +21,10 @@ namespace UserManagement.Infrastructure
             // Build configuration
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../UserManagement.Api"))
-                .AddJsonFile("appsettings.{environment}.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment}.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
+          var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
 
             optionsBuilder.UseSqlServer(connectionString);
 
