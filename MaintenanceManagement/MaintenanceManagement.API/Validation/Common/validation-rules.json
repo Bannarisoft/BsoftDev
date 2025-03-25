@@ -109,6 +109,10 @@
         "error": "{PropertyName} already exists."
     },
     {
+        "rule": "RecordNotFound",      
+        "error": "{PropertyName} not found."
+    },
+    {
         "rule": "SoftDelete",      
         "error": "Cannot delete the relationship as it is active with another table."
     }

@@ -10,6 +10,11 @@ using MongoDB.Driver;
 using Serilog;
 using MaintenanceManagement.Infrastructure.Data;
 using MaintenanceManagement.Infrastructure.Services;
+using Core.Application.Common.Interfaces.ICostCenter;
+using MaintenanceManagement.Infrastructure.Repositories.CostCenter;
+using Core.Application.Common.Mappings;
+using Core.Application.Common.Interfaces.IWorkCenter;
+using MaintenanceManagement.Infrastructure.Repositories.WorkCenter;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -102,17 +107,22 @@ namespace MaintenanceManagement.Infrastructure
             services.AddHttpContextAccessor();
 
             // Register repositories
-            
+            services.AddScoped<ICostCenterQueryRepository, CostCenterQueryRepository>();
+            services.AddScoped<ICostCenterCommandRepository, CostCenterCommandRepository>();
+            services.AddScoped<IWorkCenterQueryRepository, WorkCenterQueryRepository>();
+            services.AddScoped<IWorkCenterCommandRepository, WorkCenterCommandRepository>();
             
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
+            
 
             // AutoMapper profiles
-            // services.AddAutoMapper(
-				
-            // );
+            services.AddAutoMapper(
+            typeof(CostCenterProfile),
+            typeof(WorkCenterProfile)	
+            );
             return services;
         }
     }
