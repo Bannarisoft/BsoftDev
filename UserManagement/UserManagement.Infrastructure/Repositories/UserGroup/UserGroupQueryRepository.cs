@@ -1,4 +1,5 @@
 using System.Data;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IUserGroup;
 using Dapper;
 
@@ -7,9 +8,11 @@ namespace UserManagement.Infrastructure.Repositories.UserGroup
     public class UserGroupQueryRepository :IUserGroupQueryRepository
     {
          private readonly IDbConnection _dbConnection; 
-        public  UserGroupQueryRepository(IDbConnection dbConnection)
+         private readonly IIPAddressService _ipAddressService;
+        public  UserGroupQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<(List<Core.Domain.Entities.UserGroup>, int)> GetAllUserGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
@@ -56,13 +59,46 @@ namespace UserManagement.Infrastructure.Repositories.UserGroup
         }
 
         public async Task<List<Core.Domain.Entities.UserGroup>> GetUserGroups(string searchTerm = null)
-        {
-            const string query = @"
+        { 
+            var groupCode = _ipAddressService.GetGroupcode();
+            var query="";
+            if (groupCode == "COMP_ADM" || groupCode == "COMP_ADM_USR")
+            {
+                query = @"
             SELECT Id, GroupCode, GroupName,  IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
                 ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP, IsDeleted
             FROM AppSecurity.UserGroup
-            WHERE (GroupName LIKE @searchTerm OR CAST(Id AS NVARCHAR) LIKE @searchTerm) AND IsDeleted = 0
+            WHERE (GroupName LIKE @searchTerm OR CAST(Id AS NVARCHAR) LIKE @searchTerm) AND IsDeleted = 0 AND GroupCode IN ('COMP_ADM_USR')
             ORDER BY Id DESC";
+            }
+             else if (groupCode == "ENT_ADM" || groupCode == "ENT_ADM_USR")
+            {
+                query = @"
+            SELECT Id, GroupCode, GroupName,  IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
+                ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP, IsDeleted
+            FROM AppSecurity.UserGroup
+            WHERE (GroupName LIKE @searchTerm OR CAST(Id AS NVARCHAR) LIKE @searchTerm) AND IsDeleted = 0 AND GroupCode IN ('ENT_ADM_USR','COMP_ADM')
+            ORDER BY Id DESC";
+            }
+            else if (groupCode == "SUPER_ADM" || groupCode == "SUPER_ADM_USR")
+            {
+                query = @"
+            SELECT Id, GroupCode, GroupName,  IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
+                ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP, IsDeleted
+            FROM AppSecurity.UserGroup
+            WHERE (GroupName LIKE @searchTerm OR CAST(Id AS NVARCHAR) LIKE @searchTerm) AND IsDeleted = 0 AND GroupCode IN ('SUPER_ADM_USR','ENT_ADM')
+            ORDER BY Id DESC";
+            }
+             else 
+            {
+                query = @"
+            SELECT Id, GroupCode, GroupName,  IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
+                ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP, IsDeleted
+            FROM AppSecurity.UserGroup
+            WHERE (GroupName LIKE @searchTerm OR CAST(Id AS NVARCHAR) LIKE @searchTerm) AND IsDeleted = 0 AND GroupCode IN ('COMP_ADM_USR')
+            ORDER BY Id DESC";
+            }
+            
 
             var parameters = new
             {

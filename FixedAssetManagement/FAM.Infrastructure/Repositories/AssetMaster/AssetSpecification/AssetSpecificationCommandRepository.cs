@@ -38,7 +38,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
                 existingAssetSpecGroup.AssetId = assetSpecifications.AssetId;
                 existingAssetSpecGroup.IsActive = assetSpecifications.IsActive;
                 existingAssetSpecGroup.SpecificationId = assetSpecifications.SpecificationId;
-                existingAssetSpecGroup.SpecificationValue = assetSpecifications.SpecificationValue;
+                existingAssetSpecGroup.SpecificationValue = assetSpecifications.SpecificationValue;                
                 _applicationDbContext.AssetSpecifications.Update(existingAssetSpecGroup);
                 return await _applicationDbContext.SaveChangesAsync();
             }

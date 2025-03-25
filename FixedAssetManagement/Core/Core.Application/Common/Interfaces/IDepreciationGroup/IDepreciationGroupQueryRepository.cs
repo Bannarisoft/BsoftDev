@@ -10,6 +10,6 @@ namespace Core.Application.Common.Interfaces.IDepreciationGroup
         Task<List<DepreciationGroupDTO>> GetByDepreciationNameAsync(string depreciationGroupName);             
         Task<List<Core.Domain.Entities.MiscMaster>> GetBookTypeAsync();             
         Task<List<Core.Domain.Entities.MiscMaster>> GetDepreciationMethodAsync();        
-
+        Task<bool> SoftDeleteValidation(int Id); 
     }
 }

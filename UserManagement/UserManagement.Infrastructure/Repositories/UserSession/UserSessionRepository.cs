@@ -5,18 +5,22 @@ using Core.Domain.Entities;
 using Core.Application.Common.Interfaces.IUserSession;
 using Infrastructure;
 using Core.Application.Common.Interfaces;
+using System.Data;
+using Dapper;
 
 namespace UserManagement.Infrastructure.Repositories
 {
     public class UserSessionRepository : IUserSessionRepository
     {
         private readonly ApplicationDbContext _applicationDbContext;   
-        private readonly ITimeZoneService _timeZoneService;       
+        private readonly ITimeZoneService _timeZoneService;    
+        private readonly IDbConnection _dbConnection;   
 
-        public UserSessionRepository(ApplicationDbContext applicationDbContext, ITimeZoneService timeZoneService)
+        public UserSessionRepository(ApplicationDbContext applicationDbContext, ITimeZoneService timeZoneService, IDbConnection dbConnection)
         {
             _applicationDbContext = applicationDbContext;    
-            _timeZoneService = timeZoneService;                 
+            _timeZoneService = timeZoneService;     
+            _dbConnection = dbConnection;            
         }       
         public async Task AddSessionAsync(UserSessions session)
         {
@@ -76,5 +80,15 @@ namespace UserManagement.Infrastructure.Repositories
 
             await _applicationDbContext.SaveChangesAsync();
         }
+           public async Task<bool> ValidateUserSession(string username )
+          {
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
+              var query = @"SELECT COUNT(1) FROM [AppSecurity].[Users] U
+            INNER JOIN [AppSecurity].[UserSessions] US ON US.UserId = U.UserId WHERE U.UserName = @username AND US.IsActive = 1 AND US.ExpiresAt > @currentTime";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { username = username, currentTime = currentTime });
+                return count > 0;
+          }
     }
 }

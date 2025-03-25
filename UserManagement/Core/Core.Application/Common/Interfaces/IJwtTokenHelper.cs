@@ -6,7 +6,7 @@ namespace Core.Application.Common.Interfaces
 {
     public interface IJwtTokenHelper
     {
-        string GenerateToken(string? username,int userid,string Mobile,string EmailId,int CompanyId,int DivisionId,int UnitId, out string jti);
+        string GenerateToken(string? username,int userid,string Mobile,string EmailId,string IsFirstTimeUser,int EntityId,string GroupCode,int CompanyId,int DivisionId,int UnitId, out string jti);
         ClaimsPrincipal ValidateToken(string token);
     }
 }

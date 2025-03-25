@@ -123,5 +123,17 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
             return result.ToList();
         }
+
+        public async Task<bool> SoftDeleteValidation(int Id)
+        {
+            const string query = @"
+                SELECT 1 AM.Id
+                FROM FixedAsset.AssetMaster AM
+                inner join  FixedAsset.AssetWarranty AW on AW.AssetId = AM.Id
+                WHERE AW.Id = @Id AND   AM.IsDeleted = 0;";        
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });        
+            var warrantyExists = await multi.ReadFirstOrDefaultAsync<int?>();          
+            return warrantyExists.HasValue ;
+        }
     }
 }

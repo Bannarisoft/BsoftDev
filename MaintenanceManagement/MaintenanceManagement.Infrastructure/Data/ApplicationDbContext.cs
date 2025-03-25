@@ -26,6 +26,8 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<MachineGroup> MachineGroup { get ; set; }
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<MiscMaster> MiscMaster { get; set; }
+        public DbSet<ShiftMaster> ShiftMaster { get; set; }
+        public DbSet<ShiftMasterDetail> ShiftMasterDetail { get; set; }
        
 
 
@@ -36,6 +38,8 @@ namespace MaintenanceManagement.Infrastructure.Data
            modelBuilder.ApplyConfiguration( new MachineGroupConfiguration());
            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new ShiftMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new ShiftMasterDetailsConfiguration());
 
 
             base.OnModelCreating(modelBuilder);

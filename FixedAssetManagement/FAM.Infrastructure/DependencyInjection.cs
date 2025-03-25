@@ -72,15 +72,23 @@ using FAM.Infrastructure.Repositories.AssetTransferReceipt;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer;
 using Core.Application.Common.Interfaces.IExcelImport;
 using FAM.Infrastructure.Repositories.ExcelImport;
+using FAM.Application.Common;
+using System.Text;
+using System.Security.Cryptography;
+using FAM.Infrastructure.Helpers;
 
 namespace FAM.Infrastructure
 {
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
-        {
-              var connectionString = configuration.GetConnectionString("DefaultConnection");
-                var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
+        {           
+
+            var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
+            var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);
+
+            //var connectionString = configuration.GetConnectionString("DefaultConnection");
+            //var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
 
                 if (string.IsNullOrWhiteSpace(connectionString))
                 {
@@ -220,6 +228,7 @@ namespace FAM.Infrastructure
             services.AddScoped<IIPAddressService, IPAddressService>(); 
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
+            services.AddSingleton<EnvironmentEncryptionService>();
 
             // AutoMapper profiles
             services.AddAutoMapper(
@@ -250,5 +259,6 @@ namespace FAM.Infrastructure
             );
             return services;
         }
+      
     }
 }

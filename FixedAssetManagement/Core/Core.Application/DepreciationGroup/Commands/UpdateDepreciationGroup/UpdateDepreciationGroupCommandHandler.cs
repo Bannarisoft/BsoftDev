@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup
 {
-    public class UpdateDepreciationGroupCommandHandler : IRequestHandler<UpdateDepreciationGroupCommand, ApiResponseDTO<DepreciationGroupDTO>>
+    public class UpdateDepreciationGroupCommandHandler : IRequestHandler<UpdateDepreciationGroupCommand, ApiResponseDTO<bool>>
     {
         private readonly IDepreciationGroupCommandRepository _depreciationGroupRepository;
         private readonly IDepreciationGroupQueryRepository _depreciationGroupQueryRepository;
@@ -24,29 +24,31 @@ namespace Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<DepreciationGroupDTO>> Handle(UpdateDepreciationGroupCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<bool>> Handle(UpdateDepreciationGroupCommand request, CancellationToken cancellationToken)
         {
             var depreciationGroups = await _depreciationGroupQueryRepository.GetByIdAsync(request.Id);
             if (depreciationGroups is null)
-            return new ApiResponseDTO<DepreciationGroupDTO>
+            return new ApiResponseDTO<bool>
             {
                 IsSuccess = false,
-                Message = "Invalid DepreciationGroupID. The specified Name does not exist or is inactive."
+                Message = "Invalid DepreciationGroupID. The specified Name does not exist"
             };
 
               // Check for duplicate GroupName or SortOrder
-            var (isNameDuplicate, isSortOrderDuplicate) = await _depreciationGroupRepository
-                                    .CheckForDuplicatesAsync(request.DepreciationGroupName ?? string.Empty, request.SortOrder, request.Id);
+            var (isNameDuplicate, isCodeDuplicate,isSortOrderDuplicate) = await _depreciationGroupRepository
+                                    .CheckForDuplicatesAsync(request.DepreciationGroupName ?? string.Empty,request.Code ?? string.Empty, request.SortOrder, request.Id);
 
-            if (isNameDuplicate || isSortOrderDuplicate)
+            if (isNameDuplicate || isCodeDuplicate || isSortOrderDuplicate)
             {
-                string errorMessage = isNameDuplicate && isSortOrderDuplicate
+                string errorMessage = isNameDuplicate && isCodeDuplicate && isSortOrderDuplicate
                 ? "Both Category Name and Sort Order already exist."
                 : isNameDuplicate
                 ? "DepreciationGroup with the same Name already exists."
+                : isCodeDuplicate
+                ? "DepreciationGroup with the same Code already exists."
                 : "DepreciationGroup with the same Sort Order already exists.";
 
-                return new ApiResponseDTO<DepreciationGroupDTO>
+                return new ApiResponseDTO<bool>
                 {
                     IsSuccess = false,
                     Message = errorMessage                    
@@ -54,85 +56,29 @@ namespace Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup
             }
             
             var oldDepreciationName = depreciationGroups.DepreciationGroupName;
-            depreciationGroups.DepreciationGroupName = request.DepreciationGroupName;
-
-            if (depreciationGroups is null || depreciationGroups.IsDeleted is BaseEntity.IsDelete.Deleted )
-            {
-                return new ApiResponseDTO<DepreciationGroupDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid DepreciationGroupID. The specified Name does not exist or is deleted."
-                };
-            }
-            if (depreciationGroups.IsActive != request.IsActive)
-            {    
-                depreciationGroups.IsActive =  (BaseEntity.Status)request.IsActive;             
-                var updatedDepreciation = _mapper.Map<DepreciationGroups>(request); 
-                await _depreciationGroupRepository.UpdateAsync(depreciationGroups.Id, updatedDepreciation);
-                if (request.IsActive is 0)
-                {
-                    return new ApiResponseDTO<DepreciationGroupDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "Code DeActivated."
-                    };
-                }
-                else{
-                    return new ApiResponseDTO<DepreciationGroupDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "Code Activated."
-                    }; 
-                }                                     
-            }
-
-            var depreciationGroupsExistsByName = await _depreciationGroupRepository.ExistsByCodeAsync(request.Code??string.Empty);
-            if (depreciationGroupsExistsByName)
-            {                                   
-                return new ApiResponseDTO<DepreciationGroupDTO>
-                {
-                    IsSuccess = false,
-                    Message = $"Code already exists and is {(BaseEntity.Status) request.IsActive}."
-                };                     
-            }
+            
             var updatedDepreciationEntity = _mapper.Map<DepreciationGroups>(request);                   
-            var updateResult = await _depreciationGroupRepository.UpdateAsync(request.Id, updatedDepreciationEntity);            
+            var updateResult = await _depreciationGroupRepository.UpdateAsync(updatedDepreciationEntity);            
 
-            var updatedDepreciationGroup =  await _depreciationGroupQueryRepository.GetByIdAsync(request.Id);    
-            if (updatedDepreciationGroup != null)
-            {
-                var depreciationGroupDto = _mapper.Map<DepreciationGroupDTO>(updatedDepreciationGroup);
+          
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: depreciationGroupDto.Code ?? string.Empty,
-                    actionName: depreciationGroupDto.DepreciationGroupName ?? string.Empty,                            
-                    details: $"DepreciationGroup '{oldDepreciationName}' was updated to '{depreciationGroupDto.DepreciationGroupName}'.  Code: {depreciationGroupDto.Code}",
+                    actionCode: request.Code ?? string.Empty,
+                    actionName: request.DepreciationGroupName ?? string.Empty,                            
+                    details: $"DepreciationGroup '{oldDepreciationName}' was updated to '{request.DepreciationGroupName}'.  Code: {request.Code}",
                     module:"DepreciationGroup"
                 );            
                 await _mediator.Publish(domainEvent, cancellationToken);
-                if(updateResult>0)
+                if(updateResult)
                 {
-                    return new ApiResponseDTO<DepreciationGroupDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "DepreciationGroup updated successfully.",
-                        Data = depreciationGroupDto
-                    };
+                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Depreciation Groups updated successfully."};
                 }
-                return new ApiResponseDTO<DepreciationGroupDTO>
+                return new ApiResponseDTO<bool>
                 {
                     IsSuccess = false,
                     Message = "DepreciationGroup not updated."
                 };                
-            }
-            else
-            {
-                return new ApiResponseDTO<DepreciationGroupDTO>{
-                    IsSuccess = false,
-                    Message = "DepreciationGroup not found."
-                };
-            }
-        }
+            }         
     }
 }

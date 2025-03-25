@@ -106,7 +106,52 @@
     {
         "rule": "InActive",      
         "error": "User is inactive."
+    },
+    {
+        "rule": "InvalidVerificationCode",      
+        "error": "Invalid verification code."
+    },
+    {
+        "rule": "ExpiredVerificationCode",      
+        "error": "Verification code is invalid or has expired."
+    },
+    {
+        "rule": "PasswordCompare",      
+        "error": "Your new password cannot be the same as the old password. Please choose a different password."
+    },
+    {
+        "rule": "UserSession",      
+        "error": "This username is already logged in on another machine. Please log out first."
+    },
+    {
+        "rule": "UserLock",      
+        "error": "User is locked. Try again after {lockoutInfo.UnlockTime:G}."
+    },
+    {
+        "rule": "PasswordLength",             
+        "error": " Passwords must be between 8 to 16 characters."
+    },
+    {
+        "rule": "UpperCase",             
+        "error": " Passwords must include at least one uppercase letter (A-Z)"
+    },
+    {
+        "rule": "LowerCase",             
+        "error": " Passwords must include at least one lowercase letter (a-z)"
+    },
+    {
+        "rule": "Numeric",             
+        "error": " Your password must contain at least one number."
+    },
+    {
+        "rule": "SpecialCharacter",             
+        "error": " Your password must contain at least one special character."
+    },
+    {
+        "rule": "UserRole",             
+        "error": " User does not have any role assigned to it. Contact your admin."
     }
+     
     
     
     

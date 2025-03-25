@@ -160,6 +160,20 @@ namespace UserManagement.Infrastructure.Repositories
         
               return null;
           }
+           public string GetGroupcode()
+          {
+              var GroupCode = _httpContextAccessor.HttpContext?.User?.FindFirst("GroupCode")?.Value;
+        
+        
+              return GroupCode;
+          }
+          public int GetEntityId()
+            {
+              var EntityId = _httpContextAccessor.HttpContext?.User?.FindFirst("EntityId")?.Value;
+        
+        
+              return EntityId != null ? Convert.ToInt32(EntityId) : 0;
+          }
       
     }    
 }

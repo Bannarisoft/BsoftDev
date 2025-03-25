@@ -5,15 +5,24 @@ using Core.Application.MiscMaster.Command.UpdateMiscMaster;
 using Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster;
 using Core.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster;
 
+using Core.Application.ShiftMasterCQRS.Commands.CreateShiftMaster;
+using Core.Application.ShiftMasterCQRS.Commands.DeleteShiftMaster;
+using Core.Application.ShiftMasterCQRS.Commands.UpdateShiftMaster;
+using Core.Application.ShiftMasterDetailCQRS.Commands.CreateShiftMasterDetail;
+using Core.Application.ShiftMasterDetailCQRS.Commands.DeleteShiftMasterDetail;
+using Core.Application.ShiftMasterDetailCQRS.Commands.UpdateShiftMasterDetail;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.MachineGroup;
 using MaintenanceManagement.API.Validation.MiscMaster;
 using MaintenanceManagement.API.Validation.MiscTypeMaster;
+using MaintenanceManagement.API.Validation.ShiftMaster;
+using MaintenanceManagement.API.Validation.ShiftMasterDetail;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
     public class ValidationService
     {
+
         public void AddValidationServices(IServiceCollection services)
         {
             services.AddScoped<MaxLengthProvider>();
@@ -23,6 +32,13 @@ namespace MaintenanceManagement.API.Validation.Common
             services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
             services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
             services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>(); 
+        services.AddScoped<IValidator<CreateShiftMasterCommand>, CreateShiftMasterCommandValidator>();
+        services.AddScoped<IValidator<UpdateShiftMasterCommand>, UpdateShiftMasterCommandValidator>();
+        services.AddScoped<IValidator<DeleteShiftMasterCommand>, DeleteShiftMasterCommandValidator>();
+        services.AddScoped<IValidator<CreateShiftMasterDetailCommand>, CreateShiftMasterDetailCommandValidator>();
+        services.AddScoped<IValidator<UpdateShiftMasterDetailCommand>, UpdateShiftMasterDetailCommandValidator>();
+        services.AddScoped<IValidator<DeleteShiftMasterDetailCommand>, DeleteShiftMasterDetailCommandValidator>();
+
 
 
         }  

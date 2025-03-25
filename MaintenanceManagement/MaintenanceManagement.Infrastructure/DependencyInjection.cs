@@ -18,6 +18,11 @@ using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using MaintenanceManagement.Infrastructure.Repositories.MiscTypeMaster;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using MaintenanceManagement.Infrastructure.Repositories.MiscMaster;
+using Core.Application.Common.Interfaces.IShiftMaster;
+using Core.Domain.Entities;
+using MaintenanceManagement.Infrastructure.Repositories.ShiftMaster;
+using Core.Application.Common.Interfaces.IShiftMasterDetail;
+using MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRepo;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -117,7 +122,10 @@ namespace MaintenanceManagement.Infrastructure
              services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();
              services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
              services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
-            
+            services.AddScoped<IShiftMasterQuery, ShiftMasterQueryRepository>();
+            services.AddScoped<IShiftMasterCommand, ShiftMasterCommandRepository>();
+            services.AddScoped<IShiftMasterDetailQuery, ShiftMasterDetailQueryRepository>();
+            services.AddScoped<IShiftMasterDetailCommand, ShiftMasterDetailCommandRepository>();
             
             
             // Miscellaneous services
@@ -126,11 +134,13 @@ namespace MaintenanceManagement.Infrastructure
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
 
             // AutoMapper profiles
+
              services.AddAutoMapper(
                 typeof(MachineGroupProfile),
                 typeof(MiscTypeMasterProfile),
                 typeof(MiscMasterProfile)
 				
+
              );
             return services;
         }

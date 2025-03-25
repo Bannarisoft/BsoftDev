@@ -8,6 +8,9 @@ using FAM.Infrastructure.Repositories;
 using MongoDB.Driver;
 using Microsoft.AspNetCore.Http;
 using FAM.Infrastructure.Services;
+using System.Text;
+using System.Security.Cryptography;
+using FAM.Infrastructure.Helpers;
 
 namespace FAM.Infrastructure
 {
@@ -17,24 +20,24 @@ namespace FAM.Infrastructure
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+
             // Build configuration
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../FAM.Api"))
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment}.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
+          
+            var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
 
             optionsBuilder.UseSqlServer(connectionString);
 
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
-            // Create a dummy or mock IPAddressService implementation
             IIPAddressService ipAddressService = new IPAddressService(httpContextAccessor);
             ITimeZoneService timeZoneService = new TimeZoneService();
 
-            return new ApplicationDbContext(optionsBuilder.Options, ipAddressService,timeZoneService);  // Pass both dependencies
-            //return new ApplicationDbContext(optionsBuilder.Options);  // Pass both dependencies
+            return new ApplicationDbContext(optionsBuilder.Options, ipAddressService, timeZoneService);
         }
     }
 }

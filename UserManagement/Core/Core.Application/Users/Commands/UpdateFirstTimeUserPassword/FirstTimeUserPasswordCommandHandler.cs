@@ -25,8 +25,7 @@ namespace Core.Application.Users.Commands.UpdateFirstTimeUserPassword
         }
         public async Task<ApiResponseDTO<string>> Handle(FirstTimeUserPasswordCommand request, CancellationToken cancellationToken)
         {
-            //  try
-            //   {
+           
                 
                 var user = await _userQueryRepository.GetByIdAsync(request.UserId);
                 
@@ -48,12 +47,7 @@ namespace Core.Application.Users.Commands.UpdateFirstTimeUserPassword
                  }
                  
                  return new ApiResponseDTO<string> { IsSuccess = false, Message = "Your input password should not match the default password. Please try a different password."};    
-            //    }
-            // catch (Exception ex)
-            // {
-
-            //     return $"Password change failed: {ex.Message}";
-            // }
+           
         }
     }
 }

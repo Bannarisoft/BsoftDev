@@ -122,7 +122,29 @@ namespace UserManagement.Infrastructure.Repositories
         }
         public async Task<bool> ValidatePassword(int userId,string password)
         {
-            var passwordHistoryCount  =  _applicationDbContext.CompanySettings.FirstOrDefault().PasswordHistoryCount;
+            var groupCode = _ipAddressService.GetGroupcode();
+            var Entityid = _ipAddressService.GetEntityId();
+            var CompanyId = _ipAddressService.GetCompanyId();
+            var passwordHistoryCount =0;
+            if (groupCode == "ENT_ADM" || groupCode == "ENT_ADM_USR")
+            {
+                passwordHistoryCount  =  _applicationDbContext.AdminSecuritySettings
+                                         .Where(a => a.EntityId == Entityid)
+                                         .Select(a => a.PasswordHistoryCount)
+                                         .FirstOrDefault();
+            }
+            else if (groupCode == "COMP_ADM" || groupCode == "COMP_ADM_USR")
+            {
+                passwordHistoryCount  =  _applicationDbContext.CompanySettings
+                                         .Where(a => a.CompanyId == CompanyId)
+                                         .Select(c => c.PasswordHistoryCount)
+                                         .FirstOrDefault();
+            }
+            else
+            {
+                return false;
+            }
+            
 
             if (passwordHistoryCount  == 0)
               return false;
@@ -134,7 +156,7 @@ namespace UserManagement.Infrastructure.Repositories
                     .Take(passwordHistoryCount )
                     .ToListAsync();
 
-                    return passwordLogs.Any(log => BCrypt.Net.BCrypt.Verify(password, log.PasswordHash));
+             return passwordLogs.Any(log => BCrypt.Net.BCrypt.Verify(password, log.PasswordHash));
         }
 
         public async Task<bool> ValidateFirstTimeUser(int userId)
@@ -162,12 +184,30 @@ namespace UserManagement.Infrastructure.Repositories
         //   if (companyId == null)
         //     return false;
 
-                var querySettings = @"
-                   SELECT top 1 PasswordHistoryCount 
-                   FROM [AppData].[CompanySetting] 
+                var querySettings = @"Declare @EntityId int,@GroupCode nvarchar(50),@CompanyId int  
+
+                 SET @GroupCode = (SELECT TOP 1 UG.GroupCode FROM [AppSecurity].[Users] U
+                 INNER JOIN [AppSecurity].[UserGroup] UG ON UG.Id = U.UserGroupId
+                 WHERE U.Username = @Username AND U.IsDeleted = 0 )
+
+               IF @GroupCode = 'ENT_ADM_USR' OR @GroupCode = 'ENT_ADM'
+               BEGIN
+                 SET @EntityId = (SELECT TOP 1 U.EntityId FROM [AppSecurity].[Users] U
+                    WHERE U.Username = @Username AND U.IsDeleted = 0 )
+
+                 SELECT TOP 1 PasswordHistoryCount  FROM [AppSecurity].[AdminSecuritySettings] WHERE EntityId = @EntityId AND IsDeleted = 0
+               END
+               ELSE IF @GroupCode = 'COMP_ADM_USR' OR @GroupCode = 'COMP_ADM'
+               BEGIN
+
+                SET @CompanyId = (SELECT TOP 1 UC.CompanyId FROM [AppSecurity].[Users] U
+                INNER JOIN [AppSecurity].[UserCompany] UC ON UC.UserId = U.UserId  WHERE U.Username = @Username AND U.IsDeleted = 0 AND UC.IsActive = 1)
+
+                SELECT TOP 1  PasswordHistoryCount  FROM [AppData].[CompanySetting] WHERE CompanyId = @CompanyId AND IsDeleted = 0   
+               END
                    ";
 
-               var passwordHistoryCount = await _dbConnection.QueryFirstOrDefaultAsync<int?>(querySettings);
+               var passwordHistoryCount = await _dbConnection.QueryFirstOrDefaultAsync<int?>(querySettings, new { Username = username });
 
                if (passwordHistoryCount == null || passwordHistoryCount == 0)
                    return false; 
@@ -186,5 +226,6 @@ namespace UserManagement.Infrastructure.Repositories
                
                return passwordLogs.Any(hash => BCrypt.Net.BCrypt.Verify(password, hash));
         }
+        
     }
 }

@@ -43,10 +43,10 @@ namespace UserManagement.Infrastructure.Repositories.CompanySettings
                 companySettingsToUpdate.MaxConcurrentLogins = companySettings.MaxConcurrentLogins;
                 companySettingsToUpdate.ForgotPasswordCodeExpiry = companySettings.ForgotPasswordCodeExpiry;
                 companySettingsToUpdate.CaptchaOnLogin = companySettings.CaptchaOnLogin;
-                companySettingsToUpdate.Currency = companySettings.Currency;
-                companySettingsToUpdate.Language = companySettings.Language;
+                companySettingsToUpdate.CurrencyId = companySettings.CurrencyId;
+                companySettingsToUpdate.LanguageId = companySettings.LanguageId;
                 companySettingsToUpdate.TimeZone = companySettings.TimeZone;
-                companySettingsToUpdate.FinancialYear = companySettings.FinancialYear;
+                companySettingsToUpdate.FinancialYearId = companySettings.FinancialYearId;
                 companySettingsToUpdate.IsActive = companySettings.IsActive;
                 _context.CompanySettings.Update(companySettingsToUpdate);
               return await  _context.SaveChangesAsync() > 0;
