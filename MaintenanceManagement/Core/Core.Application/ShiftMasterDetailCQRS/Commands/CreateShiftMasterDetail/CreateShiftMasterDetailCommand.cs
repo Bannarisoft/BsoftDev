@@ -13,7 +13,6 @@ namespace Core.Application.ShiftMasterDetailCQRS.Commands.CreateShiftMasterDetai
         public int UnitId { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
-        public decimal DurationInHours { get; set; }
         public int BreakDurationInMinutes { get; set; }
         public DateOnly EffectiveDate { get; set; }
         public int ShiftSupervisorId { get; set; }

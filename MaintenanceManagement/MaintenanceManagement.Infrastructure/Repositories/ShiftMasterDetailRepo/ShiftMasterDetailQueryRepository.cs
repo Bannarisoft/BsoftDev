@@ -9,10 +9,10 @@ using Dapper;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRepo
 {
-    public class ShiftMasterQueryRepository : IShiftMasterDetailQuery
+    public class ShiftMasterDetailQueryRepository : IShiftMasterDetailQuery
     {
         private readonly IDbConnection _dbConnection;
-        public ShiftMasterQueryRepository(IDbConnection dbConnection)
+        public ShiftMasterDetailQueryRepository(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }
@@ -21,6 +21,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
              var query = "SELECT COUNT(1) FROM [Maintenance].[ShiftMasterDetails] WHERE ShiftMasterId = @ShiftMasterId AND IsDeleted = 0";
                
                 var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { ShiftMasterId = ShiftMasterId });
+                return count > 0;
+        }
+
+        public async Task<bool> FKColumnValidation(int ShiftMasterId)
+        {
+            var query = "SELECT COUNT(1) FROM [Maintenance].[ShiftMaster] WHERE Id = @Id AND IsDeleted = 0";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = ShiftMasterId });
                 return count > 0;
         }
 
@@ -75,11 +83,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
             throw new NotImplementedException();
         }
 
-        public async Task<bool> NotFoundAsync(int ShiftMasterId)
+        public async Task<bool> NotFoundAsync(int Id)
         {
-             var query = "SELECT COUNT(1) FROM [Maintenance].[ShiftMasterDetails] WHERE ShiftMasterId = @ShiftMasterId AND IsDeleted = 0";
+             var query = "SELECT COUNT(1) FROM [Maintenance].[ShiftMasterDetails] WHERE Id = @Id AND IsDeleted = 0";
              
-                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { ShiftMasterId = ShiftMasterId });
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = Id });
                 return count > 0;
         }
 

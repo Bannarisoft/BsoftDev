@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRepo
 {
-    public class ShiftMasterCommandRepository : IShiftMasterDetailCommand
+    public class ShiftMasterDetailCommandRepository : IShiftMasterDetailCommand
     {
         private readonly ApplicationDbContext _applicationDbContext;
-        public ShiftMasterCommandRepository(ApplicationDbContext applicationDbContext)
+        public ShiftMasterDetailCommandRepository(ApplicationDbContext applicationDbContext)
         {
             _applicationDbContext = applicationDbContext;
         }
