@@ -22,7 +22,8 @@ namespace MaintenanceManagement.Infrastructure.Data
                
         }
         
-        // public DbSet<AssetGroup> AssetGroup { get; set; } 
+         public DbSet<CostCenter> CostCenter { get; set; } 
+         public DbSet<WorkCenter> WorkCenter { get; set; } 
         public DbSet<MachineGroup> MachineGroup { get ; set; }
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<MiscMaster> MiscMaster { get; set; }
@@ -30,9 +31,8 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<ShiftMasterDetail> ShiftMasterDetail { get; set; }
        
 
-
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
+
         {            
          //  modelBuilder.ApplyConfiguration(new MachineGroupConfiguration());
            modelBuilder.ApplyConfiguration( new MachineGroupConfiguration());
@@ -40,6 +40,9 @@ namespace MaintenanceManagement.Infrastructure.Data
            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
             modelBuilder.ApplyConfiguration(new ShiftMasterConfiguration());
             modelBuilder.ApplyConfiguration(new ShiftMasterDetailsConfiguration());
+        
+            modelBuilder.ApplyConfiguration(new CostCenterConfiguration());
+            modelBuilder.ApplyConfiguration(new WorkCenterConfiguration());
 
 
             base.OnModelCreating(modelBuilder);
