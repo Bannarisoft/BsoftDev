@@ -6,6 +6,7 @@ using Core.Domain.Common;
 using MaintenanceManagement.Infrastructure.Data.Configurations;
 
 
+
 namespace MaintenanceManagement.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContext
@@ -23,6 +24,8 @@ namespace MaintenanceManagement.Infrastructure.Data
         
         // public DbSet<AssetGroup> AssetGroup { get; set; } 
         public DbSet<MachineGroup> MachineGroup { get ; set; }
+        public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
+        public DbSet<MiscMaster> MiscMaster { get; set; }
         public DbSet<ShiftMaster> ShiftMaster { get; set; }
         public DbSet<ShiftMasterDetail> ShiftMasterDetail { get; set; }
        
@@ -33,8 +36,11 @@ namespace MaintenanceManagement.Infrastructure.Data
         {            
          //  modelBuilder.ApplyConfiguration(new MachineGroupConfiguration());
            modelBuilder.ApplyConfiguration( new MachineGroupConfiguration());
+           modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
+           modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
             modelBuilder.ApplyConfiguration(new ShiftMasterConfiguration());
             modelBuilder.ApplyConfiguration(new ShiftMasterDetailsConfiguration());
+
 
             base.OnModelCreating(modelBuilder);
 

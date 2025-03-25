@@ -10,11 +10,20 @@ using MongoDB.Driver;
 using Serilog;
 using MaintenanceManagement.Infrastructure.Data;
 using MaintenanceManagement.Infrastructure.Services;
+using Core.Application.Common.Interfaces.IMachineGroup;
+using System.Reflection.PortableExecutable;
+using MaintenanceManagement.Infrastructure.Repositories.MachineGroup;
+using Core.Application.Common.Mappings;
+using Core.Application.Common.Interfaces.IMiscTypeMaster;
+using MaintenanceManagement.Infrastructure.Repositories.MiscTypeMaster;
+using Core.Application.Common.Interfaces.IMiscMaster;
+using MaintenanceManagement.Infrastructure.Repositories.MiscMaster;
 using Core.Application.Common.Interfaces.IShiftMaster;
 using Core.Domain.Entities;
 using MaintenanceManagement.Infrastructure.Repositories.ShiftMaster;
 using Core.Application.Common.Interfaces.IShiftMasterDetail;
 using MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRepo;
+
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -107,10 +116,17 @@ namespace MaintenanceManagement.Infrastructure
             services.AddHttpContextAccessor();
 
             // Register repositories
+             services.AddScoped<IMachineGroupCommandRepository, MachineGroupCommandRepository>(); 
+             services.AddScoped<IMachineGroupQueryRepository, MachineGroupQueryRepository>();
+             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
+             services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();
+             services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
+             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
             services.AddScoped<IShiftMasterQuery, ShiftMasterQueryRepository>();
             services.AddScoped<IShiftMasterCommand, ShiftMasterCommandRepository>();
             services.AddScoped<IShiftMasterDetailQuery, ShiftMasterDetailQueryRepository>();
             services.AddScoped<IShiftMasterDetailCommand, ShiftMasterDetailCommandRepository>();
+            
             
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -118,9 +134,14 @@ namespace MaintenanceManagement.Infrastructure
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
 
             // AutoMapper profiles
-            // services.AddAutoMapper(
+
+             services.AddAutoMapper(
+                typeof(MachineGroupProfile),
+                typeof(MiscTypeMasterProfile),
+                typeof(MiscMasterProfile)
 				
-            // );
+
+             );
             return services;
         }
     }
