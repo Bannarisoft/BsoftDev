@@ -40,6 +40,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
 
             return result > 0;
         }
+   
 
         public async Task<bool> GetByMachineGroupnameAsync(string groupName)
         {
