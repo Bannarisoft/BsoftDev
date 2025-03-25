@@ -27,9 +27,9 @@ namespace UserManagement.API.Controllers
             var encryptedServer = await _mediator.Send(new EncryptPasswordCommand(request.Server));
             var encryptedUserId = await _mediator.Send(new EncryptPasswordCommand(request.UserId));
 
-            Environment.SetEnvironmentVariable("DATABASE_SERVER", encryptedServer, EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DATABASE_USERID", encryptedUserId, EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DATABASE_PASSWORD", encryptedPassword, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DATABASE_SERVER", encryptedServer, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("DATABASE_USERID", encryptedUserId, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("DATABASE_PASSWORD", encryptedPassword, EnvironmentVariableTarget.Process);
             
 //            string connectionString = $"Server={request.Server};Database=FixedAsset;User Id={request.UserId};Password={encryptedPassword};Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=true;";
 
@@ -43,7 +43,7 @@ namespace UserManagement.API.Controllers
                 appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{environment}.json");
 
                 // Set `APP_SETTINGS_PATH` Environment Variable
-                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", appSettingsPath, EnvironmentVariableTarget.User);
+                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", appSettingsPath, EnvironmentVariableTarget.Process);
             }
 
             if (!System.IO.File.Exists($"appsettings.{appSettingsPath}.json"))
