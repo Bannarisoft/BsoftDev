@@ -10,6 +10,11 @@ using MongoDB.Driver;
 using Serilog;
 using MaintenanceManagement.Infrastructure.Data;
 using MaintenanceManagement.Infrastructure.Services;
+using Core.Application.Common.Interfaces.IShiftMaster;
+using Core.Domain.Entities;
+using MaintenanceManagement.Infrastructure.Repositories.ShiftMaster;
+using Core.Application.Common.Interfaces.IShiftMasterDetail;
+using MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRepo;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -102,7 +107,10 @@ namespace MaintenanceManagement.Infrastructure
             services.AddHttpContextAccessor();
 
             // Register repositories
-            
+            services.AddScoped<IShiftMasterQuery, ShiftMasterQueryRepository>();
+            services.AddScoped<IShiftMasterCommand, ShiftMasterCommandRepository>();
+            services.AddScoped<IShiftMasterDetailQuery, ShiftMasterDetailQueryRepository>();
+            services.AddScoped<IShiftMasterDetailCommand, ShiftMasterDetailCommandRepository>();
             
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
