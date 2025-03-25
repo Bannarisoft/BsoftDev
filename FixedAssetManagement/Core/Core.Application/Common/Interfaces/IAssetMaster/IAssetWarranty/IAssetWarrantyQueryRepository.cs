@@ -9,6 +9,7 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty
         Task<(List<AssetWarrantyDTO>,int)> GetAllAssetWarrantyAsync(int PageNumber, int PageSize, string? SearchTerm);        
         Task<List<AssetWarrantyDTO>> GetByAssetWarrantyNameAsync(string assetName);  
         Task<List<Core.Domain.Entities.MiscMaster>> GetWarrantyTypeAsync();    
-        Task<List<Core.Domain.Entities.MiscMaster>> GetWarrantyClaimStatusAsync();    
+        Task<List<Core.Domain.Entities.MiscMaster>> GetWarrantyClaimStatusAsync();  
+        Task<bool> SoftDeleteValidation(int Id);   
     }
 }

@@ -35,6 +35,8 @@ namespace UserManagement.API.Controllers
          private readonly IValidator<ChangeUserPasswordCommand> _changeUserPasswordCommandValidator;
          private readonly ILogger<UserController> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IValidator<ForgotUserPasswordCommand> _forgotUserPasswordCommandValidator;
+        private readonly IValidator<ResetUserPasswordCommand> _resetUserPasswordCommandValidator;
          
        public UserController(ISender mediator, 
                              IValidator<CreateUserCommand> createUserCommandValidator, 
@@ -42,7 +44,9 @@ namespace UserManagement.API.Controllers
                              ApplicationDbContext dbContext, 
                              IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator, 
                              IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
-                             ILogger<UserController> logger,IHttpClientFactory httpClientFactory) 
+                             ILogger<UserController> logger,IHttpClientFactory httpClientFactory,
+                             IValidator<ForgotUserPasswordCommand> forgotUserPasswordCommandValidator,
+                             IValidator<ResetUserPasswordCommand> resetUserPasswordCommandValidator) 
          : base(mediator)
         {        
             _createUserCommandValidator = createUserCommandValidator;
@@ -52,6 +56,8 @@ namespace UserManagement.API.Controllers
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
             _logger = logger;
             _httpClientFactory = httpClientFactory;
+            _forgotUserPasswordCommandValidator = forgotUserPasswordCommandValidator;
+            _resetUserPasswordCommandValidator = resetUserPasswordCommandValidator;
         }
         
         [HttpGet]
@@ -327,7 +333,17 @@ namespace UserManagement.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand forgotUserPasswordCommand)
         {       
-
+              var validationResult = await _forgotUserPasswordCommandValidator.ValidateAsync(forgotUserPasswordCommand);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage)
+                });
+            }
+            
             var response = await Mediator.Send(forgotUserPasswordCommand);
 
             if (response.IsSuccess)
@@ -357,6 +373,18 @@ namespace UserManagement.API.Controllers
        [AllowAnonymous]
         public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand resetUserPasswordCommand)
         {
+             
+               var validationResult = await _resetUserPasswordCommandValidator.ValidateAsync(resetUserPasswordCommand);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage)
+                });
+            }
+            
             var response = await Mediator.Send(resetUserPasswordCommand);
             if (!response.IsSuccess)
             {

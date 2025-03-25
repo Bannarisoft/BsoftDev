@@ -7,6 +7,7 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetCodePatter
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralAutoComplete;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById;
+using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetParentMaster;
 using Core.Application.DepreciationGroup.Queries.GetAssetTypeQuery;
 using Core.Application.DepreciationGroup.Queries.GetWorkingStatusQuery;
 using Core.Application.ExcelImport;
@@ -40,7 +41,7 @@ namespace FAM.API.Controllers.AssetMaster
             _deleteAssetMasterGeneralCommandValidator = deleteAssetMasterGeneralCommandValidator;   
         }
 
-        // GET: api/AssetMasterGeneral?PageNumber=1&PageSize=10&SearchTerm=...
+        
         [HttpGet]                
         public async Task<IActionResult> GetAllAssetMasterGeneralAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
         {            
@@ -229,7 +230,26 @@ namespace FAM.API.Controllers.AssetMaster
                 data = result.Data
             });
         }
-
+     // GET: api/AssetMasterGeneral/WorkingStatus
+        [HttpGet("ParentAsset")]
+        public async Task<IActionResult> GetParentAsset([FromQuery] string assetType)
+        {
+             var result = await Mediator.Send(new GetAssetParentMasterQuery { AssetType = assetType });
+            if (!result.IsSuccess)
+            {
+                return NotFound(new 
+                { 
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = result.Message
+                }); 
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = result.Message,
+                data = result.Data
+            });
+        }
         // GET: api/AssetMasterGeneral/WorkingStatus
         [HttpGet("WorkingStatus")]
         public async Task<IActionResult> GetWorkingStatus()
@@ -303,11 +323,20 @@ namespace FAM.API.Controllers.AssetMaster
                 errors = ""
             });
         }
-
         // DELETE: api/AssetMasterGeneral/delete-logo
         [HttpDelete("delete-logo")]
-        public async Task<IActionResult> DeleteLogo(DeleteFileAssetMasterGeneralCommand deleteFileCommand)
+        public async Task<IActionResult> DeleteLogo([FromBody] DeleteFileAssetMasterGeneralCommand deleteFileCommand)
         {
+            if (deleteFileCommand == null || string.IsNullOrWhiteSpace(deleteFileCommand.assetPath))
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode = StatusCodes.Status400BadRequest, 
+                    message = "Invalid request. 'assetPath' cannot be null or empty.",
+                    errors = ""
+                });
+            }
+
             var file = await Mediator.Send(deleteFileCommand);
             if (!file.IsSuccess)
             {
@@ -325,6 +354,8 @@ namespace FAM.API.Controllers.AssetMaster
                 errors = ""
             });
         }
+
+
         //Excel Import
         [HttpPost("import")]
         public async Task<IActionResult> Import([FromForm] ImportAssetDto dto)

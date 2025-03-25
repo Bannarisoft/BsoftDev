@@ -5,16 +5,19 @@ using System.Threading.Tasks;
 using UserManagement.API.Validation.Common;
 using Core.Application.CompanySettings.Commands.UpdateCompanySettings;
 using FluentValidation;
+using Core.Application.Common.Interfaces.ICompanySettings;
 
 namespace UserManagement.API.Validation.CompanySettings
 {
     public class UpdateCompanySettingsCommandValidator : AbstractValidator<UpdateCompanySettingsCommand>
     {
         private readonly List<ValidationRule> _validationRules;
+        private readonly ICompanyQuerySettings _icompanyQuerySettings;
 
-        public UpdateCompanySettingsCommandValidator()
+        public UpdateCompanySettingsCommandValidator(ICompanyQuerySettings icompanyQuerySettings)
         {
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _icompanyQuerySettings = icompanyQuerySettings;
 
             if(_validationRules == null || !_validationRules.Any())
             {
@@ -142,6 +145,15 @@ namespace UserManagement.API.Validation.CompanySettings
                         RuleFor(x => x.CaptchaOnLogin)
                         .Must(value => value == 0 || value == 1) 
                         .WithMessage($"{nameof(UpdateCompanySettingsCommand.CaptchaOnLogin)} {rule.Error}");
+                     break;
+                        case "AlreadyExists":
+                           RuleFor(x =>  new { x.Id, x.CompanyId })
+                           .MustAsync(async (company, cancellation) => 
+                        !await _icompanyQuerySettings.AlreadyExistsAsync(company.CompanyId,company.Id))             
+                           .WithName("Company")
+                            .WithMessage($"{rule.Error}");
+                            break; 
+                     default:
                      break;
                 }
             }

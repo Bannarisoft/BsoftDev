@@ -6,15 +6,18 @@ using Dapper;
 using UserManagement.Infrastructure.Data;
 using System.Data;
 using Core.Application.Common.Interfaces.INotifications;
+using Core.Application.Common.Interfaces;
 
 namespace UserManagement.Infrastructure.Repositories.Notifications
 {
     public class NotificationsQueryRepository : INotificationsQueryRepository
     {
         private readonly IDbConnection _dbConnection;
-        public NotificationsQueryRepository(IDbConnection dbConnection)
+        private readonly IIPAddressService _ipAddressService;
+        public NotificationsQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
         }
 
         public async  Task<DateTime?> GetLastPasswordChangeDate(string username)
@@ -34,19 +37,27 @@ namespace UserManagement.Infrastructure.Repositories.Notifications
         public async Task<(int PwdExpiryDays, int PwdExpiryAlertDays)> GetPasswordExpiryDays()
         {
              var query = @"
-             SELECT PasswordExpiryDays, PasswordExpiryAlertDays 
-             FROM AppSecurity.AdminSecuritySettings";
+             SELECT top 1 PasswordExpiryDays, PasswordExpiryAlert 
+             FROM [AppData].[CompanySetting]";
              var result = await _dbConnection.QueryFirstOrDefaultAsync<(int PwdExpiryDays, int PwdExpiryAlertDays)>(query);
              return result;
         }
 
         public async Task<int> GetResetCodeExpiryMinutes()
         {
+        //     var companyId = _ipAddressService.GetCompanyId();
+        // if (companyId == null)
+        //     return 0; 
             var query = @"
-            SELECT PasswordResetCodeExpiryMinutes 
-            FROM AppSecurity.AdminSecuritySettings";
+            SELECT top 1 ForgotPasswordCodeExpiry 
+            FROM [AppData].[CompanySetting] ";
+            //  var result = await _dbConnection.QueryFirstOrDefaultAsync<int>(
+            //       query, 
+            //       new { CompanyId = companyId } 
+            //   );
             var result = await _dbConnection.QueryFirstOrDefaultAsync<int>(query);
-            return result;
+
+              return result;
         }
     }
 

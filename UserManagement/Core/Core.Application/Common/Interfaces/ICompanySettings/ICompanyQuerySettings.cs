@@ -8,5 +8,8 @@ namespace Core.Application.Common.Interfaces.ICompanySettings
     public interface ICompanyQuerySettings
     {
         Task<Core.Domain.Entities.CompanySettings> GetAsync();
+        Task<bool> AlreadyExistsAsync(int CompanyId, int? id = null);
+        Task<Core.Domain.Entities.CompanySettings> BeforeLoginGetUserCompanySettings(string Username);
+        Task<bool> BeforeLoginNotFoundValidation(string Username);
     }
 }

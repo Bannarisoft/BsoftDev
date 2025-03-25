@@ -38,6 +38,10 @@ namespace UserManagement.API.Validation.Users
                         RuleFor(x => x.UserName)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateUserCommand.UserName)} {rule.Error}");
+
+                             RuleFor(x => x.UserId)
+                            .NotEmpty()
+                            .WithMessage($"{nameof(UpdateUserCommand.UserName)} {rule.Error}");
                         break;
 
                     case "MaxLength":
@@ -57,7 +61,7 @@ namespace UserManagement.API.Validation.Users
                          
                     case "Email":
                         RuleFor(x => x.EmailId)
-                            .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                            .EmailAddress()
                             .WithMessage($"{nameof(UpdateUserCommand.EmailId)} {rule.Error}");   
                         break; 
 
@@ -67,12 +71,7 @@ namespace UserManagement.API.Validation.Users
                         .WithMessage($"{nameof(UpdateUserCommand.Mobile)} {rule.Error}"); 
                         break; 
 
-                    case "Password":
-                        // Apply Password validation
-                        RuleFor(x => x.PasswordHash)
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                        .WithMessage($"{nameof(UpdateUserCommand.PasswordHash)} {rule.Error}");
-                        break;  
+                   
                     
                     case "AlreadyExists":
                            RuleFor(x =>  new { x.UserName, x.UserId })
@@ -80,7 +79,14 @@ namespace UserManagement.API.Validation.Users
                         !await _userQueryRepository.AlreadyExistsAsync(user.UserName, user.UserId))             
                            .WithName("User Name")
                             .WithMessage($"{rule.Error}");
-                            break;            
+                            break;  
+                    case "NotFound":
+                           RuleFor(x => x.UserId )
+                           .MustAsync(async (UserId, cancellation) => 
+                        await _userQueryRepository.NotFoundAsync(UserId))             
+                           .WithName("User Id")
+                            .WithMessage($"{rule.Error}");
+                            break;          
                     default:
                         // Handle unknown rule (log or throw)
                         // Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");

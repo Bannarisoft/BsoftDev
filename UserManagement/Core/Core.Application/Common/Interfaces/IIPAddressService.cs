@@ -10,6 +10,9 @@ namespace Core.Application.Common.Interfaces
         string GetUserName();
         string GetUserOS(); 
         string GetUserBrowserDetails(string userAgent);
+        int? GetCompanyId();
+        string GetGroupcode();
+        int GetEntityId();
                
     }
 }

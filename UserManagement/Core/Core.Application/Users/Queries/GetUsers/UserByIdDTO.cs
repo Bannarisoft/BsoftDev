@@ -21,7 +21,6 @@ namespace Core.Application.Users.Queries.GetUsers
     public int UserType { get; set; }
     public string Mobile { get; set; }
     public string EmailId { get; set; }
-    public int CompanyId { get; set; }
     public List<UserDivisionDTO> userDivisions { get; set; }
     public FirstTimeUserStatus IsFirstTimeUser { get; set; }
     public IsDelete IsDeleted { get; set; } 

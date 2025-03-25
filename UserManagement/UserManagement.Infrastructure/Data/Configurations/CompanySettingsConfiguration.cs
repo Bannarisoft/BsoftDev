@@ -28,6 +28,7 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 
             builder.ToTable("CompanySetting", "AppData");
             builder.HasKey(m => m.Id);
+            builder.HasIndex(c => new { c.CompanyId, c.CurrencyId,c.FinancialYearId,c.LanguageId }).IsUnique(false);
 
             builder.Property(c => c.Id)
                 .HasColumnName("Id")

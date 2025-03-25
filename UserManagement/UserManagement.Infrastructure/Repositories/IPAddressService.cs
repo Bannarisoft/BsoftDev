@@ -151,6 +151,29 @@ namespace UserManagement.Infrastructure.Repositories
             if (userAgent.Contains("Opera") || userAgent.Contains("OPR")) return "Opera";
             return "Unknown Browser";
         }
+           public int? GetCompanyId()
+          {
+              var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("CompanyId")?.Value;
+        
+              if (int.TryParse(claim, out int companyId))
+                  return companyId;
+        
+              return null;
+          }
+           public string GetGroupcode()
+          {
+              var GroupCode = _httpContextAccessor.HttpContext?.User?.FindFirst("GroupCode")?.Value;
+        
+        
+              return GroupCode;
+          }
+          public int GetEntityId()
+            {
+              var EntityId = _httpContextAccessor.HttpContext?.User?.FindFirst("EntityId")?.Value;
+        
+        
+              return EntityId != null ? Convert.ToInt32(EntityId) : 0;
+          }
       
     }    
 }

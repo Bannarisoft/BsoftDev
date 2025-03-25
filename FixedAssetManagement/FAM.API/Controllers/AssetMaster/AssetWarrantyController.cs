@@ -20,15 +20,20 @@ namespace FAM.API.Controllers.AssetMaster
         private readonly IValidator<CreateAssetWarrantyCommand> _createAssetWarrantyCommandValidator;
         private readonly IValidator<UpdateAssetWarrantyCommand> _updateAssetWarrantyCommandValidator;        
         private readonly IValidator<UploadFileAssetWarrantyCommand> _UploadFileCommandValidator;
+        private readonly IValidator<DeleteAssetWarrantyCommand> _deleteAssetWarrantyCommandValidator;
         
     public AssetWarrantyController(ISender mediator, 
                             IValidator<CreateAssetWarrantyCommand> createAssetWarrantyCommandValidator, 
-                            IValidator<UpdateAssetWarrantyCommand> updateAssetWarrantyCommandValidator, IValidator<UploadFileAssetWarrantyCommand> UploadFileCommandValidator) 
+                            IValidator<UpdateAssetWarrantyCommand> updateAssetWarrantyCommandValidator,
+                             IValidator<UploadFileAssetWarrantyCommand> UploadFileCommandValidator,
+                             IValidator<DeleteAssetWarrantyCommand> deleteAssetWarrantyCommandValidator
+                             ) 
         : base(mediator)
         {        
             _createAssetWarrantyCommandValidator = createAssetWarrantyCommandValidator;    
             _updateAssetWarrantyCommandValidator = updateAssetWarrantyCommandValidator;                 
             _UploadFileCommandValidator = UploadFileCommandValidator;     
+            _deleteAssetWarrantyCommandValidator = deleteAssetWarrantyCommandValidator;  
         }
         [HttpGet]                
         public async Task<IActionResult> GetAllAssetWarrantyAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -145,7 +150,17 @@ namespace FAM.API.Controllers.AssetMaster
         }
         [HttpDelete("{id}")]        
         public async Task<IActionResult> DeleteAsync(int id)
-        {             
+        {   
+            var command = new DeleteAssetWarrantyCommand { Id = id };
+            var validationResult = await  _deleteAssetWarrantyCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                    statusCode = StatusCodes.Status400BadRequest
+                });
+            }          
             if (id <= 0)
             {
                 return BadRequest(new

@@ -130,7 +130,6 @@ namespace UserManagement.Infrastructure.Repositories
                         existingUser.FirstName = user.FirstName;
                         existingUser.LastName = user.LastName;
                         existingUser.UserName = user.UserName;
-                        existingUser.PasswordHash = user.PasswordHash;
                         existingUser.UserType = user.UserType;
                         existingUser.Mobile = user.Mobile;
                         existingUser.EmailId = user.EmailId;

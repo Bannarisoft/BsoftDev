@@ -115,6 +115,22 @@
     {
         "rule": "SoftDelete",      
         "error": "Cannot delete the relationship as it is active with another table."
+    },
+    {
+        "rule": "DateValidation",      
+        "error": " Invalid date format."
+    },
+    {
+        "rule": "NotFound",      
+        "error": "{PropertyName} not found."
+    },
+    {
+        "rule": "FKColumnActiveOrInactive",      
+        "error": "{PropertyName} is inactive."
+    },
+    {
+        "rule": "PastDateValidation",      
+        "error": "{PropertyName} cannot be in the past."
     }
     
 ]

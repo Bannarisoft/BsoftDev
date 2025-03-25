@@ -29,7 +29,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
             var latestAssetCode = await _assetMasterGeneralQueryRepository.GetLatestAssetCode(request.AssetMaster.CompanyId,request.AssetMaster.UnitId, request.AssetMaster.AssetGroupId, request.AssetMaster.AssetCategoryId,request.AssetMaster.AssetLocation.DepartmentId,request.AssetMaster.AssetLocation.LocationId);
             var assetCode=latestAssetCode;
             var assetEntity  = _mapper.Map<AssetMasterGenerals>(request.AssetMaster);            
-            assetEntity.AssetCode = assetCode; // Assign generated AssetCode       
+            assetEntity.AssetCode = assetCode;
             var result = await _assetMasterGeneralRepository.CreateAsync(assetEntity, cancellationToken);
             
             //Domain Event
@@ -45,6 +45,24 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
             var assetMasterDTO = _mapper.Map<AssetMasterDto>(result);
             if (result.Id > 0)
             {
+                string tempFilePath = request.AssetMaster.AssetImage;
+                if (!string.IsNullOrEmpty(tempFilePath) && File.Exists(tempFilePath))
+                {
+                    string directory = Path.GetDirectoryName(tempFilePath) ?? string.Empty;
+                    string newFileName = $"{result.AssetCode}{Path.GetExtension(tempFilePath)}";
+                    string newFilePath = Path.Combine(directory, newFileName);
+
+                    try
+                    {
+                        File.Move(tempFilePath, newFilePath); 
+                        assetEntity.AssetImage = newFilePath.Replace(@"\", "/"); 
+                        await _assetMasterGeneralRepository.UpdateAsync(assetEntity); 
+                    }
+                    catch (Exception ex)
+                    {                        
+                        Console.WriteLine($"Failed to rename file: {ex.Message}");
+                    }
+                }                
                 return new ApiResponseDTO<AssetMasterDto>{
                     IsSuccess = true, 
                     Message = "AssetMasterGeneral created successfully.",

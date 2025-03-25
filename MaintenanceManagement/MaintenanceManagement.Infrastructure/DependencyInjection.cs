@@ -10,11 +10,25 @@ using MongoDB.Driver;
 using Serilog;
 using MaintenanceManagement.Infrastructure.Data;
 using MaintenanceManagement.Infrastructure.Services;
+using Core.Application.Common.Interfaces.IMachineGroup;
+using System.Reflection.PortableExecutable;
+using MaintenanceManagement.Infrastructure.Repositories.MachineGroup;
+using Core.Application.Common.Mappings;
+using Core.Application.Common.Interfaces.IMiscTypeMaster;
+using MaintenanceManagement.Infrastructure.Repositories.MiscTypeMaster;
+using Core.Application.Common.Interfaces.IMiscMaster;
+using MaintenanceManagement.Infrastructure.Repositories.MiscMaster;
+using Core.Application.Common.Interfaces.IShiftMaster;
+using Core.Domain.Entities;
+using MaintenanceManagement.Infrastructure.Repositories.ShiftMaster;
+using Core.Application.Common.Interfaces.IShiftMasterDetail;
+using MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRepo;
 using Core.Application.Common.Interfaces.ICostCenter;
 using MaintenanceManagement.Infrastructure.Repositories.CostCenter;
-using Core.Application.Common.Mappings;
+
 using Core.Application.Common.Interfaces.IWorkCenter;
 using MaintenanceManagement.Infrastructure.Repositories.WorkCenter;
+
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -111,6 +125,16 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<ICostCenterCommandRepository, CostCenterCommandRepository>();
             services.AddScoped<IWorkCenterQueryRepository, WorkCenterQueryRepository>();
             services.AddScoped<IWorkCenterCommandRepository, WorkCenterCommandRepository>();
+             services.AddScoped<IMachineGroupCommandRepository, MachineGroupCommandRepository>(); 
+             services.AddScoped<IMachineGroupQueryRepository, MachineGroupQueryRepository>();
+             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
+             services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();
+             services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
+             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
+            services.AddScoped<IShiftMasterQuery, ShiftMasterQueryRepository>();
+            services.AddScoped<IShiftMasterCommand, ShiftMasterCommandRepository>();
+            services.AddScoped<IShiftMasterDetailQuery, ShiftMasterDetailQueryRepository>();
+            services.AddScoped<IShiftMasterDetailCommand, ShiftMasterDetailCommandRepository>();
             
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -118,11 +142,17 @@ namespace MaintenanceManagement.Infrastructure
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
             
 
-            // AutoMapper profiles
-            services.AddAutoMapper(
-            typeof(CostCenterProfile),
+
+
+             services.AddAutoMapper(
+                typeof(MachineGroupProfile),
+                typeof(MiscTypeMasterProfile),
+                typeof(MiscMasterProfile),
+				typeof(CostCenterProfile),
             typeof(WorkCenterProfile)	
-            );
+				
+
+             );
             return services;
         }
     }
