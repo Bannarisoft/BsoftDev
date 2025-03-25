@@ -1,0 +1,65 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.IMachineGroup;
+using Core.Domain.Events;
+using MediatR;
+
+namespace Core.Application.MachineGroup.Quries.GetMachineGroupById
+{
+    public class GetMachineGroupByIdQueryHandler  : IRequestHandler<GetMachineGroupByIdQuery, ApiResponseDTO<GetMachineGroupByIdDto>>
+    {
+
+        private readonly IMachineGroupQueryRepository  _machineGroupQueryRepository;
+        private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
+
+         public GetMachineGroupByIdQueryHandler(IMachineGroupQueryRepository machineGroupQueryRepository, IMapper mapper, IMediator mediator)
+        {
+            _machineGroupQueryRepository = machineGroupQueryRepository;
+            _mapper =mapper;
+            _mediator = mediator;
+        } 
+
+         public async Task<ApiResponseDTO<GetMachineGroupByIdDto>> Handle(GetMachineGroupByIdQuery request, CancellationToken cancellationToken)
+        {
+            var result = await _machineGroupQueryRepository.GetByIdAsync(request.Id);
+            
+            if (result is null)
+            {
+                return new ApiResponseDTO<GetMachineGroupByIdDto>
+                {
+                    IsSuccess = false,
+                    Message = $"MachineGroup with Id {request.Id} not found.",
+                    Data = null
+                };
+            }
+            
+            var machineGroup = _mapper.Map<GetMachineGroupByIdDto>(result);
+
+            // Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "GetById",
+                actionCode: "",
+                actionName: "",
+                details: $"MachineGroup details {machineGroup.Id} were fetched.",
+                module: "MachineGroup"
+            );
+
+            await _mediator.Publish(domainEvent, cancellationToken);
+
+            return new ApiResponseDTO<GetMachineGroupByIdDto>
+            {
+                IsSuccess = true,
+                Message = "Success",
+                Data = machineGroup
+            };
+        }
+
+
+
+    }
+}

@@ -10,7 +10,7 @@ namespace Core.Domain.Entities
 
     {
         public string?  GroupName { get; set; }
-        public string? Manufacturer { get; set;}            
+        public int Manufacturer { get; set;}            
         
     }
 }

@@ -109,7 +109,7 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
             return divisions.ToList();
         }
            public async Task<bool>SoftDeleteValidation(int Id)
-            {
+           {
                                 const string query = @"
                            SELECT 1 
                            FROM [AppData].[Unit] 
@@ -121,6 +121,6 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
                        var divisionExists = await multi.ReadFirstOrDefaultAsync<int?>();
                     
                        return divisionExists.HasValue ;
-            }
+          }
     }
 }
