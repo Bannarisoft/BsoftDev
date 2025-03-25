@@ -26,7 +26,6 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
         };
 
         var assetDictionary = new Dictionary<int, AssetSpecificationJsonDto>();
-
             var query = @"
             SELECT 
             s.AssetId, a.AssetCode, a.AssetName,

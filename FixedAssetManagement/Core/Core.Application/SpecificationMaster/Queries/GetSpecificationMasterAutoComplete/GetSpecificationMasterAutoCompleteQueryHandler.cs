@@ -22,7 +22,7 @@ namespace Core.Application.SpecificationMaster.Queries.GetSpecificationMasterAut
 
         public async Task<ApiResponseDTO<List<SpecificationMasterAutoCompleteDTO>>> Handle(GetSpecificationMasterAutoCompleteQuery request, CancellationToken cancellationToken)
         {
-            var result = await _specificationMasterRepository.GetBySpecificationNameAsync(request.SearchPattern ?? string.Empty);
+            var result = await _specificationMasterRepository.GetBySpecificationNameAsync(request.AssetGroupId, request.SearchPattern ?? string.Empty);
             if (result is null || result.Count is 0)
             {
                 return new ApiResponseDTO<List<SpecificationMasterAutoCompleteDTO>>
