@@ -23,6 +23,11 @@ using Core.Domain.Entities;
 using MaintenanceManagement.Infrastructure.Repositories.ShiftMaster;
 using Core.Application.Common.Interfaces.IShiftMasterDetail;
 using MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRepo;
+using Core.Application.Common.Interfaces.ICostCenter;
+using MaintenanceManagement.Infrastructure.Repositories.CostCenter;
+
+using Core.Application.Common.Interfaces.IWorkCenter;
+using MaintenanceManagement.Infrastructure.Repositories.WorkCenter;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -116,6 +121,10 @@ namespace MaintenanceManagement.Infrastructure
             services.AddHttpContextAccessor();
 
             // Register repositories
+            services.AddScoped<ICostCenterQueryRepository, CostCenterQueryRepository>();
+            services.AddScoped<ICostCenterCommandRepository, CostCenterCommandRepository>();
+            services.AddScoped<IWorkCenterQueryRepository, WorkCenterQueryRepository>();
+            services.AddScoped<IWorkCenterCommandRepository, WorkCenterCommandRepository>();
              services.AddScoped<IMachineGroupCommandRepository, MachineGroupCommandRepository>(); 
              services.AddScoped<IMachineGroupQueryRepository, MachineGroupQueryRepository>();
              services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
@@ -127,18 +136,20 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IShiftMasterDetailQuery, ShiftMasterDetailQueryRepository>();
             services.AddScoped<IShiftMasterDetailCommand, ShiftMasterDetailCommandRepository>();
             
-            
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
+            
 
-            // AutoMapper profiles
+
 
              services.AddAutoMapper(
                 typeof(MachineGroupProfile),
                 typeof(MiscTypeMasterProfile),
-                typeof(MiscMasterProfile)
+                typeof(MiscMasterProfile),
+				typeof(CostCenterProfile),
+            typeof(WorkCenterProfile)	
 				
 
              );
