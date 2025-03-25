@@ -73,6 +73,12 @@ namespace UserManagement.API.Validation.UserLogin
                            .MustAsync(async (Username, cancellation) => 
                         await _userQueryRepository.ValidateUserRolesAsync(Username))
                             .WithMessage($"{rule.Error}");
+                            break;
+                    case "UserLock":
+                           RuleFor(x => x.Username)
+                           .MustAsync(async (UserName, cancellation) => !await _userQueryRepository.UserLockedAsync(UserName))
+                           .WithName("User Name")
+                            .WithMessage($"{rule.Error}");
                             break; 
                             
                     default:                        

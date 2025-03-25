@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserManagement.Infrastructure.Data;
 
 #nullable disable
 
-namespace UserManagement.Infrastructure.Migrations
+namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250325054755_userDepartment")]
+    partial class userDepartment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1709,10 +1712,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Property<bool>("IsFirstTimeUser")
                         .HasColumnType("bit")
                         .HasColumnName("IsFirstTimeUser");
-
-                    b.Property<bool>("IsLocked")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsLocked");
 
                     b.Property<string>("LastName")
                         .HasColumnType("varchar(50)")
