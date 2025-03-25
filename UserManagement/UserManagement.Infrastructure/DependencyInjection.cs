@@ -72,6 +72,7 @@ using UserManagement.Infrastructure.Repositories.UserGroup;
 using System.Text;
 using System.Security.Cryptography;
 using Core.Application.Common;
+using UserManagement.Infrastructure.Helpers;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
@@ -80,18 +81,8 @@ namespace UserManagement.Infrastructure
             (this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
         {
                 
-             var environmentSetup = new EnvironmentSetup(configuration);
-    environmentSetup.SetupEnvironmentVariables();
-
-    var connectionString = configuration.GetConnectionString("DefaultConnection")
-                                        .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER"))
-                                        .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID"))
-                                        .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD"));
-
-    var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
-                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER"))
-                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID"))
-                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD"));
+             var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
+            var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);;
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {

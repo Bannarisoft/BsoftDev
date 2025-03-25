@@ -31,6 +31,6 @@
             public ICollection<AssetPurchaseCombineDto>? AssetPurchaseDetails{ get; set; }       
             public ICollection<AssetAdditionalCostCombineDto>? AssetAdditionalCost{ get; set; }       
             public ICollection<AssetSpecificationCombineDto>? AssetSpecification{ get; set; } 
-
+            public ICollection<AssetInsuranceCombineDto>? AssetInsurance{ get; set; } 
         }
     }
