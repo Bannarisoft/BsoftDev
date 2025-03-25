@@ -1,19 +1,18 @@
-
 using System.Text.Json;
-using Core.Application.Security;
+using Core.Application.Common.EnvironmentSetup;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace UserManagement.API.Controllers
-{ 
+namespace FAM.API.Controllers
+{
     [Route("api/security")]
     [ApiController]
-    public class SecurityController : ControllerBase
+    public class EnvironmentSetupController : ControllerBase
     {
         private readonly IMediator _mediator;
         private readonly IConfiguration _configuration;
 
-        public SecurityController(IMediator mediator, IConfiguration configuration)
+        public EnvironmentSetupController(IMediator mediator, IConfiguration configuration)
         {
             _mediator = mediator;
             _configuration = configuration;
@@ -28,14 +27,14 @@ namespace UserManagement.API.Controllers
             var encryptedServer = await _mediator.Send(new EncryptPasswordCommand(request.Server));
             var encryptedUserId = await _mediator.Send(new EncryptPasswordCommand(request.UserId));
 
-            Environment.SetEnvironmentVariable("DATABASE_SERVER", encryptedServer, EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DATABASE_USERID", encryptedUserId, EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DATABASE_PASSWORD", encryptedPassword, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DATABASE_SERVER", encryptedServer, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("DATABASE_USERID", encryptedUserId, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("DATABASE_PASSWORD", encryptedPassword, EnvironmentVariableTarget.Process);
             
 //            string connectionString = $"Server={request.Server};Database=FixedAsset;User Id={request.UserId};Password={encryptedPassword};Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=true;";
 
                 // Load `appSettingsPath` from Environment Variable
-            var appSettingsPath = Environment.GetEnvironmentVariable("APP_SETTINGS_PATH");
+            var appSettingsPath = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
             if (string.IsNullOrWhiteSpace(appSettingsPath))
             {
@@ -44,7 +43,7 @@ namespace UserManagement.API.Controllers
                 appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{environment}.json");
 
                 // Set `APP_SETTINGS_PATH` Environment Variable
-                Environment.SetEnvironmentVariable("APP_SETTINGS_PATH", appSettingsPath, EnvironmentVariableTarget.User);
+                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", appSettingsPath, EnvironmentVariableTarget.User);
             }
 
             if (!System.IO.File.Exists($"appsettings.{appSettingsPath}.json"))

@@ -114,5 +114,17 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
             return result.ToList();
         }
+        
+        public async Task<bool> SoftDeleteValidation(int Id)
+        {
+            const string query = @"
+                SELECT 1 
+                FROM FixedAsset.AssetMaster AM
+                inner join  FixedAsset.DepreciationGroups DG on DG.AssetGroupId = AM.AssetGroupId
+                WHERE DG.Id = @Id AND   AM.IsDeleted = 0;";        
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });        
+            var DepreciationExists = await multi.ReadFirstOrDefaultAsync<int?>();          
+            return DepreciationExists.HasValue ;
+        }
     }
 }

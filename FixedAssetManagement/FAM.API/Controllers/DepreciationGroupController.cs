@@ -16,17 +16,20 @@ namespace FAM.API.Controllers
     [Route("api/[controller]")]
     public class DepreciationGroupController  : ApiControllerBase
     {
-         private readonly IValidator<CreateDepreciationGroupCommand> _createDepreciationGroupCommandValidator;
-         private readonly IValidator<UpdateDepreciationGroupCommand> _updateDepreciationGroupCommandValidator;
+        private readonly IValidator<CreateDepreciationGroupCommand> _createDepreciationGroupCommandValidator;
+        private readonly IValidator<UpdateDepreciationGroupCommand> _updateDepreciationGroupCommandValidator;
+        private readonly IValidator<DeleteDepreciationGroupCommand> _deleteDepreciationGroupCommandValidator;
          
          
        public DepreciationGroupController(ISender mediator, 
                              IValidator<CreateDepreciationGroupCommand> createDepreciationGroupCommandValidator, 
-                             IValidator<UpdateDepreciationGroupCommand> updateDepreciationGroupCommandValidator) 
+                             IValidator<UpdateDepreciationGroupCommand> updateDepreciationGroupCommandValidator,
+                             IValidator<DeleteDepreciationGroupCommand> deleteDepreciationGroupCommandValidator) 
         : base(mediator)
         {        
             _createDepreciationGroupCommandValidator = createDepreciationGroupCommandValidator;    
             _updateDepreciationGroupCommandValidator = updateDepreciationGroupCommandValidator;                 
+            _deleteDepreciationGroupCommandValidator = deleteDepreciationGroupCommandValidator;     
         }
         [HttpGet]                
         public async Task<IActionResult> GetAllDepreciationGroupsAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -143,7 +146,17 @@ namespace FAM.API.Controllers
         }
         [HttpDelete("{id}")]        
         public async Task<IActionResult> DeleteAsync(int id)
-        {             
+        {      
+            var command = new DeleteDepreciationGroupCommand { Id = id };
+            var validationResult = await  _deleteDepreciationGroupCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                    statusCode = StatusCodes.Status400BadRequest
+                });
+            }
             if (id <= 0)
             {
                 return BadRequest(new

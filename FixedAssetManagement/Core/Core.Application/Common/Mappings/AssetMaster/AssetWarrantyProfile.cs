@@ -21,7 +21,7 @@ namespace Core.Application.Common.Mappings.AssetMaster
 
             CreateMap<UpdateAssetWarrantyCommand, AssetWarranties>()
             .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => (Status)src.IsActive));
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));            
 
             CreateMap<AssetWarrantyDTO, AssetWarrantyAutoCompleteDTO>();
             CreateMap<AssetWarranties, AssetWarrantyDTO>();      

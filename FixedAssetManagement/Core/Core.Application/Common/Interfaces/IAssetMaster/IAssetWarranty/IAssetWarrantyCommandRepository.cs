@@ -6,7 +6,7 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty
     public interface IAssetWarrantyCommandRepository
     {
         Task<AssetWarranties> CreateAsync(AssetWarranties assetWarranty);
-        Task<int>  UpdateAsync(int assetId,AssetWarranties assetWarranty);
+        Task<bool>  UpdateAsync(AssetWarranties assetWarranty);
         Task<int>  DeleteAsync(int assetId,AssetWarranties assetWarranty);        
         Task<bool> ExistsByAssetIdAsync(int? assetId); 
         Task<AssetWarrantyDTO?> GetByAssetCodeAsync(string  assetCode);

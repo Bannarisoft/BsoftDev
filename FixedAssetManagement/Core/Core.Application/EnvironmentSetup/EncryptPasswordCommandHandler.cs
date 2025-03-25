@@ -1,19 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.Common;
+
+using FAM.Application.Common;
 using MediatR;
 
-namespace Core.Application.Security
+namespace Core.Application.Common.EnvironmentSetup
 {
     public class EncryptPasswordCommandHandler : IRequestHandler<EncryptPasswordCommand, string>
     {
-        private readonly AesEncryptionService _encryptionService;
+        private readonly EnvironmentEncryptionService _encryptionService;
 
         public EncryptPasswordCommandHandler()
         {
-            _encryptionService = new AesEncryptionService();
+            _encryptionService = new EnvironmentEncryptionService();
         }
 
         public Task<string> Handle(EncryptPasswordCommand request, CancellationToken cancellationToken)

@@ -8,52 +8,41 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
 {
     public class DeleteFileAssetMasterGeneralCommandHandler : IRequestHandler<DeleteFileAssetMasterGeneralCommand, ApiResponseDTO<bool>>
     {
-        private readonly IFileUploadService _fileUploadService;
-        private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
+        private readonly IFileUploadService _fileUploadService;        
+        private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly ILogger<DeleteFileAssetMasterGeneralCommandHandler> _logger;
 
         public DeleteFileAssetMasterGeneralCommandHandler(
-            IFileUploadService fileUploadService,
-            IAssetMasterGeneralCommandRepository assetMasterGeneralRepository,
+            IFileUploadService fileUploadService,            
+            IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository,
             ILogger<DeleteFileAssetMasterGeneralCommandHandler> logger)
         {
-            _fileUploadService = fileUploadService;
-            _assetMasterGeneralRepository = assetMasterGeneralRepository;
+            _fileUploadService = fileUploadService;            
+            _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
             _logger = logger;
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(DeleteFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrWhiteSpace(request.AssetCode))
+        { 
+            string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
+            if (string.IsNullOrWhiteSpace(baseDirectory))
             {
-                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Asset image path is required." };
+                _logger.LogError("Base directory path not found in database.");
+                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Base directory not configured." };                
             }
+            string companyFolder = Path.Combine(baseDirectory, request.CompanyName ?? string.Empty);
+            string unitFolder = Path.Combine(companyFolder, request.UnitName ?? string.Empty);
+            
+            string filePath = Path.Combine(unitFolder, request.assetPath??string.Empty);
 
-            // 🔹 Check if asset exists by image name
-            var existingAsset = await _assetMasterGeneralRepository.GetByAssetImageAsync(request.AssetCode);
+            //var correctedAssetPath = request.assetPath?.Replace("\\", "\\\\") ?? string.Empty;         
 
-            if (existingAsset == null)
+            var result = await _fileUploadService.DeleteFileAsync(filePath);
+            if (result)
             {
-                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Asset not found for this image." };
+                return new ApiResponseDTO<bool> { IsSuccess = true, Message = "File deleted successfully" };
             }
-
-            // 🔹 Delete the file
-            var deleteResult = await _fileUploadService.DeleteFileAsync(existingAsset.AssetImage ?? string.Empty);
-            if (!deleteResult)
-            {
-                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "File deletion failed." };
-            }
-
-            // 🔹 Remove the AssetImage reference in DB
-            bool updateSuccess = await _assetMasterGeneralRepository.RemoveAssetImageReferenceAsync(existingAsset.Id);
-            if (!updateSuccess)
-            {
-                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Failed to update asset record." };
-            }
-
-            _logger.LogInformation($"Asset image deleted: {request.AssetCode}");
-
-            return new ApiResponseDTO<bool> { IsSuccess = true, Message = "File deleted successfully." };
+            return new ApiResponseDTO<bool> { IsSuccess = false, Message = "File deletion failed" };
         }
     }
 }

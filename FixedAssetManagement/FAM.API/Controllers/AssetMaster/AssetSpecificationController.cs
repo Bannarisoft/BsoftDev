@@ -16,15 +16,18 @@ namespace FAM.API.Controllers.AssetMaster
     {
         private readonly IValidator<CreateAssetSpecificationCommand> _createAssetSpecificationCommandValidator;
         private readonly IValidator<UpdateAssetSpecificationCommand> _updateAssetSpecificationCommandValidator;
+        private readonly IValidator<DeleteAssetSpecificationCommand> _deleteAssetSpecificationCommandValidator;
         
         
     public AssetSpecificationController(ISender mediator, 
                             IValidator<CreateAssetSpecificationCommand> createAssetSpecificationCommandValidator, 
-                            IValidator<UpdateAssetSpecificationCommand> updateAssetSpecificationCommandValidator) 
+                            IValidator<UpdateAssetSpecificationCommand> updateAssetSpecificationCommandValidator,
+                            IValidator<DeleteAssetSpecificationCommand> deleteAssetSpecificationCommandValidator)
         : base(mediator)
         {        
             _createAssetSpecificationCommandValidator = createAssetSpecificationCommandValidator;    
             _updateAssetSpecificationCommandValidator = updateAssetSpecificationCommandValidator;                 
+            _deleteAssetSpecificationCommandValidator = deleteAssetSpecificationCommandValidator;     
         }
         [HttpGet]                
         public async Task<IActionResult> GetAllAssetSpecificationAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -141,7 +144,17 @@ namespace FAM.API.Controllers.AssetMaster
         }
         [HttpDelete("{id}")]        
         public async Task<IActionResult> DeleteAsync(int id)
-        {             
+        {   
+            var command = new DeleteAssetSpecificationCommand { Id = id };
+            var validationResult = await  _deleteAssetSpecificationCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                    statusCode = StatusCodes.Status400BadRequest
+                });
+            }          
             if (id <= 0)
             {
                 return BadRequest(new

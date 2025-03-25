@@ -41,7 +41,7 @@ namespace FAM.API.Controllers.AssetMaster
             _deleteAssetMasterGeneralCommandValidator = deleteAssetMasterGeneralCommandValidator;   
         }
 
-        // GET: api/AssetMasterGeneral?PageNumber=1&PageSize=10&SearchTerm=...
+        
         [HttpGet]                
         public async Task<IActionResult> GetAllAssetMasterGeneralAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
         {            
@@ -323,11 +323,20 @@ namespace FAM.API.Controllers.AssetMaster
                 errors = ""
             });
         }
-
         // DELETE: api/AssetMasterGeneral/delete-logo
         [HttpDelete("delete-logo")]
-        public async Task<IActionResult> DeleteLogo(DeleteFileAssetMasterGeneralCommand deleteFileCommand)
+        public async Task<IActionResult> DeleteLogo([FromBody] DeleteFileAssetMasterGeneralCommand deleteFileCommand)
         {
+            if (deleteFileCommand == null || string.IsNullOrWhiteSpace(deleteFileCommand.assetPath))
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode = StatusCodes.Status400BadRequest, 
+                    message = "Invalid request. 'assetPath' cannot be null or empty.",
+                    errors = ""
+                });
+            }
+
             var file = await Mediator.Send(deleteFileCommand);
             if (!file.IsSuccess)
             {
@@ -345,6 +354,8 @@ namespace FAM.API.Controllers.AssetMaster
                 errors = ""
             });
         }
+
+
         //Excel Import
         [HttpPost("import")]
         public async Task<IActionResult> Import([FromForm] ImportAssetDto dto)

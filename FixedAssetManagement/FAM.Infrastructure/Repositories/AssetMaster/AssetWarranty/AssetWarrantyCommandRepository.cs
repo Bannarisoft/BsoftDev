@@ -31,9 +31,9 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty
             }
             return 0;
         }
-        public async Task<int> UpdateAsync(int assetId, AssetWarranties assetWarranties)
+        public async Task<bool> UpdateAsync( AssetWarranties assetWarranties)
         {
-            var existingAssetWarrantyGroup = await _applicationDbContext.AssetWarranties.FirstOrDefaultAsync(u => u.Id == assetId);             
+            var existingAssetWarrantyGroup = await _applicationDbContext.AssetWarranties.FirstOrDefaultAsync(u => u.Id == assetWarranties.Id);             
     
             if (existingAssetWarrantyGroup != null)
             {
@@ -59,9 +59,9 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty
                 existingAssetWarrantyGroup.ServiceLastClaimDate = assetWarranties.ServiceLastClaimDate;
                 existingAssetWarrantyGroup.ServiceClaimStatus = assetWarranties.ServiceClaimStatus;
                 _applicationDbContext.AssetWarranties.Update(existingAssetWarrantyGroup);
-                return await _applicationDbContext.SaveChangesAsync();
+                return await _applicationDbContext.SaveChangesAsync()>0;
             }
-           return 0; 
+           return false; 
         }
         public async Task<bool> ExistsByAssetIdAsync(int? assetCode)
         {

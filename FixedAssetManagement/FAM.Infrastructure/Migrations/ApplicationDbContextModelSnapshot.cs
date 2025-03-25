@@ -890,7 +890,6 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("AssetDescription")
-                        .IsRequired()
                         .HasColumnType("varchar(250)");
 
                     b.Property<int>("AssetGroupId")
@@ -1626,9 +1625,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("SortOrder")
                         .HasColumnType("int")
                         .HasColumnName("SortOrder");
-
-                    b.Property<int>("SubLocationId")
-                        .HasColumnType("int");
 
                     b.Property<int>("UnitId")
                         .HasColumnType("int");

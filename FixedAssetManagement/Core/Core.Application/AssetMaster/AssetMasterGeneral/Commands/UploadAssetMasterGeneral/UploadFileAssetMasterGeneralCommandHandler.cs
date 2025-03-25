@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral
 {
-    public class UploadFileAssetMasterGeneralCommandHandler : IRequestHandler<UploadFileAssetMasterGeneralCommand, ApiResponseDTO<AssetMasterGeneralDTO>>
+    public class UploadFileAssetMasterGeneralCommandHandler : IRequestHandler<UploadFileAssetMasterGeneralCommand, ApiResponseDTO<AssetMasterImageDto>>
     {
         private readonly IFileUploadService _fileUploadService;
         private readonly IMediator _mediator;
@@ -33,11 +33,11 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             _logger = logger;
         }
 
-        public async Task<ApiResponseDTO<AssetMasterGeneralDTO>> Handle(UploadFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<AssetMasterImageDto>> Handle(UploadFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         {
             if (request.File == null || request.File.Length == 0)
             {
-                return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "No file uploaded" };
+                return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = false, Message = "No file uploaded" };
             }
              /*       // Get latest AssetCode
             
@@ -63,7 +63,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             if (string.IsNullOrWhiteSpace(baseDirectory))
             {
                 _logger.LogError("Base directory path not found in database.");
-                return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "Base directory not configured." };
+                return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = false, Message = "Base directory not configured." };
             }
             
             // 🔹 Construct the required file path
@@ -92,7 +92,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
                 string base64Image = Convert.ToBase64String(await File.ReadAllBytesAsync(filePath));
 
                 // ✅ Ensure the correct format before saving in DB
-                string formattedPath = filePath.Replace(@"\", "/");
+                string formattedPath = dummyFileName;
                 
 
   /*               // ✅ Update AssetImage field using repository
@@ -102,18 +102,18 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
                     return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "Failed to update asset image." };
                 }
  */
-                var response = new AssetMasterGeneralDTO
+                var response = new AssetMasterImageDto
                 {
                     AssetImage = formattedPath,  // ✅ Correctly formatted file path
                     AssetImageBase64 = base64Image  // ✅ Convert to Base64
                 };
 
-                return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = true, Data = response };
+                return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = true, Data = response };
             }
             catch (Exception ex)
             {
                 _logger.LogError($"File upload failed: {ex.Message}");
-                return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = $"File upload failed: {ex.Message}" };
+                return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = false, Message = $"File upload failed: {ex.Message}" };
             }
         }   
         private void EnsureDirectoryExists(string path)
