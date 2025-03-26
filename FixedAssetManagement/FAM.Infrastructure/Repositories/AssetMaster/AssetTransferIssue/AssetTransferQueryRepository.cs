@@ -9,6 +9,7 @@ using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAllAssetTransfe
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCategory;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetDtlToTransfer;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByDeptId;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
 using Dapper;
 
@@ -28,33 +29,95 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
          public async Task<(List<AssetTransferDto>, int)> GetAllAsync(int PageNumber, int PageSize ,string? SearchTerm, DateTimeOffset? FromDate , DateTimeOffset? ToDate )        
         {
 
-                var query = $$"""
-            DECLARE @TotalCount INT;
-            SELECT @TotalCount = COUNT(*) 
-            FROM FixedAsset.AssetTransferIssueHdr
-            WHERE 1 = 1 
-             {{(FromDate.HasValue ? "AND DocDate >= @FromDate" : "")}}
-            {{(ToDate.HasValue ? "AND DocDate <= @ToDate" : "")}}
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(Id AS NVARCHAR) LIKE @Search)") }};
+            //     var query = $$"""
+            // DECLARE @TotalCount INT;
+            // SELECT @TotalCount = COUNT(*) 
+            // FROM FixedAsset.AssetTransferIssueHdr
+            // WHERE 1 = 1 
+            //  {{(FromDate.HasValue ? "AND DocDate >= @FromDate" : "")}}
+            // {{(ToDate.HasValue ? "AND DocDate <= @ToDate" : "")}}
+            // {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(Id AS NVARCHAR) LIKE @Search)") }};
 
 
-            SELECT Id, DocDate, TransferType, FromUnitId, ToUnitId, 
-                FromDepartmentId, ToDepartmentId, FromCustodianId, ToCustodianId, 
-                Status, CreatedBy, CreatedDate, CreatedByName, CreatedIP, 
-                ModifiedBy, ModifiedDate, ModifiedByName, ModifiedIP, 
-                AuthorizedBy, AuthorizedDate, AuthorizedByName, AuthorizedIP, 
-                FromCustodianName, ToCustodianName, AckStatus
-            FROM FixedAsset.AssetTransferIssueHdr
-            WHERE   1 = 1          
-            {{(FromDate.HasValue ? "AND DocDate >= @FromDate" : "")}}
-            {{(ToDate.HasValue ? "AND DocDate < @ToDate" : "")}}
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(Id AS NVARCHAR) LIKE @Search)") }}        
-            ORDER BY Id DESC
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+            // SELECT Id, DocDate, TransferType, FromUnitId, ToUnitId, 
+            //     FromDepartmentId, ToDepartmentId, FromCustodianId, ToCustodianId, 
+            //     Status, CreatedBy, CreatedDate, CreatedByName, CreatedIP, 
+            //     ModifiedBy, ModifiedDate, ModifiedByName, ModifiedIP, 
+            //     AuthorizedBy, AuthorizedDate, AuthorizedByName, AuthorizedIP, 
+            //     FromCustodianName, ToCustodianName, AckStatus
+            // FROM FixedAsset.AssetTransferIssueHdr
+            // WHERE   1 = 1          
+            // {{(FromDate.HasValue ? "AND DocDate >= @FromDate" : "")}}
+            // {{(ToDate.HasValue ? "AND DocDate < @ToDate" : "")}}
+            // {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(Id AS NVARCHAR) LIKE @Search)") }}        
+            // ORDER BY Id DESC
+            // OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
 
-            SELECT @TotalCount AS TotalCount;
-            """;
+            // SELECT @TotalCount AS TotalCount;
+            // """;
+                        var query = $$"""
+                DECLARE @TotalCount INT;
+                SELECT @TotalCount = COUNT(*) 
+                FROM FixedAsset.AssetTransferIssueHdr A
+                INNER JOIN Bannari.AppData.Unit FromUnit ON A.FromUnitId = FromUnit.Id
+                INNER JOIN Bannari.AppData.Unit ToUnit ON A.ToUnitId = ToUnit.Id
+                INNER JOIN Bannari.AppData.Department FromDept ON A.FromDepartmentId = FromDept.Id
+                INNER JOIN Bannari.AppData.Department ToDept ON A.ToDepartmentId = ToDept.Id
+                INNER JOIN FixedAsset.MiscMaster Misc ON A.TransferType = Misc.Id
+                WHERE 1 = 1 
+                {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
+                {{(ToDate.HasValue ? "AND A.DocDate <= @ToDate" : "")}}
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search)") }};
+
+
+                SELECT 
+                    A.Id, 
+                    A.DocDate, 
+                    A.TransferType, 
+                    Misc.code as TransferTypeName, 
+                    A.FromUnitId, 
+                    FromUnit.UnitName AS FromUnitName, 
+                    A.ToUnitId, 
+                    ToUnit.UnitName AS ToUnitName,
+                    A.FromDepartmentId, 
+                    FromDept.DeptName AS FromDepartmentName, 
+                    A.ToDepartmentId, 
+                    ToDept.DeptName AS ToDepartmentName, 
+                    A.FromCustodianId, 
+                    A.ToCustodianId, 
+                    A.Status,  
+                    A.FromCustodianName, 
+                    A.ToCustodianName, 
+                    A.AckStatus, 
+                    A.CreatedBy, 
+                    A.CreatedDate, 
+                    A.CreatedByName, 
+                    A.CreatedIP, 
+                    A.ModifiedBy, 
+                    A.ModifiedDate,
+                    A.ModifiedByName,
+                    A.ModifiedIP, 
+                    A.AuthorizedBy, 
+                    A.AuthorizedDate, 
+                    A.AuthorizedByName, 
+                    A.AuthorizedIP
+                FROM FixedAsset.AssetTransferIssueHdr A
+                INNER JOIN Bannari.AppData.Unit FromUnit ON A.FromUnitId = FromUnit.Id
+                INNER JOIN Bannari.AppData.Unit ToUnit ON A.ToUnitId = ToUnit.Id
+                INNER JOIN Bannari.AppData.Department FromDept ON A.FromDepartmentId = FromDept.Id
+                INNER JOIN Bannari.AppData.Department ToDept ON A.ToDepartmentId = ToDept.Id
+                INNER JOIN FixedAsset.MiscMaster Misc ON A.TransferType = Misc.Id
+                WHERE 1 = 1          
+                {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
+                {{(ToDate.HasValue ? "AND A.DocDate < @ToDate" : "")}}
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search)") }}        
+                ORDER BY A.Id DESC
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+
+                SELECT @TotalCount AS TotalCount;
+                """;
 
 
             var parameters = new
@@ -116,10 +179,25 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
 
         return header;
     }
-    public async Task<List<GetAssetMasterDto>> GetAssetsByCategoryAsync(int assetCategoryId)
+    
+    public async Task<List<GetCategoryByDeptIdDto>> GetCategoriesByDepartmentAsync(int departmentId)
     {         
-            const string query = @"SELECT Id as AssetId, AssetName FROM FixedAsset.AssetMaster WHERE AssetCategoryId = @assetCategoryId";                          
-            var result = await _dbConnection.QueryAsync<GetAssetMasterDto>(query, new { assetCategoryId });         
+            const string query = @"SELECT DISTINCT 
+            A.Id AS CategoryID,  A.CategoryName  FROM FixedAsset.AssetCategories A 
+            INNER JOIN FixedAsset.AssetMaster   B   ON A.Id = B.AssetCategoryId 
+            INNER JOIN FixedAsset.AssetLocation C   ON B.Id = C.AssetId 
+            WHERE C.DepartmentId = @departmentId";                          
+            var result = await _dbConnection.QueryAsync<GetCategoryByDeptIdDto>(query, new { departmentId });         
+            return result.ToList();      
+    }   
+
+    public async Task<List<GetAssetMasterDto>> GetAssetsByCategoryAsync(int assetCategoryId , int assetDepartmentId)
+    {         
+           // const string query = @"SELECT Id as AssetId, AssetName FROM FixedAsset.AssetMaster WHERE AssetCategoryId = @assetCategoryId";    
+            const string query = @"	SELECT  A.Id AS AssetId,A.AssetName,A.AssetCategoryId FROM FixedAsset.AssetMaster A 
+                                    INNER JOIN FixedAsset.AssetLocation B  ON A.Id = B.AssetId  
+                                    WHERE      A.AssetCategoryId = @assetCategoryId   AND B.DepartmentId =  @assetDepartmentId";                      
+            var result = await _dbConnection.QueryAsync<GetAssetMasterDto>(query, new { assetCategoryId, assetDepartmentId });         
             return result.ToList();      
     }   
     

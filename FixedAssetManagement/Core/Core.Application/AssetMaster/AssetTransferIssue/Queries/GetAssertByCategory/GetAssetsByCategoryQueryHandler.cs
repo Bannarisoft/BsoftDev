@@ -21,7 +21,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCat
         }
         public async Task<List<GetAssetMasterDto>> Handle(GetAssetsByCategoryQuery request, CancellationToken cancellationToken)
         {
-            var assets = await _assetTransferQueryRepository.GetAssetsByCategoryAsync(request.AssetCategoryId);
+            var assets = await _assetTransferQueryRepository.GetAssetsByCategoryAsync(request.AssetCategoryId , request.AssetDepartmentId);
 
             return _mapper.Map<List<GetAssetMasterDto>>(assets);
         }

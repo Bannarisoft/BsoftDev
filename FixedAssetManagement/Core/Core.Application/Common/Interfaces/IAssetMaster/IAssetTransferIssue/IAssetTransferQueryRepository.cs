@@ -7,6 +7,7 @@ using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAllAssetTransfe
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCategory;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetDtlToTransfer;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByDeptId;
 using Core.Domain.Entities.AssetMaster;
 
 namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue
@@ -15,8 +16,9 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue
     {
           Task<(List<AssetTransferDto>,int)> GetAllAsync(int PageNumber, int PageSize,string? SearchTerm, DateTimeOffset? FromDate = null, DateTimeOffset? ToDate = null);
            Task<List<GetAllTransferDtlDto>> GetAssetTransferByIDAsync(int assetTransferId);           
-           Task<AssetTransferJsonDto?> GetAssetTransferByIdAsync(int assetTransferId);           
-           Task<List<GetAssetMasterDto>> GetAssetsByCategoryAsync(int assetCategoryId);             
+           Task<AssetTransferJsonDto?> GetAssetTransferByIdAsync(int assetTransferId);
+           Task<List<GetCategoryByDeptIdDto>> GetCategoriesByDepartmentAsync(int departmentId);            
+           Task<List<GetAssetMasterDto>> GetAssetsByCategoryAsync(int assetCategoryId , int assetDepartmentId);             
            Task<GetAssetDetailsToTransferHdrDto?> GetAssetDetailsToTransferByIdAsync(int assetId); 
            Task<bool> IsAssetPendingOrApprovedAsync(int assetId);
 

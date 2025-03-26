@@ -24,14 +24,17 @@ namespace MaintenanceManagement.API.Controllers
 
          private  readonly IValidator<CreateMachineGroupCommand>  _createMachineGroupCommandValidator;
          private readonly IValidator<UpdateMachineGroupCommand> _updateMachineGroupCommandValidator;
+        private readonly IValidator<DeleteMachineGroupCommand> _deleteMachineGroupCommandValidator;
 
         
 
-        public MachineGroupController(ISender mediator, IMachineGroupCommandRepository machineGroupCommandRepository,IValidator<CreateMachineGroupCommand>  createMachineGroupCommandValidator, IValidator<UpdateMachineGroupCommand> updateMachineGroupCommandValidator   ):base(mediator)
+        public MachineGroupController(ISender mediator, IMachineGroupCommandRepository machineGroupCommandRepository,IValidator<CreateMachineGroupCommand>  createMachineGroupCommandValidator, IValidator<UpdateMachineGroupCommand> updateMachineGroupCommandValidator,
+        IValidator<DeleteMachineGroupCommand> deleteMachineGroupCommandValidator   ):base(mediator)
         {
             _machineGroupCommandRepository = machineGroupCommandRepository;
             _createMachineGroupCommandValidator = createMachineGroupCommandValidator;
             _updateMachineGroupCommandValidator = updateMachineGroupCommandValidator;
+            _deleteMachineGroupCommandValidator = deleteMachineGroupCommandValidator;
           
         }
 
@@ -144,7 +147,17 @@ namespace MaintenanceManagement.API.Controllers
        [ HttpDelete("{id}")]
           public async Task<IActionResult> Delete(int id)
         {
-           
+            var command = new DeleteMachineGroupCommand { Id = id };
+           var validationResult = await  _deleteMachineGroupCommandValidator.ValidateAsync(command);
+               if (!validationResult.IsValid)
+                {
+                    return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+                }
+
            var updatedMiscMaster = await Mediator.Send(new DeleteMachineGroupCommand { Id = id });
 
            if(updatedMiscMaster.IsSuccess)

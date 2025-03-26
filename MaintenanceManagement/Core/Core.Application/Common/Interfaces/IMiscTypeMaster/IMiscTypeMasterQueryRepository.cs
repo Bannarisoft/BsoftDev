@@ -17,6 +17,14 @@ namespace Core.Application.Common.Interfaces.IMiscTypeMaster
 
            Task<Core.Domain.Entities.MiscTypeMaster?> GetByMiscTypeMasterCodeAsync(string name,int? id = null);
 
+           Task<bool> AlreadyExistsAsync(string miscTypeCode,int? id = null);
+
+            Task<bool> NotFoundAsync(int Id );
+
+            Task<bool> SoftDeleteValidation(int Id); 
+
+
+
            
 
     }
