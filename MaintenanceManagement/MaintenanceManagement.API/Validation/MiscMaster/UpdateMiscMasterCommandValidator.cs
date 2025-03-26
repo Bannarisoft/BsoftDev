@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.MiscMaster.Command.UpdateMiscMaster;
 using MaintenanceManagement.API.Validation.Common;
 using FluentValidation;
+using Core.Application.Common.Interfaces.IMiscMaster;
 
 namespace MaintenanceManagement.API.Validation.MiscMaster
 {
@@ -13,12 +14,15 @@ namespace MaintenanceManagement.API.Validation.MiscMaster
     
 
         private readonly List<ValidationRule> _validationRules;
-          public UpdateMiscMasterCommandValidator(MaxLengthProvider maxLengthProvider)
+        private readonly IMiscMasterQueryRepository _miscMasterQuery;
+
+          public UpdateMiscMasterCommandValidator( IMiscMasterQueryRepository miscMasterQuery,MaxLengthProvider maxLengthProvider)
         {
             var MiscCodeMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.MiscMaster>("Code") ?? 50;
             var DescriptionMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.MiscMaster>("Description")?? 250;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _miscMasterQuery = miscMasterQuery;
             if (_validationRules == null || !_validationRules.Any())
             {
                       throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -27,7 +31,7 @@ namespace MaintenanceManagement.API.Validation.MiscMaster
             {
              switch (rule.Rule)
                 {
-                    case "NotFound" :
+                    case "Notempty": 
                      // Apply NotEmpty validation
                         RuleFor(x => x.Code)
                             .NotEmpty()
@@ -51,6 +55,22 @@ namespace MaintenanceManagement.API.Validation.MiscMaster
                             .MaximumLength(DescriptionMaxLength)
                             .WithMessage($"{nameof(UpdateMiscMasterCommand.Description)} {rule.Error}");
                         break;
+
+
+                    case "AlreadyExists":
+                           RuleFor(x =>  new { x.Code, x.Id })
+                           .MustAsync(async (misccode, cancellation) => 
+                        !await _miscMasterQuery.AlreadyExistsAsync(misccode.Code, misccode.Id))             
+                           .WithName("Misc Code")
+                            .WithMessage($"{rule.Error}");
+                            break; 
+                    case "NotFound":
+                           RuleFor(x => x.Id )
+                           .MustAsync(async (Id, cancellation) => 
+                        await _miscMasterQuery.NotFoundAsync(Id))             
+                           .WithName("Misc Code")
+                            .WithMessage($"{rule.Error}");
+                            break; 
                 }
 
             }

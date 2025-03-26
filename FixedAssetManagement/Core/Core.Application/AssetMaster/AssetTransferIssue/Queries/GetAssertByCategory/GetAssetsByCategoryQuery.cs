@@ -9,5 +9,6 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCat
     public class GetAssetsByCategoryQuery  : IRequest<List<GetAssetMasterDto>>
     {
          public int AssetCategoryId { get; set; }
+         public int AssetDepartmentId { get; set;}
     }
 }

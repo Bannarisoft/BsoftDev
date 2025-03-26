@@ -40,6 +40,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
 
             return result > 0;
         }
+   
 
         public async Task<bool> GetByMachineGroupnameAsync(string groupName)
         {
@@ -52,23 +53,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
 
             return result > 0;
         }
-        //   public async Task<bool> GetByMachineGroupCodeAsync(string Groupname, int id)
-        // {
-        //       var query = """
-        //          SELECT * FROM Maintenance.MachineGroup
-        //          WHERE GroupName = @Groupname   AND IsDeleted = 0 AND Id <> @Id
-        //          """;
-
-        //     // var parameters = new DynamicParameters(new { Name = Groupname });             
-
-        //    // return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineGroup>(query, parameters);
-
-        //     //var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { Groupname = Groupname });
-        //         var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { Groupname, Id = id });
-
-        // return result > 0; // Returns `true` if group name exists, `false` otherwise
-        // } 
-
+         public async Task<bool> NotFoundAsync(int id)
+        {
+             var query = "SELECT COUNT(1) FROM Maintenance.MachineGroup WHERE Id = @Id AND IsDeleted = 0";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+                return count > 0;
+        }   
         public async Task<(List<Core.Domain.Entities.MachineGroup>, int)> GetAllMachineGroupsAsync(int PageNumber, int PageSize, string? SearchTerm)
             {
                 var query = $$"""
@@ -107,28 +98,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
 
                 return (machineGroupList, totalCount);
             }
+             public async Task<List<Core.Domain.Entities.MachineGroup>> GetMachineGroupAutoComplete(string searchPattern)
+               {
+                   const string query = @"
+                       SELECT Id, GroupName  
+                       FROM Maintenance.MachineGroup
+                       WHERE IsDeleted = 0 AND GroupName LIKE @SearchPattern";
 
-
-              public async Task<List<Core.Domain.Entities.MachineGroup>> GetMachineGroupAutoComplete(string searchPattern)
-                {
-                    const string query = @"
-                        SELECT Id, GroupName  
-                        FROM Maintenance.MachineGroup
-                        WHERE IsDeleted = 0 AND GroupName LIKE @SearchPattern";
-                    
-                    var parameters = new 
-                    { 
-                        SearchPattern = $"%{searchPattern ?? string.Empty}%"
-                    };
-
-                    var machineGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineGroup>(query, parameters);
-                    return machineGroups.ToList();
-                }
-
-
-          
-
-
+                   var parameters = new 
+                   { 
+                       SearchPattern = $"%{searchPattern ?? string.Empty}%"
+                   };
+               var machineGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineGroup>(query, parameters);
+                   return machineGroups.ToList();
+               }          
 
     }
 }
