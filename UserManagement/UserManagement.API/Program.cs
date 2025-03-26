@@ -7,12 +7,12 @@ using Core.Domain.Entities;
 using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
 
     // If environment is null or empty, set default to "Development"
     if (string.IsNullOrWhiteSpace(environment))
     {      
-        environment = "Development";
+        environment = "development";
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
     }
 

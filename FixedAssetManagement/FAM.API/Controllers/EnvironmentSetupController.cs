@@ -39,7 +39,7 @@ namespace FAM.API.Controllers
             if (string.IsNullOrWhiteSpace(appSettingsPath))
             {
                 // If not set, fallback to default path
-                var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+                var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
                 appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{environment}.json");
 
                 // Set `APP_SETTINGS_PATH` Environment Variable
