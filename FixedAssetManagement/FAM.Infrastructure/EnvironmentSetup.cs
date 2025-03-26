@@ -24,9 +24,9 @@ namespace FAM.Infrastructure
             var encryptedServer = FetchOrSetEnvironmentVariable("DATABASE_SERVER", _configuration["Encryption:DefaultEncryptedServer"]);
             var encryptedUserId = FetchOrSetEnvironmentVariable("DATABASE_USERID", _configuration["Encryption:DefaultEncryptedUserId"]);
 
-            var decryptedPassword = Decrypt(encryptedPassword, encryptionKey);
+             var decryptedPassword = Decrypt(encryptedPassword, encryptionKey);
             var decryptedServer = Decrypt(encryptedServer, encryptionKey);
-            var decryptedUserId = Decrypt(encryptedUserId, encryptionKey);
+            var decryptedUserId = Decrypt(encryptedUserId, encryptionKey); 
 
             Environment.SetEnvironmentVariable("DATABASE_PASSWORD", decryptedPassword, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("DATABASE_SERVER", decryptedServer, EnvironmentVariableTarget.Process);

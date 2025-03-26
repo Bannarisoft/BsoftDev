@@ -101,7 +101,6 @@ builder.Services.AddMassTransit(cfg =>
         app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
         app.UseAuthorization();
         app.MapControllers();
-        app.ConfigureHangfireDashboard();
-         app.MapGet("/", () => "Fixed Asset Management Running");
+        app.ConfigureHangfireDashboard();         
         app.Run();
 
