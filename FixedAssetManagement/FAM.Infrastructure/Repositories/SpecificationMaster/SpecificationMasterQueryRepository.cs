@@ -43,16 +43,17 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
             return (specificationMasterList, totalCount);             
         }
 
-        public async Task<List<SpecificationMasters>> GetBySpecificationNameAsync(string searchPattern)
+        public async Task<List<SpecificationMasters>> GetBySpecificationNameAsync(int? AssetGroupId, string searchPattern)
         {
             const string query = @"
             SELECT Id,SpecificationName,AssetGroupId,ISDefault,  IsActive
             ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
             FROM FixedAsset.SpecificationMaster
             WHERE (SpecificationName LIKE @SearchPattern) 
-            AND  IsDeleted=0 and IsActive=1
+            AND  IsDeleted=0 and IsActive=1 and AssetGroupId=@AssetGroupId
             ORDER BY ID DESC";            
-            var result = await _dbConnection.QueryAsync<SpecificationMasters>(query, new { SearchPattern = $"%{searchPattern}%" });
+            var result = await _dbConnection.QueryAsync<SpecificationMasters>(query, 
+                    new { SearchPattern = $"%{searchPattern}%", AssetGroupId });
             return result.ToList();
         }
 

@@ -16,25 +16,24 @@ using Microsoft.AspNetCore.Authorization;
 using Core.Application.Users.Commands.ForgotUserPassword;
 using UserManagement.Infrastructure.Services;
 using Core.Application.Users.Commands.ResetUserPassword;
+using Contracts.Events;
+using MassTransit;
 
 namespace UserManagement.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    
+
     public class UserController : ApiControllerBase
     {
-        // public UserController(ISender mediator) : base(mediator)
-        // {
-        // }
-
-         private readonly IValidator<CreateUserCommand> _createUserCommandValidator;
-         private readonly IValidator<UpdateUserCommand> _updateUserCommandValidator;
-         private readonly ApplicationDbContext _dbContext;
-         private readonly IValidator<FirstTimeUserPasswordCommand> _firstTimeUserPasswordCommandValidator;
-         private readonly IValidator<ChangeUserPasswordCommand> _changeUserPasswordCommandValidator;
-         private readonly ILogger<UserController> _logger;
+        private readonly IValidator<CreateUserCommand> _createUserCommandValidator;
+        private readonly IValidator<UpdateUserCommand> _updateUserCommandValidator;
+        private readonly ApplicationDbContext _dbContext;
+        private readonly IValidator<FirstTimeUserPasswordCommand> _firstTimeUserPasswordCommandValidator;
+        private readonly IValidator<ChangeUserPasswordCommand> _changeUserPasswordCommandValidator;
+        private readonly ILogger<UserController> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IPublishEndpoint _publishEndpoint;
         private readonly IValidator<ForgotUserPasswordCommand> _forgotUserPasswordCommandValidator;
         private readonly IValidator<ResetUserPasswordCommand> _resetUserPasswordCommandValidator;
          
@@ -46,48 +45,55 @@ namespace UserManagement.API.Controllers
                              IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
                              ILogger<UserController> logger,IHttpClientFactory httpClientFactory,
                              IValidator<ForgotUserPasswordCommand> forgotUserPasswordCommandValidator,
-                             IValidator<ResetUserPasswordCommand> resetUserPasswordCommandValidator) 
+                             IValidator<ResetUserPasswordCommand> resetUserPasswordCommandValidator,
+                             IPublishEndpoint publishEndpoint) 
          : base(mediator)
         {        
             _createUserCommandValidator = createUserCommandValidator;
-            _updateUserCommandValidator = updateUserCommandValidator;    
             _dbContext = dbContext;  
+            _updateUserCommandValidator = updateUserCommandValidator;
+            _dbContext = dbContext;
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
             _logger = logger;
             _httpClientFactory = httpClientFactory;
+            _publishEndpoint = publishEndpoint;
             _forgotUserPasswordCommandValidator = forgotUserPasswordCommandValidator;
             _resetUserPasswordCommandValidator = resetUserPasswordCommandValidator;
         }
-        
+
         [HttpGet]
-        public async Task<IActionResult> GetAllUsersAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        public async Task<IActionResult> GetAllUsersAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
         {
             var users = await Mediator.Send(new GetUserQuery
             {
-                PageNumber = PageNumber, 
-                PageSize = PageSize, 
+
+                PageNumber = PageNumber,
+                PageSize = PageSize,
                 SearchTerm = SearchTerm
             });
             // var activeUsers = users.ToList();
-            if(!users.IsSuccess)
+
+            if (!users.IsSuccess)
             {
-                return BadRequest(new 
-                { 
-                    StatusCode = StatusCodes.Status400BadRequest, 
-                    message = users.Message 
+
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = users.Message
                 });
             }
 
             _logger.LogInformation($"Total {users.Data.Count} active users listed successfully.");
 
-            return Ok(new 
-            { 
-            StatusCode = StatusCodes.Status200OK, 
-            data = users.Data,
-             TotalCount = users.TotalCount,
-             PageNumber = users.PageNumber,
-            PageSize = users.PageSize
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = users.Data,
+                TotalCount = users.TotalCount,
+                PageNumber = users.PageNumber,
+                PageSize = users.PageSize
 
             });
         }
@@ -97,7 +103,6 @@ namespace UserManagement.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            
 
             var user = await Mediator.Send(new GetUserByIdQuery { UserId = id });
 
@@ -110,20 +115,20 @@ namespace UserManagement.API.Controllers
 
                 return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"User ID {id} not found." });
             }
-                _logger.LogWarning("User Listed successfully: {Username}", user);
 
-                return Ok(new { StatusCode = StatusCodes.Status200OK, data = user });
+            _logger.LogWarning("User Listed successfully: {Username}", user);
+
+
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = user });
         }
 
         [HttpPost]
-
-
         public async Task<IActionResult> CreateAsync([FromBody] CreateUserCommand createUserCommand)
         {
 
-
             var validationResult = await _createUserCommandValidator.ValidateAsync(createUserCommand);
-                _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
+
+            _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
 
             if (!validationResult.IsValid)
             {
@@ -134,6 +139,39 @@ namespace UserManagement.API.Controllers
                     errors = validationResult.Errors.Select(e => e.ErrorMessage)
                 });
             }
+
+            var userId = Guid.NewGuid();
+            var userCreatedEvent = new UserCreatedEvent(
+                CorrelationId: Guid.NewGuid(),   // Create a new CorrelationId
+                UserId: userId,                  // Pass the UserId from createUserCommand
+                Email: createUserCommand.EmailId // Pass the Email from createUserCommand
+            );
+
+            // Log the information
+            _logger.LogInformation("Publishing IUserCreatedEvent for UserId: {UserId}, UserName: {UserName}, Email: {Email}",
+                userCreatedEvent.UserId, createUserCommand.UserName, createUserCommand.EmailId);
+
+            // Publish the event
+            await _publishEndpoint.Publish(userCreatedEvent, context =>
+            {
+                // Use ContentType object
+                context.ContentType = new System.Net.Mime.ContentType("application/json");
+            });
+            //   // ? Create a proper event instance
+            //     var userCreatedEvent = new UserCreated(
+            //         CorrelationId: Guid.NewGuid(),
+            //         UserId: userId,
+            //         Email: createUserCommand.EmailId,
+            //         CreatedAt: DateTime.UtcNow
+            //     );
+
+            //     _logger.LogInformation("Publishing IUserCreated Event: {@UserCreated}", userCreatedEvent);
+
+            //     // ? Publish the event using a concrete class
+            //     await _publishEndpoint.Publish(userCreatedEvent, context =>
+            //     {
+            //         context.ContentType = "application/json";
+            //     });
 
 
             var response = await Mediator.Send(createUserCommand);
@@ -145,20 +183,21 @@ namespace UserManagement.API.Controllers
                 return Ok(new { StatusCode = StatusCodes.Status201Created, message = response.Message, data = response.Data });
             }
 
-                _logger.LogWarning($"Failed to create user {createUserCommand.UserName}.");
+
+            _logger.LogWarning($"Failed to create user {createUserCommand.UserName}.");
 
 
-                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
-        }        
+
+            return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message });
+        }
         [HttpPut]
-
-
         public async Task<IActionResult> UpdateAsync([FromBody] UpdateUserCommand updateUserCommand)
         {
 
 
             var validationResult = await _updateUserCommandValidator.ValidateAsync(updateUserCommand);
-                _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
+
+            _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
 
             if (!validationResult.IsValid)
             {
@@ -169,8 +208,6 @@ namespace UserManagement.API.Controllers
                     errors = validationResult.Errors.Select(e => e.ErrorMessage)
                 });
             }
-
-
 
             var userExists = await Mediator.Send(new GetUserByIdQuery { UserId = updateUserCommand.UserId });
             if (userExists is null)
@@ -190,33 +227,35 @@ namespace UserManagement.API.Controllers
                 return Ok(new { StatusCode = StatusCodes.Status200OK, message = response.Message });
             }
 
-                _logger.LogWarning($"Failed to update user {updateUserCommand.UserName}.");
 
-                return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message }); 
-        }      
+            _logger.LogWarning($"Failed to update user {updateUserCommand.UserName}.");
 
 
-
+            return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message });
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-           
+
             if (id <= 0)
             {
                 return BadRequest(new
-            {
+
+                {
                     StatusCode = StatusCodes.Status400BadRequest,
                     message = "Invalid User ID"
                 });
             }
-            var result = await Mediator.Send(new DeleteUserCommand { UserId= id });                 
+
+            var result = await Mediator.Send(new DeleteUserCommand { UserId = id });
             if (!result.IsSuccess)
-            {          
-                 _logger.LogWarning($"Deletion failed for User {id}: {result?.Message ?? "Unknown error"}.");
-    
-                return NotFound(new 
-                { 
+
+            {
+                _logger.LogWarning($"Deletion failed for User {id}: {result?.Message ?? "Unknown error"}.");
+
+                return NotFound(new
+                {
                     StatusCode = StatusCodes.Status404NotFound,
                     message = result.Message
                 });
@@ -229,7 +268,8 @@ namespace UserManagement.API.Controllers
             {
 
                 StatusCode = StatusCodes.Status200OK,
-                data =$"User ID {id} Deleted" 
+
+                data = $"User ID {id} Deleted"
             });
             // var deleteUser = await Mediator.Send(deleteUserCommand);
 
@@ -238,9 +278,6 @@ namespace UserManagement.API.Controllers
             // {
             //     _logger.LogInformation($"User {deleteUserCommand.UserId} deleted successfully.");
             //     return Ok(new { StatusCode=StatusCodes.Status200OK, message = deleteUser.Message, errors = "" });
-              
-
-
 
             // }
             //     _logger.LogInformation($"Failed to delete user with ID {deleteUserCommand.UserId}.");
@@ -248,20 +285,14 @@ namespace UserManagement.API.Controllers
         }
 
         [HttpGet]
-
-
         [Route("by-name")]
         public async Task<IActionResult> GetByUsernameAsync([FromQuery] string? name)
         {
-           
-
-
-            var users = await Mediator.Send(new GetUserAutoCompleteQuery {SearchPattern = name});
+            var users = await Mediator.Send(new GetUserAutoCompleteQuery { SearchPattern = name });
             _logger.LogWarning($"Users listed successfully: {string.Join(", ", users)}");
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = users.Data });
+
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = users.Data });
         }
-
-
 
         [HttpPut("password/first-time")]
         public async Task<IActionResult> FirstTimeUserChangePassword([FromBody] FirstTimeUserPasswordCommand firstTimeUserPasswordCommand)
@@ -286,10 +317,9 @@ namespace UserManagement.API.Controllers
                 return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = response.Message });
             }
             _logger.LogInformation($"First Time User {firstTimeUserPasswordCommand.UserName} and Password changed successfully.");
-            return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });     
+
+            return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });
         }
-
-
 
         [HttpPut("password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangeUserPasswordCommand changeUserPasswordCommand)
@@ -306,33 +336,31 @@ namespace UserManagement.API.Controllers
                 });
             }
 
-
-
             var response = await Mediator.Send(changeUserPasswordCommand);
             if (response.IsSuccess)
             {
-                 _logger.LogInformation($"User {changeUserPasswordCommand.UserName} and password changed successfully.");
 
-                return Ok(new 
-                { 
-                    StatusCode = StatusCodes.Status200OK, 
-                    message = response 
+                _logger.LogInformation($"User {changeUserPasswordCommand.UserName} and password changed successfully.");
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    message = response
                 });
-           }
-           return BadRequest(new 
-           { 
-            StatusCode = StatusCodes.Status400BadRequest, 
-            message = response.Message 
+            }
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = response.Message
             });
-           
+
         }
-
-
 
         [HttpPost("password/reset-request")]
         [AllowAnonymous]
         public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand forgotUserPasswordCommand)
-        {       
+
+        {
               var validationResult = await _forgotUserPasswordCommandValidator.ValidateAsync(forgotUserPasswordCommand);
             if (!validationResult.IsValid)
             {
@@ -350,27 +378,28 @@ namespace UserManagement.API.Controllers
             {
 
                 _logger.LogInformation($"User {forgotUserPasswordCommand.UserName} fetched successfully.");
-                
 
-              return Ok(new
-              {
-                  StatusCode = StatusCodes.Status200OK,
-                  message = response.Data, // Correctly access the message
                     
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    message = response.Data, // Correctly access the message
+
                 });
             }
             _logger.LogWarning($"Invalid username, email, or mobile number: {forgotUserPasswordCommand.UserName}.");
 
-             return BadRequest(new
+
+            return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
                 message = response.Message // Access the message for error
             });
         }
 
-
-       [HttpPut("password/reset")]
-       [AllowAnonymous]
+        [HttpPut("password/reset")]
+        [AllowAnonymous]
         public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand resetUserPasswordCommand)
         {
              
@@ -396,7 +425,8 @@ namespace UserManagement.API.Controllers
             }
             _logger.LogInformation($"Password changed successfully for user {resetUserPasswordCommand.UserName}.");
 
-            return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });     
+
+            return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });
         }
     }
 }

@@ -166,7 +166,8 @@ namespace FAM.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data =$"Location ID {id} Deleted" 
+                data =$"Location ID {id} Deleted" ,
+                message = deletedlocation.Message
             });
             
     }

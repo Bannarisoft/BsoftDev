@@ -1,4 +1,4 @@
-using AutoMapper;
+/* using AutoMapper;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.Common.Interfaces.IExcelImport;
 using Core.Domain.Entities;
@@ -66,10 +66,7 @@ namespace Core.Application.ExcelImport
                             //AssetUOM
                             string assetUOM = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty;                             
                             int? assetUOMId = await _assetRepository.GetAssetUOMIdByNameAsync(assetUOM);
-                         /*    if (assetUOMId == null)
-                            {
-                                throw new Exception($"Invalid Asset UOM '{assetUOM}' at Excel Row {currentRow}");
-                            } */
+                      
                              //Unit
                             string assetUnit = worksheet.Cells[row, 11].Value?.ToString() ?? string.Empty;                             
                             int? assetUnitId = await _assetQueryRepository.GetAssetUnitIdByNameAsync(assetUnit);
@@ -80,24 +77,15 @@ namespace Core.Application.ExcelImport
                             //Dept
                             string assetDept = worksheet.Cells[row, 12].Value?.ToString() ?? string.Empty;                             
                             int? assetDeptId = await _assetQueryRepository.GetAssetDeptIdByNameAsync(assetDept);
-                       /*      if (assetDeptId == null)
-                            {
-                                throw new Exception($"Invalid Asset Department Name '{assetDept}' at Excel Row {currentRow}");
-                            } */
+                       
                             //AssetLocation
                             string assetLocation = worksheet.Cells[row, 13].Value?.ToString() ?? string.Empty;                             
                             int? assetLocationId = await _assetRepository.GetAssetLocationIdByNameAsync(assetLocation);
-                           /*  if (assetLocationId == null)
-                            {
-                                throw new Exception($"Invalid Asset Location Name '{assetLocation}' at Excel Row {currentRow}");
-                            } */
+                          
                             //AssetSubLocation
                             string assetSubLocation = worksheet.Cells[row, 14].Value?.ToString() ?? string.Empty;                             
                             int? assetSubLocationId = await _assetRepository.GetAssetSubLocationIdByNameAsync(assetSubLocation);
-                            /* if (assetSubLocationId == null)
-                            {
-                                throw new Exception($"Invalid Asset SubLocation Name '{assetSubLocation}' at Excel Row {currentRow}");
-                            } */
+                         
                                //Unit
                             int getUnit = request.ImportDto.UnitId;                             
                             UnitDto? unitDetails  = await _assetQueryRepository.GetUnitByNameAsync(getUnit);
@@ -122,16 +110,7 @@ namespace Core.Application.ExcelImport
                             else{
                                 assetParentId = await _assetRepository.GetAssetIdByNameAsync(assetParent);
                             }
-                            /*  //AssetManufacturer
-                            int? assetManufacturerId;
-                            string assetManufacturer = worksheet.Cells[row, 34].Value?.ToString() ?? string.Empty;   
-                            if (assetManufacturer == string.Empty)
-                            {
-                                assetManufacturerId =null;
-                            }                          
-                            else{
-                                assetManufacturerId = await _assetRepository.GetManufacturerIdByNameAsync(assetManufacturer);
-                            } */
+                    
                             var assetSpecifications = new List<AssetSpecificationCombineDto>();
                             string? make = string.IsNullOrWhiteSpace(worksheet.Cells[row, 16].Value?.ToString()) ? null : worksheet.Cells[row, 16].Value?.ToString()?.Trim();
                             int? makeId = make == null ? null : 7; 
@@ -371,7 +350,7 @@ namespace Core.Application.ExcelImport
                             string pjYear = worksheet.Cells[row, 40].Value?.ToString()?.Trim();
                             DateTimeOffset? billDate = DateTimeOffset.TryParse(worksheet.Cells[row, 41].Value?.ToString(), out DateTimeOffset parsedBillDate) ? (DateTimeOffset?)parsedBillDate : null;
                             string billNo = worksheet.Cells[row, 42].Value?.ToString()?.Trim();
-                            DateTimeOffset? capitalizationDate = DateTimeOffset.TryParse(worksheet.Cells[row, 43].Value?.ToString(), out DateTimeOffset parsedCapitalizationDate) ? (DateTimeOffset?)parsedCapitalizationDate : null;
+                            
                             decimal purchaseValue = decimal.TryParse(worksheet.Cells[row, 43].Value?.ToString(), out decimal price) ? price : 0;
                             DateTimeOffset? grnDate = DateTimeOffset.TryParse(worksheet.Cells[row, 44].Value?.ToString(), out DateTimeOffset parsedGrnDate) ? (DateTimeOffset?)parsedGrnDate : null;
 
@@ -494,4 +473,4 @@ namespace Core.Application.ExcelImport
                 
         }
     }
-}
+} */

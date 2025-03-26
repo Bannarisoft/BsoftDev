@@ -103,6 +103,15 @@ namespace UserManagement.Infrastructure.Data.Configurations
             .HasConversion(isDeletedConverter)
             .IsRequired();
 
+             builder.Property(u => u.IsLocked)
+            .HasColumnName("IsLocked")
+            .HasColumnType("bit")
+            .HasConversion(
+                    v => v == 1, 
+                    v => v ? (byte)1 : (byte)0 
+                )
+            .IsRequired();
+
             builder.Property(b => b.CreatedByName)
             .IsRequired()
             .HasColumnType("varchar(50)");

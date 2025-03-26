@@ -125,7 +125,7 @@
     },
     {
         "rule": "UserLock",      
-        "error": "User is locked. Try again after {lockoutInfo.UnlockTime:G}."
+        "error": "User is locked. Please contact your admin."
     },
     {
         "rule": "PasswordLength",             

@@ -57,6 +57,7 @@ namespace UserManagement.Infrastructure.Data
         public DbSet<RoleParent> RoleParent { get; set; }
         public DbSet<RoleChild> RoleChild { get; set; }
         public DbSet<UserDivision> UserDivision {get; set;}
+        public DbSet<UserDepartment> UserDepartment {get; set;}
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -100,6 +101,7 @@ namespace UserManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new RoleParentConfiguration());
             modelBuilder.ApplyConfiguration(new RoleChildConfiguration());
             modelBuilder.ApplyConfiguration(new UserDivisionConfiguration());
+            modelBuilder.ApplyConfiguration(new UserDepartmentConfiguration());
             
                
             base.OnModelCreating(modelBuilder);
