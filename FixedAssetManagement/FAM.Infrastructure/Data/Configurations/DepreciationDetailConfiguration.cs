@@ -3,8 +3,6 @@
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using static Core.Domain.Common.BaseEntity;
 
 namespace FAM.Infrastructure.Data.Configurations
 {
@@ -12,17 +10,9 @@ namespace FAM.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<DepreciationDetails> builder)
         {
-             var statusConverter = new ValueConverter<Status, bool>(
-                    v => v == Status.Active,                    
-                    v => v ? Status.Active : Status.Inactive    
-                );
-            // ValueConverter for IsDelete (enum to bit)
-                var isDeleteConverter = new ValueConverter<IsDelete, bool>(
-                    v => v == IsDelete.Deleted,                 
-                    v => v ? IsDelete.Deleted : IsDelete.NotDeleted
-                );
-
                 builder.ToTable("DepreciationDetail", "FixedAsset");
+                builder.Ignore(b => b.IsActive);
+                builder.Ignore(b => b.IsDeleted);
                 // Primary Key
                 builder.HasKey(b => b.Id);
                 builder.Property(b => b.Id)
@@ -38,8 +28,8 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired(); 
 
-                builder.Property(dg => dg.Finyear)                
-                .HasColumnType("varchar(10)")
+                builder.Property(dg => dg.Finyear )                
+                .HasColumnType("int")
                 .IsRequired(); 
 
                  builder.Property(dg => dg.StartDate)                
@@ -51,8 +41,13 @@ namespace FAM.Infrastructure.Data.Configurations
                 .IsRequired(); 
 
                 builder.Property(dg => dg.DepreciationType)                
-                .HasColumnType("varchar(10)")
+                .HasColumnType("int")
                 .IsRequired(); 
+                 // Configure Foreign Key Relationship
+                builder.HasOne(dg => dg.DepType)
+                .WithMany(ag => ag.DepType)
+                .HasForeignKey(dg => dg.DepreciationType)                
+                .OnDelete(DeleteBehavior.Restrict); 
                 
                 builder.Property(dg => dg.AssetId)                
                 .HasColumnType("int")
@@ -112,6 +107,11 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("decimal(18,3)")
                 .IsRequired(); 
 
+                builder.Property(dg => dg.NetValue)                
+                .HasColumnType("decimal(18,3)")
+                .IsRequired()
+                .HasDefaultValue(0);
+
                 builder.Property(dg => dg.DepreciationPeriod)                
                 .HasColumnType("int")
                 .IsRequired(); 
@@ -135,16 +135,6 @@ namespace FAM.Infrastructure.Data.Configurations
                     v => v == 1, 
                     v => v ? (byte)1 : (byte)0 
                 )
-                .IsRequired();
-
-                 builder.Property(b => b.IsActive)                
-                .HasColumnType("bit")
-                .HasConversion(statusConverter)
-                .IsRequired();
-
-                 builder.Property(b => b.IsDeleted)                
-                .HasColumnType("bit")
-                .HasConversion(isDeleteConverter)
                 .IsRequired();
 
                 builder.Property(b => b.CreatedByName)

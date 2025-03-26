@@ -23,7 +23,8 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => IsDelete.NotDeleted));     
              
-            CreateMap<SpecificationMasters, SpecificationMasterAutoCompleteDTO>();    
+            CreateMap<SpecificationMasters, SpecificationMasterAutoCompleteDTO>();   
+             
             CreateMap<SpecificationMasters, SpecificationMasterDTO>();             
         }
     }

@@ -37,37 +37,9 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
             var oldAssetName = assetMaster.AssetName;
             assetMaster.AssetName = request.AssetMaster.AssetName;
 
-            if (assetMaster is null || assetMaster.IsDeleted is BaseEntity.IsDelete.Deleted )
-            {
-                return new ApiResponseDTO<AssetMasterUpdateDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid AssetId. The specified AssetName does not exist or is deleted."
-                };
-            }
-            if (assetMaster.IsActive != request.AssetMaster.IsActive)
-            {    
-                 assetMaster.IsActive =  (BaseEntity.Status)request.AssetMaster.IsActive;   
-                 var updatedAssetMasterGeneral = _mapper.Map<AssetMasterGenerals>(request);           
-                await _assetMasterGeneralRepository.UpdateAsync(assetMaster.Id, updatedAssetMasterGeneral);
-                if (request.AssetMaster.IsActive is 0)
-                {
-                    return new ApiResponseDTO<AssetMasterUpdateDto>
-                    {
-                        IsSuccess = false,
-                        Message = "Code DeActivated."
-                    };
-                }
-                else{
-                    return new ApiResponseDTO<AssetMasterUpdateDto>
-                    {
-                        IsSuccess = false,
-                        Message = "Code Activated."
-                    }; 
-                }                                     
-            }
+         
             var updatedAssetMasterEntity = _mapper.Map<AssetMasterGenerals>(request);                   
-            var updateResult = await _assetMasterGeneralRepository.UpdateAsync(request.AssetMaster.Id, updatedAssetMasterEntity);            
+            var updateResult = await _assetMasterGeneralRepository.UpdateAsync( updatedAssetMasterEntity);            
 
             var updatedAssetMaster =  await _assetMasterGeneralQueryRepository.GetByIdAsync(request.AssetMaster.Id);    
             if (updatedAssetMaster != null)

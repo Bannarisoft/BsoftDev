@@ -5,34 +5,44 @@ using FAM.API.Configurations;
 using MassTransit;
 using Contracts.Events;
 
-var builder = WebApplication.CreateBuilder(args);
 
-// Configure Serilog for logging to MongoDB and console
+    var builder = WebApplication.CreateBuilder(args);
 
-// Log.Logger = new LoggerConfiguration()
-//     .MinimumLevel.Debug()
-//     .WriteTo.Console() // Log to console for debugging
-//     .WriteTo.MongoDB("mongodb://192.168.1.126:27017/FixedAsset") // MongoDB connection string (adjust as needed)
-//     .WriteTo.MongoDB("mongodb://192.168.1.126:27017/FixedAsset", collectionName: "ApplicationLogs", restrictedToMinimumLevel: LogEventLevel.Warning)
-//     .Enrich.FromLogContext()
-//     .CreateLogger();
+    var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
-// builder.Host.UseSerilog(); // Use Serilog for logging in the app
+        // If environment is null or empty, set default to "Development"
+        if (string.IsNullOrWhiteSpace(environment))
+        {      
+            environment = "Development";
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
+        }
 
 
-// Load Serilog configuration from appsettings.json
-builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile("settings/serilogsetting.json", optional: false, reloadOnChange: true)
-    .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
-    .AddEnvironmentVariables();
+    // Load configuration files based on the environment
+    builder.Configuration
+        .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)    
+        .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: true, reloadOnChange: true) 
+        .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
+        .AddEnvironmentVariables();
+    // Configure Serilog
+    builder.Host.ConfigureSerilog(builder.Configuration); 
 
-// Configure Serilog
-builder.Host.ConfigureSerilog();
 
-// Add validation services
-var validationService = new ValidationService();
-validationService.AddValidationServices(builder.Services);
+    // Add validation services
+    var validationService = new ValidationService();
+    validationService.AddValidationServices(builder.Services);
+
+
+    // Add services to the container
+    builder.Services.AddControllers();
+    builder.Services.AddSwaggerDocumentation();
+    builder.Services.AddJwtAuthentication(builder.Configuration);
+    builder.Services.AddCorsPolicy();
+    builder.Services.AddApplicationServices();
+    builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddProblemDetails();
+
 
 // Configure MassTransit with RabbitMQ
 builder.Services.AddMassTransit(cfg =>
@@ -70,33 +80,24 @@ builder.Services.AddMassTransit(cfg =>
 //         });
 //     });
 // });
-//Add layer dependency & Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddSwaggerDocumentation();
-builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddCorsPolicy();
-builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddProblemDetails();
 
-var app = builder.Build();
+  var app = builder.Build();
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseDeveloperExceptionPage();
+            
+    }
+// Configure the HTTP request pipeline
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseHttpsRedirection();
+    app.UseRouting();
+    app.UseCors();
+    app.UseAuthentication();
+    app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
+    app.UseAuthorization();
+    app.MapControllers();
+    app.ConfigureHangfireDashboard();
+    app.MapGet("/", () => "Fixed Asset Management Running");
+    app.Run();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-app.UseSwagger();
-app.UseSwaggerUI();
-app.UseDeveloperExceptionPage();
-
-//}
-app.UseHttpsRedirection();
-app.UseRouting(); // Enable routing
-app.UseCors();// Enable CORS
-app.UseAuthentication();
-app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>();
-app.UseAuthorization();
-app.MapControllers();
-app.ConfigureHangfireDashboard();
-app.MapGet("/", () => "Fixed Asset Management Running");
-app.Run();

@@ -11,6 +11,10 @@ using Core.Application.Common.Interfaces.IUserSession;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Core.Domain.Entities;
+using System.Collections.Concurrent;
+using Hangfire;
+using Core.Application.Common.Interfaces.ICompanySettings;
+using static Core.Domain.Enums.Common.Enums;
 namespace Core.Application.UserLogin.Commands.UserLogin
 {
     public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, ApiResponseDTO<LoginResponse>>
@@ -25,8 +29,10 @@ namespace Core.Application.UserLogin.Commands.UserLogin
         private readonly ILogger<UserLoginCommandHandler> _logger;
         private readonly IMediator _mediator;
         private readonly ITimeZoneService _timeZoneService;
+        private static readonly ConcurrentDictionary<string, UserLockoutInfo> _userLockoutInfo = new();
+        private readonly ICompanyQuerySettings _companyQuerySettings;
 
-        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository, IMediator mediator,ILogger<UserLoginCommandHandler> logger,IUserSessionRepository userSessionRepository, IHttpContextAccessor httpContextAccessor, IIPAddressService ipAddressService, IOptions<JwtSettings> jwtSettings, ITimeZoneService timeZoneService)
+        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository, IMediator mediator,ILogger<UserLoginCommandHandler> logger,IUserSessionRepository userSessionRepository, IHttpContextAccessor httpContextAccessor, IIPAddressService ipAddressService, IOptions<JwtSettings> jwtSettings, ITimeZoneService timeZoneService, ICompanyQuerySettings companyQuerySettings)
         {
             _userRepository = userRepository;
             _userQueryRepository = userQueryRepository;
@@ -37,87 +43,54 @@ namespace Core.Application.UserLogin.Commands.UserLogin
             _jwtSettings = jwtSettings.Value;
              _mediator = mediator; 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));   
-            _timeZoneService = timeZoneService;         
+            _timeZoneService = timeZoneService;  
+            _companyQuerySettings = companyQuerySettings;       
         }
 
        public async Task<ApiResponseDTO<LoginResponse>> Handle(UserLoginCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Handling user login request for Username: {Username}", request.Username);
-                        // Validate request input
-            if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
-            {
-                _logger.LogWarning("Invalid login attempt with missing credentials.");
-                return new ApiResponseDTO<LoginResponse>
-                {
-                    IsSuccess = false,
-                    Message = "Username and password are required."
-                };
-            }          
-            // Fetch user details
+
+                        
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
+            
             var user = await _userQueryRepository.GetByUsernameAsync(request.Username);
-            if (user == null )
-            {
-                _logger.LogWarning("Invalid login attempt for Username: {Username}", request.Username);
-                
-                return new ApiResponseDTO<LoginResponse>
-                {
-                    IsSuccess = false,
-                    Message = "User does not exist."
-                };
-            }
+          
 
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
-              //  user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+              
                 _logger.LogWarning("Invalid login attempt for Username: {Username}", request.Username);
-                
+
+              var (remainingAttempts, lockoutTime) = await loginAttemptSession(user.UserName, currentTime);
+
+                if (lockoutTime > 0)
+                {
+                    return new ApiResponseDTO<LoginResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"User is locked. Try again after {lockoutTime:G}."
+                    };
+                }                
                 return new ApiResponseDTO<LoginResponse>
                 {
                     IsSuccess = false,
-                    Message = "Invalid username or password."
+                    Message = $"Invalid username or password.You have {remainingAttempts} attempts remaining."
                 };
             }
 
-
-            _logger.LogInformation("User {Username} found. Retrieving roles...", request.Username);
-            // Check if the user already has an active session
-            var activeSession = await _userSessionRepository.GetSessionByUserIdAsync(user.UserId);
-
-            if (activeSession != null)
-            {
-                // Step 2: Restrict login and notify the user
-                return new ApiResponseDTO<LoginResponse>
-                {
-                    IsSuccess = false,
-                    Message = "This username is already logged in on another machine. Please log out first."
-                };
-            }
-        
-        
-           // Invalidate existing sessions if required (optional)
-            await _userSessionRepository.DeactivateUserSessionsAsync(user.UserId);   
-                      // Get user roles            
-            var roles = await _userQueryRepository.GetUserRolesAsync(user.UserId);
-            if (roles == null || roles.Count == 0)
-            {
-                _logger.LogWarning("No roles found for user {UserId}.", user.UserId);
-                return new ApiResponseDTO<LoginResponse>
-                {
-                    IsSuccess = false,
-                    Message = "User does not have any assigned roles."
-                };
-            }        
+            // await _userSessionRepository.DeactivateUserSessionsAsync(user.UserId);   
+                  
         
 
-            _logger.LogInformation("Roles retrieved for user {UserId}: {Roles}", user.UserId, string.Join(", ", roles));
-            var userlist = await _userQueryRepository.GetByIdAsync(user.UserId);
+            
             // Generate JWT token            
- 			var token = _jwtTokenHelper.GenerateToken(user.UserName,user.UserId,user.UserType ?? 0, roles,user.Mobile,user.EmailId,userlist.UserCompanies.ToList() , out var jti);
+ 			var token = _jwtTokenHelper.GenerateToken(user.UserName,user.UserId,user.Mobile,user.EmailId,user.IsFirstTimeUser.ToString(),user.EntityId ?? 0,user.UserGroup.GroupCode,0,0,0, out var jti);
             var httpContext = _httpContextAccessor.HttpContext;
             var browserInfo = httpContext?.Request.Headers["User-Agent"].ToString();
             string broswerDetails = browserInfo != null ? _ipAddressService.GetUserBrowserDetails(browserInfo) : string.Empty;
-            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
-            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);  
+
             DateTime expirationTime = currentTime.AddMinutes(_jwtSettings.ExpiryMinutes);
             await _userSessionRepository.AddSessionAsync(new UserSessions
             {
@@ -136,13 +109,16 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                 actionDetail: "Login",
                 actionCode: user.UserName,
                 actionName: "User logged in",
-                details: $"User '{user.UserName}' logged in successfully with roles: {token}, Roles: {roles}",
+                details: $"User '{user.UserName}' logged in successfully with roles: {token}",
                 module:"UserLogin"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
             
             //Log login event via Serilog
-            Log.Information("User {UserName} logged in successfully at {Time}. Roles: {Roles}", user.UserName, currentTime, string.Join(", ", roles));
+            Log.Information("User {UserName} logged in successfully at {Time}. Roles: {Roles}", user.UserName, currentTime);
+
+            _userLockoutInfo.TryRemove(request.Username, out _);
+
             return new ApiResponseDTO<LoginResponse>
             {
                 IsSuccess = true,
@@ -150,13 +126,47 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                 Data = new LoginResponse
                 {
                     Token = token,
-                    UserName = user.UserName,
-                    UserRole = roles,
-                    IsAuthenticated = true,
                     IsFirstTimeUser = user.IsFirstTimeUser,
                     Message = "Login Successful."
                 }
             };
-        }         
+        } 
+      
+        public async Task<(int,int)> loginAttemptSession(string username, DateTime currentTime)
+        {
+              
+                if (!_userLockoutInfo.ContainsKey(username))
+                {
+                    _userLockoutInfo[username] = new UserLockoutInfo { Attempts = 0, IsLocked = false };
+                }
+                var userInfo = _userLockoutInfo[username];
+                userInfo.Attempts++;
+      
+                       
+                var companySettings = await _companyQuerySettings.BeforeLoginGetUserCompanySettings(username);
+                
+                
+                int remainingAttempts = companySettings.FailedLoginAttempts - userInfo.Attempts;
+
+                if (remainingAttempts > 0)
+                {
+                    return (remainingAttempts,0);
+                }
+                if (userInfo.Attempts >= companySettings.FailedLoginAttempts)
+                {
+                    // Lock the user
+                    userInfo.IsLocked = true; 
+                    userInfo.UnlockTime = currentTime.AddMinutes(companySettings.AutoReleaseTime);
+                    _userRepository.lockUser(username);
+                    // Schedule Hangfire job to unlock user
+                    BackgroundJob.Schedule<IUserCommandRepository>(service =>service.UnlockUser(username), TimeSpan.FromMinutes(companySettings.AutoReleaseTime));
+
+                    _logger.LogWarning("User {Username} is locked due to too many invalid login attempts.", username);
+
+                    
+                    return (0,companySettings.AutoReleaseTime);
+                }
+                 return (0,0);
+        }        
     }
 }

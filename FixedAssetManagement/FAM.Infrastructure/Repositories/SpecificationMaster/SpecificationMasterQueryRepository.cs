@@ -43,16 +43,17 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
             return (specificationMasterList, totalCount);             
         }
 
-        public async Task<List<SpecificationMasters>> GetBySpecificationNameAsync(string searchPattern)
+        public async Task<List<SpecificationMasters>> GetBySpecificationNameAsync(int? AssetGroupId, string searchPattern)
         {
             const string query = @"
             SELECT Id,SpecificationName,AssetGroupId,ISDefault,  IsActive
             ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
             FROM FixedAsset.SpecificationMaster
             WHERE (SpecificationName LIKE @SearchPattern) 
-            AND  IsDeleted=0 and IsActive=1
+            AND  IsDeleted=0 and IsActive=1 and AssetGroupId=@AssetGroupId
             ORDER BY ID DESC";            
-            var result = await _dbConnection.QueryAsync<SpecificationMasters>(query, new { SearchPattern = $"%{searchPattern}%" });
+            var result = await _dbConnection.QueryAsync<SpecificationMasters>(query, 
+                    new { SearchPattern = $"%{searchPattern}%", AssetGroupId });
             return result.ToList();
         }
 
@@ -65,9 +66,20 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
             var specificationMaster = await _dbConnection.QueryFirstOrDefaultAsync<SpecificationMasters>(query, new { specId });           
             if (specificationMaster is null)
             {
-                throw new KeyNotFoundException($"Specufication with ID {specId} not found.");
+                throw new KeyNotFoundException($"Specification with ID {specId} not found.");
             }
             return specificationMaster;
+        }
+        public async Task<bool> SoftDeleteValidation(int Id)
+        {
+            const string query = @"
+                SELECT 1 
+                FROM FixedAsset.SpecificationMaster SM
+                inner join  FixedAsset.AssetSpecifications AP on AP.SpecificationId = SM.Id
+                WHERE SM.Id = @Id AND   AP.IsDeleted = 0;";        
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });        
+            var SpecificationExists = await multi.ReadFirstOrDefaultAsync<int?>();          
+            return SpecificationExists.HasValue ;
         }
     }
 }

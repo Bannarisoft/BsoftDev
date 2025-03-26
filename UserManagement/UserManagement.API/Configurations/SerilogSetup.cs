@@ -4,13 +4,16 @@ namespace UserManagement.API.Configurations
 {
     public static class SerilogSetup
     {
-        public static void ConfigureSerilog(this IHostBuilder hostBuilder)
+        public static void ConfigureSerilog(this IHostBuilder hostBuilder, IConfiguration configuration)
         {
+            var mongoDbConnection = configuration.GetConnectionString("MongoDbConnectionString");
+            var mongoDbDatabase = configuration["MongoDb:DatabaseName"];
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Console()
-                .WriteTo.MongoDB("mongodb://192.168.1.126:27017/Bannari", 
-                    collectionName: "ApplicationLogs", 
+                .WriteTo.MongoDB($"{mongoDbConnection}/{mongoDbDatabase}",
+                    collectionName: "ApplicationLogs",
                     restrictedToMinimumLevel: LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .CreateLogger();

@@ -5,7 +5,7 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Commands.UpdateAssetWarranty
 {
-    public class UpdateAssetWarrantyCommand : IRequest<ApiResponseDTO<AssetWarrantyDTO>> 
+    public class UpdateAssetWarrantyCommand : IRequest<ApiResponseDTO<bool>> 
     {
         public int Id { get; set; }      
         public int AssetId { get; set; }
@@ -30,6 +30,6 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.UpdateAssetWarrant
         public string? ServiceClaimProcessDescription { get; set; } 
         public DateTimeOffset? ServiceLastClaimDate { get; set; } 
         public int? ServiceClaimStatus { get; set; } 
-        public Status IsActive { get; set; }
+        public byte IsActive { get; set; }
     }
 }

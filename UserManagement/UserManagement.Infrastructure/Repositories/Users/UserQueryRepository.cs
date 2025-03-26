@@ -66,7 +66,6 @@ namespace UserManagement.Infrastructure.Repositories.Users
 
                 SELECT DISTINCT ur.Id,
                                 ur.UserId,
-                                ur.DivisionId,
                                 ur.FirstName,
                                 ur.LastName,
                                 ur.UserName,
@@ -76,8 +75,9 @@ namespace UserManagement.Infrastructure.Repositories.Users
                                 ur.Mobile,
                                 ur.EmailId,
                                 ur.IsFirstTimeUser,
-                                ur.IsDeleted
+                                ur.IsDeleted,UG.Id AS UserGroupId
                 FROM AppSecurity.Users ur
+                left join AppSecurity.UserGroup UG on UG.Id=ur.UserGroupId and UG.IsActive=1
                 WHERE ur.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ur.FirstName LIKE @Search OR ur.LastName LIKE @Search OR ur.UserName LIKE @Search)")}}
                 ORDER BY ur.UserId desc
@@ -107,51 +107,98 @@ namespace UserManagement.Infrastructure.Repositories.Users
                     });
         }
 
-        public async Task<User?> GetByIdAsync(int userId)
+     public async Task<User?> GetByIdAsync(int userId)
+{
+    const string query = @"
+        SELECT ur.Id,
+               ur.UserId,
+               ur.FirstName,
+               ur.LastName,
+               ur.UserName,
+               ur.IsActive,
+               ur.PasswordHash,
+               ur.UserType,
+               ur.Mobile,
+               ur.EmailId,
+               ur.IsFirstTimeUser,
+               ur.IsDeleted,
+               ura.UserRoleId,
+               uc.CompanyId,
+               uu.UnitId,
+               ud.DivisionId,
+               udd.DepartmentId,
+               UG.Id AS UserGroupId
+        FROM AppSecurity.Users ur
+        LEFT JOIN AppSecurity.UserRoleAllocation ura ON ur.UserId = ura.UserId AND ura.IsActive = 1
+        LEFT JOIN AppSecurity.UserCompany uc ON uc.UserId = ur.UserId AND uc.IsActive = 1
+        LEFT JOIN AppSecurity.UserUnit uu ON uu.UserId = ur.UserId AND uu.IsActive = 1
+        LEFT JOIN AppSecurity.UserDivision ud ON ud.UserId = ur.UserId AND ud.IsActive = 1
+        LEFT JOIN AppSecurity.UserGroup UG ON UG.Id = ur.UserGroupId AND UG.IsActive = 1
+        LEFT JOIN AppSecurity.UserDepartment udd ON udd.UserId = ur.UserId AND udd.IsActive = 1
+        WHERE ur.IsDeleted = 0 AND ur.UserId = @UserId";
+
+    var userDictionary = new Dictionary<int, User>();
+
+    var userResponse = await _dbConnection.QueryAsync<User,Core.Domain.Entities.UserRoleAllocation, UserCompany, UserUnit, UserDivision, UserDepartment,int?, User>(
+        query,
+        (user, userRole, userCompany, userUnit, userDivision, userDepartment,userGroupId) =>
         {
+            if (!userDictionary.TryGetValue(user.UserId, out var existingUser))
+            {
+                existingUser = user;
+                existingUser.UserRoleAllocations = new List<Core.Domain.Entities.UserRoleAllocation>();
+                existingUser.UserCompanies = new List<UserCompany>();
+                existingUser.UserUnits = new List<UserUnit>();
+                existingUser.userDivisions = new List<UserDivision>();
+                existingUser.userDepartments = new List<UserDepartment>();
+                userDictionary[user.UserId] = existingUser;
+            }
 
-             const string query = @"
-             SELECT ur.Id,
-                    ur.UserId,
-                    ur.DivisionId,
-                    ur.FirstName,
-                    ur.LastName,
-                    ur.UserName,
-                    ur.IsActive,
-                    ur.PasswordHash,
-                    ur.UserType,
-                    ur.Mobile,
-                    ur.EmailId,
-                    ur.UserId,
-                    ur.IsFirstTimeUser,
-                    ur.IsDeleted,
-                    ura.UserRoleId,
-                    uc.CompanyId,
-                    uu.UnitId 
-                    FROM AppSecurity.Users ur
-                Left JOIN AppSecurity.UserRoleAllocation ura ON   ur.UserId = ura.UserId and ura.IsActive = 1
-                Left JOIN AppSecurity.UserCompany uc ON uc.UserId = ur.UserId and uc.IsActive = 1
-                Left JOIN AppSecurity.UserUnit uu ON uu.UserId = ur.UserId and uu.IsActive = 1
-                WHERE  ur.IsDeleted = 0 and ur.UserId = @UserId";
-          var userResponse = await _dbConnection.QueryAsync<User, Core.Domain.Entities.UserRoleAllocation, UserCompany, UserUnit,User>(query, 
-          (user, userRole, userCompany, userUnit) =>
-          {
-              user.UserRoleAllocations = new List<Core.Domain.Entities.UserRoleAllocation> { userRole };
-              user.UserCompanies = new List<UserCompany> { userCompany };
-              user.UserUnits = new List<UserUnit> { userUnit };
-              return user;
-              }, 
-          new { userId },
-          splitOn: "UserRoleId,CompanyId,UnitId");
+            // ✅ Append user roles
+            if (userRole != null && !existingUser.UserRoleAllocations.Any(ur => ur.UserRoleId == userRole.UserRoleId))
+            {
+                existingUser.UserRoleAllocations.Add(userRole);
+            }
 
-            var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
-            return await policyWrap.ExecuteAsync(async () =>
-                        {
-                        return userResponse.FirstOrDefault();
-            });
-            // const string query = "SELECT * FROM AppSecurity.Users WHERE UserId = @UserId";
-            // return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new { userId });
-        }
+            // ✅ Append user companies
+            if (userCompany != null && !existingUser.UserCompanies.Any(uc => uc.CompanyId == userCompany.CompanyId))
+            {
+                existingUser.UserCompanies.Add(userCompany);
+            }
+
+            // ✅ Append user units
+            if (userUnit != null && !existingUser.UserUnits.Any(uu => uu.UnitId == userUnit.UnitId))
+            {
+                existingUser.UserUnits.Add(userUnit);
+            }
+
+            // ✅ Append user divisions
+            if (userDivision != null && !existingUser.userDivisions.Any(ud => ud.DivisionId == userDivision.DivisionId))
+            {
+                existingUser.userDivisions.Add(userDivision);
+            }
+
+             if (userDepartment != null && !existingUser.userDepartments.Any(ud => ud.DepartmentId == userDepartment.DepartmentId))
+            {
+                existingUser.userDepartments.Add(userDepartment);
+            }
+
+            // ✅ Assign UserGroupId
+            if (userGroupId.HasValue)
+            {
+                existingUser.UserGroupId = userGroupId.Value;
+            }
+
+            return existingUser;
+        },
+        new { userId },
+        splitOn: "UserRoleId,CompanyId,UnitId,DivisionId,DepartmentId,UserGroupId" // ✅ Added UserGroupId here
+    );
+
+    return userResponse.FirstOrDefault();
+}
+
+
 
         public async Task<User?> GetByUsernameAsync(string? username, int? id = null)
         {
@@ -216,6 +263,116 @@ namespace UserManagement.Infrastructure.Repositories.Users
                 });
 
         }
+          public async Task<bool> AlreadyExistsAsync(string username, int? id = null)
+          {
+              var query = "SELECT COUNT(1) FROM [AppSecurity].[Users] WHERE UserName = @UserName AND IsDeleted = 0";
+                var parameters = new DynamicParameters(new { Username = username });
+
+             if (id is not null)
+             {
+                 query += " AND UserId != @Id";
+                 parameters.Add("Id", id);
+             }
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+          }
+          public async Task<User?> GetByUserByUnit(int UserId,int UnitId)
+          {
+            const string query = @"
+                SELECT U.UserId, U.UserName,U.Mobile,U.EmailId,U.IsFirstTimeUser,U.EntityId,U.UserGroupId
+                FROM AppSecurity.Users U
+                Inner join [AppSecurity].[UserUnit] UU on UU.UserId = U.UserId
+                Inner join [AppData].[Unit] U1 on U1.Id = UU.UnitId
+                Inner join [AppData].[Division] D on D.Id = U1.DivisionId
+                Inner join [AppData].[Company] C on C.Id = U1.CompanyId
+                WHERE U.IsDeleted = 0 AND U.UserId = @UserId and UU.UnitId = @UnitId";
+                
+            
+            return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, new
+             {
+                 UserId,
+                 UnitId
+             });
+            
+            
+          }
+            public async Task<bool> ValidateUsernameAsync(string? username, int? id = null)
+          {
+              var query = "SELECT COUNT(1) FROM AppSecurity.Users WHERE UserName = @Username AND IsDeleted = 0";
+               var condition = id is not null ? "AND UserId != @Id" : "";
+               query = string.Format(query, condition);
+
+               var parameters = new DynamicParameters(new { Username = username });
+               if (id is not null) parameters.Add("Id", id);
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+          }
+          
+            public async Task<bool> ValidateUserActiveAsync(string? username, int? id = null)
+             {
+                 var query = "SELECT COUNT(1) FROM AppSecurity.Users WHERE UserName = @Username AND IsActive = 1";
+                  var condition = id is not null ? "AND UserId != @Id" : "";
+                  query = string.Format(query, condition);
+
+                  var parameters = new DynamicParameters(new { Username = username });
+                  if (id is not null) parameters.Add("Id", id);
+                   var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                   return count > 0;
+             }
+              public async Task<bool> NotFoundAsync(int id )
+          {
+              var query = "SELECT COUNT(1) FROM [AppSecurity].[Users] WHERE Userid = @Id AND IsDeleted = 0";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+                return count > 0;
+          }
+          public async Task<bool> ValidateUserRolesAsync(string username)
+        {
+                const string query = @"
+                SELECT Count(ur.RoleName)
+                FROM AppSecurity.UserRole ur
+                INNER JOIN AppSecurity.UserRoleAllocation ura ON   ur.Id = ura.UserRoleId AND ura.IsActive=1
+                INNER JOIN AppSecurity.Users u ON u.UserId = ura.UserId
+                WHERE u.Username = @username and u.IsDeleted = 0";
+                
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { username = username });
+                return count > 0;
+             
+        }
+          public async Task<User> GetByUsernameAsync(string username)
+        {
+           
+             var query = """
+                 SELECT U.Id,U.FirstName,U.LastName,U.UserName,U.UserType,U.Mobile,U.EmailId,U.UserId,U.IsFirstTimeUser,U.EntityId,U.PasswordHash,UG.GroupCode FROM AppSecurity.Users U
+                 LEFT JOIN AppSecurity.UserGroup UG ON UG.Id = U.UserGroupId 
+                 WHERE U.UserName = @Username AND U.IsDeleted = 0
+                 """;
+
+
+                           var user = await _dbConnection.QueryAsync<User, Core.Domain.Entities.UserGroup, User>(
+                      query,
+                      (user, userGroup) =>
+                      {
+                          user.UserGroup = userGroup; 
+                          return user;  
+                      },
+                      new { Username = username },
+                      splitOn: "GroupCode"
+                  );
+
+                  return user.FirstOrDefault();
+          
+        }
+              public async Task<bool> UserLockedAsync(string UserName )
+          {
+              var query = "SELECT COUNT(1) FROM [AppSecurity].[Users] WHERE UserName = @UserName AND IsDeleted = 0 AND IsLocked = 1";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { UserName = UserName });
+                return count > 0;
+          }
+          
+             
+          
         
     }
 }

@@ -64,24 +64,34 @@ using Core.Application.Common.Interfaces.IFinancialYear;
 using UserManagement.Infrastructure.Repositories.FinancialYear;
 using Core.Application.Common.Interfaces.IMenu;
 using UserManagement.Infrastructure.Repositories.Menu;
+using Core.Application.Common.Interfaces.IProfile;
+using AutoMapper;
+using UserManagement.Infrastructure.Repositories.Profile;
+using Core.Application.Common.Interfaces.IUserGroup;
+using UserManagement.Infrastructure.Repositories.UserGroup;
+using System.Text;
+using System.Security.Cryptography;
+using Core.Application.Common;
+using UserManagement.Infrastructure.Helpers;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices
             (this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
-            {
-                var connectionString = configuration.GetConnectionString("DefaultConnection");
-                var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
+        {
+                
+             var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
+            var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);
 
-                if (string.IsNullOrWhiteSpace(connectionString))
-                {
-                    throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
-                } 
-                if (string.IsNullOrWhiteSpace(HangfireConnectionString))
-                {
-                    throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
-                }
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
+            } 
+            if (string.IsNullOrWhiteSpace(HangfireConnectionString))
+            {
+                throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
+            }
 
             // Register ApplicationDbContext with SQL Server
            /*  services.AddDbContext<ApplicationDbContext>(options =>
@@ -216,7 +226,12 @@ namespace UserManagement.Infrastructure
             services.AddScoped<ILanguageCommand, LanguageCommandRepository>();
             services.AddScoped<ILanguageQuery, LanguageQueryRepository>(); 
             services.AddScoped<IMenuQuery, MenuQueryRepository>();
-
+            services.AddScoped<IProfileQuery, ProfileQueryRepository>();
+            services.AddScoped<IProfileCommand, ProfileCommandRepository>();
+            services.AddScoped<IUserGroupQueryRepository, UserGroupQueryRepository>();
+            services.AddScoped<IUserGroupCommandRepository, UserGroupCommandRepository>();
+            
+            
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();            
             services.AddTransient<IFileUploadService, FileUploadRepository>();
@@ -234,6 +249,7 @@ namespace UserManagement.Infrastructure
             services.Configure<SmsSettings>(configuration.GetSection("SmsSettings"));
             services.AddSingleton<IEmailService,EmailService>();            
             services.AddSingleton<ISmsService, SmsService>();
+            services.AddSingleton<EnvironmentEncryptionService>();
 
             // AutoMapper profiles
             services.AddAutoMapper(
@@ -252,6 +268,6 @@ namespace UserManagement.Infrastructure
             );
 
             return services;
-        }
+        }      
     }
 }

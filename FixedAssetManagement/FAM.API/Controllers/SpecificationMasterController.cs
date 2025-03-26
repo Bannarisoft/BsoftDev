@@ -16,15 +16,18 @@ namespace FAM.API.Controllers
     {
         private readonly IValidator<CreateSpecificationMasterCommand> _createSpecificationMasterCommandValidator;
         private readonly IValidator<UpdateSpecificationMasterCommand> _updateSpecificationMasterCommandValidator;
+        private readonly IValidator<DeleteSpecificationMasterCommand> _deleteSpecificationMasterCommandValidator;
         
         
     public SpecificationMasterController(ISender mediator, 
                             IValidator<CreateSpecificationMasterCommand> createSpecificationMasterCommandValidator, 
-                            IValidator<UpdateSpecificationMasterCommand> updateSpecificationMasterCommandValidator) 
+                            IValidator<UpdateSpecificationMasterCommand> updateSpecificationMasterCommandValidator,
+                            IValidator<DeleteSpecificationMasterCommand> deleteSpecificationMasterCommandValidator) 
         : base(mediator)
         {        
             _createSpecificationMasterCommandValidator = createSpecificationMasterCommandValidator;    
             _updateSpecificationMasterCommandValidator = updateSpecificationMasterCommandValidator;                 
+            _deleteSpecificationMasterCommandValidator = deleteSpecificationMasterCommandValidator;
         }
         [HttpGet]                
         public async Task<IActionResult> GetAllSpecificationMasterAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -141,7 +144,17 @@ namespace FAM.API.Controllers
         }
         [HttpDelete("{id}")]        
         public async Task<IActionResult> DeleteAsync(int id)
-        {             
+        {    
+            var command = new DeleteSpecificationMasterCommand { Id = id };
+            var validationResult = await  _deleteSpecificationMasterCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
+                    statusCode = StatusCodes.Status400BadRequest
+                });
+            }         
             if (id <= 0)
             {
                 return BadRequest(new
@@ -168,9 +181,9 @@ namespace FAM.API.Controllers
         }
             
         [HttpGet("by-name")]  
-        public async Task<IActionResult> GetSpecificationMaster([FromQuery] string? name)
+        public async Task<IActionResult> GetSpecificationMaster([FromQuery] int assetGroupId,string? name)
         {          
-            var result = await Mediator.Send(new GetSpecificationMasterAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
+            var result = await Mediator.Send(new GetSpecificationMasterAutoCompleteQuery {AssetGroupId=assetGroupId,SearchPattern = name}); // Pass `searchPattern` to the constructor
             if (!result.IsSuccess)
             {
                 return NotFound(new 

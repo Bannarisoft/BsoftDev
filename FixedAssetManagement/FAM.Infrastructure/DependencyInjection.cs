@@ -56,22 +56,39 @@ using Core.Application.Common.Interfaces.IAssetMaster.IAssetInsurance;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetInsurance;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetAmc;
-using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransfer;
-using FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer;
+
+
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetDisposal;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetDisposal;
 
 using Core.Application.Common.Interfaces.IDepreciationDetail;
 using FAM.Infrastructure.Repositories.DepreciationDetail;
+using Core.Application.Common.Interfaces.IAssetTransferIssueApproval;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue;
+using FAM.Infrastructure.Repositories.AssetTransferIssueApproval;
+using Core.Application.Common.Interfaces.IAssetTransferReceipt;
+using FAM.Infrastructure.Repositories.AssetTransferReceipt;
+using FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer;
+using Core.Application.Common.Interfaces.IExcelImport;
+using FAM.Infrastructure.Repositories.ExcelImport;
+using FAM.Application.Common;
+using System.Text;
+using System.Security.Cryptography;
+using FAM.Infrastructure.Helpers;
 
 namespace FAM.Infrastructure
 {
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
-        {
-              var connectionString = configuration.GetConnectionString("DefaultConnection");
-                var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
+        {           
+
+            var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
+            var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);
+
+            //var connectionString = configuration.GetConnectionString("DefaultConnection");
+            //var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
 
                 if (string.IsNullOrWhiteSpace(connectionString))
                 {
@@ -191,23 +208,27 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetWarrantyQueryRepository, AssetWarrantyQueryRepository>();
             services.AddScoped<IAssetWarrantyCommandRepository, AssetWarrantyCommandRepository>();
 			services.AddScoped<IAssetInsuranceCommandRepository, AssetInsuranceCommandRepository>();
-
             services.AddScoped<IAssetInsuranceQueryRepository, AssetInsuranceQueryRepository>();            
             services.AddScoped<IAssetAmcQueryRepository, AssetAmcQueryRepository>();
             services.AddScoped<IAssetAmcCommandRepository, AssetAmcCommandRepository>();
             services.AddScoped<IAssetTransferQueryRepository, AssetTransferQueryRepository>();
-            
+            services.AddScoped<IAssetTransferCommandRepository, AssetTransferCommandRepository>();            
             services.AddScoped<IAssetDisposalQueryRepository, AssetDisposalQueryRepository>();
             services.AddScoped<IAssetDisposalCommandRepository, AssetDisposalCommandRepository>();
-
-			 services.AddScoped<IDepreciationDetailCommandRepository, DepreciationDetailCommandRepository>();
+			services.AddScoped<IDepreciationDetailCommandRepository, DepreciationDetailCommandRepository>();
             services.AddScoped<IDepreciationDetailQueryRepository, DepreciationDetailQueryRepository>();
-
-
+            services.AddScoped<IAssetTransferIssueApprovalQueryRepository, AssetTransferIssueQueryRepository>();
+            services.AddScoped<IAssetTransferIssueApprovalCommandRepository, AssetTransferIssueCommandRepository>();
+            services.AddScoped<IAssetTransferReceiptQueryRepository, AssetTransferReceiptQueryRepository>();
+            services.AddScoped<IAssetTransferReceiptCommandRepository, AssetTransferReceiptCommandRepository>();
+            services.AddScoped<IExcelImportCommandRepository, ExcelImportCommandRepository>();
+            services.AddScoped<IExcelImportQueryRepository, ExcelImportCommandQueryRepository>();
+            
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
+            services.AddSingleton<EnvironmentEncryptionService>();
 
             // AutoMapper profiles
             services.AddAutoMapper(
@@ -229,16 +250,15 @@ namespace FAM.Infrastructure
 				typeof(AssetLocationProfile),
 				typeof(AssetAdditionalCostProfile),
 				typeof(AssetInsuranceProfile),
-
-
                 typeof(AssetTransferProfile),
                 typeof(AssetAmcProfile),
                 typeof(AssetDisposalProfile),
- 				typeof(DepreciationDetailProfile)
-
+ 				typeof(DepreciationDetailProfile),
+                typeof(AssetIssueTransferApproval),
+                typeof(AssetTransferReceiptProfile)
             );
-
             return services;
         }
+      
     }
 }

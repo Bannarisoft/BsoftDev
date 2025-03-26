@@ -47,7 +47,7 @@ namespace UserManagement.Infrastructure.Repositories
             } 
         }
 
-      public string GenerateToken(string username, int userId, int usertype, IEnumerable<string> roles,string mobile,string email,List<UserCompany> companyId, out string jti)
+      public string GenerateToken(string? username,int userid,string Mobile,string EmailId,string IsFirstTimeUser,int EntityId,string GroupCode,int CompanyId,int DivisionId,int UnitId, out string jti)
         {
             jti = Guid.NewGuid().ToString();            
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
@@ -56,24 +56,28 @@ namespace UserManagement.Infrastructure.Repositories
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, username),
-                new Claim(JwtRegisteredClaimNames.NameId, userId.ToString()),
+                new Claim(JwtRegisteredClaimNames.NameId, userid.ToString()),
                 // new Claim(JwtRegisteredClaimNames.Typ, usertype.ToString()),
                 // new Claim(JwtRegisteredClaimNames.PhoneNumber, mobile.ToString()),
                 // new Claim(JwtRegisteredClaimNames.Email, email.ToString()),
                 // new Claim(JwtRegisteredClaimNames.Typ, unitId.ToString()),
                 // new Claim(JwtRegisteredClaimNames.Typ, companyId.ToString()),
-                new Claim("usertype", usertype.ToString()),
-                new Claim("mobile", mobile.ToString()),
-                new Claim("email", email.ToString()),
-                new Claim("companyId", JsonSerializer.Serialize(companyId)),
+                new Claim("Mobile", Mobile.ToString()),
+                new Claim("EmailId", EmailId.ToString()),
+                new Claim("CompanyId", CompanyId.ToString()),
+                new Claim("DivisionId", DivisionId.ToString()),
+                new Claim("UnitId", UnitId.ToString()),
+                 new Claim("IsFirstTimeUser", IsFirstTimeUser.ToString()),
+                new Claim("EntityId", EntityId.ToString()),
+                new Claim("GroupCode", GroupCode.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, jti),
                 new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(currentTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             };
 
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            // foreach (var role in roles)
+            // {
+            //     claims.Add(new Claim(ClaimTypes.Role, role));
+            // }
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
             var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
 

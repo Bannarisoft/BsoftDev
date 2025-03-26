@@ -101,13 +101,31 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetLocation
                 var employeeList = employees.ToList();
             int totalCount = employeeList.Count;  // Count employees from the result
 
-            return (employeeList, totalCount);  
-                    
+            return (employeeList, totalCount);                      
         
 
         }
+        public async Task<List<Core.Domain.Entities.SubLocation>> GetSublocationByIdAsync(int id)
+            {
+                const string query = @"
+                    SELECT Id, Code, SubLocationName, Description, UnitId, DepartmentId, LocationId, IsActive  
+                    FROM FixedAsset.SubLocation 
+                    WHERE LocationId = @id AND IsDeleted = 0";
 
-     
+                var result = await _dbConnection.QueryAsync<Core.Domain.Entities.SubLocation>(query, new { id });
+
+                return result.ToList(); // Convert IEnumerable to List
+            }
+        //  public async Task<List<Core.Domain.Entities.SubLocation>> GetSublocationByIdAsync(int id)
+        // {
+           
+        //      const string query = @"
+        //         SELECT  Id,Code,SubLocationName,Description,UnitId,DepartmentId,LocationId,IsActive  FROM  FixedAsset.SubLocation 
+        //         WHERE  LocationId = @id  and  IsDeleted = 0 ";
+
+        //     return  await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.SubLocation>(query, new { id });
+
+        // }     
 
     }
 }

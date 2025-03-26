@@ -160,9 +160,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetPurchase
             builder.HasOne(b => b.AssetSource)
                 .WithMany(pu => pu.AssetPurchase)
                 .HasForeignKey(b => b.AssetSourceId)
-                .OnDelete(DeleteBehavior.Restrict); 
-
-      
+                .OnDelete(DeleteBehavior.Restrict);       
         }
     }
 }

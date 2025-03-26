@@ -2,18 +2,21 @@ using FluentValidation;
 using Core.Domain.Entities;
 using Core.Application.Users.Commands.UpdateUser;
 using UserManagement.API.Validation.Common;
+using Core.Application.Common.Interfaces.IUser;
 
 namespace UserManagement.API.Validation.Users
 {
     public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
     {
         private readonly List<ValidationRule> _validationRules;
+        private readonly IUserQueryRepository _userQueryRepository;
 
-        public UpdateUserCommandValidator(MaxLengthProvider maxLengthProvider)
+        public UpdateUserCommandValidator(MaxLengthProvider maxLengthProvider,IUserQueryRepository userRepository)
         {
             var MaxLen = maxLengthProvider.GetMaxLength<User>("FirstName") ?? 25;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _userQueryRepository = userRepository;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -35,6 +38,10 @@ namespace UserManagement.API.Validation.Users
                         RuleFor(x => x.UserName)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateUserCommand.UserName)} {rule.Error}");
+
+                             RuleFor(x => x.UserId)
+                            .NotEmpty()
+                            .WithMessage($"{nameof(UpdateUserCommand.UserName)} {rule.Error}");
                         break;
 
                     case "MaxLength":
@@ -54,7 +61,7 @@ namespace UserManagement.API.Validation.Users
                          
                     case "Email":
                         RuleFor(x => x.EmailId)
-                            .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                            .EmailAddress()
                             .WithMessage($"{nameof(UpdateUserCommand.EmailId)} {rule.Error}");   
                         break; 
 
@@ -64,18 +71,22 @@ namespace UserManagement.API.Validation.Users
                         .WithMessage($"{nameof(UpdateUserCommand.Mobile)} {rule.Error}"); 
                         break; 
 
-                    case "Password":
-                        // Apply Password validation
-                        RuleFor(x => x.PasswordHash)
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                        .WithMessage($"{nameof(UpdateUserCommand.PasswordHash)} {rule.Error}");
-                        break;  
+                   
                     
-                    case "UserType":
-                        RuleFor(x => x.UserType)
-                            .InclusiveBetween(1, 2) // Assuming UserType should be between 1 and 2
-                            .WithMessage($"{nameof(UpdateUserCommand.UserType)} {rule.Error}");
-                        break;               
+                    case "AlreadyExists":
+                           RuleFor(x =>  new { x.UserName, x.UserId })
+                           .MustAsync(async (user, cancellation) => 
+                        !await _userQueryRepository.AlreadyExistsAsync(user.UserName, user.UserId))             
+                           .WithName("User Name")
+                            .WithMessage($"{rule.Error}");
+                            break;  
+                    case "NotFound":
+                           RuleFor(x => x.UserId )
+                           .MustAsync(async (UserId, cancellation) => 
+                        await _userQueryRepository.NotFoundAsync(UserId))             
+                           .WithName("User Id")
+                            .WithMessage($"{rule.Error}");
+                            break;          
                     default:
                         // Handle unknown rule (log or throw)
                         // Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");

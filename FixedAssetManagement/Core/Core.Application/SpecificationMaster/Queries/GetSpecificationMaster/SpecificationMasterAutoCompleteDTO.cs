@@ -7,5 +7,7 @@ namespace Core.Application.SpecificationMaster.Queries.GetSpecificationMaster
     {
         public int Id { get; set; }        
         public string? SpecificationName { get; set; } 
+        public byte ISDefault { get; set; }
+
     }
 }

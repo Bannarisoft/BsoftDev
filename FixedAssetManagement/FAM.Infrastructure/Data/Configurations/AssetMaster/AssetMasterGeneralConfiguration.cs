@@ -114,8 +114,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                   .WithMany(mm => mm.AssetWorkTypeGenerals) 
                 .HasForeignKey(dg => dg.WorkingStatus)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("FK_WorkingStatus_Misc");
-                
+                .HasConstraintName("FK_WorkingStatus_Misc");                
 
                 builder.Property(c => c.IsTangible)                
                 .HasColumnType("bit")
@@ -134,7 +133,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .IsRequired();
             
                 builder.Property(b => b.AssetDescription)
-                .IsRequired()
+                .IsRequired(false)
                 .HasColumnType("varchar(250)");
 
                 builder.Property(ca => ca.AssetImage)

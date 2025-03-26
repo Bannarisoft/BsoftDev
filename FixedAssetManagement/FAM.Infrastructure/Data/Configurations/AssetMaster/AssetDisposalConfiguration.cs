@@ -38,7 +38,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
 
               // One-to-One: AssetMasterGenerals
             builder.HasOne(ad => ad.AssetMasterDisposal)
-                   .WithOne()
+                   .WithOne(ad => ad.AssetDisposalMaster)
                    .HasForeignKey<AssetDisposal>(ad => ad.AssetId)
                    .OnDelete(DeleteBehavior.Restrict);
 
@@ -48,7 +48,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
 
               // One-to-One: AssetPurchaseDetails
             builder.HasOne(ad => ad.AssetPurchaseDetails)
-                   .WithOne()
+                   .WithOne(ad => ad.AssetDisposalPurchase)
                    .HasForeignKey<AssetDisposal>(ad => ad.AssetPurchaseId)
                    .OnDelete(DeleteBehavior.Restrict);
 
@@ -60,10 +60,10 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .HasColumnType("int")                
                 .IsRequired();
 
-            // One-to-One: MiscMaster (DisposalType)
+            // One-to-Many: MiscMaster (DisposalType)
             builder.HasOne(ad => ad.AssetMiscDisposalType)
-                   .WithOne()
-                   .HasForeignKey<AssetDisposal>(ad => ad.DisposalType)
+                   .WithMany(ad => ad.AssetMiscDisposalType)
+                   .HasForeignKey(ad => ad.DisposalType)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(dg => dg.DisposalReason)

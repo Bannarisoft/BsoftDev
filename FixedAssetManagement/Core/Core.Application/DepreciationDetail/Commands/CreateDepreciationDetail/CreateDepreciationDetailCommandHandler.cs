@@ -2,11 +2,8 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IDepreciationDetail;
 using Core.Application.DepreciationDetail.Queries.GetDepreciationDetail;
-using Core.Domain.Entities;
 using Core.Domain.Events;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
 {
@@ -30,7 +27,7 @@ namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
         {
             // Check if Depreciation already exists
             var exists = await _depreciationDetailQueryRepository.ExistDataAsync(
-                request.companyId, request.unitId, request.finYear??string.Empty,  request.depreciationType??string.Empty,  request.depreciationPeriod
+                request.companyId, request.unitId, request.finYearId,  request.depreciationType,  request.depreciationPeriod
             );
 
             if (exists)
@@ -46,7 +43,7 @@ namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
             var depreciationList = await _depreciationDetailQueryRepository.CreateAsync(
                 request.companyId,
                 request.unitId,
-                request.finYear,               
+                request.finYearId,               
                 request.depreciationType ,request.depreciationPeriod            
             );
 
@@ -54,8 +51,8 @@ namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
                 actionCode: request.companyId.ToString(),
-                actionName: request.finYear ?? string.Empty,
-                details: $"Depreciation detail for Finyear {request.finYear} was created.",
+                actionName: request.finYearId.ToString(),
+                details: $"Depreciation detail for finYear {request.finYearId} was created.",
                 module: "Depreciation"
             );
 

@@ -32,28 +32,10 @@ namespace Core.Application.Users.Commands.UpdateUser
         public async Task<ApiResponseDTO<bool>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
              _logger.LogInformation("Starting user update process for UserId: {UserId}", request.UserId);
-            var dublicateUser = await _userQueryRepository.GetByUsernameAsync(request.UserName,request.UserId);
-            if (dublicateUser != null)
-            {
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "User name already exists."
-                };
-            }
-             // Fetch the existing user
+            
 
             var existingUser = await _userQueryRepository.GetByIdAsync(request.UserId);
-            if (existingUser == null)
-            {
-                _logger.LogWarning("User with UserId: {UserId} not found.", request.UserId);
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "User not found.",
-                    Data = false
-                };
-            }
+           
 
             var OldUserName = existingUser.UserName;
             existingUser.UserName = request.UserName;
@@ -62,11 +44,6 @@ namespace Core.Application.Users.Commands.UpdateUser
 
              _mapper.Map(request, existingUser);
             
-            // Hash the password if it's provided in the request
-            if (!string.IsNullOrWhiteSpace(request.PasswordHash))
-            {
-                existingUser.SetPassword(request.PasswordHash); // Ensure SetPassword handles hashing
-            }
             //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",

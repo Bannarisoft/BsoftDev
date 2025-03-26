@@ -9,8 +9,8 @@ namespace Core.Application.DepreciationDetail.Commands.DeleteDepreciationDetail
     {
         public int companyId { get; set; } 
         public int unitId { get; set; } 
-        public string? finYear { get; set; }        
-        public string? depreciationType { get; set; }      
+        public int finYearId { get; set; }        
+        public int depreciationType { get; set; }      
         public int depreciationPeriod { get; set; }  
     }
 }

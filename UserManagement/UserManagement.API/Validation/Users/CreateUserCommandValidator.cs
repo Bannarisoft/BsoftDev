@@ -6,18 +6,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UserManagement.API.Validation.Common;
+using Core.Application.Common.Interfaces.IUser;
 
 namespace UserManagement.API.Validation.Users
 {
     public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
     {
         private readonly List<ValidationRule> _validationRules;
+        private readonly IUserQueryRepository _userQueryRepository;
 
-        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider)
+        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userRepository)
         {
            var MaxLen = maxLengthProvider.GetMaxLength<User>("FirstName") ?? 25;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _userQueryRepository = userRepository;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -53,12 +56,13 @@ namespace UserManagement.API.Validation.Users
 
                              RuleFor(x => x.UserName)
                             .MaximumLength(MaxLen) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateUserCommand.UserName)} {rule.Error} {MaxLen}"); 
+                            .WithMessage($"{nameof(CreateUserCommand.UserName)} {rule.Error} {MaxLen}");
+
                         break; 
                          
                     case "Email":
                         RuleFor(x => x.EmailId)
-                            .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                            .EmailAddress()
                             .WithMessage($"{nameof(CreateUserCommand.EmailId)} {rule.Error}");   
                         break; 
 
@@ -67,17 +71,37 @@ namespace UserManagement.API.Validation.Users
                         .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
                         .WithMessage($"{nameof(CreateUserCommand.Mobile)} {rule.Error}"); 
                         break; 
-
-                    case "Password":
-                        RuleFor(x => x.Password)
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
-                        break; 
                         
-                    case "UserType":
-                        RuleFor(x => x.UserType)
-                            .InclusiveBetween(1, 2) // Assuming UserType should be between 1 and 2
-                            .WithMessage($"{nameof(CreateUserCommand.UserType)} {rule.Error}");
+                    case "AlreadyExists":
+                           RuleFor(x => x.UserName)
+                           .MustAsync(async (UserName, cancellation) => !await _userQueryRepository.AlreadyExistsAsync(UserName))
+                           .WithName("User Name")
+                            .WithMessage($"{rule.Error}");
+                            break;
+                    case "PasswordMaxLength":
+                        RuleFor(x => x.Password)
+                        .Length(8,10)
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}"); 
+                        break;
+                    case "UpperCase":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[A-Z]+")
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
+                        break;
+                        case "LowerCase":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[a-z]+")
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
+                        break;
+                         case "Numeric":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[0-9]+")
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
+                        break;
+                         case "SpecialCharacter":
+                        RuleFor(x => x.Password)
+                        .Matches(@"[!@#$%^&*(),.?""{}|<>]")
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
                         break;
 
                     default:                        

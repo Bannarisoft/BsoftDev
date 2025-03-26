@@ -22,7 +22,7 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
             CreateMap<Division, DivisionDTO>();            
             CreateMap<Division, DivisionAutoCompleteDTO>();
-            CreateMap<UserCompanyDTO, UserCompany>();
+            // CreateMap<UserCompanyDTO, UserCompany>();
         }
     }
 }

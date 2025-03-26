@@ -13,6 +13,8 @@ using Core.Application.Common.Interfaces.IUser;
 using Polly;
 using Polly.Timeout;
 using Serilog;
+using System.Collections.Concurrent;
+using Core.Application.UserLogin.Commands.UserLogin;
 
 namespace UserManagement.Infrastructure.Repositories
 {
@@ -26,13 +28,15 @@ namespace UserManagement.Infrastructure.Repositories
         private readonly IAsyncPolicy _timeoutPolicy;
         private readonly IAsyncPolicy _fallbackPolicy;
         private readonly HttpClient _httpClient;
+        private readonly IIPAddressService _ipAddressService;
         
 
-		public UserCommandRepository(ApplicationDbContext applicationDbContext,IDbConnection dbConnection, IHttpClientFactory httpClientFactory)
+		public UserCommandRepository(ApplicationDbContext applicationDbContext,IDbConnection dbConnection, IHttpClientFactory httpClientFactory, IIPAddressService ipAddressService)
         {
             _applicationDbContext = applicationDbContext;
 
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
 
         
         // Create an HttpClient using IHttpClientFactory and the registered "ResilientHttpClient"
@@ -61,24 +65,18 @@ namespace UserManagement.Infrastructure.Repositories
             });
 
 
-        // Fallback policy: Return 0 or a default value in case of failure
-            //   _fallbackPolicy = Policy
-            //     .Handle<Exception>()
-            //     .FallbackAsync(async (cancellationToken) =>
-            //     {
-            //         Log.Warning("Executing fallback policy due to a failure.");
-            //     });
         }
 
           public async Task<User> CreateAsync(User user)
             {
-                   var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
-                  return await policyWrap.ExecuteAsync(async () =>
-                  {       
+                user.EntityId = _ipAddressService.GetEntityId();
+                //    var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
+                //   return await policyWrap.ExecuteAsync(async () =>
+                //   {       
                       await _applicationDbContext.User.AddAsync(user);
                       await _applicationDbContext.SaveChangesAsync();
                       return user;
-                  });
+                //   });
 
             }
         
@@ -106,6 +104,19 @@ namespace UserManagement.Infrastructure.Repositories
       
         }
 
+        public async Task<bool> lockUser(string username)
+        {
+             var existingUser = await _applicationDbContext.User
+                    .FirstOrDefaultAsync(u => u.UserName == username);
+            
+                  if (existingUser != null)
+                    {
+                        existingUser.IsLocked = 1;
+                    }
+             _applicationDbContext.User.Update(existingUser);
+            return await _applicationDbContext.SaveChangesAsync() >0;
+        }
+
         public async Task<int> SetAdminPassword(int userId, User user)
         {
              var existingUser = await _applicationDbContext.User
@@ -120,6 +131,19 @@ namespace UserManagement.Infrastructure.Repositories
                 return 0;
         }
 
+        public async Task<bool> UnlockUser(string username)
+        {
+             var existingUser = await _applicationDbContext.User
+                    .FirstOrDefaultAsync(u => u.UserName == username);
+            
+                  if (existingUser != null)
+                    {
+                        existingUser.IsLocked = 0;
+                    }
+             _applicationDbContext.User.Update(existingUser);
+            return await _applicationDbContext.SaveChangesAsync() >0;
+        }
+
         public async Task<int> UpdateAsync(int userId, User user)
         {
             var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
@@ -129,6 +153,8 @@ namespace UserManagement.Infrastructure.Repositories
                     .Include(uc => uc.UserCompanies)
                     .Include(ur => ur.UserRoleAllocations)
                     .Include(uu => uu.UserUnits)
+                    .Include(ud => ud.userDivisions)
+                    .Include(ug => ug.userDepartments)
                     .FirstOrDefaultAsync(u => u.UserId == userId);
                     if (existingUser != null)
                     {
@@ -136,16 +162,12 @@ namespace UserManagement.Infrastructure.Repositories
                         existingUser.FirstName = user.FirstName;
                         existingUser.LastName = user.LastName;
                         existingUser.UserName = user.UserName;
-                        existingUser.PasswordHash = user.PasswordHash;
                         existingUser.UserType = user.UserType;
                         existingUser.Mobile = user.Mobile;
                         existingUser.EmailId = user.EmailId;
-                        // existingUser.CompanyId = user.CompanyId;
-                        existingUser.DivisionId = user.DivisionId;
-                        // existingUser.UnitId = user.UnitId;
-                        // existingUser.UserRoleId = user.UserRoleId;
                         existingUser.IsFirstTimeUser = user.IsFirstTimeUser;
                         existingUser.IsActive = user.IsActive;
+                        existingUser.UserGroupId = user.UserGroupId;
 
                          var updatedCompanyIds = user.UserCompanies.Select(uc => uc.CompanyId).ToList();
                          foreach (var existingCompany in existingUser.UserCompanies)
@@ -202,6 +224,46 @@ namespace UserManagement.Infrastructure.Repositories
                               {
                                   UserId = existingUser.UserId,
                                   UnitId = newUnitId,
+                                  IsActive = 1
+                              });
+                          }
+
+                           var updatedDivisionIds = user.userDivisions.Select(ur => ur.DivisionId).ToList();
+                          foreach (var existingDivision in existingUser.userDivisions)
+                          {
+                              existingDivision.IsActive = updatedDivisionIds.Contains(existingDivision.DivisionId) ? (byte)1 : (byte)0;
+                          }
+
+                          var newDivisionIds = updatedDivisionIds
+                              .Where(id => !existingUser.userDivisions.Any(ur => ur.DivisionId == id))
+                              .ToList();
+
+                          foreach (var newDivisionId in newDivisionIds)
+                          {
+                              existingUser.userDivisions.Add(new Core.Domain.Entities.UserDivision
+                              {
+                                  UserId = existingUser.UserId,
+                                  DivisionId = newDivisionId,
+                                  IsActive = 1
+                              });
+                          }
+
+                           var updatedDepartmentIds = user.userDepartments.Select(ur => ur.DepartmentId).ToList();
+                          foreach (var existingDepartment in existingUser.userDepartments)
+                          {
+                              existingDepartment.IsActive = updatedDepartmentIds.Contains(existingDepartment.DepartmentId) ? (byte)1 : (byte)0;
+                          }
+
+                          var newDepartmentIds = updatedDepartmentIds
+                              .Where(id => !existingUser.userDepartments.Any(ur => ur.DepartmentId == id))
+                              .ToList();
+
+                          foreach (var newDepartmentId in newDepartmentIds)
+                          {
+                              existingUser.userDepartments.Add(new Core.Domain.Entities.UserDepartment
+                              {
+                                  UserId = existingUser.UserId,
+                                  DepartmentId = newDepartmentId,
                                   IsActive = 1
                               });
                           }

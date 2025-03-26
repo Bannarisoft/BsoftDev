@@ -110,7 +110,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                             .WithMessage($"{nameof(CreateAssetLocationCommand.SubLocationId)} {rule.Error}")                            
                             .WithMessage($"{nameof(CreateAssetLocationCommand.SubLocationId)} must be a valid number.");
                         //Additional Cost
-                         RuleForEach(x => x.AssetMaster.AssetAssetAdditionalCost)
+                         RuleForEach(x => x.AssetMaster.AssetAdditionalCost)
                             .ChildRules(additionalCost =>
                             {
                                 additionalCost.RuleFor(x => x.JournalNo)
@@ -191,7 +191,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                             .MaximumLength(assetMasterGeneralMachineCodeMaxLength) 
                             .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.MachineCode)} {rule.Error} {assetMasterGeneralMachineCodeMaxLength}");
                         //Additional Cost
-                        RuleForEach(x => x.AssetMaster.AssetAssetAdditionalCost)
+                        RuleForEach(x => x.AssetMaster.AssetAdditionalCost)
                             .ChildRules(additionalCost =>
                             {
                                 additionalCost.RuleFor(x => x.JournalNo)
@@ -253,7 +253,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                             .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.Quantity)} {rule.Error}");                                                
                         break;
                     case "NumericWithDecimal":
-                        RuleForEach(x => x.AssetMaster.AssetAssetAdditionalCost)
+                        RuleForEach(x => x.AssetMaster.AssetAdditionalCost)
                             .ChildRules(additionalCost =>
                             {                               
                                 additionalCost.RuleFor(x => x.Amount.ToString())

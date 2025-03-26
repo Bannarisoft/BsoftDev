@@ -6,10 +6,11 @@ namespace Core.Domain.Entities
     {        
         public int CompanyId { get; set; } 
         public int UnitId { get; set; } 
-        public string? Finyear { get; set; }        
+        public int? Finyear { get; set; }        
         public DateTimeOffset? StartDate { get; set; }    
         public DateTimeOffset? EndDate { get; set; }                    
-        public string? DepreciationType { get; set; }
+        public int DepreciationType { get; set; }
+        public MiscMaster DepType { get; set; } = null!;  
         public int? AssetId { get; set; }          
         public AssetMasterGenerals AssetMasterId { get; set; } = null!;      
         // Foreign Key
@@ -25,6 +26,7 @@ namespace Core.Domain.Entities
         public decimal OpeningValue { get; set; }   
         public decimal DepreciationValue { get; set; }   
         public decimal ClosingValue { get; set; }   
+        public decimal NetValue { get; set; }   
         public byte IsLocked { get; set; }
         public int? DepreciationPeriod { get; set; }        
         public MiscMaster DepMiscType { get; set; } = null!;  

@@ -49,7 +49,7 @@ namespace UserManagement.API.Controllers
          [HttpPost("SendOTP")]
         public async Task<IActionResult> SendOTP(SendOTPCommand command)
         {
-            
+             
             var response = await Mediator.Send(command);
             if(response.IsSuccess)
             {
