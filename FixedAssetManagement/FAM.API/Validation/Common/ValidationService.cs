@@ -72,6 +72,9 @@ using Core.Application.AssetMaster.AssetWarranty.Commands.DeleteAssetWarranty;
 using Core.Application.Manufacture.Commands.DeleteManufacture;
 using Core.Application.AssetMaster.AssetSpecification.Commands.DeleteAssetSpecification;
 using Core.Application.SpecificationMaster.Commands.DeleteSpecificationMaster;
+using Core.Application.AssetMaster.AssetAmc.Command.CreateAssetAmc;
+using FAM.API.Validation.AssetMaster.AssetAmc;
+using Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc;
 
 
 namespace FAM.API.Validation.Common
@@ -129,6 +132,8 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<DeleteAssetWarrantyCommand>,DeleteAssetWarrantyCommandValidator>();
         services.AddScoped<IValidator<DeleteAssetSpecificationCommand>,DeleteAssetSpecificationCommandValidator>();
         services.AddScoped<IValidator<DeleteSpecificationMasterCommand>,DeleteSpecificationMasterCommandValidator>();
+        services.AddScoped<IValidator<CreateAssetAmcCommand>,CreateAssetAmcCommandValidator>();
+        services.AddScoped<IValidator<UpdateAssetAmcCommand>,UpdateAssetAmcCommandValidator>();
         
         
 

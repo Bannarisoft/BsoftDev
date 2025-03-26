@@ -4,6 +4,7 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAssetMa
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetCodePattern;
+using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetDetailsById;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralAutoComplete;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById;
@@ -354,8 +355,6 @@ namespace FAM.API.Controllers.AssetMaster
                 errors = ""
             });
         }
-
-
         //Excel Import
         [HttpPost("import")]
         public async Task<IActionResult> Import([FromForm] ImportAssetDto dto)
@@ -369,6 +368,20 @@ namespace FAM.API.Controllers.AssetMaster
                 return Ok("File uploaded and data saved successfully.");
             else
                 return StatusCode(500, "An error occurred while processing the file.");
+        }
+
+        [HttpGet("GetAllAssetDetails/{assetId}")]        
+        public async Task<IActionResult> GetAllAssetDetailsById(int assetId)
+        {
+            var command = new GetAsstDetailsByIdQuery { AssetId = assetId };            
+            var result = await Mediator.Send(command);
+
+            if (result.IsSuccess)
+            {
+                // Return the entire result object, including Data
+                return Ok(result);
+            }            
+            return BadRequest(result);
         }
     }
 }
