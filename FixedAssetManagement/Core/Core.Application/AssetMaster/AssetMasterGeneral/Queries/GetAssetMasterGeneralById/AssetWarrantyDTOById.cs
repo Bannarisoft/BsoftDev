@@ -29,5 +29,10 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string ServiceEmail { get; set; }
         public string ServiceClaimProcessDescription { get; set; }
         public string ServiceLastClaimDate { get; set; }
+        public int WarrantyTypeId { get; set; }
+        public int ServiceClaimStatusId { get; set; }
+        public int ServiceCountryId { get; set; }
+        public int ServiceStateId { get; set; }
+        public int ServiceCityId { get; set; }
     }
 }
