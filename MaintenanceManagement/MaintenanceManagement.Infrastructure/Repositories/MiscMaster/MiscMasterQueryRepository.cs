@@ -102,14 +102,44 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
             return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MiscMaster>(query, parameters);
         } 
 
-                    public async Task<int> GetMaxSortOrderAsync()
-            {
-                var query = "SELECT ISNULL(MAX(SortOrder), 0) FROM Maintenance.MiscMaster WHERE IsDeleted = 0";
-                return await _dbConnection.QueryFirstOrDefaultAsync<int>(query);
-            }
-                    
+               public async Task<int> GetMaxSortOrderAsync()
+       {
+           var query = "SELECT ISNULL(MAX(SortOrder), 0) FROM Maintenance.MiscMaster WHERE IsDeleted = 0";
+           return await _dbConnection.QueryFirstOrDefaultAsync<int>(query);
+       }
+
+        public async Task<bool> AlreadyExistsAsync(string code, int? id = null)
+        {   
+
+              var query = "SELECT COUNT(1) FROM Maintenance.MiscMaster WHERE Code = @code AND IsDeleted = 0";
+                var parameters = new DynamicParameters(new { Code = code });
+
+             if (id is not null)
+             {
+                 query += " AND Id != @Id";
+                 parameters.Add("Id", id);
+             }
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+        } 
 
 
+           public async Task<bool> NotFoundAsync(int id)
+        {
+             var query = "SELECT COUNT(1) FROM Maintenance.MiscMaster WHERE Id = @Id AND IsDeleted = 0";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+                return count > 0;
+        } 
+
+           public async Task<bool> FKColumnValidation(int MiscMasterId)
+        {
+            var query = "SELECT COUNT(1) FROM Maintenance.MiscMaster WHERE Id = @Id AND IsDeleted = 0";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = MiscMasterId });
+                return count > 0;
+        }
+                  
     }   
 
     

@@ -8,6 +8,7 @@ using MaintenanceManagement.API.Validation.Common;
 using MaintenanceManagement.Infrastructure.Data;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
+using Core.Application.Common.Interfaces.IMiscTypeMaster;
 
 namespace MaintenanceManagement.API.Validation.MiscTypeMaster
 {
@@ -16,11 +17,13 @@ namespace MaintenanceManagement.API.Validation.MiscTypeMaster
 
 
              private readonly List<ValidationRule> _validationRules;
-      public CreateMiscTypeMasterCommandValidator(MaxLengthProvider maxLengthProvider)
+             private readonly IMiscTypeMasterQueryRepository _miscTypeMasterQueryRepository;
+      public CreateMiscTypeMasterCommandValidator( IMiscTypeMasterQueryRepository machineGroupQueryRepository,MaxLengthProvider maxLengthProvider)
         {
             var MiscTypeCodeMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.MiscTypeMaster>("MiscTypeCode") ?? 50;
             var DescriptionMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.MiscTypeMaster>("Description")?? 250;
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _miscTypeMasterQueryRepository = machineGroupQueryRepository;
             if (_validationRules == null || !_validationRules.Any())
             {
                       throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -47,6 +50,14 @@ namespace MaintenanceManagement.API.Validation.MiscTypeMaster
                             .MaximumLength(DescriptionMaxLength)
                             .WithMessage($"{nameof(CreateMiscTypeMasterCommand.Description)} {rule.Error}");
                         break;
+                    case "AlreadyExists":
+                        RuleFor(x => x.MiscTypeCode)
+                            .MustAsync(async (miscTypeCode, cancellation) =>
+                                !await _miscTypeMasterQueryRepository.AlreadyExistsAsync(miscTypeCode))
+                            .WithMessage("MiscTypeCode already exists.");
+                        break;    
+
+
                 }
 
             }

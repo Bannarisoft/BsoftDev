@@ -13,8 +13,7 @@ namespace Core.Application.AssetLocation.Queries.GetAssetLocation
         public int DepartmentId { get; set; }
         public int LocationId { get; set; }
         public int SubLocationId { get; set; } 
-        public string CustodianId { get; set; }
-        public string UserId { get; set; } 
+
 
         
     }

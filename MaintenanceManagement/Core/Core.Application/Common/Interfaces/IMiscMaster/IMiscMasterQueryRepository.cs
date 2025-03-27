@@ -13,6 +13,10 @@ namespace Core.Application.Common.Interfaces.IMiscMaster
          Task<List<Core.Domain.Entities.MiscMaster>> GetMiscMaster(string searchPattern);
          Task<Core.Domain.Entities.MiscMaster?> GetByMiscMasterCodeAsync(string name,int? id = null);
 
+        Task<bool> AlreadyExistsAsync(string code,int? id = null);
+        Task<bool> NotFoundAsync(int id );
+        Task<bool> FKColumnValidation(int ShiftMasterId );
+
             
     }
 }

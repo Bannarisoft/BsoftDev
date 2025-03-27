@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250326113829_asetlocationcustodianidasint")]
+    partial class asetlocationcustodianidasint
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -784,8 +787,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("varchar(100)");
 
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTimeOffset>("EndDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -839,8 +842,8 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(100)");
 
-                    b.Property<DateOnly?>("ServiceLastClaimDate")
-                        .HasColumnType("date");
+                    b.Property<DateTimeOffset?>("ServiceLastClaimDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ServiceMobileNumber")
                         .IsRequired()
@@ -852,8 +855,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("ServiceStateId")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("WarrantyProvider")
                         .IsRequired()

@@ -26,12 +26,16 @@ namespace MaintenanceManagement.API.Controllers
           private readonly IValidator<CreateMiscTypeMasterCommand>  _createMiscTypeMasterCommand;
           private readonly IValidator<UpdateMiscTypeMasterCommand> _updateMiscTypeMasterCommand;
 
+           private readonly IValidator<DeleteMiscTypeMasterCommand> _deleteMiscTypeMasterCommand;
+
           
-          public MiscTypeMasterController(ISender mediator,IValidator<CreateMiscTypeMasterCommand>  createMiscTypeMasterCommand,IValidator<UpdateMiscTypeMasterCommand> updateMiscTypeMasterCommand) 
-          :base(mediator)
+          public MiscTypeMasterController(ISender mediator,IValidator<CreateMiscTypeMasterCommand>  createMiscTypeMasterCommand,IValidator<UpdateMiscTypeMasterCommand> updateMiscTypeMasterCommand
+           , IMiscTypeMasterCommandRepository miscTypeMasterCommandRepository, IValidator<DeleteMiscTypeMasterCommand> deleteMiscTypeMasterCommand ):base(mediator) 
+        
           {
               _createMiscTypeMasterCommand=createMiscTypeMasterCommand;
             _updateMiscTypeMasterCommand=updateMiscTypeMasterCommand;
+            _deleteMiscTypeMasterCommand=deleteMiscTypeMasterCommand;
           }      
     
       [HttpGet] 
@@ -151,6 +155,17 @@ namespace MaintenanceManagement.API.Controllers
         
         public async Task<IActionResult> Delete(int id)
         {
+
+             var command = new DeleteMiscTypeMasterCommand { Id = id };
+           var validationResult = await  _deleteMiscTypeMasterCommand.ValidateAsync(command);
+               if (!validationResult.IsValid)
+                {
+                    return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+                }
            
            var updatedDivision = await Mediator.Send(new DeleteMiscTypeMasterCommand { Id = id });
 

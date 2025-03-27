@@ -18,7 +18,7 @@ namespace Core.Application.Common.Interfaces.IMachineGroup
         Task<bool> GetByMachineGroupnameAsync(string GroupName);
 
          Task<List<Core.Domain.Entities.MachineGroup>> GetMachineGroupAutoComplete(string searchPattern);
-
+          Task<bool> NotFoundAsync(int id );
 
 
     //  Task<bool> GetByMachineGroupCodeAsync(string groupName); 
