@@ -1,46 +1,47 @@
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Contracts.Events;
-using SagaOrchestrator.Application; // Ensure correct reference
+using SagaOrchestrator.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add MassTransit & RabbitMQ
-builder.Services.AddMassTransit(cfg =>
+builder.Services.AddMassTransit(x =>
 {
-    cfg.SetKebabCaseEndpointNameFormatter();
+    x.AddSagaStateMachine<UserAssetStateMachine, UserAssetState>().InMemoryRepository();
 
-    // Register the Saga State Machine and MongoDB Repository
-    cfg.AddSagaStateMachine<UserAssetStateMachine, UserAssetState>()
-        .MongoDbRepository(r =>
-        {
-            r.Connection = "mongodb://localhost:27017";
-            r.DatabaseName = "saga_state";
-        });
-
-    cfg.UsingRabbitMq((context, config) =>
+    x.UsingRabbitMq((context, cfg) =>
     {
-        config.Host("rabbitmq://localhost");
-
-        config.ReceiveEndpoint("user-created-event-queue", ep =>
+        cfg.Host("rabbitmq://localhost");
+        
+        cfg.ReceiveEndpoint("saga-orchestrator-queue", e =>
         {
-            ep.ConfigureConsumeTopology = false;
-            ep.Bind<UserCreatedEvent>();
-            ep.ConfigureSaga<UserAssetState>(context);
+            e.ConfigureConsumeTopology = false;
+            e.Bind<UserCreatedEvent>();
+            e.ConfigureSaga<UserAssetState>(context);
         });
 
-        config.ConfigureEndpoints(context);
+        cfg.ConfigureEndpoints(context);  // Auto-configuration of endpoints
     });
 });
 
+
 // Register Controllers
 builder.Services.AddControllers();
+
+// Enable Logging for MassTransit (Optional but useful for debugging)
+LogContext.ConfigureCurrentLogContext();
 
 var app = builder.Build();
 
 // Middleware Setup
 app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 app.MapControllers();
 
 app.Run();

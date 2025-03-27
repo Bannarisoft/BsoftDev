@@ -9,55 +9,64 @@ using MassTransit;
 var builder = WebApplication.CreateBuilder(args);
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
 
-    // If environment is null or empty, set default to "Development"
-    if (string.IsNullOrWhiteSpace(environment))
-    {      
-        environment = "development";
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
-    }
+// If environment is null or empty, set default to "Development"
+if (string.IsNullOrWhiteSpace(environment))
+{
+    environment = "development";
+    Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
+}
 
-builder.Configuration    
+builder.Configuration
     .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
     .AddJsonFile("settings/emailsetting.json", optional: false, reloadOnChange: true)
 
-    .AddJsonFile("settings/smssetting.json", optional: false, reloadOnChange: true)    
-    .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true) 
+    .AddJsonFile("settings/smssetting.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true)
     .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 
 // Configure Serilog
 
-builder.Host.ConfigureSerilog(builder.Configuration); 
+builder.Host.ConfigureSerilog(builder.Configuration);
 
 // Add validation services
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
 
-builder.Services.AddMassTransit(cfg =>
+// MassTransit Configuration
+builder.Services.AddMassTransit(x =>
 {
-    cfg.UsingRabbitMq((context, config) =>
+    x.UsingRabbitMq((context, cfg) =>
     {
-        config.Host("rabbitmq://localhost");
-        config.ConfigureEndpoints(context);
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
     });
 });
 
-builder.Services.AddMassTransitHostedService();
 
-// builder.Services.AddMassTransit(busConfig =>
+// // Load RabbitMQ Configuration from appsettings.json
+// var rabbitMQSettings = builder.Configuration.GetSection("RabbitMQ");
+
+// // MassTransit - RabbitMQ Configuration
+// builder.Services.AddMassTransit(cfg =>
 // {
-//     busConfig.SetKebabCaseEndpointNameFormatter();
-
-//     busConfig.UsingRabbitMq((context, cfg) =>
+//     cfg.UsingRabbitMq((context, config) =>
 //     {
-//         cfg.Host("localhost", "/", h =>
+//         var rabbitHost = rabbitMQSettings["Host"];
+//         var rabbitUser = rabbitMQSettings["Username"];
+//         var rabbitPassword = rabbitMQSettings["Password"];
+
+//         config.Host(new Uri($"rabbitmq://{rabbitHost}"), h =>
 //         {
-//             h.Username("guest");
-//             h.Password("guest");
+//             h.Username(rabbitUser);
+//             h.Password(rabbitPassword);
 //         });
 
-//         cfg.ConfigureEndpoints(context);
+//         config.ConfigureEndpoints(context);
 //     });
 // });
 
