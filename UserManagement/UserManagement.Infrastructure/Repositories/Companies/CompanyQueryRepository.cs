@@ -180,6 +180,12 @@ namespace UserManagement.Infrastructure.Repositories.Companies
                     
                        return companySettingExists.HasValue || divisionExists.HasValue || unitExists.HasValue;
             }
+             public async Task<bool> FKColumnExistValidation(int companyId)
+          {
+              var sql = "SELECT COUNT(1) FROM AppData.Company WHERE Id = @Id AND IsDeleted = 0 AND IsActive = 1";
+                var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = companyId });
+                return count > 0;
+          }
         
     }
 }

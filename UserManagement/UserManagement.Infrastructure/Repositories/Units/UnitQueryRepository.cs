@@ -123,6 +123,12 @@ namespace UserManagement.Infrastructure.Repositories.Units
              });
             return result.ToList();
         }
+         public async Task<bool> FKColumnExistValidation(int Id)
+          {
+              var sql = "SELECT COUNT(1) FROM AppData.Unit WHERE Id = @Id AND IsDeleted = 0 AND IsActive = 1";
+                var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = Id });
+                return count > 0;
+          }
   
 
                   
