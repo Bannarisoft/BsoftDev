@@ -6,8 +6,8 @@ namespace Core.Domain.Entities.AssetMaster
     {
         public int AssetId { get; set; } 
         public AssetMasterGenerals AssetMasterId { get; set; } = null!;
-        public DateTimeOffset? StartDate { get; set; } 
-        public DateTimeOffset? EndDate { get; set; } 
+        public DateOnly? StartDate { get; set; } 
+        public DateOnly? EndDate { get; set; } 
         public int? Period { get; set; }         
         public int? WarrantyType { get; set; } 
         public MiscMaster MiscWarrantyTypes { get; set; } = null!;    
@@ -28,7 +28,7 @@ namespace Core.Domain.Entities.AssetMaster
         public string? ServiceMobileNumber { get; set; }        
         public string? ServiceEmail { get; set; }   
         public string? ServiceClaimProcessDescription { get; set; } 
-        public DateTimeOffset? ServiceLastClaimDate { get; set; } 
+        public DateOnly? ServiceLastClaimDate { get; set; } 
         public int? ServiceClaimStatus { get; set; } 
         public MiscMaster MiscClaimStatus { get; set; } = null!;   
 

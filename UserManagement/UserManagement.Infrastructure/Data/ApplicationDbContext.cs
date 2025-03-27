@@ -58,6 +58,8 @@ namespace UserManagement.Infrastructure.Data
         public DbSet<RoleChild> RoleChild { get; set; }
         public DbSet<UserDivision> UserDivision {get; set;}
         public DbSet<UserDepartment> UserDepartment {get; set;}
+        public DbSet<MiscMaster> MiscMaster { get; set; } 
+        public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -102,6 +104,8 @@ namespace UserManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new RoleChildConfiguration());
             modelBuilder.ApplyConfiguration(new UserDivisionConfiguration());
             modelBuilder.ApplyConfiguration(new UserDepartmentConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             
                
             base.OnModelCreating(modelBuilder);

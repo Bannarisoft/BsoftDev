@@ -1,0 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById
+{
+    public class AssetDisposalByIdDTO
+    {
+        public string DisposalType { get; set; }
+        public string DisposalDate { get; set; }
+        public string DisposalReason { get; set; }
+        public string DisposalAmount { get; set; }
+    }
+}

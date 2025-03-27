@@ -11,7 +11,7 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
 {
     public interface IAssetDetailsQueryRepository
     {
-        Task<AssetMasterGeneralDTO> GetAssetMasterByIdAsync(int assetId);
+        Task<(dynamic AssetResult, dynamic LocationResult, IEnumerable<dynamic> PurchaseDetails, IEnumerable<dynamic> Spec, IEnumerable<dynamic> Warranty,IEnumerable<dynamic> Amc,dynamic Disposal, IEnumerable<dynamic> Insurance)> GetAssetMasterByIdAsync(int assetId);
         Task<AssetLocationDto> GetAssetLocationByIdAsync(int assetId);
         Task<AssetPurchaseDetailsDto> GetAssetPurchaseByIdAsync(int assetId);
         Task<AssetAmcDto> GetAssetAMCByIdAsync(int assetId);
