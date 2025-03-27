@@ -15,6 +15,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string VendorCode { get; set; }
         public string RenewalStatus { get; set; }
         public string RenewedDate { get; set; }
+        public byte IsActive { get; set; }
         
     }
 }

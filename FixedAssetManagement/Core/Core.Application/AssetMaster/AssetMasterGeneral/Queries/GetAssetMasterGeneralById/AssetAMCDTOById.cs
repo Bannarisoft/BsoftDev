@@ -18,5 +18,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
          public string AssetName { get; set; }
          public int CoverageTypeId { get; set; }
          public int RenewalStatusId { get; set; }
+         public byte IsActive { get; set; }
     }
 }
