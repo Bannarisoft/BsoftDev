@@ -71,7 +71,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 SELECT CAST(AA.StartDate AS DATE) AS StartDate,CAST(AA.EndDate AS DATE) AS EndDate,AA.Period,AA.VendorCode,AA.VendorName,
                 MMCoverage.description AS CoverageType,
 				MMRenewal.description AS RenewalStatus,CAST(AA.RenewedDate AS DATE) AS RenewedDate,AA.CoverageType AS CoverageTypeId,
-                AA.RenewalStatus AS RenewalStatusId
+                AA.RenewalStatus AS RenewalStatusId,AA.IsActive
 				FROM [FixedAsset].[AssetAmc] AA
 				INNER JOIN [FixedAsset].[MiscMaster] MMCoverage ON MMCoverage.Id=AA.CoverageType
 				INNER JOIN [FixedAsset].[MiscMaster] MMRenewal ON MMRenewal.Id=AA.RenewalStatus
@@ -84,7 +84,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 				WHERE AD.AssetId=@AssetId
 
                 SELECT PolicyNo,CAST(StartDate AS DATE) AS StartDate,CAST(EndDate AS DATE) AS EndDate,Insuranceperiod,PolicyAmount,
-                VendorCode,RenewalStatus,CAST(RenewedDate AS DATE) AS RenewedDate
+                VendorCode,RenewalStatus,CAST(RenewedDate AS DATE) AS RenewedDate,IsActive
                 FROM [FixedAsset].[AssetInsurance]
 				WHERE AssetId=@AssetId
               ";
