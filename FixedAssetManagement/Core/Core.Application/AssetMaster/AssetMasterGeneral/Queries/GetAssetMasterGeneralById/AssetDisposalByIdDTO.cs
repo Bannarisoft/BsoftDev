@@ -11,5 +11,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string DisposalDate { get; set; }
         public string DisposalReason { get; set; }
         public string DisposalAmount { get; set; }
+        public int DisposalTypeId { get; set; }
     }
 }

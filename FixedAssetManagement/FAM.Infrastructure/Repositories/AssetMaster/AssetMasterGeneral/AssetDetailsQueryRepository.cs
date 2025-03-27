@@ -50,7 +50,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 				  INNER JOIN [FixedAsset].[AssetSource] ASource ON ASource.Id=AP.AssetSourceId
                   WHERE AP.AssetId = @AssetId;
 
-                SELECT SM.SpecificationName,A.SpecificationValue FROM  [FixedAsset].[AssetSpecifications] A
+                SELECT SM.SpecificationName,A.SpecificationValue,A.SpecificationId FROM  [FixedAsset].[AssetSpecifications] A
 				INNER JOIN [FixedAsset].[SpecificationMaster] SM ON SM.Id=A.SpecificationId
 				WHERE A.AssetId=@AssetId
 
@@ -58,7 +58,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 				AW.WarrantyProvider,AW.MobileNumber,AW.ContactPerson,AW.Description,AW.Email,AW.Document,C.CountryName,S.StateName,City.CityName,
                 AW.ServiceAddressLine1,AW.ServiceAddressLine2,
 				AW.ServicePinCode,AW.ServiceContactPerson,AW.ServiceMobileNumber,AW.ServiceEmail,AW.ServiceClaimProcessDescription,
-                CAST(AW.ServiceLastClaimDate AS DATE) AS ServiceLastClaimDate 
+                CAST(AW.ServiceLastClaimDate AS DATE) AS ServiceLastClaimDate,AW.WarrantyType AS WarrantyTypeId,
+                AW.ServiceClaimStatus AS ServiceClaimStatusId,AW.ServiceCountryId,AW.ServiceStateId,AW.ServiceCityId 
 				FROM [FixedAsset].[AssetWarranty] AW
 				INNER JOIN [FixedAsset].[MiscMaster] MMWaranty ON MMWaranty.Id=AW.WarrantyType
 				INNER JOIN [FixedAsset].[MiscMaster] MMClaim ON MMClaim.Id=AW.ServiceClaimStatus
@@ -69,13 +70,15 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 
                 SELECT CAST(AA.StartDate AS DATE) AS StartDate,CAST(AA.EndDate AS DATE) AS EndDate,AA.Period,AA.VendorCode,AA.VendorName,
                 MMCoverage.description AS CoverageType,
-				MMRenewal.description AS RenewalStatus,CAST(AA.RenewedDate AS DATE) AS RenewedDate
+				MMRenewal.description AS RenewalStatus,CAST(AA.RenewedDate AS DATE) AS RenewedDate,AA.CoverageType AS CoverageTypeId,
+                AA.RenewalStatus AS RenewalStatusId
 				FROM [FixedAsset].[AssetAmc] AA
 				INNER JOIN [FixedAsset].[MiscMaster] MMCoverage ON MMCoverage.Id=AA.CoverageType
 				INNER JOIN [FixedAsset].[MiscMaster] MMRenewal ON MMRenewal.Id=AA.RenewalStatus
 				WHERE AA.AssetId=@AssetId
 
-                SELECT MMDisposal.description AS DisposalType,CAST(AD.DisposalDate AS DATE) AS DisposalDate,AD.DisposalReason,AD.DisposalAmount  
+                SELECT MMDisposal.description AS DisposalType,CAST(AD.DisposalDate AS DATE) AS DisposalDate,AD.DisposalReason,
+                AD.DisposalAmount,AD.DisposalType AS DisposalTypeId  
                 FROM [FixedAsset].[AssetDisposal] AD
 				INNER JOIN [FixedAsset].[MiscMaster] MMDisposal ON MMDisposal.Id=AD.DisposalType
 				WHERE AD.AssetId=@AssetId
