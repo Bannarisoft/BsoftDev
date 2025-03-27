@@ -36,21 +36,21 @@ namespace UserManagement.API.Controllers
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly IValidator<ForgotUserPasswordCommand> _forgotUserPasswordCommandValidator;
         private readonly IValidator<ResetUserPasswordCommand> _resetUserPasswordCommandValidator;
-
-        public UserController(ISender mediator,
-                              IValidator<CreateUserCommand> createUserCommandValidator,
-                              IValidator<UpdateUserCommand> updateUserCommandValidator,
-                              ApplicationDbContext dbContext,
-                              IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator,
-                              IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
-                              ILogger<UserController> logger, IHttpClientFactory httpClientFactory,
-                              IValidator<ForgotUserPasswordCommand> forgotUserPasswordCommandValidator,
-                              IValidator<ResetUserPasswordCommand> resetUserPasswordCommandValidator,
-                              IPublishEndpoint publishEndpoint)
-          : base(mediator)
-        {
+         
+       public UserController(ISender mediator, 
+                             IValidator<CreateUserCommand> createUserCommandValidator, 
+                             IValidator<UpdateUserCommand> updateUserCommandValidator, 
+                             ApplicationDbContext dbContext, 
+                             IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator, 
+                             IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
+                             ILogger<UserController> logger,IHttpClientFactory httpClientFactory,
+                             IValidator<ForgotUserPasswordCommand> forgotUserPasswordCommandValidator,
+                             IValidator<ResetUserPasswordCommand> resetUserPasswordCommandValidator,
+                             IPublishEndpoint publishEndpoint) 
+         : base(mediator)
+        {        
             _createUserCommandValidator = createUserCommandValidator;
-            _dbContext = dbContext;
+            _dbContext = dbContext;  
             _updateUserCommandValidator = updateUserCommandValidator;
             _dbContext = dbContext;
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
@@ -151,13 +151,27 @@ namespace UserManagement.API.Controllers
             // _logger.LogInformation("Publishing IUserCreatedEvent for UserId: {UserId}, UserName: {UserName}, Email: {Email}",
             //     userCreatedEvent.UserId, createUserCommand.UserName, createUserCommand.EmailId);
 
-            // // Publish the event
+            // Publish the event
             // await _publishEndpoint.Publish(userCreatedEvent, context =>
             // {
             //     // Use ContentType object
-            //     // context.ContentType = new System.Net.Mime.ContentType("application/json");
-            //     context.Durable = true;  // Ensures message is marked as persistent
+            //     context.ContentType = new System.Net.Mime.ContentType("application/json");
             // });
+            //   // ? Create a proper event instance
+            //     var userCreatedEvent = new UserCreated(
+            //         CorrelationId: Guid.NewGuid(),
+            //         UserId: userId,
+            //         Email: createUserCommand.EmailId,
+            //         CreatedAt: DateTime.UtcNow
+            //     );
+
+            //     _logger.LogInformation("Publishing IUserCreated Event: {@UserCreated}", userCreatedEvent);
+
+            //     // ? Publish the event using a concrete class
+            //     await _publishEndpoint.Publish(userCreatedEvent, context =>
+            //     {
+            //         context.ContentType = "application/json";
+            //     });
 
 
             var response = await Mediator.Send(createUserCommand);
@@ -347,7 +361,7 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> ForgotUserPassword([FromBody] ForgotUserPasswordCommand forgotUserPasswordCommand)
 
         {
-            var validationResult = await _forgotUserPasswordCommandValidator.ValidateAsync(forgotUserPasswordCommand);
+              var validationResult = await _forgotUserPasswordCommandValidator.ValidateAsync(forgotUserPasswordCommand);
             if (!validationResult.IsValid)
             {
                 return BadRequest(new
@@ -357,7 +371,7 @@ namespace UserManagement.API.Controllers
                     errors = validationResult.Errors.Select(e => e.ErrorMessage)
                 });
             }
-
+            
             var response = await Mediator.Send(forgotUserPasswordCommand);
 
             if (response.IsSuccess)
@@ -365,7 +379,7 @@ namespace UserManagement.API.Controllers
 
                 _logger.LogInformation($"User {forgotUserPasswordCommand.UserName} fetched successfully.");
 
-
+                    
 
                 return Ok(new
                 {
@@ -388,8 +402,8 @@ namespace UserManagement.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ResetUserPassword([FromBody] ResetUserPasswordCommand resetUserPasswordCommand)
         {
-
-            var validationResult = await _resetUserPasswordCommandValidator.ValidateAsync(resetUserPasswordCommand);
+             
+               var validationResult = await _resetUserPasswordCommandValidator.ValidateAsync(resetUserPasswordCommand);
             if (!validationResult.IsValid)
             {
                 return BadRequest(new
@@ -399,7 +413,7 @@ namespace UserManagement.API.Controllers
                     errors = validationResult.Errors.Select(e => e.ErrorMessage)
                 });
             }
-
+            
             var response = await Mediator.Send(resetUserPasswordCommand);
             if (!response.IsSuccess)
             {

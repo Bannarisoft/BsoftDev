@@ -12,6 +12,8 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetInsurance
             Task<Core.Domain.Entities.AssetMaster.AssetInsurance>  GetByAssetIdAsync(int id );            
 
             Task<(List<Core.Domain.Entities.AssetMaster.AssetInsurance>,int)> GetAllAssetInsuranceAsync(int PageNumber, int PageSize, string? SearchTerm);
+            Task<bool> AlreadyExistsAsync(string PolicyNo, int? id = null);
+             Task<bool> ActiveInsuranceValidation(int AssetId, int? id = null);
            
            
         

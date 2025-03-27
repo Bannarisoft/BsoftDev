@@ -92,6 +92,17 @@
 				"/consoleloggerparameters:NoSummary;ForceNoAlign"
 			],
 			"problemMatcher": "$msCompile"
+		},
+		{
+			"type": "dotnet",
+			"task": "watch UserManagement.API",
+			"file": "D:\\MyProjects\\gRPC\\BSOFT\\UserManagement\\UserManagement.API\\UserManagement.API.csproj",
+			"problemMatcher": [],
+			"label": "dotnet: watch UserManagement.API",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
 		}
 	]
 }

@@ -7,6 +7,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using UserManagement.API.Validation.Common;
 using Core.Application.Common.Interfaces.IUser;
+using Core.Application.Common.Interfaces.ICompany;
+using Core.Application.Common.Interfaces.IDivision;
+using Core.Application.Common.Interfaces.IDepartment;
+using Core.Application.Common.Interfaces.IUserRole;
+using Core.Application.Common.Interfaces.IUnit;
 
 namespace UserManagement.API.Validation.Users
 {
@@ -14,13 +19,23 @@ namespace UserManagement.API.Validation.Users
     {
         private readonly List<ValidationRule> _validationRules;
         private readonly IUserQueryRepository _userQueryRepository;
+        private readonly ICompanyQueryRepository _companyQueryRepository;
+        private readonly IDivisionQueryRepository _divisionQueryRepository;
+        private readonly IDepartmentQueryRepository _departmentQueryRepository;
+        private readonly IUserRoleQueryRepository _userRoleQueryRepository;
+        private readonly IUnitQueryRepository _unitQueryRepository;
 
-        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userRepository)
+        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userRepository, ICompanyQueryRepository companyQueryRepository, IDivisionQueryRepository divisionQueryRepository, IDepartmentQueryRepository departmentQueryRepository, IUserRoleQueryRepository userRoleQueryRepository, IUnitQueryRepository unitQueryRepository)
         {
            var MaxLen = maxLengthProvider.GetMaxLength<User>("FirstName") ?? 25;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();
             _userQueryRepository = userRepository;
+            _companyQueryRepository = companyQueryRepository;
+            _divisionQueryRepository = divisionQueryRepository;
+            _departmentQueryRepository = departmentQueryRepository;
+            _userRoleQueryRepository = userRoleQueryRepository;
+            _unitQueryRepository = unitQueryRepository;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -42,6 +57,36 @@ namespace UserManagement.API.Validation.Users
                         RuleFor(x => x.UserName)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateUserCommand.UserName)} {rule.Error}");
+
+                        RuleFor(x => x.UserCompanies)
+                        .NotNull()
+                        .WithMessage($"{rule.Error}")
+                        .Must(x => x.Count > 0)
+                        .WithMessage($"{rule.Error}");
+
+                        RuleFor(x => x.userUnits)
+                        .NotNull()
+                        .WithMessage($"{rule.Error}")
+                        .Must(x => x.Count > 0)
+                        .WithMessage($"{rule.Error}");
+
+                        RuleFor(x => x.userDivisions)
+                        .NotNull()
+                        .WithMessage($"{rule.Error}")
+                        .Must(x => x.Count > 0)
+                        .WithMessage($"{rule.Error}");
+
+                         RuleFor(x => x.userDepartments)
+                         .NotNull()
+                        .WithMessage($"{rule.Error}")
+                        .Must(x => x.Count > 0)
+                        .WithMessage($"{rule.Error}");
+
+                        RuleFor(x => x.userRoleAllocations)
+                         .NotNull()
+                        .WithMessage($"{rule.Error}")
+                        .Must(x => x.Count > 0)
+                        .WithMessage($"{rule.Error}");
                         break;
 
                     case "MaxLength":
@@ -103,6 +148,45 @@ namespace UserManagement.API.Validation.Users
                         .Matches(@"[!@#$%^&*(),.?""{}|<>]")
                         .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
                         break;
+                    case "FKColumnDelete":
+                        RuleFor(x => x.UserCompanies)
+                             .ForEach(companyRule =>
+                             {
+                                 companyRule.MustAsync(async (company, cancellation) => 
+                                     await _companyQueryRepository.FKColumnExistValidation(company.CompanyId))
+                                     .WithMessage($"{rule.Error}");  
+                             });
+                     RuleFor(x => x.userDivisions)
+                             .ForEach(divisionRule =>
+                             {
+                                 divisionRule.MustAsync(async (division, cancellation) => 
+                                     await _divisionQueryRepository.FKColumnExistValidation(division.DivisionId))
+                                     .WithMessage($"{rule.Error}");  
+                             });
+                        RuleFor(x => x.userUnits)
+                             .ForEach(unitRule =>
+                             {
+                                 unitRule.MustAsync(async (unit, cancellation) => 
+                                     await _unitQueryRepository.FKColumnExistValidation(unit.UnitId))
+                                     .WithMessage($"{rule.Error}");  
+                             });
+                        RuleFor(x => x.userRoleAllocations)
+                             .ForEach(RoleRule =>
+                             {
+                                 RoleRule.MustAsync(async (role, cancellation) => 
+                                     await _userRoleQueryRepository.FKColumnExistValidation(role.UserRoleId))
+                                     .WithMessage($"{rule.Error}");  
+                             });
+
+                        RuleFor(x => x.userDepartments)
+                             .ForEach(departmentRule =>
+                             {
+                                 departmentRule.MustAsync(async (department, cancellation) => 
+                                     await _departmentQueryRepository.FKColumnExistValidation(department.DepartmentId))
+                                     .WithMessage($"{rule.Error}");  
+                             });
+                             
+                        break; 
 
                     default:                        
                         break;

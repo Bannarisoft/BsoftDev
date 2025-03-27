@@ -1,90 +1,106 @@
-using Core.Application;
-using FAM.Infrastructure;
-using FAM.API.Validation.Common;
-using FAM.API.Configurations;
-using MassTransit;
-using Contracts.Events;
-using FAM.API.Consumers;
+        using Core.Application;
+        using FAM.Infrastructure;
+        using FAM.API.Validation.Common;
+        using FAM.API.Configurations;
+        using MassTransit;
+        using Contracts.Events;
 
-var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(args);
 
-//var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
+        //var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
 
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
-var appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{environment}.json");
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
+        var appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{environment}.json");
 
 
-// If environment is null or empty, set default to "Development"
-if (string.IsNullOrWhiteSpace(environment))
+        // If environment is null or empty, set default to "Development"
+        if (string.IsNullOrWhiteSpace(environment))
+        {      
+            environment = "development";
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
+            
+        }
+
+
+        // Load configuration files based on the environment
+        builder.Configuration
+            .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)    
+            .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: true, reloadOnChange: true) 
+            .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
+            .AddEnvironmentVariables();
+        // Configure Serilog
+        builder.Host.ConfigureSerilog(builder.Configuration); 
+
+
+        // Add validation services
+        var validationService = new ValidationService();
+        validationService.AddValidationServices(builder.Services);
+
+        // Add services to the container
+        builder.Services.AddControllers();
+        builder.Services.AddSwaggerDocumentation();
+        builder.Services.AddJwtAuthentication(builder.Configuration);
+        builder.Services.AddCorsPolicy();
+        builder.Services.AddApplicationServices();
+        builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddProblemDetails();
+
+        // Configure MassTransit with RabbitMQ
+builder.Services.AddMassTransit(cfg =>
 {
-    environment = "development";
-    Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
+    cfg.AddConsumer<UserCreatedConsumer>();
 
-}
-
-
-// Load configuration files based on the environment
-builder.Configuration
-    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
-    .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: true, reloadOnChange: true)
-    .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
-    .AddEnvironmentVariables();
-// Configure Serilog
-builder.Host.ConfigureSerilog(builder.Configuration);
-
-
-// Add validation services
-var validationService = new ValidationService();
-validationService.AddValidationServices(builder.Services);
-
-// Add services to the container
-builder.Services.AddControllers();
-builder.Services.AddSwaggerDocumentation();
-builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddCorsPolicy();
-builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddProblemDetails();
-
-builder.Services.AddMassTransit(x =>
-{
-    x.AddConsumer<UserCreatedConsumer>();  // Registering Consumer
-
-    x.UsingRabbitMq((context, cfg) =>
+    cfg.UsingRabbitMq((context, config) =>
     {
-        cfg.Host("rabbitmq://localhost");
+        config.Host("rabbitmq://localhost");
 
-        cfg.ReceiveEndpoint("user-created-queue", e =>
+        config.ReceiveEndpoint("user-created-event-queue", ep =>
         {
-            e.ConfigureConsumeTopology = false;
-            e.Bind<UserCreatedEvent>();
-            e.ConfigureConsumer<UserCreatedConsumer>(context);  // Attach the consumer to the queue
+            ep.ConfigureConsumeTopology = false;
+            ep.Bind<UserCreatedEvent>();
+            ep.ConfigureConsumer<UserCreatedConsumer>(context);
         });
-
-        cfg.ConfigureEndpoints(context);  // Auto-configuration of endpoints
     });
 });
 
+// builder.Services.AddMassTransit(cfg =>
+// {
+//     cfg.AddConsumer<FixedAssetConsumer>();
 
-var app = builder.Build();
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
+//     cfg.UsingRabbitMq((context, config) =>
+//     {
+//         config.Host("rabbitmq://localhost", h =>
+//         {
+//             h.Username("guest");
+//             h.Password("guest");
+//         });
 
-}
+//         config.ReceiveEndpoint("user-created-queue", e =>
+//         {
+//             e.ConfigureConsumer<FixedAssetConsumer>(context);
+//         });
+//     });
+// });
 
-// Configure the HTTP request pipeline
-app.UseSwagger();
-app.UseSwaggerUI();
-//app.UseDeveloperExceptionPage();
-app.UseHttpsRedirection();
-app.UseRouting();
-app.UseCors();
-app.UseAuthentication();
-app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>();
-app.UseAuthorization();
-app.MapControllers();
-app.ConfigureHangfireDashboard();
-app.Run();
+        var app = builder.Build();
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+            
+        }
+
+        // Configure the HTTP request pipeline
+        app.UseSwagger();
+        app.UseSwaggerUI();
+        //app.UseDeveloperExceptionPage();
+        app.UseHttpsRedirection();
+        app.UseRouting();
+        app.UseCors();
+        app.UseAuthentication();
+        app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
+        app.UseAuthorization();
+        app.MapControllers();
+        app.ConfigureHangfireDashboard();         
+        app.Run();
 

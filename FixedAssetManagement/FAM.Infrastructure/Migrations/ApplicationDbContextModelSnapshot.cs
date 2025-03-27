@@ -409,9 +409,8 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("AssetId");
 
-                    b.Property<string>("CustodianId")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(50)")
+                    b.Property<int>("CustodianId")
+                        .HasColumnType("int")
                         .HasColumnName("CustodianId");
 
                     b.Property<int>("DepartmentId")
@@ -428,9 +427,10 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("UnitId");
 
-                    b.Property<string>("UserID")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(50)")
+                    b.Property<int>("UserID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
                         .HasColumnName("UserId");
 
                     b.HasKey("Id");
@@ -784,8 +784,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("varchar(100)");
 
-                    b.Property<DateTimeOffset>("EndDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -839,8 +839,8 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(100)");
 
-                    b.Property<DateTimeOffset?>("ServiceLastClaimDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly?>("ServiceLastClaimDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("ServiceMobileNumber")
                         .IsRequired()
@@ -852,8 +852,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("ServiceStateId")
                         .HasColumnType("int");
 
-                    b.Property<DateTimeOffset>("StartDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("WarrantyProvider")
                         .IsRequired()

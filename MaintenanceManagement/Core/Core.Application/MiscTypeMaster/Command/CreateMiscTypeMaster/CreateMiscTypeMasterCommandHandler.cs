@@ -28,17 +28,17 @@ namespace Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster
         public async Task<ApiResponseDTO<GetMiscTypeMasterDto>> Handle(CreateMiscTypeMasterCommand request, CancellationToken cancellationToken)
         {
                // 🔹 Check if a MiscTypeMaster with the same name already exists
-            var existingMiscTypeMaster = await _miscTypeMasterQueryRepository.GetByMiscTypeMasterCodeAsync(request.MiscTypeCode);
+            // var existingMiscTypeMaster = await _miscTypeMasterQueryRepository.GetByMiscTypeMasterCodeAsync(request.MiscTypeCode);
 
-            if (existingMiscTypeMaster != null)
-            {
-                return new ApiResponseDTO<GetMiscTypeMasterDto>
-                {
-                    IsSuccess = false,
-                    Message = "Misc Type Master already exists",
-                    Data = null
-                };
-            }
+            // if (existingMiscTypeMaster != null)
+            // {
+            //     return new ApiResponseDTO<GetMiscTypeMasterDto>
+            //     {
+            //         IsSuccess = false,
+            //         Message = "Misc Type Master already exists",
+            //         Data = null
+            //     };
+            // }
 
             // 🔹 Map request to domain entity
             var miscTypeMaster = _imapper.Map<Core.Domain.Entities.MiscTypeMaster>(request);

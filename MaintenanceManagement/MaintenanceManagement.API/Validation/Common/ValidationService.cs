@@ -25,6 +25,9 @@ using MaintenanceManagement.API.Validation.MiscMaster;
 using MaintenanceManagement.API.Validation.MiscTypeMaster;
 using MaintenanceManagement.API.Validation.ShiftMaster;
 using MaintenanceManagement.API.Validation.ShiftMasterDetail;
+using Core.Application.MachineGroup.Command.DeleteMachineGroup;
+using Core.Application.MiscMaster.Command.DeleteMiscMaster;
+using Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -33,13 +36,16 @@ namespace MaintenanceManagement.API.Validation.Common
 
         public void AddValidationServices(IServiceCollection services)
         {
-            services.AddScoped<MaxLengthProvider>();
-            services.AddScoped<IValidator<CreateMachineGroupCommand>, CreateMachineGroupCommandValidator>();
-            services.AddScoped<IValidator<UpdateMachineGroupCommand>, UpdateMachineGroupCommandValidator>();   
-            services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
-            services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
-            services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
-            services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>(); 
+        services.AddScoped<MaxLengthProvider>();
+        services.AddScoped<IValidator<CreateMachineGroupCommand>, CreateMachineGroupCommandValidator>();
+        services.AddScoped<IValidator<DeleteMachineGroupCommand>, DeleteMachineGroupCommandValidator>();
+        services.AddScoped<IValidator<UpdateMachineGroupCommand>, UpdateMachineGroupCommandValidator>();   
+        services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
+        services.AddScoped<IValidator<DeleteMiscTypeMasterCommand>, DeleteMiscTypeMasterCommandValidator>();
+        services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
+        services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
+        services.AddScoped<IValidator<DeleteMiscMasterCommand>, DeleteMiscMasterCommandValidator>();
+        services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>(); 
         services.AddScoped<IValidator<CreateShiftMasterCommand>, CreateShiftMasterCommandValidator>();
         services.AddScoped<IValidator<UpdateShiftMasterCommand>, UpdateShiftMasterCommandValidator>();
         services.AddScoped<IValidator<DeleteShiftMasterCommand>, DeleteShiftMasterCommandValidator>();
