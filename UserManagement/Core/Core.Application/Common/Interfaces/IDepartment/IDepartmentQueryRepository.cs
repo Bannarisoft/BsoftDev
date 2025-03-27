@@ -13,6 +13,7 @@ namespace Core.Application.Common.Interfaces.IDepartment
   
         Task<Department> GetByIdAsync(int id);         
         Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync(string SearchDept);
+        Task<bool> FKColumnExistValidation(int Id);
 
     
          
