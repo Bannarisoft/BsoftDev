@@ -25,6 +25,14 @@ using MaintenanceManagement.API.Validation.MiscMaster;
 using MaintenanceManagement.API.Validation.MiscTypeMaster;
 using MaintenanceManagement.API.Validation.ShiftMaster;
 using MaintenanceManagement.API.Validation.ShiftMasterDetail;
+using Core.Application.MaintenanceCategory.Command.CreateMaintenanceCategory;
+using MaintenanceManagement.API.Validation.MaintenanceCategory;
+using Core.Application.MaintenanceCategory.Command.DeleteMaintenanceCategory;
+using Core.Application.MaintenanceCategory.Command.UpdateMaintenanceCategory;
+using MaintenanceManagement.API.Validation.MaintenanceType;
+using Core.Application.MaintenanceType.Command.CreateMaintenanceType;
+using Core.Application.MaintenanceType.Command.DeleteMaintenanceType;
+using Core.Application.MaintenanceType.Command.UpdateMaintenanceType;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -40,18 +48,24 @@ namespace MaintenanceManagement.API.Validation.Common
             services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
             services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
             services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>(); 
-        services.AddScoped<IValidator<CreateShiftMasterCommand>, CreateShiftMasterCommandValidator>();
-        services.AddScoped<IValidator<UpdateShiftMasterCommand>, UpdateShiftMasterCommandValidator>();
-        services.AddScoped<IValidator<DeleteShiftMasterCommand>, DeleteShiftMasterCommandValidator>();
-        services.AddScoped<IValidator<CreateShiftMasterDetailCommand>, CreateShiftMasterDetailCommandValidator>();
-        services.AddScoped<IValidator<UpdateShiftMasterDetailCommand>, UpdateShiftMasterDetailCommandValidator>();
-        services.AddScoped<IValidator<DeleteShiftMasterDetailCommand>, DeleteShiftMasterDetailCommandValidator>();
- 		services.AddScoped<IValidator<CreateCostCenterCommand>, CreateCostCenterCommandValidator>();
-        services.AddScoped<IValidator<UpdateCostCenterCommand>, UpdateCostCenterCommandValidator>();
-        services.AddScoped<IValidator<DeleteCostCenterCommand>, DeleteCostCenterCommandValidator>();
-        services.AddScoped<IValidator<CreateWorkCenterCommand>, CreateWorkCenterCommandValidator>();
-        services.AddScoped<IValidator<UpdateWorkCenterCommand>, UpdateWorkCenterCommandValidator>();
-        services.AddScoped<IValidator<DeleteWorkCenterCommand>, DeleteWorkCenterCommandValidator>();
+            services.AddScoped<IValidator<CreateShiftMasterCommand>, CreateShiftMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateShiftMasterCommand>, UpdateShiftMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteShiftMasterCommand>, DeleteShiftMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateShiftMasterDetailCommand>, CreateShiftMasterDetailCommandValidator>();
+            services.AddScoped<IValidator<UpdateShiftMasterDetailCommand>, UpdateShiftMasterDetailCommandValidator>();
+            services.AddScoped<IValidator<DeleteShiftMasterDetailCommand>, DeleteShiftMasterDetailCommandValidator>();
+            services.AddScoped<IValidator<CreateCostCenterCommand>, CreateCostCenterCommandValidator>();
+            services.AddScoped<IValidator<UpdateCostCenterCommand>, UpdateCostCenterCommandValidator>();
+            services.AddScoped<IValidator<DeleteCostCenterCommand>, DeleteCostCenterCommandValidator>();
+            services.AddScoped<IValidator<CreateWorkCenterCommand>, CreateWorkCenterCommandValidator>();
+            services.AddScoped<IValidator<UpdateWorkCenterCommand>, UpdateWorkCenterCommandValidator>();
+            services.AddScoped<IValidator<DeleteWorkCenterCommand>, DeleteWorkCenterCommandValidator>();
+            services.AddScoped<IValidator<CreateMaintenanceCategoryCommand>, CreateMaintenanceCategoryCommandValidator>();
+            services.AddScoped<IValidator<UpdateMaintenanceCategoryCommand>, UpdateMaintenanceCategoryCommandValidator>();
+            services.AddScoped<IValidator<DeleteMaintenanceCategoryCommand>, DeleteMaintenanceCategoryCommandValidator>();
+            services.AddScoped<IValidator<CreateMaintenanceTypeCommand>, CreateMaintenanceTypeCommandValidator>();
+            services.AddScoped<IValidator<UpdateMaintenanceTypeCommand>, UpdateMaintenanceTypeCommandValidator>();
+            services.AddScoped<IValidator<DeleteMaintenanceTypeCommand>, DeleteMaintenanceTypeCommandValidator>();
 
 
 
