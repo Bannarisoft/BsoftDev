@@ -7,9 +7,9 @@ using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Application.MachineGroup.Command.CreateMachineGroup;
 using Core.Application.MachineGroup.Command.DeleteMachineGroup;
 using Core.Application.MachineGroup.Command.UpdateMachineGroup;
-using Core.Application.MachineGroup.Quries.GetMachineGroup;
-using Core.Application.MachineGroup.Quries.GetMachineGroupAutoComplete;
-using Core.Application.MachineGroup.Quries.GetMachineGroupById;
+using Core.Application.MachineGroup.Queries.GetMachineGroup;
+using Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete;
+using Core.Application.MachineGroup.Queries.GetMachineGroupById;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +20,7 @@ namespace MaintenanceManagement.API.Controllers
     [Route("api/[controller]")]
     public class MachineGroupController : ApiControllerBase
     {
-        private readonly IMachineGroupCommandRepository _machineGroupCommandRepository;
+          private readonly IMachineGroupCommandRepository _machineGroupCommandRepository;
 
          private  readonly IValidator<CreateMachineGroupCommand>  _createMachineGroupCommandValidator;
          private readonly IValidator<UpdateMachineGroupCommand> _updateMachineGroupCommandValidator;
@@ -173,7 +173,7 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> GetMachineGroup([FromQuery] string? name)
         {
           
-            var miscmaster = await Mediator.Send(new GetMiscMasterAutoCompleteQuery {SearchPattern = name});
+            var miscmaster = await Mediator.Send(new GetMachineGroupAutoCompleteQuery {SearchPattern = name});
             if(miscmaster.IsSuccess)
             {
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = miscmaster.Data });

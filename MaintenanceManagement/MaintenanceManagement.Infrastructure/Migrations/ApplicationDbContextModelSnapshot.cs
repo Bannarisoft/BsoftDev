@@ -22,74 +22,101 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Core.Domain.Entities.ShiftMaster", b =>
+            modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActivityName")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("ActivityName");
+
+                    b.Property<int>("ActivityType")
+                        .HasColumnType("int")
+                        .HasColumnName("ActivityType");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("CreatedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
+
+                    b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("Description");
 
-                    b.Property<DateOnly>("EffectiveDate")
-                        .HasColumnType("date");
+                    b.Property<int>("EstimatedDuration")
+                        .HasColumnType("int")
+                        .HasColumnName("EstimatedDuration");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MachineGroupId")
+                        .HasColumnType("int")
+                        .HasColumnName("MachineGroupId");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("ModifiedDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("ShiftCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<string>("ShiftName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShiftMaster", "Maintenance");
+                    b.HasIndex("MachineGroupId");
+
+                    b.ToTable("ActivityMaster", "Maintenance");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ShiftMasterDetail", b =>
+            modelBuilder.Entity("Core.Domain.Entities.CostCenter", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BreakDurationInMinutes")
-                        .HasColumnType("int");
+                    b.Property<decimal?>("BudgetAllocated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0.00m);
+
+                    b.Property<string>("CostCenterCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("CostCenterCode");
+
+                    b.Property<string>("CostCenterName")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("CostCenterName");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -103,25 +130,21 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("CreatedIP")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(50)");
 
-                    b.Property<decimal>("DurationInHours")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
 
-                    b.Property<DateOnly>("EffectiveDate")
-                        .HasColumnType("date");
-
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time");
+                    b.Property<DateTimeOffset>("EffectiveDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("EffectiveDate");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
@@ -133,41 +156,24 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(50)");
 
-                    b.Property<int>("ShiftMasterId")
-                        .HasColumnType("int");
+                    b.Property<string>("Remarks")
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("Remarks");
 
-                    b.Property<int>("ShiftSupervisorId")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time");
+                    b.Property<string>("ResponsiblePerson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("ResponsiblePerson");
 
                     b.Property<int>("UnitId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ShiftMasterId");
-
-                    b.ToTable("ShiftMasterDetails", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.ShiftMasterDetail", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.ShiftMaster", "ShiftMaster")
-                        .WithMany("ShiftMasterDetails")
-                        .HasForeignKey("ShiftMasterId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ShiftMaster");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.ShiftMaster", b =>
-                {
-                    b.Navigation("ShiftMasterDetails");
+                    b.ToTable("CostCenter", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MachineGroup", b =>
@@ -352,44 +358,13 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("MiscTypeMaster", "Maintenance");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
-                        .WithMany("MiscMaster")
-                        .HasForeignKey("MiscTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("MiscTypeMaster");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
-                {
-                    b.Navigation("MiscMaster");
-                });
-   modelBuilder.Entity("Core.Domain.Entities.CostCenter", b =>
+            modelBuilder.Entity("Core.Domain.Entities.ShiftMaster", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("BudgetAllocated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(18,2)")
-                        .HasDefaultValue(0.00m);
-
-                    b.Property<string>("CostCenterCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("CostCenterCode");
-
-                    b.Property<string>("CostCenterName")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("CostCenterName");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -403,21 +378,18 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("CreatedIP")
                         .IsRequired()
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("varchar(255)");
 
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int")
-                        .HasColumnName("DepartmentId");
-
-                    b.Property<DateTimeOffset>("EffectiveDate")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("EffectiveDate");
+                    b.Property<DateOnly>("EffectiveDate")
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
@@ -429,24 +401,93 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("varchar(255)");
 
-                    b.Property<string>("Remarks")
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Remarks");
-
-                    b.Property<string>("ResponsiblePerson")
+                    b.Property<string>("ShiftCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("ResponsiblePerson");
+                        .HasColumnType("varchar(10)");
 
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("UnitId");
+                    b.Property<string>("ShiftName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("CostCenter", "Maintenance");
+                    b.ToTable("ShiftMaster", "Maintenance");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.ShiftMasterDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BreakDurationInMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<decimal>("DurationInHours")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateOnly>("EffectiveDate")
+                        .HasColumnType("date");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("ShiftMasterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShiftSupervisorId")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShiftMasterId");
+
+                    b.ToTable("ShiftMasterDetails", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.WorkCenter", b =>
@@ -511,6 +552,54 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WorkCenter", "Maintenance");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MachineGroup", "MachineGroup")
+                        .WithMany("ActivityMasters")
+                        .HasForeignKey("MachineGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MachineGroup");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
+                        .WithMany("MiscMaster")
+                        .HasForeignKey("MiscTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MiscTypeMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.ShiftMasterDetail", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.ShiftMaster", "ShiftMaster")
+                        .WithMany("ShiftMasterDetails")
+                        .HasForeignKey("ShiftMasterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ShiftMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MachineGroup", b =>
+                {
+                    b.Navigation("ActivityMasters");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
+                {
+                    b.Navigation("MiscMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.ShiftMaster", b =>
+                {
+                    b.Navigation("ShiftMasterDetails");
                 });
 #pragma warning restore 612, 618
         }

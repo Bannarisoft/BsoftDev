@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMachineGroup;
-using Core.Application.MachineGroup.Quries.GetMachineGroup;
+using Core.Application.MachineGroup.Queries.GetMachineGroup;
 using Core.Domain.Events;
 using MediatR;
 

@@ -19,7 +19,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                     v => v == Status.Active,                    
                     v => v ? Status.Active : Status.Inactive    
                 );
-            // ValueConverter for IsDelete (enum to bit)
+          
                 var isDeleteConverter = new ValueConverter<IsDelete, bool>(
                     v => v == IsDelete.Deleted,                 
                     v => v ? IsDelete.Deleted : IsDelete.NotDeleted
@@ -31,14 +31,10 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnName("Id")
                 .HasColumnType("int")
                 .IsRequired();
-
-            builder.Property(t => t.ActivityCode)
-                .HasColumnName("ActivityCode")
-                .HasColumnType("varchar(20)")
-                .IsRequired();
+            
             builder.Property(t => t.ActivityName)
                 .HasColumnName("ActivityName")
-                .HasColumnType("varchar(100)")
+                .HasColumnType("varchar(250)")
                 .IsRequired();
             builder.Property(t => t.Description)
                 .HasColumnName("Description")
@@ -49,9 +45,9 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(t => t.MachineGroup)
-                .HasColumnName("MachineGroup")
-                .HasColumnType("varchar(100)")
+            builder.Property(t => t.MachineGroupId)
+                .HasColumnName("MachineGroupId")
+                .HasColumnType("int")
                 .IsRequired();
 
             builder.Property(t => t.EstimatedDuration)
@@ -63,8 +59,11 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnName("ActivityType")
                 .HasColumnType("int")
                 .IsRequired();
-
-
+                // MachineGroup → ActivityMaster (One-to-Many Relationship)
+            builder.HasOne(am => am.MachineGroup)  // One MachineGroup per ActivityMaster
+            .WithMany(mg => mg.ActivityMasters) // One MachineGroup has many ActivityMasters
+            .HasForeignKey(am => am.MachineGroupId) // Foreign key in ActivityMaster
+            .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete   
 
 
                
