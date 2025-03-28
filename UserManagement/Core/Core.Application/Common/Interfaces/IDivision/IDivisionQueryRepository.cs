@@ -14,5 +14,6 @@ namespace Core.Application.Common.Interfaces.IDivision
         Task<List<Division>> GetDivision(string searchPattern, List<UserCompany> userCompanies);
         Task<Division?> GetByDivisionnameAsync(string name,int? id = null);
         Task<bool> SoftDeleteValidation(int Id); 
+        Task<bool> FKColumnExistValidation(int Id);
     }
 }

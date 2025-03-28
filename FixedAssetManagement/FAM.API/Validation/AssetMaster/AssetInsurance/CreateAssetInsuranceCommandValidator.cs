@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.AssetMaster.AssetInsurance.Commands.CreateAssetInsurance;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetInsurance;
 using FAM.API.Validation.Common;
 using FluentValidation;
 
@@ -11,11 +12,13 @@ namespace FAM.API.Validation.AssetMaster.AssetInsurance
     public class CreateAssetInsuranceCommandValidator  : AbstractValidator<CreateAssetInsuranceCommand>
     {
           private readonly List<ValidationRule> _validationRules;
-            public CreateAssetInsuranceCommandValidator()
+          private readonly IAssetInsuranceQueryRepository _assetInsuranceQueryRepository;
+            public CreateAssetInsuranceCommandValidator( IAssetInsuranceQueryRepository assetInsuranceQueryRepository)
         {    
             
             _validationRules = new List<ValidationRule>();
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _assetInsuranceQueryRepository = assetInsuranceQueryRepository;
                  if (!_validationRules.Any())
             {
                 throw new ArgumentException("Validation rules could not be loaded.");
@@ -57,6 +60,20 @@ namespace FAM.API.Validation.AssetMaster.AssetInsurance
 
                         
                         break;
+                    case "AlreadyExists":
+                           RuleFor(x => x.PolicyNo)
+                           .MustAsync(async (PolicyNo, cancellation) => !await _assetInsuranceQueryRepository.AlreadyExistsAsync(PolicyNo))
+                           .WithName("PolicyNo")
+                            .WithMessage($"{rule.Error}");
+                            break;
+
+                    case "ActivePolicy":
+                           RuleFor(x => x.AssetId)
+                           .MustAsync(async (AssetId, cancellation) => !await _assetInsuranceQueryRepository.ActiveInsuranceValidation(AssetId))
+                            .WithMessage($"{rule.Error}");
+                            break;
+                        default:
+                            break;
 
                 }
             }    

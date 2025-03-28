@@ -52,6 +52,7 @@ namespace Core.Application.Common.Mappings.AssetMaster
                 .ReverseMap();
              CreateMap<AssetInsuranceCombineDto, AssetInsurance>()
                 .ReverseMap();
+                
         }        
     }
 }

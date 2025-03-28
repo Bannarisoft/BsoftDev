@@ -150,6 +150,10 @@
     {
         "rule": "UserRole",             
         "error": " User does not have any role assigned to it. Contact your admin."
+    },
+    {
+        "rule": "FKColumnDelete",      
+        "error": "{PropertyName} is inactive/deleted."
     }
      
     

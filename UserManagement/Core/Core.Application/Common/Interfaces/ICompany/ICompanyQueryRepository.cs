@@ -15,6 +15,7 @@ namespace Core.Application.Common.Interfaces.ICompany
         Task<Company?> GetByCompanynameAsync(string name,int? id = null);
         Task<bool> CompanyExistsAsync(string companyName);
         Task<bool> SoftDeleteValidation(int Id); 
+        Task<bool> FKColumnExistValidation(int companyId);
        
     }
 }
