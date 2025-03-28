@@ -10,7 +10,7 @@ namespace Core.Application.AssetMaster.AssetDisposal.Queries.GetAssetDisposal
         public int Id { get; set; }
         public int AssetId { get; set; } 
         public int AssetPurchaseId { get; set; } 
-        public DateTimeOffset DisposalDate { get; set; }
+        public DateOnly DisposalDate { get; set; }
         public int? DisposalType { get; set; }  
         public string? DisposalReason { get; set; }
         public decimal? DisposalAmount { get; set; }

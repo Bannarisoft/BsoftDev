@@ -42,11 +42,11 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(dg => dg.StartDate)
-                .HasColumnType("datetimeoffset")                               
+                .HasColumnType("date")                               
                 .IsRequired();
 
             builder.Property(dg => dg.EndDate)   
-                .HasColumnType("datetimeoffset")                             
+                .HasColumnType("date")                             
                 .IsRequired();
 
             builder.Property(dg => dg.Period)
@@ -92,7 +92,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(b => b.RenewedDate)
-                .HasColumnType("datetimeoffset")
+                .HasColumnType("date")
                 .IsRequired(false);
 
              builder.Property(b => b.IsActive)                

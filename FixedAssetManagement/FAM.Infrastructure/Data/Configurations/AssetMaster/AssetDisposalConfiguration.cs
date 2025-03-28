@@ -53,7 +53,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(dg => dg.DisposalDate)
-                .HasColumnType("datetimeoffset")                               
+                .HasColumnType("date")                               
                 .IsRequired();
             
             builder.Property(dg => dg.DisposalType)
