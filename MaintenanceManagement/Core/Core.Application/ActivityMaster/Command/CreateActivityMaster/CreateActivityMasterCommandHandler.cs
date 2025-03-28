@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.ActivityMaster.Command.CreateActivityMaster
 {
-    public class CreateActivityMasterCommandHandler  : IRequestHandler<CreateActivityMasterCommand, ApiResponseDTO<GetAllActivityMasterDto>>
+    public class CreateActivityMasterCommandHandler  : IRequestHandler<CreateActivityMasterCommand, ApiResponseDTO<int>>
     {
         private readonly IActivityMasterCommandRepository _activityMasterCommandRepository;
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
@@ -29,48 +29,48 @@ namespace Core.Application.ActivityMaster.Command.CreateActivityMaster
             _mapper = mapper;
             _mediator = mediator;
         }
-
-        public async Task<ApiResponseDTO<GetAllActivityMasterDto>> Handle(CreateActivityMasterCommand request, CancellationToken cancellationToken)
-        {
-            // 🔹 Map request to domain entity
-            var activityMaster = _mapper.Map<Core.Domain.Entities.ActivityMaster>(request);
-
-            // 🔹 Insert into the database
-            var result = await _activityMasterCommandRepository.CreateAsync(activityMaster);
-
-            if (result.Id <= 0)
+        public async Task<ApiResponseDTO<int>> Handle(CreateActivityMasterCommand request, CancellationToken cancellationToken)
             {
-                return new ApiResponseDTO<GetAllActivityMasterDto>
+                
+
+                // 🔹 Map DTO to domain entity
+                var activityMaster = _mapper.Map<Core.Domain.Entities.ActivityMaster>(request.CreateActivityMasterDto);
+
+                // 🔹 Insert into the database
+               var createdActivityMaster = await _activityMasterCommandRepository.CreateAsync(activityMaster);
+
+                if (createdActivityMaster.Id <= 0)
                 {
-                    IsSuccess = false,
-                    Message = "Failed to create Activity",
-                    Data = null
+                    return new ApiResponseDTO<int>
+                    {
+                        IsSuccess = false,
+                        Message = "Failed to create Activity",
+                        Data = 0
+                    };
+                }
+
+                // 🔹 Publish domain event for auditing/logging
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "Create",
+                    actionCode: "ActivityMaster",
+                    actionName: "Activity Created",
+                    details: $"Activity was created.",
+                    module: "ActivityMaster"
+                );
+
+                await _mediator.Publish(domainEvent, cancellationToken);
+
+                // 🔹 Return success response
+                return new ApiResponseDTO<int>
+                {
+                    IsSuccess = true,
+                    Message = "Activity created successfully",
+                    Data = createdActivityMaster.Id
+                   
                 };
             }
 
-            // 🔹 Fetch newly created record
-            var createdActivityMaster = await _activityMasterQueryRepository.GetByIdAsync(result.Id);
-            var mappedResult = _mapper.Map<GetAllActivityMasterDto>(createdActivityMaster);
 
-            // 🔹 Publish domain event for auditing/logging
-            var domainEvent = new AuditLogsDomainEvent(
-                actionDetail: "Create",
-                actionCode: activityMaster.ActivityName,
-                actionName: "Activity Created",
-                details: $"Activity '{activityMaster.ActivityName}' was created.",
-                module: "ActivityMaster"
-            );
-
-            await _mediator.Publish(domainEvent, cancellationToken);
-
-            // 🔹 Return success response
-            return new ApiResponseDTO<GetAllActivityMasterDto>
-            {
-                IsSuccess = true,
-                Message = "Activity created successfully",
-                Data = mappedResult
-            };
-        }
-
+       
     }
 }

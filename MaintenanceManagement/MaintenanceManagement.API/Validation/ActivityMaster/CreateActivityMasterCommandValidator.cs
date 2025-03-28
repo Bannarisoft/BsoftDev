@@ -33,21 +33,21 @@ namespace MaintenanceManagement.API.Validation.ActivityMaster
                 { 
                   case "NotEmpty":
                         // Apply NotEmpty validation
-                        RuleFor(x => x.ActivityName)
+                        RuleFor(x => x.CreateActivityMasterDto.ActivityName)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateActivityMasterCommand.ActivityName)} {rule.Error}");
+                            .WithMessage($"{nameof(CreateActivityMasterCommand.CreateActivityMasterDto.ActivityName)} {rule.Error}");
                         break;
                   case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values
-                        RuleFor(x => x.ActivityName)
+                        RuleFor(x => x.CreateActivityMasterDto.ActivityName)
                             .MaximumLength(maxLength)
-                            .WithMessage($"{nameof(CreateActivityMasterCommand.ActivityName)} {rule.Error}"); 
+                            .WithMessage($"{nameof(CreateActivityMasterCommand.CreateActivityMasterDto.ActivityName)} {rule.Error}"); 
                             break;
                    case "AlreadyExists":
-                        RuleFor(x => x.ActivityName)
+                        RuleFor(x => x.CreateActivityMasterDto.ActivityName)
                             .MustAsync(async (activityname, cancellation) =>
                                 !await _activityMasterQueryRepository.GetByActivityNameAsync(activityname))
-                            .WithMessage("Group name already exists.");
+                            .WithMessage("Activity name already exists.");
                         break;    
 
 

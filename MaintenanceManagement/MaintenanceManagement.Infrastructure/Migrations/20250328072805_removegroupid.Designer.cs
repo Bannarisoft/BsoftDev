@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250328072805_removegroupid")]
+    partial class removegroupid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,32 +24,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Core.Domain.Entities.ActivityMachineGroup", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ActivityMasterId")
-                        .HasColumnType("int")
-                        .HasColumnName("ActivityMasterId");
-
-                    b.Property<int>("MachineGroupId")
-                        .HasColumnType("int")
-                        .HasColumnName("MachineGroupId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActivityMasterId");
-
-                    b.HasIndex("MachineGroupId");
-
-                    b.ToTable("ActivityMachineGroup", "Maintenance");
-                });
 
             modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
                 {
@@ -95,6 +72,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MachineGroupId")
                         .HasColumnType("int");
 
                     b.Property<int?>("ModifiedBy")
@@ -680,25 +660,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("WorkCenter", "Maintenance");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ActivityMachineGroup", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.ActivityMaster", "ActivityMaster")
-                        .WithMany("ActivityMachineGroups")
-                        .HasForeignKey("ActivityMasterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MachineGroup", "MachineGroup")
-                        .WithMany("ActivityMachineGroups")
-                        .HasForeignKey("MachineGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ActivityMaster");
-
-                    b.Navigation("MachineGroup");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
@@ -719,16 +680,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ShiftMaster");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
-                {
-                    b.Navigation("ActivityMachineGroups");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MachineGroup", b =>
-                {
-                    b.Navigation("ActivityMachineGroups");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>

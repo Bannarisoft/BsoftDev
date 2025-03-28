@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250328074348_ActivityMachineGroup")]
+    partial class ActivityMachineGroup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,18 +29,15 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ActivityMasterId")
-                        .HasColumnType("int")
-                        .HasColumnName("ActivityMasterId");
+                        .HasColumnType("int");
 
                     b.Property<int>("MachineGroupId")
-                        .HasColumnType("int")
-                        .HasColumnName("MachineGroupId");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -45,7 +45,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasIndex("MachineGroupId");
 
-                    b.ToTable("ActivityMachineGroup", "Maintenance");
+                    b.ToTable("ActivityMachineGroup");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
@@ -95,6 +95,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MachineGroupId")
                         .HasColumnType("int");
 
                     b.Property<int?>("ModifiedBy")
