@@ -19,7 +19,7 @@ namespace Core.Application.Common.Mappings.AssetMaster
             CreateMap<Core.Domain.Entities.AssetMaster.AssetInsurance, GetAssetInsuranceDto>(); 
 
             CreateMap<CreateAssetInsuranceCommand, Core.Domain.Entities.AssetMaster.AssetInsurance>()
-             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive))
              .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
             CreateMap<UpdateAssetInsuranceCommand , Core.Domain.Entities.AssetMaster.AssetInsurance>()
