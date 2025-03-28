@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250327060806_activitymaster")]
+    partial class activitymaster
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,8 +91,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MachineGroupId");
 
                     b.ToTable("ActivityMaster", "Maintenance");
                 });
@@ -554,17 +555,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("WorkCenter", "Maintenance");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.MachineGroup", "MachineGroup")
-                        .WithMany("ActivityMasters")
-                        .HasForeignKey("MachineGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("MachineGroup");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
@@ -585,11 +575,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ShiftMaster");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MachineGroup", b =>
-                {
-                    b.Navigation("ActivityMasters");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>

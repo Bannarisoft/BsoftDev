@@ -29,6 +29,8 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<MiscMaster> MiscMaster { get; set; }
         public DbSet<ShiftMaster> ShiftMaster { get; set; }
         public DbSet<ShiftMasterDetail> ShiftMasterDetail { get; set; }
+
+        public DbSet<ActivityMaster> ActivityMaster { get; set; }
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -43,6 +45,7 @@ namespace MaintenanceManagement.Infrastructure.Data
         
             modelBuilder.ApplyConfiguration(new CostCenterConfiguration());
             modelBuilder.ApplyConfiguration(new WorkCenterConfiguration());
+            modelBuilder.ApplyConfiguration(new ActivityMasterConfiguration());
 
 
             base.OnModelCreating(modelBuilder);

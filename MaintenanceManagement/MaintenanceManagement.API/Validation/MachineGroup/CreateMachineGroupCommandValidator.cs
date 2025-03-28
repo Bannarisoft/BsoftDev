@@ -11,7 +11,7 @@ namespace MaintenanceManagement.API.Validation.MachineGroup
 {
     public class CreateMachineGroupCommandValidator : AbstractValidator<CreateMachineGroupCommand>
     {
-          private readonly List<ValidationRule> _validationRules;            
+      private readonly List<ValidationRule> _validationRules;            
       private readonly IMachineGroupQueryRepository _machineGroupQueryRepository;   
         
         public CreateMachineGroupCommandValidator(IMachineGroupQueryRepository machineGroupQueryRepository ,MaxLengthProvider maxLengthProvider)

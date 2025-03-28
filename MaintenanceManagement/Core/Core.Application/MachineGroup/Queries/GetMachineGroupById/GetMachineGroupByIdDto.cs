@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static Core.Domain.Common.BaseEntity;
 
-namespace Core.Application.MachineGroup.Quries.GetMachineGroupById
+namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
 {
     public class GetMachineGroupByIdDto
     {

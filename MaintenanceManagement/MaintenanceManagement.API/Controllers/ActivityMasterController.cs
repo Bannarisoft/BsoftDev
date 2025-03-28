@@ -1,0 +1,123 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using Core.Application.ActivityMaster.Command.CreateActivityMaster;
+using Core.Application.ActivityMaster.Queries.GetAllActivityMaster;
+using Core.Application.Common.Interfaces.IActivityMaster;
+using Core.Application.MachineGroup.Queries.GetActivityMasterAutoComplete;
+using Core.Application.MachineGroup.Queries.GetMachineGroupById;
+using FluentValidation;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+
+namespace MaintenanceManagement.API.Controllers
+{
+     [Route("api/[controller]")]
+    public class ActivityMasterController : ApiControllerBase
+    {
+        private readonly IActivityMasterCommandRepository _activityMasterCommandRepository;
+
+         private  readonly IValidator<CreateActivityMasterCommand>  _createactivityMasterCommandValidator;
+
+        public ActivityMasterController(ISender mediator ,IActivityMasterCommandRepository activityMasterCommandRepository ,IValidator<CreateActivityMasterCommand> createactivityMasterCommandValidator   ):base(mediator)
+        {
+            _activityMasterCommandRepository = activityMasterCommandRepository;
+            _createactivityMasterCommandValidator = createactivityMasterCommandValidator;
+          
+        }
+
+            [HttpGet] 
+          public async Task<IActionResult> GetAllActivityMasterAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        {
+            var activitymaster = await Mediator.Send(
+            new GetAllActivityMasterQuery
+            {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
+           // var activecompanies = companies.Data.ToList(); 
+
+            return Ok(new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                data = activitymaster.Data,
+                TotalCount = activitymaster.TotalCount,
+                PageNumber = activitymaster.PageNumber,
+                PageSize = activitymaster.PageSize
+            });
+        }
+
+
+
+         [HttpGet("{id}")]
+        [ActionName(nameof(GetByIdAsync))]
+        public async Task<IActionResult> GetByIdAsync(int id)
+        {
+           
+            var activitymaster = await Mediator.Send(new GetActivityMasterByIdQuery() { Id = id});
+          
+             if(activitymaster.IsSuccess)
+            {
+                 return Ok(new { StatusCode=StatusCodes.Status200OK, data = activitymaster.Data,message=activitymaster.Message});
+            }
+
+            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"ActivityMaster ID {id} not found.", errors = "" });
+           
+        }
+         [HttpGet("by-name")]
+        public async Task<IActionResult> GetMachineGroup([FromQuery] string? name)
+        {
+          
+            var activitymaster = await Mediator.Send(new GetActivityMasterAutoCompleteQuery {SearchPattern = name});
+            if(activitymaster.IsSuccess)
+            {
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = activitymaster.Data });
+            }
+            return NotFound( new { StatusCode=activitymaster.Message}) ;
+        }
+        
+         [HttpPost]
+        public async Task<IActionResult> CreateAsync(CreateActivityMasterCommand command)
+        {
+             var validationResult = await _createactivityMasterCommandValidator.ValidateAsync(command);
+            
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+            }
+          
+            var response = await Mediator.Send(command);
+            if(response.IsSuccess)
+            {                             
+                return Ok(new 
+                {
+                     StatusCode=StatusCodes.Status201Created,
+                 message = response.Message,
+                  errors = "",
+                  data = response.Data 
+                  });
+            }
+             
+            
+            return BadRequest( new {
+                 StatusCode=StatusCodes.Status400BadRequest,
+                  message = response.Message, 
+                  errors = "" 
+                  });             
+        } 
+
+
+
+
+
+    }
+
+}

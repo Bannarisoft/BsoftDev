@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
 using MediatR;
 
-namespace Core.Application.MachineGroup.Quries.GetMachineGroupById
+namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
 {
     public class GetMachineGroupByIdQuery   :  IRequest<ApiResponseDTO<GetMachineGroupByIdDto>>
     {
