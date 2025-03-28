@@ -17,6 +17,8 @@ namespace Core.Domain.Entities
         public MiscMaster LabelType { get; set; }
         public byte IsRequired { get; set; }
         public IList<CustomFieldMenu> CustomFieldMenu { get; set; }
+        public IList<CustomFieldUnit> CustomFieldUnits { get; set; }
+        public IList<CustomFieldOptionalValue> CustomFieldOptionalValues { get; set; }
         
         
     }
