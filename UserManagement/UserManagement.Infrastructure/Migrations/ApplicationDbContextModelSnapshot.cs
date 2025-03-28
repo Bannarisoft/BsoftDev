@@ -630,6 +630,152 @@ namespace UserManagement.Infrastructure.Migrations
                     b.ToTable("Currency", "AppData");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.CustomField", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("DataTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("DataTypeId");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsRequired");
+
+                    b.Property<string>("LabelName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("LabelName");
+
+                    b.Property<int>("LabelTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("LabelTypeId");
+
+                    b.Property<int?>("Length")
+                        .HasColumnType("int")
+                        .HasColumnName("Length");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataTypeId");
+
+                    b.HasIndex("LabelTypeId");
+
+                    b.ToTable("CustomField", "AppData");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.CustomFieldMenu", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomFieldId")
+                        .HasColumnType("int")
+                        .HasColumnName("CustomFieldId");
+
+                    b.Property<int>("MenuId")
+                        .HasColumnType("int")
+                        .HasColumnName("MenuId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomFieldId");
+
+                    b.HasIndex("MenuId");
+
+                    b.ToTable("CustomFieldMenu", "AppData");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.CustomFieldOptionalValue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomFieldId")
+                        .HasColumnType("int")
+                        .HasColumnName("CustomFieldId");
+
+                    b.Property<string>("OptionFieldValue")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("OptionFieldValue");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomFieldId");
+
+                    b.ToTable("CustomFieldOptionalValue", "AppData");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.CustomFieldUnit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomFieldId")
+                        .HasColumnType("int")
+                        .HasColumnName("CustomFieldId");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomFieldId");
+
+                    b.HasIndex("UnitId");
+
+                    b.ToTable("CustomFieldUnit", "AppData");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Department", b =>
                 {
                     b.Property<int>("Id")
@@ -2280,6 +2426,74 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("company");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.CustomField", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "DataType")
+                        .WithMany("CustomFieldDataTypes")
+                        .HasForeignKey("DataTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "LabelType")
+                        .WithMany("CustomFieldLabelTypes")
+                        .HasForeignKey("LabelTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DataType");
+
+                    b.Navigation("LabelType");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.CustomFieldMenu", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.CustomField", "CustomField")
+                        .WithMany("CustomFieldMenu")
+                        .HasForeignKey("CustomFieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Menu", "Menu")
+                        .WithMany("CustomFieldMenus")
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CustomField");
+
+                    b.Navigation("Menu");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.CustomFieldOptionalValue", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.CustomField", "CustomField")
+                        .WithMany("CustomFieldOptionalValues")
+                        .HasForeignKey("CustomFieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CustomField");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.CustomFieldUnit", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.CustomField", "CustomField")
+                        .WithMany("CustomFieldUnits")
+                        .HasForeignKey("CustomFieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Unit", "Unit")
+                        .WithMany("CustomFieldUnits")
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CustomField");
+
+                    b.Navigation("Unit");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Division", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Company", "Company")
@@ -2628,6 +2842,15 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.CustomField", b =>
+                {
+                    b.Navigation("CustomFieldMenu");
+
+                    b.Navigation("CustomFieldOptionalValues");
+
+                    b.Navigation("CustomFieldUnits");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Department", b =>
                 {
                     b.Navigation("userDepartments");
@@ -2662,11 +2885,20 @@ namespace UserManagement.Infrastructure.Migrations
                 {
                     b.Navigation("ChildMenus");
 
+                    b.Navigation("CustomFieldMenus");
+
                     b.Navigation("RoleChildren");
 
                     b.Navigation("RoleMenus");
 
                     b.Navigation("RoleParents");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
+                {
+                    b.Navigation("CustomFieldDataTypes");
+
+                    b.Navigation("CustomFieldLabelTypes");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
@@ -2688,6 +2920,8 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Unit", b =>
                 {
+                    b.Navigation("CustomFieldUnits");
+
                     b.Navigation("UnitAddress");
 
                     b.Navigation("UnitContacts");

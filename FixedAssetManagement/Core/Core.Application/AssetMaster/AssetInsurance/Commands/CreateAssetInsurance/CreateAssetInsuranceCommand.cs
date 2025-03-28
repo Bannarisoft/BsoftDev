@@ -17,7 +17,7 @@ namespace Core.Application.AssetMaster.AssetInsurance.Commands.CreateAssetInsura
         public DateOnly EndDate { get; set; }
         public decimal PolicyAmount { get; set; }
         public string? VendorCode { get; set; }
-        public string? RenewalStatus { get; set; }
+        public int RenewalStatus { get; set; }
         public DateOnly RenewedDate { get; set; }
         public byte IsActive { get; set; }
         
