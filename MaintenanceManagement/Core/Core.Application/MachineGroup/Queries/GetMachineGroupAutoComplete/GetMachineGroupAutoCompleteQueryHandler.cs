@@ -8,9 +8,9 @@ using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Domain.Events;
 using MediatR;
 
-namespace Core.Application.MachineGroup.Quries.GetMachineGroupAutoComplete
+namespace Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete
 {
-    public class GetMiscMasterAutoCompleteQueryHandler : IRequestHandler<GetMiscMasterAutoCompleteQuery,ApiResponseDTO<List<GetMachineGroupAutoCompleteDto>>>
+    public class GetMachineGroupAutoCompleteQueryHandler : IRequestHandler<GetMachineGroupAutoCompleteQuery,ApiResponseDTO<List<GetMachineGroupAutoCompleteDto>>>
     {
 
         private readonly IMachineGroupQueryRepository  _machineGroupQueryRepository;
@@ -18,7 +18,7 @@ namespace Core.Application.MachineGroup.Quries.GetMachineGroupAutoComplete
         private readonly IMediator _mediator;
 
 
-         public GetMiscMasterAutoCompleteQueryHandler(IMachineGroupQueryRepository machineGroupQueryRepository , IMapper mapper, IMediator mediator)
+         public GetMachineGroupAutoCompleteQueryHandler(IMachineGroupQueryRepository machineGroupQueryRepository , IMapper mapper, IMediator mediator)
          {
            
             _machineGroupQueryRepository = machineGroupQueryRepository;
@@ -26,7 +26,7 @@ namespace Core.Application.MachineGroup.Quries.GetMachineGroupAutoComplete
             _mediator = mediator;
          }
 
-           public  async Task<ApiResponseDTO<List<GetMachineGroupAutoCompleteDto>>> Handle(GetMiscMasterAutoCompleteQuery request, CancellationToken cancellationToken)
+           public  async Task<ApiResponseDTO<List<GetMachineGroupAutoCompleteDto>>> Handle(GetMachineGroupAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var machineGroup  = await _machineGroupQueryRepository.GetMachineGroupAutoComplete(request.SearchPattern);
 

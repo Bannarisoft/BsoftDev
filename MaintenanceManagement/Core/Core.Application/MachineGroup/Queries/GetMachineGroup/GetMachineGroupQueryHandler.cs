@@ -8,7 +8,7 @@ using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Domain.Events;
 using MediatR;
 
-namespace Core.Application.MachineGroup.Quries.GetMachineGroup
+namespace Core.Application.MachineGroup.Queries.GetMachineGroup
 {
     public class GetMachineGroupQueryHandler : IRequestHandler<GetMachineGroupQuery, ApiResponseDTO<List<MachineGroupDto>>>
     {

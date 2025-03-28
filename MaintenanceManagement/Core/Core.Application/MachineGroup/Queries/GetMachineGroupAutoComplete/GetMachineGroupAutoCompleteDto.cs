@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Core.Application.MachineGroup.Quries.GetMachineGroupAutoComplete
+namespace Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete
 {
     public class GetMachineGroupAutoCompleteDto
     {

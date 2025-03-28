@@ -8,13 +8,14 @@ namespace Core.Domain.Entities
 {
     public class ActivityMaster : BaseEntity
     {      
-      public string? ActivityCode { get; set; }
+     
       public string? ActivityName { get; set; }
       public string? Description { get; set; }
       public int DepartmentId { get; set; }
-      public int MachineGroup { get; set; }
-      public decimal EstimatedDuration { get; set; }
-      public string? ActivityType { get; set; }    
-        
+      public int MachineGroupId { get; set; }
+      public int EstimatedDuration { get; set; }
+      public int ActivityType { get; set; }    
+
+      public MachineGroup? MachineGroup { get; set; }    
     }
 }

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
 using MediatR;
 
-namespace Core.Application.MachineGroup.Quries.GetMachineGroupAutoComplete
+namespace Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete
 {
-    public class GetMiscMasterAutoCompleteQuery :  IRequest<ApiResponseDTO<List<GetMachineGroupAutoCompleteDto>>>
+    public class GetMachineGroupAutoCompleteQuery :  IRequest<ApiResponseDTO<List<GetMachineGroupAutoCompleteDto>>>
     {
          public string? SearchPattern { get; set; }
     }

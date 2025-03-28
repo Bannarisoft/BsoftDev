@@ -28,6 +28,8 @@ using MaintenanceManagement.API.Validation.ShiftMasterDetail;
 using Core.Application.MachineGroup.Command.DeleteMachineGroup;
 using Core.Application.MiscMaster.Command.DeleteMiscMaster;
 using Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster;
+using Core.Application.ActivityMaster.Command.CreateActivityMaster;
+using MaintenanceManagement.API.Validation.ActivityMaster;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -58,6 +60,7 @@ namespace MaintenanceManagement.API.Validation.Common
         services.AddScoped<IValidator<CreateWorkCenterCommand>, CreateWorkCenterCommandValidator>();
         services.AddScoped<IValidator<UpdateWorkCenterCommand>, UpdateWorkCenterCommandValidator>();
         services.AddScoped<IValidator<DeleteWorkCenterCommand>, DeleteWorkCenterCommandValidator>();
+        services.AddScoped<IValidator<CreateActivityMasterCommand>, CreateActivityMasterCommandValidator>();
 
 
 
