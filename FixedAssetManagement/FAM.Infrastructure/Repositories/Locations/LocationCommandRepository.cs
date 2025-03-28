@@ -37,15 +37,15 @@ namespace FAM.Infrastructure.Repositories.Locations
             return location;
         }
 
-        public async Task<bool> DeleteAsync(int id, Location location)
+        public async Task<int> DeleteAsync(int id, Location location)
         {
             var existingLocation = await _applicationDbContext.Locations.FirstOrDefaultAsync(u => u.Id == id);
             if (existingLocation != null)
             {
                 existingLocation.IsDeleted = location.IsDeleted;
-                return await _applicationDbContext.SaveChangesAsync() >0;
+                return await _applicationDbContext.SaveChangesAsync();
             }
-            return false; 
+            return 0; 
         }
 
         public async Task<int> GetMaxSortOrderAsync()

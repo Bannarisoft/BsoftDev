@@ -140,40 +140,6 @@ namespace UserManagement.API.Controllers
                 });
             }
 
-            // var userId = Guid.NewGuid();
-            // var userCreatedEvent = new UserCreatedEvent(
-            //     CorrelationId: Guid.NewGuid(),   // Create a new CorrelationId
-            //     UserId: userId,                  // Pass the UserId from createUserCommand
-            //     Email: createUserCommand.EmailId // Pass the Email from createUserCommand
-            // );
-
-            // // Log the information
-            // _logger.LogInformation("Publishing IUserCreatedEvent for UserId: {UserId}, UserName: {UserName}, Email: {Email}",
-            //     userCreatedEvent.UserId, createUserCommand.UserName, createUserCommand.EmailId);
-
-            // Publish the event
-            // await _publishEndpoint.Publish(userCreatedEvent, context =>
-            // {
-            //     // Use ContentType object
-            //     context.ContentType = new System.Net.Mime.ContentType("application/json");
-            // });
-            //   // ? Create a proper event instance
-            //     var userCreatedEvent = new UserCreated(
-            //         CorrelationId: Guid.NewGuid(),
-            //         UserId: userId,
-            //         Email: createUserCommand.EmailId,
-            //         CreatedAt: DateTime.UtcNow
-            //     );
-
-            //     _logger.LogInformation("Publishing IUserCreated Event: {@UserCreated}", userCreatedEvent);
-
-            //     // ? Publish the event using a concrete class
-            //     await _publishEndpoint.Publish(userCreatedEvent, context =>
-            //     {
-            //         context.ContentType = "application/json";
-            //     });
-
-
             var response = await Mediator.Send(createUserCommand);
             if (response.IsSuccess)
             {
