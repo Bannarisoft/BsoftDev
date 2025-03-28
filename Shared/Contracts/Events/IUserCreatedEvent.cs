@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace Contracts.Events
 {
-    public interface IAssetReleased
+    public interface IUserCreatedEvent
     {
         Guid CorrelationId { get; }
-        Guid UserId { get; }
+        int UserId { get; }
+        string Email { get; }
     }
 }
