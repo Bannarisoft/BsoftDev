@@ -9,7 +9,7 @@ using Serilog;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces;
 using MassTransit;
-using Contracts.Events;
+using Contracts.Events.Users;
 
 
 namespace Core.Application.Users.Commands.CreateUser
@@ -115,18 +115,17 @@ namespace Core.Application.Users.Commands.CreateUser
             await _mediator.Publish(domainEvent, cancellationToken);
 
             // 🔥 Publish UserCreatedEvent to RabbitMQ
-            var correlationId = Guid.NewGuid();
             var userCreatedEvent = new UserCreatedEvent
             {
-                CorrelationId = correlationId,
                 UserId = createdUser.UserId,
+                UserName = createdUser.UserName,
                 Email = createdUser.EmailId
             };
 
             try
             {
                 await _publishEndpoint.Publish(userCreatedEvent, cancellationToken);
-                _logger.LogInformation("UserCreatedEvent published successfully for UserId: {UserId} with CorrelationId: {CorrelationId}", createdUser.UserId, correlationId);
+                _logger.LogInformation("UserCreatedEvent published successfully for UserId: {UserId}", createdUser.UserId);
             }
             catch (Exception ex)
             {

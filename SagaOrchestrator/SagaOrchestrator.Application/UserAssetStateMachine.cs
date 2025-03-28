@@ -34,14 +34,14 @@ namespace SagaOrchestrator.Application
             Event(() => AssetAssignedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
 
             Initially(
-                When(UserCreatedEvent)
-                    .Then(context =>
-                    {
-                        context.Saga.UserId = context.Message.UserId;
-                        Console.WriteLine($"UserCreatedEvent received. UserId: {context.Message.UserId}");
-                    })
-                    .TransitionTo(UserCreated)
-            );
+             When(UserCreatedEvent)
+                 .Then(context =>
+                 {
+                     context.Saga.UserId = context.Message.UserId;
+                     Console.WriteLine($"UserCreatedEvent received. UserId: {context.Message.UserId}");
+                 })
+                 .TransitionTo(UserCreated)
+         );
 
             During(UserCreated,
                 When(AssetAssignedEvent)
@@ -50,7 +50,7 @@ namespace SagaOrchestrator.Application
                         context.Saga.AssetId = context.Message.AssetId;
                         Console.WriteLine($"AssetAssignedEvent received. AssetId: {context.Message.AssetId}");
                     })
-                    .Finalize()
+                    .TransitionTo(AssetAssigned)
             );
 
             SetCompletedWhenFinalized();

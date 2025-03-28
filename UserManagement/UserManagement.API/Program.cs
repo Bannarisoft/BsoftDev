@@ -5,6 +5,7 @@ using UserManagement.API.Middleware;
 using UserManagement.API.Configurations;
 using Core.Domain.Entities;
 using MassTransit;
+using UserManagement.Infrastructure.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
@@ -35,8 +36,23 @@ var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
 
 // MassTransit Configuration
+// builder.Services.AddMassTransit(x =>
+// {
+//     x.UsingRabbitMq((context, cfg) =>
+//     {
+//         cfg.Host("localhost", "/", h =>
+//         {
+//             h.Username("guest");
+//             h.Password("guest");
+//         });
+//     });
+// });
+
+
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<UserCreatedEventConsumer>();
+
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host("localhost", "/", h =>
@@ -44,31 +60,14 @@ builder.Services.AddMassTransit(x =>
             h.Username("guest");
             h.Password("guest");
         });
+
+        cfg.ReceiveEndpoint("user-created-queue", e =>
+        {
+            e.ConfigureConsumer<UserCreatedEventConsumer>(context);
+        });
     });
 });
 
-
-// // Load RabbitMQ Configuration from appsettings.json
-// var rabbitMQSettings = builder.Configuration.GetSection("RabbitMQ");
-
-// // MassTransit - RabbitMQ Configuration
-// builder.Services.AddMassTransit(cfg =>
-// {
-//     cfg.UsingRabbitMq((context, config) =>
-//     {
-//         var rabbitHost = rabbitMQSettings["Host"];
-//         var rabbitUser = rabbitMQSettings["Username"];
-//         var rabbitPassword = rabbitMQSettings["Password"];
-
-//         config.Host(new Uri($"rabbitmq://{rabbitHost}"), h =>
-//         {
-//             h.Username(rabbitUser);
-//             h.Password(rabbitPassword);
-//         });
-
-//         config.ConfigureEndpoints(context);
-//     });
-// });
 
 // Register Services
 builder.Services.AddControllers();
