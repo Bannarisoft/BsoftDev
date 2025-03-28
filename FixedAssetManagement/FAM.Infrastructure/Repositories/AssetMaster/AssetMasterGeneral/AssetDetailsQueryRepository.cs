@@ -42,7 +42,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                   WHERE AL.AssetId = @AssetId;
 
                   -- Third Query: AssetPurchaseDetails (One-to-Many)
-                  SELECT AP.VendorCode, AP.VendorName,U.UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
+                  SELECT AP.Id,AP.VendorCode, AP.VendorName,U.UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
                   AP.GrnSno,AP.GrnValue,AP.PoNo,Cast(AP.PoDate AS date) AS PoDate,AP.PurchaseValue,AP.AcceptedQty,AP.Uom,
                   AP.PoSno,AP.ItemCode,AP.ItemName,AP.BillNo,Cast(AP.BillDate AS date) AS BillDate ,AP.BinLocation 
                   FROM [FixedAsset].[AssetPurchaseDetails] AP

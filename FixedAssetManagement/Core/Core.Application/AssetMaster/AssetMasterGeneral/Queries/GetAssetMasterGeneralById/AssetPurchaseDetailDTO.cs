@@ -7,6 +7,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
 {
     public class AssetPurchaseDetailDTO
     {
+        public int Id { get; set; }
         public string VendorCode { get; set; }
         public string VendorName { get; set; }
         public string UnitName { get; set; }
