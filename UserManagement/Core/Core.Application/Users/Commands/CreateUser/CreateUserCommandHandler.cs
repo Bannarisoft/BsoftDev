@@ -114,23 +114,23 @@ namespace Core.Application.Users.Commands.CreateUser
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            // 🔥 Publish UserCreatedEvent to RabbitMQ
-            var userCreatedEvent = new UserCreatedEvent
-            {
-                UserId = createdUser.UserId,
-                UserName = createdUser.UserName,
-                Email = createdUser.EmailId
-            };
+            // // 🔥 Publish UserCreatedEvent to RabbitMQ
+            // var userCreatedEvent = new UserCreatedEvent
+            // {
+            //     UserId = createdUser.UserId,
+            //     UserName = createdUser.UserName,
+            //     Email = createdUser.EmailId
+            // };
 
-            try
-            {
-                await _publishEndpoint.Publish(userCreatedEvent, cancellationToken);
-                _logger.LogInformation("UserCreatedEvent published successfully for UserId: {UserId}", createdUser.UserId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Error publishing UserCreatedEvent: {Message}", ex.Message);
-            }
+            // try
+            // {
+            //     await _publishEndpoint.Publish(userCreatedEvent, cancellationToken);
+            //     _logger.LogInformation("UserCreatedEvent published successfully for UserId: {UserId}", createdUser.UserId);
+            // }
+            // catch (Exception ex)
+            // {
+            //     _logger.LogError("Error publishing UserCreatedEvent: {Message}", ex.Message);
+            // }
             
             // Map the created user entity to DTO
             var userDto = _mapper.Map<UserDto>(createdUser);

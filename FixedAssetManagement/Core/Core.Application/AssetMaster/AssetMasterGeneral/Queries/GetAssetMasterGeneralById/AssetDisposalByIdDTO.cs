@@ -7,6 +7,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
 {
     public class AssetDisposalByIdDTO
     {
+        public int Id { get; set; }
         public string DisposalType { get; set; }
         public string DisposalDate { get; set; }
         public string DisposalReason { get; set; }
