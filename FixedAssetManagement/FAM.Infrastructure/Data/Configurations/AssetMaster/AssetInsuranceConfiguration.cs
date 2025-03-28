@@ -60,9 +60,8 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .IsRequired(false);
 
             builder.Property(ai => ai.RenewalStatus)  
-                .HasColumnType("varchar(50)")              
-                .HasMaxLength(50)
-                .IsRequired(false);
+                .HasColumnType("int")
+                .IsRequired();
 
             builder.Property(ai => ai.RenewedDate)
                 .HasColumnType("date")

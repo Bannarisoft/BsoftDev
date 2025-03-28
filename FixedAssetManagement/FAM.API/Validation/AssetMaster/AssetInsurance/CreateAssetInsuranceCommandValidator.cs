@@ -30,33 +30,39 @@ namespace FAM.API.Validation.AssetMaster.AssetInsurance
                 {
                     case "NotEmpty":
                         RuleFor(x => x.AssetId)
-                            .NotEmpty().WithMessage("Asset ID is required.");
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateAssetInsuranceCommand.AssetId)} {rule.Error}");
 
                         RuleFor(x => x.PolicyNo)
-                            .NotEmpty().WithMessage("Policy number is required.");
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateAssetInsuranceCommand.PolicyNo)} {rule.Error}");                             
 
                         RuleFor(x => x.StartDate)
-                            .LessThan(x => x.EndDate).WithMessage("Start date must be before end date.");
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateAssetInsuranceCommand.StartDate)} {rule.Error}");
+                           // .LessThan(x => x.EndDate).WithMessage("Start date must be before end date.");
 
-                        RuleFor(x => x.EndDate)
-                            .GreaterThan(x => x.StartDate).WithMessage("End date must be after start date.");
+                          RuleFor(x => x.EndDate)
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateAssetInsuranceCommand.EndDate)} {rule.Error}");
+                           // .GreaterThan(x => x.StartDate).WithMessage("End date must be after start date.");
 
-                        RuleFor(x => x.PolicyAmount)
-                            .Must(value => value >= 0) // Ensure it's a valid decimal value
-                            .WithMessage("PolicyAmount must be a positive number.");
-
-                        RuleFor(x => x.PolicyAmount)
-                            .ScalePrecision(3, 18) // Allows up to 2 decimal places
-                            .WithMessage("PolicyAmount must have up to 3 decimal places.");
+                        RuleFor(x => x.PolicyAmount)                           
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateAssetInsuranceCommand.PolicyAmount)} {rule.Error}");                                                                                                  
 
                         RuleFor(x => x.VendorCode)
-                            .NotEmpty().WithMessage("Vendor code is required.");
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateAssetInsuranceCommand.VendorCode)} {rule.Error}");
 
                         RuleFor(x => x.RenewedDate)
-                            .GreaterThanOrEqualTo(x => x.StartDate).WithMessage("Renewed date must be after or equal to the start date.");
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateAssetInsuranceCommand.RenewedDate)} {rule.Error}"); 
+                            
+                           
 
                         RuleFor(x => x.RenewalStatus)
-                            .NotEmpty().WithMessage("Renewal status is required.");
+                            .NotEmpty().WithMessage($"{nameof(CreateAssetInsuranceCommand.RenewalStatus)} {rule.Error}");
 
                         
                         break;
