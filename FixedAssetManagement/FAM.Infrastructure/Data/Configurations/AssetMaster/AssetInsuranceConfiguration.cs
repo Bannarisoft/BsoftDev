@@ -39,7 +39,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                .IsRequired();
               
             builder.Property(ai => ai.StartDate)
-               .HasColumnType("datetimeoffset")
+               .HasColumnType("date")
                .IsRequired();
 
             builder.Property(ai => ai.Insuranceperiod)
@@ -47,7 +47,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                     .IsRequired();
 
             builder.Property(ai => ai.EndDate)
-               .HasColumnType("datetimeoffset")
+               .HasColumnType("date")
                .IsRequired();
                
             builder.Property(ai => ai.PolicyAmount)
@@ -65,7 +65,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .IsRequired(false);
 
             builder.Property(ai => ai.RenewedDate)
-                .HasColumnType("datetimeoffset")
+                .HasColumnType("date")
                 .IsRequired();                          
 
             builder.Property(b => b.IsActive)
