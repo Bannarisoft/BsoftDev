@@ -62,6 +62,11 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
                          RuleFor(x => x.RenewalStatus)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateAssetAmcCommand.RenewalStatus)} {rule.Error}"); 
+                         RuleFor(x => x.IsActive)
+                            .NotNull()
+                            .WithMessage($"{nameof(CreateAssetAmcCommand.IsActive)} {rule.Error}")
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateAssetAmcCommand.IsActive)} {rule.Error}"); 
                         break;
                      case "MaxLength":
                         RuleFor(x => x.AssetId.ToString())
