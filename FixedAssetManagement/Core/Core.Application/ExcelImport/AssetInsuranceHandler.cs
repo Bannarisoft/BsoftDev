@@ -28,8 +28,8 @@ namespace Core.Application.ExcelImport
                 new AssetInsuranceCombineDto
                 {
                     PolicyNo = policyNo,
-                    StartDate = DateTimeOffset.TryParse(_worksheet.Cells[_row, 49].Value?.ToString(), out DateTimeOffset startDate) ? (DateTimeOffset?)startDate : null,
-                    EndDate = DateTimeOffset.TryParse(_worksheet.Cells[_row, 50].Value?.ToString(), out DateTimeOffset endDate) ? (DateTimeOffset?)endDate : null,
+                    StartDate = DateOnly.TryParse(_worksheet.Cells[_row, 49].Value?.ToString(), out DateOnly startDate) ? (DateOnly?)startDate : null,
+                    EndDate = DateOnly.TryParse(_worksheet.Cells[_row, 50].Value?.ToString(), out DateOnly endDate) ? (DateOnly?)endDate : null,
                     PolicyAmount = policyAmount.ToString(),
                     VendorCode = _worksheet.Cells[_row, 52].Value?.ToString()?.Trim() ?? string.Empty
                 }

@@ -13,7 +13,7 @@ namespace Core.Domain.Entities.AssetMaster
         public AssetMasterGenerals AssetMasterDisposal  { get; set; } = null!;
         public int AssetPurchaseId { get; set; } 
         public AssetPurchaseDetails AssetPurchaseDetails   { get; set; } = null!;
-        public DateTimeOffset DisposalDate { get; set; }
+        public DateOnly DisposalDate { get; set; }
         public int? DisposalType { get; set; }        
         public MiscMaster AssetMiscDisposalType { get; set; } = null!;  
         public string? DisposalReason { get; set; }
