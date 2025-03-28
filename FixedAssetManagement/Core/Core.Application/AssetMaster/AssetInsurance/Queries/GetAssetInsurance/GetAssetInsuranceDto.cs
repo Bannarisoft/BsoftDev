@@ -16,7 +16,7 @@ namespace Core.Application.AssetMaster.AssetInsurance.Queries.GetAssetInsurance
         public DateOnly EndDate { get; set; }
         public string? PolicyAmount { get; set; }
         public string? VendorCode { get; set; }
-        public string? RenewalStatus { get; set; }
+        public int RenewalStatus { get; set; }
         public DateOnly RenewedDate { get; set; }
         public Status IsActive { get; set; }
 
