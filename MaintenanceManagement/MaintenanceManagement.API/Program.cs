@@ -2,6 +2,8 @@ using Core.Application;
 using MaintenanceManagement.Infrastructure;
 using MaintenanceManagement.API.Configurations;
 using MaintenanceManagement.API.Validation.Common;
+using MassTransit;
+using MaintenanceManagement.Infrastructure.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,24 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration,builder.Services);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
+
+// MassTransit Configuration
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<DepartmentCreatedEventConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
