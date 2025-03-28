@@ -6,9 +6,9 @@ using AutoMapper;
 using Core.Application.MachineGroup.Command.CreateMachineGroup;
 using Core.Application.MachineGroup.Command.DeleteMachineGroup;
 using Core.Application.MachineGroup.Command.UpdateMachineGroup;
-using Core.Application.MachineGroup.Quries.GetMachineGroup;
-using Core.Application.MachineGroup.Quries.GetMachineGroupAutoComplete;
-using Core.Application.MachineGroup.Quries.GetMachineGroupById;
+using Core.Application.MachineGroup.Queries.GetMachineGroup;
+using Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete;
+using Core.Application.MachineGroup.Queries.GetMachineGroupById;
 using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.Common.Mappings
