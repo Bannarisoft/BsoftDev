@@ -7,6 +7,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
 {
     public class AssetInsuranceByIdDTO
     {
+        public int Id { get; set; }
         public string PolicyNo { get; set; }
         public string StartDate { get; set; }
         public string EndDate { get; set; }

@@ -137,6 +137,20 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetAmc
 
                 return vendorDetailsList?.ToList() ?? new List<ExistingVendorDetails>();
         }
+         public async Task<bool> ActiveAMCValidation(int AssetId, int? id = null)
+        {   
+
+              var query = "SELECT COUNT(1) FROM FixedAsset.AssetAmc   WHERE AssetId = @AssetId AND IsDeleted = 0 AND IsActive = 1 ";
+                var parameters = new DynamicParameters(new { AssetId = AssetId });
+
+             if (id is not null)
+             {
+                 query += " AND Id != @Id";
+                 parameters.Add("Id", id);
+             }
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+        }
 
     
     }

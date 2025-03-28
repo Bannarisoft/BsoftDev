@@ -12,6 +12,7 @@ using Core.Application.AdminSecuritySettings.Queries.GetAdminSecuritySettingsByI
 using Core.Application.Common.Interfaces.IUser;
 using Infrastructure;
 using Core.Application.Common.Interfaces;
+using Core.Application.UserLogin.Commands.DeactivateUserSession;
 
 namespace UserManagement.API.Controllers
 {
@@ -27,15 +28,17 @@ namespace UserManagement.API.Controllers
         private readonly IUserSessionRepository _userSessionRepository;        
         private readonly IUserQueryRepository _userQueryRepository;
         private readonly ITimeZoneService _timeZoneService;
+        private readonly IValidator<DeactivateUserSessionCommand> _deactivateUserSessionCommandValidator;
 
-        public AuthController(IMediator mediator,IValidator<UserLoginCommand> userLoginCommandValidator,  ILogger<AuthController> logger,IUserSessionRepository userSessionRepository, IUserQueryRepository userQueryRepository, ITimeZoneService timeZoneService)
+        public AuthController(IMediator mediator,IValidator<UserLoginCommand> userLoginCommandValidator,  ILogger<AuthController> logger,IUserSessionRepository userSessionRepository, IUserQueryRepository userQueryRepository, ITimeZoneService timeZoneService, IValidator<DeactivateUserSessionCommand> deactivateUserSessionCommandValidator)
         {
             _mediator = mediator;
             _userLoginCommandValidator = userLoginCommandValidator;
             _logger = logger;
             _userSessionRepository = userSessionRepository;            
             _userQueryRepository = userQueryRepository; 
-            _timeZoneService = timeZoneService;           
+            _timeZoneService = timeZoneService; 
+            _deactivateUserSessionCommandValidator = deactivateUserSessionCommandValidator;          
         }
 
         [HttpPost("login")]
@@ -140,6 +143,29 @@ namespace UserManagement.API.Controllers
             {
                 StatusCode = StatusCodes.Status200OK,
                 Message = $"All sessions for user {userId} have been deactivated."
+            });
+        }
+         [HttpPost("deactivate-user-sessionByUsername")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeactivateUserSessionsByUsername([FromBody] DeactivateUserSessionCommand command)
+        {
+              var validationResult = await _deactivateUserSessionCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest, 
+                    message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+            }
+            var UserSession = await _mediator.Send(command);
+            
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = $"All sessions for user {command.Username} have been deactivated."
             });
         }
         

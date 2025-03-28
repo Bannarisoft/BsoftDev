@@ -75,6 +75,7 @@ using Core.Application.UserGroup.Commands.CreateUserGroup;
 using Core.Application.UserGroup.Commands.UpdateUesrGroup;
 using Core.Application.UserGroup.Commands.DeleteUserGroup;
 using UserManagement.API.Validation.UserGroup;
+using Core.Application.UserLogin.Commands.DeactivateUserSession;
 namespace UserManagement.API.Validation.Common
 {
     public class ValidationService
@@ -137,6 +138,7 @@ namespace UserManagement.API.Validation.Common
         services.AddScoped<IValidator<DeleteUserGroupCommand>, DeleteUserGroupCommandValidator>();
         services.AddScoped<IValidator<ForgotUserPasswordCommand>, ForgotPasswordCommandValidator>();
         services.AddScoped<IValidator<ResetUserPasswordCommand>, ResetUserPasswordCommandValidator>();
+        services.AddScoped<IValidator<DeactivateUserSessionCommand>, DeactivateUserSessionCommandValidator>();
          }  
     }
 }

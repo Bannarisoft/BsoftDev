@@ -60,6 +60,10 @@ namespace UserManagement.Infrastructure.Data
         public DbSet<UserDepartment> UserDepartment {get; set;}
         public DbSet<MiscMaster> MiscMaster { get; set; } 
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
+        public DbSet<CustomField> CustomField { get; set; }
+        public DbSet<CustomFieldOptionalValue> CustomFieldOptionalValue { get; set; }
+        public DbSet<CustomFieldUnit> CustomFieldUnit { get; set; }
+        public DbSet<CustomFieldMenu> CustomFieldMenu { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -106,6 +110,10 @@ namespace UserManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UserDepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomFieldConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomFieldOptionalValueConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomFieldUnitConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomFieldMenuConfiguration());
             
                
             base.OnModelCreating(modelBuilder);

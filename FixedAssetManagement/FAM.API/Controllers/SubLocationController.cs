@@ -168,8 +168,8 @@ namespace FAM.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data =$"SubLocation ID {id} Deleted" ,
-                message = deletedsublocation.Message
+                data =$"SubLocation ID {id} Deleted",
+                message = deletedsublocation.Message 
             });
     }
     [HttpGet("by-name")]

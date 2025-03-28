@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
 using FAM.API.Validation.Common;
 using FluentValidation;
 
@@ -11,7 +12,8 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
     public class UpdateAssetAmcCommandValidator : AbstractValidator<UpdateAssetAmcCommand>
     {
          private readonly List<ValidationRule> _validationRules;
-           public UpdateAssetAmcCommandValidator(MaxLengthProvider maxLengthProvider)
+         private readonly IAssetAmcQueryRepository _assetAmcQueryRepository;
+           public UpdateAssetAmcCommandValidator(MaxLengthProvider maxLengthProvider, IAssetAmcQueryRepository assetAmcQueryRepository)
         {
            
             var AssetId = maxLengthProvider.GetMaxLength<Core.Domain.Entities.AssetMaster.AssetAmc>("AssetId") ?? 10;
@@ -27,6 +29,7 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
 
                // Load validation rules from JSON or another source
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _assetAmcQueryRepository = assetAmcQueryRepository;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -55,7 +58,12 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
                             .WithMessage($"{nameof(UpdateAssetAmcCommand.CoverageType)} {rule.Error}"); 
                          RuleFor(x => x.RenewalStatus)
                             .NotEmpty()
-                            .WithMessage($"{nameof(UpdateAssetAmcCommand.RenewalStatus)} {rule.Error}"); 
+                            .WithMessage($"{nameof(UpdateAssetAmcCommand.RenewalStatus)} {rule.Error}");
+                         RuleFor(x => x.IsActive)
+                            .NotNull()
+                            .WithMessage($"{nameof(UpdateAssetAmcCommand.IsActive)} {rule.Error}")
+                            .NotEmpty()
+                            .WithMessage($"{nameof(UpdateAssetAmcCommand.IsActive)} {rule.Error}");  
                         break;
                      case "MaxLength":
                         RuleFor(x => x.Period.ToString())
@@ -96,7 +104,12 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
                             .When(x => !string.IsNullOrEmpty(x.VendorEmail))
                             .WithMessage($"{nameof(VendorEmail)} {rule.Error}");
                              break;
-
+                     case "ActivePolicy":
+                           RuleFor(x => new { x.AssetId, x.Id })
+                           .MustAsync(async (insurance, cancellation) => !await _assetAmcQueryRepository.ActiveAMCValidation(insurance.AssetId, insurance.Id))
+                            .WithMessage($"{rule.Error}")
+                            .When(x => x.IsActive == 1);
+                            break;
                         default:
                         // Handle unknown rule (log or throw)
                         Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");

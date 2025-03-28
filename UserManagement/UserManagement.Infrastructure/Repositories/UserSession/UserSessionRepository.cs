@@ -90,5 +90,16 @@ namespace UserManagement.Infrastructure.Repositories
                 var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { username = username, currentTime = currentTime });
                 return count > 0;
           }
+           public async Task<bool> DeactivateUserSessionsByUsername(string username)
+           {
+                var user = await _applicationDbContext.User
+                                   .FirstOrDefaultAsync(u => u.UserName == username);
+               var sessions = await _applicationDbContext.UserSession.Where(s => s.UserId == user.UserId && s.IsActive==1).ToListAsync();
+               foreach (var session in sessions)
+               {
+                   session.IsActive = 0;
+               }
+              return await _applicationDbContext.SaveChangesAsync() > 0;
+           }
     }
 }
