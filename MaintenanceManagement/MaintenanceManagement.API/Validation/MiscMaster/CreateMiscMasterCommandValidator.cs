@@ -5,19 +5,25 @@ using System.Threading.Tasks;
 using Core.Application.MiscMaster.Command.CreateMiscMaster;
 using MaintenanceManagement.API.Validation.Common;
 using FluentValidation;
+using Core.Application.Common.Interfaces.IMiscMaster;
 
 namespace MaintenanceManagement.API.Validation.MiscMaster
 {
     public class CreateMiscMasterCommandValidator  : AbstractValidator<CreateMiscMasterCommand>
     {
             private readonly List<ValidationRule> _validationRules;
+            private readonly IMiscMasterQueryRepository _miscMasterQuery;
 
-         public CreateMiscMasterCommandValidator(MaxLengthProvider maxLengthProvider)
+         public CreateMiscMasterCommandValidator( IMiscMasterQueryRepository miscMasterQuery,MaxLengthProvider maxLengthProvider)
         {
+
+           
+
             var MiscCodeMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.MiscMaster>("Code") ?? 50;
             var DescriptionMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.MiscMaster>("Description")?? 250;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+             _miscMasterQuery = miscMasterQuery;
             if (_validationRules == null || !_validationRules.Any())
             {
                       throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -46,6 +52,12 @@ namespace MaintenanceManagement.API.Validation.MiscMaster
                         RuleFor(x => x.Description)
                             .MaximumLength(DescriptionMaxLength)
                             .WithMessage($"{nameof(CreateMiscMasterCommand.Description)} {rule.Error}");
+                        break;
+                        case "AlreadyExists":
+                           RuleFor(x => x.Code)
+                           .MustAsync(async (Code, cancellation) => !await _miscMasterQuery.AlreadyExistsAsync(Code))
+                           .WithName("Misc Code")
+                            .WithMessage($"{rule.Error}");
                         break;
                         
                 }

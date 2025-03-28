@@ -24,7 +24,8 @@ namespace Core.Application.Users.Commands.UpdateUser
     public List<UserDivisionDTO> userDivisions { get; set; }
     public List<UserCompanyDTO> UserCompanies  { get; set; }
     public List<UserRoleAllocationDTO> userRoleAllocations { get; set; }
-    public List<UserUnitDTO> userUnits { get; set; } 
+    public List<UserUnitDTO> userUnits { get; set; }
+    public List<UserDepartmentDTO> userDepartments { get; set; } 
 
     }
 }

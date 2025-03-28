@@ -32,6 +32,9 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<MaintenanceType> MaintenanceType { get; set; }
         public DbSet<MaintenanceCategory> MaintenanceCategory { get; set; }
 
+        public DbSet<ActivityMaster> ActivityMaster { get; set; }
+       
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 
         {            
@@ -46,6 +49,7 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new WorkCenterConfiguration());
             modelBuilder.ApplyConfiguration(new MaintenanceTypeConfiguration());
             modelBuilder.ApplyConfiguration(new MaintenanceCategoryConfiguration());
+            modelBuilder.ApplyConfiguration(new ActivityMasterConfiguration());
 
 
             base.OnModelCreating(modelBuilder);

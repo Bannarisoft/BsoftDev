@@ -41,7 +41,9 @@ namespace Core.Application.Common.Mappings.AssetMaster
 
             // **Add these mappings to clear your error:**
             CreateMap<AssetPurchaseCombineDto, AssetPurchaseDetails>()
-                .ReverseMap();
+             .ForMember(dest => dest.CapitalizationDate,
+                       opt => opt.MapFrom(src => src.CapitalizationDate.ToDateTime(TimeOnly.MinValue)));
+               // .ReverseMap();
             CreateMap<AssetLocationCombineDto, Core.Domain.Entities.AssetMaster.AssetLocation>()
                 .ReverseMap(); 
             CreateMap<AssetAdditionalCostCombineDto, Core.Domain.Entities.AssetPurchase.AssetAdditionalCost>()
@@ -50,6 +52,7 @@ namespace Core.Application.Common.Mappings.AssetMaster
                 .ReverseMap();
              CreateMap<AssetInsuranceCombineDto, AssetInsurance>()
                 .ReverseMap();
+                
         }        
     }
 }

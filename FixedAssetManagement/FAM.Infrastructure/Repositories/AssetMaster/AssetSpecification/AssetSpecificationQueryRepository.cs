@@ -16,94 +16,185 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
         }     
         //public async Task<(List<AssetSpecificationDTO>, int)> GetAllAssetSpecificationAsync(int PageNumber, int PageSize, string? SearchTerm)
                     
-        public async Task<(List<AssetSpecificationJsonDto>, int)> GetAllAssetSpecificationAsync(int PageNumber, int PageSize, string? SearchTerm)
+   public async Task<(List<AssetSpecificationJsonDto>, int)> GetAllAssetSpecificationAsync(int PageNumber, int PageSize, string? SearchTerm)
+    {
+        var parameters = new
         {
-            var parameters = new
-            {
-                PageNumber,
-                PageSize,
-                SearchTerm = string.IsNullOrEmpty(SearchTerm) ? null : SearchTerm
-            };
+            PageNumber = (PageNumber - 1) * PageSize,
+            PageSize,
+            SearchTerm = string.IsNullOrEmpty(SearchTerm) ? null : $"%{SearchTerm}%"
+        };
 
-            using var multi = await _dbConnection.QueryMultipleAsync("FAM_GetAssetSpecifications", parameters, commandType: CommandType.StoredProcedure);
+        var assetDictionary = new Dictionary<int, AssetSpecificationJsonDto>();
+            var query = @"
+            SELECT 
+            s.AssetId, a.AssetCode, a.AssetName,
+            s.SpecificationId, SM.SpecificationName , s.SpecificationValue 
+            FROM FixedAsset.AssetSpecifications S  
+            INNER JOIN FixedAsset.AssetMaster A ON A.Id = S.AssetId   
+            INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = S.SpecificationId  
+            WHERE A.IsDeleted = 0  
+            and (@SearchTerm IS NULL OR a.AssetName LIKE @SearchTerm OR a.AssetCode LIKE @SearchTerm)
+            ORDER BY s.AssetId
+            OFFSET @PageNumber ROWS FETCH NEXT @PageSize ROWS ONLY;
 
-            // Read JSON result
-            string jsonResult = await multi.ReadFirstOrDefaultAsync<string>(); // JSON Data
-            int totalCount = await multi.ReadFirstAsync<int>(); // Total Count
+            SELECT COUNT(*) 
+            FROM FixedAsset.AssetSpecifications S  
+            INNER JOIN FixedAsset.AssetMaster A ON A.Id = S.AssetId   
+            INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = S.SpecificationId  
+            WHERE A.IsDeleted = 0  
+            and (@SearchTerm IS NULL OR SM.SpecificationName LIKE @SearchTerm OR s.SpecificationValue  LIKE @SearchTerm  OR a.AssetName LIKE @SearchTerm OR a.AssetCode LIKE @SearchTerm);
+            ";
 
-            // Ensure JSON is properly deserialized with nested specifications
-            var assetSpecificationsList = string.IsNullOrWhiteSpace(jsonResult)
-                ? new List<AssetSpecificationJsonDto>()
-                : JsonSerializer.Deserialize<List<AssetSpecificationJsonDto>>(jsonResult, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
+        List<dynamic> assetResult;
+        int totalRecords;
 
-            return (assetSpecificationsList ?? new List<AssetSpecificationJsonDto>(), totalCount);
+        using (var multi = await _dbConnection.QueryMultipleAsync(query, parameters))
+        {
+            // Read all results before processing
+            assetResult = (await multi.ReadAsync()).ToList();
+            totalRecords = await multi.ReadSingleAsync<int>();
         }
+
+        // Process all data after reading from the GridReader
+        foreach (var row in assetResult)
+        {
+            int assetId = row.AssetId;
+
+            if (!assetDictionary.TryGetValue(assetId, out var assetEntry))
+            {
+                assetEntry = new AssetSpecificationJsonDto
+                {
+                    AssetId = assetId,
+                    AssetCode = row.AssetCode,
+                    AssetName = row.AssetName,
+                    Specifications = new List<SpecificationDto>()
+                };
+                
+                assetDictionary.Add(assetId, assetEntry);
+            }
+
+            // If the row contains specification data, add it to the specifications list
+            if (row.SpecificationId != null)
+            {
+                assetEntry.Specifications.Add(new SpecificationDto
+                {
+                    SpecificationId = row.SpecificationId,
+                    SpecificationName = row.SpecificationName,
+                    SpecificationValue = row.SpecificationValue
+                });
+            }
+        }
+
+        return (assetDictionary.Values.ToList(), totalRecords);
+    }
 
         public async Task<List<AssetSpecificationJsonDto>> GetByAssetSpecificationNameAsync(string searchPattern)
         {
-            const string query = @"
-                SELECT (SELECT AM.Id AS AssetId,AM.AssetCode,AM.AssetName,MM.ManufactureName,(
-                SELECT A.Id AS SpecificationId,A.SpecificationValue,SM.SpecificationName 
-                FROM FixedAsset.AssetSpecifications A
-                INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = A.SpecificationId
-                WHERE A.AssetId = AM.Id AND A.IsDeleted = 0 
-                 FOR JSON PATH ) AS Specifications
-                FROM FixedAsset.AssetMaster AM
-                INNER JOIN FixedAsset.AssetSpecifications A ON A.AssetId = AM.Id
-                INNER JOIN FixedAsset.Manufacture MM ON MM.Id = A.ManufactureId
-                INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = A.SpecificationId
-                WHERE (AM.AssetCode LIKE '%' + @searchPattern + '%'                 
-                OR SM.SpecificationName LIKE '%' + @searchPattern + '%'   )
-                AND A.IsDeleted = 0  AND A.IsActive = 1
-                GROUP BY AM.Id, AM.AssetCode, AM.AssetName, MM.ManufactureName
-                FOR JSON PATH, INCLUDE_NULL_VALUES
-                ) AS JsonResult;";            
-           // ✅ Fetch JSON as string
-            string jsonResult = await _dbConnection.QueryFirstOrDefaultAsync<string>(query, new { SearchPattern = $"%{searchPattern}%" });
+            var parameters = new
+            {
+                SearchPattern = string.IsNullOrEmpty(searchPattern) ? null : $"%{searchPattern}%"
+            };
 
-            if (string.IsNullOrWhiteSpace(jsonResult))
+            var assetDictionary = new Dictionary<int, AssetSpecificationJsonDto>();
+
+
+            var query = @"
+                SELECT 
+                s.AssetId, a.AssetCode, a.AssetName,
+                s.SpecificationId, SM.SpecificationName , s.SpecificationValue 
+                FROM FixedAsset.AssetSpecifications S  
+                INNER JOIN FixedAsset.AssetMaster A ON A.Id = S.AssetId   
+                INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = S.SpecificationId  
+                WHERE A.IsDeleted = 0  
+                and (@searchPattern IS NULL OR sM.SpecificationName LIKE @searchPattern OR s.SpecificationValue  LIKE @searchPattern OR a.AssetName LIKE @searchPattern OR a.AssetCode LIKE @searchPattern)
+                ORDER BY s.AssetId ";
+
+            List<dynamic> assetResult;
+            using (var multi = await _dbConnection.QueryMultipleAsync(query, parameters))
             {
-                return new List<AssetSpecificationJsonDto>();
+                assetResult = (await multi.ReadAsync()).ToList();
             }
-            // ✅ Deserialize JSON manually
-            var assetSpecificationsList = JsonSerializer.Deserialize<List<AssetSpecificationJsonDto>>(jsonResult, new JsonSerializerOptions
+
+            foreach (var row in assetResult)
             {
-                PropertyNameCaseInsensitive = true
-            });
-            return assetSpecificationsList ?? new List<AssetSpecificationJsonDto>();
+                int assetId = row.AssetId;
+
+                if (!assetDictionary.TryGetValue(assetId, out var assetEntry))
+                {
+                    assetEntry = new AssetSpecificationJsonDto
+                    {
+                        AssetId = assetId,
+                        AssetCode = row.AssetCode,
+                        AssetName = row.AssetName,
+                        Specifications = new List<SpecificationDto>()
+                    };
+                    assetDictionary.Add(assetId, assetEntry);
+                }
+
+                if (row.SpecificationId != null)
+                {
+                    assetEntry.Specifications.Add(new SpecificationDto
+                    {
+                        SpecificationId = row.SpecificationId,
+                        SpecificationName = row.SpecificationName,
+                        SpecificationValue = row.SpecificationValue
+                    });
+                }
+            }
+            return assetDictionary.Values.ToList();
         }
         public async Task<AssetSpecificationJsonDto> GetByIdAsync(int assetId)
         {
-            const string query = @"
-                SELECT AM.Id AS AssetId,AM.AssetCode,AM.AssetName,MM.ManufactureName,(
-                SELECT A.Id AS SpecificationId,A.SpecificationValue,SM.SpecificationName
-                FROM FixedAsset.AssetSpecifications A
-                INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = A.SpecificationId
-                WHERE A.AssetId = AM.Id AND A.IsDeleted = 0 FOR JSON PATH ) AS Specifications
-                FROM FixedAsset.AssetMaster AM
-                left JOIN FixedAsset.AssetSpecifications A ON A.AssetId = AM.Id
-                INNER JOIN FixedAsset.Manufacture MM ON MM.Id = A.ManufactureId
-                WHERE A.Id =@assetId AND A.IsDeleted = 0 
-                GROUP BY AM.Id,A.Id, AM.AssetCode, AM.AssetName, MM.ManufactureName
-                FOR JSON PATH, INCLUDE_NULL_VALUES;";
-             // ✅ Fetch JSON as string
-            string jsonResult = await _dbConnection.QueryFirstOrDefaultAsync<string>(query, new { assetId });
+            var parameters = new { AssetId = assetId };
 
-            if (string.IsNullOrWhiteSpace(jsonResult))
+            var query = @"
+                SELECT 
+                s.AssetId, a.AssetCode, a.AssetName,
+                s.SpecificationId, SM.SpecificationName , s.SpecificationValue 
+                FROM FixedAsset.AssetSpecifications S  
+                INNER JOIN FixedAsset.AssetMaster A ON A.Id = S.AssetId   
+                INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = S.SpecificationId                    
+                WHERE A.IsDeleted = 0  
+                and  A.Id =@assetId 
+                ORDER BY s.AssetId ";
+            
+            AssetSpecificationJsonDto? assetEntry = null;
+
+            using (var multi = await _dbConnection.QueryMultipleAsync(query, parameters))
             {
-                throw new KeyNotFoundException($"AssetSpecifications with ID {assetId} not found.");
+                var assetResult = (await multi.ReadAsync()).ToList();
+
+                if (assetResult.Count > 0)
+                {
+                    // Extracting the first row (assuming the same AssetId for all rows)
+                    var firstRow = assetResult.First();
+
+                    // Create the asset entry
+                    assetEntry = new AssetSpecificationJsonDto
+                    {
+                        AssetId = firstRow.AssetId,
+                        AssetCode = firstRow.AssetCode,
+                        AssetName = firstRow.AssetName,
+                        Specifications = new List<SpecificationDto>()
+                    };
+
+                    // Add specifications if available
+                    foreach (var row in assetResult)
+                    {
+                        if (row.SpecificationId != null)
+                        {
+                            assetEntry.Specifications.Add(new SpecificationDto
+                            {
+                                SpecificationId = row.SpecificationId,
+                                SpecificationName = row.SpecificationName,
+                                SpecificationValue = row.SpecificationValue
+                            });
+                        }
+                    }
+                }
             }
-
-            // ✅ Deserialize JSON manually
-            var assetSpecification = JsonSerializer.Deserialize<List<AssetSpecificationJsonDto>>(jsonResult, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            })?.FirstOrDefault();
-
-            return assetSpecification ?? throw new KeyNotFoundException($"AssetSpecifications with ID {assetId} not found.");
+            return assetEntry ?? new AssetSpecificationJsonDto(); 
         }
 
         public async Task<bool> SoftDeleteValidation(int Id)

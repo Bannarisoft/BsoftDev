@@ -7,8 +7,8 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.CreateAssetWarrant
     public class CreateAssetWarrantyCommand : IRequest<ApiResponseDTO<AssetWarrantyDTO>>  
     { 
         public int AssetId { get; set; }
-        public DateTimeOffset? StartDate { get; set; } 
-        public DateTimeOffset? EndDate { get; set; } 
+        public DateOnly? StartDate { get; set; } 
+        public DateOnly? EndDate { get; set; } 
         public int? Period { get; set; } 
         public int? WarrantyType { get; set; } 
         public string? WarrantyProvider { get; set; } 
@@ -27,7 +27,7 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.CreateAssetWarrant
         public string? ServiceMobileNumber { get; set; }        
         public string? ServiceEmail { get; set; }   
         public string? ServiceClaimProcessDescription { get; set; } 
-        public DateTimeOffset? ServiceLastClaimDate { get; set; } 
+        public DateOnly? ServiceLastClaimDate { get; set; } 
         public int? ServiceClaimStatus { get; set; } 
     }
 }

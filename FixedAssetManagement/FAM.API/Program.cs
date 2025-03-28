@@ -2,16 +2,23 @@
         using FAM.Infrastructure;
         using FAM.API.Validation.Common;
         using FAM.API.Configurations;
+        using MassTransit;
+        using Contracts.Events;
 
         var builder = WebApplication.CreateBuilder(args);
 
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+        //var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
+
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
+        var appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{environment}.json");
+
 
         // If environment is null or empty, set default to "Development"
         if (string.IsNullOrWhiteSpace(environment))
         {      
-            environment = "Development";
+            environment = "development";
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
+            
         }
 
 
@@ -39,6 +46,43 @@
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddProblemDetails();
 
+        // Configure MassTransit with RabbitMQ
+builder.Services.AddMassTransit(cfg =>
+{
+    cfg.AddConsumer<UserCreatedConsumer>();
+
+    cfg.UsingRabbitMq((context, config) =>
+    {
+        config.Host("rabbitmq://localhost");
+
+        config.ReceiveEndpoint("user-created-event-queue", ep =>
+        {
+            ep.ConfigureConsumeTopology = false;
+            ep.Bind<UserCreatedEvent>();
+            ep.ConfigureConsumer<UserCreatedConsumer>(context);
+        });
+    });
+});
+
+// builder.Services.AddMassTransit(cfg =>
+// {
+//     cfg.AddConsumer<FixedAssetConsumer>();
+
+//     cfg.UsingRabbitMq((context, config) =>
+//     {
+//         config.Host("rabbitmq://localhost", h =>
+//         {
+//             h.Username("guest");
+//             h.Password("guest");
+//         });
+
+//         config.ReceiveEndpoint("user-created-queue", e =>
+//         {
+//             e.ConfigureConsumer<FixedAssetConsumer>(context);
+//         });
+//     });
+// });
+
         var app = builder.Build();
         if (app.Environment.IsDevelopment())
         {
@@ -57,6 +101,6 @@
         app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
         app.UseAuthorization();
         app.MapControllers();
-        app.ConfigureHangfireDashboard();
+        app.ConfigureHangfireDashboard();         
         app.Run();
 

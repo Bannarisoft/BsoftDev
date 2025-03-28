@@ -125,7 +125,7 @@
     },
     {
         "rule": "UserLock",      
-        "error": "User is locked. Try again after {lockoutInfo.UnlockTime:G}."
+        "error": "User is locked. Please contact your admin."
     },
     {
         "rule": "PasswordLength",             
@@ -150,6 +150,10 @@
     {
         "rule": "UserRole",             
         "error": " User does not have any role assigned to it. Contact your admin."
+    },
+    {
+        "rule": "FKColumnDelete",      
+        "error": "{PropertyName} is inactive/deleted."
     }
      
     

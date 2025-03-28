@@ -132,6 +132,10 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<DeleteAssetWarrantyCommand>,DeleteAssetWarrantyCommandValidator>();
         services.AddScoped<IValidator<DeleteAssetSpecificationCommand>,DeleteAssetSpecificationCommandValidator>();
         services.AddScoped<IValidator<DeleteSpecificationMasterCommand>,DeleteSpecificationMasterCommandValidator>();
+
+        
+        
+
         services.AddScoped<IValidator<UpdateAssetDisposalCommand>, UpdateAssetDisposalCommandValidator>();  
         services.AddScoped<IValidator<UpdateAssetTranferIssueApprovalCommand>, UpdateAssetTransferIssueApprovalValidator>();                
         services.AddScoped<IValidator<CreateAssetTransferIssueCommand>, CreateAssetTransferIssueCommandValidator>();

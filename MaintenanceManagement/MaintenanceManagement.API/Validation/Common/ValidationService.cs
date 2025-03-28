@@ -33,6 +33,11 @@ using MaintenanceManagement.API.Validation.MaintenanceType;
 using Core.Application.MaintenanceType.Command.CreateMaintenanceType;
 using Core.Application.MaintenanceType.Command.DeleteMaintenanceType;
 using Core.Application.MaintenanceType.Command.UpdateMaintenanceType;
+using Core.Application.MachineGroup.Command.DeleteMachineGroup;
+using Core.Application.MiscMaster.Command.DeleteMiscMaster;
+using Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster;
+using Core.Application.ActivityMaster.Command.CreateActivityMaster;
+using MaintenanceManagement.API.Validation.ActivityMaster;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -41,13 +46,18 @@ namespace MaintenanceManagement.API.Validation.Common
 
         public void AddValidationServices(IServiceCollection services)
         {
-            services.AddScoped<MaxLengthProvider>();
-            services.AddScoped<IValidator<CreateMachineGroupCommand>, CreateMachineGroupCommandValidator>();
-            services.AddScoped<IValidator<UpdateMachineGroupCommand>, UpdateMachineGroupCommandValidator>();   
-            services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
-            services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
-            services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
-            services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>(); 
+
+        services.AddScoped<MaxLengthProvider>();
+        services.AddScoped<IValidator<CreateMachineGroupCommand>, CreateMachineGroupCommandValidator>();
+        services.AddScoped<IValidator<DeleteMachineGroupCommand>, DeleteMachineGroupCommandValidator>();
+        services.AddScoped<IValidator<UpdateMachineGroupCommand>, UpdateMachineGroupCommandValidator>();   
+        services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
+        services.AddScoped<IValidator<DeleteMiscTypeMasterCommand>, DeleteMiscTypeMasterCommandValidator>();
+        services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
+        services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
+        services.AddScoped<IValidator<DeleteMiscMasterCommand>, DeleteMiscMasterCommandValidator>();
+        services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>(); 
+
             services.AddScoped<IValidator<CreateShiftMasterCommand>, CreateShiftMasterCommandValidator>();
             services.AddScoped<IValidator<UpdateShiftMasterCommand>, UpdateShiftMasterCommandValidator>();
             services.AddScoped<IValidator<DeleteShiftMasterCommand>, DeleteShiftMasterCommandValidator>();
@@ -66,6 +76,7 @@ namespace MaintenanceManagement.API.Validation.Common
             services.AddScoped<IValidator<CreateMaintenanceTypeCommand>, CreateMaintenanceTypeCommandValidator>();
             services.AddScoped<IValidator<UpdateMaintenanceTypeCommand>, UpdateMaintenanceTypeCommandValidator>();
             services.AddScoped<IValidator<DeleteMaintenanceTypeCommand>, DeleteMaintenanceTypeCommandValidator>();
+        services.AddScoped<IValidator<CreateActivityMasterCommand>, CreateActivityMasterCommandValidator>();
 
 
 

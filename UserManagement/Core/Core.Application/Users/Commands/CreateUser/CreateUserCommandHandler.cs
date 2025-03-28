@@ -13,22 +13,26 @@ using Core.Application.Common.Interfaces;
 
 namespace Core.Application.Users.Commands.CreateUser
 {
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand,ApiResponseDTO<UserDto>>
+
+    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ApiResponseDTO<UserDto>>
     {
         private readonly IUserCommandRepository _userRepository;
         private readonly IMapper _mapper;
-        private readonly IMediator _mediator; 
+
+        private readonly IMediator _mediator;
         private readonly ILogger<CreateUserCommandHandler> _logger;
         private readonly IUserQueryRepository _userQueryRepository;
         private readonly IEmailService _emailService;
         private readonly ISmsService _smsService;
 
 
-        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator,ILogger<CreateUserCommandHandler> logger,IEmailService emailService,ISmsService smsService,IUserQueryRepository userQueryRepository)
+
+        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator, ILogger<CreateUserCommandHandler> logger, IEmailService emailService, ISmsService smsService, IUserQueryRepository userQueryRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
-            _mediator = mediator;    
+
+            _mediator = mediator;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _userQueryRepository = userQueryRepository;
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
@@ -39,10 +43,13 @@ namespace Core.Application.Users.Commands.CreateUser
         public async Task<ApiResponseDTO<UserDto>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Starting user creation process for Username: {Username}", request.UserName);
+
             
 
             // Use AutoMapper to map CreateUserCommand to User entity
             var userEntity = _mapper.Map<User>(request);
+
+
 
             // Save the user to the repository
             var createdUser = await _userRepository.CreateAsync(userEntity);
@@ -55,8 +62,10 @@ namespace Core.Application.Users.Commands.CreateUser
                     IsSuccess = false,
                     Message = "Failed to create user. Please try again."
                 };
-            }                
+
+            }
             _logger.LogInformation("User successfully created for Username: {Username}", createdUser.UserName);
+          
          
           
             //Domain Event
@@ -65,10 +74,11 @@ namespace Core.Application.Users.Commands.CreateUser
                 actionCode: createdUser.UserName,
                 actionName: createdUser.FirstName + " " + createdUser.LastName,
                 details: $"User '{createdUser.UserName}' was created. FirstName: {createdUser.FirstName}, {createdUser.LastName}",
-                module:"User"
+
+                module: "User"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            
+
             // Map the created user entity to DTO
             var userDto = _mapper.Map<UserDto>(createdUser);
             _logger.LogError("An exception occurred while creating user for Username: {Username}", request.UserName);
@@ -78,7 +88,7 @@ namespace Core.Application.Users.Commands.CreateUser
                 Message = "User created successfully",
                 Data = userDto
             };
-                    
+
 
         }
     }

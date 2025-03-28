@@ -126,6 +126,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
                uc.CompanyId,
                uu.UnitId,
                ud.DivisionId,
+               udd.DepartmentId,
                UG.Id AS UserGroupId
         FROM AppSecurity.Users ur
         LEFT JOIN AppSecurity.UserRoleAllocation ura ON ur.UserId = ura.UserId AND ura.IsActive = 1
@@ -133,13 +134,14 @@ namespace UserManagement.Infrastructure.Repositories.Users
         LEFT JOIN AppSecurity.UserUnit uu ON uu.UserId = ur.UserId AND uu.IsActive = 1
         LEFT JOIN AppSecurity.UserDivision ud ON ud.UserId = ur.UserId AND ud.IsActive = 1
         LEFT JOIN AppSecurity.UserGroup UG ON UG.Id = ur.UserGroupId AND UG.IsActive = 1
+        LEFT JOIN AppSecurity.UserDepartment udd ON udd.UserId = ur.UserId AND udd.IsActive = 1
         WHERE ur.IsDeleted = 0 AND ur.UserId = @UserId";
 
     var userDictionary = new Dictionary<int, User>();
 
-    var userResponse = await _dbConnection.QueryAsync<User,Core.Domain.Entities.UserRoleAllocation, UserCompany, UserUnit, UserDivision, int?, User>(
+    var userResponse = await _dbConnection.QueryAsync<User,Core.Domain.Entities.UserRoleAllocation, UserCompany, UserUnit, UserDivision, UserDepartment,int?, User>(
         query,
-        (user, userRole, userCompany, userUnit, userDivision, userGroupId) =>
+        (user, userRole, userCompany, userUnit, userDivision, userDepartment,userGroupId) =>
         {
             if (!userDictionary.TryGetValue(user.UserId, out var existingUser))
             {
@@ -148,6 +150,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
                 existingUser.UserCompanies = new List<UserCompany>();
                 existingUser.UserUnits = new List<UserUnit>();
                 existingUser.userDivisions = new List<UserDivision>();
+                existingUser.userDepartments = new List<UserDepartment>();
                 userDictionary[user.UserId] = existingUser;
             }
 
@@ -175,6 +178,11 @@ namespace UserManagement.Infrastructure.Repositories.Users
                 existingUser.userDivisions.Add(userDivision);
             }
 
+             if (userDepartment != null && !existingUser.userDepartments.Any(ud => ud.DepartmentId == userDepartment.DepartmentId))
+            {
+                existingUser.userDepartments.Add(userDepartment);
+            }
+
             // ✅ Assign UserGroupId
             if (userGroupId.HasValue)
             {
@@ -184,7 +192,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
             return existingUser;
         },
         new { userId },
-        splitOn: "UserRoleId,CompanyId,UnitId,DivisionId,UserGroupId" // ✅ Added UserGroupId here
+        splitOn: "UserRoleId,CompanyId,UnitId,DivisionId,DepartmentId,UserGroupId" // ✅ Added UserGroupId here
     );
 
     return userResponse.FirstOrDefault();
@@ -271,7 +279,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
           public async Task<User?> GetByUserByUnit(int UserId,int UnitId)
           {
             const string query = @"
-                SELECT U.UserId, U.UserName,U.Mobile,U.EmailId
+                SELECT U.UserId, U.UserName,U.Mobile,U.EmailId,U.IsFirstTimeUser,U.EntityId,U.UserGroupId
                 FROM AppSecurity.Users U
                 Inner join [AppSecurity].[UserUnit] UU on UU.UserId = U.UserId
                 Inner join [AppData].[Unit] U1 on U1.Id = UU.UnitId
@@ -355,6 +363,13 @@ namespace UserManagement.Infrastructure.Repositories.Users
                   return user.FirstOrDefault();
           
         }
+              public async Task<bool> UserLockedAsync(string UserName )
+          {
+              var query = "SELECT COUNT(1) FROM [AppSecurity].[Users] WHERE UserName = @UserName AND IsDeleted = 0 AND IsLocked = 1";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { UserName = UserName });
+                return count > 0;
+          }
           
              
           

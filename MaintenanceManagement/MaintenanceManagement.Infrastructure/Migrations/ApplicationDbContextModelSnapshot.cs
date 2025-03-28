@@ -22,6 +22,78 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActivityName")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("ActivityName");
+
+                    b.Property<int>("ActivityType")
+                        .HasColumnType("int")
+                        .HasColumnName("ActivityType");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("Description");
+
+                    b.Property<int>("EstimatedDuration")
+                        .HasColumnType("int")
+                        .HasColumnName("EstimatedDuration");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MachineGroupId")
+                        .HasColumnType("int")
+                        .HasColumnName("MachineGroupId");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MachineGroupId");
+
+                    b.ToTable("ActivityMaster", "Maintenance");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.CostCenter", b =>
                 {
                     b.Property<int>("Id")
@@ -157,112 +229,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MachineGroup", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MaintenanceCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CategoryName")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("CategoryName");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Description");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MaintenanceCategory", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MaintenanceType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("TypeName")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("TypeName");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MaintenanceType", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
@@ -588,6 +554,17 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("WorkCenter", "Maintenance");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MachineGroup", "MachineGroup")
+                        .WithMany("ActivityMasters")
+                        .HasForeignKey("MachineGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MachineGroup");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
@@ -608,6 +585,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ShiftMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MachineGroup", b =>
+                {
+                    b.Navigation("ActivityMasters");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>

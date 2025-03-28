@@ -181,9 +181,9 @@ namespace FAM.API.Controllers
         }
             
         [HttpGet("by-name")]  
-        public async Task<IActionResult> GetSpecificationMaster([FromQuery] string? name)
+        public async Task<IActionResult> GetSpecificationMaster([FromQuery] int assetGroupId,string? name)
         {          
-            var result = await Mediator.Send(new GetSpecificationMasterAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
+            var result = await Mediator.Send(new GetSpecificationMasterAutoCompleteQuery {AssetGroupId=assetGroupId,SearchPattern = name}); // Pass `searchPattern` to the constructor
             if (!result.IsSuccess)
             {
                 return NotFound(new 
