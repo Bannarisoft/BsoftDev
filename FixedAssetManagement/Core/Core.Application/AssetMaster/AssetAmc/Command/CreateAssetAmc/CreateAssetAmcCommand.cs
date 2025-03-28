@@ -19,6 +19,7 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.CreateAssetAmc
         public int? CoverageType { get; set; } 
         public int? FreeServiceCount  { get; set; }  
         public int? RenewalStatus { get; set; }  
-        public DateOnly? RenewedDate { get; set; }   
+        public DateOnly? RenewedDate { get; set; } 
+        public byte IsActive { get; set; }  
     }
 }

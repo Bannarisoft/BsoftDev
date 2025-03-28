@@ -70,7 +70,8 @@ namespace FAM.API.Validation.AssetMaster.AssetInsurance
                     case "ActivePolicy":
                            RuleFor(x => x.AssetId)
                            .MustAsync(async (AssetId, cancellation) => !await _assetInsuranceQueryRepository.ActiveInsuranceValidation(AssetId))
-                            .WithMessage($"{rule.Error}");
+                            .WithMessage($"{rule.Error}")
+                            .When(x => x.IsActive == 1);
                             break;
                         default:
                             break;

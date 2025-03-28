@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.AssetMaster.AssetAmc.Command.CreateAssetAmc;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
 using FAM.API.Validation.Common;
 using FluentValidation;
 
@@ -11,7 +12,8 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
     public class CreateAssetAmcCommandValidator : AbstractValidator<CreateAssetAmcCommand>
     {
         private readonly List<ValidationRule> _validationRules;
-        public CreateAssetAmcCommandValidator(MaxLengthProvider maxLengthProvider)
+        private readonly IAssetAmcQueryRepository _assetAmcQueryRepository;
+        public CreateAssetAmcCommandValidator(MaxLengthProvider maxLengthProvider, IAssetAmcQueryRepository assetAmcQueryRepository)
         {
            
             var AssetId = maxLengthProvider.GetMaxLength<Core.Domain.Entities.AssetMaster.AssetAmc>("AssetId") ?? 10;
@@ -27,6 +29,7 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
 
                // Load validation rules from JSON or another source
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _assetAmcQueryRepository = assetAmcQueryRepository;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -102,8 +105,13 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
                             .When(x => !string.IsNullOrEmpty(x.VendorEmail))
                             .WithMessage($"{nameof(VendorEmail)} {rule.Error}");
                              break;
-
-
+                    case "ActivePolicy":
+                           RuleFor(x => x.AssetId)
+                           .MustAsync(async (AssetId, cancellation) => !await _assetAmcQueryRepository.ActiveAMCValidation(AssetId))
+                            .WithMessage($"{rule.Error}")
+                            .When(x => x.IsActive == 1);
+                            break;
+                     
                         default:
                         // Handle unknown rule (log or throw)
                         Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
