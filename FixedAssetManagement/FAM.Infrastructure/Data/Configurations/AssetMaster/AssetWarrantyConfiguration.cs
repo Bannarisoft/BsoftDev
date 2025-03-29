@@ -37,10 +37,12 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .HasForeignKey(dg => dg.AssetId)                
                 .OnDelete(DeleteBehavior.Restrict); 
 
-                builder.Property(dg => dg.StartDate)                                
+                builder.Property(dg => dg.StartDate)
+                .HasColumnType("date")                                
                 .IsRequired();
                 
-                builder.Property(dg => dg.EndDate)                                
+                builder.Property(dg => dg.EndDate)
+                .HasColumnType("date")                                
                 .IsRequired();
 
                 builder.Property(dg => dg.Period)
@@ -113,8 +115,8 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 builder.Property(dg => dg.ServiceClaimProcessDescription)
                 .HasColumnType("varchar(1000)");
                 
-                builder.Property(dg => dg.ServiceLastClaimDate);
-
+                builder.Property(dg => dg.ServiceLastClaimDate)
+                .HasColumnType("date");
                 builder.Property(dg => dg.ServiceClaimStatus)
                 .HasColumnType("int");
 

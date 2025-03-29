@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.AssetMaster.AssetInsurance.Commands.UpdateAssetInsurance;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetInsurance;
 using FAM.API.Validation.Common;
 using FluentValidation;
 
@@ -11,11 +12,13 @@ namespace FAM.API.Validation.AssetMaster.AssetInsurance
     public class UpdateAssetInsuranceCommandValidator  : AbstractValidator<UpdateAssetInsuranceCommand>
     {
          private readonly List<ValidationRule> _validationRules;
+         private readonly IAssetInsuranceQueryRepository _assetInsuranceQueryRepository;
 
-         public UpdateAssetInsuranceCommandValidator()
+         public UpdateAssetInsuranceCommandValidator( IAssetInsuranceQueryRepository assetInsuranceQueryRepository)
          {
              _validationRules = new List<ValidationRule>();
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            _assetInsuranceQueryRepository = assetInsuranceQueryRepository;
                  if (!_validationRules.Any())
             {
                 throw new ArgumentException("Validation rules could not be loaded.");
@@ -57,6 +60,21 @@ namespace FAM.API.Validation.AssetMaster.AssetInsurance
 
                        
                         break;
+                        case "AlreadyExists":
+                           RuleFor(x => new { x.PolicyNo, x.Id })
+                           .MustAsync(async (insurance, cancellation) => !await _assetInsuranceQueryRepository.AlreadyExistsAsync(insurance.PolicyNo, insurance.Id))
+                           .WithName("PolicyNo")
+                            .WithMessage($"{rule.Error}");
+                            break;
+                         case "ActivePolicy":
+                           RuleFor(x => new { x.AssetId, x.Id })
+                           .MustAsync(async (insurance, cancellation) => !await _assetInsuranceQueryRepository.ActiveInsuranceValidation(insurance.AssetId, insurance.Id))
+                            .WithMessage($"{rule.Error}")
+                            .When(x => x.IsActive == 1);
+                            break;
+
+                            default:
+                            break;
 
                 }
             }    

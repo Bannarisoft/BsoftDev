@@ -29,19 +29,6 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.CreateAssetAmc
         {
             var assetAmc = _imapper.Map<Core.Domain.Entities.AssetMaster.AssetAmc>(request);
 
-            var existingAssetAmc = await _iassetamccommandrepository.GetAlreadyAsync(a => 
-            a.AssetId == request.AssetId && a.IsActive == Domain.Common.BaseEntity.Status.Active);
-
-                if (existingAssetAmc != null)
-                {
-                    return new ApiResponseDTO<int>
-                    {
-                        IsSuccess = false,
-                        Message = "AssetAmc Id already exists with Active Status.Please Close and Create New Amc Details",
-                        Data = 0
-                    };
-                }
-
 
             // Ensure RenewedDate is properly handled
             assetAmc.RenewedDate = request.RenewedDate ?? null;

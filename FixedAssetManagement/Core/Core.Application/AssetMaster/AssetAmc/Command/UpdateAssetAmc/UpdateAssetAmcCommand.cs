@@ -11,7 +11,8 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc
     {
     
         public int Id {get;set;}
-        public DateTimeOffset? StartDate { get; set; }
+        public int AssetId { get; set; }
+        public DateOnly? StartDate { get; set; }
         public int? Period { get; set; }   
         public string? VendorCode { get; set; }  
         public string? VendorName { get; set; }  
@@ -20,7 +21,7 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc
         public int? CoverageType { get; set; } 
         public int? FreeServiceCount  { get; set; }  
         public int? RenewalStatus { get; set; }  
-        public DateTimeOffset? RenewedDate { get; set; }  
+        public DateOnly? RenewedDate { get; set; }  
         public byte IsActive { get; set; }
     }
 }

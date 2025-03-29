@@ -16,6 +16,7 @@ namespace Core.Application.Common.Interfaces.IUserRole
         Task<UserRole?> GetByIdAsync(int id);
         Task<List<UserRole>> GetRolesAsync(string searchTerm); 
         Task<bool> SoftDeleteValidation(int Id); 
+        Task<bool> FKColumnExistValidation(int Id);
         
         
          

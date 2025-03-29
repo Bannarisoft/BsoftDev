@@ -25,7 +25,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetDetail
 
             var response = new AssetDetailsResponse
             {
-                AssetMaster = await _assetRepository.GetAssetMasterByIdAsync(assetId),
+               // AssetMaster = await _assetRepository.GetAssetMasterByIdAsync(assetId),
                 AssetLocation = await _assetRepository.GetAssetLocationByIdAsync(assetId),
                 AssetPurchase = await _assetRepository.GetAssetPurchaseByIdAsync(assetId),
                 AssetAMC = await _assetRepository.GetAssetAMCByIdAsync(assetId),

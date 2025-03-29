@@ -111,6 +111,10 @@
     {
         "rule": "SoftDelete",      
         "error": "Cannot delete the relationship as it is active with another table."
+    },
+    {
+        "rule": "ActivePolicy",      
+        "error": "Please Inactive previous active policy."
     }
     
 ]

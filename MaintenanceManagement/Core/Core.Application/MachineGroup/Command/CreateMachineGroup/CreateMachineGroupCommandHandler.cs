@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMachineGroup;
-using Core.Application.MachineGroup.Quries.GetMachineGroup;
+using Core.Application.MachineGroup.Queries.GetMachineGroup;
 using Core.Domain.Events;
 using MediatR;
 
@@ -14,7 +14,7 @@ namespace Core.Application.MachineGroup.Command.CreateMachineGroup
     public class CreateMachineGroupCommandHandler : IRequestHandler<CreateMachineGroupCommand, ApiResponseDTO<MachineGroupDto>>
     {
 
-      private readonly IMachineGroupCommandRepository _machineGroupCommandRepository;
+         private readonly IMachineGroupCommandRepository _machineGroupCommandRepository;
         private readonly IMachineGroupQueryRepository _machineGroupQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;

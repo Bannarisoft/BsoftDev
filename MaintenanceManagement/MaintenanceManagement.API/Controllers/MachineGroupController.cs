@@ -7,9 +7,9 @@ using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Application.MachineGroup.Command.CreateMachineGroup;
 using Core.Application.MachineGroup.Command.DeleteMachineGroup;
 using Core.Application.MachineGroup.Command.UpdateMachineGroup;
-using Core.Application.MachineGroup.Quries.GetMachineGroup;
-using Core.Application.MachineGroup.Quries.GetMachineGroupAutoComplete;
-using Core.Application.MachineGroup.Quries.GetMachineGroupById;
+using Core.Application.MachineGroup.Queries.GetMachineGroup;
+using Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete;
+using Core.Application.MachineGroup.Queries.GetMachineGroupById;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -20,18 +20,21 @@ namespace MaintenanceManagement.API.Controllers
     [Route("api/[controller]")]
     public class MachineGroupController : ApiControllerBase
     {
-        private readonly IMachineGroupCommandRepository _machineGroupCommandRepository;
+          private readonly IMachineGroupCommandRepository _machineGroupCommandRepository;
 
          private  readonly IValidator<CreateMachineGroupCommand>  _createMachineGroupCommandValidator;
          private readonly IValidator<UpdateMachineGroupCommand> _updateMachineGroupCommandValidator;
+        private readonly IValidator<DeleteMachineGroupCommand> _deleteMachineGroupCommandValidator;
 
         
 
-        public MachineGroupController(ISender mediator, IMachineGroupCommandRepository machineGroupCommandRepository,IValidator<CreateMachineGroupCommand>  createMachineGroupCommandValidator, IValidator<UpdateMachineGroupCommand> updateMachineGroupCommandValidator   ):base(mediator)
+        public MachineGroupController(ISender mediator, IMachineGroupCommandRepository machineGroupCommandRepository,IValidator<CreateMachineGroupCommand>  createMachineGroupCommandValidator, IValidator<UpdateMachineGroupCommand> updateMachineGroupCommandValidator,
+        IValidator<DeleteMachineGroupCommand> deleteMachineGroupCommandValidator   ):base(mediator)
         {
             _machineGroupCommandRepository = machineGroupCommandRepository;
             _createMachineGroupCommandValidator = createMachineGroupCommandValidator;
             _updateMachineGroupCommandValidator = updateMachineGroupCommandValidator;
+            _deleteMachineGroupCommandValidator = deleteMachineGroupCommandValidator;
           
         }
 
@@ -144,7 +147,17 @@ namespace MaintenanceManagement.API.Controllers
        [ HttpDelete("{id}")]
           public async Task<IActionResult> Delete(int id)
         {
-           
+            var command = new DeleteMachineGroupCommand { Id = id };
+           var validationResult = await  _deleteMachineGroupCommandValidator.ValidateAsync(command);
+               if (!validationResult.IsValid)
+                {
+                    return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+                }
+
            var updatedMiscMaster = await Mediator.Send(new DeleteMachineGroupCommand { Id = id });
 
            if(updatedMiscMaster.IsSuccess)
@@ -160,7 +173,7 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> GetMachineGroup([FromQuery] string? name)
         {
           
-            var miscmaster = await Mediator.Send(new GetMiscMasterAutoCompleteQuery {SearchPattern = name});
+            var miscmaster = await Mediator.Send(new GetMachineGroupAutoCompleteQuery {SearchPattern = name});
             if(miscmaster.IsSuccess)
             {
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = miscmaster.Data });

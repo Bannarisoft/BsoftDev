@@ -32,12 +32,12 @@ namespace Core.Application.MiscMaster.Command.UpdateMiscMaster
            public async Task<ApiResponseDTO<bool>> Handle(UpdateMiscMasterCommand request, CancellationToken cancellationToken)
         {
                    
-                var existingMisctype = await _miscMasterQueryRepository.GetByMiscMasterCodeAsync(request.Code,request.Id);
+                // var existingMisctype = await _miscMasterQueryRepository.GetByMiscMasterCodeAsync(request.Code,request.Id);
 
-                if (existingMisctype != null)
-                {
-                    return new ApiResponseDTO<bool>{IsSuccess = false, Message = "MiscMaster already exists"};
-                }              
+                // if (existingMisctype != null)
+                // {
+                //     return new ApiResponseDTO<bool>{IsSuccess = false, Message = "MiscMaster already exists"};
+                // }              
                  var miscmaster  = _imapper.Map<Core.Domain.Entities.MiscMaster>(request);         
                 var MiscMasterresult = await _miscMasterCommandRepository.UpdateAsync(request.Id, miscmaster);                
 

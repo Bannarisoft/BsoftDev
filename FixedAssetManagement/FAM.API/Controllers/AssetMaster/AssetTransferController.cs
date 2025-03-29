@@ -5,6 +5,7 @@ using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCategor
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetDtlToTransfer;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTranferedById;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByDeptId;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
 using Core.Domain.Entities.AssetMaster;
@@ -67,7 +68,27 @@ namespace FAM.API.Controllers.AssetMaster
                       return NotFound($"Asset Transfer with ID {id} not found.");
                   }
                  return Ok(result);
-              }     
+              }   
+
+
+         [HttpGet("GetCategoryByDepartmentId")]
+        public async Task<IActionResult> GetCategoriesByDepartmentAsync(int id)
+        {
+            var assetCategoryList = await Mediator.Send(
+                new GetCategoryByDeptIQuery
+                {   
+                    DepartmentId = id                 
+                    
+                });
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Data = assetCategoryList.Data,
+               
+            });
+        }              
+
 
         [HttpPost]
        // public async Task<ActionResult<ApiResponseDTO<AssetTransferIssueHdr>>> CreateAssetTransfer([FromBody] CreateAssetTransferIssueCommand command)
@@ -111,6 +132,9 @@ namespace FAM.API.Controllers.AssetMaster
                  return Ok(result);
               }
 
+
+
+
         [HttpPut]
         public async Task<IActionResult> UpdateAssetTransferIssue([FromBody] UpdateAssetTransferIssueCommand command)
         {
@@ -142,9 +166,9 @@ namespace FAM.API.Controllers.AssetMaster
         }
 
          [HttpGet("GetAssetsByCategory/{categoryId}")]
-        public async Task<IActionResult> GetAssetsByCategoryAsync(int categoryId)
+        public async Task<IActionResult> GetAssetsByCategoryAsync(int categoryId , int assetDepartmentId)
         {
-            var query = new GetAssetsByCategoryQuery { AssetCategoryId = categoryId };
+            var query = new GetAssetsByCategoryQuery { AssetCategoryId = categoryId , AssetDepartmentId = assetDepartmentId };
             var result = await Mediator.Send(query);
             return Ok(result);
         }

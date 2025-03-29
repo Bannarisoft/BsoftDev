@@ -25,14 +25,17 @@ namespace MaintenanceManagement.API.Controllers
         private readonly ILogger<MiscMaster> _logger;
         private  readonly IValidator<CreateMiscMasterCommand> _miscMasterCommand;
         private readonly IValidator<UpdateMiscMasterCommand> _updateMiscMasterCommand;
+
+        private readonly IValidator<DeleteMiscMasterCommand> _deleteMiscMasterCommand;
         private readonly IMiscMasterCommandRepository _miscMasterCommandRepository;
-       public MiscMasterController(ISender mediator, IValidator<CreateMiscMasterCommand>  miscMasterCommand, IValidator<UpdateMiscMasterCommand> updateMiscMasterCommand, IMiscMasterCommandRepository miscMasterCommandRepository ):base(mediator)
+       public MiscMasterController(ISender mediator, IValidator<CreateMiscMasterCommand>  miscMasterCommand, IValidator<UpdateMiscMasterCommand> updateMiscMasterCommand, IMiscMasterCommandRepository miscMasterCommandRepository,
+        IValidator<DeleteMiscMasterCommand> deleteMiscMasterCommand ):base(mediator)
           {
 
             _miscMasterCommand=miscMasterCommand;
             _updateMiscMasterCommand=updateMiscMasterCommand;
             _miscMasterCommandRepository=miscMasterCommandRepository;
-              
+            _deleteMiscMasterCommand = deleteMiscMasterCommand;
           } 
 
          [HttpGet] 
@@ -121,45 +124,17 @@ namespace MaintenanceManagement.API.Controllers
  
          public async Task<IActionResult> Update(UpdateMiscMasterCommand command)
         {
-
-            
-            // Validate the command
-            var validationResult = await _updateMiscMasterCommand.ValidateAsync(command);
+            // Update the record
+              var validationResult = await _updateMiscMasterCommand.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                return BadRequest(new 
-                { 
-                    StatusCode = StatusCodes.Status400BadRequest, 
-                    Message = "Validation Failed", 
-                    Errors = validationResult.Errors 
+                 return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
                 });
             }
 
-            // Check if the record exists
-            var miscMasterExists = await Mediator.Send(new GetMiscMasterByIdQuery { Id = command.Id });
-            if (miscMasterExists == null)
-            {
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound, 
-                    Message = $"MiscMaster ID {command.Id} not found.", 
-                    Errors = "" 
-                });
-            }
-
-             // Check if SortOrder is not greater than the max value in the table
-            // var maxSortOrder = await _miscMasterCommandRepository.GetMaxSortOrderAsync();
-            // if (command.SortOrder > maxSortOrder)
-            // {
-            //     return BadRequest(new 
-            //     { 
-            //         StatusCode = StatusCodes.Status400BadRequest, 
-            //         Message = $"SortOrder cannot be greater than the maximum value ({maxSortOrder}) in the table.", 
-            //         Errors = "" 
-            //     });
-            // }
-
-            // Update the record
             var response = await Mediator.Send(command);
             if (response.IsSuccess)
             {
@@ -182,6 +157,19 @@ namespace MaintenanceManagement.API.Controllers
         [ HttpDelete("{id}")]
           public async Task<IActionResult> Delete(int id)
         {
+            
+           var command = new DeleteMiscMasterCommand { Id = id };
+           var validationResult = await  _deleteMiscMasterCommand.ValidateAsync(command);
+               if (!validationResult.IsValid)
+                {
+                    return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+                }
+
+
            
            var updatedMiscMaster = await Mediator.Send(new DeleteMiscMasterCommand { Id = id });
 

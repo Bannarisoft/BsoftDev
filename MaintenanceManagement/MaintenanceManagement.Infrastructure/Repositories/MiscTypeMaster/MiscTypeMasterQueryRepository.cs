@@ -94,6 +94,44 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscTypeMaster
             var misctypemaster = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscTypeMaster>(query, parameters);
             return misctypemaster.ToList();
         }
+          public async Task<bool> AlreadyExistsAsync(string miscTypeCode, int? id = null)
+        {   
+
+              var query = "SELECT COUNT(1) FROM Maintenance.MiscTypeMaster WHERE MiscTypeCode = @miscTypeCode AND IsDeleted = 0";
+                var parameters = new DynamicParameters(new { MiscTypeCode = miscTypeCode });
+
+             if (id is not null)
+             {
+                 query += " AND Id != @Id";
+                 parameters.Add("Id", id);
+             }
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+        }
+
+         public async Task<bool> NotFoundAsync(int id)
+        {
+             var query = "SELECT COUNT(1) FROM  Maintenance.MiscTypeMaster WHERE Id = @Id AND IsDeleted = 0";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+                return count > 0;
+        }
+
+         public async Task<bool> SoftDeleteValidation(int Id)
+        {
+             const string query = @"
+                           SELECT 1 
+                           FROM  Maintenance.MiscTypeMaster
+                           WHERE Id  = @Id AND IsDeleted = 0;";
+                    
+                       using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+                    
+                       var shiftMasterDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
+                    
+                       return shiftMasterDetailExists.HasValue;
+        }
+
+
         
         
     }

@@ -63,6 +63,35 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetInsurance
                 return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.AssetMaster.AssetInsurance>(query, new { id });
             }
 
+          public async Task<bool> AlreadyExistsAsync(string PolicyNo, int? id = null)
+        {   
+
+              var query = "SELECT COUNT(1) FROM FixedAsset.AssetInsurance   WHERE PolicyNo = @PolicyNo AND IsDeleted = 0 ";
+                var parameters = new DynamicParameters(new { PolicyNo = PolicyNo });
+
+             if (id is not null)
+             {
+                 query += " AND Id != @Id";
+                 parameters.Add("Id", id);
+             }
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+        }
+          public async Task<bool> ActiveInsuranceValidation(int AssetId, int? id = null)
+        {   
+
+              var query = "SELECT COUNT(1) FROM FixedAsset.AssetInsurance   WHERE AssetId = @AssetId AND IsDeleted = 0 AND IsActive = 1 ";
+                var parameters = new DynamicParameters(new { AssetId = AssetId });
+
+             if (id is not null)
+             {
+                 query += " AND Id != @Id";
+                 parameters.Add("Id", id);
+             }
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+        }
+
           
 
 

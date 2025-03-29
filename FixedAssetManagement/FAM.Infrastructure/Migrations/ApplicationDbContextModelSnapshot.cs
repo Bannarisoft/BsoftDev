@@ -185,8 +185,8 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<DateTimeOffset>("EndDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<int?>("FreeServiceCount")
                         .HasColumnType("int");
@@ -215,11 +215,11 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("RenewalStatus")
                         .HasColumnType("int");
 
-                    b.Property<DateTimeOffset?>("RenewedDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly?>("RenewedDate")
+                        .HasColumnType("date");
 
-                    b.Property<DateTimeOffset>("StartDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("VendorCode")
                         .IsRequired()
@@ -278,8 +278,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<decimal>("DisposalAmount")
                         .HasColumnType("decimal(18,3)");
 
-                    b.Property<DateTimeOffset>("DisposalDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly>("DisposalDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("DisposalReason")
                         .HasColumnType("nvarchar(250)");
@@ -343,8 +343,8 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(20)");
 
-                    b.Property<DateTimeOffset>("EndDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<int>("Insuranceperiod")
                         .HasColumnType("int");
@@ -376,15 +376,14 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("RenewalStatus")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                    b.Property<int>("RenewalStatus")
+                        .HasColumnType("int");
 
-                    b.Property<DateTimeOffset>("RenewedDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly>("RenewedDate")
+                        .HasColumnType("date");
 
-                    b.Property<DateTimeOffset>("StartDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("VendorCode")
                         .HasMaxLength(50)
@@ -409,9 +408,8 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("AssetId");
 
-                    b.Property<string>("CustodianId")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(50)")
+                    b.Property<int>("CustodianId")
+                        .HasColumnType("int")
                         .HasColumnName("CustodianId");
 
                     b.Property<int>("DepartmentId")
@@ -428,9 +426,10 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("UnitId");
 
-                    b.Property<string>("UserID")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(50)")
+                    b.Property<int>("UserID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
                         .HasColumnName("UserId");
 
                     b.HasKey("Id");
@@ -784,8 +783,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("varchar(100)");
 
-                    b.Property<DateTimeOffset>("EndDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -839,8 +838,8 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(100)");
 
-                    b.Property<DateTimeOffset?>("ServiceLastClaimDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly?>("ServiceLastClaimDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("ServiceMobileNumber")
                         .IsRequired()
@@ -852,8 +851,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("ServiceStateId")
                         .HasColumnType("int");
 
-                    b.Property<DateTimeOffset>("StartDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("WarrantyProvider")
                         .IsRequired()

@@ -20,7 +20,8 @@ namespace Core.Application.Common.Mappings.AssetMaster
             CreateMap<ExistingVendorDetails, GetExistingVendorDetailsDto>();
             CreateMap<AssetAmc, AssetAmcDto>();
             CreateMap<CreateAssetAmcCommand, AssetAmc>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore());
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
             CreateMap<UpdateAssetAmcCommand, AssetAmc>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.AssetId, opt => opt.Ignore())

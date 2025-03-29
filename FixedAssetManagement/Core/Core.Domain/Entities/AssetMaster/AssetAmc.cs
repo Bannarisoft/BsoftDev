@@ -10,8 +10,8 @@ namespace Core.Domain.Entities.AssetMaster
     {
         public int AssetId { get; set; } 
         public AssetMasterGenerals AssetMasterAmcId { get; set; } = null!;
-        public DateTimeOffset? StartDate { get; set; }
-        public DateTimeOffset? EndDate { get; set; } 
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; } 
         public int? Period { get; set; }   
         public string? VendorCode { get; set; }  
         public string? VendorName { get; set; }  
@@ -22,7 +22,7 @@ namespace Core.Domain.Entities.AssetMaster
         public int? FreeServiceCount  { get; set; }  
         public int? RenewalStatus { get; set; }        
         public MiscMaster RenewalStatusMiscType { get; set; } = null!;  
-        public DateTimeOffset? RenewedDate { get; set; } 
+        public DateOnly? RenewedDate { get; set; } 
        
     }
 }

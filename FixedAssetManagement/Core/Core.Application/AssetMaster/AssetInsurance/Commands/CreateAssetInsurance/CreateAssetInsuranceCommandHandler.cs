@@ -36,30 +36,6 @@ namespace Core.Application.AssetMaster.AssetInsurance.Commands.CreateAssetInsura
         public async Task<ApiResponseDTO<GetAssetInsuranceDto>> Handle(CreateAssetInsuranceCommand request, CancellationToken cancellationToken)
         {
 
-            var existingAssetInsurance = await _assetInsuranceCommandRepository.GetAlreadyAsync(a =>
-            a.AssetId == request.AssetId && a.IsActive == Domain.Common.BaseEntity.Status.Active && a.IsDeleted == Domain.Common.BaseEntity.IsDelete.NotDeleted);
-                if (existingAssetInsurance != null)
-                {
-                    return new ApiResponseDTO<GetAssetInsuranceDto>
-                    {
-                        IsSuccess = false,
-                        Message = $"AssetInsurance Id {request.AssetId} already exists with Active Status.Please Close and Create New Asset Insurance  Details"
-                       
-                    };
-                }
-
-     
-
-            if (existingAssetInsurance != null)
-            {
-                return new ApiResponseDTO<GetAssetInsuranceDto>
-                {
-                    IsSuccess = false,
-                    Message = "Asset Insurance already exists",
-                    Data = null
-                };
-            }
-
             // Map request to domain entity
             var assetInsurance = _mapper.Map<Core.Domain.Entities.AssetMaster.AssetInsurance>(request);
 
