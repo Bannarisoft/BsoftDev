@@ -28,26 +28,9 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration,builder.Services);
+builder.services.AddSagaInfrastructure();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
-
-// MassTransit Configuration
-builder.Services.AddMassTransit(x =>
-{
-    x.AddConsumer<DepartmentCreatedEventConsumer>();
-
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.Host("localhost", "/", h =>
-        {
-            h.Username("guest");
-            h.Password("guest");
-        });
-
-        cfg.ConfigureEndpoints(context);
-    });
-});
-
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 

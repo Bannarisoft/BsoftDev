@@ -18,15 +18,16 @@ namespace SagaOrchestrator.API.Controllers
         {
             _departmentSagaService = departmentSagaService;
         }
-        
-        [HttpPost("asset")]
+
+        [HttpPost("department")]
         public async Task<IActionResult> TriggerDepartment(int departmentId)
         {
             await _departmentSagaService.TriggerDepartmentCreation(departmentId);
             return Ok(new
             {
-                message = "Asset creation process triggered successfully.",
-                delegatementId = departmentId
+                message = "Department creation process triggered successfully.",
+                delegatementId = departmentId,
+                departmentName = departmentId
             });
 
         }

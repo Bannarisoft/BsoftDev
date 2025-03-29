@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SagaOrchestrator.Application;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IAssets;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IMaintenance;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
 using SagaOrchestrator.Application.Orchestration.Services;
 using SagaOrchestrator.Application.Orchestration.Services.MaintenanceServices;
+using SagaOrchestrator.Infrastructure.Consumers;
 using SagaOrchestrator.Infrastructure.Services;
 using SagaOrchestrator.Infrastructure.Services.MaintenanceServices;
 
@@ -17,7 +19,7 @@ namespace SagaOrchestrator.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
         {
 
             // HttpClient Registration using HttpClientFactory
@@ -40,17 +42,51 @@ namespace SagaOrchestrator.Infrastructure
 
 
             // Configure MassTransit with RabbitMQ
+            // services.AddMassTransit(x =>
+            // {
+            //     x.UsingRabbitMq((context, cfg) =>
+            //     {
+            //         cfg.Host("localhost", "/", h =>
+            //         {
+            //             h.Username("guest");
+            //             h.Password("guest");
+            //         });
+            //     });
+            // });
+
             services.AddMassTransit(x =>
-            {
-                x.UsingRabbitMq((context, cfg) =>
+          {
+              x.AddSagaStateMachine<UserAssetStateMachine, UserAssetState>()
+                  .InMemoryRepository();
+
+              x.AddConsumer<UserCreatedEventConsumer>();
+              x.AddConsumer<AssetCreatedEventConsumer>();
+              x.AddConsumer<SagaCompletedEventConsumer>();
+
+              x.UsingRabbitMq((context, cfg) =>
+              {
+                cfg.Host("localhost", "/", h =>
                 {
-                    cfg.Host("localhost", "/", h =>
-                    {
-                        h.Username("guest");
-                        h.Password("guest");
-                    });
+                    h.Username("guest");
+                    h.Password("guest");
                 });
-            });
+
+                cfg.ReceiveEndpoint("user-created-queue", e =>
+                {
+                    e.ConfigureConsumer<UserCreatedEventConsumer>(context);
+                });
+
+                cfg.ReceiveEndpoint("asset-created-queue", e =>
+                {
+                    e.ConfigureConsumer<AssetCreatedEventConsumer>(context);
+                });
+
+                cfg.ReceiveEndpoint("saga-completed-queue", e =>
+                {
+                    e.ConfigureConsumer<SagaCompletedEventConsumer>(context);
+                });
+              });
+          });
 
 
             // Register IPublishEndpoint from MassTransit
