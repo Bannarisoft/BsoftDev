@@ -79,7 +79,8 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
 
                  builder.Property(ca => ca.Document)
                 .HasColumnName("Document")
-                .HasColumnType("nvarchar(255)");
+                .HasColumnType("nvarchar(255)")
+                .IsRequired(false);
 
                  builder.Property(dg => dg.ServiceCountryId)
                 .HasColumnType("int");                
