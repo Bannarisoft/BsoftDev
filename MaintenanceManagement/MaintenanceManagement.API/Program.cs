@@ -2,6 +2,8 @@ using Core.Application;
 using MaintenanceManagement.Infrastructure;
 using MaintenanceManagement.API.Configurations;
 using MaintenanceManagement.API.Validation.Common;
+using MassTransit;
+using MaintenanceManagement.Infrastructure.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,7 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration,builder.Services);
+builder.services.AddSagaInfrastructure();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 

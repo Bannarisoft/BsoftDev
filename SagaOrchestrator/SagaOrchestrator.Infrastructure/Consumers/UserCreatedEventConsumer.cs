@@ -6,14 +6,16 @@ using Contracts.Events.Users;
 using MassTransit;
 using Serilog;
 
-namespace UserManagement.Infrastructure.Consumers
+namespace SagaOrchestrator.Infrastructure.Consumers
 {
     public class UserCreatedEventConsumer : IConsumer<UserCreatedEvent>
     {
         public async Task Consume(ConsumeContext<UserCreatedEvent> context)
         {
-            var user = context.Message;
-            Log.Information($"User Created: {user.UserName} with ID: {user.UserId}");
+            var userEvent = context.Message;
+            Log.Information($"User Created: {userEvent.UserName}, CorrelationId: {userEvent.CorrelationId}");
+
+            await Task.CompletedTask;
         }
     }
 }
