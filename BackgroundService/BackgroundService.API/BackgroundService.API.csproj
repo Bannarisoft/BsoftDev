@@ -22,5 +22,8 @@
     <PackageReference Include="RabbitMQ.Client" Version="7.1.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
   </ItemGroup>
-
+ <ItemGroup>
+    <ProjectReference Include="..\Core\BackgroundService.Application\BackgroundService.Application.csproj"/>
+    <ProjectReference Include="..\Core\BackgroundService.Domain\BackgroundService.Domain.csproj"/>
+  </ItemGroup>
 </Project>

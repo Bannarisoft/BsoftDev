@@ -34,6 +34,8 @@ using Core.Application.Common.Interfaces.IMaintenanceCategory;
 using MaintenanceManagement.Infrastructure.Repositories.MaintenanceCategory;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using MaintenanceManagement.Infrastructure.Repositories.ActivityMaster;
+using Core.Application.Common.Interfaces.IMachineGroupUser;
+using MaintenanceManagement.Infrastructure.Repositories.MachineGroupUser;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -147,7 +149,10 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMaintenanceCategoryQueryRepository, MaintenanceCategoryQueryRepository>();
 
             services.AddScoped<IActivityMasterQueryRepository, ActivityMasterQueryRepository>();
-            services.AddScoped<IActivityMasterCommandRepository, ActivityMasterCommandRepository>();
+            services.AddScoped<IActivityMasterCommandRepository, ActivityMasterCommandRepository>();            
+
+            services.AddScoped<IMachineGroupUserQueryRepository, MachineGroupUserQueryRepository>();
+            services.AddScoped<IMachineGroupUserCommandRepository, MachineGroupUserCommandRepository>();
             
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -168,7 +173,8 @@ namespace MaintenanceManagement.Infrastructure
                 typeof(MaintenanceCategoryProfile),
                 typeof(ShiftMasterProfile),
                 typeof(ShiftMasterDetailProfile),
-                typeof(ActivityMasterProfile)
+                typeof(ActivityMasterProfile),
+                typeof(MachineGroupUserProfile)
 
 				
 
