@@ -11,20 +11,18 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
     {
         private readonly IAssetMasterGeneralQueryRepository _assetMasterRepository;
         private readonly IMapper _mapper;
-        private readonly IMediator _mediator; 
-        private readonly IAssetDetailsQueryRepository _assetDetailsRepository;
+        private readonly IMediator _mediator;         
 
-        public GetAssetMasterGeneralByIdQueryHandler(IAssetMasterGeneralQueryRepository assetMasterRepository,  IMapper mapper, IMediator mediator, IAssetDetailsQueryRepository assetDetailsRepository)
+        public GetAssetMasterGeneralByIdQueryHandler(IAssetMasterGeneralQueryRepository assetMasterRepository,  IMapper mapper, IMediator mediator)
         {
             _assetMasterRepository =assetMasterRepository;
             _mapper =mapper;
-            _mediator = mediator;
-            _assetDetailsRepository = assetDetailsRepository;
+            _mediator = mediator;            
         }
         public async Task<ApiResponseDTO<AssetMasterDTO>> Handle(GetAssetMasterGeneralByIdQuery request, CancellationToken cancellationToken)
         {
           //  var assetMaster = await _assetMasterRepository.GetByIdAsync(request.Id);
-          var (assetResult, locationResult, purchaseDetails, spec, warranty, amc, disposal, insurance) = await _assetDetailsRepository.GetAssetMasterByIdAsync(request.Id);
+          var (assetResult, locationResult, purchaseDetails, spec, warranty, amc, disposal, insurance) = await _assetMasterRepository.GetAssetMasterByIdAsync(request.Id);
           var asset = _mapper.Map<AssetMasterDTO>(assetResult);
 
             if (assetResult?.AssetName != null)
@@ -59,18 +57,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
              if (insurance != null)
              {
                  asset.AssetInsurance = _mapper.Map<List<AssetInsuranceByIdDTO>>(insurance);
-             }
-             
-
-            // string logoBase64 = null;
-            //  if (!string.IsNullOrEmpty(assetMaster.AssetImage) && File.Exists(assetMaster.AssetImage))
-            //  {
-            //      byte[] imageBytes = await File.ReadAllBytesAsync(assetMaster.AssetImage);
-            //      logoBase64 = Convert.ToBase64String(imageBytes);
-            //  }
-
-            // var assetMasterDto = _mapper.Map<AssetMasterGeneralDTO>(assetMaster);
-            // assetMasterDto.AssetImageBase64 = logoBase64;
+             }      
 
             if (asset is null)
             {                
