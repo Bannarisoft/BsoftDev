@@ -73,6 +73,8 @@ using System.Text;
 using System.Security.Cryptography;
 using Core.Application.Common;
 using UserManagement.Infrastructure.Helpers;
+using Core.Application.Common.Interfaces.ICustomField;
+using UserManagement.Infrastructure.Repositories.CustomFields;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
@@ -233,6 +235,8 @@ namespace UserManagement.Infrastructure
             services.AddScoped<IProfileCommand, ProfileCommandRepository>();
             services.AddScoped<IUserGroupQueryRepository, UserGroupQueryRepository>();
             services.AddScoped<IUserGroupCommandRepository, UserGroupCommandRepository>();
+            services.AddScoped<ICustomFieldQuery, CustomFieldQuery>();
+            services.AddScoped<ICustomFieldCommand, CustomFieldCommand>();
             
             
             // Miscellaneous services
