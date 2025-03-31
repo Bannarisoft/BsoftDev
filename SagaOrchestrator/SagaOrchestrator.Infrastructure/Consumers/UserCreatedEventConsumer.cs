@@ -12,10 +12,26 @@ namespace SagaOrchestrator.Infrastructure.Consumers
     {
         public async Task Consume(ConsumeContext<UserCreatedEvent> context)
         {
-            var userEvent = context.Message;
-            Log.Information($"User Created: {userEvent.UserName}, CorrelationId: {userEvent.CorrelationId}");
+            try
+            {
+                var userEvent = context.Message;
 
-            await Task.CompletedTask;
+                Log.Information("User Created: {UserName}, Email: {Email}, CorrelationId: {CorrelationId}",
+                    userEvent.UserName, userEvent.Email, context.CorrelationId);
+
+                // You can add additional logic here
+
+                await Task.CompletedTask;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error consuming UserCreatedEvent");
+                throw;
+            }
+            // var userEvent = context.Message;
+            // Log.Information($"User Created: {userEvent.UserName}, CorrelationId: {userEvent.CorrelationId}");
+
+            // await Task.CompletedTask;
         }
     }
 }
