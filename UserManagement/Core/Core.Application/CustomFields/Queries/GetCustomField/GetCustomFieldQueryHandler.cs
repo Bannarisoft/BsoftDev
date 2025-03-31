@@ -27,15 +27,15 @@ namespace Core.Application.CustomFields.Queries.GetCustomField
             var customfieldList = _mapper.Map<List<CustomFieldDTO>>(customfield);
 
              //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetCustomFields",
-                    actionCode: "",        
-                    actionName: "",
-                    details: $"Custom field details was fetched.",
-                    module:"Custom Field"
-                );
+                // var domainEvent = new AuditLogsDomainEvent(
+                //     actionDetail: "GetCustomFields",
+                //     actionCode: "",        
+                //     actionName: "",
+                //     details: $"Custom field details was fetched.",
+                //     module:"Custom Field"
+                // );
 
-                await _mediator.Publish(domainEvent, cancellationToken);
+                // await _mediator.Publish(domainEvent, cancellationToken);
                 
             return new ApiResponseDTO<List<CustomFieldDTO>> 
             { 

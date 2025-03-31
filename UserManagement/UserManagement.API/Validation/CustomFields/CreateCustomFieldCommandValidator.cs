@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.ICustomField;
+using Core.Application.Common.Interfaces.IUnit;
 using Core.Application.CustomFields.Commands.CreateCustomField;
 using Core.Domain.Entities;
 using FluentValidation;
@@ -14,12 +15,14 @@ namespace UserManagement.API.Validation.CustomFields
     {
         private readonly List<ValidationRule> _validationRules;
         private readonly ICustomFieldQuery _customFieldQuery;
-        public CreateCustomFieldCommandValidator(MaxLengthProvider maxLengthProvider, ICustomFieldQuery customFieldQuery)
+        private readonly IUnitQueryRepository _unitQueryRepository;
+        public CreateCustomFieldCommandValidator(MaxLengthProvider maxLengthProvider, ICustomFieldQuery customFieldQuery, IUnitQueryRepository unitQueryRepository)
         {
             var LabelNameMaxLength = maxLengthProvider.GetMaxLength<CustomField>("LabelName") ?? 50;
 
              _validationRules = ValidationRuleLoader.LoadValidationRules();
              _customFieldQuery = customFieldQuery;
+            _unitQueryRepository = unitQueryRepository;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -39,6 +42,16 @@ namespace UserManagement.API.Validation.CustomFields
                         RuleFor(x => x.LabelTypeId)
                             .NotEmpty()
                             .WithMessage($" {rule.Error}");
+                        RuleFor(x => x.Menu)
+                        .NotNull()
+                        .WithMessage($"{rule.Error}")
+                        .Must(x => x.Count > 0)
+                        .WithMessage($"{rule.Error}");
+                     RuleFor(x => x.Unit)
+                        .NotNull()
+                        .WithMessage($"{rule.Error}")
+                        .Must(x => x.Count > 0)
+                        .WithMessage($"{rule.Error}");
                        
                         break;
                     case "MaxLength":
@@ -61,6 +74,16 @@ namespace UserManagement.API.Validation.CustomFields
                            .WithName("Label Name")
                             .WithMessage($"{rule.Error}");
                             break;
+                            case "FKColumnDelete":
+                        RuleFor(x => x.Unit)
+                             .ForEach(unitRule =>
+                             {
+                                 unitRule.MustAsync(async (unit, cancellation) => 
+                                     await _unitQueryRepository.FKColumnExistValidation(unit.UnitId))
+                                     .WithMessage($"{rule.Error}");  
+                             });
+                             
+                        break; 
                         default:
                         
                         break;

@@ -42,6 +42,16 @@ namespace UserManagement.API.Validation.CustomFields
                         RuleFor(x => x.LabelTypeId)
                             .NotEmpty()
                             .WithMessage($"{rule.Error}");
+                        RuleFor(x => x.Menu)
+                        .NotNull()
+                        .WithMessage($"{rule.Error}")
+                        .Must(x => x.Count > 0)
+                        .WithMessage($"{rule.Error}");
+                     RuleFor(x => x.Unit)
+                        .NotNull()
+                        .WithMessage($"{rule.Error}")
+                        .Must(x => x.Count > 0)
+                        .WithMessage($"{rule.Error}");
                         break;
                     case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.CustomFields.Commands.CreateCustomField;
 using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.CustomFields.Queries.GetCustomField
@@ -15,5 +16,6 @@ namespace Core.Application.CustomFields.Queries.GetCustomField
         public string LabelType { get; set; }
         public string DataType { get; set; }
         public Status IsActive { get; set; }
+        
     }
 }

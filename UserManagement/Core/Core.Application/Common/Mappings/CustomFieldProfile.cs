@@ -18,8 +18,15 @@ namespace Core.Application.Common.Mappings
         public CustomFieldProfile()
         {
              CreateMap<CreateCustomFieldCommand, CustomField>()
+             .ForMember(dest => dest.CustomFieldMenu, opt => opt.MapFrom(src => src.Menu))
+             .ForMember(dest => dest.CustomFieldUnits, opt => opt.MapFrom(src => src.Unit))
+             .ForMember(dest => dest.CustomFieldOptionalValues, opt => opt.MapFrom(src => src.OptionalValues))
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+
+            CreateMap<CustomFieldMenuDto, CustomFieldMenu>();
+            CreateMap<CustomFieldUnitDto, CustomFieldUnit>();
+            CreateMap<CustomFieldOptionalValueDto, CustomFieldOptionalValue>();
 
             CreateMap<UpdateCustomFieldCommand, CustomField>()
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
@@ -31,7 +38,7 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.LabelType, opt => opt.MapFrom(src => src.LabelType.Code)) 
             .ForMember(dest => dest.DataType, opt => opt.MapFrom(src => src.DataType.Code));
 
-            CreateMap<CustomField, CustomFieldByIdDTO>();
+
 
         }
     }

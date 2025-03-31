@@ -14,5 +14,8 @@ namespace Core.Application.CustomFields.Commands.CreateCustomField
         public int DataTypeId { get; set; }
         public int LabelTypeId { get; set; }
         public byte IsRequired { get; set; }
+        public List<CustomFieldMenuDto> Menu { get; set; }
+        public List<CustomFieldUnitDto> Unit { get; set; }
+        public List<CustomFieldOptionalValueDto>? OptionalValues { get; set; }
     }
 }

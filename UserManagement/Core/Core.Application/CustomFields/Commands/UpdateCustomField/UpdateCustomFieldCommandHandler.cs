@@ -29,14 +29,14 @@ namespace Core.Application.CustomFields.Commands.UpdateCustomField
                 var customFieldresult = await _customFieldCommand.UpdateAsync(customField);
 
                 
-                    var domainEvent = new AuditLogsDomainEvent(
-                        actionDetail: "Update",
-                        actionCode: "Update custom field",
-                        actionName: "Update",
-                        details: $"Custom field '{request.Id}' was updated.",
-                        module:"Custom Field"
-                    );               
-                    await _mediator.Publish(domainEvent, cancellationToken); 
+                    // var domainEvent = new AuditLogsDomainEvent(
+                    //     actionDetail: "Update",
+                    //     actionCode: "Update custom field",
+                    //     actionName: "Update",
+                    //     details: $"Custom field '{request.Id}' was updated.",
+                    //     module:"Custom Field"
+                    // );               
+                    // await _mediator.Publish(domainEvent, cancellationToken); 
               
                 if(customFieldresult)
                 {

@@ -31,14 +31,14 @@ namespace Core.Application.CustomFields.Commands.CreateCustomField
                 
                 if (customFieldresult > 0)
                 {
-                    var domainEvent = new AuditLogsDomainEvent(
-                     actionDetail: "Create",
-                     actionCode: "Create custom field",
-                     actionName: "Create",
-                     details: $"Custom field ",
-                     module:"Custom Field"
-                 );
-                 await _mediator.Publish(domainEvent, cancellationToken);
+                //     var domainEvent = new AuditLogsDomainEvent(
+                //      actionDetail: "Create",
+                //      actionCode: "Create custom field",
+                //      actionName: "Create",
+                //      details: $"Custom field ",
+                //      module:"Custom Field"
+                //  );
+                //  await _mediator.Publish(domainEvent, cancellationToken);
                  
                     return new ApiResponseDTO<int>
                     {

@@ -113,10 +113,23 @@ namespace UserManagement.Infrastructure.Repositories.CustomFields
                 return count > 0;
           }
 
-        public async Task<CustomField> GetByIdAsync(int id)
+        public async Task<(dynamic CustomField,IList<dynamic> CustomFieldMenu,IList<dynamic> CustomFieldUnit,IList<dynamic> CustomFieldOptionValue)> GetByIdAsync(int id)
         {
-            const string query = "SELECT * FROM [AppData].[CustomField] WHERE Id = @Id AND IsDeleted = 0";
-            return await _dbConnection.QueryFirstOrDefaultAsync<CustomField>(query, new { id });
+            const string query = @"SELECT Id,LabelName,DataTypeId,Length,LabelTypeId,IsRequired,IsActive
+                                     FROM [AppData].[CustomField] WHERE Id = @Id AND IsDeleted = 0
+
+                                  SELECT MenuId FROM [AppData].[CustomFieldMenu] WHERE CustomFieldId = @Id 
+
+                                  SELECT UnitId FROM [AppData].[CustomFieldUnit] WHERE CustomFieldId = @Id 
+                                  
+                                  SELECT OptionFieldValue FROM [AppData].[CustomFieldOptionalValue] WHERE CustomFieldId = @Id  ";
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = id });
+            var customfieldResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
+            var customFieldMenuResult = await multi.ReadAsync<dynamic>();
+            var customFieldUnit = await multi.ReadAsync<dynamic>();
+            var customFieldOption = await multi.ReadAsync<dynamic>();
+
+            return (customfieldResult,customFieldMenuResult.ToList(),customFieldUnit.ToList(),customFieldOption.ToList());
         }
 
         public async Task<List<CustomField>> GetCustomField(string searchPattern)

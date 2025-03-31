@@ -9,7 +9,7 @@ namespace Core.Application.Common.Interfaces.ICustomField
     public interface ICustomFieldQuery
     {
          Task<(List<CustomField>,int)> GetAllCustomFieldsAsync(int PageNumber, int PageSize, string? SearchTerm);
-        Task<CustomField> GetByIdAsync(int id);
+        Task<(dynamic CustomField,IList<dynamic> CustomFieldMenu,IList<dynamic> CustomFieldUnit,IList<dynamic> CustomFieldOptionValue)> GetByIdAsync(int id);
         Task<List<CustomField>> GetCustomField(string searchPattern);
         Task<bool> AlreadyExistsAsync(string LabelName, int? id = null);
         Task<bool> SoftDeleteValidation(int Id); 
