@@ -4,19 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using Contracts.Events.Users;
 using MassTransit;
+using Serilog;
 
-namespace FAM.Infrastructure.Consumers
+namespace SagaOrchestrator.Infrastructure.Consumers
 {
     public class AssetCreatedEventConsumer : IConsumer<AssetCreatedEvent>
     {
         public async Task Consume(ConsumeContext<AssetCreatedEvent> context)
         {
             var assetEvent = context.Message;
-            Console.WriteLine($"Asset Created: {assetEvent.AssetName} for UserId: {assetEvent.UserId}");
+            Log.Information($"Asset Created: {assetEvent.AssetName}");
 
-            // Notify SagaOrchestrator of completion
             await context.Publish(new SagaCompletedEvent
             {
+                CorrelationId = assetEvent.CorrelationId,
                 UserId = assetEvent.UserId,
                 Status = "Completed"
             });

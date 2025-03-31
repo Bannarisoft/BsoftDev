@@ -25,11 +25,11 @@ namespace Core.Application.Users.Commands.CreateUser
         private readonly IUserQueryRepository _userQueryRepository;
         private readonly IEmailService _emailService;
         private readonly ISmsService _smsService;
-        private readonly IPublishEndpoint _publishEndpoint;  // MassTransit Publish Endpoint
+        private readonly IEventPublisher _eventPublisher;  // Use IEventPublisher instead of IPublishEndpoint
 
 
         public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator, ILogger<CreateUserCommandHandler> logger, IEmailService emailService, ISmsService smsService, IUserQueryRepository userQueryRepository
-        , IPublishEndpoint publishEndpoint)
+        , IEventPublisher eventPublisher)
         {
             _userRepository = userRepository;
             _mapper = mapper;
@@ -38,7 +38,7 @@ namespace Core.Application.Users.Commands.CreateUser
             _userQueryRepository = userQueryRepository;
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _smsService = smsService ?? throw new ArgumentNullException(nameof(smsService));
-            _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
+            _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
 
         }
 
@@ -68,33 +68,18 @@ namespace Core.Application.Users.Commands.CreateUser
             }
             _logger.LogInformation("User successfully created for Username: {Username}", createdUser.UserName);
 
-            // Publish UserCreatedEvent to RabbitMQ
-            // var userCreatedEvent = new
-            // {
-            //     CorrelationId = Guid.NewGuid(),
-            //     UserId = createdUser.UserId,  // Using generated UserId
-            //     Email = createdUser.EmailId
-            // };
-
-
-            // await _publishEndpoint.Publish<IUserCreatedEvent>(userCreatedEvent, context =>
-            // {
-            //     context.Durable = true;  // Ensures message is persistent in RabbitMQ
-            // });
-
-            // _logger.LogInformation("UserCreatedEvent published successfully for UserId: {UserId}", createdUser.UserId);
-
-            // Publish UserCreatedEvent to RabbitMQ
+            // 🔥 Publish UserCreatedEvent to RabbitMQ
             // var userCreatedEvent = new UserCreatedEvent
             // {
             //     CorrelationId = Guid.NewGuid(),
             //     UserId = createdUser.UserId,
+            //     UserName = createdUser.UserName,
             //     Email = createdUser.EmailId
             // };
+
             // try
             // {
-            //     // Publish UserCreatedEvent to RabbitMQ
-            //     await _publishEndpoint.Publish<IUserCreatedEvent>(userCreatedEvent);
+            //     await _publishEndpoint.Publish(userCreatedEvent, cancellationToken);
             //     _logger.LogInformation("UserCreatedEvent published successfully for UserId: {UserId}", createdUser.UserId);
             // }
             // catch (Exception ex)
@@ -114,24 +99,24 @@ namespace Core.Application.Users.Commands.CreateUser
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            // // 🔥 Publish UserCreatedEvent to RabbitMQ
-            // var userCreatedEvent = new UserCreatedEvent
-            // {
-            //     UserId = createdUser.UserId,
-            //     UserName = createdUser.UserName,
-            //     Email = createdUser.EmailId
-            // };
+            // 🔥 Publish UserCreatedEvent to RabbitMQ
+            // Use the ID generated from the database
+            var userid = userEntity.UserId;
+            var userCreatedEvent = new UserCreatedEvent
+            {
+                CorrelationId = Guid.NewGuid(),
+                UserId = userid,
+                UserName = createdUser.UserName,
+                Email = createdUser.EmailId
+            };
 
-            // try
-            // {
-            //     await _publishEndpoint.Publish(userCreatedEvent, cancellationToken);
-            //     _logger.LogInformation("UserCreatedEvent published successfully for UserId: {UserId}", createdUser.UserId);
-            // }
-            // catch (Exception ex)
-            // {
-            //     _logger.LogError("Error publishing UserCreatedEvent: {Message}", ex.Message);
-            // }
-            
+            // Save event to Outbox 
+            await _eventPublisher.SaveEventAsync(userCreatedEvent);
+
+            // Triggering the publishing of pending events
+            await _eventPublisher.PublishPendingEventsAsync();
+
+
             // Map the created user entity to DTO
             var userDto = _mapper.Map<UserDto>(createdUser);
             _logger.LogError("An exception occurred while creating user for Username: {Username}", request.UserName);
