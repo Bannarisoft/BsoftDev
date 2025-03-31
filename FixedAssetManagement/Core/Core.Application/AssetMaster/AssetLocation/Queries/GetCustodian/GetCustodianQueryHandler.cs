@@ -12,7 +12,6 @@ namespace Core.Application.AssetMaster.AssetLocation.Queries.GetCustodian
 {
     public class GetCustodianQueryHandler : IRequestHandler<GetCustodianQuery, ApiResponseDTO<List<GetCustodianDto>>>
     {
-
         private readonly IAssetLocationQueryRepository _assetLocationRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
@@ -22,16 +21,12 @@ namespace Core.Application.AssetMaster.AssetLocation.Queries.GetCustodian
             _assetLocationRepository = assetLocationRepository;
             _mapper = mapper;
             _mediator = mediator;
-
         }
 
         public async Task<ApiResponseDTO<List<GetCustodianDto>>> Handle(GetCustodianQuery request, CancellationToken cancellationToken)
-        {
-           
-           var (assetcustodian, totalCount) = await _assetLocationRepository.GetAllCustodianAsync(request.OldUnitId,  request.SearchEmployee);
-
+        {           
+            var (assetcustodian, totalCount) = await _assetLocationRepository.GetAllCustodianAsync(request.OldUnitId,  request.SearchEmployee);
             var assetMasterList = _mapper.Map<List<GetCustodianDto>>(assetcustodian);
-
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetAll",

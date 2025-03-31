@@ -1,6 +1,7 @@
 using MassTransit;
 using Microsoft.OpenApi.Models;
 using SagaOrchestrator.Infrastructure;
+using SagaOrchestrator.Infrastructure.PollyResilience;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +35,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
+builder.Services.AddInfrastructureServices();
+builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

@@ -376,9 +376,8 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("RenewalStatus")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                    b.Property<int>("RenewalStatus")
+                        .HasColumnType("int");
 
                     b.Property<DateOnly>("RenewedDate")
                         .HasColumnType("date");

@@ -57,7 +57,6 @@ using Core.Application.Common.Interfaces.ICurrency;
 using UserManagement.Infrastructure.Repositories.Currency;
 using Core.Application.Common.Interfaces.ITimeZones;
 using UserManagement.Infrastructure.Repositories.TimeZones;
-using UserManagement.Infrastructure.PollyResilience;
 using Core.Application.Common.Interfaces.ILanguage;
 using UserManagement.Infrastructure.Repositories.Language;
 using Core.Application.Common.Interfaces.IFinancialYear;
@@ -65,12 +64,9 @@ using UserManagement.Infrastructure.Repositories.FinancialYear;
 using Core.Application.Common.Interfaces.IMenu;
 using UserManagement.Infrastructure.Repositories.Menu;
 using Core.Application.Common.Interfaces.IProfile;
-using AutoMapper;
 using UserManagement.Infrastructure.Repositories.Profile;
 using Core.Application.Common.Interfaces.IUserGroup;
 using UserManagement.Infrastructure.Repositories.UserGroup;
-using System.Text;
-using System.Security.Cryptography;
 using Core.Application.Common;
 using UserManagement.Infrastructure.Helpers;
 using Core.Application.Common.Interfaces.ICustomField;
@@ -181,7 +177,7 @@ namespace UserManagement.Infrastructure
         //     options.Cookie.IsEssential = true;
         // });
         // Register Polly Policies
-        services.AddPollyPolicies(configuration);
+        // services.AddPollyPolicies(configuration);
             
 
             // Register repositories

@@ -43,12 +43,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 builder.Property(t => t.DepartmentId)
                 .HasColumnName("DepartmentId")
                 .HasColumnType("int")
-                .IsRequired();
-
-            builder.Property(t => t.MachineGroupId)
-                .HasColumnName("MachineGroupId")
-                .HasColumnType("int")
-                .IsRequired();
+                .IsRequired();          
 
             builder.Property(t => t.EstimatedDuration)
                 .HasColumnName("EstimatedDuration")
@@ -60,10 +55,10 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
                 // MachineGroup → ActivityMaster (One-to-Many Relationship)
-            builder.HasOne(am => am.MachineGroup)  // One MachineGroup per ActivityMaster
-            .WithMany(mg => mg.ActivityMasters) // One MachineGroup has many ActivityMasters
-            .HasForeignKey(am => am.MachineGroupId) // Foreign key in ActivityMaster
-            .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete   
+            // builder.HasOne(am => am.MachineGroup)  // One MachineGroup per ActivityMaster
+            // .WithMany(mg => mg.ActivityMasters) // One MachineGroup has many ActivityMasters
+            // .HasForeignKey(am => am.MachineGroupId) // Foreign key in ActivityMaster
+            // .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete   
 
 
                

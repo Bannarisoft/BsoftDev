@@ -70,7 +70,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
         {
             const string query = @"
                 SELECT 
-                    A.Id, A.ActivityName,  A.Description,  A.DepartmentId, B.DeptName AS Department, A.MachineGroupId, C.GroupName AS MachineGroup, 
+                    A.Id, A.ActivityName,  A.Description,  A.DepartmentId, B.DeptName AS Department, A.MachineGroupId, C.GroupName AS MachineGroupName, 
                     A.EstimatedDuration,  A.ActivityType,  D.Code AS ActivityTypeDescription,A.IsActive, A.IsDeleted,A.CreatedBy, A.CreatedDate, 
                     A.CreatedByName,  A.CreatedIP,  A.ModifiedBy, A.ModifiedDate,  A.ModifiedByName, A.ModifiedIP  FROM Maintenance.ActivityMaster A  
                 INNER JOIN Bannari.AppData.Department B ON A.DepartmentId = B.Id
