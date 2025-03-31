@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MaintenanceManagement.Infrastructure
 {
-    public class SagaDependencyInjection
+    public static class SagaDependencyInjection
     {
         public static IServiceCollection AddSagaInfrastructure(this IServiceCollection services)
         {
