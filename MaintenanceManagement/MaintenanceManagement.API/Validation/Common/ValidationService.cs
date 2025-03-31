@@ -11,12 +11,12 @@ using Core.Application.WorkCenter.Command.CreateWorkCenter;
 using Core.Application.WorkCenter.Command.DeleteWorkCenter;
 using Core.Application.WorkCenter.Command.UpdateWorkCenter;
 
-using Core.Application.ShiftMasterCQRS.Commands.CreateShiftMaster;
-using Core.Application.ShiftMasterCQRS.Commands.DeleteShiftMaster;
-using Core.Application.ShiftMasterCQRS.Commands.UpdateShiftMaster;
-using Core.Application.ShiftMasterDetailCQRS.Commands.CreateShiftMasterDetail;
-using Core.Application.ShiftMasterDetailCQRS.Commands.DeleteShiftMasterDetail;
-using Core.Application.ShiftMasterDetailCQRS.Commands.UpdateShiftMasterDetail;
+using Core.Application.ShiftMasters.Commands.CreateShiftMaster;
+using Core.Application.ShiftMasters.Commands.DeleteShiftMaster;
+using Core.Application.ShiftMasters.Commands.UpdateShiftMaster;
+using Core.Application.ShiftMasterDetails.Commands.CreateShiftMasterDetail;
+using Core.Application.ShiftMasterDetails.Commands.DeleteShiftMasterDetail;
+using Core.Application.ShiftMasterDetails.Commands.UpdateShiftMasterDetail;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.CostCenter;
 using MaintenanceManagement.API.Validation.WorkCenter;
