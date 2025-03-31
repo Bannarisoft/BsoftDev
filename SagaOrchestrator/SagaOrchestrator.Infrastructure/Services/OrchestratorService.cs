@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Contracts.Events.Users;
+using Contracts.Models.Users;
 using MassTransit;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IAssets;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
@@ -20,9 +21,9 @@ namespace SagaOrchestrator.Infrastructure.Services
             _assetService = assetService;
             _publishEndpoint = publishEndpoint;
         }
-        public async Task TriggerUserCreation(int userId)
+        public async Task<UserDto> TriggerUserCreation(int userId,string token)
         {
-            var user = await _userService.GetUserByIdAsync(userId);
+            var user = await _userService.GetUserByIdAsync(userId, token);
 
             if (user != null)
             {
@@ -30,10 +31,12 @@ namespace SagaOrchestrator.Infrastructure.Services
                 {
                     UserId = user.UserId,
                     UserName = user.UserName,
-                    Email = user.Email
+                    Email  = user.Email
                 };
                 await _publishEndpoint.Publish(userCreatedEvent);
+                return user;
             }
+            return null;
         }
 
         public async Task TriggerAssetCreation(int userId, int assetId)
