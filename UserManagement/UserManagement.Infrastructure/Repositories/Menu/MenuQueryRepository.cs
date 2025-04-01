@@ -47,5 +47,11 @@ namespace UserManagement.Infrastructure.Repositories.Menu
             var parentMenus = await _dbConnection.QueryAsync<Core.Domain.Entities.Menu>(query);
             return parentMenus.ToList();
         }
+         public async Task<bool> FKColumnExistValidation(int Id)
+          {
+              var sql = "SELECT COUNT(1) FROM AppData.Menus WHERE Id = @Id AND IsDeleted = 0 AND IsActive = 1";
+                var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = Id });
+                return count > 0;
+          }
     }
 }
