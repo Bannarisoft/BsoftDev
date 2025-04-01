@@ -76,6 +76,10 @@ using Core.Application.UserGroup.Commands.UpdateUesrGroup;
 using Core.Application.UserGroup.Commands.DeleteUserGroup;
 using UserManagement.API.Validation.UserGroup;
 using Core.Application.UserLogin.Commands.DeactivateUserSession;
+using Core.Application.CustomFields.Commands.CreateCustomField;
+using UserManagement.API.Validation.CustomFields;
+using Core.Application.CustomFields.Commands.UpdateCustomField;
+using Core.Application.CustomFields.Commands.DeleteCustomField;
 namespace UserManagement.API.Validation.Common
 {
     public class ValidationService
@@ -139,6 +143,9 @@ namespace UserManagement.API.Validation.Common
         services.AddScoped<IValidator<ForgotUserPasswordCommand>, ForgotPasswordCommandValidator>();
         services.AddScoped<IValidator<ResetUserPasswordCommand>, ResetUserPasswordCommandValidator>();
         services.AddScoped<IValidator<DeactivateUserSessionCommand>, DeactivateUserSessionCommandValidator>();
+        services.AddScoped<IValidator<CreateCustomFieldCommand>, CreateCustomFieldCommandValidator>();
+        services.AddScoped<IValidator<UpdateCustomFieldCommand>, UpdateCustomFieldCommandValidator>();
+        services.AddScoped<IValidator<DeleteCustomFieldCommand>, DeleteCustomFieldCommandValidator>();
          }  
     }
 }

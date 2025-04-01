@@ -2,36 +2,59 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Application.ShiftMasterDetails.Commands.CreateShiftMasterDetail;
-using Core.Application.ShiftMasterDetails.Commands.DeleteShiftMasterDetail;
-using Core.Application.ShiftMasterDetails.Commands.UpdateShiftMasterDetail;
-using Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetailById;
+using Core.Application.CustomFields.Commands.CreateCustomField;
+using Core.Application.CustomFields.Commands.DeleteCustomField;
+using Core.Application.CustomFields.Commands.UpdateCustomField;
+using Core.Application.CustomFields.Queries.GetCustomField;
+using Core.Application.CustomFields.Queries.GetCustomFieldById;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MaintenanceManagement.API.Controllers
+namespace UserManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ShiftMasterDetailController : ApiControllerBase
+    public class CustomFieldController : ApiControllerBase
     {
-        private readonly IValidator<CreateShiftMasterDetailCommand> _createShiftMasterDetailCommandValidator;
-        private readonly IValidator<UpdateShiftMasterDetailCommand> _updateShiftMasterDetailCommandValidator;
-        private readonly IValidator<DeleteShiftMasterDetailCommand> _deleteShiftMasterDetailCommandValidator;
-        public ShiftMasterDetailController(ISender mediator,IValidator<CreateShiftMasterDetailCommand> createShiftMasterDetailCommandValidator,IValidator<UpdateShiftMasterDetailCommand> updateShiftMasterDetailCommandValidator,IValidator<DeleteShiftMasterDetailCommand> deleteShiftMasterDetailCommandValidator) 
+        private readonly IValidator<CreateCustomFieldCommand> _createCustomFieldCommandValidator;
+        private readonly IValidator<UpdateCustomFieldCommand> _updateCustomFieldCommandValidator;
+        private readonly IValidator<DeleteCustomFieldCommand> _deleteCustomFieldCommandValidator;
+        public CustomFieldController(ISender mediator, 
+                                    IValidator<CreateCustomFieldCommand> createCustomFieldCommandValidator,
+                                    IValidator<UpdateCustomFieldCommand> updateCustomFieldCommandValidator,
+                                    IValidator<DeleteCustomFieldCommand> deleteCustomFieldCommandValidator) 
         : base(mediator)
         {
-            _createShiftMasterDetailCommandValidator = createShiftMasterDetailCommandValidator;
-            _updateShiftMasterDetailCommandValidator = updateShiftMasterDetailCommandValidator;
-            _deleteShiftMasterDetailCommandValidator = deleteShiftMasterDetailCommandValidator;
+            _createCustomFieldCommandValidator = createCustomFieldCommandValidator;
+            _updateCustomFieldCommandValidator = updateCustomFieldCommandValidator;
+            _deleteCustomFieldCommandValidator = deleteCustomFieldCommandValidator;
         }
-         
+           [HttpGet]
+        public async Task<IActionResult> GetAllCustomFieldsAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        {
+           var divisions = await Mediator.Send(
+            new GetCustomFieldQuery
+            {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
+           
+            return Ok( new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                data = divisions.Data,
+                TotalCount = divisions.TotalCount,
+                PageNumber = divisions.PageNumber,
+                PageSize = divisions.PageSize
+                });
+        }
          [HttpPost]
-        public async Task<IActionResult> CreateAsync(CreateShiftMasterDetailCommand command)
+        public async Task<IActionResult> CreateAsync(CreateCustomFieldCommand command)
         {
             
-            var validationResult = await _createShiftMasterDetailCommandValidator.ValidateAsync(command);
+            var validationResult = await _createCustomFieldCommandValidator.ValidateAsync(command);
             
             if (!validationResult.IsValid)
             {
@@ -67,28 +90,28 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> GetByIdAsync(int id)
         {
                
-            var shiftMaster = await Mediator.Send(new GetShiftMasterByIdQuery { Id = id});
+            var customField = await Mediator.Send(new GetCustomFieldByIdQuery { Id = id});
           
-             if(shiftMaster == null)
+             if(customField == null)
             {
                 return NotFound( new 
                 { 
                     StatusCode=StatusCodes.Status404NotFound, 
-                    message = $"Shift Master ID {id} not found.", 
+                    message = $"CustomField ID {id} not found.", 
                     errors = "" 
                 });
             }
             return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
-                data = shiftMaster.Data
+                data = customField.Data
             });
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update( UpdateShiftMasterDetailCommand command )
+        public async Task<IActionResult> Update( UpdateCustomFieldCommand command )
         {
-            var validationResult = await _updateShiftMasterDetailCommandValidator.ValidateAsync(command);
+            var validationResult = await _updateCustomFieldCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
                  return BadRequest(new 
@@ -124,8 +147,8 @@ namespace MaintenanceManagement.API.Controllers
         
         public async Task<IActionResult> Delete(int id)
         {
-            var command = new DeleteShiftMasterDetailCommand { Id = id };
-             var validationResult = await  _deleteShiftMasterDetailCommandValidator.ValidateAsync(command);
+            var command = new DeleteCustomFieldCommand { Id = id };
+             var validationResult = await  _deleteCustomFieldCommandValidator.ValidateAsync(command);
                if (!validationResult.IsValid)
                 {
                     return BadRequest(new 
@@ -134,14 +157,14 @@ namespace MaintenanceManagement.API.Controllers
                     errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
                 });
                 }
-           var updatedShiftMaster = await Mediator.Send(command);
+           var updatedCustomField = await Mediator.Send(command);
 
-           if(updatedShiftMaster.IsSuccess)
+           if(updatedCustomField.IsSuccess)
            {
             return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
-                message = updatedShiftMaster.Message, 
+                message = updatedCustomField.Message, 
                 errors = "" 
             });
               
@@ -150,7 +173,7 @@ namespace MaintenanceManagement.API.Controllers
             return BadRequest(new 
             { 
                 StatusCode=StatusCodes.Status400BadRequest, 
-                message = updatedShiftMaster.Message, 
+                message = updatedCustomField.Message, 
                 errors = "" 
             });
             

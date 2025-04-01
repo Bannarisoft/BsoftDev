@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Core.Application.ShiftMasterCQRS.Commands.CreateShiftMaster;
-using Core.Application.ShiftMasterCQRS.Commands.DeleteShiftMaster;
-using Core.Application.ShiftMasterCQRS.Commands.UpdateShiftMaster;
-using Core.Application.ShiftMasterCQRS.Queries.GetShiftMaster;
-using Core.Application.ShiftMasterCQRS.Queries.GetShiftMasterAutoComplete;
+using Core.Application.ShiftMasters.Commands.CreateShiftMaster;
+using Core.Application.ShiftMasters.Commands.DeleteShiftMaster;
+using Core.Application.ShiftMasters.Commands.UpdateShiftMaster;
+using Core.Application.ShiftMasters.Queries.GetShiftMaster;
+using Core.Application.ShiftMasters.Queries.GetShiftMasterAutoComplete;
 using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.Common.Mappings
