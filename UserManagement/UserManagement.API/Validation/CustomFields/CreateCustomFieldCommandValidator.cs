@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.ICustomField;
+using Core.Application.Common.Interfaces.IMenu;
 using Core.Application.Common.Interfaces.IUnit;
 using Core.Application.CustomFields.Commands.CreateCustomField;
 using Core.Domain.Entities;
@@ -16,13 +17,15 @@ namespace UserManagement.API.Validation.CustomFields
         private readonly List<ValidationRule> _validationRules;
         private readonly ICustomFieldQuery _customFieldQuery;
         private readonly IUnitQueryRepository _unitQueryRepository;
-        public CreateCustomFieldCommandValidator(MaxLengthProvider maxLengthProvider, ICustomFieldQuery customFieldQuery, IUnitQueryRepository unitQueryRepository)
+        private readonly IMenuQuery _menuQuery;
+        public CreateCustomFieldCommandValidator(MaxLengthProvider maxLengthProvider, ICustomFieldQuery customFieldQuery, IUnitQueryRepository unitQueryRepository, IMenuQuery menuQuery)
         {
             var LabelNameMaxLength = maxLengthProvider.GetMaxLength<CustomField>("LabelName") ?? 50;
 
              _validationRules = ValidationRuleLoader.LoadValidationRules();
              _customFieldQuery = customFieldQuery;
             _unitQueryRepository = unitQueryRepository;
+            _menuQuery = menuQuery;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -42,17 +45,27 @@ namespace UserManagement.API.Validation.CustomFields
                         RuleFor(x => x.LabelTypeId)
                             .NotEmpty()
                             .WithMessage($" {rule.Error}");
+                       
+
                         RuleFor(x => x.Menu)
                         .NotNull()
                         .WithMessage($"{rule.Error}")
                         .Must(x => x.Count > 0)
                         .WithMessage($"{rule.Error}");
+
                      RuleFor(x => x.Unit)
                         .NotNull()
                         .WithMessage($"{rule.Error}")
                         .Must(x => x.Count > 0)
                         .WithMessage($"{rule.Error}");
-                       
+                    RuleForEach(x => x.OptionalValues)
+                             .ChildRules(optionRule =>
+                             {
+                                 optionRule.RuleFor(m => m.OptionFieldValue)
+                                 .NotEmpty()
+                                 .WithMessage($"{rule.Error}");  
+                             })
+                             .When(x => x.OptionalValues != null);
                         break;
                     case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values
@@ -75,15 +88,25 @@ namespace UserManagement.API.Validation.CustomFields
                             .WithMessage($"{rule.Error}");
                             break;
                             case "FKColumnDelete":
-                        RuleFor(x => x.Unit)
-                             .ForEach(unitRule =>
+                        RuleForEach(x => x.Unit)
+                             .ChildRules(unitRule =>
                              {
-                                 unitRule.MustAsync(async (unit, cancellation) => 
-                                     await _unitQueryRepository.FKColumnExistValidation(unit.UnitId))
+                                 unitRule.RuleFor(m => m.UnitId)
+                                 .MustAsync(async (unitid, cancellation) => 
+                                     await _unitQueryRepository.FKColumnExistValidation(unitid))
+                                     .WithMessage($"{rule.Error}");  
+                             });
+                        RuleForEach(x => x.Menu)
+                             .ChildRules(menuRule =>
+                             {
+                                 menuRule.RuleFor(m => m.MenuId)
+                                 .MustAsync(async (id, cancellation) => 
+                                     await _menuQuery.FKColumnExistValidation(id))
                                      .WithMessage($"{rule.Error}");  
                              });
                              
                         break; 
+                        
                         default:
                         
                         break;
