@@ -36,20 +36,44 @@ namespace UserManagement.Infrastructure.Repositories.CustomFields
 
         public async Task<bool> UpdateAsync(CustomField customField)
         {
-            var existingCustomField = await _applicationDbContext.CustomField.FirstOrDefaultAsync(u => u.Id == customField.Id);
-            if (existingCustomField != null)
-            {
-                existingCustomField.LabelName = customField.LabelName;
-                existingCustomField.DataTypeId = customField.DataTypeId;
-                existingCustomField.Length = customField.Length;
-                existingCustomField.LabelTypeId = customField.LabelTypeId;
-                existingCustomField.IsRequired = customField.IsRequired;
-                existingCustomField.IsActive = customField.IsActive;
+             var existingCustomField = await _applicationDbContext.CustomField
+                   .Include(cf => cf.CustomFieldMenu)
+                   .Include(cf => cf.CustomFieldUnits)
+                   .Include(cf => cf.CustomFieldOptionalValues)
+                   .FirstOrDefaultAsync(u => u.Id == customField.Id);
 
-                _applicationDbContext.CustomField.Update(existingCustomField);
-                return await _applicationDbContext.SaveChangesAsync() > 0;
-            }
-            return false;
+               if (existingCustomField == null)
+                   return false;
+
+               
+               _applicationDbContext.CustomFieldMenu.RemoveRange(
+                   _applicationDbContext.CustomFieldMenu.Where(x => x.CustomFieldId == customField.Id));
+
+               _applicationDbContext.CustomFieldUnit.RemoveRange(
+                   _applicationDbContext.CustomFieldUnit.Where(x => x.CustomFieldId == customField.Id));
+
+               _applicationDbContext.CustomFieldOptionalValue.RemoveRange(
+                   _applicationDbContext.CustomFieldOptionalValue.Where(x => x.CustomFieldId == customField.Id));
+
+               
+               existingCustomField.LabelName = customField.LabelName;
+               existingCustomField.DataTypeId = customField.DataTypeId;
+               existingCustomField.Length = customField.Length;
+               existingCustomField.LabelTypeId = customField.LabelTypeId;
+               existingCustomField.IsRequired = customField.IsRequired;
+               existingCustomField.IsActive = customField.IsActive;
+
+               
+               if (customField.CustomFieldMenu?.Any() == true)
+                   await _applicationDbContext.CustomFieldMenu.AddRangeAsync(customField.CustomFieldMenu);
+
+               if (customField.CustomFieldUnits?.Any() == true)
+                   await _applicationDbContext.CustomFieldUnit.AddRangeAsync(customField.CustomFieldUnits);
+
+               if (customField.CustomFieldOptionalValues?.Any() == true)
+                   await _applicationDbContext.CustomFieldOptionalValue.AddRangeAsync(customField.CustomFieldOptionalValues);
+
+               return await _applicationDbContext.SaveChangesAsync() > 0;
         }
     }
 }

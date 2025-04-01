@@ -17,9 +17,9 @@ namespace Core.Application.CustomFields.Commands.UpdateCustomField
         public int LabelTypeId { get; set; }
         public byte IsRequired { get; set; }
         public byte IsActive { get; set; }
-        public List<CustomFieldMenuDto> Menu { get; set; }
-        public List<CustomFieldUnitDto> Unit { get; set; }
-        public List<CustomFieldOptionalValueDto>? OptionalValues { get; set; }
+        public List<CustomFieldMenuUpdateDto> Menu { get; set; }
+        public List<CustomFieldUnitUpdateDto> Unit { get; set; }
+        public List<CustomFieldOptionalValueUpdateDto>? OptionalValues { get; set; }
 
     }
 }
