@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250402044816_Migrationtest")]
+    partial class Migrationtest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,7 +100,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<int>("IsDeleted")
                         .HasColumnType("int");
 
-                   
+                    b.Property<int?>("MachineGroupId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
@@ -113,7 +117,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                 
+                    b.HasIndex("MachineGroupId");
 
                     b.ToTable("ActivityMaster", "Maintenance");
                 });
@@ -863,7 +867,12 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("MachineGroup");
                 });
 
-           
+            modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MachineGroup", null)
+                        .WithMany("ActivityMasters")
+                        .HasForeignKey("MachineGroupId");
+                });
 
             modelBuilder.Entity("Core.Domain.Entities.MachineGroupUser", b =>
                 {
@@ -946,6 +955,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.MachineGroup", b =>
                 {
                     b.Navigation("ActivityMachineGroups");
+
+                    b.Navigation("ActivityMasters");
 
                     b.Navigation("MachineGroupUser");
 
