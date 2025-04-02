@@ -5,7 +5,7 @@ using UserManagement.API.Middleware;
 using UserManagement.API.Configurations;
 using Core.Domain.Entities;
 using MassTransit;
-using UserManagement.Infrastructure.Consumers;
+using UserManagement.Infrastructure.PollyResilience;
 
 var builder = WebApplication.CreateBuilder(args);
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
@@ -49,24 +49,24 @@ validationService.AddValidationServices(builder.Services);
 // });
 
 
-builder.Services.AddMassTransit(x =>
-{
-    x.AddConsumer<UserCreatedEventConsumer>();
+// builder.Services.AddMassTransit(x =>
+// {
+//     x.AddConsumer<UserCreatedEventConsumer>();
 
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.Host("localhost", "/", h =>
-        {
-            h.Username("guest");
-            h.Password("guest");
-        });
+//     x.UsingRabbitMq((context, cfg) =>
+//     {
+//         cfg.Host("localhost", "/", h =>
+//         {
+//             h.Username("guest");
+//             h.Password("guest");
+//         });
 
-        cfg.ReceiveEndpoint("user-created-queue", e =>
-        {
-            e.ConfigureConsumer<UserCreatedEventConsumer>(context);
-        });
-    });
-});
+//         cfg.ReceiveEndpoint("user-created-queue", e =>
+//         {
+//             e.ConfigureConsumer<UserCreatedEventConsumer>(context);
+//         });
+//     });
+// });
 
 
 // Register Services
@@ -75,7 +75,9 @@ builder.Services.AddSwaggerDocumentation();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
+builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
+builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 

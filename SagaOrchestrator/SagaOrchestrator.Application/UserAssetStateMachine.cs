@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Contracts.Events;
+using Contracts.Events.Users;
 using MassTransit;
 
 namespace SagaOrchestrator.Application
@@ -23,34 +24,45 @@ namespace SagaOrchestrator.Application
         public State UserCreated { get; private set; }
         public State AssetAssigned { get; private set; }
 
-        public Event<UserCreatedEvent> UserCreatedEvent { get; private set; }
-        public Event<IAssetAssigned> AssetAssignedEvent { get; private set; }
+        public Event<Contracts.Events.Users.UserCreatedEvent> UserCreatedEvent { get; private set; }
+        public Event<AssetCreatedEvent> AssetCreatedEvent { get; private set; }
+        public Event<SagaCompletedEvent> SagaCompletedEvent { get; private set; }
 
         public UserAssetStateMachine()
         {
             InstanceState(x => x.CurrentState);
 
             Event(() => UserCreatedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
-            Event(() => AssetAssignedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
+            Event(() => AssetCreatedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
+            Event(() => SagaCompletedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
 
             Initially(
-             When(UserCreatedEvent)
-                 .Then(context =>
-                 {
-                     context.Saga.UserId = context.Message.UserId;
-                     Console.WriteLine($"UserCreatedEvent received. UserId: {context.Message.UserId}");
-                 })
-                 .TransitionTo(UserCreated)
-         );
+                When(UserCreatedEvent)
+                    .Then(context =>
+                    {
+                        context.Saga.UserId = context.Message.UserId;
+                        Console.WriteLine($"User Created: {context.Message.UserName}");
+                    })
+                    .TransitionTo(UserCreated)
+            );
 
             During(UserCreated,
-                When(AssetAssignedEvent)
+                When(AssetCreatedEvent)
                     .Then(context =>
                     {
                         context.Saga.AssetId = context.Message.AssetId;
-                        Console.WriteLine($"AssetAssignedEvent received. AssetId: {context.Message.AssetId}");
+                        Console.WriteLine($"Asset Assigned: {context.Message.AssetName}");
                     })
                     .TransitionTo(AssetAssigned)
+            );
+
+            During(AssetAssigned,
+                When(SagaCompletedEvent)
+                    .Then(context =>
+                    {
+                        Console.WriteLine($"Saga Completed for UserId: {context.Message.UserId}");
+                    })
+                    .Finalize()
             );
 
             SetCompletedWhenFinalized();

@@ -15,5 +15,6 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
         Task<string?> GetLatestAssetCode(int companyId,int unitId, int assetGroupId, int assetCategoryId,int DepartmentId,int LocationId);
         Task<string> GetBaseDirectoryAsync();
         Task<List<Core.Domain.Entities.MiscMaster>> GetAssetPattern();
+        Task<(dynamic AssetResult, dynamic LocationResult, IEnumerable<dynamic> PurchaseDetails, IEnumerable<dynamic> Spec, IEnumerable<dynamic> Warranty,IEnumerable<dynamic> Amc,dynamic Disposal, IEnumerable<dynamic> Insurance)> GetAssetMasterByIdAsync(int assetId);
     }
 }
