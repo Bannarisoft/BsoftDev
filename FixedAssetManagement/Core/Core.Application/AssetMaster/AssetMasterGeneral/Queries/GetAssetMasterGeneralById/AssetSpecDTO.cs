@@ -11,5 +11,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? SpecificationName { get; set; }
         public string? SpecificationValue { get; set; }
         public int SpecificationId { get; set; }
+        public bool IsDefault { get; set; }   
     }
 }

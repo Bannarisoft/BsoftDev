@@ -261,7 +261,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 INNER JOIN [FixedAsset].[AssetSource] ASource ON ASource.Id=AP.AssetSourceId
                 WHERE AP.AssetId = @AssetId;
 
-                SELECT A.Id,SM.SpecificationName,A.SpecificationValue,A.SpecificationId FROM  [FixedAsset].[AssetSpecifications] A
+                SELECT A.Id,SM.SpecificationName,A.SpecificationValue,A.SpecificationId,SM.IsDefault FROM  [FixedAsset].[AssetSpecifications] A
                 INNER JOIN [FixedAsset].[SpecificationMaster] SM ON SM.Id=A.SpecificationId
                 WHERE A.AssetId=@AssetId
 
