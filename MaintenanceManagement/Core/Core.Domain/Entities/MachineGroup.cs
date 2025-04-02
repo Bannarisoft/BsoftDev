@@ -12,8 +12,7 @@ namespace Core.Domain.Entities
         public string?  GroupName { get; set; }
             
         public int Manufacturer { get; set;}       
-         public ICollection<ActivityMachineGroup>? ActivityMachineGroups { get; set; }  
-        public ICollection<ActivityMaster>? ActivityMasters { get; set; }   
+         public ICollection<ActivityMachineGroup>? ActivityMachineGroups { get; set; }   
          public ICollection<MachineGroupUser>? MachineGroupUser { get; set; }             
         public ICollection<MachineMaster>? MachineMasters { get; set; }   
         
