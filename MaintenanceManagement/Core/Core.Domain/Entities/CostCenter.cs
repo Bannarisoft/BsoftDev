@@ -16,6 +16,7 @@ namespace Core.Domain.Entities
         public string? ResponsiblePerson { get; set; }
         public decimal? BudgetAllocated { get; set; }
         public string? Remarks { get; set; }
+        public ICollection<MachineMaster>? MachineMasters { get; set; } 
 
     }
 }

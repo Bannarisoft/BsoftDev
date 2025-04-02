@@ -13,5 +13,6 @@ namespace Core.Domain.Entities
         public string ShiftName { get; set; }
         public DateOnly EffectiveDate { get; set; }
         public List<ShiftMasterDetail> ShiftMasterDetails { get; set; }
+        public ICollection<MachineMaster>? MachineMasters { get; set; }  
     }
 }

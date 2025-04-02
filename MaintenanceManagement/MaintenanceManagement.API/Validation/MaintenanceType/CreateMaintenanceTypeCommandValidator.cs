@@ -14,10 +14,11 @@ namespace MaintenanceManagement.API.Validation.MaintenanceType
     {
           private readonly List<ValidationRule> _validationRules;
          private readonly IMaintenanceTypeCommandRepository _imaintenanceTypeCommandRepository;
-        public CreateMaintenanceTypeCommandValidator(IMaintenanceTypeCommandRepository imaintenanceTypeCommandRepository)
+        public CreateMaintenanceTypeCommandValidator(IMaintenanceTypeCommandRepository imaintenanceTypeCommandRepository,MaxLengthProvider maxLengthProvider)
         {
             _imaintenanceTypeCommandRepository = imaintenanceTypeCommandRepository;
             _validationRules = ValidationRuleLoader.LoadValidationRules();
+            var MaintenanceTypeMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.MaintenanceType>("TypeName") ?? 100;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -31,6 +32,11 @@ namespace MaintenanceManagement.API.Validation.MaintenanceType
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateMaintenanceTypeCommand.TypeName)} {rule.Error}");
                         break;
+                    case "MaxLength":
+                        RuleFor(x => x.TypeName)
+                            .MaximumLength(MaintenanceTypeMaxLength)
+                            .WithMessage($"{nameof(CreateMaintenanceTypeCommand.TypeName)} {rule.Error} {MaintenanceTypeMaxLength}");
+                            break;
                     case "AlphaNumericWithPunctuation":
                         RuleFor(x => x.TypeName)
                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
