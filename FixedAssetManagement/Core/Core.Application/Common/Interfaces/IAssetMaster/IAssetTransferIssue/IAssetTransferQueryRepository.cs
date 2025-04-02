@@ -8,6 +8,7 @@ using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCategor
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetDtlToTransfer;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByDeptId;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetTransferType;
 using Core.Domain.Entities.AssetMaster;
 
 namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue
@@ -21,6 +22,10 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue
            Task<List<GetAssetMasterDto>> GetAssetsByCategoryAsync(int assetCategoryId , int assetDepartmentId);             
            Task<GetAssetDetailsToTransferHdrDto?> GetAssetDetailsToTransferByIdAsync(int assetId); 
            Task<bool> IsAssetPendingOrApprovedAsync(int assetId);
+
+          // Task<List<GetTransferTypeDto>> GetTransferTypeAsync() ;
+
+            Task<List<Core.Domain.Entities.MiscMaster>> GetTransferTypeAsync();
 
          
          

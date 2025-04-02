@@ -26,7 +26,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransf
     
     // List of assets associated with this transfer
     public List<AssetTransferIssueDtlDto>? AssetTransferIssueDtls { get; set; }
-    public AssetTransferIssueHdrIdDto? AssetTransferIssueHdr { get; set; }
+   // public AssetTransferIssueHdrIdDto? AssetTransferIssueHdr { get; set; }
 
     }
 }

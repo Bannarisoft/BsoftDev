@@ -10,7 +10,9 @@ using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCategor
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetDtlToTransfer;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByDeptId;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetTransferType;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
+using Core.Domain.Common;
 using Dapper;
 
 namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
@@ -29,33 +31,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
          public async Task<(List<AssetTransferDto>, int)> GetAllAsync(int PageNumber, int PageSize ,string? SearchTerm, DateTimeOffset? FromDate , DateTimeOffset? ToDate )        
         {
 
-            //     var query = $$"""
-            // DECLARE @TotalCount INT;
-            // SELECT @TotalCount = COUNT(*) 
-            // FROM FixedAsset.AssetTransferIssueHdr
-            // WHERE 1 = 1 
-            //  {{(FromDate.HasValue ? "AND DocDate >= @FromDate" : "")}}
-            // {{(ToDate.HasValue ? "AND DocDate <= @ToDate" : "")}}
-            // {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(Id AS NVARCHAR) LIKE @Search)") }};
-
-
-            // SELECT Id, DocDate, TransferType, FromUnitId, ToUnitId, 
-            //     FromDepartmentId, ToDepartmentId, FromCustodianId, ToCustodianId, 
-            //     Status, CreatedBy, CreatedDate, CreatedByName, CreatedIP, 
-            //     ModifiedBy, ModifiedDate, ModifiedByName, ModifiedIP, 
-            //     AuthorizedBy, AuthorizedDate, AuthorizedByName, AuthorizedIP, 
-            //     FromCustodianName, ToCustodianName, AckStatus
-            // FROM FixedAsset.AssetTransferIssueHdr
-            // WHERE   1 = 1          
-            // {{(FromDate.HasValue ? "AND DocDate >= @FromDate" : "")}}
-            // {{(ToDate.HasValue ? "AND DocDate < @ToDate" : "")}}
-            // {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(Id AS NVARCHAR) LIKE @Search)") }}        
-            // ORDER BY Id DESC
-            // OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
-
-
-            // SELECT @TotalCount AS TotalCount;
-            // """;
+           
                         var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
@@ -272,7 +248,31 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
 			                                 INNER JOIN  FixedAsset.AssetMaster B on  A.AssetId=B.ID WHERE AssetTransferId = @assetTransferId";                          
                         var result = await _dbConnection.QueryAsync<GetAllTransferDtlDto>(query, new { assetTransferId });         
                         return result.ToList();      
-                }   
+                }  
+
+                // public async Task<List<GetTransferTypeDto>> GetTransferTypeAsync()
+                // {
+                //         const string query = @"select Id as TypeId , Code as TransferType from  FixedAsset.MiscMaster where  MiscTypeId =36";                          
+                //         var result = await _dbConnection.QueryAsync<GetTransferTypeDto>(query);         
+                //         return result.ToList();
+                // } 
+               
+               
+
+        public async Task<List<Core.Domain.Entities.MiscMaster>> GetTransferTypeAsync()
+        {
+            const string query = @"
+                    SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder, M.IsActive
+                    ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
+                    FROM FixedAsset.MiscMaster M
+                    INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeId
+                    WHERE (MiscTypeCode = @MiscTypeCode)
+                    AND M.IsDeleted=0 and M.IsActive=1
+                    ORDER BY M.ID DESC";
+                    var parameters = new { MiscTypeCode = MiscEnumEntity.AssetTransferType.MiscCode};
+                    var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+                    return result.ToList();
+        }
     }
 
 }
