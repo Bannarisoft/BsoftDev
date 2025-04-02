@@ -12,6 +12,7 @@ namespace Core.Domain.Entities
         public string? WorkCenterName { get; set; }
         public int UnitId { get; set; }
         public int DepartmentId { get; set; }
+        public ICollection<MachineMaster>? MachineMasters { get; set; } 
        
     }
 }

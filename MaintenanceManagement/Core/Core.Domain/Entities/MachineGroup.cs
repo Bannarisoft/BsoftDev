@@ -13,6 +13,7 @@ namespace Core.Domain.Entities
         public int Manufacturer { get; set;} 
 
         public ICollection<ActivityMaster>? ActivityMasters { get; set; }   
+        public ICollection<MachineMaster>? MachineMasters { get; set; }   
             
         
     }

@@ -85,5 +85,19 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkCenter
             var workCenters = await _dbConnection.QueryAsync<Core.Domain.Entities.WorkCenter>(query, parameters);
             return workCenters.ToList();
         }
+
+         public async Task<bool> SoftDeleteValidation(int Id)
+        {
+            const string query = @"
+                           SELECT 1 
+                           FROM [Maintenance].[MachineMaster]
+                           WHERE WorkCenterId = @Id AND IsDeleted = 0;";
+                    
+                       using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+                    
+                       var WorkCentermasterDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
+                    
+                       return WorkCentermasterDetailExists.HasValue;
+        }
     }
 }

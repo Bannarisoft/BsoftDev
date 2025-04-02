@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAssetTransferIssueById;
 using Core.Application.AssetMaster.AssetTransferReceipt.Command.CreateAssetTransferReceipt;
+using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetIssueDetailsById;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetails;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetailsById;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptPending;
@@ -133,6 +134,18 @@ namespace FAM.API.Controllers.AssetMaster
             return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetreceipt.Message });
            
         }
+
+          [HttpGet("AssetTransfer/{id}")]       
+              public async Task<IActionResult> GetAssetTransferByIdAsync(int id)
+              {
+                  var query = new GetAssetIssueDetailsByIdQuery { AssetTransferId = id };  
+                  var result = await Mediator.Send(query);
+                 if (result == null) 
+                  {
+                      return NotFound($"Asset Transfer with ID {id} not found.");
+                  }
+                 return Ok(result);
+              }
 
       
     }
