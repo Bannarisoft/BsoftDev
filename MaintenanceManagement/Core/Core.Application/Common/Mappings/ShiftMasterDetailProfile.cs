@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Core.Application.ShiftMasterDetailCQRS.Commands.CreateShiftMasterDetail;
-using Core.Application.ShiftMasterDetailCQRS.Commands.DeleteShiftMasterDetail;
-using Core.Application.ShiftMasterDetailCQRS.Commands.UpdateShiftMasterDetail;
-using Core.Application.ShiftMasterDetailCQRS.Queries.GetShiftMasterDetailById;
+using Core.Application.ShiftMasterDetails.Commands.CreateShiftMasterDetail;
+using Core.Application.ShiftMasterDetails.Commands.DeleteShiftMasterDetail;
+using Core.Application.ShiftMasterDetails.Commands.UpdateShiftMasterDetail;
+using Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetailById;
 using Core.Domain.Entities;
 using static Core.Domain.Common.BaseEntity;
 

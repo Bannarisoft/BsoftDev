@@ -154,6 +154,10 @@
     {
         "rule": "FKColumnDelete",      
         "error": "{PropertyName} is inactive/deleted."
+    },
+    {
+        "rule": "PasswordValidation",      
+        "error": "Password is incorrect."
     }
      
     

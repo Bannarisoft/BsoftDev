@@ -11,6 +11,7 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc
     {
     
         public int Id {get;set;}
+        public int AssetId { get; set; }
         public DateOnly? StartDate { get; set; }
         public int? Period { get; set; }   
         public string? VendorCode { get; set; }  

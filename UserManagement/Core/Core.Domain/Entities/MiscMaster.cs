@@ -16,7 +16,9 @@ namespace Core.Domain.Entities
         public int SortOrder  { get; set;}
         public Status IsActive { get; set; }
             
-        public MiscTypeMaster? MiscTypeMaster { get; set; } 
+        public MiscTypeMaster? MiscTypeMaster { get; set; }
+        public IList<CustomField> CustomFieldDataTypes { get; set; } 
+        public IList<CustomField> CustomFieldLabelTypes { get; set; } 
 		
     }
 }

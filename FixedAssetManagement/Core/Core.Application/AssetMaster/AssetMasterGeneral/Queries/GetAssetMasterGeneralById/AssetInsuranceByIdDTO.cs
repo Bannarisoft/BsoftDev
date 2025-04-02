@@ -7,14 +7,15 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
 {
     public class AssetInsuranceByIdDTO
     {
-        public string PolicyNo { get; set; }
-        public string StartDate { get; set; }
-        public string EndDate { get; set; }
-        public int Insuranceperiod { get; set; }
-        public string PolicyAmount { get; set; }
-        public string VendorCode { get; set; }
-        public string RenewalStatus { get; set; }
-        public string RenewedDate { get; set; }
+        public int Id { get; set; }
+        public string? PolicyNo { get; set; }
+        public string? StartDate { get; set; }
+        public string? EndDate { get; set; }
+        public int InsurancePeriod { get; set; }
+        public string? PolicyAmount { get; set; }
+        public string? VendorCode { get; set; }
+        public string? RenewalStatus { get; set; }
+        public string? RenewedDate { get; set; }
         public byte IsActive { get; set; }
         
     }

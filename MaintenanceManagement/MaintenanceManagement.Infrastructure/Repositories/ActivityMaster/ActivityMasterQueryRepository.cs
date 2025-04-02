@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Core.Application.ActivityMaster.Queries.GetAllActivityMaster;
+using Core.Application.ActivityMaster.Queries.GetMachineGroupById;
 using Core.Application.Common.Interfaces.IActivityMaster;
+using Core.Application.MachineGroup.Queries.GetMachineGroupById;
 using Dapper;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
@@ -19,28 +23,26 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
 
         }
 
-        public async Task<(List<Core.Domain.Entities.ActivityMaster>, int)> GetAllActivityMasterAsync(int PageNumber, int PageSize, string? SearchTerm)
+    
+          public async Task<(List<GetAllActivityMasterDto>, int)> GetAllActivityMasterAsync(int PageNumber, int PageSize ,string? SearchTerm )        
         {
                     var query = $$"""
-                DECLARE @TotalCount INT;
-                SELECT @TotalCount = COUNT(*) 
-                FROM [Maintenance].[ActivityMaster] A
-                INNER JOIN [Bannari].[AppData].[Department] B ON A.DepartmentId = B.Id
-                INNER JOIN [Maintenance].[MachineGroup] C ON A.MachineGroupId = C.Id
-                INNER JOIN [Maintenance].[MiscMaster] D ON A.ActivityType = D.Id
-                WHERE A.IsDeleted = 0
+                 DECLARE @TotalCount INT;
+                    SELECT @TotalCount = COUNT(DISTINCT A.Id)
+                    FROM [Maintenance].[ActivityMaster] A
+                    INNER JOIN [Bannari].[AppData].[Department] B ON A.DepartmentId = B.Id            
+                    INNER JOIN [Maintenance].[MiscMaster] C ON A.ActivityType = C.Id
+                    WHERE A.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (A.ActivityName LIKE @Search OR A.Description LIKE @Search)")}}; 
 
-                SELECT A.Id, A.ActivityName, A.Description, A.DepartmentId, B.DeptName AS Department, 
-                    A.MachineGroupId, C.GroupName AS MachineGroup, 
-                    A.EstimatedDuration, A.ActivityType, D.Code AS ActivityTypeDescription, 
+                  SELECT  A.Id, A.ActivityName, A.Description, A.DepartmentId, B.DeptName AS Department,                    
+                    A.EstimatedDuration, A.ActivityType, C.Code AS ActivityTypeDescription, 
                     A.IsActive, A.IsDeleted, 
                     A.CreatedBy, A.CreatedDate, A.CreatedByName, A.CreatedIP, 
                     A.ModifiedBy, A.ModifiedDate, A.ModifiedByName, A.ModifiedIP
                 FROM [Maintenance].[ActivityMaster] A  
-                INNER JOIN [Bannari].[AppData].[Department] B ON A.DepartmentId = B.Id
-                INNER JOIN [Maintenance].[MachineGroup] C ON A.MachineGroupId = C.Id
-                INNER JOIN [Maintenance].[MiscMaster] D ON A.ActivityType = D.Id
+                INNER JOIN [Bannari].[AppData].[Department] B ON A.DepartmentId = B.Id                           
+                INNER JOIN [Maintenance].[MiscMaster] C ON A.ActivityType = C.Id
                 WHERE A.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (A.ActivityName LIKE @Search OR A.Description LIKE @Search)")}}
                 ORDER BY A.Id DESC 
@@ -55,31 +57,70 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
                 PageSize
             };
 
-            var result = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var assetTransfers = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var assetTransferList = (await assetTransfers.ReadAsync<GetAllActivityMasterDto>()).ToList();
+            int totalCount = await assetTransfers.ReadFirstAsync<int>();
 
-            // Read the data for ActivityMaster and convert to list
-            var activityMasterList = (await result.ReadAsync<Core.Domain.Entities.ActivityMaster>()).ToList();
 
-            // Read the total count
-            int totalCount = await result.ReadFirstAsync<int>();
+            return (assetTransferList, totalCount);
 
-            return (activityMasterList, totalCount);
+          
+        }
+         public async Task<GetActivityMasterByIdDto?> GetByIdAsync(int activityMasterId)
+        {
+                const string query = @"
+                   
+                    SELECT A.Id, A.ActivityName, A.Description, DepartmentId, 
+                        B.DeptName AS Department, A.EstimatedDuration, A.ActivityType, 
+                        C.Code AS ActivityTypeDescription, A.IsActive, A.IsDeleted
+                    FROM [Maintenance].[ActivityMaster] A
+                    INNER JOIN [Bannari].[AppData].[Department] B ON A.DepartmentId = B.Id
+                    INNER JOIN [Maintenance].[MiscMaster] C ON A.ActivityType = C.Id
+                    WHERE A.Id = @ActivityMasterId AND A.IsDeleted = 0
+                    FOR JSON PATH, INCLUDE_NULL_VALUES;
+             -- Fetch Related Machine Groups
+                    SELECT  D.MachineGroupId, F.GroupName AS MachineGroupName
+                    FROM [Maintenance].[ActivityMachineGroup] D
+                    INNER JOIN [Maintenance].[MachineGroup] F ON D.MachineGroupId = F.Id                       
+                    WHERE D.ActivityMasterId = @ActivityMasterId
+                    FOR JSON PATH, INCLUDE_NULL_VALUES;
+                ";
+         using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { activityMasterId });
+         string activityJson = await multiQuery.ReadFirstOrDefaultAsync<string>() ?? "[]";
+                string machineGroupsJson = await multiQuery.ReadFirstOrDefaultAsync<string>() ?? "[]";
+         if (string.IsNullOrWhiteSpace(activityJson))
+                {
+                    return null; // Return null if no activity found
+                }
+         var activity = JsonSerializer.Deserialize<List<GetActivityMasterByIdDto>>(activityJson, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                })?.FirstOrDefault();
+         var machineGroups = JsonSerializer.Deserialize<List<GetAllMachineGroupDto>>(machineGroupsJson, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+         if (activity != null)
+                {
+                    activity.GetAllMachineGroupDto = machineGroups ?? new List<GetAllMachineGroupDto>();
+                }
+         return activity;
         }
 
-      public async Task<Core.Domain.Entities.ActivityMaster> GetByIdAsync(int id)
+         public async Task<List<GetMachineGroupNameByIdDto?>> GetMachineGroupById(int activityId)
         {
             const string query = @"
-                SELECT 
-                    A.Id, A.ActivityName,  A.Description,  A.DepartmentId, B.DeptName AS Department, A.MachineGroupId, C.GroupName AS MachineGroup, 
-                    A.EstimatedDuration,  A.ActivityType,  D.Code AS ActivityTypeDescription,A.IsActive, A.IsDeleted,A.CreatedBy, A.CreatedDate, 
-                    A.CreatedByName,  A.CreatedIP,  A.ModifiedBy, A.ModifiedDate,  A.ModifiedByName, A.ModifiedIP  FROM Maintenance.ActivityMaster A  
-                INNER JOIN Bannari.AppData.Department B ON A.DepartmentId = B.Id
-                INNER JOIN Maintenance.MachineGroup C ON A.MachineGroupId = C.Id
-                INNER JOIN Maintenance.MiscMaster D ON A.ActivityType = D.Id         
-                WHERE A.Id = @id AND A.IsDeleted = 0";
+                SELECT A.ActivityMasterId AS ActivityId, A.MachineGroupId, B.GroupName AS MachineGroupName
+                FROM [Maintenance].[ActivityMachineGroup] A
+                INNER JOIN [Maintenance].[MachineGroup] B ON A.MachineGroupId = B.Id
+                WHERE A.ActivityMasterId = @ActivityMasterId
+            ";
 
-            return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.ActivityMaster>(query, new { id });
-        } 
+            var machineGroups = await _dbConnection.QueryAsync<GetMachineGroupNameByIdDto>(query, new { ActivityMasterId = activityId });
+            
+            return machineGroups.ToList();
+
+        }
 
           public async Task<List<Core.Domain.Entities.ActivityMaster>> GetActivityMasterAutoComplete(string searchPattern)
                {
@@ -107,11 +148,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
 
                     return result > 0;
                 }
-
-
-
-
-
         
     }
 }

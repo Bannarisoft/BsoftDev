@@ -5,51 +5,55 @@ using UserManagement.API.Middleware;
 using UserManagement.API.Configurations;
 using Core.Domain.Entities;
 using MassTransit;
+using UserManagement.Infrastructure.PollyResilience;
 
 var builder = WebApplication.CreateBuilder(args);
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
 
-    // If environment is null or empty, set default to "Development"
-    if (string.IsNullOrWhiteSpace(environment))
-    {      
-        environment = "development";
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
-    }
+// If environment is null or empty, set default to "Development"
+if (string.IsNullOrWhiteSpace(environment))
+{
+    environment = "development";
+    Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
+}
 
-builder.Configuration    
+builder.Configuration
     .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
     .AddJsonFile("settings/emailsetting.json", optional: false, reloadOnChange: true)
 
-    .AddJsonFile("settings/smssetting.json", optional: false, reloadOnChange: true)    
-    .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true) 
+    .AddJsonFile("settings/smssetting.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true)
     .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 
 // Configure Serilog
 
-builder.Host.ConfigureSerilog(builder.Configuration); 
+builder.Host.ConfigureSerilog(builder.Configuration);
 
 // Add validation services
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
 
-builder.Services.AddMassTransit(cfg =>
-{
-    cfg.UsingRabbitMq((context, config) =>
-    {
-        config.Host("rabbitmq://localhost");
-        config.ConfigureEndpoints(context);
-    });
-});
-
-builder.Services.AddMassTransitHostedService();
-
-// builder.Services.AddMassTransit(busConfig =>
+// MassTransit Configuration
+// builder.Services.AddMassTransit(x =>
 // {
-//     busConfig.SetKebabCaseEndpointNameFormatter();
+//     x.UsingRabbitMq((context, cfg) =>
+//     {
+//         cfg.Host("localhost", "/", h =>
+//         {
+//             h.Username("guest");
+//             h.Password("guest");
+//         });
+//     });
+// });
 
-//     busConfig.UsingRabbitMq((context, cfg) =>
+
+// builder.Services.AddMassTransit(x =>
+// {
+//     x.AddConsumer<UserCreatedEventConsumer>();
+
+//     x.UsingRabbitMq((context, cfg) =>
 //     {
 //         cfg.Host("localhost", "/", h =>
 //         {
@@ -57,9 +61,13 @@ builder.Services.AddMassTransitHostedService();
 //             h.Password("guest");
 //         });
 
-//         cfg.ConfigureEndpoints(context);
+//         cfg.ReceiveEndpoint("user-created-queue", e =>
+//         {
+//             e.ConfigureConsumer<UserCreatedEventConsumer>(context);
+//         });
 //     });
 // });
+
 
 // Register Services
 builder.Services.AddControllers();
@@ -67,7 +75,9 @@ builder.Services.AddSwaggerDocumentation();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
+builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
+builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 

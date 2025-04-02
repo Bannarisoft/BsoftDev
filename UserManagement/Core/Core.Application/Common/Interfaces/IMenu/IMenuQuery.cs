@@ -10,5 +10,6 @@ namespace Core.Application.Common.Interfaces.IMenu
     {
         Task<List<Domain.Entities.Menu>> GetParentMenus(List<int> moduleId);
         Task<List<Domain.Entities.Menu>> GetChildMenus(List<int> ParentId);
+        Task<bool> FKColumnExistValidation(int Id); 
     }
 }

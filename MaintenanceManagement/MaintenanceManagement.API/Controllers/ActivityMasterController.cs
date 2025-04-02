@@ -4,7 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.ActivityMaster.Command.CreateActivityMaster;
+using Core.Application.ActivityMaster.Command.UpdateActivityMster;
 using Core.Application.ActivityMaster.Queries.GetAllActivityMaster;
+using Core.Application.ActivityMaster.Queries.GetMachineGroupById;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using Core.Application.MachineGroup.Queries.GetActivityMasterAutoComplete;
 using Core.Application.MachineGroup.Queries.GetMachineGroupById;
@@ -65,9 +68,24 @@ namespace MaintenanceManagement.API.Controllers
                  return Ok(new { StatusCode=StatusCodes.Status200OK, data = activitymaster.Data,message=activitymaster.Message});
             }
 
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"ActivityMaster ID {id} not found.", errors = "" });
+            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"Activity Group master ID {id} not found.", errors = "" });
            
         }
+         [HttpGet("MachineGroup/{activityId}")]
+         [ActionName(nameof(GetMachineGroupById))]
+         public async Task<IActionResult> GetMachineGroupById(int activityId)
+         {
+             var MachineGroup = await Mediator.Send(new GetMachineGroupNameByIdQuery() { ActivityId = activityId});
+          
+             if(MachineGroup.IsSuccess)
+            {
+                 return Ok(new { StatusCode=StatusCodes.Status200OK, data = MachineGroup.Data,message=MachineGroup.Message});
+            }
+
+            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"Activity Machine Group master ID {activityId} not found.", errors = "" });
+
+         }
+
          [HttpGet("by-name")]
         public async Task<IActionResult> GetMachineGroup([FromQuery] string? name)
         {
@@ -113,6 +131,28 @@ namespace MaintenanceManagement.API.Controllers
                   errors = "" 
                   });             
         } 
+
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateActivityMaster([FromBody] UpdateActivityMasterCommand command)
+        {
+            if (command == null)
+            {
+                return BadRequest(new ApiResponseDTO<int>
+                {
+                    IsSuccess = false,
+                    Message = "Invalid request data."
+                });
+            }
+
+            var result = await Mediator.Send(command);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result); // Return 400 if update fails
+            }
+
+            return Ok(result); // Return 200 if update succeeds
+        }
 
 
 

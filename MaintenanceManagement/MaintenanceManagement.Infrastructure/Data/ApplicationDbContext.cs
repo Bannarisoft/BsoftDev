@@ -33,6 +33,9 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<MaintenanceCategory> MaintenanceCategory { get; set; }
         public DbSet<ActivityMaster> ActivityMaster { get; set; }
         public DbSet<MachineMaster> MachineMaster { get; set; }
+        public DbSet<ActivityMachineGroup>  ActivityMachineGroup { get; set; }
+        public DbSet<MachineGroupUser>  MachineGroupUser { get; set; }
+       
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 
@@ -49,6 +52,8 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new MaintenanceCategoryConfiguration());
             modelBuilder.ApplyConfiguration(new ActivityMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MachineMasterConfiguration());
+            modelBuilder.ApplyConfiguration( new ActivityMachineGroupConfiguration());
+            modelBuilder.ApplyConfiguration( new MachineGroupUserConfiguration());
 
 
             base.OnModelCreating(modelBuilder);

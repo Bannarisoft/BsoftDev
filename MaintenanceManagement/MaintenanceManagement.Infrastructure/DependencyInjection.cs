@@ -35,7 +35,9 @@ using MaintenanceManagement.Infrastructure.Repositories.MaintenanceCategory;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using MaintenanceManagement.Infrastructure.Repositories.ActivityMaster;
 using Core.Application.Common.Interfaces.IMachineMaster;
+using Core.Application.Common.Interfaces.IMachineGroupUser;
 using MaintenanceManagement.Infrastructure.Repositories.MachineMaster;
+using MaintenanceManagement.Infrastructure.Repositories.MachineGroupUser;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -149,7 +151,11 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMaintenanceCategoryQueryRepository, MaintenanceCategoryQueryRepository>();
 
             services.AddScoped<IActivityMasterQueryRepository, ActivityMasterQueryRepository>();
-            services.AddScoped<IActivityMasterCommandRepository, ActivityMasterCommandRepository>();
+
+            services.AddScoped<IActivityMasterCommandRepository, ActivityMasterCommandRepository>();            
+
+            services.AddScoped<IMachineGroupUserQueryRepository, MachineGroupUserQueryRepository>();
+            services.AddScoped<IMachineGroupUserCommandRepository, MachineGroupUserCommandRepository>();
 
             services.AddScoped<IMachineMasterCommandRepository, MachineMasterCommandRepository>();
             services.AddScoped<IMachineMasterQueryRepository, MachineMasterQueryRepository>();
@@ -159,6 +165,7 @@ namespace MaintenanceManagement.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
             
+
 
 
 
@@ -173,9 +180,9 @@ namespace MaintenanceManagement.Infrastructure
                 typeof(MaintenanceCategoryProfile),
                 typeof(ShiftMasterProfile),
                 typeof(ShiftMasterDetailProfile),
+
                 typeof(ActivityMasterProfile),
-                typeof(MachineMasterProfile)
-                
+                typeof(MachineGroupUserProfile)
 
 				
 

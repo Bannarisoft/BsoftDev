@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IShiftMaster;
-using Core.Application.ShiftMasterCQRS.Commands.CreateShiftMaster;
+using Core.Application.ShiftMasters.Commands.CreateShiftMaster;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
 

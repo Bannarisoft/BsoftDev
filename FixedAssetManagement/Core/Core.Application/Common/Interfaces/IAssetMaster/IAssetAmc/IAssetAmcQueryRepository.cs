@@ -14,6 +14,7 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc
         Task<List<Core.Domain.Entities.MiscMaster>> GetCoverageScopeAsync(); 
         Task<AssetAmc?> GetByIdAsync(int Id);
         Task<(List<AssetAmc>,int)> GetAllAssetAmcAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<bool> ActiveAMCValidation(int AssetId, int? id = null);
      
 
     }

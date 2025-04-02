@@ -21,6 +21,7 @@ namespace Core.Domain.Entities
     public IList<RoleMenuPrivileges> RoleMenus { get; set; }
     public IList<RoleParent> RoleParents { get; set; }
     public IList<RoleChild> RoleChildren { get; set; }
+    public IList<CustomFieldMenu> CustomFieldMenus { get; set; }
 
 
     }

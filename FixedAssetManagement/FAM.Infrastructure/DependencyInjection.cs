@@ -227,8 +227,7 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetTransferReceiptQueryRepository, AssetTransferReceiptQueryRepository>();
             services.AddScoped<IAssetTransferReceiptCommandRepository, AssetTransferReceiptCommandRepository>();
             services.AddScoped<IExcelImportCommandRepository, ExcelImportCommandRepository>();
-            services.AddScoped<IExcelImportQueryRepository, ExcelImportCommandQueryRepository>();
-            services.AddScoped<IAssetDetailsQueryRepository, AssetDetailsQueryRepository>();
+            services.AddScoped<IExcelImportQueryRepository, ExcelImportCommandQueryRepository>();          
             
             
             // Miscellaneous services

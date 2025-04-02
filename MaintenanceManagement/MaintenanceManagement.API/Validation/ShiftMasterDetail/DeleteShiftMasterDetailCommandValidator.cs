@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IShiftMasterDetail;
-using Core.Application.ShiftMasterDetailCQRS.Commands.DeleteShiftMasterDetail;
+using Core.Application.ShiftMasterDetails.Commands.DeleteShiftMasterDetail;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
 

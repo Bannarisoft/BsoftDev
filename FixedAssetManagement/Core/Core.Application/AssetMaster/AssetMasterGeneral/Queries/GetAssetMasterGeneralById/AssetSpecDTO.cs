@@ -7,8 +7,9 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
 {
     public class AssetSpecDTO
     {
-        public string SpecificationName { get; set; }
-        public string SpecificationValue { get; set; }
+        public int Id { get; set; }
+        public string? SpecificationName { get; set; }
+        public string? SpecificationValue { get; set; }
         public int SpecificationId { get; set; }
     }
 }
