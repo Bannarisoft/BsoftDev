@@ -17,7 +17,7 @@ namespace SagaOrchestrator.Application.Orchestration.Services.MaintenanceService
         }
         public async Task<DepartmentDto> GetDepartmentByIdAsync(int departmentId)
         {
-            var response = await _httpClient.GetAsync($"/api/Department/{departmentId}");
+            var response = await _httpClient.GetAsync($"/api/Departments/{departmentId}");
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<DepartmentDto>(content);
