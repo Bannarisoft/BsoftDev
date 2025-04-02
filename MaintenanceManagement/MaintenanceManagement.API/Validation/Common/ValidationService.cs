@@ -38,6 +38,7 @@ using Core.Application.MiscMaster.Command.DeleteMiscMaster;
 using Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster;
 using Core.Application.ActivityMaster.Command.CreateActivityMaster;
 using MaintenanceManagement.API.Validation.ActivityMaster;
+using Core.Application.ActivityMaster.Command.UpdateActivityMster;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -77,6 +78,7 @@ namespace MaintenanceManagement.API.Validation.Common
             services.AddScoped<IValidator<UpdateMaintenanceTypeCommand>, UpdateMaintenanceTypeCommandValidator>();
             services.AddScoped<IValidator<DeleteMaintenanceTypeCommand>, DeleteMaintenanceTypeCommandValidator>();
         services.AddScoped<IValidator<CreateActivityMasterCommand>, CreateActivityMasterCommandValidator>();
+        services.AddScoped<IValidator<UpdateActivityMasterCommand>, UpdateActivityMasterCommandValidator>();
 
 
 
