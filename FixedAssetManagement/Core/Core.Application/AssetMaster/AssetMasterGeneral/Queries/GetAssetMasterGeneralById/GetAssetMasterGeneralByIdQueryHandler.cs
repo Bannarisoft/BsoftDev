@@ -39,9 +39,9 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
              asset.AssetPurchaseDetails = _mapper.Map<List<AssetPurchaseDetailDTO>>(purchaseDetails);
              }
             if (spec != null)
-             {
+            {
                  asset.AssetSpecification = _mapper.Map<List<AssetSpecDTO>>(spec);
-             }
+            }
              if (warranty != null)
              {
                  asset.AssetWarranty = _mapper.Map<List<AssetWarrantyDTOById>>(warranty);

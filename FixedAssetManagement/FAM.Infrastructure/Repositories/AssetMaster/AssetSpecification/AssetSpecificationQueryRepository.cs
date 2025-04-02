@@ -29,7 +29,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
             var query = @"
             SELECT 
             s.AssetId, a.AssetCode, a.AssetName,
-            s.SpecificationId, SM.SpecificationName , s.SpecificationValue 
+            s.SpecificationId, SM.SpecificationName , s.SpecificationValue ,SM.IsDefault
             FROM FixedAsset.AssetSpecifications S  
             INNER JOIN FixedAsset.AssetMaster A ON A.Id = S.AssetId   
             INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = S.SpecificationId  
@@ -81,7 +81,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
                 {
                     SpecificationId = row.SpecificationId,
                     SpecificationName = row.SpecificationName,
-                    SpecificationValue = row.SpecificationValue
+                    SpecificationValue = row.SpecificationValue,
+                    ISDefault = row.IsDefault
                 });
             }
         }
@@ -102,7 +103,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
             var query = @"
                 SELECT 
                 s.AssetId, a.AssetCode, a.AssetName,
-                s.SpecificationId, SM.SpecificationName , s.SpecificationValue 
+                s.SpecificationId, SM.SpecificationName , s.SpecificationValue  ,SM.IsDefault
                 FROM FixedAsset.AssetSpecifications S  
                 INNER JOIN FixedAsset.AssetMaster A ON A.Id = S.AssetId   
                 INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = S.SpecificationId  
@@ -138,7 +139,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
                     {
                         SpecificationId = row.SpecificationId,
                         SpecificationName = row.SpecificationName,
-                        SpecificationValue = row.SpecificationValue
+                        SpecificationValue = row.SpecificationValue,
+                        ISDefault = row.IsDefault
                     });
                 }
             }
@@ -151,7 +153,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
             var query = @"
                 SELECT 
                 s.AssetId, a.AssetCode, a.AssetName,
-                s.SpecificationId, SM.SpecificationName , s.SpecificationValue 
+                s.SpecificationId, SM.SpecificationName , s.SpecificationValue  ,SM.IsDefault
                 FROM FixedAsset.AssetSpecifications S  
                 INNER JOIN FixedAsset.AssetMaster A ON A.Id = S.AssetId   
                 INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = S.SpecificationId                    
@@ -188,7 +190,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
                             {
                                 SpecificationId = row.SpecificationId,
                                 SpecificationName = row.SpecificationName,
-                                SpecificationValue = row.SpecificationValue
+                                SpecificationValue = row.SpecificationValue,
+                                ISDefault = row.IsDefault
                             });
                         }
                     }
