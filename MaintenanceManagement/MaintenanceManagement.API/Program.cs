@@ -13,8 +13,8 @@ builder.Configuration
     .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-    // Configure Serilog
-builder.Host.ConfigureSerilog(); 
+// Configure Serilog
+builder.Host.ConfigureSerilog();
 
 // Add validation services
 var validationService = new ValidationService();
@@ -26,8 +26,8 @@ builder.Services.AddSwaggerDocumentation();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructureServices(builder.Configuration,builder.Services);
-builder.Services.AddSagaInfrastructure();
+builder.Services.AddSagaInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
@@ -39,16 +39,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage(); 
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseDeveloperExceptionPage();
 
 //}
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
 app.UseCors();// Enable CORS
 app.UseAuthentication();
-app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>(); 
+app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Contracts.Events.Maintenance;
+using Contracts.Models.Maintenance;
 using MassTransit;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IMaintenance;
 
@@ -17,20 +18,22 @@ namespace SagaOrchestrator.Infrastructure.Services.MaintenanceServices
             _departmentService = departmentService;
             _publishEndpoint = publishEndpoint;
         }
-        public async Task TriggerDepartmentCreation(int departmentId)
+        public async Task<DepartmentDto> TriggerDepartmentCreation(int departmentId,string token)
         {
-            var department = await _departmentService.GetDepartmentByIdAsync(departmentId);
+            var department = await _departmentService.GetDepartmentByIdAsync(departmentId, token);
 
             if (department != null)
             {
                 var departmentCreatedEvent = new DepartmentCreatedEvent
                 {
-                    DepartmentId = department.DepartmentId
-                    // DepartmentName = department.DepartmentName
+                    DepartmentId = department.DepartmentId,
+                    DepartmentName = department.DepartmentName
                 };
 
                 await _publishEndpoint.Publish(departmentCreatedEvent);
+                return department;
             }
+            return null;
         }
     }
 
