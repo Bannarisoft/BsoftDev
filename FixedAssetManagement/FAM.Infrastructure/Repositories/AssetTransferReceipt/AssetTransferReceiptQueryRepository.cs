@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetails;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetailsById;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptPending;
@@ -174,6 +176,49 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
 
             return (assetTransferIssueList, totalCount);
         }
+
+        public async Task<AssetTransferJsonDto> GetAssetTransferByIdAsync(int assetTransferId)
+    {
+        const string query = @"
+            SELECT Id as AssetTransferId , DocDate, TransferType, FromUnitId, ToUnitId, FromDepartmentId, ToDepartmentId, 
+                   FromCustodianId, ToCustodianId, Status, FromCustodianName, ToCustodianName
+            FROM FixedAsset.AssetTransferIssueHdr
+            WHERE Id = @AssetTransferId AND Status = 'Approved' and AckStatus = 0
+            FOR JSON PATH, INCLUDE_NULL_VALUES;
+
+            SELECT AssetId, AssetValue 
+            FROM FixedAsset.AssetTransferIssueDtl
+            WHERE AssetTransferId = @AssetTransferId
+            FOR JSON PATH, INCLUDE_NULL_VALUES;
+        ";
+
+        using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { assetTransferId });
+
+        string headerJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+        string detailsJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+
+        if (string.IsNullOrWhiteSpace(headerJson))
+        {
+            return null;
+        }
+
+        var header = JsonSerializer.Deserialize<List<AssetTransferJsonDto>>(headerJson, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        })?.FirstOrDefault();
+
+        var details = JsonSerializer.Deserialize<List<AssetTransferDetailJsonDto>>(detailsJson ?? "[]", new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (header != null)
+        {
+            header.AssetTransferDetails = details ?? new List<AssetTransferDetailJsonDto>();
+        }
+
+        return header;
+    }
 
        
     }

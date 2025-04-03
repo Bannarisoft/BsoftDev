@@ -1,0 +1,97 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Core.Application.Common.Interfaces.IMachineMaster;
+using MaintenanceManagement.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
+{
+    public class MachineMasterCommandRepository : IMachineMasterCommandRepository
+    {
+          private readonly ApplicationDbContext _applicationDbContext;
+        public MachineMasterCommandRepository(ApplicationDbContext applicationDbContext)
+        {
+            _applicationDbContext = applicationDbContext;
+        }
+        public async Task<int> CreateAsync(Core.Domain.Entities.MachineMaster machineMaster)
+        {
+            // Add the MachineMaster to the DbContext
+                await _applicationDbContext.MachineMaster.AddAsync(machineMaster);
+
+                // Save changes to the database
+                await _applicationDbContext.SaveChangesAsync();
+
+                // Return the ID of the created MachineMaster
+                return machineMaster.Id;
+        }
+
+        public async Task<int> DeleteAsync(int Id, Core.Domain.Entities.MachineMaster machineMaster)
+        {
+            // Fetch the MachineMaster to delete from the database
+            var machinemasterToDelete = await _applicationDbContext.MachineMaster.FirstOrDefaultAsync(u => u.Id == Id);
+
+            // If the MachineMaster does not exist
+            if (machinemasterToDelete is null)
+            {
+                return -1; //indicate failure
+            }
+
+            // Update the IsActive status to indicate deletion (or soft delete)
+            machinemasterToDelete.IsDeleted = machineMaster.IsDeleted;
+
+            // Save changes to the database 
+            await _applicationDbContext.SaveChangesAsync();
+
+            return 1; // Indicate success
+        }
+
+        public async Task<bool> ExistsByCodeAsync(string? MachineCode)
+        {
+             if (string.IsNullOrWhiteSpace(MachineCode))
+             return false; // Return false if null/empty
+             return await _applicationDbContext.MachineMaster.AnyAsync(c => c.MachineCode == MachineCode);
+        }
+
+        public async Task<bool> IsNameDuplicateAsync(string? name, int excludeId)
+        {
+            return await _applicationDbContext.MachineMaster
+                .AnyAsync(cc => cc.MachineName == name && cc.Id != excludeId);
+        }
+
+        public async Task<int> UpdateAsync(int Id, Core.Domain.Entities.MachineMaster machineMaster)
+        {
+           var existingmachinemaster = await _applicationDbContext.MachineMaster.FirstOrDefaultAsync(u => u.Id == Id);
+
+        // If the MaintenanceType does not exist
+        if (existingmachinemaster is null)
+        {
+            return -1; //indicate failure
+        }
+
+        // Update the existing MaintenanceType properties
+        existingmachinemaster.MachineName = machineMaster.MachineName;
+        existingmachinemaster.MachineGroupId = machineMaster.MachineGroupId;
+        existingmachinemaster.UnitId = machineMaster.UnitId;
+        existingmachinemaster.DepartmentId = machineMaster.DepartmentId;
+        existingmachinemaster.ProductionCapacity = machineMaster.ProductionCapacity;
+        existingmachinemaster.UomId = machineMaster.UomId;
+        existingmachinemaster.ShiftMasterId = machineMaster.ShiftMasterId;
+        existingmachinemaster.CostCenterId = machineMaster.CostCenterId;
+        existingmachinemaster.WorkCenterId = machineMaster.WorkCenterId;
+        existingmachinemaster.InstallationDate = machineMaster.InstallationDate;
+        existingmachinemaster.AssetId = machineMaster.AssetId;
+        existingmachinemaster.IsActive=machineMaster.IsActive;
+
+
+        // Mark the entity as modified
+        _applicationDbContext.MachineMaster.Update(existingmachinemaster);
+
+        // Save changes to the database
+        await _applicationDbContext.SaveChangesAsync();
+
+        return 1; // Indicate success
+        }
+    }
+}

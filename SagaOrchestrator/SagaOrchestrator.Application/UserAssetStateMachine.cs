@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Contracts.Events;
 using Contracts.Events.Users;
 using MassTransit;
+using Serilog;
 
 namespace SagaOrchestrator.Application
 {
@@ -24,7 +25,7 @@ namespace SagaOrchestrator.Application
         public State UserCreated { get; private set; }
         public State AssetAssigned { get; private set; }
 
-        public Event<Contracts.Events.Users.UserCreatedEvent> UserCreatedEvent { get; private set; }
+        public Event<UserCreatedEvent> UserCreatedEvent { get; private set; }
         public Event<AssetCreatedEvent> AssetCreatedEvent { get; private set; }
         public Event<SagaCompletedEvent> SagaCompletedEvent { get; private set; }
 
@@ -41,7 +42,7 @@ namespace SagaOrchestrator.Application
                     .Then(context =>
                     {
                         context.Saga.UserId = context.Message.UserId;
-                        Console.WriteLine($"User Created: {context.Message.UserName}");
+                        Log.Information($"User Created: {context.Message.UserName}");
                     })
                     .TransitionTo(UserCreated)
             );
@@ -51,7 +52,7 @@ namespace SagaOrchestrator.Application
                     .Then(context =>
                     {
                         context.Saga.AssetId = context.Message.AssetId;
-                        Console.WriteLine($"Asset Assigned: {context.Message.AssetName}");
+                        Log.Information($"Asset Assigned: {context.Message.AssetName}");
                     })
                     .TransitionTo(AssetAssigned)
             );
@@ -60,7 +61,7 @@ namespace SagaOrchestrator.Application
                 When(SagaCompletedEvent)
                     .Then(context =>
                     {
-                        Console.WriteLine($"Saga Completed for UserId: {context.Message.UserId}");
+                        Log.Information($"Saga Completed for UserId: {context.Message.UserId}");
                     })
                     .Finalize()
             );

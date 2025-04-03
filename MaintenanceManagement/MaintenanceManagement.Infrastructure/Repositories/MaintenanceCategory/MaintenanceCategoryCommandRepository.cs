@@ -49,6 +49,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceCategory
             return 1; // Indicate success
         }
 
+        public async Task<bool> ExistsByCodeAsync(string? CategoryName)
+        {
+             if (string.IsNullOrWhiteSpace(CategoryName))
+             return false; // Return false if null/empty
+             return await _applicationDbContext.MaintenanceCategory.AnyAsync(c => c.CategoryName == CategoryName);
+        }
+
         public async Task<bool> IsNameDuplicateAsync(string? name, int excludeId)
         {
             return await _applicationDbContext.MaintenanceCategory

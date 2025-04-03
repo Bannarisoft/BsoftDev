@@ -16,20 +16,6 @@ namespace UserManagement.Infrastructure
     {
         public static IServiceCollection AddSagaInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            // // Register MongoDB Client
-            // services.AddSingleton<IMongoClient>(sp =>
-            // {
-            //     var connectionString = configuration.GetConnectionString("MongoDb");
-            //     return new MongoClient(connectionString);
-            // });
-            // // Register the MongoDB Database
-            // services.AddScoped(sp =>
-            // {
-            //     var client = sp.GetRequiredService<IMongoClient>();
-            //     var databaseName = configuration["MongoDbSettings:DatabaseName"];
-            //     return client.GetDatabase(databaseName);
-            // });
-
             // Register the OutboxMessage collection
             services.AddScoped<IMongoCollection<OutboxMessage>>(sp =>
             {

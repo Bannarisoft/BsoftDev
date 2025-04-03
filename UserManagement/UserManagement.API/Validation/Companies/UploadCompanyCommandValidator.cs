@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UserManagement.API.Validation.Common;
 using Core.Application.Companies.Commands.UploadFileCompany;
 using FluentValidation;
+using Serilog;
 
 namespace UserManagement.API.Validation.Companies
 {
@@ -45,10 +46,10 @@ namespace UserManagement.API.Validation.Companies
         }
         private bool IsValidFileType(IFormFile file, List<string> allowedExtensions)
        {
-           Console.WriteLine(file.FileName);
+           Log.Information(file.FileName);
            foreach (var extension in allowedExtensions)
            {
-               Console.WriteLine(extension);
+               Log.Information(extension);
                
            }
            
