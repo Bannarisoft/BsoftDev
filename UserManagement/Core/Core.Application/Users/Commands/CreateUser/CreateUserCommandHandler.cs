@@ -68,26 +68,6 @@ namespace Core.Application.Users.Commands.CreateUser
             }
             _logger.LogInformation("User successfully created for Username: {Username}", createdUser.UserName);
 
-            // 🔥 Publish UserCreatedEvent to RabbitMQ
-            // var userCreatedEvent = new UserCreatedEvent
-            // {
-            //     CorrelationId = Guid.NewGuid(),
-            //     UserId = createdUser.UserId,
-            //     UserName = createdUser.UserName,
-            //     Email = createdUser.EmailId
-            // };
-
-            // try
-            // {
-            //     await _publishEndpoint.Publish(userCreatedEvent, cancellationToken);
-            //     _logger.LogInformation("UserCreatedEvent published successfully for UserId: {UserId}", createdUser.UserId);
-            // }
-            // catch (Exception ex)
-            // {
-            //     _logger.LogError("Error publishing UserCreatedEvent: {Message}", ex.Message);
-            // }
-
-
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",

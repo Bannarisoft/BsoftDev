@@ -26,7 +26,6 @@ namespace FAM.API.Controllers.AssetMaster
         private readonly IValidator<CreateAssetMasterGeneralCommand> _createAssetMasterGeneralCommandValidator;
         private readonly IValidator<UpdateAssetMasterGeneralCommand> _updateAssetMasterGeneralCommandValidator;
         private readonly IValidator<UploadFileAssetMasterGeneralCommand> _uploadFileCommandValidator;
-        private readonly IPublishEndpoint _publishEndpoint;
         private readonly IValidator<DeleteAssetMasterGeneralCommand> _deleteAssetMasterGeneralCommandValidator;
 
         public AssetMasterGeneralController(
@@ -35,7 +34,6 @@ namespace FAM.API.Controllers.AssetMaster
             IValidator<CreateAssetMasterGeneralCommand> createAssetMasterGeneralCommandValidator, 
             IValidator<UpdateAssetMasterGeneralCommand> updateAssetMasterGeneralCommandValidator, 
             IValidator<UploadFileAssetMasterGeneralCommand> uploadFileCommandValidator,
-            IPublishEndpoint publishEndpoint,
             IValidator<DeleteAssetMasterGeneralCommand> deleteAssetMasterGeneralCommandValidator
             ) 
             : base(mediator)
@@ -44,7 +42,6 @@ namespace FAM.API.Controllers.AssetMaster
             _createAssetMasterGeneralCommandValidator = createAssetMasterGeneralCommandValidator;
             _updateAssetMasterGeneralCommandValidator = updateAssetMasterGeneralCommandValidator;
             _uploadFileCommandValidator = uploadFileCommandValidator;
-            _publishEndpoint = publishEndpoint;
             _deleteAssetMasterGeneralCommandValidator = deleteAssetMasterGeneralCommandValidator;   
         }
 
@@ -128,16 +125,7 @@ namespace FAM.API.Controllers.AssetMaster
                 });
 
             }
-            //Saga implementation
-            // var assetId = Guid.NewGuid();
-
-            // await _publishEndpoint.Publish<IAssetAssigned>(new
-            // {
-            //     AssetId = assetId,
-            //     // UserId = command.userId
-            // });
-            // _logger.LogInformation($"Publishing IAssetAssigned for AssetId: {AssetId}, AssetName: {command.AssetName}");
-            //Saga implementation end
+            
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
