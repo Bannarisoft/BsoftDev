@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
 using Core.Application.Common.Interfaces.INotifications;
+using Serilog;
 
 namespace UserManagement.Infrastructure.Services
 {
@@ -10,7 +11,7 @@ namespace UserManagement.Infrastructure.Services
     {
         private readonly string _host = "localhost";
         private readonly string _forgotPasswordQueue = "forgot_password_notifications";
-        private readonly string _userCreatedQueue = "user_logged_in_queue";        
+        private readonly string _userCreatedQueue = "user_logged_in_queue";
 
         public void PublishMessage<T>(T message, bool isUserCreated = false)
         {
@@ -37,7 +38,7 @@ namespace UserManagement.Infrastructure.Services
                                     basicProperties: null,
                                     body: body);
 
-                Console.WriteLine($" [x] Sent message to RabbitMQ queue: {queueName}");
+                Log.Information($" [x] Sent message to RabbitMQ queue: {queueName}");
             }
         }
     }

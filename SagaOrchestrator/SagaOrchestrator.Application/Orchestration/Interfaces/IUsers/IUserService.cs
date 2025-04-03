@@ -8,7 +8,6 @@ namespace SagaOrchestrator.Application.Orchestration.Interfaces.IUsers
 {
     public interface IUserService
     {
-        // Task<UserDto> GetUserByIdAsync(int userId);
         Task<UserDto> GetUserByIdAsync(int userId, string token);
     }
 }
