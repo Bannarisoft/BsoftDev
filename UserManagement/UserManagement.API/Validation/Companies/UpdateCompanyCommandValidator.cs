@@ -15,9 +15,9 @@ namespace UserManagement.API.Validation.Companies
 
         public UpdateCompanyCommandValidator(MaxLengthProvider maxLengthProvider)
         {
-             var companyNameMaxLength = maxLengthProvider.GetMaxLength<Company>("CompanyName") ?? 50;
+            var companyNameMaxLength = maxLengthProvider.GetMaxLength<Company>("CompanyName") ?? 50;
             var LegalNameMaxLength = maxLengthProvider.GetMaxLength<Company>("LegalName") ?? 50;
-            
+
             _validationRules = ValidationRuleLoader.LoadValidationRules();
             if (_validationRules == null || !_validationRules.Any())
             {
@@ -28,7 +28,7 @@ namespace UserManagement.API.Validation.Companies
             {
                 switch (rule.Rule)
                 {
-                     case "NotEmpty":
+                    case "NotEmpty":
                         // Apply NotEmpty validation
                         // RuleFor(x => x.Company.File)
                         //     .NotNull()
@@ -36,37 +36,37 @@ namespace UserManagement.API.Validation.Companies
                         //     .NotEmpty()
                         //     .WithMessage($"{nameof(UpdateCompanyCommand.Company.File)} {rule.Error}");
 
-                             RuleFor(x => x.Company.CompanyName)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyName)} {rule.Error}");
+                        RuleFor(x => x.Company.CompanyName)
+                       .NotEmpty()
+                       .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyName)} {rule.Error}");
 
                         RuleFor(x => x.Company.LegalName)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateCompanyCommand.Company.LegalName)} {rule.Error}");
 
-                            RuleFor(x => x.Company.GstNumber)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.GstNumber)} {rule.Error}");
+                        RuleFor(x => x.Company.GstNumber)
+                        .NotEmpty()
+                        .WithMessage($"{nameof(UpdateCompanyCommand.Company.GstNumber)} {rule.Error}");
 
-                            RuleFor(x => x.Company.YearOfEstablishment)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.YearOfEstablishment)} {rule.Error}");
+                        RuleFor(x => x.Company.YearOfEstablishment)
+                        .NotEmpty()
+                        .WithMessage($"{nameof(UpdateCompanyCommand.Company.YearOfEstablishment)} {rule.Error}");
 
-                            RuleFor(x => x.Company.Website)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.Website)} {rule.Error}");
+                        RuleFor(x => x.Company.Website)
+                        .NotEmpty()
+                        .WithMessage($"{nameof(UpdateCompanyCommand.Company.Website)} {rule.Error}");
 
-                            RuleFor(x => x.Company.CompanyAddress.AddressLine1)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyAddress.AddressLine1)} {rule.Error}");
+                        RuleFor(x => x.Company.CompanyAddress.AddressLine1)
+                        .NotEmpty()
+                        .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyAddress.AddressLine1)} {rule.Error}");
 
                         RuleFor(x => x.Company.CompanyAddress.PinCode)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyAddress.AddressLine2)} {rule.Error}");
 
-                               RuleFor(x => x.Company.CompanyContact.Name)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyContact.Name)} {rule.Error}");
+                        RuleFor(x => x.Company.CompanyContact.Name)
+                     .NotEmpty()
+                     .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyContact.Name)} {rule.Error}");
                         RuleFor(x => x.Company.CompanyContact.Designation)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyContact.Designation)} {rule.Error}");
@@ -86,7 +86,7 @@ namespace UserManagement.API.Validation.Companies
                     // .WithMessage($"{nameof(UpdateCompanyCommand.Company.File)} {rule.Error}");
                     // break;
 
-                     case "MaxLength":
+                    case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values
                         RuleFor(x => x.Company.CompanyName)
                             .MaximumLength(companyNameMaxLength) // Dynamic value from MaxLengthProvider
@@ -96,19 +96,19 @@ namespace UserManagement.API.Validation.Companies
                             .WithMessage($"{nameof(UpdateCompanyCommand.Company.LegalName)} {rule.Error} {LegalNameMaxLength}");
                         break;
 
-                       case "GstFormat":
+                    case "GstFormat":
                         RuleFor(x => x.Company.GstNumber)
                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.GstNumber)} {rule.Error}");   
-                        break;  
-                        case "NumericOnly":
+                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.GstNumber)} {rule.Error}");
+                        break;
+                    case "NumericOnly":
                         RuleFor(x => x.Company.YearOfEstablishment)
                             .InclusiveBetween(1900, DateTime.Now.Year)
-                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.YearOfEstablishment)} {rule.Error}");   
+                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.YearOfEstablishment)} {rule.Error}");
 
-                              RuleFor(x => x.Company.CompanyAddress.CityId)
-                        .InclusiveBetween(1, int.MaxValue)
-                        .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyAddress.CityId)} {rule.Error}");
+                        RuleFor(x => x.Company.CompanyAddress.CityId)
+                  .InclusiveBetween(1, int.MaxValue)
+                  .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyAddress.CityId)} {rule.Error}");
 
                         RuleFor(x => x.Company.CompanyAddress.StateId)
                         .InclusiveBetween(1, int.MaxValue)
@@ -117,20 +117,20 @@ namespace UserManagement.API.Validation.Companies
                         RuleFor(x => x.Company.CompanyAddress.CountryId)
                         .InclusiveBetween(1, int.MaxValue)
                         .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyAddress.CountryId)} {rule.Error}");
-                        break;   
-
-                        case "Website":      
-                        RuleFor(x => x.Company.Website)
-                            .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.Website)} {rule.Error}");   
-                        break;  
-                        case "MinLength":
-                        RuleFor(x => x.Company.EntityId)
-                            .GreaterThanOrEqualTo(1)
-                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.EntityId)} {rule.Error} {0}");   
                         break;
 
-                        case "Pincode":
+                    case "Website":
+                        RuleFor(x => x.Company.Website)
+                            .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.Website)} {rule.Error}");
+                        break;
+                    case "MinLength":
+                        RuleFor(x => x.Company.EntityId)
+                            .GreaterThanOrEqualTo(1)
+                            .WithMessage($"{nameof(UpdateCompanyCommand.Company.EntityId)} {rule.Error} {0}");
+                        break;
+
+                    case "Pincode":
                         RuleFor(x => x.Company.CompanyAddress.PinCode)
                         .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
                         .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyAddress.PinCode)} {rule.Error}");
@@ -147,12 +147,12 @@ namespace UserManagement.API.Validation.Companies
                         .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyAddress.Phone)} {rule.Error}")
                         .When(x => !string.IsNullOrWhiteSpace(x.Company.CompanyAddress.Phone));
 
-                         RuleFor(x => x.Company.CompanyContact.Phone)
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                        .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyContact.Phone)} {rule.Error}");
+                        RuleFor(x => x.Company.CompanyContact.Phone)
+                       .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                       .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyContact.Phone)} {rule.Error}");
                         break;
 
-                        case "Email":
+                    case "Email":
                         RuleFor(x => x.Company.CompanyContact.Email)
                         .EmailAddress()
                         .WithMessage($"{nameof(UpdateCompanyCommand.Company.CompanyContact.Email)} {rule.Error}");
@@ -163,19 +163,5 @@ namespace UserManagement.API.Validation.Companies
                 }
             }
         }
-    //      private bool IsValidFileType(IFormFile file, List<string> allowedExtensions)
-    //    {
-    //        Console.WriteLine(file.FileName);
-    //        foreach (var extension in allowedExtensions)
-    //        {
-    //            Console.WriteLine(extension);
-               
-    //        }
-           
-    //        if (file == null) return false;
-       
-    //        var fileExtension = System.IO.Path.GetExtension(file.FileName).ToLowerInvariant();
-    //        return allowedExtensions.Contains(fileExtension);
-    //    }
     }
 }

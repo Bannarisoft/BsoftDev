@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace UserManagement.Infrastructure
 {
@@ -55,7 +56,7 @@ namespace UserManagement.Infrastructure
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Decryption failed: {ex.Message}");
+                Log.Information($"❌ Decryption failed: {ex.Message}");
                 return "Decryption Failed!";
             }
         }

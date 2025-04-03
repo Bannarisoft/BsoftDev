@@ -1,6 +1,7 @@
 using FluentValidation;
 using Core.Application.Entity.Commands.CreateEntity;
 using UserManagement.API.Validation.Common;
+using Serilog;
 
 namespace UserManagement.API.Validation.Entity
 {
@@ -88,7 +89,7 @@ namespace UserManagement.API.Validation.Entity
                         break;  
                     default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information($"Warning: Unknown rule '{rule.Rule}' encountered.");
                         break;
                 }
             }

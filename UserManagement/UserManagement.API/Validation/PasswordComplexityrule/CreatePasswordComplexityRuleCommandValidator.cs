@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Application.PwdComplexityRule.Commands.CreatePasswordComplexityRule;
 using UserManagement.API.Validation.Common;
 using Core.Domain.Entities;
+using Serilog;
 
 namespace UserManagement.API.Validation.PasswordComplexityrule
 {
@@ -38,7 +39,7 @@ namespace UserManagement.API.Validation.PasswordComplexityrule
                             .WithMessage($"{nameof(CreatePasswordComplexityRuleCommand.PwdComplexityRule)} {rule.Error} {maxLengthProvider.GetMaxLength<PasswordComplexityRule>("PwdComplexityRule") ?? 150}");
                         break;
                     default:
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information($"Warning: Unknown rule '{rule.Rule}' encountered.");
                         break;
                 }
             }

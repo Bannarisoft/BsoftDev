@@ -15,5 +15,8 @@ namespace UserManagement.Infrastructure.Persistence
         public string? EventData { get; set; }
         public bool Processed { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime? LastPublishedAt { get; set; }
+        public int RetryCount { get; set; }
+        public string? LastError { get; set; }
     }
 }
