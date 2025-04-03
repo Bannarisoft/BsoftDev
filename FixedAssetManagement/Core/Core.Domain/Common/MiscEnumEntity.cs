@@ -65,7 +65,7 @@ namespace Core.Domain.Common
         public const string MiscCode = "DEPMETHOD";
         }
          public static class  AssetTransferType
-                {
+        {
         public const string MiscCode = "ASSETISSUETYPE";
         }
 
