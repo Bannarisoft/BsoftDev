@@ -6,6 +6,7 @@ using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetDtlToTrans
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTranferedById;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByDeptId;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetTransferType;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
 using Core.Domain.Entities.AssetMaster;
@@ -71,7 +72,7 @@ namespace FAM.API.Controllers.AssetMaster
               }   
 
 
-         [HttpGet("GetCategoryByDepartmentId")]
+         [HttpGet("GetCategoryByDepartmentId/{id}")]
         public async Task<IActionResult> GetCategoriesByDepartmentAsync(int id)
         {
             var assetCategoryList = await Mediator.Send(
@@ -165,7 +166,7 @@ namespace FAM.API.Controllers.AssetMaster
                 });
         }
 
-         [HttpGet("GetAssetsByCategory/{categoryId}")]
+         [HttpGet("GetAssetsByCategory/{categoryId}/{assetDepartmentId}")]
         public async Task<IActionResult> GetAssetsByCategoryAsync(int categoryId , int assetDepartmentId)
         {
             var query = new GetAssetsByCategoryQuery { AssetCategoryId = categoryId , AssetDepartmentId = assetDepartmentId };
@@ -188,7 +189,29 @@ namespace FAM.API.Controllers.AssetMaster
             var result = await Mediator.Send(query);
             return Ok(result);
             
-        }      
+        } 
+
+         
+
+        [HttpGet("TransferTypes")]
+        public async Task<IActionResult> GetDisposalTypes()
+        {
+            var result = await Mediator.Send(new GetTransferTypeQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Transfer Types found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Transfer Types fetched successfully.",
+                data = result.Data
+            });
+        }   
  
     }
 }

@@ -26,13 +26,14 @@ namespace MaintenanceManagement.API.Controllers
         private readonly IValidator<DeleteMaintenanceTypeCommand> _deletemaintenancecommandvalidator;
 
 
-        public MaintenanceTypeController(ILogger<MaintenanceTypeController> logger,IValidator<CreateMaintenanceTypeCommand> createmaintenancecommandvalidator,IValidator<UpdateMaintenanceTypeCommand> updatemaintenanceommandvalidator,IValidator<DeleteMaintenanceTypeCommand> _deletemaintenancecommandvalidator,IMediator mediator)
+        public MaintenanceTypeController(ILogger<MaintenanceTypeController> logger,IValidator<CreateMaintenanceTypeCommand> createmaintenancecommandvalidator,IValidator<UpdateMaintenanceTypeCommand> updatemaintenanceommandvalidator,IValidator<DeleteMaintenanceTypeCommand> deletemaintenancecommandvalidator,IMediator mediator)
         : base(mediator)
         {
             _logger = logger;
             _mediator=mediator;
             _createmaintenancecommandvalidator=createmaintenancecommandvalidator;
             _updatemaintenanceommandvalidator=updatemaintenanceommandvalidator;
+            _deletemaintenancecommandvalidator=deletemaintenancecommandvalidator;
         }
 
          [HttpGet]

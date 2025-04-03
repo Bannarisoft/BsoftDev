@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.ActivityMaster.Command.CreateActivityMaster;
+using Core.Application.ActivityMaster.Command.UpdateActivityMster;
 using Core.Application.ActivityMaster.Queries.GetAllActivityMaster;
 using Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete;
 using Core.Application.MachineGroup.Queries.GetMachineGroupById;
@@ -17,7 +18,12 @@ namespace Core.Application.Common.Mappings
     {
         public ActivityMasterProfile()
         {
-            CreateMap<Core.Domain.Entities.ActivityMaster, GetAllActivityMasterDto>();
+            //CreateMap<Core.Domain.Entities.ActivityMaster, GetAllActivityMasterDto>();
+           
+            CreateMap<Core.Domain.Entities.ActivityMaster, GetAllActivityMasterDto>(); 
+             CreateMap<ActivityMachineGroup, GetAllMachineGroupDto>();
+          //  CreateMap<Core.Domain.Entities.ActivityMaster, GetAllMachineGroupDto>();
+
 
             CreateMap<Core.Domain.Entities.ActivityMaster, GetActivityMasterByIdDto>();
 
@@ -30,9 +36,29 @@ namespace Core.Application.Common.Mappings
             
             CreateMap<ActivityMachineGroupDto, ActivityMachineGroup>();
 
-            //  CreateMap<CreateActivityMasterCommand, Core.Domain.Entities.ActivityMaster>()
-            // .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
-            // .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+
+             CreateMap<UpdateActivityMasterDto, Core.Domain.Entities.ActivityMaster>()
+            .ForMember(dest => dest.ActivityMachineGroups, opt => opt.MapFrom(src => src.UpdateActivityMachineGroup)) // Maps List<ActivityMachineGroupDto> to List<ActivityMachineGroup>
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+            
+            CreateMap<UpdateActivityMachineGroupDto, ActivityMachineGroup>();
+
+            // CreateMap<UpdateActivityMasterDto, Core.Domain.Entities.ActivityMaster>()
+            //     .ForMember(dest => dest.ActivityMachineGroups, opt => opt.MapFrom(src => 
+            //         src.UpdateActivityMachineGroup.Select(x => new ActivityMachineGroup 
+            //         {
+            //             ActivityMasterId = src.ActivityId,  // Ensure the correct ActivityMasterId is set
+            //             MachineGroupId = x.MachineGroupId
+            //         }).ToList()
+            //     ))
+            //     .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+            //     .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+
+            // CreateMap<UpdateActivityMachineGroupDto, ActivityMachineGroup>(); 
+
+
+           
 
          
 

@@ -63,7 +63,6 @@ namespace FAM.API.Validation.AssetMaster.AssetInsurance
 
                         RuleFor(x => x.RenewalStatus)
                             .NotEmpty().WithMessage($"{nameof(CreateAssetInsuranceCommand.RenewalStatus)} {rule.Error}");
-
                         
                         break;
                     case "AlreadyExists":

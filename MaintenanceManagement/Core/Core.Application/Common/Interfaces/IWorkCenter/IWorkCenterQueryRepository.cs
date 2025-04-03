@@ -10,5 +10,6 @@ namespace Core.Application.Common.Interfaces.IWorkCenter
          Task<Core.Domain.Entities.WorkCenter?> GetByIdAsync(int Id);
          Task<(List<Core.Domain.Entities.WorkCenter>,int)> GetAllWorkCenterGroupAsync(int PageNumber, int PageSize, string? SearchTerm);
          Task<List<Core.Domain.Entities.WorkCenter>> GetWorkCenterGroups(string searchPattern);
+          Task<bool> SoftDeleteValidation(int Id); 
     }
 }

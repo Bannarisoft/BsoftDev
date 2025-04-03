@@ -11,6 +11,8 @@ using Core.Application.WorkCenter.Command.CreateWorkCenter;
 using Core.Application.WorkCenter.Command.DeleteWorkCenter;
 using Core.Application.WorkCenter.Command.UpdateWorkCenter;
 
+
+
 using Core.Application.ShiftMasters.Commands.CreateShiftMaster;
 using Core.Application.ShiftMasters.Commands.DeleteShiftMaster;
 using Core.Application.ShiftMasters.Commands.UpdateShiftMaster;
@@ -38,8 +40,13 @@ using Core.Application.MiscMaster.Command.DeleteMiscMaster;
 using Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster;
 using Core.Application.ActivityMaster.Command.CreateActivityMaster;
 using MaintenanceManagement.API.Validation.ActivityMaster;
+using MaintenanceManagement.API.Validation.MachineMaster;
+using Core.Application.ActivityMaster.Command.UpdateActivityMster;
+using Core.Application.MachineMaster.Command.CreateMachineMaster;
 using MaintenanceManagement.API.Validation.MachineGroupUser;
+using Core.Application.MachineMaster.Command.UpdateMachineMaster;
 using Core.Application.MachineGroupUsers.Command.CreateMachineGroupUser;
+using Core.Application.MachineMaster.Command.DeleteMachineMaster;
 using Core.Application.MachineGroupUser.Command.UpdateMachineGroupUser;
 using Core.Application.MachineGroupUser.Command.DeleteMachineGroupUser;
 
@@ -62,6 +69,8 @@ namespace MaintenanceManagement.API.Validation.Common
         services.AddScoped<IValidator<DeleteMiscMasterCommand>, DeleteMiscMasterCommandValidator>();
         services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>(); 
 
+
+
         services.AddScoped<IValidator<CreateShiftMasterCommand>, CreateShiftMasterCommandValidator>();
         services.AddScoped<IValidator<UpdateShiftMasterCommand>, UpdateShiftMasterCommandValidator>();
         services.AddScoped<IValidator<DeleteShiftMasterCommand>, DeleteShiftMasterCommandValidator>();
@@ -80,7 +89,12 @@ namespace MaintenanceManagement.API.Validation.Common
         services.AddScoped<IValidator<CreateMaintenanceTypeCommand>, CreateMaintenanceTypeCommandValidator>();
         services.AddScoped<IValidator<UpdateMaintenanceTypeCommand>, UpdateMaintenanceTypeCommandValidator>();
         services.AddScoped<IValidator<DeleteMaintenanceTypeCommand>, DeleteMaintenanceTypeCommandValidator>();
-        services.AddScoped<IValidator<CreateActivityMasterCommand>, CreateActivityMasterCommandValidator>();
+
+            services.AddScoped<IValidator<CreateActivityMasterCommand>, CreateActivityMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateMachineMasterCommand>, CreateMachineMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateMachineMasterCommand>, UpdateMachineMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteMachineMasterCommand>, DeleteMachineMasterCommandValidator>();
+        services.AddScoped<IValidator<UpdateActivityMasterCommand>, UpdateActivityMasterCommandValidator>();
         services.AddScoped<IValidator<CreateMachineGroupUserCommand>, CreateMachineGroupUserCommandValidator>();
         services.AddScoped<IValidator<UpdateMachineGroupUserCommand>, UpdateMachineGroupUserCommandValidator>();
         services.AddScoped<IValidator<DeleteMachineGroupUserCommand>, DeleteMachineGroupUserCommandValidator>();

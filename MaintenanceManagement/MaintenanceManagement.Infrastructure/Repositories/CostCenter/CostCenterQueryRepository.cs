@@ -90,19 +90,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.CostCenter
             return costCenters.ToList();
         }
 
-    //     public async Task<bool> SoftDeleteValidation(int Id)
-    //     {
-    //             const string query = @"
-    //                        SELECT 1 
-    //                        FROM [Maintenance].[CostCenter] 
-    //                        WHERE Id = @Id AND IsDeleted = 0;";
+        public async Task<bool> SoftDeleteValidation(int Id)
+        {
+            const string query = @"
+                           SELECT 1 
+                           FROM [Maintenance].[MachineMaster]
+                           WHERE CostCenterId = @Id AND IsDeleted = 0;";
                     
-    //                    using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+                       using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
                     
-                       
-    //                    var costCenterExists = await multi.ReadFirstOrDefaultAsync<int?>();
+                       var costcentermasterDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
                     
-    //                    return costCenterExists.HasValue ;
-    //   }
+                       return costcentermasterDetailExists.HasValue;
+        }
+
+       
     }
 }

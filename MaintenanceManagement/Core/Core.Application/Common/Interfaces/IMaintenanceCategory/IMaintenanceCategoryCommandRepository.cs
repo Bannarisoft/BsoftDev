@@ -11,5 +11,6 @@ namespace Core.Application.Common.Interfaces.IMaintenanceCategory
         Task<int> UpdateAsync(int Id,Core.Domain.Entities.MaintenanceCategory maintenanceCategory);
         Task<int> DeleteAsync(int Id,Core.Domain.Entities.MaintenanceCategory maintenanceCategory);
         Task<bool> IsNameDuplicateAsync(string? name, int excludeId);
+        Task<bool> ExistsByCodeAsync(string? CategoryName);
     }
 }

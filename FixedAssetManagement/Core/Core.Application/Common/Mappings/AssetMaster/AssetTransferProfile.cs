@@ -9,6 +9,7 @@ using Core.Application.AssetMaster.AssetTransferIssue.Command.UpdateAssetTransfe
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCategory;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByDeptId;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetTransferType;
 using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.Common.Mappings.AssetMaster
@@ -44,6 +45,8 @@ namespace Core.Application.Common.Mappings.AssetMaster
             CreateMap< AssetMasterDto , GetAssetMasterDto>();
 
             CreateMap<GetAssetMasterDto, GetCategoryByDeptIdDto>(); 
+
+           
 
 
           
