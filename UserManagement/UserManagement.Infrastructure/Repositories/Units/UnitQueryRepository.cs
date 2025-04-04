@@ -123,6 +123,25 @@ namespace UserManagement.Infrastructure.Repositories.Units
              });
             return result.ToList();
         }
+         public async Task<List<Unit>> GetUnitByUserId(int userId,int CompanyId)
+        {
+             const string query = @"
+                SELECT 
+                U.Id, 
+                U.UnitName,
+                U.DivisionId
+            FROM AppData.Unit U
+            Inner join [AppSecurity].[UserUnit] UU on UU.UnitId = U.Id where IsDeleted = 0 
+            and UU.UserId = @UserId and UU.IsActive = 1 and U.CompanyId = @CompanyId";
+                
+              var result = await _dbConnection.QueryAsync<Unit>(query, new 
+            {                
+                 UserId = userId,
+                 CompanyId = CompanyId
+            
+             });
+            return result.ToList();
+        }
          public async Task<bool> FKColumnExistValidation(int Id)
           {
               var sql = "SELECT COUNT(1) FROM AppData.Unit WHERE Id = @Id AND IsDeleted = 0 AND IsActive = 1";
