@@ -5,24 +5,23 @@ using Core.Application.Common.Interfaces.IUnit;
 using AutoMapper;
 using Core.Application.Common;
 using Core.Domain.Events;
-
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces;
 
-namespace Core.Application.Units.Queries.GetUnitAutoComplete
+namespace Core.Application.Units.Queries.GetUnitByUserId
 {
-    public class GetUnitAutoCompleteQueryHandler : IRequestHandler<GetUnitAutoCompleteQuery, ApiResponseDTO<List<UnitAutoCompleteDTO>>>
+    public class GetUnitByUserIdQueryHandler : IRequestHandler<GetUnitByUserIdQuery, ApiResponseDTO<List<UnitAutoCompleteDTO>>>
     {
          private readonly IUnitQueryRepository _unitRepository;        
         private readonly IMapper _mapper;
 
         private readonly IMediator _mediator; 
 
-        private readonly ILogger<GetUnitAutoCompleteQueryHandler> _logger;
+        private readonly ILogger<GetUnitByUserIdQueryHandler> _logger;
 
         private readonly IIPAddressService _ipAddressService;
-        public GetUnitAutoCompleteQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper, IMediator mediator,ILogger<GetUnitAutoCompleteQueryHandler> logger,IIPAddressService ipAddressService)
+        public GetUnitByUserIdQueryHandler(IUnitQueryRepository unitRepository, IMapper mapper, IMediator mediator,ILogger<GetUnitByUserIdQueryHandler> logger,IIPAddressService ipAddressService)
         {
              _unitRepository = unitRepository;
             _mapper = mapper;
@@ -31,15 +30,13 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
             _ipAddressService = ipAddressService;
         }
 
-        public async Task<ApiResponseDTO<List<UnitAutoCompleteDTO>>> Handle(GetUnitAutoCompleteQuery request, CancellationToken cancellationToken)
-        {     
-           _logger.LogInformation($"Search pattern started: {request.SearchPattern}");
-
-            var userId = _ipAddressService.GetUserId();
-            var result = await _unitRepository.GetUnit(request.SearchPattern,userId,request.CompanyId);
+        public async Task<ApiResponseDTO<List<UnitAutoCompleteDTO>>> Handle(GetUnitByUserIdQuery request, CancellationToken cancellationToken)
+        { 
+            //var userId = _ipAddressService.GetUserId();
+            var result = await _unitRepository.GetUnitByUserId(request.UserId,request.CompanyId);
               if (result is null || !result.Any() || result.Count == 0) 
                 {
-                      _logger.LogWarning($"No Unit Record {request.SearchPattern} not found in DB.");
+                      _logger.LogWarning($"No Unit Record found in DB.");
                      return new ApiResponseDTO<List<UnitAutoCompleteDTO>>
                      {
                          IsSuccess = false,
@@ -51,10 +48,10 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
 
             //Domain Event            
             var domainEvent = new AuditLogsDomainEvent(
-                actionDetail: "GetUnitAutoCompleteQuery",
+                actionDetail: "GetUnitByUserIdQuery",
                 actionCode:"",        
-                actionName: request.SearchPattern,                
-                details: $"Unit '{request.SearchPattern}' was searched",
+                actionName: "",                
+                details: $"Unit  was searched",
                 module:"Unit"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
