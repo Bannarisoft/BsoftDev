@@ -26,6 +26,13 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? ItemName { get; set; }
         public string? BillNo { get; set; }
         public string? BillDate { get; set; }
-        public string? BinLocation { get; set; }
+        public string? BinLocation { get; set; }         
+        public string? PjYear { get; set; }
+        public string? PjDocId { get; set; }
+        public string? PjDocSr { get; set;}
+        public int PjDocNo { get; set; }
+        public int AssetSourceId { get; set; }   
+         public string? CapitalizationDate { get; set; }
+    
     }
 }

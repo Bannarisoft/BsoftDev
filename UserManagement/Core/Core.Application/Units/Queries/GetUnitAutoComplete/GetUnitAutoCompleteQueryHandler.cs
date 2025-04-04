@@ -35,8 +35,8 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
         {     
            _logger.LogInformation($"Search pattern started: {request.SearchPattern}");
 
-           var userId = _ipAddressService.GetUserId();
-            var result = await _unitRepository.GetUnit(request.SearchPattern,userId,request.CompanyId);
+            //var userId = _ipAddressService.GetUserId();
+            var result = await _unitRepository.GetUnit(request.SearchPattern,request.UserId,request.CompanyId);
               if (result is null || !result.Any() || result.Count == 0) 
                 {
                       _logger.LogWarning($"No Unit Record {request.SearchPattern} not found in DB.");

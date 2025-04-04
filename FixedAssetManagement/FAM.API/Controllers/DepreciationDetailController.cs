@@ -7,7 +7,6 @@ using Core.Application.DepreciationDetail.Commands.UpdateDepreciationDetail;
 using Core.Application.DepreciationDetail.Queries.GetDepreciationAbstract;
 using Core.Application.DepreciationDetail.Queries.GetDepreciationDetail;
 using Core.Application.DepreciationDetail.Queries.GetDepreciationMethod;
-using Core.Application.DepreciationDetail.Queries.GetDepreciationPeriod;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -178,28 +177,9 @@ namespace FAM.API.Controllers
                 data =$"Depreciation Details Locked" ,
                 message = result.Message
             });
-        }
-            // GET: api/AssetMasterGeneral/WorkingStatus
+        }            // GET: api/AssetMasterGeneral/WorkingStatus
+       
         [HttpGet("DeprecationPeriod")]
-        public async Task<IActionResult> GetDepreciationPeriod()
-        {
-            var result = await Mediator.Send(new GetDepreciationQuery());
-            if (result == null || result.Data == null || result.Data.Count == 0)
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = "No Working Status found."
-                });
-            }
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status200OK,
-                message = "Working Status fetched successfully.",
-                data = result.Data
-            });
-        }  
-        [HttpGet("DeprecationMethod")]
         public async Task<IActionResult> GetDepreciationMethod()
         {
             var result = await Mediator.Send(new GetDepreciationMethodQuery());

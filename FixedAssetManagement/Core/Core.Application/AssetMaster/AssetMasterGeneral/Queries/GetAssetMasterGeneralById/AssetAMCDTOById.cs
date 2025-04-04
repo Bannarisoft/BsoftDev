@@ -21,5 +21,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
          public int RenewalStatusId { get; set; }
          public byte IsActive { get; set; }
          public int FreeServiceCount { get; set; }
+        public string? VendorPhone { get; set; }  
+        public string? VendorEmail { get; set; }  
     }
 }

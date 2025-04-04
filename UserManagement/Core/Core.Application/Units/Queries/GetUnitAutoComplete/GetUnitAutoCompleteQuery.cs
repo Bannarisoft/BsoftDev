@@ -10,5 +10,6 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
     {
         public string? SearchPattern { get; set; }
         public int CompanyId { get; set; }
+        public int UserId { get; set; }
     }
 }
