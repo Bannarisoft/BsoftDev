@@ -10,3 +10,11 @@
 /SagaOrchestrator/SagaOrchestrator.Infrastructure/obj
 /Shared/Contracts/obj
 /Shared/Contracts/bin
+/BackgroundService/BackgroundService.API/bin
+/BackgroundService/BackgroundService.API/obj
+/BackgroundService/BackgroundService.Application/bin
+/BackgroundService/BackgroundService.Application/obj
+/BackgroundService/BackgroundService.Domain/bin
+/BackgroundService/BackgroundService.Domain/obj
+/BackgroundService/BackgroundService.Infrastructure/bin
+/BackgroundService/BackgroundService.Infrastructure/obj
