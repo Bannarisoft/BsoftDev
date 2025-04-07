@@ -18,6 +18,7 @@ namespace Core.Domain.Entities
         public ICollection<WorkOrder>? WorkOrderPriority  {get; set;} 
         public ICollection<WorkOrder>? WorkOrderStatus  {get; set;}  
         public ICollection<WorkOrder>? WorkOrderRootCause  {get; set;}  
+        public ICollection<WorkOrder>? WorkOrderRequestType  {get; set;}  
 		
   		    
     }

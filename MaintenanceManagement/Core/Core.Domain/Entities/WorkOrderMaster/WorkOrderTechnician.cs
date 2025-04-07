@@ -6,7 +6,8 @@ namespace Core.Domain.Entities.WorkOrderMaster
     {
         public int? WorkOrderId { get; set; }
         public WorkOrder WOTechnician { get; set; } = null!; 
-        public int? TechnicianId { get; set; }
+        public int TechnicianId { get; set; }
+        public string? TechnicianName { get; set; }
         public decimal HoursSpent { get; set; }        
     }
 }
