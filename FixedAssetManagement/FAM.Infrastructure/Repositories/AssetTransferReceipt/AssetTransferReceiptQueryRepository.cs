@@ -27,38 +27,45 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
              var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
-                FROM FixedAsset.AssetTransferReceiptHdr a
-                INNER JOIN FixedAsset.MiscMaster c ON a.TransferType = c.Id
-                INNER JOIN [Bannari].AppData.Unit d ON a.FromUnitId = d.Id
-                INNER JOIN [Bannari].AppData.Unit e ON a.ToUnitId = e.Id
-                INNER JOIN [Bannari].AppData.Department f ON a.FromDepartmentId = f.Id
-                INNER JOIN [Bannari].AppData.Department g ON a.ToDepartmentId = g.Id
-                {{(string.IsNullOrEmpty(Receiptno) ? "" : "AND a.Id LIKE @Search")}}
-                {{(FromDate.HasValue ? "AND a.DocDate >= @FromDate" : "")}}
-                {{(ToDate.HasValue ? "AND a.DocDate <= @ToDate" : "")}};
+                FROM FixedAsset.AssetTransferReceiptHdr A
+                INNER JOIN FixedAsset.AssetTransferIssueHdr B ON A.AssetTransferId = B.Id
+                INNER JOIN FixedAsset.MiscMaster C ON B.TransferType = C.Id
+                INNER JOIN [Bannari].AppData.Unit D ON B.FromUnitId = D.Id
+                INNER JOIN [Bannari].AppData.Unit E ON B.ToUnitId = E.Id
+                INNER JOIN [Bannari].AppData.Department F ON B.FromDepartmentId = F.Id
+                INNER JOIN [Bannari].AppData.Department G ON B.ToDepartmentId = G.Id
+                {{(string.IsNullOrEmpty(Receiptno) ? "" : "AND A.Id LIKE @Search")}}
+                {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
+                {{(ToDate.HasValue ? "AND A.DocDate <= @ToDate" : "")}};
 
                 SELECT 
-                a.Id as AssetReceiptId,
-                a.AssetTransferId,
+                A.Id AS AssetReceiptId,
+                A.AssetTransferId,
                 A.DocDate,
                 C.Description AS TransferType,
                 D.UnitName AS FromUnitName,
                 E.UnitName AS ToUnitName,
                 F.DeptName AS FromDepartment,
                 G.DeptName AS ToDepartment,
-                A.FromCustodianId, 
-                A.FromCustodianName,
-                A.ToCustodianId,
-                A.ToCustodianName
-                FROM FixedAsset.AssetTransferReceiptHdr a
-                INNER JOIN FixedAsset.MiscMaster c ON a.TransferType = c.Id
-                INNER JOIN [Bannari].AppData.Unit d ON a.FromUnitId = d.Id
-                INNER JOIN [Bannari].AppData.Unit e ON a.ToUnitId = e.Id
-                INNER JOIN [Bannari].AppData.Department f ON a.FromDepartmentId = f.Id
-                INNER JOIN [Bannari].AppData.Department g ON a.ToDepartmentId = g.Id
-                {{(string.IsNullOrEmpty(Receiptno) ? "" : "AND a.Id LIKE @Search")}}
-                {{(FromDate.HasValue ? "AND a.DocDate >= @FromDate" : "")}}
-                {{(ToDate.HasValue ? "AND a.DocDate <= @ToDate" : "")}}
+                B.FromCustodianId,
+                B.FromCustodianName,
+                B.ToCustodianId,
+                B.ToCustodianName,
+                A.Sdcno,
+                A.GatePassNo,
+                A.Remarks,
+                A.AuthorizedByName,
+                A.AuthorizedDate
+                FROM FixedAsset.AssetTransferReceiptHdr A
+                INNER JOIN FixedAsset.AssetTransferIssueHdr B ON A.AssetTransferId = B.Id
+                INNER JOIN FixedAsset.MiscMaster C ON B.TransferType = C.Id
+                INNER JOIN [Bannari].AppData.Unit D ON B.FromUnitId = D.Id
+                INNER JOIN [Bannari].AppData.Unit E ON B.ToUnitId = E.Id
+                INNER JOIN [Bannari].AppData.Department F ON B.FromDepartmentId = F.Id
+                INNER JOIN [Bannari].AppData.Department G ON B.ToDepartmentId = G.Id
+                {{(string.IsNullOrEmpty(Receiptno) ? "" : "AND A.Id LIKE @Search")}}
+                {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
+                {{(ToDate.HasValue ? "AND A.DocDate <= @ToDate" : "")}}
                 ORDER BY a.Id ASC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
@@ -99,51 +106,20 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
             INNER JOIN FixedAsset.AssetMaster c on b.AssetId=c.Id
             INNER JOIN FixedAsset.Location d on b.LocationId=d.Id
             INNER JOIN FixedAsset.SubLocation e on b.SubLocationId=e.Id
-	        WHERE a.Id= @AssetReceiptId";
+	        WHERE a.Id= @AssetReceiptId and b.AckStatus=1";
 
             var assetreceiptList = await _dbConnection.QueryAsync<AssetReceiptDetailsByIdDto>(query, new { AssetReceiptId });
 
             return assetreceiptList.ToList(); // Ensure it returns a List
         }
 
-        public async Task<(List<AssetTransferReceiptPendingDto>, int)> GetAllPendingAssetTransferAsync(int PageNumber, int PageSize, string? TransferType, DateTimeOffset? FromDate, DateTimeOffset? ToDate)
+        public async Task<(List<AssetTransferReceiptPendingDto>, int)> GetAllPendingAssetTransferAsync(
+            int PageNumber, int PageSize, int? AssetTransferId, string? TransferType, DateTimeOffset? FromDate, DateTimeOffset? ToDate)
         {
             var query = $$"""
                 DECLARE @TotalCount INT;
-                SELECT @TotalCount = COUNT(*) 
-                FROM FixedAsset.AssetTransferIssueHdr a
-                INNER JOIN FixedAsset.AssetTransferIssueDtl b on a.Id=b.AssetTransferId
-                INNER JOIN FixedAsset.AssetMaster m on b.AssetId=m.Id
-                INNER JOIN FixedAsset.MiscMaster c on  a.TransferType= c.Id
-                INNER JOIN [Bannari].AppData.Unit d on a.FromUnitId= d.Id
-                INNER JOIN [Bannari].AppData.Unit e on a.ToUnitId= e.Id
-                INNER JOIN [Bannari].AppData.Department f on a.FromDepartmentId= f.Id
-                INNER JOIN [Bannari].AppData.Department g on a.FromDepartmentId= g.Id
-                WHERE a.AckStatus= 0 and  a.Status = 'Approved'
-                {{(string.IsNullOrEmpty(TransferType) ? "" : "AND a.Id LIKE @Search")}}
-                {{(FromDate.HasValue ? "AND a.DocDate >= @FromDate" : "")}}
-                {{(ToDate.HasValue ? "AND a.DocDate <= @ToDate" : "")}};
-
-                SELECT 
-                B.AssetTransferId,
-                A.DocDate,
-                C.Description AS TransferType,
-                M.AssetCode,
-                M.AssetName,
-                A.FromUnitId,
-                D.UnitName AS FromUnitName,
-                A.ToUnitId,
-                E.UnitName AS ToUnitName,
-                A.FromDepartmentId,
-                F.DeptName AS FromDepartment,
-                A.ToDepartmentId,
-                G.DeptName AS ToDepartment,
-                A.FromCustodianId, 
-                A.FromCustodianName,
-                A.ToCustodianId,
-                A.ToCustodianName,
-                A.Status 
-                FROM FixedAsset.AssetTransferIssueHdr A 
+                SELECT @TotalCount = COUNT(DISTINCT A.Id)
+                FROM FixedAsset.AssetTransferIssueHdr A
                 INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
                 INNER JOIN FixedAsset.AssetMaster M ON B.AssetId = M.Id
                 INNER JOIN FixedAsset.MiscMaster C ON A.TransferType = C.Id
@@ -151,11 +127,49 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 INNER JOIN [Bannari].AppData.Unit E ON A.ToUnitId = E.Id
                 INNER JOIN [Bannari].AppData.Department F ON A.FromDepartmentId = F.Id
                 INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
-                WHERE A.AckStatus= 0 and  A.Status = 'Approved'
-                {{(string.IsNullOrEmpty(TransferType) ? "" : "AND a.Id LIKE @Search")}}
-                {{(FromDate.HasValue ? "AND a.DocDate >= @FromDate" : "")}}
-                {{(ToDate.HasValue ? "AND a.DocDate <= @ToDate" : "")}}
-                ORDER BY B.AssetTransferId ASC
+                LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
+                LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
+                WHERE A.Status = 'Approved' 
+                AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL) -- Consider pending receipts only
+                {{(AssetTransferId.HasValue ? "AND A.Id = @AssetTransferId" : "")}}
+                {{(string.IsNullOrEmpty(TransferType) ? "" : "AND A.TransferType LIKE @Search")}}
+                {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
+                {{(ToDate.HasValue ? "AND A.DocDate <= @ToDate" : "")}};
+
+                SELECT 
+                    A.Id AS AssetTransferId,
+                    A.DocDate,
+                    C.Description AS TransferType,
+                    M.AssetCode,
+                    M.AssetName,
+                    B.AssetId,
+                    D.UnitName AS FromUnitName,
+                    E.UnitName AS ToUnitName,
+                    A.FromDepartmentId,
+                    F.DeptName AS FromDepartment,
+                    G.DeptName AS ToDepartment,
+                    A.FromCustodianName,
+                    A.ToCustodianName,
+                    A.Status,
+                    RH.Sdcno,
+                    RH.GatePassNo 
+                FROM FixedAsset.AssetTransferIssueHdr A
+                INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
+                INNER JOIN FixedAsset.AssetMaster M ON B.AssetId = M.Id
+                INNER JOIN FixedAsset.MiscMaster C ON A.TransferType = C.Id
+                INNER JOIN [Bannari].AppData.Unit D ON A.FromUnitId = D.Id
+                INNER JOIN [Bannari].AppData.Unit E ON A.ToUnitId = E.Id
+                INNER JOIN [Bannari].AppData.Department F ON A.FromDepartmentId = F.Id
+                INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
+                LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
+                LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
+                WHERE A.Status = 'Approved' 
+                AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL)
+                {{(AssetTransferId.HasValue ? "AND A.Id = @AssetTransferId" : "")}}
+                {{(string.IsNullOrEmpty(TransferType) ? "" : "AND A.TransferType LIKE @Search")}}
+                {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
+                {{(ToDate.HasValue ? "AND A.DocDate <= @ToDate" : "")}}
+                ORDER BY A.Id ASC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
                 SELECT @TotalCount AS TotalCount;
@@ -163,6 +177,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
 
             var parameters = new
             {
+                AssetTransferId,
                 Search = $"%{TransferType}%",
                 FromDate,
                 ToDate,
@@ -178,12 +193,12 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
         }
 
         public async Task<AssetTransferJsonDto> GetAssetTransferByIdAsync(int assetTransferId)
-    {
+        {
         const string query = @"
             SELECT Id as AssetTransferId , DocDate, TransferType, FromUnitId, ToUnitId, FromDepartmentId, ToDepartmentId, 
                    FromCustodianId, ToCustodianId, Status, FromCustodianName, ToCustodianName
             FROM FixedAsset.AssetTransferIssueHdr
-            WHERE Id = @AssetTransferId AND Status = 'Approved' and AckStatus = 0
+            WHERE Id = @AssetTransferId AND Status = 'Approved' 
             FOR JSON PATH, INCLUDE_NULL_VALUES;
 
             SELECT AssetId, AssetValue 
@@ -220,6 +235,18 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
         return header;
     }
 
-       
+        public async Task<AssetTransferDto?> GetByAssetTransferId(int assetTransferId)
+        {
+             const string query = @"
+                SELECT ToUnitId, ToDepartmentId, ToCustodianId
+                FROM FixedAsset.AssetTransferIssueHdr
+                WHERE Id = @AssetTransferId";
+
+                var parameters = new { AssetTransferId = assetTransferId };
+
+                var assetTransfer = await _dbConnection.QueryFirstOrDefaultAsync<AssetTransferDto>(query, parameters);
+
+            return assetTransfer;
+        }
     }
 }

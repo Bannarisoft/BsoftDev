@@ -18,65 +18,115 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<int> CreateAsync(AssetTransferReceiptHdr assetTransferReceiptHdr,AssetTransferIssueHdr assetTransferIssueHdr,List<Core.Domain.Entities.AssetMaster.AssetLocation> assetLocation)
+        public async Task<int> CreateAsync(AssetTransferReceiptHdr assetTransferReceiptHdr,List<Core.Domain.Entities.AssetMaster.AssetLocation> assetLocation)
         {
-            var existingRecord = await _applicationDbContext.AssetTransferIssueHdr
-                .FirstOrDefaultAsync(x => x.Id == assetTransferIssueHdr.Id && x.AckStatus == 0 && x.Status == "Approved");
+             int resultId;
+           // Check if AssetTransferId exists in AssetTransferReceiptHdr
+                var existingReceipt = await _applicationDbContext.AssetTransferReceiptHdr
+                .FirstOrDefaultAsync(x => x.AssetTransferId == assetTransferReceiptHdr.AssetTransferId);
+
+            if (existingReceipt is null)
+            {
 
                 // Insert into AssetTransferReceiptHdr table
                 var entry =_applicationDbContext.Entry(assetTransferReceiptHdr);
                 await _applicationDbContext.AssetTransferReceiptHdr.AddAsync(assetTransferReceiptHdr);
+            }
+            else
+            {        
+            // Fetch AssetIds where AckStatus = 0
+            var assetIds = await _applicationDbContext.AssetTransferReceiptDtl
+                .Where(d => d.AssetReceiptId == existingReceipt.Id && d.AckStatus == 0)
+                .Select(d => d.AssetId)
+                .ToListAsync();
 
-                 if (existingRecord != null)
-                 {
-                     existingRecord.AckStatus = assetTransferIssueHdr.AckStatus;
-                     _applicationDbContext.AssetTransferIssueHdr.Update(existingRecord);
-                 }
+            // Fetch only relevant existing details
+            var existingDetails = await _applicationDbContext.AssetTransferReceiptDtl
+                .Where(d => d.AssetReceiptId == existingReceipt.Id && assetIds.Contains(d.AssetId))
+                .ToListAsync();
 
-                // Retrieve all AssetLocations that need to be updated based on the provided list
-                var assetIds = assetLocation.Select(a => a.AssetId).ToList();
+            // Convert new details to a dictionary using Tuple as key
+            var newDetailsDict = assetTransferReceiptHdr.AssetTransferReceiptDtl
+                .ToDictionary(a => (a.AssetId)); // Use AssetId since AssetReceiptId is already known (existingReceipt.Id)
+
+            // Update existing details using LINQ
+            var updatedDetails = existingDetails
+                .Where(d => newDetailsDict.ContainsKey(d.AssetId))
+                .Select(d =>
+                {
+                    var newDetail = newDetailsDict[d.AssetId];
+                    d.AckStatus = newDetail.AckStatus;
+                    d.AckDate = newDetail.AckStatus == 1 ? DateTimeOffset.UtcNow : (DateTimeOffset?)null;
+                    d.LocationId = newDetail.LocationId;
+                    d.SubLocationId = newDetail.SubLocationId;
+                    d.UserID = newDetail.UserID;
+                    d.UserName=newDetail.UserName;
+                    return d;
+                })
+                .ToList();
+
+                // Apply the updates
+                _applicationDbContext.AssetTransferReceiptDtl.UpdateRange(updatedDetails);
+  
+            }
+
+            // Filter only assets where AckStatus == 1
+           var acknowledgedAssets = assetTransferReceiptHdr.AssetTransferReceiptDtl
+            .Where(a => a.AckStatus == 1)
+            .ToList();
+
+            if (acknowledgedAssets.Any()) // Proceed only if there are acknowledged assets
+            {
+                var assetIds = acknowledgedAssets.Select(a => a.AssetId).ToList();
+
+                // Update AssetLocations for acknowledged assets using LINQ Join
                 var assetLocationsToUpdate = await _applicationDbContext.AssetLocations
                     .Where(x => assetIds.Contains(x.AssetId))
                     .ToListAsync();
 
-                if (assetLocationsToUpdate.Any()) // Ensure there are records to update
-                {
-                    foreach (var assetLocationToUpdate in assetLocationsToUpdate)
+                var updatedAssetLocations = assetLocationsToUpdate.Join(
+                    assetLocation,
+                    existing => existing.AssetId,
+                    incoming => incoming.AssetId,
+                    (existing, incoming) =>
                     {
-                        var newLocation = assetLocation.FirstOrDefault(a => a.AssetId == assetLocationToUpdate.AssetId);
-                        if (newLocation != null)
-                        {
-                            assetLocationToUpdate.LocationId = newLocation.LocationId;
-                            assetLocationToUpdate.SubLocationId = newLocation.SubLocationId;
-                            assetLocationToUpdate.UserID = newLocation.UserID;
-                            assetLocationToUpdate.UnitId = newLocation.UnitId;
-                            assetLocationToUpdate.CustodianId = newLocation.CustodianId;
-                            assetLocationToUpdate.DepartmentId = newLocation.DepartmentId;
-                        }
-                    }
+                        existing.LocationId = incoming.LocationId;
+                        existing.SubLocationId = incoming.SubLocationId;
+                        existing.UserID = incoming.UserID;
+                        existing.UnitId = incoming.UnitId;
+                        existing.CustodianId = incoming.CustodianId;
+                        existing.DepartmentId = incoming.DepartmentId;
+                        return existing;
+                    }).ToList();
 
-                    _applicationDbContext.AssetLocations.UpdateRange(assetLocationsToUpdate);
-                }
+                _applicationDbContext.AssetLocations.UpdateRange(updatedAssetLocations);
 
-                  //  Update FixedAsset.AssetMaster's ToUnitId based on AssetId
-                    var assetMasterRecords = await _applicationDbContext.AssetMasterGenerals
-                     .Where(x => assetIds.Contains(x.Id))
+                // Update FixedAsset.AssetMaster's UnitId using LINQ Join
+                var assetMasterRecords = await _applicationDbContext.AssetMasterGenerals
+                    .Where(x => assetIds.Contains(x.Id))
                     .ToListAsync();
-                    
-                    foreach (var assetMaster in assetMasterRecords)
-                    {
-                        var matchingAsset = assetLocation.FirstOrDefault(a => a.AssetId == assetMaster.Id);
-                        if (matchingAsset != null)
-                        {
-                            assetMaster.UnitId = matchingAsset.UnitId; // Update ToUnitId
-                        }
-                    }
 
-                    _applicationDbContext.AssetMasterGenerals.UpdateRange(assetMasterRecords);
-                    await _applicationDbContext.SaveChangesAsync();
-                    return assetTransferReceiptHdr.Id;
-                    
+                var updatedAssetMasters = assetMasterRecords.Join(
+                    assetLocation,
+                    existing => existing.Id,
+                    incoming => incoming.AssetId,
+                    (existing, incoming) =>
+                    {
+                        existing.UnitId = incoming.UnitId;
+                        return existing;
+                    }).ToList();
+
+                _applicationDbContext.AssetMasterGenerals.UpdateRange(updatedAssetMasters);
+
+                 
+            }
+           // Save all changes in one transaction for efficiency
+            await _applicationDbContext.SaveChangesAsync();
+            resultId = existingReceipt?.Id ?? assetTransferReceiptHdr.Id;
+            return resultId;
         }
+           
+            
+    }
 
     }
-}
