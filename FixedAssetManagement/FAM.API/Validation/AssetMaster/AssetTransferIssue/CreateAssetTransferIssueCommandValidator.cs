@@ -36,10 +36,10 @@ namespace FAM.API.Validation.AssetMaster.AssetTransferIssue
             RuleFor(x => x.AssetTransferIssueHdrDto.ToCustodianId)
                 .GreaterThan(0).WithMessage("To Custodian ID must be greater than 0.");
 
-            RuleFor(x => x.AssetTransferIssueHdrDto.Status)
-                .NotEmpty().WithMessage("Status is required.")
-                .Must(s => s == "Pending" || s == "Approved" || s == "Rejected")
-                .WithMessage("Status must be 'Pending', 'Approved', or 'Rejected'.");
+            // RuleFor(x => x.AssetTransferIssueHdrDto.Status)
+            //     .NotEmpty().WithMessage("Status is required.")
+            //     .Must(s => s == "Pending" || s == "Approved" || s == "Rejected")
+            //     .WithMessage("Status must be 'Pending', 'Approved', or 'Rejected'.");
 
             RuleFor(x => x.AssetTransferIssueHdrDto.AssetTransferIssueDtls)
                 .NotEmpty().WithMessage("At least one asset must be included.")
