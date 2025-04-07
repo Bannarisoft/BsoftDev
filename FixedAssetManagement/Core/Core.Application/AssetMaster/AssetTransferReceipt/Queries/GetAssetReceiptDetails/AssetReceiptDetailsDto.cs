@@ -20,6 +20,11 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
         public string? FromCustodianName  { get; set; } 
         public int ToCustodianId  { get; set; } 
         public string? ToCustodianName  { get; set; } 
+        public string? Sdcno { get; set; } 
+        public string? GatePassNo { get; set; } 
+        public string? Remarks { get; set; } 
+        public string? AuthorizedByName { get; set; }
+        public DateTimeOffset AuthorizedDate { get; set; }
    
     }
 }

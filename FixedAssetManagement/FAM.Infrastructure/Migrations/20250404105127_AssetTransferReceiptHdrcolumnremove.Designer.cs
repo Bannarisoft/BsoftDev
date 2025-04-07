@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250404105127_AssetTransferReceiptHdrcolumnremove")]
+    partial class AssetTransferReceiptHdrcolumnremove
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1399,7 +1402,7 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("AssetGroupId")
                         .HasColumnType("int");
 
-                    b.Property<int>("BookType")
+                    b.Property<int?>("BookType")
                         .HasColumnType("int");
 
                     b.Property<string>("Code")
@@ -1424,7 +1427,7 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int>("DepreciationMethod")
+                    b.Property<int?>("DepreciationMethod")
                         .HasColumnType("int");
 
                     b.Property<decimal>("DepreciationRate")
@@ -1462,12 +1465,11 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssetGroupId");
+
                     b.HasIndex("BookType");
 
                     b.HasIndex("DepreciationMethod");
-
-                    b.HasIndex("AssetGroupId", "DepreciationMethod", "BookType", "IsActive")
-                        .IsUnique();
 
                     b.ToTable("DepreciationGroups", "FixedAsset");
                 });
@@ -2416,14 +2418,12 @@ namespace FAM.Infrastructure.Migrations
                         .WithMany("BookType")
                         .HasForeignKey("BookType")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("FK_BookType_Misc");
 
                     b.HasOne("Core.Domain.Entities.MiscMaster", "DepMiscType")
                         .WithMany("DepreciationMethod")
                         .HasForeignKey("DepreciationMethod")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("FK_DepreciationMethod_Misc");
 
                     b.Navigation("AssetGroup");

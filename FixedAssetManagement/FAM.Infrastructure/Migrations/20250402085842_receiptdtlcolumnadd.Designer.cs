@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250402085842_receiptdtlcolumnadd")]
+    partial class receiptdtlcolumnadd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -701,6 +704,19 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("DocDate")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int>("FromCustodianId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FromCustodianName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("FromDepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FromUnitId")
+                        .HasColumnType("int");
+
                     b.Property<string>("GatePassNo")
                         .HasColumnType("nvarchar(50)");
 
@@ -710,10 +726,28 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<string>("Sdcno")
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("ToCustodianId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ToCustodianName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ToDepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ToUnitId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransferType")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AssetTransferId")
                         .IsUnique();
+
+                    b.HasIndex("TransferType");
 
                     b.ToTable("AssetTransferReceiptHdr", "FixedAsset");
                 });
@@ -1399,7 +1433,7 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("AssetGroupId")
                         .HasColumnType("int");
 
-                    b.Property<int>("BookType")
+                    b.Property<int?>("BookType")
                         .HasColumnType("int");
 
                     b.Property<string>("Code")
@@ -1424,7 +1458,7 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int>("DepreciationMethod")
+                    b.Property<int?>("DepreciationMethod")
                         .HasColumnType("int");
 
                     b.Property<decimal>("DepreciationRate")
@@ -1462,12 +1496,11 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssetGroupId");
+
                     b.HasIndex("BookType");
 
                     b.HasIndex("DepreciationMethod");
-
-                    b.HasIndex("AssetGroupId", "DepreciationMethod", "BookType", "IsActive")
-                        .IsUnique();
 
                     b.ToTable("DepreciationGroups", "FixedAsset");
                 });
@@ -2223,7 +2256,15 @@ namespace FAM.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "TransferTypeReceiptMiscType")
+                        .WithMany("AssetTransferReceiptHdr")
+                        .HasForeignKey("TransferType")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("AssetTransferIssueHdr");
+
+                    b.Navigation("TransferTypeReceiptMiscType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetWarranties", b =>
@@ -2416,14 +2457,12 @@ namespace FAM.Infrastructure.Migrations
                         .WithMany("BookType")
                         .HasForeignKey("BookType")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("FK_BookType_Misc");
 
                     b.HasOne("Core.Domain.Entities.MiscMaster", "DepMiscType")
                         .WithMany("DepreciationMethod")
                         .HasForeignKey("DepreciationMethod")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("FK_DepreciationMethod_Misc");
 
                     b.Navigation("AssetGroup");
@@ -2586,6 +2625,8 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetMiscTypeGenerals");
 
                     b.Navigation("AssetTransferIssueType");
+
+                    b.Navigation("AssetTransferReceiptHdr");
 
                     b.Navigation("AssetWorkTypeGenerals");
 
