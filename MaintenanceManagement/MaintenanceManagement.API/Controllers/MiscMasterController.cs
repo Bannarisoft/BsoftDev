@@ -120,8 +120,7 @@ namespace MaintenanceManagement.API.Controllers
                   }); 
             
         } 
-        [HttpPut]
- 
+        [HttpPut] 
          public async Task<IActionResult> Update(UpdateMiscMasterCommand command)
         {
             // Update the record
