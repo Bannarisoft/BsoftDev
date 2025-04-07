@@ -74,11 +74,11 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration( new WorkOrderScheduleConfiguration());
             modelBuilder.ApplyConfiguration( new WorkOrderTechnicianConfiguration());           
             modelBuilder.ApplyConfiguration( new ActivityCheckListMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new MachineGroupUserConfiguration());
             modelBuilder.ApplyConfiguration( new PreventiveSchedulerHdrConfiguration());
             modelBuilder.ApplyConfiguration( new PreventiveSchedulerDtlConfiguration());
             modelBuilder.ApplyConfiguration( new PreventiveSchedulerItemsConfiguration());
             modelBuilder.ApplyConfiguration( new PreventiveSchedulerActivityConfiguration());
-
 
             base.OnModelCreating(modelBuilder);
 
