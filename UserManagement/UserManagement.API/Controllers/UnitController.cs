@@ -9,6 +9,7 @@ using Core.Application.Units.Queries.GetUnitAutoComplete;
 using FluentValidation;
 using UserManagement.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
+using Core.Application.Units.Queries.GetUnitByUserId;
 
 namespace UserManagement.API.Controllers
 {
@@ -198,7 +199,7 @@ namespace UserManagement.API.Controllers
        [HttpGet("by-name")]
         public async Task<IActionResult> GetUnit([FromQuery] string? unitname,int? CompanyId)
         {
-            var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = unitname??string.Empty, CompanyId = CompanyId??0 });
+            var units = await Mediator.Send(new GetUnitAutoCompleteQuery {SearchPattern = unitname??string.Empty, CompanyId = CompanyId??0});
              _logger.LogInformation("Search pattern: {SearchPattern}", unitname);
             if(units.IsSuccess)
             {
@@ -218,6 +219,28 @@ namespace UserManagement.API.Controllers
             });
           
         }
-     
+      [HttpGet("by-userid")]
+        public async Task<IActionResult> GetUnitByUserId([FromQuery] int? CompanyId,int UserId)
+        {
+            var units = await Mediator.Send(new GetUnitByUserIdQuery { CompanyId = CompanyId??0 ,UserId=UserId});
+             
+            if(units.IsSuccess)
+            {
+                _logger.LogInformation($"Unit {units.Data.Count} Listed successfully.");
+                return Ok(new
+                {
+                    message = units.Message,
+                    statusCode = StatusCodes.Status200OK,
+                    data = units.Data
+                });
+            }
+            _logger.LogWarning($"No Unit Record not found in DB.");
+            return NotFound(new
+            {
+                message = units.Message,
+                statusCode = StatusCodes.Status404NotFound
+            });
+          
+        }
     }
 }

@@ -2,6 +2,7 @@ using FluentValidation;
 using Core.Domain.Entities;
 using Core.Application.Modules.Commands.UpdateModule;
 using UserManagement.API.Validation.Common;
+using Serilog;
 
 namespace UserManagement.API.Validation.Module
 {
@@ -33,7 +34,7 @@ namespace UserManagement.API.Validation.Module
                         break;
                                   
                         default:
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information($"Warning: Unknown rule '{rule.Rule}' encountered.");
                         break;
                 }
             }

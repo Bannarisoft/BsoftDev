@@ -12,6 +12,9 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public int UserId { get; set; }      
         public string? UserName { get; set; }
         public string? OldUnitId { get; set; }  
+        public int DepartmentId { get; set; }
+        public int LocationId { get; set; }
+        public int SubLocationId { get; set; } 
 
     }
 }

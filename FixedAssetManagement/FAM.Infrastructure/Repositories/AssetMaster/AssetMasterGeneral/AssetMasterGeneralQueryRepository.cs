@@ -231,7 +231,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
                 SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,
-                MM.Description+'\'+C.CompanyName+'\'+UN.ShortName +'\'+AM.AssetImage AssetImage
+                MM.Description+'\'+C.CompanyName+'\'+UN.ShortName +'\'+AM.AssetImage AssetImage,AM.AssetCategoryId,AM.AssetSubCategoryId,
+                AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
                 INNER JOIN [FixedAsset].[AssetGroup] AG ON AM.AssetGroupId = AG.Id
@@ -244,7 +245,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 WHERE AM.Id = @AssetId;
 
                 -- Second Query: AssetLocation (One-to-One)
-                SELECT U.UnitName,D.DeptName,L.LocationName,SL.SubLocationName,U.OldUnitId,AL.CustodianId,AL.UserId FROM [FixedAsset].[AssetLocation] AL
+                SELECT U.UnitName,D.DeptName,L.LocationName,SL.SubLocationName,U.OldUnitId,AL.CustodianId,AL.UserId,AL.DepartmentId,AL.LocationId,AL.SubLocationId
+                FROM [FixedAsset].[AssetLocation] AL
                 INNER JOIN [FixedAsset].[Location] L ON L.Id=AL.LocationId
                 INNER JOIN [FixedAsset].[SubLocation] SL ON SL.Id=AL.SubLocationId
                 LEFT JOIN [Bannari].[AppData].[Unit] U ON AL.UnitId = U.Id
@@ -256,6 +258,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 SELECT AP.Id,AP.VendorCode, AP.VendorName,U.UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
                 AP.GrnSno,AP.GrnValue,AP.PoNo,Cast(AP.PoDate AS date) AS PoDate,AP.PurchaseValue,AP.AcceptedQty,AP.Uom,
                 AP.PoSno,AP.ItemCode,AP.ItemName,AP.BillNo,Cast(AP.BillDate AS date) AS BillDate ,AP.BinLocation 
+                ,AP.PjYear,AP.PjDocId,AP.PjDocSr,AP.PjDocNo,AP.AssetSourceId ,cast(AP.CapitalizationDate as date)CapitalizationDate
                 FROM [FixedAsset].[AssetPurchaseDetails] AP
                 LEFT JOIN [Bannari].[AppData].[Unit] U ON AP.OldUnitId = U.OldUnitId
                 INNER JOIN [FixedAsset].[AssetSource] ASource ON ASource.Id=AP.AssetSourceId
@@ -282,7 +285,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 SELECT AA.Id,CAST(AA.StartDate AS DATE) AS StartDate,CAST(AA.EndDate AS DATE) AS EndDate,AA.Period,AA.VendorCode,AA.VendorName,
                 MMCoverage.description AS CoverageType,
                 MMRenewal.description AS RenewalStatus,CAST(AA.RenewedDate AS DATE) AS RenewedDate,AA.CoverageType AS CoverageTypeId,
-                AA.RenewalStatus AS RenewalStatusId,AA.IsActive,AA.FreeServiceCount
+                AA.RenewalStatus AS RenewalStatusId,AA.IsActive,AA.FreeServiceCount,AA.VendorEmail,AA.VendorPhone
                 FROM [FixedAsset].[AssetAmc] AA
                 INNER JOIN [FixedAsset].[MiscMaster] MMCoverage ON MMCoverage.Id=AA.CoverageType
                 INNER JOIN [FixedAsset].[MiscMaster] MMRenewal ON MMRenewal.Id=AA.RenewalStatus

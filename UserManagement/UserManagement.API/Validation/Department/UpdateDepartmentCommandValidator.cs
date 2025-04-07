@@ -6,6 +6,7 @@ using FluentValidation;
 using Core.Application.Departments.Commands.CreateDepartment;
 using Core.Application.Departments.Commands.UpdateDepartment;
 using UserManagement.API.Validation.Common;
+using Serilog;
 
 namespace UserManagement.API.Validation.Department
 {
@@ -50,7 +51,7 @@ namespace UserManagement.API.Validation.Department
                             .WithMessage($"{nameof(UpdateDepartmentCommand.ShortName)} {rule.Error} {DepartmentShortNameMaxLength}"); break;
                             default:
                                // Handle unknown rule (log or throw)
-                               Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                               Log.Information($"Warning: Unknown rule '{rule.Rule}' encountered.");
                             break;
 
                        }

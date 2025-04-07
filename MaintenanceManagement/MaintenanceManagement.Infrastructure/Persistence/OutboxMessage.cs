@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace UserManagement.Infrastructure.Persistence
+namespace MaintenanceManagement.Infrastructure.Persistence
 {
     public class OutboxMessage
     {

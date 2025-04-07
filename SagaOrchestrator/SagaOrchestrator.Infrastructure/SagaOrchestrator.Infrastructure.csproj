@@ -23,7 +23,7 @@
   </ItemGroup>
 
     <ItemGroup>
-    <ProjectReference Include="..\SagaOrchestrator.Application\SagaOrchestrator.Application.csproj"/>  
+    <ProjectReference Include="..\SagaOrchestrator.Application\SagaOrchestrator.Application.csproj" />  
   </ItemGroup>
 
 </Project>

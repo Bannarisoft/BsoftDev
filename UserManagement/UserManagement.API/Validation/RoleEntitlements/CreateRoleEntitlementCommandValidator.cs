@@ -3,6 +3,7 @@ using Core.Domain.Entities;
 using Core.Application.Users.Commands.CreateUser;
 using Core.Application.RoleEntitlements.Commands.CreateRoleEntitlement;
 using UserManagement.API.Validation.Common;
+using Serilog;
 
 namespace UserManagement.API.Validation.RoleEntitlements
 {
@@ -11,16 +12,16 @@ namespace UserManagement.API.Validation.RoleEntitlements
       private readonly List<ValidationRule> _validationRules;
       public CreateRoleEntitlementCommandValidator(MaxLengthProvider maxLengthProvider)
       {
-            _validationRules = ValidationRuleLoader.LoadValidationRules();
-            if (_validationRules == null || !_validationRules.Any())
-            {
-                throw new InvalidOperationException("Validation rules could not be loaded.");
-            }
+            // _validationRules = ValidationRuleLoader.LoadValidationRules();
+            // if (_validationRules == null || !_validationRules.Any())
+            // {
+            //     throw new InvalidOperationException("Validation rules could not be loaded.");
+            // }
 
-            foreach (var rule in _validationRules)
-            {
-                switch (rule.Rule)
-                {
+            // foreach (var rule in _validationRules)
+            // {
+                // switch (rule.Rule)
+                // {
                     // case "NotEmpty":
                     //     RuleFor(x => x.RoleName)
                     //         .NotEmpty()
@@ -42,10 +43,10 @@ namespace UserManagement.API.Validation.RoleEntitlements
                     //     break;
                                   
                     //     default:
-                    //     Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        // Log.Information($"Warning: Unknown rule '{rule.Rule}' encountered.");
                     //     break;
-                }
-            }
+                // }
+            // }
       }   
     }
 }

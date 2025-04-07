@@ -7,6 +7,7 @@ using Core.Application.Entity.Commands.UpdateEntity;
 using Core.Domain.Entities;
 using UserManagement.API.Validation.Common;
 using UserManagement.Infrastructure.Migrations;
+using Serilog;
 
 namespace UserManagement.API.Validation.Entity 
 {
@@ -93,7 +94,7 @@ namespace UserManagement.API.Validation.Entity
                         break;  
                     default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information($"Warning: Unknown rule '{rule.Rule}' encountered.");
                         break;
                 }
             }

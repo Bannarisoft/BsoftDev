@@ -9,9 +9,9 @@ using Core.Domain.Entities;
 using MassTransit;
 using MongoDB.Driver;
 using Serilog;
-using UserManagement.Infrastructure.Persistence;
+using MaintenanceManagement.Infrastructure.Persistence;
 
-namespace UserManagement.Infrastructure.Services
+namespace MaintenanceManagement.Infrastructure.Services
 {
     public class EventPublisher : IEventPublisher
     {

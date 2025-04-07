@@ -3,6 +3,7 @@ using Core.Domain.Entities;
 using Core.Application.Users.Commands.UpdateUser;
 using UserManagement.API.Validation.Common;
 using Core.Application.Common.Interfaces.IUser;
+using Serilog;
 
 namespace UserManagement.API.Validation.Users
 {
@@ -89,7 +90,7 @@ namespace UserManagement.API.Validation.Users
                             break;          
                     default:
                         // Handle unknown rule (log or throw)
-                        // Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information($"Warning: Unknown rule '{rule.Rule}' encountered.");
                         break;
                 }
             }

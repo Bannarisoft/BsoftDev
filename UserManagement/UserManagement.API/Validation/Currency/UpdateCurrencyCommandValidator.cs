@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UserManagement.API.Validation.Common;
 using Core.Application.Currency.Commands.UpdateCurrency;
 using FluentValidation;
+using Serilog;
 
 namespace UserManagement.API.Validation.Currency
 {
@@ -63,7 +64,7 @@ namespace UserManagement.API.Validation.Currency
                     //         break;
                     default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information($"Warning: Unknown rule '{rule.Rule}' encountered.");
                         break;
                 }
             }

@@ -35,40 +35,6 @@ builder.Host.ConfigureSerilog(builder.Configuration);
 var validationService = new ValidationService();
 validationService.AddValidationServices(builder.Services);
 
-// MassTransit Configuration
-// builder.Services.AddMassTransit(x =>
-// {
-//     x.UsingRabbitMq((context, cfg) =>
-//     {
-//         cfg.Host("localhost", "/", h =>
-//         {
-//             h.Username("guest");
-//             h.Password("guest");
-//         });
-//     });
-// });
-
-
-// builder.Services.AddMassTransit(x =>
-// {
-//     x.AddConsumer<UserCreatedEventConsumer>();
-
-//     x.UsingRabbitMq((context, cfg) =>
-//     {
-//         cfg.Host("localhost", "/", h =>
-//         {
-//             h.Username("guest");
-//             h.Password("guest");
-//         });
-
-//         cfg.ReceiveEndpoint("user-created-queue", e =>
-//         {
-//             e.ConfigureConsumer<UserCreatedEventConsumer>(context);
-//         });
-//     });
-// });
-
-
 // Register Services
 builder.Services.AddControllers();
 builder.Services.AddSwaggerDocumentation();

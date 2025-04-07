@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SagaOrchestrator.API.Models;
 using SagaOrchestrator.Infrastructure.Services.MaintenanceServices;
 
 namespace SagaOrchestrator.API.Controllers
@@ -20,17 +21,37 @@ namespace SagaOrchestrator.API.Controllers
         }
 
         [HttpPost("department")]
-        public async Task<IActionResult> TriggerDepartment(int departmentId)
+        
+        public async Task<IActionResult> TriggerDepartment([FromBody] TriggerDepartmentRequest request)
         {
-            await _departmentSagaService.TriggerDepartmentCreation(departmentId);
+            var token = Request.Headers["Authorization"].FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(token))
+                return Unauthorized("Missing bearer token");
+
+            var department = await _departmentSagaService.TriggerDepartmentCreation(request.DepartmentId, token);
+
+            if (department == null)
+                return NotFound($"Department with ID {request.DepartmentId} not found.");
+
             return Ok(new
             {
                 message = "Department creation process triggered successfully.",
-                delegatementId = departmentId,
-                departmentName = departmentId
+                departmentId = department.DepartmentId,
+                departmentName = department.DepartmentName
             });
-
         }
+        // public async Task<IActionResult> TriggerDepartment(int departmentId)
+        // {
+        //     await _departmentSagaService.TriggerDepartmentCreation(departmentId);
+        //     return Ok(new
+        //     {
+        //         message = "Department creation process triggered successfully.",
+        //         delegatementId = departmentId,
+        //         departmentName = departmentId
+        //     });
+
+        // }
 
     }
 }
