@@ -31,7 +31,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
                 INNER JOIN [Bannari].AppData.Department f ON a.FromDepartmentId = f.Id
                 INNER JOIN [Bannari].AppData.Department g ON a.ToDepartmentId = g.Id
                 WHERE a.Status = 'Pending'
-                {{(string.IsNullOrEmpty(TransferType) ? "" : "AND c.Description LIKE @Search")}}
+                {{(string.IsNullOrEmpty(TransferType) ? "" : "AND a.TransferType LIKE @Search")}}
                 {{(FromDate.HasValue ? "AND CAST(a.DocDate AS DATE) >= CAST(@FromDate AS DATE)" : "")}}
                 {{(ToDate.HasValue ? "AND CAST(a.DocDate AS DATE) <= CAST(@ToDate AS DATE)" : "")}};
 
@@ -55,7 +55,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
                 INNER JOIN [Bannari].AppData.Department f ON a.FromDepartmentId = f.Id
                 INNER JOIN [Bannari].AppData.Department g ON a.ToDepartmentId = g.Id
                 WHERE a.Status = 'Pending'
-                {{(string.IsNullOrEmpty(TransferType) ? "" : "AND c.Description LIKE @Search")}}
+                {{(string.IsNullOrEmpty(TransferType) ? "" : "AND a.TransferType LIKE @Search")}}
                 {{(FromDate.HasValue ? "AND CAST(a.DocDate AS DATE) >= CAST(@FromDate AS DATE)" : "")}}
                 {{(ToDate.HasValue ? "AND CAST(a.DocDate AS DATE) <= CAST(@ToDate AS DATE)" : "")}}
                 ORDER BY a.Id DESC
