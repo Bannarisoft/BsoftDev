@@ -38,6 +38,13 @@ using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.Common.Interfaces.IMachineGroupUser;
 using MaintenanceManagement.Infrastructure.Repositories.MachineMaster;
 using MaintenanceManagement.Infrastructure.Repositories.MachineGroupUser;
+using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
+using MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.WorkOrder;
+using MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.WorkOrderActivity;
+using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrderActivity;
+using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrderSchedule;
+using MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.WorkOrderSchedule;
+using Core.Application.Common.Mappings.WorkOrderMaster;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -159,6 +166,15 @@ namespace MaintenanceManagement.Infrastructure
 
             services.AddScoped<IMachineMasterCommandRepository, MachineMasterCommandRepository>();
             services.AddScoped<IMachineMasterQueryRepository, MachineMasterQueryRepository>();
+
+            services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
+            services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
+
+            services.AddScoped<IWorkOrderActivityCommandRepository, WorkOrderActivityCommandRepository>();
+            services.AddScoped<IWorkOrderActivityQueryRepository, WorkOrderActivityQueryRepository>();
+
+            services.AddScoped<IWorkOrderScheduleCommandRepository, WorkOrderScheduleCommandRepository>();
+            services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>();
             
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -182,7 +198,10 @@ namespace MaintenanceManagement.Infrastructure
                 typeof(ShiftMasterDetailProfile),
 
                 typeof(ActivityMasterProfile),
-                typeof(MachineGroupUserProfile)
+                typeof(MachineGroupUserProfile),
+                typeof(WorkOrderProfile),
+                typeof(WorkOrderScheduleProfile),
+                typeof(WorkOrderActivityProfile)
 
 				
 

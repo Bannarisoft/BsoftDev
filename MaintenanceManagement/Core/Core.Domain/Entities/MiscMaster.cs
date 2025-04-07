@@ -1,4 +1,6 @@
 using Core.Domain.Common;
+using Core.Domain.Entities.WorkOrderMaster;
+
 
 
 namespace Core.Domain.Entities
@@ -13,6 +15,9 @@ namespace Core.Domain.Entities
         public Status IsActive { get; set; }
             
         public MiscTypeMaster? MiscTypeMaster { get; set; } 
+        public ICollection<WorkOrder>? WorkOrderPriority  {get; set;} 
+        public ICollection<WorkOrder>? WorkOrderStatus  {get; set;}  
+        public ICollection<WorkOrder>? WorkOrderRootCause  {get; set;}  
 		
   		    
     }
