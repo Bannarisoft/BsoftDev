@@ -13,6 +13,7 @@ using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByDeptI
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetTransferType;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
 using Core.Domain.Common;
+using Core.Domain.Entities.AssetMaster;
 using Dapper;
 
 namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
@@ -177,7 +178,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
             return result.ToList();      
     }   
     
-     public async Task<GetAssetDetailsToTransferHdrDto> GetAssetDetailsToTransferByIdAsync(int assetId)
+     public async Task<GetAssetDetailsToTransferHdrDto>  GetAssetDetailsToTransferByIdAsync(int assetId)
     {
                     const string query = @"
                     -- Get Asset Master Details
@@ -200,12 +201,26 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                     FROM FixedAsset.AssetPurchaseDetails 
                     WHERE AssetId = @AssetId
                     FOR JSON PATH, INCLUDE_NULL_VALUES;
+
+
+                     SELECT U.UnitName,D.DeptName,L.LocationName,SL.SubLocationName,U.OldUnitId,AL.CustodianId,AL.UserId as FromCustodianId ,AL.UserId as ToCustodianId  FROM [FixedAsset].[AssetLocation] AL
+                INNER JOIN [FixedAsset].[Location] L ON L.Id=AL.LocationId
+                INNER JOIN [FixedAsset].[SubLocation] SL ON SL.Id=AL.SubLocationId
+                LEFT JOIN [Bannari].[AppData].[Unit] U ON AL.UnitId = U.Id
+                LEFT JOIN [Bannari].[AppData].[Department] D ON AL.DepartmentId=D.Id                
+                WHERE AL.AssetId =@AssetId  
+
+
                 ";
 
                 using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { AssetId = assetId });
 
                 string assetJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
                 string transferJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+                var location = await multiQuery.ReadFirstOrDefaultAsync<dynamic>();
+
+
+                
 
                 if (string.IsNullOrWhiteSpace(assetJson))
                 {
@@ -227,6 +242,53 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                 if (assetDetails != null)
                 {
                     assetDetails.GetAssetDetailToTransfer = transferDetails ?? new List<GetAssetDetailsToTransferDto>();
+
+                     if (location != null)
+                    {
+                        assetDetails.UnitName = location.UnitName;
+                        assetDetails.DepartmentName = location.DeptName;
+                        assetDetails.LocationName = location.LocationName;
+                        assetDetails.SubLocationName = location.SubLocationName;
+                        assetDetails.FromCustodianId = location.CustodianId;
+                        assetDetails.OldUnitId = location.OldUnitId;
+                        assetDetails.ToCustodianId=location.ToCustodianId;
+
+                        // Fetch Custodian Name if CustodianId is valid;
+                        if (location.CustodianId > 0 && !string.IsNullOrEmpty(location.OldUnitId))
+                        {
+                            var custodianParams = new
+                            {
+                                DivCode = location.OldUnitId,
+                                EmpNo = location.CustodianId
+                            };
+
+                            var custodianEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
+                                "dbo.GetEmployeeByDivision",
+                                custodianParams,
+                                commandType: CommandType.StoredProcedure
+                            );
+
+                            assetDetails.FromCustodianName = custodianEmployee?.Empname;
+                        }
+                         // Fetch User
+                        if (assetDetails.ToCustodianId > 0)
+                        {
+                            var userParams = new
+                            {
+                                DivCode = assetDetails.OldUnitId,
+                                EmpNo = assetDetails.ToCustodianId
+                            };
+
+                            var userEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
+                                "dbo.GetEmployeeByDivision",
+                                userParams,
+                                commandType: CommandType.StoredProcedure
+                            );
+
+                            if (userEmployee != null)
+                                assetDetails.ToCustodianName = userEmployee.Empname;
+                        }
+                    }
                 }
                 return assetDetails;                
                 }
@@ -248,15 +310,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
 			                                 INNER JOIN  FixedAsset.AssetMaster B on  A.AssetId=B.ID WHERE AssetTransferId = @assetTransferId";                          
                         var result = await _dbConnection.QueryAsync<GetAllTransferDtlDto>(query, new { assetTransferId });         
                         return result.ToList();      
-                }  
-
-                // public async Task<List<GetTransferTypeDto>> GetTransferTypeAsync()
-                // {
-                //         const string query = @"select Id as TypeId , Code as TransferType from  FixedAsset.MiscMaster where  MiscTypeId =36";                          
-                //         var result = await _dbConnection.QueryAsync<GetTransferTypeDto>(query);         
-                //         return result.ToList();
-                // } 
-               
+                }                                
                
 
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetTransferTypeAsync()

@@ -22,6 +22,61 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Core.Domain.Entities.ActivityCheckListMaster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActivityCheckList")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("ActivityCheckList");
+
+                    b.Property<int>("ActivityId")
+                        .HasColumnType("int")
+                        .HasColumnName("ActivityID");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.ToTable("ActivityCheckListMaster", "Maintenance");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.ActivityMachineGroup", b =>
                 {
                     b.Property<int>("Id")
@@ -307,6 +362,108 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasIndex("MachineGroupId");
 
                     b.ToTable("MachineGroupUser", "Maintenance");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MachineMaster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CostCenterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int?>("DepartmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasColumnName("DepartmentId");
+
+                    b.Property<DateTimeOffset>("InstallationDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("InstallationDate");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MachineCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("MachineCode");
+
+                    b.Property<int>("MachineGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MachineName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("MachineName");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal?>("ProductionCapacity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0.00m);
+
+                    b.Property<int>("ShiftMasterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
+                    b.Property<int>("UomId")
+                        .HasColumnType("int")
+                        .HasColumnName("UomId");
+
+                    b.Property<int>("WorkCenterId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CostCenterId");
+
+                    b.HasIndex("MachineGroupId");
+
+                    b.HasIndex("ShiftMasterId");
+
+                    b.HasIndex("WorkCenterId");
+
+                    b.ToTable("MachineMaster", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MaintenanceCategory", b =>
@@ -738,6 +895,17 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("WorkCenter", "Maintenance");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.ActivityCheckListMaster", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.ActivityMaster", "ActivityMaster")
+                        .WithMany("ActivityCheckLists")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ActivityMaster");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.ActivityMachineGroup", b =>
                 {
                     b.HasOne("Core.Domain.Entities.ActivityMaster", "ActivityMaster")
@@ -768,6 +936,41 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("MachineGroup");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.MachineMaster", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.CostCenter", "CostCenter")
+                        .WithMany("MachineMasters")
+                        .HasForeignKey("CostCenterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MachineGroup", "MachineGroup")
+                        .WithMany("MachineMasters")
+                        .HasForeignKey("MachineGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.ShiftMaster", "ShiftMaster")
+                        .WithMany("MachineMasters")
+                        .HasForeignKey("ShiftMasterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.WorkCenter", "WorkCenter")
+                        .WithMany("MachineMasters")
+                        .HasForeignKey("WorkCenterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CostCenter");
+
+                    b.Navigation("MachineGroup");
+
+                    b.Navigation("ShiftMaster");
+
+                    b.Navigation("WorkCenter");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
@@ -792,7 +995,14 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
                 {
+                    b.Navigation("ActivityCheckLists");
+
                     b.Navigation("ActivityMachineGroups");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.CostCenter", b =>
+                {
+                    b.Navigation("MachineMasters");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MachineGroup", b =>
@@ -800,6 +1010,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("ActivityMachineGroups");
 
                     b.Navigation("MachineGroupUser");
+
+                    b.Navigation("MachineMasters");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
@@ -809,7 +1021,14 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.ShiftMaster", b =>
                 {
+                    b.Navigation("MachineMasters");
+
                     b.Navigation("ShiftMasterDetails");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WorkCenter", b =>
+                {
+                    b.Navigation("MachineMasters");
                 });
 #pragma warning restore 612, 618
         }

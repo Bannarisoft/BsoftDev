@@ -11,6 +11,6 @@ namespace Core.Application.Common.Interfaces.ICostCenter
          Task<Core.Domain.Entities.CostCenter?> GetByIdAsync(int Id);
          Task<(List<Core.Domain.Entities.CostCenter>,int)> GetAllCostCenterGroupAsync(int PageNumber, int PageSize, string? SearchTerm);
          Task<List<Core.Domain.Entities.CostCenter>> GetCostCenterGroups(string searchPattern);
-       // Task<bool> SoftDeleteValidation(int Id); 
+         Task<bool> SoftDeleteValidation(int Id); 
     }
 }

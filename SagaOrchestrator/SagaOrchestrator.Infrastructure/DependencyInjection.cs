@@ -20,6 +20,7 @@ namespace SagaOrchestrator.Infrastructure
 {
     public static class DependencyInjection
     {
+
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,IConfiguration configuration)
         {
 
@@ -34,7 +35,7 @@ namespace SagaOrchestrator.Infrastructure
             });
             services.AddHttpClient<IDepartmentService, DepartmentService>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:5293");  // URL of MaintenanceService
+
             });
 
             // Register OrchestratorService
@@ -62,39 +63,41 @@ namespace SagaOrchestrator.Infrastructure
             services.AddMassTransit(x =>
           {
               x.AddSagaStateMachine<UserAssetStateMachine, UserAssetState>()
-                  .InMemoryRepository();
+                   //   .InMemoryRepository();
 
-              x.AddConsumer<UserCreatedEventConsumer>();
-              x.AddConsumer<AssetCreatedEventConsumer>();
+             
               x.AddConsumer<EmailEventConsumer>();
-              x.AddConsumer<SagaCompletedEventConsumer>();
+             
+                   .MongoDbRepository(r =>
+                    {
+                        r.Connection = "mongodb://192.168.1.126:27017";
+                        r.DatabaseName = "saga_orchestrator_db";
+                    });
               
+
+              //   x.AddConsumer<UserCreatedEventConsumer>();
+              //   x.AddConsumer<AssetCreatedEventConsumer>();
+              //   x.AddConsumer<SagaCompletedEventConsumer>();
 
               x.UsingRabbitMq((context, cfg) =>
               {
-                cfg.Host("localhost", "/", h =>
-                {
-                    h.Username("guest");
-                    h.Password("guest");
-                });
+               
+                  cfg.Host("localhost", "/", h =>
+                  {
+                      h.Username("guest");
+                      h.Password("guest");
+                  });
+                  // Automatically configure endpoints for sagas and consumers
+                  cfg.ConfigureEndpoints(context);
 
-                cfg.ReceiveEndpoint("user-created-queue", e =>
-                {
-                    e.ConfigureConsumer<UserCreatedEventConsumer>(context);
-                });
+              
 
-                cfg.ReceiveEndpoint("asset-created-queue", e =>
-                {
-                    e.ConfigureConsumer<AssetCreatedEventConsumer>(context);
-                });
+                
                 cfg.ReceiveEndpoint("email-queue", e =>
                 {
                     e.ConfigureConsumer<EmailEventConsumer>(context);
                 });
-                cfg.ReceiveEndpoint("saga-completed-queue", e =>
-                {
-                    e.ConfigureConsumer<SagaCompletedEventConsumer>(context);
-                });
+               
               });
           });
 

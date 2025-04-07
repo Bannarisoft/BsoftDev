@@ -7,55 +7,53 @@ namespace FAM.API.Validation.AssetMaster.AssetSpecification
 {
     public class CreateAssetSpecificationCommandValidator : AbstractValidator<CreateAssetSpecificationCommand>
     {
-         private readonly List<ValidationRule> _validationRules;
+        private readonly List<ValidationRule> _validationRules;
 
         public CreateAssetSpecificationCommandValidator(MaxLengthProvider maxLengthProvider)
         {
-            // Get max lengths dynamically using MaxLengthProvider            
-            var assetSpecificationMaxLength = maxLengthProvider.GetMaxLength<AssetSpecifications>("SpecificationValue")??100;            
+            RuleFor(x => x.AssetId)
+                .GreaterThan(0).WithMessage("AssetId must be greater than 0");
 
-            // Load validation rules from JSON or another source
+            RuleFor(x => x.Specifications)
+                .NotEmpty().WithMessage("At least one specification must be provided.");
+
+            var assetSpecificationMaxLength = maxLengthProvider.GetMaxLength<AssetSpecifications>("SpecificationValue") ?? 100;
+
             _validationRules = ValidationRuleLoader.LoadValidationRules();
-            if (_validationRules is null || !_validationRules.Any())
-            {
-                throw new InvalidOperationException("Validation rules could not be loaded.");
-            }
 
-            // Loop through the rules and apply them
-            foreach (var rule in _validationRules)
+            if (_validationRules is null || !_validationRules.Any())
+                throw new InvalidOperationException("Validation rules could not be loaded.");
+
+            RuleForEach(x => x.Specifications).ChildRules(spec =>
             {
-                switch (rule.Rule)
+                foreach (var rule in _validationRules)
                 {
-                    case "NotEmpty":
-                        // Apply NotEmpty validation
-                        RuleFor(x => x.SpecificationId)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(CreateAssetSpecificationCommand.SpecificationId)} {rule.Error}");
-                        RuleFor(x => x.SpecificationValue)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(CreateAssetSpecificationCommand.SpecificationValue)} {rule.Error}");                                        
-                        break;
-                    case "MaxLength":
-                        // Apply MaxLength validation using dynamic max length values
-                        RuleFor(x => x.SpecificationValue)
-                            .MaximumLength(assetSpecificationMaxLength) 
-                            .WithMessage($"{nameof(CreateAssetSpecificationCommand.SpecificationValue)} {rule.Error} {assetSpecificationMaxLength}");                                  
-                        break;          
-                    case "NumericOnly":       
-                        RuleFor(x => x.AssetId)
-                        .InclusiveBetween(1, int.MaxValue)
-                        .WithMessage($"{nameof(CreateAssetSpecificationCommand.AssetId)} {rule.Error}");    
-                      /*   RuleFor(x => x.ManufactureId)
-                        .InclusiveBetween(1, int.MaxValue)
-                        .WithMessage($"{nameof(CreateAssetSpecificationCommand.ManufactureId)} {rule.Error}");        */            
-                        RuleFor(x => x.SpecificationId)
-                        .InclusiveBetween(1, int.MaxValue)
-                        .WithMessage($"{nameof(CreateAssetSpecificationCommand.SpecificationId)} {rule.Error}");  
-                        break;
-                    default:                        
-                        break;
+                    switch (rule.Rule)
+                    {
+                        case "NotEmpty":
+                            spec.RuleFor(x => x.SpecificationId)
+                                .NotEmpty().WithMessage($"{nameof(SpecificationItem.SpecificationId)} {rule.Error}");
+                            spec.RuleFor(x => x.SpecificationValue)
+                                .NotEmpty().WithMessage($"{nameof(SpecificationItem.SpecificationValue)} {rule.Error}");
+                            break;
+
+                        case "MaxLength":
+                            spec.RuleFor(x => x.SpecificationValue)
+                                .MaximumLength(assetSpecificationMaxLength)
+                                .WithMessage($"{nameof(SpecificationItem.SpecificationValue)} {rule.Error} {assetSpecificationMaxLength}");
+                            break;
+
+                        case "NumericOnly":
+                            spec.RuleFor(x => x.SpecificationId)
+                                .InclusiveBetween(1, int.MaxValue)
+                                .WithMessage($"{nameof(SpecificationItem.SpecificationId)} {rule.Error}");
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
-            }
+            });
         }
     }
 }

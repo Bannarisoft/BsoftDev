@@ -1,16 +1,21 @@
 using Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup;
 using Core.Domain.Entities;
 using FAM.API.Validation.Common;
+using FAM.Infrastructure.Data;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using static Core.Domain.Common.BaseEntity;
 
 namespace FAM.API.Validation.DepreciationGroup
 {
     public class CreateDepreciationGroupCommandValidator  : AbstractValidator<CreateDepreciationGroupCommand>
     {
         private readonly List<ValidationRule> _validationRules;
+        private readonly ApplicationDbContext _applicationDbContext;    
 
-        public CreateDepreciationGroupCommandValidator(MaxLengthProvider maxLengthProvider)
+        public CreateDepreciationGroupCommandValidator(MaxLengthProvider maxLengthProvider,ApplicationDbContext applicationDbContext)
         {
+            _applicationDbContext = applicationDbContext;
             // Get max lengths dynamically using MaxLengthProvider
             var depreciationGroupCodeMaxLength = maxLengthProvider.GetMaxLength<DepreciationGroups>("Code")??10;
             var depreciationGroupNameMaxLength = maxLengthProvider.GetMaxLength<DepreciationGroups>("DepreciationGroupName")??50;            
@@ -67,6 +72,18 @@ namespace FAM.API.Validation.DepreciationGroup
                         RuleFor(x => x.UsefulLife)
                         .InclusiveBetween(1, int.MaxValue)
                         .WithMessage($"{nameof(CreateDepreciationGroupCommand.UsefulLife)} {rule.Error}");
+                        break;
+                    case "UniqueCombination":
+                        RuleFor(x => x)
+                        .MustAsync(async (command, token) =>
+                        {
+                            return !await _applicationDbContext.DepreciationGroups.AnyAsync(x =>
+                                x.AssetGroupId == command.AssetGroupId &&
+                                x.DepreciationMethod == command.DepreciationMethod &&
+                                x.BookType == command.BookType &&
+                                x.IsActive == Status.Active, token);
+                        })
+                        .WithMessage(rule.Error);
                         break;
                     default:                        
                         break;

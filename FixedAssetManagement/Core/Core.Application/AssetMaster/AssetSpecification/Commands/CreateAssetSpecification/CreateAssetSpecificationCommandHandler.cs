@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSpecification
 {
-    public class CreateAssetSpecificationCommandHandler : IRequestHandler<CreateAssetSpecificationCommand, ApiResponseDTO<AssetSpecificationDTO>>
+    public class CreateAssetSpecificationCommandHandler : IRequestHandler<CreateAssetSpecificationCommand, ApiResponseDTO<string>>
     {
         private readonly IMapper _mapper;
         private readonly IAssetSpecificationCommandRepository _assetSpecificationRepository;
@@ -25,42 +25,47 @@ namespace Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSp
             _mediator = mediator;    
         } 
 
-        public async Task<ApiResponseDTO<AssetSpecificationDTO>> Handle(CreateAssetSpecificationCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<string>> Handle(CreateAssetSpecificationCommand request, CancellationToken cancellationToken)
         {
-            var assetSpecificationExists = await _assetSpecificationRepository.ExistsByAssetSpecIdAsync(request.AssetId, request.SpecificationId);
-            if (assetSpecificationExists)
+             var createdCount = 0;
+
+            foreach (var spec in request.Specifications )
             {
-                return new ApiResponseDTO<AssetSpecificationDTO> {
-                    IsSuccess = false, 
-                    Message = "Asset Specification already exists."
-                };                 
+                var alreadyExists = await _assetSpecificationRepository.ExistsByAssetSpecIdAsync(request.AssetId, spec.SpecificationId);
+                if (!alreadyExists)
+                {
+                    var assetSpecification = new AssetSpecifications
+                    {
+                        AssetId = request.AssetId,
+                        SpecificationId = spec.SpecificationId,
+                        SpecificationValue = spec.SpecificationValue                                                                        
+                    };
+
+                    await _assetSpecificationRepository.CreateAsync(assetSpecification);
+                    createdCount++;
+
+                    var domainEvent = new AuditLogsDomainEvent(
+                        actionDetail: "Create",
+                        actionCode: spec.SpecificationId.ToString() ?? string.Empty,
+                        actionName: spec.SpecificationName ?? string.Empty,
+                        details: $"Asset Specification '{spec.SpecificationValue}' created ",
+                        module: "Asset Specification"
+                    );
+                    await _mediator.Publish(domainEvent, cancellationToken);
+                }
+                else{
+                     return new ApiResponseDTO<string>
+                    {
+                        IsSuccess =false,
+                        Message =  "Already Exists"
+                    };  
+                }
             }
-            var assetEntity = _mapper.Map<AssetSpecifications>(request);     
-            var result = await _assetSpecificationRepository.CreateAsync(assetEntity);
-            
-            //Domain Event
-            var domainEvent = new AuditLogsDomainEvent(
-                actionDetail: "Create",
-                actionCode: assetEntity.AssetId.ToString() ?? string.Empty,
-                actionName: assetEntity.SpecificationId.ToString() ?? string.Empty,
-                details: $"Asset Specification '{assetEntity.SpecificationValue}' was created.Value {assetEntity.SpecificationValue}",
-                module:"Asset Specification"
-            );
-            await _mediator.Publish(domainEvent, cancellationToken);
-            
-            var assetMasterDTO = _mapper.Map<AssetSpecificationDTO>(result);
-            if (assetMasterDTO.Id > 0)
+            return new ApiResponseDTO<string>
             {
-                return new ApiResponseDTO<AssetSpecificationDTO>{
-                    IsSuccess = true, 
-                    Message = "Asset Specification created successfully.",
-                    Data = assetMasterDTO
-                };
-            }
-            return  new ApiResponseDTO<AssetSpecificationDTO>{
-                IsSuccess = false, 
-                Message = "Asset Specification not created."
-            };      
+                IsSuccess = createdCount > 0,
+                Message = createdCount > 0 ? "Specifications saved successfully." : "No new specifications were saved."
+            };  
         }
     }
 }

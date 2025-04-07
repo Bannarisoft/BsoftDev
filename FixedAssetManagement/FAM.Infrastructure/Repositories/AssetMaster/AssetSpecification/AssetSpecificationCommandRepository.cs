@@ -31,17 +31,18 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
         }
         public async Task<int> UpdateAsync(int assetId, AssetSpecifications assetSpecifications)
         {
-            var existingAssetSpecGroup = await _applicationDbContext.AssetSpecifications.FirstOrDefaultAsync(u => u.Id == assetId);             
-    
-            if (existingAssetSpecGroup != null)
-            {
-                existingAssetSpecGroup.AssetId = assetSpecifications.AssetId;
-                existingAssetSpecGroup.IsActive = assetSpecifications.IsActive;
-                existingAssetSpecGroup.SpecificationId = assetSpecifications.SpecificationId;
-                existingAssetSpecGroup.SpecificationValue = assetSpecifications.SpecificationValue;                
-                _applicationDbContext.AssetSpecifications.Update(existingAssetSpecGroup);
-                return await _applicationDbContext.SaveChangesAsync();
-            }
+            var existingAssetSpecGroup = await _applicationDbContext.AssetSpecifications
+                .FirstOrDefaultAsync(u => u.AssetId == assetId && u.SpecificationId == assetSpecifications.SpecificationId);
+
+                if (existingAssetSpecGroup != null)
+                {
+                    existingAssetSpecGroup.SpecificationValue = assetSpecifications.SpecificationValue;
+                    existingAssetSpecGroup.IsActive = assetSpecifications.IsActive;
+
+                    // No need to reassign AssetId and SpecificationId again
+                    _applicationDbContext.AssetSpecifications.Update(existingAssetSpecGroup);
+                    return await _applicationDbContext.SaveChangesAsync();
+                }
            return 0; 
         }
         public async Task<bool> ExistsByAssetSpecIdAsync(int? assetId,int? assetSpecId)

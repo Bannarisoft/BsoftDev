@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace Core.Application.Common.Utilities
 {public static class ForgotPasswordCache
@@ -15,7 +16,7 @@ namespace Core.Application.Common.Utilities
         if (CodeStorage.ContainsKey(username))
         {
             CodeStorage.Remove(username);
-            Console.WriteLine($"Verification code for user {username} has been removed.");
+            Log.Information($"Verification code for user {username} has been removed.");
         }
     }
 }

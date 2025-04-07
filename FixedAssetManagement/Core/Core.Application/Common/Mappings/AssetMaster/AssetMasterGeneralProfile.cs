@@ -5,6 +5,7 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMaster
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
+using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById;
 using Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetPurchase;
 using Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecification;
 using Core.Domain.Entities;
@@ -32,6 +33,7 @@ namespace Core.Application.Common.Mappings.AssetMaster
             CreateMap<AssetMasterGeneralDTO,AssetMasterGeneralAutoCompleteDTO>();    
             CreateMap<AssetMasterGenerals, AssetMasterGeneralDTO>();  
             
+            
             CreateMap<AssetMasterDto, AssetMasterGenerals>()
             .ForMember(dest => dest.AssetPurchase, opt => opt.MapFrom(src => src.AssetPurchaseDetails))
             .ForMember(dest => dest.AssetLocation, opt => opt.MapFrom(src => src.AssetLocation)) 
@@ -44,14 +46,15 @@ namespace Core.Application.Common.Mappings.AssetMaster
              .ForMember(dest => dest.CapitalizationDate,
                        opt => opt.MapFrom(src => src.CapitalizationDate.ToDateTime(TimeOnly.MinValue)));
                // .ReverseMap();
-            CreateMap<AssetLocationCombineDto, Core.Domain.Entities.AssetMaster.AssetLocation>()
+    
+             CreateMap<AssetLocationCombineDto, Core.Domain.Entities.AssetMaster.AssetLocation>()
                 .ReverseMap(); 
             CreateMap<AssetAdditionalCostCombineDto, Core.Domain.Entities.AssetPurchase.AssetAdditionalCost>()
                 .ReverseMap(); 
             CreateMap<AssetSpecificationCombineDto, AssetSpecifications>()
                 .ReverseMap();
              CreateMap<AssetInsuranceCombineDto, AssetInsurance>()
-                .ReverseMap();
+                .ReverseMap();           
                 
         }        
     }

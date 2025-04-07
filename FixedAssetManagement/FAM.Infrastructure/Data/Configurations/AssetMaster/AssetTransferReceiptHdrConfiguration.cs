@@ -34,48 +34,6 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .HasColumnType("datetimeoffset")                             
                 .IsRequired();
 
-              builder.Property(dg => dg.TransferType)
-                .HasColumnType("int")
-                .IsRequired(); 
-
-             // Configure Foreign Key Relationship
-            builder.HasOne(dg => dg.TransferTypeReceiptMiscType)
-                .WithMany(ag => ag.AssetTransferReceiptHdr)
-                .HasForeignKey(dg => dg.TransferType)                
-                .OnDelete(DeleteBehavior.Restrict);
-
-                builder.Property(dg => dg.FromUnitId)
-                .HasColumnType("int")
-                .IsRequired(); 
-
-            builder.Property(dg => dg.ToUnitId)
-                .HasColumnType("int")
-                .IsRequired(); 
-            
-            builder.Property(dg => dg.FromDepartmentId)
-                .HasColumnType("int")
-                .IsRequired(); 
-
-            builder.Property(dg => dg.ToDepartmentId)
-                .HasColumnType("int")
-                .IsRequired(); 
-
-            builder.Property(dg => dg.FromCustodianId)
-                .HasColumnType("int")
-                .IsRequired(); 
-
-            builder.Property(b => b.FromCustodianName)
-                .IsRequired()
-                .HasColumnType("nvarchar(100)");
-
-            builder.Property(dg => dg.ToCustodianId)
-                .HasColumnType("int")
-                .IsRequired(); 
-
-            builder.Property(b => b.ToCustodianName)
-                .IsRequired()
-                .HasColumnType("nvarchar(100)");
-
             builder.Property(b => b.Sdcno)
                 .HasColumnType("nvarchar(50)");
 

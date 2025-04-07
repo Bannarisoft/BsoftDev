@@ -26,10 +26,15 @@ namespace UserManagement.Infrastructure.Services
         {
             var message = new OutboxMessage
             {
-                EventType = @event.GetType().Name,
+                // EventType = @event.GetType().Name,
+                // EventData = JsonSerializer.Serialize(@event),
+                // Processed = false,
+                // CreatedAt = DateTime.UtcNow
+                EventType = @event.GetType().AssemblyQualifiedName!,
                 EventData = JsonSerializer.Serialize(@event),
                 Processed = false,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                RetryCount = 0
             };
             await _outboxCollection.InsertOneAsync(message);
         }
@@ -41,16 +46,49 @@ namespace UserManagement.Infrastructure.Services
             {
                 try
                 {
-                    var @event = JsonSerializer.Deserialize<UserCreatedEvent>(message.EventData);
-                    await _publishEndpoint.Publish(@event);
+                    var eventType = Type.GetType(message.EventType);
+                    if (eventType == null)
+                    {
+                        Log.Warning($"Unknown event type: {message.EventType}");
+                        continue;
+                    }
+
+                    var @event = JsonSerializer.Deserialize(message.EventData, eventType);
+                    if (@event == null)
+                    {
+                        Log.Warning($"Deserialization failed for event type: {message.EventType}");
+                        continue;
+                    }
+
+                    await _publishEndpoint.Publish(@event, eventType);
 
                     message.Processed = true;
-                    await _outboxCollection.ReplaceOneAsync(x => x.Id == message.Id, message);
+                    message.LastPublishedAt = DateTime.UtcNow;
                 }
                 catch (Exception ex)
                 {
-                    Log.Information($"Error publishing event: {ex.Message}");
+                    message.RetryCount += 1;
+                    message.LastError = ex.Message;
+                    Log.Error(ex, "Error publishing event of type: {EventType}", message.EventType);
                 }
+
+                await _outboxCollection.ReplaceOneAsync(x => x.Id == message.Id, message);
+                // var pendingMessages = await _outboxCollection.Find(x => !x.Processed).ToListAsync();
+
+                // foreach (var message in pendingMessages)
+                // {
+                //     try
+                //     {
+                //         var @event = JsonSerializer.Deserialize<UserCreatedEvent>(message.EventData);
+                //         await _publishEndpoint.Publish(@event);
+
+                //         message.Processed = true;
+                //         await _outboxCollection.ReplaceOneAsync(x => x.Id == message.Id, message);
+                //     }
+                //     catch (Exception ex)
+                //     {
+                //         Log.Information($"Error publishing event: {ex.Message}");
+                //     }
             }
         }
 

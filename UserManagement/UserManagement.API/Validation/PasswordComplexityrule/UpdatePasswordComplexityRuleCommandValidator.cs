@@ -6,6 +6,7 @@ using UserManagement.API.Validation.Common;
 using Core.Application.PasswordComplexityRule.Commands.UpdatePasswordComplexityRule;
 using Core.Domain.Entities;
 using FluentValidation;
+using Serilog;
 
 namespace UserManagement.API.Validation.PasswordComplexityrule
 {
@@ -47,7 +48,7 @@ namespace UserManagement.API.Validation.PasswordComplexityrule
                     .WithMessage($"{nameof(UpdatePasswordComplexityRuleCommand.PwdComplexityRule)} {rule.Error} ");
                 break;
             default:
-                Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                Log.Information($"Warning: Unknown rule '{rule.Rule}' encountered.");
                 break;
                        #endregion
                    }

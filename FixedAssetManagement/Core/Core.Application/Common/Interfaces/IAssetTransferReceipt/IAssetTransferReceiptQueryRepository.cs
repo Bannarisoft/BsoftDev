@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetails;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetailsById;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptPending;
@@ -14,6 +15,7 @@ namespace Core.Application.Common.Interfaces.IAssetTransferReceipt
         Task<(List<AssetTransferReceiptPendingDto>, int)> GetAllPendingAssetTransferAsync(
         int PageNumber, 
         int PageSize, 
+        int? AssetTransferId,
         string? SearchTerm, 
         DateTimeOffset? FromDate, 
         DateTimeOffset? ToDate);
@@ -26,5 +28,9 @@ namespace Core.Application.Common.Interfaces.IAssetTransferReceipt
         DateTimeOffset? ToDate);
 
         Task<List<AssetReceiptDetailsByIdDto>> GetByAssetReceiptId(int AssetReceiptId);
+        Task<AssetTransferJsonDto?> GetAssetTransferByIdAsync(int assetTransferId);
+        Task<AssetTransferDto?> GetByAssetTransferId(int assetTransferId);
+
+
     }
 }

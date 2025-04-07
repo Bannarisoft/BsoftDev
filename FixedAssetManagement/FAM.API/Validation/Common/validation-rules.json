@@ -115,6 +115,9 @@
     {
         "rule": "ActivePolicy",      
         "error": "Please Inactive previous active policy."
-    }
-    
+    },
+    {
+        "rule": "UniqueCombination",
+        "error": "Combination of values already Exists."
+      }
 ]

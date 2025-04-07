@@ -31,11 +31,12 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<ShiftMasterDetail> ShiftMasterDetail { get; set; }
         public DbSet<MaintenanceType> MaintenanceType { get; set; }
         public DbSet<MaintenanceCategory> MaintenanceCategory { get; set; }
-
         public DbSet<ActivityMaster> ActivityMaster { get; set; }
-
+        public DbSet<MachineMaster> MachineMaster { get; set; }
         public DbSet<ActivityMachineGroup>  ActivityMachineGroup { get; set; }
         public DbSet<MachineGroupUser>  MachineGroupUser { get; set; }
+
+        public DbSet<ActivityCheckListMaster>  ActivityCheckListMaster { get; set; }
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -47,14 +48,15 @@ namespace MaintenanceManagement.Infrastructure.Data
            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
             modelBuilder.ApplyConfiguration(new ShiftMasterConfiguration());
             modelBuilder.ApplyConfiguration(new ShiftMasterDetailsConfiguration());
-        
             modelBuilder.ApplyConfiguration(new CostCenterConfiguration());
             modelBuilder.ApplyConfiguration(new WorkCenterConfiguration());
             modelBuilder.ApplyConfiguration(new MaintenanceTypeConfiguration());
             modelBuilder.ApplyConfiguration(new MaintenanceCategoryConfiguration());
             modelBuilder.ApplyConfiguration(new ActivityMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new MachineMasterConfiguration());
             modelBuilder.ApplyConfiguration( new ActivityMachineGroupConfiguration());
             modelBuilder.ApplyConfiguration( new MachineGroupUserConfiguration());
+            modelBuilder.ApplyConfiguration( new ActivityCheckListMasterConfiguration());
 
 
             base.OnModelCreating(modelBuilder);

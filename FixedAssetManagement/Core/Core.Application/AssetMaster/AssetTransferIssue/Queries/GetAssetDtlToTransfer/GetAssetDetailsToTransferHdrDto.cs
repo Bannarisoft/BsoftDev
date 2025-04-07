@@ -20,7 +20,16 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetDtlToT
     public int SubLocationId { get; set; }
     public string?  SubLocationName { get; set; }
     public int DepartmentId { get; set; }
-    public string? DepartmentName { get; set; }        
+    public string? DepartmentName { get; set; }  
+    public int  FromCustodianId { get; set; }
+    public string? FromCustodianName { get; set; }
+
+    public int ToCustodianId { get; set; }
+    public string? ToCustodianName { get; set;}
+
+    public string? OldUnitId { get; set; }
+
+
     public List<GetAssetDetailsToTransferDto>? GetAssetDetailToTransfer { get; set; } 
     }
 }
