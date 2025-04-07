@@ -89,9 +89,9 @@ namespace UserManagement.Infrastructure.Services
                 //     {
                 //         Log.Information($"Error publishing event: {ex.Message}");
                 //     }
-                }
             }
-
-
         }
+
+
     }
+}

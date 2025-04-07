@@ -34,7 +34,7 @@ namespace FAM.API.Controllers.AssetMaster
         }
 
         [HttpGet("GetAssetTransferReceiptPending")]
-        public async Task<IActionResult> GetAssetTransferReceiptPendingAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? AssetTransferId = null,[FromQuery] DateTimeOffset? FromDate = null,
+        public async Task<IActionResult> GetAssetTransferReceiptPendingAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] int? AssetTransferId = null,[FromQuery] string? TransferType = null,[FromQuery] DateTimeOffset? FromDate = null,
         [FromQuery] DateTimeOffset? ToDate = null)
         {
            var assetamc = await Mediator.Send(
@@ -42,7 +42,8 @@ namespace FAM.API.Controllers.AssetMaster
             {
                 PageNumber = PageNumber, 
                 PageSize = PageSize, 
-                SearchTerm = AssetTransferId,
+                AssetTransferId = AssetTransferId,
+                SearchTerm = TransferType,
                 FromDate = FromDate,
                 ToDate = ToDate
             });
@@ -135,17 +136,17 @@ namespace FAM.API.Controllers.AssetMaster
            
         }
 
-          [HttpGet("AssetTransfer/{id}")]       
-              public async Task<IActionResult> GetAssetTransferByIdAsync(int id)
-              {
-                  var query = new GetAssetIssueDetailsByIdQuery { AssetTransferId = id };  
-                  var result = await Mediator.Send(query);
-                 if (result == null) 
-                  {
-                      return NotFound($"Asset Transfer with ID {id} not found.");
-                  }
-                 return Ok(result);
-              }
+        //   [HttpGet("AssetTransfer/{id}")]       
+        //       public async Task<IActionResult> GetAssetTransferByIdAsync(int id)
+        //       {
+        //           var query = new GetAssetIssueDetailsByIdQuery { AssetTransferId = id };  
+        //           var result = await Mediator.Send(query);
+        //          if (result == null) 
+        //           {
+        //               return NotFound($"Asset Transfer with ID {id} not found.");
+        //           }
+        //          return Ok(result);
+        //       }
 
       
     }

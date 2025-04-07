@@ -21,15 +21,39 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
 
         public async Task<int> ExecuteBulkUpdateAsync(List<int> ids, string status, int userId, DateTimeOffset currentTime, string username, string currentIp)
         {
-            return await _applicationDbContext.AssetTransferIssueHdr
-            .Where(t => ids.Contains(t.Id) && t.Status == "Pending" && t.AckStatus == 0) // 🔹 Additional Conditions
-            .ExecuteUpdateAsync(setters => setters
-                .SetProperty(t => t.Status, status)
-                .SetProperty(t => t.AuthorizedBy, userId)
-                .SetProperty(t => t.AuthorizedDate, currentTime)
-                .SetProperty(t => t.AuthorizedByName, username)
-                .SetProperty(t => t.AuthorizedIP, currentIp)
-        );
+        //     return await _applicationDbContext.AssetTransferIssueHdr
+        //     .Where(t => ids.Contains(t.Id) && t.Status == "Pending" && t.AckStatus == 0) // 🔹 Additional Conditions
+        //     .ExecuteUpdateAsync(setters => setters
+        //         .SetProperty(t => t.Status, status)
+        //         .SetProperty(t => t.AuthorizedBy, userId)
+        //         .SetProperty(t => t.AuthorizedDate, currentTime)
+        //         .SetProperty(t => t.AuthorizedByName, username)
+        //         .SetProperty(t => t.AuthorizedIP, currentIp)
+        // );
+
+                var issueHdrsToUpdate = await _applicationDbContext.AssetTransferIssueHdr
+                .Where(t => ids.Contains(t.Id) && t.Status == "Pending")
+                .Select(t => new
+                {
+                    Entity = t
+                })
+                .ToListAsync();
+
+            issueHdrsToUpdate
+                .Select(x =>
+                {
+                    x.Entity.Status = status;
+                    x.Entity.AuthorizedBy = userId;
+                    x.Entity.AuthorizedDate = currentTime;
+                    x.Entity.AuthorizedByName = username;
+                    x.Entity.AuthorizedIP = currentIp;
+                    return x;
+                })
+                .ToList(); // Ensures projection executes
+
+            await _applicationDbContext.SaveChangesAsync();
+
+            return issueHdrsToUpdate.Count;
         }
 
         public async Task<List<AssetTransferIssueHdr>> GetByIdsAsync(List<int> ids)

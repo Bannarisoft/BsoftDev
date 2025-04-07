@@ -58,11 +58,11 @@ namespace Core.Domain.Common
         } 
         public static class DeprecationPeriod
         {
-        public const string MiscCode = "DEPPERIOD";
+        public const string MiscCode = "DEPRECIATIONPERIOD";
         }     
         public static class DeprecationMethod
         {
-        public const string MiscCode = "DEPMETHOD";
+        public const string MiscCode = "DEPRECIATIONMETHOD";
         }
          public static class  AssetTransferType
         {

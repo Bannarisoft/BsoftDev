@@ -13,6 +13,7 @@ namespace Core.Domain.Entities.AssetMaster
         public int AssetId { get; set; } 
         public AssetMasterGenerals AssetMasterTransferIssue  { get; set; } = null!; 
         public decimal AssetValue {get;set;}
+      
 
     }
 }
