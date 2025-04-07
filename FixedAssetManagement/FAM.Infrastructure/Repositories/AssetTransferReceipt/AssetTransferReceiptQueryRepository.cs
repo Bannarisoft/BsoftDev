@@ -133,8 +133,8 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL) -- Consider pending receipts only
                 {{(AssetTransferId.HasValue ? "AND A.Id = @AssetTransferId" : "")}}
                 {{(string.IsNullOrEmpty(TransferType) ? "" : "AND A.TransferType LIKE @Search")}}
-                {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
-                {{(ToDate.HasValue ? "AND A.DocDate <= @ToDate" : "")}};
+                {{(FromDate.HasValue ? "AND CAST(A.DocDate AS DATE) >= CAST(@FromDate AS DATE)" : "")}}
+                {{(ToDate.HasValue ? "AND CAST(A.DocDate AS DATE) <= CAST(@ToDate AS DATE)" : "")}};
 
                 SELECT 
                     A.Id AS AssetTransferId,
@@ -167,8 +167,8 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL)
                 {{(AssetTransferId.HasValue ? "AND A.Id = @AssetTransferId" : "")}}
                 {{(string.IsNullOrEmpty(TransferType) ? "" : "AND A.TransferType LIKE @Search")}}
-                {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
-                {{(ToDate.HasValue ? "AND A.DocDate <= @ToDate" : "")}}
+                {{(FromDate.HasValue ? "AND CAST(A.DocDate AS DATE) >= CAST(@FromDate AS DATE)" : "")}}
+                {{(ToDate.HasValue ? "AND CAST(A.DocDate AS DATE) <= CAST(@ToDate AS DATE)" : "")}}
                 ORDER BY A.Id ASC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 

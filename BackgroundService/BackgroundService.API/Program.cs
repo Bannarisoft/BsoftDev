@@ -28,10 +28,4 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-    var rabbitMqConsumer = scope.ServiceProvider.GetRequiredService<IRabbitMqConsumer>();
-    Task.Run(() => rabbitMqConsumer.StartConsuming()).ConfigureAwait(false);
-}
-
 app.Run();

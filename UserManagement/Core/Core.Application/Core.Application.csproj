@@ -4,16 +4,18 @@
 
     <ProjectReference Include="..\..\..\Shared\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\Core.Domain\Core.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BackgroundService\BackgroundService.Application\BackgroundService.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
 
     <PackageReference Include="AutoMapper" Version="12.0.0" />
+
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
     <PackageReference Include="IdentityModel" Version="7.0.0" />
     <PackageReference Include="MassTransit" Version="8.0.0" />
-    <PackageReference Include="MediatR" Version="12.4.1" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="7.1.1" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />    
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
     <PackageReference Include="Serilog" Version="4.2.0" />
