@@ -1,3 +1,4 @@
+using Contracts.Models.Email;
 using MassTransit;
 using Microsoft.OpenApi.Models;
 using SagaOrchestrator.Infrastructure;
@@ -32,13 +33,27 @@ var builder = WebApplication.CreateBuilder(args);
 
 // // Register IPublishEndpoint from MassTransit
 // builder.Services.AddScoped<IPublishEndpoint>(provider => provider.GetRequiredService<IBus>());
+// Load settings
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+    builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
+builder.Services.AddSingleton(resolver =>
+{
+    var config = resolver.GetRequiredService<IConfiguration>();
+    var settings = new MailSettings();
+    config.GetSection("EmailSettings").Bind(settings);
+    return settings;
+});
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddInfrastructureServices();
+builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
+
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Saga Orchestrator API", Version = "v1" });
