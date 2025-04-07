@@ -6,7 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- NuGet Packages -->
+    <ItemGroup>
    <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="MassTransit" Version="8.0.0" />
@@ -25,10 +26,13 @@
     <PackageReference Include="Dapper" Version="2.1.44" /> 
   </ItemGroup>
 
+  <!-- Project References -->
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
+    <ProjectReference Include="..\BackgroundService.Application\BackgroundService.Application.csproj" />
+    <ProjectReference Include="..\BackgroundService.Infrastructure\BackgroundService.Infrastructure.csproj" />
     <ProjectReference Include="..\Core\Core.Application\Core.Application.csproj" />
     <ProjectReference Include="..\FAM.Infrastructure\FAM.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
   </ItemGroup>
 
 </Project>

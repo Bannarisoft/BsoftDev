@@ -1,8 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using BackgroundService.Application.Interfaces;
 using BackgroundService.Infrastructure.Configurations;
+using BackgroundService.Application.Interfaces;
 using BackgroundService.Infrastructure.Services;
+using MassTransit;
 
 namespace BackgroundService.Infrastructure
 {
@@ -10,15 +11,21 @@ namespace BackgroundService.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
-            // ✅ Correctly bind EmailSettings
-            var emailSettings = new EmailSettings();
-            configuration.GetSection("EmailSettings").Bind(emailSettings);
-            services.AddSingleton(emailSettings);
-
+         
+              services.AddMassTransit(x =>
+        {
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host("localhost", "/", h =>
+                {
+                    h.Username("guest");
+                    h.Password("guest");
+                });
+            });
+        });
             // Register Services
-            services.AddSingleton<INotificationService, NotificationService>();
-            services.AddSingleton<IRabbitMqConsumer, RabbitMqConsumer>();
-
+            services.AddScoped<IEmailEventPublisher, EmailEventPublisher>();
+            
             return services;
         }
     }

@@ -10,6 +10,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public int CustodianId { get; set; } 
         public string? CustodianName { get; set; }
         public int UserId { get; set; }      
+        
         public string? UserName { get; set; }
         public string? OldUnitId { get; set; }  
         public int DepartmentId { get; set; }
