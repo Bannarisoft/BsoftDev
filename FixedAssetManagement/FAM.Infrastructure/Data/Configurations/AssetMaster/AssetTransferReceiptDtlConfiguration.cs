@@ -65,6 +65,21 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
             builder.Property(b => b.UserName)
                 .HasColumnType("nvarchar(100)");
 
+            builder.Property(b => b.AckStatus)                              
+                .HasColumnType("bit")
+                .HasConversion(
+                    v => v == 1, 
+                    v => v ? (byte)1 : (byte)0 
+                )
+                .IsRequired();  
+
+            builder.Property(dg => dg.AckDate)                
+                .HasColumnType("datetimeoffset")
+                .IsRequired(false); 
+
+                
+
+
 
             
 

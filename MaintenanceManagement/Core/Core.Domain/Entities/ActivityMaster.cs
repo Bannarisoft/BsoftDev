@@ -19,5 +19,8 @@ namespace Core.Domain.Entities
       public ICollection<ActivityMachineGroup>? ActivityMachineGroups { get; set; } // ✅ Many-to-Many Relation 
       public ICollection<WorkOrderActivity>? workOrderActivities { get; set; } 
 
+       public ICollection<ActivityCheckListMaster>? ActivityCheckLists { get; set; } // ✅ One-to-Many Relation
+
+
     }
 }

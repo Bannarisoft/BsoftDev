@@ -43,6 +43,8 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<WorkOrderSchedule>  WorkOrderSchedule { get; set; }
         public DbSet<WorkOrderActivity>  WorkOrderActivity { get; set; }
         
+
+        public DbSet<ActivityCheckListMaster>  ActivityCheckListMaster { get; set; }
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -66,6 +68,7 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration( new WorkOrderItemConfiguration());
             modelBuilder.ApplyConfiguration( new WorkOrderScheduleConfiguration());
             modelBuilder.ApplyConfiguration( new WorkOrderTechnicianConfiguration());           
+            modelBuilder.ApplyConfiguration( new ActivityCheckListMasterConfiguration());
 
 
             base.OnModelCreating(modelBuilder);

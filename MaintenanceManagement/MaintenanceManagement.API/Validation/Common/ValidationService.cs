@@ -61,6 +61,9 @@ using Core.Application.WorkOrderMaster.WorkOrderActivity.Command.UpdateWorkOrder
 using Core.Application.WorkOrderMaster.WorkOrderActivity.Command.DeleteWorkOrderActivity;
 using Core.Application.WorkOrderMaster.WorkOrder.Command.UpdateWorkOrder;
 using Core.Application.WorkOrderMaster.WorkOrder.Command.DeleteWorkOrder;
+using Core.Application.ActivityCheckListMaster.Command.CreateActivityCheckListMaster;
+using MaintenanceManagement.API.Validation.ActivityCheckListMaster;
+using Core.Application.ActivityCheckListMaster.Command.UpdateActivityCheckListMaster;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -123,6 +126,8 @@ namespace MaintenanceManagement.API.Validation.Common
         services.AddScoped<IValidator<UpdateWorkOrderActivityCommand>, UpdateWorkOrderActivityCommandValidator>();
         services.AddScoped<IValidator<DeleteWorkOrderActivityCommand>, DeleteWorkOrderActivityCommandValidator>();
 
+        services.AddScoped<IValidator<CreateActivityCheckListMasterCommand>, CreateActivityCheckListMasterCommandValidator>();
+        services.AddScoped<IValidator<UpdateActivityCheckListMasterCommand>, UpdateActivityCheckListMasterCommandValidator>();
         }  
     }
 }

@@ -12,5 +12,8 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
         public int SubLocationId { get; set; } 
         public string? UserID { get; set; }
         public string? UserName { get; set; }
+        public byte? AckStatus { get; set; } = 0;   // Default to 0
+       // public DateTimeOffset? AckDate { get; set; }
+        
     }
 }

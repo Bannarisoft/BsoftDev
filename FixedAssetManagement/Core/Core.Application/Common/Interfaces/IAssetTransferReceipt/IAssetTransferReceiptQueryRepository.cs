@@ -15,6 +15,7 @@ namespace Core.Application.Common.Interfaces.IAssetTransferReceipt
         Task<(List<AssetTransferReceiptPendingDto>, int)> GetAllPendingAssetTransferAsync(
         int PageNumber, 
         int PageSize, 
+        int? AssetTransferId,
         string? SearchTerm, 
         DateTimeOffset? FromDate, 
         DateTimeOffset? ToDate);
@@ -28,5 +29,8 @@ namespace Core.Application.Common.Interfaces.IAssetTransferReceipt
 
         Task<List<AssetReceiptDetailsByIdDto>> GetByAssetReceiptId(int AssetReceiptId);
         Task<AssetTransferJsonDto?> GetAssetTransferByIdAsync(int assetTransferId);
+        Task<AssetTransferDto?> GetByAssetTransferId(int assetTransferId);
+
+
     }
 }

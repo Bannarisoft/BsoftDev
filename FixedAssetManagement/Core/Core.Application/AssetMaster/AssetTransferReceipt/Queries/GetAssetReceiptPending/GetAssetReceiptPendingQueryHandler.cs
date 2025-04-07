@@ -26,7 +26,7 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
         public async Task<ApiResponseDTO<List<AssetTransferReceiptPendingDto>>> Handle(GetAssetReceiptPendingQuery request, CancellationToken cancellationToken)
         {
              var (assetIssueTransfer, totalCount) = await _assetTransferReceiptQueryRepository
-                                                .GetAllPendingAssetTransferAsync(request.PageNumber, request.PageSize, request.SearchTerm, request.FromDate, request.ToDate);
+                                                .GetAllPendingAssetTransferAsync(request.PageNumber, request.PageSize,request.AssetTransferId ,request.SearchTerm, request.FromDate, request.ToDate);
             var assetIssueTransferList = _mapper.Map<List<AssetTransferReceiptPendingDto>>(assetIssueTransfer);
 
             //Domain Event

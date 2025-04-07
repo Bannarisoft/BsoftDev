@@ -11,6 +11,7 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
     {
         public int PageNumber { get; set; }
         public int PageSize { get; set; } 
+        public int? AssetTransferId { get; set; }
         public string? SearchTerm { get; set; }
         public DateTimeOffset? FromDate { get; set; }
         public DateTimeOffset? ToDate { get; set; }

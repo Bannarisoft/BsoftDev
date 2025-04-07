@@ -45,6 +45,10 @@ using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrderActivity;
 using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrderSchedule;
 using MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.WorkOrderSchedule;
 using Core.Application.Common.Mappings.WorkOrderMaster;
+using System.Diagnostics;
+using Core.Application.Common.Interfaces.IActivityCheckListMaster;
+using Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListMaster;
+using MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMaster;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -175,6 +179,8 @@ namespace MaintenanceManagement.Infrastructure
 
             services.AddScoped<IWorkOrderScheduleCommandRepository, WorkOrderScheduleCommandRepository>();
             services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>();
+            services.AddScoped<IActivityCheckListMasterQueryRepository, ActivityCheckListMasterQueryRepository>();
+            services.AddScoped<IActivityCheckListMasterCommandRepository, ActivityCheckListMasterCommandRepository>();
             
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -198,10 +204,13 @@ namespace MaintenanceManagement.Infrastructure
                 typeof(ShiftMasterDetailProfile),
 
                 typeof(ActivityMasterProfile),
+
                 typeof(MachineGroupUserProfile),
                 typeof(WorkOrderProfile),
                 typeof(WorkOrderScheduleProfile),
                 typeof(WorkOrderActivityProfile)
+                typeof(MachineGroupUserProfile),
+                typeof(ActivityCheckListMasterProfile)
 
 				
 
