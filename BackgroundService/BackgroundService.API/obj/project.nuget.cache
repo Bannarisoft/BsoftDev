@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "wOMm+hCAen8=",
+  "dgSpecHash": "8RXoTlJ5wsM=",
   "success": true,
-  "projectFilePath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.API\\BackgroundService.API.csproj",
+  "projectFilePath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.API\\BackgroundService.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Administrator\\.nuget\\packages\\dapper\\2.1.44\\dapper.2.1.44.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\dnsclient\\1.6.0\\dnsclient.1.6.0.nupkg.sha512",

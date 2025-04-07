@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj",
+      "projectUniqueName": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj",
       "projectName": "BackgroundService.Domain",
-      "projectPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj",
+      "projectPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj",
       "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-      "outputPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\obj\\",
+      "outputPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",

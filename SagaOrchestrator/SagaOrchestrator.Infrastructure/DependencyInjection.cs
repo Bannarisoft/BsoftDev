@@ -40,8 +40,7 @@ namespace SagaOrchestrator.Infrastructure
 
             // Register OrchestratorService
             services.AddScoped<OrchestratorService>();
-            services.AddScoped<DepartmentSagaService>();
-            services.AddScoped<DepartmentSagaService>();
+            services.AddScoped<DepartmentSagaService>();            
             //services.Configure<MailSettings>(configuration.GetSection("EmailSettings"));     
            var emailSettings = new MailSettings();
             configuration.GetSection("EmailSettings").Bind(emailSettings);
@@ -63,12 +62,11 @@ namespace SagaOrchestrator.Infrastructure
             services.AddMassTransit(x =>
           {
               x.AddSagaStateMachine<UserAssetStateMachine, UserAssetState>()
-                   //   .InMemoryRepository();
+                      //.InMemoryRepository();
 
              
-              x.AddConsumer<EmailEventConsumer>();
-             
-                   .MongoDbRepository(r =>
+              
+              .MongoDbRepository(r =>
                     {
                         r.Connection = "mongodb://192.168.1.126:27017";
                         r.DatabaseName = "saga_orchestrator_db";
@@ -78,7 +76,7 @@ namespace SagaOrchestrator.Infrastructure
               //   x.AddConsumer<UserCreatedEventConsumer>();
               //   x.AddConsumer<AssetCreatedEventConsumer>();
               //   x.AddConsumer<SagaCompletedEventConsumer>();
-
+                x.AddConsumer<EmailEventConsumer>();
               x.UsingRabbitMq((context, cfg) =>
               {
                

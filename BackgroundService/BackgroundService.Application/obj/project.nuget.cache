@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "z+in6MD13Jo=",
+  "dgSpecHash": "piCqGL7Oi9Q=",
   "success": true,
-  "projectFilePath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj",
+  "projectFilePath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Administrator\\.nuget\\packages\\dnsclient\\1.6.0\\dnsclient.1.6.0.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\masstransit\\8.0.0\\masstransit.8.0.0.nupkg.sha512",

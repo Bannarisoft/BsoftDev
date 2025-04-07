@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.API\\BackgroundService.API.csproj": {}
+    "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.API\\BackgroundService.API.csproj": {}
   },
   "projects": {
-    "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.API\\BackgroundService.API.csproj": {
+    "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.API\\BackgroundService.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.API\\BackgroundService.API.csproj",
+        "projectUniqueName": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.API\\BackgroundService.API.csproj",
         "projectName": "BackgroundService.API",
-        "projectPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.API\\BackgroundService.API.csproj",
+        "projectPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.API\\BackgroundService.API.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.API\\obj\\",
+        "outputPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -28,14 +28,14 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj": {
-                "projectPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj"
+              "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj": {
+                "projectPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj"
               },
-              "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Infrastructure\\BackgroundService.Infrastructure.csproj": {
-                "projectPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Infrastructure\\BackgroundService.Infrastructure.csproj"
+              "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Infrastructure\\BackgroundService.Infrastructure.csproj": {
+                "projectPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Infrastructure\\BackgroundService.Infrastructure.csproj"
               },
-              "D:\\Bannari\\BSOFT\\Shared\\Contracts\\Contracts.csproj": {
-                "projectPath": "D:\\Bannari\\BSOFT\\Shared\\Contracts\\Contracts.csproj"
+              "d:\\Bannari\\NotificationwithSaga\\Shared\\Contracts\\Contracts.csproj": {
+                "projectPath": "d:\\Bannari\\NotificationwithSaga\\Shared\\Contracts\\Contracts.csproj"
               }
             }
           }
@@ -133,14 +133,14 @@
         }
       }
     },
-    "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj": {
+    "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj",
+        "projectUniqueName": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj",
         "projectName": "BackgroundService.Application",
-        "projectPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj",
+        "projectPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Application\\obj\\",
+        "outputPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -157,11 +157,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj": {
-                "projectPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj"
+              "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj": {
+                "projectPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj"
               },
-              "D:\\Bannari\\BSOFT\\Shared\\Contracts\\Contracts.csproj": {
-                "projectPath": "D:\\Bannari\\BSOFT\\Shared\\Contracts\\Contracts.csproj"
+              "d:\\Bannari\\NotificationwithSaga\\Shared\\Contracts\\Contracts.csproj": {
+                "projectPath": "d:\\Bannari\\NotificationwithSaga\\Shared\\Contracts\\Contracts.csproj"
               }
             }
           }
@@ -238,14 +238,14 @@
         }
       }
     },
-    "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj": {
+    "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj",
+        "projectUniqueName": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj",
         "projectName": "BackgroundService.Domain",
-        "projectPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj",
+        "projectPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\obj\\",
+        "outputPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -298,14 +298,14 @@
         }
       }
     },
-    "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Infrastructure\\BackgroundService.Infrastructure.csproj": {
+    "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Infrastructure\\BackgroundService.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Infrastructure\\BackgroundService.Infrastructure.csproj",
+        "projectUniqueName": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Infrastructure\\BackgroundService.Infrastructure.csproj",
         "projectName": "BackgroundService.Infrastructure",
-        "projectPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Infrastructure\\BackgroundService.Infrastructure.csproj",
+        "projectPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Infrastructure\\BackgroundService.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Infrastructure\\obj\\",
+        "outputPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -322,14 +322,14 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj": {
-                "projectPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj"
+              "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj": {
+                "projectPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Application\\BackgroundService.Application.csproj"
               },
-              "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj": {
-                "projectPath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj"
+              "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj": {
+                "projectPath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj"
               },
-              "D:\\Bannari\\BSOFT\\Shared\\Contracts\\Contracts.csproj": {
-                "projectPath": "D:\\Bannari\\BSOFT\\Shared\\Contracts\\Contracts.csproj"
+              "d:\\Bannari\\NotificationwithSaga\\Shared\\Contracts\\Contracts.csproj": {
+                "projectPath": "d:\\Bannari\\NotificationwithSaga\\Shared\\Contracts\\Contracts.csproj"
               }
             }
           }
@@ -414,14 +414,14 @@
         }
       }
     },
-    "D:\\Bannari\\BSOFT\\Shared\\Contracts\\Contracts.csproj": {
+    "d:\\Bannari\\NotificationwithSaga\\Shared\\Contracts\\Contracts.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Bannari\\BSOFT\\Shared\\Contracts\\Contracts.csproj",
+        "projectUniqueName": "d:\\Bannari\\NotificationwithSaga\\Shared\\Contracts\\Contracts.csproj",
         "projectName": "Contracts",
-        "projectPath": "D:\\Bannari\\BSOFT\\Shared\\Contracts\\Contracts.csproj",
+        "projectPath": "d:\\Bannari\\NotificationwithSaga\\Shared\\Contracts\\Contracts.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\Bannari\\BSOFT\\Shared\\Contracts\\obj\\",
+        "outputPath": "d:\\Bannari\\NotificationwithSaga\\Shared\\Contracts\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",

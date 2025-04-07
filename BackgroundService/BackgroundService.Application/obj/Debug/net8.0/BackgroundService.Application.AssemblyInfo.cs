@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BackgroundService.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+87cf80d5a1554aec5261fecd53c03f1cd71946de")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5684b22aeee4f3063e0391fc11973fb235f0f2d8")]
 [assembly: System.Reflection.AssemblyProductAttribute("BackgroundService.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BackgroundService.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

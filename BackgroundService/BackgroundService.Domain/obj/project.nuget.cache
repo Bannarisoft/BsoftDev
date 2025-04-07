@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "UW4Kj7fFZvY=",
+  "dgSpecHash": "FGd9PA/f7rE=",
   "success": true,
-  "projectFilePath": "D:\\Bannari\\BSOFT\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj",
+  "projectFilePath": "D:\\Bannari\\NotificationwithSaga\\BackgroundService\\BackgroundService.Domain\\BackgroundService.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
