@@ -895,6 +895,386 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("WorkCenter", "Maintenance");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int")
+                        .HasColumnName("CompanyId");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("Image");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("PriorityId")
+                        .HasColumnType("int")
+                        .HasColumnName("PriorityId");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("Remarks");
+
+                    b.Property<string>("RequestId")
+                        .IsRequired()
+                        .HasColumnType("varchar(25)")
+                        .HasColumnName("RequestId");
+
+                    b.Property<int>("RequestTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("RequestTypeId");
+
+                    b.Property<int>("RootCauseId")
+                        .HasColumnType("int")
+                        .HasColumnName("RootCauseId");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("StatusId");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
+                    b.Property<string>("VendorId")
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("VendorId");
+
+                    b.Property<int>("WorkOrderTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("WorkOrderTypeId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PriorityId");
+
+                    b.HasIndex("RequestTypeId");
+
+                    b.HasIndex("RootCauseId");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("WorkOrderTypeId");
+
+                    b.ToTable("WorkOrder", "Maintenance");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrderActivity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActivityId")
+                        .HasColumnType("int")
+                        .HasColumnName("ActivityId");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("WorkOrderId")
+                        .HasColumnType("int")
+                        .HasColumnName("WorkOrderId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("WorkOrderId");
+
+                    b.ToTable("WorkOrderActivity", "Maintenance");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AvailableQty")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("AvailableQty");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("Image");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("ItemCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20))")
+                        .HasColumnName("ItemCode");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasColumnType("varchar(100))")
+                        .HasColumnName("ItemName");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<decimal>("UsedQty")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("UsedQty");
+
+                    b.Property<int>("WorkOrderId")
+                        .HasColumnType("int")
+                        .HasColumnName("WorkOrderId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkOrderId");
+
+                    b.ToTable("WorkOrderItem", "Maintenance");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<TimeSpan>("DownTimeEndTime")
+                        .HasColumnType("time")
+                        .HasColumnName("DownTimeEndTime");
+
+                    b.Property<TimeSpan>("DownTimeStartTime")
+                        .HasColumnType("time")
+                        .HasColumnName("DownTimeStartTime");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<TimeSpan>("RepairEndTime")
+                        .HasColumnType("time")
+                        .HasColumnName("RepairEndTime");
+
+                    b.Property<TimeSpan>("RepairStartTime")
+                        .HasColumnType("time")
+                        .HasColumnName("RepairStartTime");
+
+                    b.Property<int>("WorkOrderId")
+                        .HasColumnType("int")
+                        .HasColumnName("WorkOrderId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkOrderId");
+
+                    b.ToTable("WorkOrderSchedule", "Maintenance");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrderTechnician", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<decimal>("HoursSpent")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("HoursSpent");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("TechnicianId")
+                        .HasColumnType("int")
+                        .HasColumnName("TechnicianId");
+
+                    b.Property<string>("TechnicianName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("TechnicianName");
+
+                    b.Property<int>("WorkOrderId")
+                        .HasColumnType("int")
+                        .HasColumnName("WorkOrderId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkOrderId");
+
+                    b.ToTable("WorkOrderTechnician", "Maintenance");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.ActivityCheckListMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.ActivityMaster", "ActivityMaster")
@@ -993,11 +1373,108 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("ShiftMaster");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrder", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscPriority")
+                        .WithMany("WorkOrderPriority")
+                        .HasForeignKey("PriorityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscRequestType")
+                        .WithMany("WorkOrderRequestType")
+                        .HasForeignKey("RequestTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscRootCause")
+                        .WithMany("WorkOrderRootCause")
+                        .HasForeignKey("RootCauseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscStatus")
+                        .WithMany("WorkOrderStatus")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MaintenanceCategory", "CategoryType")
+                        .WithMany("WorkOrderType")
+                        .HasForeignKey("WorkOrderTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CategoryType");
+
+                    b.Navigation("MiscPriority");
+
+                    b.Navigation("MiscRequestType");
+
+                    b.Navigation("MiscRootCause");
+
+                    b.Navigation("MiscStatus");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrderActivity", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.ActivityMaster", "ActivityMaster")
+                        .WithMany("workOrderActivities")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.WorkOrderMaster.WorkOrder", "WOActivity")
+                        .WithMany("Activity")
+                        .HasForeignKey("WorkOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ActivityMaster");
+
+                    b.Navigation("WOActivity");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrderItem", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.WorkOrderMaster.WorkOrder", "WOItem")
+                        .WithMany("Item")
+                        .HasForeignKey("WorkOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WOItem");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.WorkOrderMaster.WorkOrder", "WOSchedule")
+                        .WithMany("Schedule")
+                        .HasForeignKey("WorkOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WOSchedule");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrderTechnician", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.WorkOrderMaster.WorkOrder", "WOTechnician")
+                        .WithMany("Technicians")
+                        .HasForeignKey("WorkOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WOTechnician");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
                 {
                     b.Navigation("ActivityCheckLists");
 
                     b.Navigation("ActivityMachineGroups");
+
+                    b.Navigation("workOrderActivities");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.CostCenter", b =>
@@ -1012,6 +1489,22 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("MachineGroupUser");
 
                     b.Navigation("MachineMasters");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MaintenanceCategory", b =>
+                {
+                    b.Navigation("WorkOrderType");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
+                {
+                    b.Navigation("WorkOrderPriority");
+
+                    b.Navigation("WorkOrderRequestType");
+
+                    b.Navigation("WorkOrderRootCause");
+
+                    b.Navigation("WorkOrderStatus");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
@@ -1029,6 +1522,17 @@ namespace MaintenanceManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.WorkCenter", b =>
                 {
                     b.Navigation("MachineMasters");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrder", b =>
+                {
+                    b.Navigation("Activity");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Schedule");
+
+                    b.Navigation("Technicians");
                 });
 #pragma warning restore 612, 618
         }

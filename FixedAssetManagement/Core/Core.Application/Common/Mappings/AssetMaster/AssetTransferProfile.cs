@@ -22,8 +22,9 @@ namespace Core.Application.Common.Mappings.AssetMaster
 
             CreateMap<Core.Domain.Entities.AssetMaster.AssetTransferIssue, AssetTransferDto>(); 
 
-            CreateMap<AssetTransferIssueHdrDto, Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr>()
-             .ForMember(dest => dest.AssetTransferIssueDtl, opt => opt.MapFrom(src => src.AssetTransferIssueDtls));
+            CreateMap<AssetTransferIssueHdrDto, Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr>()            
+             .ForMember(dest => dest.AssetTransferIssueDtl, opt => opt.MapFrom(src => src.AssetTransferIssueDtls))
+             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => "Pending"));
             CreateMap<AssetTransferIssueDtlDto, Core.Domain.Entities.AssetMaster.AssetTransferIssueDtl>();
             
 

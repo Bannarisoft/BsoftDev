@@ -11,7 +11,7 @@ namespace Core.Domain.Common
 
         public static class Depreciation_DepMethod
         {
-            public const string MiscCode = "DEPMETHOD";
+            public const string MiscCode = "DEPRECIATIONMETHOD";
         }
         public static class  Manufacture_ManufactureType
         {
