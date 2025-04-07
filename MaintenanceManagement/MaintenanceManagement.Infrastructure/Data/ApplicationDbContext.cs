@@ -35,6 +35,8 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<MachineMaster> MachineMaster { get; set; }
         public DbSet<ActivityMachineGroup>  ActivityMachineGroup { get; set; }
         public DbSet<MachineGroupUser>  MachineGroupUser { get; set; }
+
+        public DbSet<ActivityCheckListMaster>  ActivityCheckListMaster { get; set; }
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -54,6 +56,7 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new MachineMasterConfiguration());
             modelBuilder.ApplyConfiguration( new ActivityMachineGroupConfiguration());
             modelBuilder.ApplyConfiguration( new MachineGroupUserConfiguration());
+            modelBuilder.ApplyConfiguration( new ActivityCheckListMasterConfiguration());
 
 
             base.OnModelCreating(modelBuilder);
