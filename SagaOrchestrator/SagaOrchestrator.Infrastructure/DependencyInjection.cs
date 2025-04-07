@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Contracts.Models.Email;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,7 @@ namespace SagaOrchestrator.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,IConfiguration configuration)
         {
 
             // HttpClient Registration using HttpClientFactory
@@ -39,7 +40,11 @@ namespace SagaOrchestrator.Infrastructure
             // Register OrchestratorService
             services.AddScoped<OrchestratorService>();
             services.AddScoped<DepartmentSagaService>();
-
+            services.AddScoped<DepartmentSagaService>();
+            //services.Configure<MailSettings>(configuration.GetSection("EmailSettings"));     
+           var emailSettings = new MailSettings();
+            configuration.GetSection("EmailSettings").Bind(emailSettings);
+            services.AddSingleton(emailSettings);        
 
             // Configure MassTransit with RabbitMQ
             // services.AddMassTransit(x =>
@@ -61,7 +66,9 @@ namespace SagaOrchestrator.Infrastructure
 
               x.AddConsumer<UserCreatedEventConsumer>();
               x.AddConsumer<AssetCreatedEventConsumer>();
+              x.AddConsumer<EmailEventConsumer>();
               x.AddConsumer<SagaCompletedEventConsumer>();
+              
 
               x.UsingRabbitMq((context, cfg) =>
               {
@@ -80,7 +87,10 @@ namespace SagaOrchestrator.Infrastructure
                 {
                     e.ConfigureConsumer<AssetCreatedEventConsumer>(context);
                 });
-
+                cfg.ReceiveEndpoint("email-queue", e =>
+                {
+                    e.ConfigureConsumer<EmailEventConsumer>(context);
+                });
                 cfg.ReceiveEndpoint("saga-completed-queue", e =>
                 {
                     e.ConfigureConsumer<SagaCompletedEventConsumer>(context);

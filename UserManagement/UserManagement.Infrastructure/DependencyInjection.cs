@@ -71,6 +71,7 @@ using Core.Application.Common;
 using UserManagement.Infrastructure.Helpers;
 using Core.Application.Common.Interfaces.ICustomField;
 using UserManagement.Infrastructure.Repositories.CustomFields;
+using BackgroundService.Application.Interfaces;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
@@ -169,6 +170,12 @@ namespace UserManagement.Infrastructure
 
 
         }); 
+
+        services.AddHttpClient("BackgroundService", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5011"); // BackgroundService runs here
+});
+
         // services.AddDistributedMemoryCache();
         // services.AddSession(options =>
         // {

@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "gwcakXv9hfnrPdKfim9WgKLMVDlIRVDsP4QyexM7OZY=",
+  "Source": "BackgroundService.API",
+  "BasePath": "_content/BackgroundService.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

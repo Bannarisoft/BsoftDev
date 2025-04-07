@@ -1,0 +1,11 @@
+D:\Bannari\BSOFT\BackgroundService\BackgroundService.Domain\bin\Debug\net8.0\BackgroundService.Domain.deps.json
+D:\Bannari\BSOFT\BackgroundService\BackgroundService.Domain\bin\Debug\net8.0\BackgroundService.Domain.dll
+D:\Bannari\BSOFT\BackgroundService\BackgroundService.Domain\bin\Debug\net8.0\BackgroundService.Domain.pdb
+D:\Bannari\BSOFT\BackgroundService\BackgroundService.Domain\obj\Debug\net8.0\BackgroundService.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Bannari\BSOFT\BackgroundService\BackgroundService.Domain\obj\Debug\net8.0\BackgroundService.Domain.AssemblyInfoInputs.cache
+D:\Bannari\BSOFT\BackgroundService\BackgroundService.Domain\obj\Debug\net8.0\BackgroundService.Domain.AssemblyInfo.cs
+D:\Bannari\BSOFT\BackgroundService\BackgroundService.Domain\obj\Debug\net8.0\BackgroundService.Domain.csproj.CoreCompileInputs.cache
+D:\Bannari\BSOFT\BackgroundService\BackgroundService.Domain\obj\Debug\net8.0\BackgroundService.Domain.dll
+D:\Bannari\BSOFT\BackgroundService\BackgroundService.Domain\obj\Debug\net8.0\refint\BackgroundService.Domain.dll
+D:\Bannari\BSOFT\BackgroundService\BackgroundService.Domain\obj\Debug\net8.0\BackgroundService.Domain.pdb
+D:\Bannari\BSOFT\BackgroundService\BackgroundService.Domain\obj\Debug\net8.0\ref\BackgroundService.Domain.dll
