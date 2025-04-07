@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Contracts.Models.Email;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,8 @@ namespace SagaOrchestrator.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
+
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,IConfiguration configuration)
         {
 
             // HttpClient Registration using HttpClientFactory
@@ -33,13 +35,16 @@ namespace SagaOrchestrator.Infrastructure
             });
             services.AddHttpClient<IDepartmentService, DepartmentService>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:5174");
+
             });
 
             // Register OrchestratorService
             services.AddScoped<OrchestratorService>();
-            services.AddScoped<DepartmentSagaService>();
-
+            services.AddScoped<DepartmentSagaService>();            
+            //services.Configure<MailSettings>(configuration.GetSection("EmailSettings"));     
+           var emailSettings = new MailSettings();
+            configuration.GetSection("EmailSettings").Bind(emailSettings);
+            services.AddSingleton(emailSettings);        
 
             // Configure MassTransit with RabbitMQ
             // services.AddMassTransit(x =>
@@ -57,20 +62,24 @@ namespace SagaOrchestrator.Infrastructure
             services.AddMassTransit(x =>
           {
               x.AddSagaStateMachine<UserAssetStateMachine, UserAssetState>()
-                   //   .InMemoryRepository();
+                      //.InMemoryRepository();
 
-                   .MongoDbRepository(r =>
+             
+              
+              .MongoDbRepository(r =>
                     {
                         r.Connection = "mongodb://192.168.1.126:27017";
                         r.DatabaseName = "saga_orchestrator_db";
                     });
+              
 
               //   x.AddConsumer<UserCreatedEventConsumer>();
               //   x.AddConsumer<AssetCreatedEventConsumer>();
               //   x.AddConsumer<SagaCompletedEventConsumer>();
-
+                x.AddConsumer<EmailEventConsumer>();
               x.UsingRabbitMq((context, cfg) =>
               {
+               
                   cfg.Host("localhost", "/", h =>
                   {
                       h.Username("guest");
@@ -79,20 +88,14 @@ namespace SagaOrchestrator.Infrastructure
                   // Automatically configure endpoints for sagas and consumers
                   cfg.ConfigureEndpoints(context);
 
-                  //   cfg.ReceiveEndpoint("user-created-queue", e =>
-                  //   {
-                  //       e.ConfigureConsumer<UserCreatedEventConsumer>(context);
-                  //   });
+              
 
-                  //   cfg.ReceiveEndpoint("asset-created-queue", e =>
-                  //   {
-                  //     e.ConfigureConsumer<AssetCreatedEventConsumer>(context);
-                  //   });
-
-                  //   cfg.ReceiveEndpoint("saga-completed-queue", e =>
-                  //   {
-                  //       e.ConfigureConsumer<SagaCompletedEventConsumer>(context);
-                  //   });
+                
+                cfg.ReceiveEndpoint("email-queue", e =>
+                {
+                    e.ConfigureConsumer<EmailEventConsumer>(context);
+                });
+               
               });
           });
 
