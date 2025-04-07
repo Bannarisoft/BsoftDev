@@ -208,8 +208,7 @@ namespace MaintenanceManagement.Infrastructure
                 typeof(MachineGroupUserProfile),
                 typeof(WorkOrderProfile),
                 typeof(WorkOrderScheduleProfile),
-                typeof(WorkOrderActivityProfile),
-                typeof(MachineGroupUserProfile),
+                typeof(WorkOrderActivityProfile),                
                 typeof(ActivityCheckListMasterProfile)
 
 				
