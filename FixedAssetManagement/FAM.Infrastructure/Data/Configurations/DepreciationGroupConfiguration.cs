@@ -30,6 +30,9 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
+                builder.HasIndex(x => new { x.AssetGroupId, x.DepreciationMethod,x.BookType,x.IsActive })
+               .IsUnique();
+
                 builder.Property(dg => dg.Code)                
                 .HasColumnType("varchar(10)")
                 .IsRequired(); 
@@ -50,7 +53,7 @@ namespace FAM.Infrastructure.Data.Configurations
 
                 builder.Property(dg => dg.BookType)                
                 .HasColumnType("int")
-                .IsRequired(false);   
+                .IsRequired();   
 
                  builder.HasOne(dg => dg.BookMiscType)
                 .WithMany(mm => mm.BookType) 
@@ -60,7 +63,7 @@ namespace FAM.Infrastructure.Data.Configurations
 
                  builder.Property(b => b.DepreciationMethod)                
                 .HasColumnType("int")
-                .IsRequired(false);
+                .IsRequired();
 
                 builder.HasOne(dg => dg.DepMiscType)
                 .WithMany(mm => mm.DepreciationMethod) 

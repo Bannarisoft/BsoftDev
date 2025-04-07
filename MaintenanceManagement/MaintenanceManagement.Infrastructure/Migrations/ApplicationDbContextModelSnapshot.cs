@@ -22,6 +22,61 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Core.Domain.Entities.ActivityCheckListMaster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActivityCheckList")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("ActivityCheckList");
+
+                    b.Property<int>("ActivityId")
+                        .HasColumnType("int")
+                        .HasColumnName("ActivityID");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.ToTable("ActivityCheckListMaster", "Maintenance");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.ActivityMachineGroup", b =>
                 {
                     b.Property<int>("Id")
@@ -840,6 +895,17 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("WorkCenter", "Maintenance");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.ActivityCheckListMaster", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.ActivityMaster", "ActivityMaster")
+                        .WithMany("ActivityCheckLists")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ActivityMaster");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.ActivityMachineGroup", b =>
                 {
                     b.HasOne("Core.Domain.Entities.ActivityMaster", "ActivityMaster")
@@ -929,6 +995,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.ActivityMaster", b =>
                 {
+                    b.Navigation("ActivityCheckLists");
+
                     b.Navigation("ActivityMachineGroups");
                 });
 

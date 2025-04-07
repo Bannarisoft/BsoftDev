@@ -19,10 +19,10 @@ namespace Core.Application.Common.Mappings.AssetMaster
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))            
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted)); 
 
+          CreateMap<UpdateSpecificationItem, AssetSpecifications>()
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive))
+                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
-            CreateMap<UpdateAssetSpecificationCommand, AssetSpecifications>()
-            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => (Status)src.IsActive));
 
             CreateMap<AssetSpecificationJsonDto, AssetSpecificationAutoCompleteDTO>();
             CreateMap<AssetSpecifications, AssetSpecificationDTO>();      

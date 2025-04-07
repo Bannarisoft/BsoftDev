@@ -18,6 +18,8 @@ namespace Core.Domain.Entities.AssetMaster
         public SubLocation? SubLocation { get; set; }
         public string? UserID { get; set; }
         public string? UserName { get; set; }   
+        public byte AckStatus { get; set; }
+        public DateTimeOffset? AckDate { get; set; }
 
 
     }

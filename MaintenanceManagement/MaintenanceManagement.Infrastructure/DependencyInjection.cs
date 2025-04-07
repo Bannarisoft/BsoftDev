@@ -38,6 +38,10 @@ using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.Common.Interfaces.IMachineGroupUser;
 using MaintenanceManagement.Infrastructure.Repositories.MachineMaster;
 using MaintenanceManagement.Infrastructure.Repositories.MachineGroupUser;
+using System.Diagnostics;
+using Core.Application.Common.Interfaces.IActivityCheckListMaster;
+using Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListMaster;
+using MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMaster;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -159,6 +163,8 @@ namespace MaintenanceManagement.Infrastructure
 
             services.AddScoped<IMachineMasterCommandRepository, MachineMasterCommandRepository>();
             services.AddScoped<IMachineMasterQueryRepository, MachineMasterQueryRepository>();
+            services.AddScoped<IActivityCheckListMasterQueryRepository, ActivityCheckListMasterQueryRepository>();
+            services.AddScoped<IActivityCheckListMasterCommandRepository, ActivityCheckListMasterCommandRepository>();
             
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
@@ -182,7 +188,8 @@ namespace MaintenanceManagement.Infrastructure
                 typeof(ShiftMasterDetailProfile),
 
                 typeof(ActivityMasterProfile),
-                typeof(MachineGroupUserProfile)
+                typeof(MachineGroupUserProfile),
+                typeof(ActivityCheckListMasterProfile)
 
 				
 
