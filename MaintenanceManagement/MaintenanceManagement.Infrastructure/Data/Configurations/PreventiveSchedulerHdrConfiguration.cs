@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using static Core.Domain.Common.BaseEntity;
 
 namespace MaintenanceManagement.Infrastructure.Data.Configurations
 {
@@ -12,6 +14,18 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<PreventiveSchedulerHdr> builder)
         {
+            var isActiveConverter = new ValueConverter<Status, bool>
+               (
+                    v => v == Status.Active,  
+                    v => v ? Status.Active : Status.Inactive 
+                );
+
+                var isDeletedConverter = new ValueConverter<IsDelete, bool>
+                (
+                 v => v == IsDelete.Deleted,  
+                 v => v ? IsDelete.Deleted : IsDelete.NotDeleted 
+                );
+                
             builder.ToTable("PreventiveSchedulerHdr", "Maintenance");
 
             builder.HasKey(b => b.Id);
@@ -69,7 +83,57 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                     v => v ? (byte)1 : (byte)0 
                 )
                 .IsRequired();
+
+                 builder.Property(cf => cf.IsActive)
+                .HasColumnName("IsActive")
+                .HasColumnType("bit")
+                .HasConversion(isActiveConverter)
+                .IsRequired();
+
+            builder.Property(cf => cf.IsDeleted)
+                 .HasColumnName("IsDeleted")
+                 .HasColumnType("bit")
+                 .HasConversion(isDeletedConverter)
+                 .IsRequired();
+
+            builder.Property(cf => cf.CreatedByName)
+                .IsRequired()
+                .HasColumnType("varchar(50)");
+
+            builder.Property(cf => cf.CreatedIP)
+                .IsRequired()
+                .HasColumnType("varchar(255)");
+
+            builder.Property(cf => cf.ModifiedByName)
+                 .HasColumnType("varchar(50)");
+
+            builder.Property(cf => cf.ModifiedIP)
+                .HasColumnType("varchar(255)");
                 
+                builder.HasOne(b => b.MachineGroup)
+                .WithMany(b => b.PreventiveSchedulerHdr)
+                .HasForeignKey(b => b.MachineGroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne(b => b.MaintenanceCategory)
+                .WithMany(b => b.PreventiveSchedulerHdr)
+                .HasForeignKey(b => b.MaintenanceCategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne(b => b.MiscSchedule)
+                .WithMany(b => b.Schedule)
+                .HasForeignKey(b => b.ScheduleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne(b => b.MiscDueType)
+                .WithMany(b => b.DueType)
+                .HasForeignKey(b => b.DueTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne(b => b.MiscFrequency)
+                .WithMany(b => b.Frequency)
+                .HasForeignKey(b => b.FrequencyId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

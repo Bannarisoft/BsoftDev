@@ -14,7 +14,8 @@ namespace Core.Domain.Entities
         public int Manufacturer { get; set;}       
          public ICollection<ActivityMachineGroup>? ActivityMachineGroups { get; set; }   
          public ICollection<MachineGroupUser>? MachineGroupUser { get; set; }             
-        public ICollection<MachineMaster>? MachineMasters { get; set; }   
+        public ICollection<MachineMaster>? MachineMasters { get; set; }
+        public ICollection<PreventiveSchedulerHdr>? PreventiveSchedulerHdr { get; set; }   
         
     }
 }

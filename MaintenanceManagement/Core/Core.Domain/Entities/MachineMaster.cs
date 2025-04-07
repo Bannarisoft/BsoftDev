@@ -24,7 +24,7 @@ namespace Core.Domain.Entities
         public WorkCenter WorkCenter  { get; set; } = null!;
         public DateTimeOffset? InstallationDate { get; set; }
         public int AssetId { get; set; }
-
+        public ICollection<PreventiveSchedulerDtl>? PreventiveSchedulerDtls { get; set; }
 
 
 

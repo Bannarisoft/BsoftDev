@@ -13,6 +13,9 @@ namespace Core.Domain.Entities
         public Status IsActive { get; set; }
             
         public MiscTypeMaster? MiscTypeMaster { get; set; } 
+        public ICollection<PreventiveSchedulerHdr>? Schedule { get; set; }
+        public ICollection<PreventiveSchedulerHdr>? DueType { get; set; }
+        public ICollection<PreventiveSchedulerHdr>? Frequency { get; set; }
 		
   		    
     }
