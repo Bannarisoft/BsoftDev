@@ -10,7 +10,7 @@ using Dapper;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.WorkOrder
 {
-    public class WorkOrderQueryRepository : IWorkOrderQueryRepository
+  /*   public class WorkOrderQueryRepository : IWorkOrderQueryRepository
     {
         private readonly IDbConnection _dbConnection;
         public WorkOrderQueryRepository(IDbConnection dbConnection)
@@ -203,6 +203,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
             return result.ToList();
         }
         
-    }
+    } */
 }
    

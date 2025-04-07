@@ -46,8 +46,17 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
 
             builder.Property(t => t.RequestId)
                 .HasColumnName("RequestId")
+                .HasColumnType("varchar(25)")
+                .IsRequired();  
+            
+             builder.Property(t => t.RequestTypeId)
+                .HasColumnName("RequestTypeId")
                 .HasColumnType("int")
-                .IsRequired(false);  
+                .IsRequired(false);   
+            builder.HasOne(amg => amg.MiscRequestType)
+                .WithMany(mg => mg.WorkOrderRequestType)
+                .HasForeignKey(amg => amg.RequestTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
             
             builder.Property(t => t.PriorityId)
                 .HasColumnName("PriorityId")
@@ -71,7 +80,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
             builder.Property(t => t.StatusId)
                 .HasColumnName("StatusId")
                 .HasColumnType("int")
-                .IsRequired();           
+                .IsRequired(false);           
             builder.HasOne(amg => amg.MiscStatus)
                 .WithMany(mg => mg.WorkOrderStatus)
                 .HasForeignKey(amg => amg.StatusId)

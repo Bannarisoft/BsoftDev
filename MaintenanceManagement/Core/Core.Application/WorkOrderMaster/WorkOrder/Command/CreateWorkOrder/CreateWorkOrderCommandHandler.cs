@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.WorkOrderMaster.WorkOrder.Command.CreateWorkOrder
 {
-    public class CreateWorkOrderCommandHandler : IRequestHandler<CreateWorkOrderCommand, ApiResponseDTO<WorkOrderCombineDto>>
+   /*  public class CreateWorkOrderCommandHandler : IRequestHandler<CreateWorkOrderCommand, ApiResponseDTO<WorkOrderCombineDto>>
     {
         private readonly IMapper _mapper;
         private readonly IWorkOrderCommandRepository _workOrderRepository;
@@ -73,5 +73,5 @@ namespace Core.Application.WorkOrderMaster.WorkOrder.Command.CreateWorkOrder
                 Message = "AssetMasterGeneral not created."
             };
         }
-    }
+    } */
 }

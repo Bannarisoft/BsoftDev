@@ -36,14 +36,19 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasForeignKey(amg => amg.WorkOrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Property(t => t.DeptId)
-                .HasColumnName("DeptId")
+            builder.Property(t => t.DepartmentId)
+                .HasColumnName("DepartmentId")
                 .HasColumnType("int")
                 .IsRequired();  
             
-            builder.Property(t => t.ItemId)
-                .HasColumnName("ItemId")
-                .HasColumnType("int)")
+            builder.Property(t => t.ItemCode)
+                .HasColumnName("ItemCode")
+                .HasColumnType("nvarchar(20))")
+                .IsRequired();
+            
+            builder.Property(t => t.ItemName)
+                .HasColumnName("ItemName")
+                .HasColumnType("varchar(100))")
                 .IsRequired();
 
             builder.Property(t => t.AvailableQty)
