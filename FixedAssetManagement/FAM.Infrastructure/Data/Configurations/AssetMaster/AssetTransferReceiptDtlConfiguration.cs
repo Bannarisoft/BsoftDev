@@ -41,8 +41,8 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                    .OnDelete(DeleteBehavior.Restrict); // Prevent accidental deletions
 
             builder.Property(dg => dg.LocationId)                
-                .HasColumnType("int")
-                .IsRequired();
+                .HasColumnType("int");
+             
              // One-to-Many: LocationId with Location
              builder.HasOne(x => x.Location)
                    .WithMany(x=>x.AssetTransferReceiptLocation)
@@ -50,8 +50,8 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(dg => dg.SubLocationId)                
-                .HasColumnType("int")
-                .IsRequired();
+                .HasColumnType("int");
+               
 
             // One-to-Many: SubLocationId with SubLocation
             builder.HasOne(x => x.SubLocation)

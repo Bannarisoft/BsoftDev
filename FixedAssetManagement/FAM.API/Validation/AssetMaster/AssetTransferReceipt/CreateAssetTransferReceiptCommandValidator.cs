@@ -54,21 +54,21 @@ namespace FAM.API.Validation.AssetMaster.AssetTransferReceipt
                     .WithMessage("AssetId must be greater than 0.");
                 });
 
-              RuleForEach(x => x.AssetTransferReceiptHdrDto.AssetTransferReceiptDtl)
-                .ChildRules(asset =>
-                {
-                    asset.RuleFor(a => a.LocationId)
-                    .GreaterThan(0)
-                    .WithMessage("LocationId must be greater than 0.");
-                });
+            //   RuleForEach(x => x.AssetTransferReceiptHdrDto.AssetTransferReceiptDtl)
+            //     .ChildRules(asset =>
+            //     {
+            //         asset.RuleFor(a => a.LocationId)
+            //         .GreaterThan(0)
+            //         .WithMessage("LocationId must be greater than 0.");
+            //     });
 
-                    RuleForEach(x => x.AssetTransferReceiptHdrDto.AssetTransferReceiptDtl)
-                .ChildRules(asset =>
-                {
-                    asset.RuleFor(a => a.SubLocationId)
-                    .GreaterThan(0)
-                    .WithMessage("SubLocationId must be greater than 0.");
-                });
+            //         RuleForEach(x => x.AssetTransferReceiptHdrDto.AssetTransferReceiptDtl)
+            //     .ChildRules(asset =>
+            //     {
+            //         asset.RuleFor(a => a.SubLocationId)
+            //         .GreaterThan(0)
+            //         .WithMessage("SubLocationId must be greater than 0.");
+            //     });
 
 
 
