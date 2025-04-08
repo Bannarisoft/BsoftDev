@@ -113,27 +113,27 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 builder.HasOne(b => b.MachineGroup)
                 .WithMany(b => b.PreventiveSchedulerHdr)
                 .HasForeignKey(b => b.MachineGroupId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
                 builder.HasOne(b => b.MaintenanceCategory)
                 .WithMany(b => b.PreventiveSchedulerHdr)
                 .HasForeignKey(b => b.MaintenanceCategoryId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
                 builder.HasOne(b => b.MiscSchedule)
                 .WithMany(b => b.Schedule)
                 .HasForeignKey(b => b.ScheduleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
                 builder.HasOne(b => b.MiscDueType)
                 .WithMany(b => b.DueType)
                 .HasForeignKey(b => b.DueTypeId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
                 builder.HasOne(b => b.MiscFrequency)
                 .WithMany(b => b.Frequency)
                 .HasForeignKey(b => b.FrequencyId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

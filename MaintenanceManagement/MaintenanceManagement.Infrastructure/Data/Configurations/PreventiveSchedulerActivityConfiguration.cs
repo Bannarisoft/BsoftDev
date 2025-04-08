@@ -35,12 +35,12 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 builder.HasOne(t => t.PreventiveScheduler)
                 .WithMany(t => t.PreventiveSchedulerActivities)
                 .HasForeignKey(t => t.PreventiveSchedulerHdrId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
                 builder.HasOne(t => t.Activity)
                 .WithMany(t => t.PreventiveSchedulerActivities)
                 .HasForeignKey(t => t.ActivityId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

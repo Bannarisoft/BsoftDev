@@ -33,7 +33,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 builder.HasOne(t => t.PreventiveScheduler)
                 .WithMany(t => t.PreventiveSchedulerItems)
                 .HasForeignKey(t => t.PreventiveSchedulerHdrId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -37,12 +37,12 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 builder.HasOne(t => t.PreventiveScheduler)
                 .WithMany(t => t.PreventiveSchedulerDtls)
                 .HasForeignKey(t => t.PreventiveSchedulerId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
                  builder.HasOne(t => t.Machine)
                 .WithMany(t => t.PreventiveSchedulerDtls)
                 .HasForeignKey(t => t.MachineId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
