@@ -91,5 +91,23 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             var machineMasters = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
             return machineMasters.ToList();
         }
+        // public async Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroup(int MachineGroupId)
+        // {
+        //     searchPattern = searchPattern ?? string.Empty; // Prevent null issues
+
+        //     const string query = @"
+        //      SELECT M.Id, M.MachineName 
+        //     FROM Maintenance.MachineMaster M
+        //     LEFT JOIN [Maintenance].[WorkOrder] WO on WO.MachineId=M.Id
+        //     WHERE IsDeleted = 0 
+        //     AND MachineName LIKE @SearchPattern";  
+        //     var parameters = new 
+        //     { 
+        //     SearchPattern = $"%{searchPattern}%" 
+        //     };
+
+        //     var machineMasters = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
+        //     return machineMasters.ToList();
+        // }
     }
 }

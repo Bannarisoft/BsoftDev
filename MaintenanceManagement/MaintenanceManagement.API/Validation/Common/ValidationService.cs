@@ -114,17 +114,17 @@ namespace MaintenanceManagement.API.Validation.Common
         services.AddScoped<IValidator<UpdateMachineGroupUserCommand>, UpdateMachineGroupUserCommandValidator>();
         services.AddScoped<IValidator<DeleteMachineGroupUserCommand>, DeleteMachineGroupUserCommandValidator>();
 
-        services.AddScoped<IValidator<CreateWorkOrderCommand>, CreateWorkOrderCommandValidator>();
-        services.AddScoped<IValidator<UpdateWorkOrderCommand>, UpdateWorkOrderCommandValidator>();
-        services.AddScoped<IValidator<DeleteWorkOrderCommand>, DeleteWorkOrderCommandValidator>();
+        // services.AddScoped<IValidator<CreateWorkOrderCommand>, CreateWorkOrderCommandValidator>();
+        // services.AddScoped<IValidator<UpdateWorkOrderCommand>, UpdateWorkOrderCommandValidator>();
+        // services.AddScoped<IValidator<DeleteWorkOrderCommand>, DeleteWorkOrderCommandValidator>();
         
-        services.AddScoped<IValidator<CreateWorkOrderScheduleCommand>, CreateWorkOrderScheduleCommandValidator>();
-        services.AddScoped<IValidator<UpdateWorkOrderScheduleCommand>, UpdateWorkOrderScheduleCommandValidator>();
-        services.AddScoped<IValidator<DeleteWorkOrderScheduleCommand>, DeleteWorkOrderScheduleCommandValidator>();
+        // services.AddScoped<IValidator<CreateWorkOrderScheduleCommand>, CreateWorkOrderScheduleCommandValidator>();
+        // services.AddScoped<IValidator<UpdateWorkOrderScheduleCommand>, UpdateWorkOrderScheduleCommandValidator>();
+        // services.AddScoped<IValidator<DeleteWorkOrderScheduleCommand>, DeleteWorkOrderScheduleCommandValidator>();
         
-        services.AddScoped<IValidator<CreateWorkOrderActivityCommand>, CreateWorkOrderActivityCommandValidator>();
-        services.AddScoped<IValidator<UpdateWorkOrderActivityCommand>, UpdateWorkOrderActivityCommandValidator>();
-        services.AddScoped<IValidator<DeleteWorkOrderActivityCommand>, DeleteWorkOrderActivityCommandValidator>();
+        // services.AddScoped<IValidator<CreateWorkOrderActivityCommand>, CreateWorkOrderActivityCommandValidator>();
+        // services.AddScoped<IValidator<UpdateWorkOrderActivityCommand>, UpdateWorkOrderActivityCommandValidator>();
+        // services.AddScoped<IValidator<DeleteWorkOrderActivityCommand>, DeleteWorkOrderActivityCommandValidator>();
 
         services.AddScoped<IValidator<CreateActivityCheckListMasterCommand>, CreateActivityCheckListMasterCommandValidator>();
         services.AddScoped<IValidator<UpdateActivityCheckListMasterCommand>, UpdateActivityCheckListMasterCommandValidator>();
