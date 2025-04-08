@@ -172,13 +172,13 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMachineMasterQueryRepository, MachineMasterQueryRepository>();
 
             services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
-            services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
+    /*         services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
 
             services.AddScoped<IWorkOrderActivityCommandRepository, WorkOrderActivityCommandRepository>();
             services.AddScoped<IWorkOrderActivityQueryRepository, WorkOrderActivityQueryRepository>();
 
             services.AddScoped<IWorkOrderScheduleCommandRepository, WorkOrderScheduleCommandRepository>();
-            services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>();
+            services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>(); */
             services.AddScoped<IActivityCheckListMasterQueryRepository, ActivityCheckListMasterQueryRepository>();
             services.AddScoped<IActivityCheckListMasterCommandRepository, ActivityCheckListMasterCommandRepository>();
             
@@ -208,8 +208,7 @@ namespace MaintenanceManagement.Infrastructure
                 typeof(MachineGroupUserProfile),
                 typeof(WorkOrderProfile),
                 typeof(WorkOrderScheduleProfile),
-                typeof(WorkOrderActivityProfile)
-                typeof(MachineGroupUserProfile),
+                typeof(WorkOrderActivityProfile),                
                 typeof(ActivityCheckListMasterProfile)
 
 				

@@ -41,6 +41,10 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasColumnName("TechnicianId")
                 .HasColumnType("int")
                 .IsRequired();  
+            builder.Property(t => t.TechnicianName)
+                .HasColumnName("TechnicianName")
+                .HasColumnType("varchar(50)")
+                .IsRequired();  
             
             builder.Property(t => t.HoursSpent)
                 .HasColumnName("HoursSpent")

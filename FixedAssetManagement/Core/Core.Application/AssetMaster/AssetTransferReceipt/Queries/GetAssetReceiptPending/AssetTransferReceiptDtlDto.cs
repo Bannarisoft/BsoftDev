@@ -8,8 +8,8 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
     public class AssetTransferReceiptDtlDto
     {      
         public int AssetId { get; set; } 
-        public int LocationId { get; set; }
-        public int SubLocationId { get; set; } 
+        public int? LocationId { get; set; }
+        public int? SubLocationId { get; set; } 
         public string? UserID { get; set; }
         public string? UserName { get; set; }
         public byte? AckStatus { get; set; } = 0;   // Default to 0

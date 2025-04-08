@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250407104937_schedule")]
+    partial class schedule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -519,87 +522,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MaintenanceCategory", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MaintenanceRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int")
-                        .HasColumnName("DepartmentId");
-
-                    b.Property<int>("IsActive")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IsDeleted")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MachineId")
-                        .HasColumnType("int")
-                        .HasColumnName("MachineId");
-
-                    b.Property<int>("MaintenanceTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("MaintenanceTypeId");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OldVendorId")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("OldVendorId");
-
-                    b.Property<string>("Remarks")
-                        .HasColumnType("nvarchar")
-                        .HasColumnName("Remarks");
-
-                    b.Property<int>("RequestTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("RequestTypeId");
-
-                    b.Property<int>("SourceId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("VendorId")
-                        .HasColumnType("int")
-                        .HasColumnName("VendorId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MachineId");
-
-                    b.HasIndex("MaintenanceTypeId");
-
-                    b.HasIndex("RequestTypeId");
-
-                    b.ToTable("MaintenanceRequest", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MaintenanceType", b =>
@@ -1639,33 +1561,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("WorkCenter");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.MaintenanceRequest", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.MachineMaster", "Machine")
-                        .WithMany("MaintenanceRequest")
-                        .HasForeignKey("MachineId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscMaintenanceType")
-                        .WithMany("MaintenanceType")
-                        .HasForeignKey("MaintenanceTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscRequestType")
-                        .WithMany("RequestType")
-                        .HasForeignKey("RequestTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Machine");
-
-                    b.Navigation("MiscMaintenanceType");
-
-                    b.Navigation("MiscRequestType");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
@@ -1929,18 +1824,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("WorkOrderRootCause");
 
                     b.Navigation("WorkOrderStatus");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MachineMaster", b =>
-                {
-                    b.Navigation("MaintenanceRequest");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
-                {
-                    b.Navigation("MaintenanceType");
-
-                    b.Navigation("RequestType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>

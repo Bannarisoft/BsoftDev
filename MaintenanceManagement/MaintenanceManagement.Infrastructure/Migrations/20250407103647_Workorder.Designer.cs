@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250407103647_Workorder")]
+    partial class Workorder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -521,87 +524,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("MaintenanceCategory", "Maintenance");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.MaintenanceRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int")
-                        .HasColumnName("DepartmentId");
-
-                    b.Property<int>("IsActive")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IsDeleted")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MachineId")
-                        .HasColumnType("int")
-                        .HasColumnName("MachineId");
-
-                    b.Property<int>("MaintenanceTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("MaintenanceTypeId");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OldVendorId")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("OldVendorId");
-
-                    b.Property<string>("Remarks")
-                        .HasColumnType("nvarchar")
-                        .HasColumnName("Remarks");
-
-                    b.Property<int>("RequestTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("RequestTypeId");
-
-                    b.Property<int>("SourceId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("VendorId")
-                        .HasColumnType("int")
-                        .HasColumnName("VendorId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MachineId");
-
-                    b.HasIndex("MaintenanceTypeId");
-
-                    b.HasIndex("RequestTypeId");
-
-                    b.ToTable("MaintenanceRequest", "Maintenance");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.MaintenanceType", b =>
                 {
                     b.Property<int>("Id")
@@ -778,213 +700,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MiscTypeMaster", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerActivity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ActivityId")
-                        .HasColumnType("int")
-                        .HasColumnName("ActivityId");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Description");
-
-                    b.Property<decimal>("EstimatedTimeHrs")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("EstimatedTimeHrs");
-
-                    b.Property<int>("PreventiveSchedulerHdrId")
-                        .HasColumnType("int")
-                        .HasColumnName("PreventiveSchedulerHdrId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActivityId");
-
-                    b.HasIndex("PreventiveSchedulerHdrId");
-
-                    b.ToTable("PreventiveSchedulerActivity", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerDtl", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("MachineId")
-                        .HasColumnType("int")
-                        .HasColumnName("MachineId");
-
-                    b.Property<DateOnly>("NextDueDate")
-                        .HasColumnType("date")
-                        .HasColumnName("NextDueDate");
-
-                    b.Property<int>("PreventiveSchedulerId")
-                        .HasColumnType("int")
-                        .HasColumnName("PreventiveSchedulerId");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date")
-                        .HasColumnName("StartDate");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MachineId");
-
-                    b.HasIndex("PreventiveSchedulerId");
-
-                    b.ToTable("PreventiveSchedulerDtl", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerHdr", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int")
-                        .HasColumnName("DepartmentId");
-
-                    b.Property<decimal>("DownTimeEstimateHrs")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("DuePeriod")
-                        .HasColumnType("int")
-                        .HasColumnName("DuePeriod");
-
-                    b.Property<int>("DueTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("DueTypeId");
-
-                    b.Property<DateOnly>("EffectiveDate")
-                        .HasColumnType("date")
-                        .HasColumnName("EffectiveDate");
-
-                    b.Property<int>("FrequencyId")
-                        .HasColumnType("int")
-                        .HasColumnName("FrequencyId");
-
-                    b.Property<int>("GraceDays")
-                        .HasColumnType("int")
-                        .HasColumnName("GraceDays");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<bool>("IsDownTimeRequired")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDownTimeRequired");
-
-                    b.Property<int>("MachineGroupId")
-                        .HasColumnType("int")
-                        .HasColumnName("MachineGroupId");
-
-                    b.Property<int>("MaintenanceCategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("MaintenanceCategoryId");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("ReminderMaterialReqDays")
-                        .HasColumnType("int")
-                        .HasColumnName("ReminderMaterialReqDays");
-
-                    b.Property<int>("ReminderWorkOrderDays")
-                        .HasColumnType("int")
-                        .HasColumnName("ReminderWorkOrderDays");
-
-                    b.Property<int>("ScheduleId")
-                        .HasColumnType("int")
-                        .HasColumnName("ScheduleId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DueTypeId");
-
-                    b.HasIndex("FrequencyId");
-
-                    b.HasIndex("MachineGroupId");
-
-                    b.HasIndex("MaintenanceCategoryId");
-
-                    b.HasIndex("ScheduleId");
-
-                    b.ToTable("PreventiveSchedulerHdr", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerItems", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int")
-                        .HasColumnName("ItemId");
-
-                    b.Property<string>("OldItemId")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("OldItemId");
-
-                    b.Property<int>("PreventiveSchedulerHdrId")
-                        .HasColumnType("int")
-                        .HasColumnName("PreventiveSchedulerId");
-
-                    b.Property<int>("RequiredQty")
-                        .HasColumnType("int")
-                        .HasColumnName("RequiredQty");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PreventiveSchedulerHdrId");
-
-                    b.ToTable("PreventiveSchedulerItems", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.ShiftMaster", b =>
@@ -1639,33 +1354,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("WorkCenter");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.MaintenanceRequest", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.MachineMaster", "Machine")
-                        .WithMany("MaintenanceRequest")
-                        .HasForeignKey("MachineId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscMaintenanceType")
-                        .WithMany("MaintenanceType")
-                        .HasForeignKey("MaintenanceTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscRequestType")
-                        .WithMany("RequestType")
-                        .HasForeignKey("RequestTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Machine");
-
-                    b.Navigation("MiscMaintenanceType");
-
-                    b.Navigation("MiscRequestType");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MiscTypeMaster", "MiscTypeMaster")
@@ -1675,98 +1363,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("MiscTypeMaster");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerActivity", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.ActivityMaster", "Activity")
-                        .WithMany("PreventiveSchedulerActivities")
-                        .HasForeignKey("ActivityId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.PreventiveSchedulerHdr", "PreventiveScheduler")
-                        .WithMany("PreventiveSchedulerActivities")
-                        .HasForeignKey("PreventiveSchedulerHdrId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Activity");
-
-                    b.Navigation("PreventiveScheduler");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerDtl", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.MachineMaster", "Machine")
-                        .WithMany("PreventiveSchedulerDtls")
-                        .HasForeignKey("MachineId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.PreventiveSchedulerHdr", "PreventiveScheduler")
-                        .WithMany("PreventiveSchedulerDtls")
-                        .HasForeignKey("PreventiveSchedulerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Machine");
-
-                    b.Navigation("PreventiveScheduler");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerHdr", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscDueType")
-                        .WithMany("DueType")
-                        .HasForeignKey("DueTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscFrequency")
-                        .WithMany("Frequency")
-                        .HasForeignKey("FrequencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MachineGroup", "MachineGroup")
-                        .WithMany("PreventiveSchedulerHdr")
-                        .HasForeignKey("MachineGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MaintenanceCategory", "MaintenanceCategory")
-                        .WithMany("PreventiveSchedulerHdr")
-                        .HasForeignKey("MaintenanceCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscSchedule")
-                        .WithMany("Schedule")
-                        .HasForeignKey("ScheduleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("MachineGroup");
-
-                    b.Navigation("MaintenanceCategory");
-
-                    b.Navigation("MiscDueType");
-
-                    b.Navigation("MiscFrequency");
-
-                    b.Navigation("MiscSchedule");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerItems", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.PreventiveSchedulerHdr", "PreventiveScheduler")
-                        .WithMany("PreventiveSchedulerItems")
-                        .HasForeignKey("PreventiveSchedulerHdrId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("PreventiveScheduler");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.ShiftMasterDetail", b =>
@@ -1881,8 +1477,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Navigation("ActivityMachineGroups");
 
-                    b.Navigation("PreventiveSchedulerActivities");
-
                     b.Navigation("workOrderActivities");
                 });
 
@@ -1898,30 +1492,15 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("MachineGroupUser");
 
                     b.Navigation("MachineMasters");
-
-                    b.Navigation("PreventiveSchedulerHdr");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MachineMaster", b =>
-                {
-                    b.Navigation("PreventiveSchedulerDtls");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MaintenanceCategory", b =>
                 {
-                    b.Navigation("PreventiveSchedulerHdr");
-
                     b.Navigation("WorkOrderType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
-                    b.Navigation("DueType");
-
-                    b.Navigation("Frequency");
-
-                    b.Navigation("Schedule");
-
                     b.Navigation("WorkOrderPriority");
 
                     b.Navigation("WorkOrderRequestType");
@@ -1931,30 +1510,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("WorkOrderStatus");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.MachineMaster", b =>
-                {
-                    b.Navigation("MaintenanceRequest");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
-                {
-                    b.Navigation("MaintenanceType");
-
-                    b.Navigation("RequestType");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
                 {
                     b.Navigation("MiscMaster");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerHdr", b =>
-                {
-                    b.Navigation("PreventiveSchedulerActivities");
-
-                    b.Navigation("PreventiveSchedulerDtls");
-
-                    b.Navigation("PreventiveSchedulerItems");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.ShiftMaster", b =>

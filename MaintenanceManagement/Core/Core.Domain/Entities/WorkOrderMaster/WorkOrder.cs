@@ -8,13 +8,15 @@ namespace Core.Domain.Entities.WorkOrderMaster
         public int UnitId { get; set; } 
         public int? WorkOrderTypeId { get; set; }
         public MaintenanceCategory CategoryType { get; set; } = null!; 
-        public int RequestId { get; set; }
+        public string? RequestId { get; set; }
+        public int RequestTypeId { get; set; }          
+        public MiscMaster MiscRequestType { get; set; } = null!; 
         public int PriorityId { get; set; }        
         public MiscMaster MiscPriority { get; set; } = null!; 
         public string? Remarks { get; set; }
         public string? Image { get; set; }
         public int StatusId { get; set; }   
-        public MiscMaster MiscStatus { get; set; } = null!;        
+        public MiscMaster MiscStatus { get; set; } = null!;                
         public string? VendorId { get; set; }      
         public int RootCauseId { get; set; }          
         public MiscMaster MiscRootCause { get; set; } = null!; 

@@ -42,21 +42,30 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
             builder.HasOne(amg => amg.CategoryType)
                 .WithMany(am => am.WorkOrderType)
                 .HasForeignKey(amg => amg.WorkOrderTypeId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(t => t.RequestId)
                 .HasColumnName("RequestId")
+                .HasColumnType("varchar(25)")
+                .IsRequired();  
+            
+             builder.Property(t => t.RequestTypeId)
+                .HasColumnName("RequestTypeId")
                 .HasColumnType("int")
-                .IsRequired(false);  
+                .IsRequired();   
+            builder.HasOne(amg => amg.MiscRequestType)
+                .WithMany(mg => mg.WorkOrderRequestType)
+                .HasForeignKey(amg => amg.RequestTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
             
             builder.Property(t => t.PriorityId)
                 .HasColumnName("PriorityId")
                 .HasColumnType("int")
-                .IsRequired(false);   
+                .IsRequired();   
             builder.HasOne(amg => amg.MiscPriority)
                 .WithMany(mg => mg.WorkOrderPriority)
                 .HasForeignKey(amg => amg.PriorityId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
                
             builder.Property(t => t.Remarks)
                 .HasColumnName("Remarks")
@@ -75,7 +84,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
             builder.HasOne(amg => amg.MiscStatus)
                 .WithMany(mg => mg.WorkOrderStatus)
                 .HasForeignKey(amg => amg.StatusId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(t => t.VendorId)
                 .HasColumnName("VendorId")
@@ -85,11 +94,11 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
               builder.Property(t => t.RootCauseId)
                 .HasColumnName("RootCauseId")
                 .HasColumnType("int")
-                .IsRequired(false);     
+                .IsRequired();     
              builder.HasOne(amg => amg.MiscRootCause)
                 .WithMany(am => am.WorkOrderRootCause)
                 .HasForeignKey(amg => amg.RootCauseId)
-                .OnDelete(DeleteBehavior.Cascade);    
+                .OnDelete(DeleteBehavior.Restrict);    
 
 
              builder.Property(b => b.IsActive)
