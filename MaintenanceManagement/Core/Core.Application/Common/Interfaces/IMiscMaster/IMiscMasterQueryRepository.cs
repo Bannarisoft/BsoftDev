@@ -10,7 +10,7 @@ namespace Core.Application.Common.Interfaces.IMiscMaster
     {
          Task<(List<Core.Domain.Entities.MiscMaster>,int)> GetAllMiscMasterAsync(int PageNumber, int PageSize, string? SearchTerm);
          Task<Core.Domain.Entities.MiscMaster> GetByIdAsync(int id);
-         Task<List<Core.Domain.Entities.MiscMaster>> GetMiscMaster(string searchPattern);
+         Task<List<Core.Domain.Entities.MiscMaster>> GetMiscMaster(string searchPattern,string miscTypeCode);
          Task<Core.Domain.Entities.MiscMaster?> GetByMiscMasterCodeAsync(string name,int? id = null);
 
         Task<bool> AlreadyExistsAsync(string code,int? id = null);

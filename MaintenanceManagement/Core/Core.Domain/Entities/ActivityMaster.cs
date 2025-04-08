@@ -20,6 +20,7 @@ namespace Core.Domain.Entities
       public ICollection<WorkOrderActivity>? workOrderActivities { get; set; } 
 
        public ICollection<ActivityCheckListMaster>? ActivityCheckLists { get; set; } // ✅ One-to-Many Relation
+       public ICollection<PreventiveSchedulerActivity>? PreventiveSchedulerActivities { get; set; }
 
 
     }
