@@ -15,10 +15,15 @@ namespace Core.Domain.Entities
         public Status IsActive { get; set; }
             
         public MiscTypeMaster? MiscTypeMaster { get; set; } 
+        public ICollection<MaintenanceRequest>? RequestType { get; set; }
+        public ICollection<MaintenanceRequest>? MaintenanceType { get; set; }
         public ICollection<WorkOrder>? WorkOrderPriority  {get; set;} 
         public ICollection<WorkOrder>? WorkOrderStatus  {get; set;}  
         public ICollection<WorkOrder>? WorkOrderRootCause  {get; set;}  
         public ICollection<WorkOrder>? WorkOrderRequestType  {get; set;}  
+        public ICollection<PreventiveSchedulerHdr>? Schedule { get; set; }
+        public ICollection<PreventiveSchedulerHdr>? DueType { get; set; }
+        public ICollection<PreventiveSchedulerHdr>? Frequency { get; set; }
 		
   		    
     }

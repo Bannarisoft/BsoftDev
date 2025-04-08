@@ -12,9 +12,9 @@ namespace Core.Domain.Entities.AssetMaster
         public AssetTransferReceiptHdr AssetTransferReceiptHdr { get; set; } = null!; 
         public int AssetId { get; set; } 
         public AssetMasterGenerals AssetMasterTransferReceipt  { get; set; } = null!; 
-        public int LocationId { get; set; }
+        public int? LocationId { get; set; }
         public Location? Location { get; set; }
-        public int SubLocationId { get; set; } 
+        public int? SubLocationId { get; set; } 
         public SubLocation? SubLocation { get; set; }
         public string? UserID { get; set; }
         public string? UserName { get; set; }   

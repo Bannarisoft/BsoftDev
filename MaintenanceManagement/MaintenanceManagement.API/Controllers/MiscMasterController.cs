@@ -75,10 +75,10 @@ namespace MaintenanceManagement.API.Controllers
            
         }
             [HttpGet("by-name")]
-        public async Task<IActionResult> GetMiscMaster([FromQuery] string? name)
+        public async Task<IActionResult> GetMiscMaster([FromQuery] string? name,[FromQuery] string MiscTypeCode)
         {
           
-            var miscmaster = await Mediator.Send(new GetMiscMasterAutoCompleteQuery {SearchPattern = name});
+            var miscmaster = await Mediator.Send(new GetMiscMasterAutoCompleteQuery {SearchPattern = name,MiscTypeCode=MiscTypeCode});
             if(miscmaster.IsSuccess)
             {
             return Ok( new { StatusCode=StatusCodes.Status200OK, data = miscmaster.Data });
