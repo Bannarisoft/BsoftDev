@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250407104512_Workorder_Vendor")]
+    partial class Workorder_Vendor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -934,10 +937,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
-                    b.Property<string>("MachineCode")
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("MachineCode");
-
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
@@ -949,10 +948,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<string>("OldVendorId")
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("OldVendorId");
 
                     b.Property<int>("PriorityId")
                         .HasColumnType("int")
@@ -983,8 +978,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("UnitId");
 
-                    b.Property<int?>("VendorId")
-                        .HasColumnType("int")
+                    b.Property<string>("VendorId")
+                        .HasColumnType("nvarchar(20)")
                         .HasColumnName("VendorId");
 
                     b.Property<string>("VendorName")
