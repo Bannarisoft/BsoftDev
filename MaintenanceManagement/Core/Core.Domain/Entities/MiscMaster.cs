@@ -13,6 +13,8 @@ namespace Core.Domain.Entities
         public Status IsActive { get; set; }
             
         public MiscTypeMaster? MiscTypeMaster { get; set; } 
+        public ICollection<MaintenanceRequest>? RequestType { get; set; }
+        public ICollection<MaintenanceRequest>? MaintenanceType { get; set; }
 		
   		    
     }

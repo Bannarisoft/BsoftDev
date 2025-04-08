@@ -23,13 +23,9 @@ namespace Core.Domain.Entities
         public int WorkCenterId { get; set; } 
         public WorkCenter WorkCenter  { get; set; } = null!;
         public DateTimeOffset? InstallationDate { get; set; }
-        public int AssetId { get; set; }
+        public int AssetId { get; set; }   
 
-
-
-
-        
-      
+        public ICollection<MaintenanceRequest> MaintenanceRequest { get; set; } = null!;              
 
 
         
