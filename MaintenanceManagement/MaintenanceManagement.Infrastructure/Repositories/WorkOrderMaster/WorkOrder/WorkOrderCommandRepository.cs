@@ -54,7 +54,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
             var asset = await _applicationDbContext.WorkOrder.FindAsync(workOrderId);
             if (asset == null)
             {
-                return false;  // Asset not found
+                return false; 
             }            
             asset.Image = imageName.Replace(@"\", "/"); 
 
@@ -86,6 +86,26 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
             asset.Image = null;
             await _applicationDbContext.SaveChangesAsync();
             return true;
-        }      
+        }
+
+        public async Task<string?> GetLatestRequestId(int CategoryId, CancellationToken cancellationToken)
+        {
+            var category = await _applicationDbContext.MaintenanceCategory
+            .FirstOrDefaultAsync(x => x.Id == CategoryId, cancellationToken);
+
+            if (category == null)
+                throw new Exception("Invalid WorkOrderTypeId");
+
+            string prefix = category.Description ?? "DIR";
+
+             var maxId = await _applicationDbContext.WorkOrder
+            .Where(x => x.WorkOrderTypeId == CategoryId)
+            .MaxAsync(x => (int?)CategoryId, cancellationToken);
+
+            int nextId = (maxId ?? 0) + 1;
+
+            return $"{prefix}-{nextId}";
+            
+        }
     }
 }

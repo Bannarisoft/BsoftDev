@@ -226,7 +226,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             return assetMaster;
         }
 
-        public async Task<(dynamic AssetResult, dynamic LocationResult, IEnumerable<dynamic> PurchaseDetails, IEnumerable<dynamic> Spec, IEnumerable<dynamic> Warranty, IEnumerable<dynamic> Amc, dynamic Disposal, IEnumerable<dynamic> Insurance)> GetAssetMasterByIdAsync(int assetId)
+        public async Task<(dynamic AssetResult, dynamic LocationResult, IEnumerable<dynamic> PurchaseDetails, IEnumerable<dynamic> Spec, IEnumerable<dynamic> Warranty, IEnumerable<dynamic> Amc, dynamic Disposal, IEnumerable<dynamic> Insurance, IEnumerable<dynamic> AdditionalCost)> GetAssetMasterByIdAsync(int assetId)
         {
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
@@ -301,6 +301,11 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 VendorCode,RenewalStatus,CAST(RenewedDate AS DATE) AS RenewedDate,IsActive
                 FROM [FixedAsset].[AssetInsurance]
                 WHERE AssetId=@AssetId
+
+                SELECT AC.Id,AssetSourceId,Amount,JournalNo,CostType,MM.Code CostTypeDesc
+                FROM [FixedAsset].[AssetAdditionalCost]AC
+                inner join FixedAsset.MiscMaster MM on MM.id=CostType 
+                WHERE AssetId=@AssetId
                 ";
 
             using var multi = await _dbConnection.QueryMultipleAsync(sqlQuery, new { AssetId = assetId });
@@ -313,6 +318,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             var AMCDetails = await multi.ReadAsync<dynamic>();
             var DisposalResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
             var InsuranceDetails = await multi.ReadAsync<dynamic>();
+            var AdditionalCost = await multi.ReadAsync<dynamic>();
 
        
             if (locationResult != null && !string.IsNullOrEmpty(locationResult.OldUnitId))
@@ -356,7 +362,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 }
             }
 
-            return (assetResult, locationResult, purchaseDetails, SpecDetails, WarrantyDetails, AMCDetails, DisposalResult, InsuranceDetails);
+            return (assetResult, locationResult, purchaseDetails, SpecDetails, WarrantyDetails, AMCDetails, DisposalResult, InsuranceDetails,AdditionalCost);
        
         }
     }

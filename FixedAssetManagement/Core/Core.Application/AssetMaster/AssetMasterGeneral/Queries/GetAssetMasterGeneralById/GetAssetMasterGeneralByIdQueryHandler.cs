@@ -22,7 +22,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public async Task<ApiResponseDTO<AssetMasterDTO>> Handle(GetAssetMasterGeneralByIdQuery request, CancellationToken cancellationToken)
         {
           //  var assetMaster = await _assetMasterRepository.GetByIdAsync(request.Id);
-          var (assetResult, locationResult, purchaseDetails, spec, warranty, amc, disposal, insurance) = await _assetMasterRepository.GetAssetMasterByIdAsync(request.Id);
+          var (assetResult, locationResult, purchaseDetails, spec, warranty, amc, disposal, insurance,additionalCost) = await _assetMasterRepository.GetAssetMasterByIdAsync(request.Id);
           var asset = _mapper.Map<AssetMasterDTO>(assetResult);
 
             if (assetResult?.AssetName != null)
@@ -57,7 +57,11 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
              if (insurance != null)
              {
                  asset.AssetInsurance = _mapper.Map<List<AssetInsuranceByIdDTO>>(insurance);
-             }      
+             } 
+            if (additionalCost != null)
+             {
+                 asset.AssetAdditionalCost = _mapper.Map<List<AssetAdditionalCostDto>>(additionalCost);
+             }        
 
             if (asset is null)
             {                
