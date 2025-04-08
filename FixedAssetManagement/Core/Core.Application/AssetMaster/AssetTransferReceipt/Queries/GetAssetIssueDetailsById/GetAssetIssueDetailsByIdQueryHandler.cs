@@ -18,25 +18,30 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetIssu
             _assetTransferQueryRepository = assetTransferQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<AssetTransferJsonDto>> Handle(GetAssetIssueDetailsByIdQuery request, CancellationToken cancellationToken)
+        public Task<ApiResponseDTO<AssetTransferJsonDto>> Handle(GetAssetIssueDetailsByIdQuery request, CancellationToken cancellationToken)
         {
-            var assetTransfer = await _assetTransferQueryRepository.GetAssetTransferByIdAsync(request.AssetTransferId);
-
-            if (assetTransfer == null)
-            {
-                return new ApiResponseDTO<AssetTransferJsonDto>
-                {
-                    IsSuccess = false,
-                    Message = $"Asset Transfer Issue with ID {request.AssetTransferId} not found."
-                
-                };
-            }
-                return new ApiResponseDTO<AssetTransferJsonDto>
-                {
-                    IsSuccess = true,
-                    Message = "Asset Transfer retrieved successfully.",
-                    Data = assetTransfer
-                };    
+            throw new NotImplementedException();
         }
+
+        // public async Task<ApiResponseDTO<AssetTransferJsonDto>> Handle(GetAssetIssueDetailsByIdQuery request, CancellationToken cancellationToken)
+        // {
+        //     var assetTransfer = await _assetTransferQueryRepository.GetAssetTransferByIdAsync(request.AssetTransferId);
+
+        //     if (assetTransfer == null)
+        //     {
+        //         return new ApiResponseDTO<AssetTransferJsonDto>
+        //         {
+        //             IsSuccess = false,
+        //             Message = $"Asset Transfer Issue with ID {request.AssetTransferId} not found."
+
+        //         };
+        //     }
+        //         return new ApiResponseDTO<AssetTransferJsonDto>
+        //         {
+        //             IsSuccess = true,
+        //             Message = "Asset Transfer retrieved successfully.",
+        //             Data = assetTransfer
+        //         };    
+        // }
     }
 }

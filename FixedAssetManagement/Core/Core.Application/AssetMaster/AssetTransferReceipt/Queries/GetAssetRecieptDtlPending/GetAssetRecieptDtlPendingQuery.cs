@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRecieptDtlPending
 {
-    public class GetAssetRecieptDtlPendingQuery : IRequest<ApiResponseDTO<List<AssetTransferReceiptDtlPendingDto>>>
+    public class GetAssetRecieptDtlPendingQuery   : IRequest<ApiResponseDTO<AssetTrasnferReceiptHdrPendingDto>>
     {
          public int AssetTransferId { get; set; }
     }
