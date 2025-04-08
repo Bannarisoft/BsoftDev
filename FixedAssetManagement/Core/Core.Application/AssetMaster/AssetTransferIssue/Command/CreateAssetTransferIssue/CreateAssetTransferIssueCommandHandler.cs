@@ -86,7 +86,8 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Command.CreateAssetTra
                  return new ApiResponseDTO<int>
                   {
                       IsSuccess = false,
-                      Message = "Asset Transfer not created"
+                      Message = "Asset Transfer not created",
+                      Data = result
                   };
            
         }
