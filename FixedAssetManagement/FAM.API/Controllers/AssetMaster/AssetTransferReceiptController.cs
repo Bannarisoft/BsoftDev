@@ -9,6 +9,7 @@ using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetIssueDet
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetails;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetailsById;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptPending;
+using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRecieptDtlPending;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Entities.AssetMaster;
 using FluentValidation;
@@ -58,6 +59,18 @@ namespace FAM.API.Controllers.AssetMaster
                 PageSize = assetamc.PageSize
             });
         }
+
+          [HttpGet("GetAssetTransferReceiptDtlPending/{id}")]       
+              public async Task<IActionResult> GetAssetTransferReceiptDtlPendingAsync(int id)
+              {
+                  var query = new GetAssetRecieptDtlPendingQuery { AssetTransferId = id };  
+                  var result = await Mediator.Send(query);
+                 if (result == null) 
+                  {
+                      return NotFound($"Asset Transfer with ID {id} not found.");
+                  }
+                 return Ok(result);
+              }
 
         [HttpGet]
         public async Task<IActionResult> GetAssetTransferReceiptDetails([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? AssetReceiptId = null,[FromQuery] DateTimeOffset? FromDate = null,
@@ -136,17 +149,7 @@ namespace FAM.API.Controllers.AssetMaster
            
         }
 
-        //   [HttpGet("AssetTransfer/{id}")]       
-        //       public async Task<IActionResult> GetAssetTransferByIdAsync(int id)
-        //       {
-        //           var query = new GetAssetIssueDetailsByIdQuery { AssetTransferId = id };  
-        //           var result = await Mediator.Send(query);
-        //          if (result == null) 
-        //           {
-        //               return NotFound($"Asset Transfer with ID {id} not found.");
-        //           }
-        //          return Ok(result);
-        //       }
+        
 
       
     }

@@ -137,12 +137,9 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 {{(ToDate.HasValue ? "AND CAST(A.DocDate AS DATE) <= CAST(@ToDate AS DATE)" : "")}};
 
                 SELECT 
-                    A.Id AS AssetTransferId,
+                    Distinct(A.Id) AS AssetTransferId,
                     A.DocDate,
                     C.Description AS TransferType,
-                    M.AssetCode,
-                    M.AssetName,
-                    B.AssetId,
                     D.UnitName AS FromUnitName,
                     E.UnitName AS ToUnitName,
                     A.FromDepartmentId,
@@ -247,6 +244,33 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 var assetTransfer = await _dbConnection.QueryFirstOrDefaultAsync<AssetTransferDto>(query, parameters);
 
             return assetTransfer;
+        }
+
+        public async Task<List<AssetTransferReceiptDtlPendingDto>> GetAllPendingAssetTransferDtlAsync(int assetTransferId)
+        {
+             const string query = @"
+                SELECT 
+                A.Id AS AssetTransferId,
+                B.AssetId,
+                M.AssetCode,
+                M.AssetName
+                FROM FixedAsset.AssetTransferIssueHdr A
+                INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
+                INNER JOIN FixedAsset.AssetMaster M ON B.AssetId = M.Id
+                INNER JOIN FixedAsset.MiscMaster C ON A.TransferType = C.Id
+                INNER JOIN [Bannari].AppData.Unit D ON A.FromUnitId = D.Id
+                INNER JOIN [Bannari].AppData.Unit E ON A.ToUnitId = E.Id
+                INNER JOIN [Bannari].AppData.Department F ON A.FromDepartmentId = F.Id
+                INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
+                LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
+                LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
+                WHERE A.Status = 'Approved' 
+                AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL)
+				AND A.Id=@assetTransferId";
+
+            var assetreceiptpendingdtl = await _dbConnection.QueryAsync<AssetTransferReceiptDtlPendingDto>(query, new { assetTransferId });
+
+            return assetreceiptpendingdtl.ToList();
         }
     }
 }
