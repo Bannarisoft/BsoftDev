@@ -7,7 +7,6 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
 {
     public class AssetTransferReceiptDtlPendingDto
     {
-        public int AssetTransferId {get;set;}
         public string? AssetCode { get; set; }
         public string? AssetName { get; set; }
         public int AssetId { get; set; }  

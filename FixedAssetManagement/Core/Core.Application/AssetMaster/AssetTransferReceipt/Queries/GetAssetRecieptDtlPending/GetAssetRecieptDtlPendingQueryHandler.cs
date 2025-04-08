@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRecieptDtlPending
 {
-    public class GetAssetRecieptDtlPendingQueryHandler : IRequestHandler<GetAssetRecieptDtlPendingQuery, ApiResponseDTO<List<AssetTransferReceiptDtlPendingDto>>> 
+    public class GetAssetRecieptDtlPendingQueryHandler : IRequestHandler<GetAssetRecieptDtlPendingQuery, ApiResponseDTO<AssetTrasnferReceiptHdrPendingDto>>
     {
         
         private readonly IAssetTransferReceiptQueryRepository _assetTransferReceiptQueryRepository;
@@ -25,40 +25,25 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReci
             _mediator = mediator;   
         }
 
-        public async Task<ApiResponseDTO<List<AssetTransferReceiptDtlPendingDto>>> Handle(GetAssetRecieptDtlPendingQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<AssetTrasnferReceiptHdrPendingDto>> Handle(GetAssetRecieptDtlPendingQuery request, CancellationToken cancellationToken)
         {
-        var result = await _assetTransferReceiptQueryRepository.GetAllPendingAssetTransferDtlAsync(request.AssetTransferId);
+             var assetTransfer = await _assetTransferReceiptQueryRepository.GetAssetTransferByIdAsync(request.AssetTransferId);
 
-        // Check if data exists
-        if (result is null || !result.Any())
-        {
-            return new ApiResponseDTO<List<AssetTransferReceiptDtlPendingDto>>
+            if (assetTransfer == null)
             {
-                IsSuccess = false,
-                Message = $"No records found for ID {request.AssetTransferId}."
-            };
+                return new ApiResponseDTO<AssetTrasnferReceiptHdrPendingDto>
+                {
+                    IsSuccess = false,
+                    Message = $"Asset Transfer Issue with ID {request.AssetTransferId} not found."
+                
+                };
+            }
+                return new ApiResponseDTO<AssetTrasnferReceiptHdrPendingDto>
+                {
+                    IsSuccess = true,
+                    Message = "Asset Transfer retrieved successfully.",
+                    Data = assetTransfer
+                };   
         }
-
-        // Map list of results
-        var assetTransferpendingReceiptList = _mapper.Map<List<AssetTransferReceiptDtlPendingDto>>(result);
-
-        // Domain Event Logging
-        var domainEvent = new AuditLogsDomainEvent(
-            actionDetail: "GetAssetRecieptDtlPendingQuery",
-            actionCode: "AssetTransferReceiptPending",
-            actionName: request.AssetTransferId.ToString(),
-            details: $"Asset transfer Receipt Details Pending details for ID {request.AssetTransferId} were fetched.",
-            module: "AssetTransferReceipt"
-        );
-        await _mediator.Publish(domainEvent, cancellationToken);
-
-        return new ApiResponseDTO<List<AssetTransferReceiptDtlPendingDto>>
-        {
-            IsSuccess = true,
-            Message = "Success",
-            Data = assetTransferpendingReceiptList
-        };
-        }
-
     }
 }
