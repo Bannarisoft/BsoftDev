@@ -1,4 +1,6 @@
 using Core.Domain.Common;
+using Core.Domain.Entities.WorkOrderMaster;
+
 
 
 namespace Core.Domain.Entities
@@ -15,6 +17,13 @@ namespace Core.Domain.Entities
         public MiscTypeMaster? MiscTypeMaster { get; set; } 
         public ICollection<MaintenanceRequest>? RequestType { get; set; }
         public ICollection<MaintenanceRequest>? MaintenanceType { get; set; }
+        public ICollection<WorkOrder>? WorkOrderPriority  {get; set;} 
+        public ICollection<WorkOrder>? WorkOrderStatus  {get; set;}  
+        public ICollection<WorkOrder>? WorkOrderRootCause  {get; set;}  
+        public ICollection<WorkOrder>? WorkOrderRequestType  {get; set;}  
+        public ICollection<PreventiveSchedulerHdr>? Schedule { get; set; }
+        public ICollection<PreventiveSchedulerHdr>? DueType { get; set; }
+        public ICollection<PreventiveSchedulerHdr>? Frequency { get; set; }
 		
   		    
     }

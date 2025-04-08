@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
 using MaintenanceManagement.Infrastructure.Data.Configurations;
+using Core.Domain.Entities.WorkOrderMaster;
+using MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMaster;
 
 
 
@@ -35,10 +37,20 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<MachineMaster> MachineMaster { get; set; }
         public DbSet<ActivityMachineGroup>  ActivityMachineGroup { get; set; }
         public DbSet<MachineGroupUser>  MachineGroupUser { get; set; }
+        public DbSet<WorkOrder>  WorkOrder { get; set; }
+        public DbSet<WorkOrderItem>  WorkOrderItem { get; set; }
+        public DbSet<WorkOrderTechnician>  WorkOrderTechnician { get; set; }
+        public DbSet<WorkOrderSchedule>  WorkOrderSchedule { get; set; }
+        public DbSet<WorkOrderActivity>  WorkOrderActivity { get; set; }
+        
 
         public DbSet<ActivityCheckListMaster>  ActivityCheckListMaster { get; set; }
-
+        public DbSet<PreventiveSchedulerHdr>  PreventiveSchedulerHdr { get; set; }
         public DbSet<MaintenanceRequest> MaintenanceRequest { get; set;}
+        public DbSet<PreventiveSchedulerDtl>  PreventiveSchedulerDtl { get; set; }
+        public DbSet<PreventiveSchedulerItems>  PreventiveSchedulerItems { get; set; }
+        public DbSet<PreventiveSchedulerActivity>  PreventiveSchedulerActivity { get; set; }
+
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -57,10 +69,17 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new ActivityMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MachineMasterConfiguration());
             modelBuilder.ApplyConfiguration( new ActivityMachineGroupConfiguration());
-            modelBuilder.ApplyConfiguration( new MachineGroupUserConfiguration());
+            modelBuilder.ApplyConfiguration( new WorkOrderConfiguration());
+            modelBuilder.ApplyConfiguration( new WorkOrderActivityConfiguration());
+            modelBuilder.ApplyConfiguration( new WorkOrderItemConfiguration());
+            modelBuilder.ApplyConfiguration( new WorkOrderScheduleConfiguration());
+            modelBuilder.ApplyConfiguration( new WorkOrderTechnicianConfiguration());           
             modelBuilder.ApplyConfiguration( new ActivityCheckListMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MaintenanceRequestConfiguration());
-
+            modelBuilder.ApplyConfiguration( new PreventiveSchedulerHdrConfiguration());
+            modelBuilder.ApplyConfiguration( new PreventiveSchedulerDtlConfiguration());
+            modelBuilder.ApplyConfiguration( new PreventiveSchedulerItemsConfiguration());
+            modelBuilder.ApplyConfiguration( new PreventiveSchedulerActivityConfiguration());
 
             base.OnModelCreating(modelBuilder);
 

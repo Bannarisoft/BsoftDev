@@ -30,6 +30,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
 
                 // Insert into AssetTransferReceiptHdr table
                 var entry =_applicationDbContext.Entry(assetTransferReceiptHdr);
+                
                 await _applicationDbContext.AssetTransferReceiptHdr.AddAsync(assetTransferReceiptHdr);
             }
             else

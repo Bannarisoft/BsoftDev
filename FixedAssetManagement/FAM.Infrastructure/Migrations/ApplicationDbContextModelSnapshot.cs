@@ -646,10 +646,10 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("AssetReceiptId")
                         .HasColumnType("int");
 
-                    b.Property<int>("LocationId")
+                    b.Property<int?>("LocationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SubLocationId")
+                    b.Property<int?>("SubLocationId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserID")
@@ -2197,14 +2197,12 @@ namespace FAM.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.Location", "Location")
                         .WithMany("AssetTransferReceiptLocation")
                         .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Core.Domain.Entities.SubLocation", "SubLocation")
                         .WithMany("AssetTransferReceiptSubLocation")
                         .HasForeignKey("SubLocationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("AssetMasterTransferReceipt");
 
