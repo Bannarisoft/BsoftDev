@@ -50,7 +50,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PS.CreatedByName,
                     PS.[CreatedIP],
                     PS.[ModifiedBy],
-                    PS.[ModifiedAt],
+                    PS.[ModifiedDate],
                     PS.[ModifiedByName],
                     PS.[ModifiedIP],
                     MG.Id AS MachineGroupId,
@@ -70,7 +70,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] DueType ON DueType.Id = PS.DueTypeId
                 INNER JOIN [Maintenance].[MiscMaster] Frequency ON Frequency.Id = PS.FrequencyId
                 WHERE PS.IsDeleted = 0
-                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.CategoryName LIKE @Search OR Schedule.Code LIKE @Search OR DueType.Code LIKE @Search OR Frequency.Code LIKE @Search)")};
+                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.CategoryName LIKE @Search OR Schedule.Code LIKE @Search OR DueType.Code LIKE @Search OR Frequency.Code LIKE @Search)")}
                 ORDER BY PS.Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 

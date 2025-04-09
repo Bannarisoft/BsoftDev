@@ -49,6 +49,8 @@ using System.Diagnostics;
 using Core.Application.Common.Interfaces.IActivityCheckListMaster;
 using Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListMaster;
 using MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMaster;
+using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -181,6 +183,8 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>(); */
             services.AddScoped<IActivityCheckListMasterQueryRepository, ActivityCheckListMasterQueryRepository>();
             services.AddScoped<IActivityCheckListMasterCommandRepository, ActivityCheckListMasterCommandRepository>();
+            services.AddScoped<IPreventiveSchedulerCommand, PreventiveSchedulerCommandRepository>();
+            services.AddScoped<IPreventiveSchedulerQuery, PreventiveSchedulerQueryRepository>();
             
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
