@@ -49,6 +49,8 @@ using System.Diagnostics;
 using Core.Application.Common.Interfaces.IActivityCheckListMaster;
 using Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListMaster;
 using MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMaster;
+using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -171,16 +173,18 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMachineMasterCommandRepository, MachineMasterCommandRepository>();
             services.AddScoped<IMachineMasterQueryRepository, MachineMasterQueryRepository>();
 
-            services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
-            services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
- /* 
-            services.AddScoped<IWorkOrderActivityCommandRepository, WorkOrderActivityCommandRepository>();
-            services.AddScoped<IWorkOrderActivityQueryRepository, WorkOrderActivityQueryRepository>();
+             services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
+           services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
 
-            services.AddScoped<IWorkOrderScheduleCommandRepository, WorkOrderScheduleCommandRepository>();
-            services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>(); */
+            // services.AddScoped<IWorkOrderActivityCommandRepository, WorkOrderActivityCommandRepository>();
+            // services.AddScoped<IWorkOrderActivityQueryRepository, WorkOrderActivityQueryRepository>();
+
+            // services.AddScoped<IWorkOrderScheduleCommandRepository, WorkOrderScheduleCommandRepository>();
+            // services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>(); 
             services.AddScoped<IActivityCheckListMasterQueryRepository, ActivityCheckListMasterQueryRepository>();
             services.AddScoped<IActivityCheckListMasterCommandRepository, ActivityCheckListMasterCommandRepository>();
+            services.AddScoped<IPreventiveSchedulerCommand, PreventiveSchedulerCommandRepository>();
+            services.AddScoped<IPreventiveSchedulerQuery, PreventiveSchedulerQueryRepository>();
             
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 

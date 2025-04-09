@@ -8,12 +8,12 @@ using MassTransit;
 using UserManagement.Infrastructure.PollyResilience;
 
 var builder = WebApplication.CreateBuilder(args);
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
 // If environment is null or empty, set default to "Development"
 if (string.IsNullOrWhiteSpace(environment))
 {
-    environment = "development";
+    environment = "Development";
     Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
 }
 

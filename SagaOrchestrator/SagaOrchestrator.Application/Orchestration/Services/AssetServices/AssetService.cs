@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Contracts.Models.Users;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IAssets;
 
-namespace SagaOrchestrator.Application.Orchestration.Services
+namespace SagaOrchestrator.Application.Orchestration.Services.AssetServices
 {
     public class AssetService : IAssetService
     {
