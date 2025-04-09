@@ -92,7 +92,7 @@ namespace MaintenanceManagement.Infrastructure.Logging.Middleware
                 case NullReferenceException nullReferenceException:
                     statusCode = StatusCodes.Status500InternalServerError;
                     title = "A null reference occurred.";
-                    detail = exception.Message;
+                    detail = exception.InnerException.Message;
                     _logger.LogError(nullReferenceException, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
                         statusCode, title, context.Request.Path);
                     break;
@@ -100,7 +100,7 @@ namespace MaintenanceManagement.Infrastructure.Logging.Middleware
                 default:
                     statusCode = StatusCodes.Status500InternalServerError;
                     title = "An unexpected error occurred.";
-                    detail = exception.Message;
+                    detail = exception.InnerException.Message;
                     _logger.LogError(exception, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
                         statusCode, title, context.Request.Path);
                     break;
