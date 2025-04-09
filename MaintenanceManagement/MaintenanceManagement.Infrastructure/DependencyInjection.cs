@@ -171,14 +171,14 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMachineMasterCommandRepository, MachineMasterCommandRepository>();
             services.AddScoped<IMachineMasterQueryRepository, MachineMasterQueryRepository>();
 
-             /* services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
+             services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
            services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
 
-            services.AddScoped<IWorkOrderActivityCommandRepository, WorkOrderActivityCommandRepository>();
-            services.AddScoped<IWorkOrderActivityQueryRepository, WorkOrderActivityQueryRepository>();
+            // services.AddScoped<IWorkOrderActivityCommandRepository, WorkOrderActivityCommandRepository>();
+            // services.AddScoped<IWorkOrderActivityQueryRepository, WorkOrderActivityQueryRepository>();
 
-            services.AddScoped<IWorkOrderScheduleCommandRepository, WorkOrderScheduleCommandRepository>();
-            services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>(); */
+            // services.AddScoped<IWorkOrderScheduleCommandRepository, WorkOrderScheduleCommandRepository>();
+            // services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>(); 
             services.AddScoped<IActivityCheckListMasterQueryRepository, ActivityCheckListMasterQueryRepository>();
             services.AddScoped<IActivityCheckListMasterCommandRepository, ActivityCheckListMasterCommandRepository>();
             

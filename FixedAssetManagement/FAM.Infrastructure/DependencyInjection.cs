@@ -76,33 +76,34 @@ using FAM.Application.Common;
 using System.Text;
 using System.Security.Cryptography;
 using FAM.Infrastructure.Helpers;
+using Contracts.Interfaces.IUser;
 
 namespace FAM.Infrastructure
 {
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
-        {           
+        {
 
             var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
             //var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);
 
-             var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
-                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
-                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
-                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");    
+            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
+                                               .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
+                                               .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
+                                               .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
 
             //var connectionString = configuration.GetConnectionString("DefaultConnection");
             //var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
 
-                if (string.IsNullOrWhiteSpace(connectionString))
-                {
-                    throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
-                } 
-                if (string.IsNullOrWhiteSpace(HangfireConnectionString))
-                {
-                    throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
-                }
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
+            }
+            if (string.IsNullOrWhiteSpace(HangfireConnectionString))
+            {
+                throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
+            }
 
             // Register ApplicationDbContext with SQL Server
 
@@ -117,8 +118,8 @@ namespace FAM.Infrastructure
 
             // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
-    
-    
+
+
             // MongoDB Context
             services.AddSingleton<IMongoClient>(sp =>
             {
@@ -140,7 +141,7 @@ namespace FAM.Infrastructure
                 }
                 return new MongoDbContext(client, databaseName);
             });
-            
+
             // Optional: Register IMongoDatabase if needed directly
             services.AddSingleton(sp =>
             {
@@ -166,105 +167,114 @@ namespace FAM.Infrastructure
             });
             // Add the Hangfire server
             services.AddHangfireServer();
-            
+
             // Register ILogger<T>
             services.AddLogging(builder =>
             {
                 builder.AddSerilog();
-            }); 
+            });
 
             // Register IDateTime
             services.AddHttpContextAccessor();
 
             // Register repositories
-            services.AddScoped<IAuditLogRepository, AuditLogRepository>(); 
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             services.AddScoped<IAssetGroupCommandRepository, AssetGroupCommandRepository>();
             services.AddScoped<ILocationCommandRepository, LocationCommandRepository>();
             services.AddScoped<ILocationQueryRepository, LocationQueryRepository>();
             services.AddScoped<ISubLocationCommandRepository, SubLocationCommandRepository>();
-            services.AddScoped<ISubLocationQueryRepository, SubLocationQueryRepository>();   
-            services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>(); 
+            services.AddScoped<ISubLocationQueryRepository, SubLocationQueryRepository>();
+            services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();
             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
-            services.AddScoped<IDepreciationGroupCommandRepository, DepreciationGroupCommandRepository>();   
-            services.AddScoped<IDepreciationGroupQueryRepository, DepreciationGroupQueryRepository>(); 
+            services.AddScoped<IDepreciationGroupCommandRepository, DepreciationGroupCommandRepository>();
+            services.AddScoped<IDepreciationGroupQueryRepository, DepreciationGroupQueryRepository>();
             services.AddScoped<IAssetGroupQueryRepository, AssetGroupQueryRepository>();
             services.AddScoped<IAssetCategoriesQueryRepository, AssetCategoriesQueryRepository>();
             services.AddScoped<IAssetCategoriesCommandRepository, AssetCategoriesCommandRepository>();
- 			services.AddScoped<IAssetSubCategoriesQueryRepository, AssetSubCategoriesQueryRepository>();
-            services.AddScoped<IAssetSubCategoriesCommandRepository, AssetSubCategoriesCommandRepository>();			
+            services.AddScoped<IAssetSubCategoriesQueryRepository, AssetSubCategoriesQueryRepository>();
+            services.AddScoped<IAssetSubCategoriesCommandRepository, AssetSubCategoriesCommandRepository>();
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
-            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();            
-			services.AddScoped<IManufactureCommandRepository, ManufactureCommandRepository>();
+            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
+            services.AddScoped<IManufactureCommandRepository, ManufactureCommandRepository>();
             services.AddScoped<IManufactureQueryRepository, ManufactureQueryRepository>();
- 			services.AddScoped<IAssetMasterGeneralCommandRepository, AssetMasterGeneralCommandRepository>();
-            services.AddScoped<IAssetMasterGeneralQueryRepository, AssetMasterGeneralQueryRepository>();            
+            services.AddScoped<IAssetMasterGeneralCommandRepository, AssetMasterGeneralCommandRepository>();
+            services.AddScoped<IAssetMasterGeneralQueryRepository, AssetMasterGeneralQueryRepository>();
             services.AddScoped<IUOMCommandRepository, UOMCommandRepository>();
             services.AddScoped<IUOMQueryRepository, UOMQueryRepository>();
-			services.AddScoped<IAssetPurchaseQueryRepository, AssetPurchaseQueryRepository>();
+            services.AddScoped<IAssetPurchaseQueryRepository, AssetPurchaseQueryRepository>();
             services.AddScoped<IAssetPurchaseCommandRepository, AssetPurchaseCommandRepository>();
             services.AddScoped<ISpecificationMasterCommandRepository, SpecificationMasterCommandRepository>();
             services.AddScoped<ISpecificationMasterQueryRepository, SpecificationMasterQueryRepository>();
-			services.AddScoped<IAssetSpecificationCommandRepository, AssetSpecificationCommandRepository>();
-			services.AddScoped<IAssetLocationQueryRepository , AssetLocationQueryRepository>();
-            services.AddScoped<IAssetLocationCommandRepository , AssetLocationCommandRepository>();
+            services.AddScoped<IAssetSpecificationCommandRepository, AssetSpecificationCommandRepository>();
+            services.AddScoped<IAssetLocationQueryRepository, AssetLocationQueryRepository>();
+            services.AddScoped<IAssetLocationCommandRepository, AssetLocationCommandRepository>();
             services.AddScoped<IAssetSpecificationQueryRepository, AssetSpecificationQueryRepository>();
-			services.AddScoped<IAssetAdditionalCostQueryRepository, AssetAdditionalCostQueryRepository>();
-            services.AddScoped<IAssetAdditionalCostCommandRepository, AssetAdditionalCostCommandRepository>();            
+            services.AddScoped<IAssetAdditionalCostQueryRepository, AssetAdditionalCostQueryRepository>();
+            services.AddScoped<IAssetAdditionalCostCommandRepository, AssetAdditionalCostCommandRepository>();
             services.AddScoped<IAssetWarrantyQueryRepository, AssetWarrantyQueryRepository>();
             services.AddScoped<IAssetWarrantyCommandRepository, AssetWarrantyCommandRepository>();
-			services.AddScoped<IAssetInsuranceCommandRepository, AssetInsuranceCommandRepository>();
-            services.AddScoped<IAssetInsuranceQueryRepository, AssetInsuranceQueryRepository>();            
+            services.AddScoped<IAssetInsuranceCommandRepository, AssetInsuranceCommandRepository>();
+            services.AddScoped<IAssetInsuranceQueryRepository, AssetInsuranceQueryRepository>();
             services.AddScoped<IAssetAmcQueryRepository, AssetAmcQueryRepository>();
             services.AddScoped<IAssetAmcCommandRepository, AssetAmcCommandRepository>();
             services.AddScoped<IAssetTransferQueryRepository, AssetTransferQueryRepository>();
-            services.AddScoped<IAssetTransferCommandRepository, AssetTransferCommandRepository>();            
+            services.AddScoped<IAssetTransferCommandRepository, AssetTransferCommandRepository>();
             services.AddScoped<IAssetDisposalQueryRepository, AssetDisposalQueryRepository>();
             services.AddScoped<IAssetDisposalCommandRepository, AssetDisposalCommandRepository>();
-			services.AddScoped<IDepreciationDetailCommandRepository, DepreciationDetailCommandRepository>();
+            services.AddScoped<IDepreciationDetailCommandRepository, DepreciationDetailCommandRepository>();
             services.AddScoped<IDepreciationDetailQueryRepository, DepreciationDetailQueryRepository>();
             services.AddScoped<IAssetTransferIssueApprovalQueryRepository, AssetTransferIssueQueryRepository>();
             services.AddScoped<IAssetTransferIssueApprovalCommandRepository, AssetTransferIssueCommandRepository>();
             services.AddScoped<IAssetTransferReceiptQueryRepository, AssetTransferReceiptQueryRepository>();
             services.AddScoped<IAssetTransferReceiptCommandRepository, AssetTransferReceiptCommandRepository>();
             services.AddScoped<IExcelImportCommandRepository, ExcelImportCommandRepository>();
-            services.AddScoped<IExcelImportQueryRepository, ExcelImportCommandQueryRepository>();          
-            
-            
+            services.AddScoped<IExcelImportQueryRepository, ExcelImportCommandQueryRepository>();
+
+
             // Miscellaneous services
-            services.AddScoped<IIPAddressService, IPAddressService>(); 
+            services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddTransient<IFileUploadService, FileUploadRepository>();
-            services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
+            services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddSingleton<EnvironmentEncryptionService>();
+            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
+
+            // HttpClient Registration using HttpClientFactory
+            services.AddHttpClient<IUserSessionService, UserSessionService>(client =>
+            {
+                client.BaseAddress = new Uri("http://localhost:5174/api"); // Or whatever your actual base URL is
+            });
+
+
 
             // AutoMapper profiles
             services.AddAutoMapper(
-				typeof(AssetGroupProfile),
-				typeof(LocationProfile),
+                typeof(AssetGroupProfile),
+                typeof(LocationProfile),
                 typeof(SubLocationProfile),
                 typeof(MiscTypeMasterProfile),
-				typeof(MiscMasterProfile),
+                typeof(MiscMasterProfile),
                 typeof(DepreciationGroupProfile),
                 typeof(AssetCategoriesProfile),
-				typeof(AssetSubCategoriesProfile),
-				typeof(ManufactureProfile),
+                typeof(AssetSubCategoriesProfile),
+                typeof(ManufactureProfile),
                 typeof(UOMProfile),
                 typeof(AssetMasterGeneralProfile),
                 typeof(SpecificationMasterProfile),
-				typeof(AssetPurchaseProfile),
- 				typeof(AssetSpecificationProfile),
+                typeof(AssetPurchaseProfile),
+                 typeof(AssetSpecificationProfile),
                 typeof(AssetWarrantyProfile),
-				typeof(AssetLocationProfile),
-				typeof(AssetAdditionalCostProfile),
-				typeof(AssetInsuranceProfile),
+                typeof(AssetLocationProfile),
+                typeof(AssetAdditionalCostProfile),
+                typeof(AssetInsuranceProfile),
                 typeof(AssetTransferProfile),
                 typeof(AssetAmcProfile),
                 typeof(AssetDisposalProfile),
- 				typeof(DepreciationDetailProfile),
+                 typeof(DepreciationDetailProfile),
                 typeof(AssetIssueTransferApproval),
                 typeof(AssetTransferReceiptProfile)
             );
             return services;
         }
-      
+
     }
 }
