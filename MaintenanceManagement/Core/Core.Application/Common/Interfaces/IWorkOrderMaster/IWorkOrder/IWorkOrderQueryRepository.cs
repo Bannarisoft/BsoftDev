@@ -1,5 +1,5 @@
 
-using Core.Application.WorkOrderMaster.WorkOrder.Queries.GetWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrder;
 
 namespace Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder
 {
@@ -9,7 +9,9 @@ namespace Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder
         Task<List<Core.Domain.Entities.MiscMaster>> GetWOPriorityDescAsync();  
         Task<List<Core.Domain.Entities.MiscMaster>> GetWOStatusDescAsync();           
         Task<List<Core.Domain.Entities.MiscMaster>> GetWORequestTypeDescAsync();     
-         Task<WorkOrderDto>  GetByIdAsync(int workOrderId);                     
-        Task<(dynamic WorkOrderResult,  IEnumerable<dynamic> Activity, IEnumerable<dynamic> Schedule, IEnumerable<dynamic> Item,IEnumerable<dynamic> Technician )> GetWorkOrderByIdAsync(int workOrderId);        
+        Task<WorkOrderDto>  GetByIdAsync(int workOrderId);  
+        Task<string> GetBaseDirectoryAsync();
+        Task<(dynamic WorkOrderResult,  IEnumerable<dynamic> Activity, IEnumerable<dynamic> Item,IEnumerable<dynamic> Technician )> GetWorkOrderByIdAsync(int workOrderId);        
+        Task<(List<WorkOrderDto>,int)> GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm);    
     }
 }

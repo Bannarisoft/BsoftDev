@@ -50,12 +50,19 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                
             builder.Property(t => t.DownTimeStartTime)
                 .HasColumnName("DownTimeStartTime")
-                .IsRequired()
-                .HasConversion(v => v.ToTimeSpan(), v => TimeOnly.FromTimeSpan(v));     
+                .IsRequired(false)
+                .HasConversion(
+                    v => v.HasValue ? v.Value.ToTimeSpan() : (TimeSpan?)null,
+                    v => v.HasValue ? TimeOnly.FromTimeSpan(v.Value) : (TimeOnly?)null
+                );
+
             builder.Property(t => t.DownTimeEndTime)
-                .HasColumnName("DownTimeEndTime")                
-                .IsRequired()
-                .HasConversion(v => v.ToTimeSpan(), v => TimeOnly.FromTimeSpan(v));    
+                .HasColumnName("DownTimeEndTime")
+                .IsRequired(false)
+                .HasConversion(
+                    v => v.HasValue ? v.Value.ToTimeSpan() : (TimeSpan?)null,
+                    v => v.HasValue ? TimeOnly.FromTimeSpan(v.Value) : (TimeOnly?)null
+                ); 
 
             builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")

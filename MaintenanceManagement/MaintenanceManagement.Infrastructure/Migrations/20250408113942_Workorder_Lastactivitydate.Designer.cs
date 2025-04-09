@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250408113942_Workorder_Lastactivitydate")]
+    partial class Workorder_Lastactivitydate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1329,15 +1332,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Description");
-
-                    b.Property<decimal>("EstimatedTime")
-                        .HasColumnType("decimal(5,2)")
-                        .HasColumnName("EstimatedTime");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("IsActive");
@@ -1474,11 +1468,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<TimeSpan?>("DownTimeEndTime")
+                    b.Property<TimeSpan>("DownTimeEndTime")
                         .HasColumnType("time")
                         .HasColumnName("DownTimeEndTime");
 
-                    b.Property<TimeSpan?>("DownTimeStartTime")
+                    b.Property<TimeSpan>("DownTimeStartTime")
                         .HasColumnType("time")
                         .HasColumnName("DownTimeStartTime");
 
@@ -1574,7 +1568,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("TechnicianName")
                         .IsRequired()
-                        .HasColumnType("varchar(100)")
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("TechnicianName");
 
                     b.Property<int>("WorkOrderId")
