@@ -8,6 +8,7 @@ using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetails;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetailsById;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptPending;
+using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRecieptDtlPending;
 using Core.Application.Common.Interfaces.IAssetTransferReceipt;
 using Dapper;
 
@@ -137,12 +138,9 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 {{(ToDate.HasValue ? "AND CAST(A.DocDate AS DATE) <= CAST(@ToDate AS DATE)" : "")}};
 
                 SELECT 
-                    A.Id AS AssetTransferId,
+                    Distinct(A.Id) AS AssetTransferId,
                     A.DocDate,
                     C.Description AS TransferType,
-                    M.AssetCode,
-                    M.AssetName,
-                    B.AssetId,
                     D.UnitName AS FromUnitName,
                     E.UnitName AS ToUnitName,
                     A.FromDepartmentId,
@@ -192,48 +190,48 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
             return (assetTransferIssueList, totalCount);
         }
 
-        public async Task<AssetTransferJsonDto> GetAssetTransferByIdAsync(int assetTransferId)
-        {
-        const string query = @"
-            SELECT Id as AssetTransferId , DocDate, TransferType, FromUnitId, ToUnitId, FromDepartmentId, ToDepartmentId, 
-                   FromCustodianId, ToCustodianId, Status, FromCustodianName, ToCustodianName
-            FROM FixedAsset.AssetTransferIssueHdr
-            WHERE Id = @AssetTransferId AND Status = 'Approved' 
-            FOR JSON PATH, INCLUDE_NULL_VALUES;
+    //     public async Task<AssetTransferJsonDto> GetAssetTransferByIdAsync(int assetTransferId)
+    //     {
+        // const string query = @"
+        //     SELECT Id as AssetTransferId , DocDate, TransferType, FromUnitId, ToUnitId, FromDepartmentId, ToDepartmentId, 
+        //            FromCustodianId, ToCustodianId, Status, FromCustodianName, ToCustodianName
+        //     FROM FixedAsset.AssetTransferIssueHdr
+        //     WHERE Id = @AssetTransferId AND Status = 'Approved' 
+        //     FOR JSON PATH, INCLUDE_NULL_VALUES;
 
-            SELECT AssetId, AssetValue 
-            FROM FixedAsset.AssetTransferIssueDtl
-            WHERE AssetTransferId = @AssetTransferId
-            FOR JSON PATH, INCLUDE_NULL_VALUES;
-        ";
+        //     SELECT AssetId, AssetValue 
+        //     FROM FixedAsset.AssetTransferIssueDtl
+        //     WHERE AssetTransferId = @AssetTransferId
+        //     FOR JSON PATH, INCLUDE_NULL_VALUES;
+        // ";
 
-        using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { assetTransferId });
+        // using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { assetTransferId });
 
-        string headerJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
-        string detailsJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+        // string headerJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+        // string detailsJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
 
-        if (string.IsNullOrWhiteSpace(headerJson))
-        {
-            return null;
-        }
+        // if (string.IsNullOrWhiteSpace(headerJson))
+        // {
+        //     return null;
+        // }
 
-        var header = JsonSerializer.Deserialize<List<AssetTransferJsonDto>>(headerJson, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        })?.FirstOrDefault();
+        // var header = JsonSerializer.Deserialize<List<AssetTransferJsonDto>>(headerJson, new JsonSerializerOptions
+        // {
+        //     PropertyNameCaseInsensitive = true
+        // })?.FirstOrDefault();
 
-        var details = JsonSerializer.Deserialize<List<AssetTransferDetailJsonDto>>(detailsJson ?? "[]", new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        // var details = JsonSerializer.Deserialize<List<AssetTransferDetailJsonDto>>(detailsJson ?? "[]", new JsonSerializerOptions
+        // {
+        //     PropertyNameCaseInsensitive = true
+        // });
 
-        if (header != null)
-        {
-            header.AssetTransferDetails = details ?? new List<AssetTransferDetailJsonDto>();
-        }
+        // if (header != null)
+        // {
+        //     header.AssetTransferDetails = details ?? new List<AssetTransferDetailJsonDto>();
+        // }
 
-        return header;
-    }
+        // return header;
+    // }
 
         public async Task<AssetTransferDto?> GetByAssetTransferId(int assetTransferId)
         {
@@ -248,5 +246,112 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
 
             return assetTransfer;
         }
+
+        public async Task<AssetTrasnferReceiptHdrPendingDto?> GetAssetTransferByIdAsync(int assetTransferId)
+        {
+             const string query = @"
+            SELECT 
+                    Distinct(A.Id) AS AssetTransferId,
+                    A.DocDate,
+                    C.Description AS TransferType,
+                    D.UnitName AS FromUnitName,
+                    E.UnitName AS ToUnitName,
+                    F.DeptName AS FromDepartment,
+                    G.DeptName AS ToDepartment,
+                    A.FromCustodianName,
+                    A.ToCustodianName,
+                    RH.Sdcno,
+                    RH.GatePassNo,
+                    RH.Remarks 
+                FROM FixedAsset.AssetTransferIssueHdr A
+                INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
+                INNER JOIN FixedAsset.AssetMaster M ON B.AssetId = M.Id
+                INNER JOIN FixedAsset.MiscMaster C ON A.TransferType = C.Id
+                INNER JOIN [Bannari].AppData.Unit D ON A.FromUnitId = D.Id
+                INNER JOIN [Bannari].AppData.Unit E ON A.ToUnitId = E.Id
+                INNER JOIN [Bannari].AppData.Department F ON A.FromDepartmentId = F.Id
+                INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
+                LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
+                LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
+                WHERE A.Status = 'Approved' 
+                AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL)
+                AND A.Id = @assetTransferId
+                FOR JSON PATH, INCLUDE_NULL_VALUES;
+
+                SELECT 
+                B.AssetId,
+                M.AssetCode,
+                M.AssetName
+                FROM FixedAsset.AssetTransferIssueHdr A
+                INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
+                INNER JOIN FixedAsset.AssetMaster M ON B.AssetId = M.Id
+                INNER JOIN FixedAsset.MiscMaster C ON A.TransferType = C.Id
+                INNER JOIN [Bannari].AppData.Unit D ON A.FromUnitId = D.Id
+                INNER JOIN [Bannari].AppData.Unit E ON A.ToUnitId = E.Id
+                INNER JOIN [Bannari].AppData.Department F ON A.FromDepartmentId = F.Id
+                INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
+                LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
+                LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
+                WHERE A.Status = 'Approved' 
+                AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL)
+        		AND A.Id=@assetTransferId
+                FOR JSON PATH, INCLUDE_NULL_VALUES;
+                ";
+
+        using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { assetTransferId });
+
+        string headerJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+        string detailsJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+
+        if (string.IsNullOrWhiteSpace(headerJson))
+        {
+            return null;
+        }
+
+        var header = JsonSerializer.Deserialize<List<AssetTrasnferReceiptHdrPendingDto>>(headerJson, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        })?.FirstOrDefault();
+
+        var details = JsonSerializer.Deserialize<List<AssetTransferReceiptDtlPendingDto>>(detailsJson ?? "[]", new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (header != null)
+        {
+            header.AssetTransferPendingDtl = details ?? new List<AssetTransferReceiptDtlPendingDto>();
+        }
+
+        return header;
+        }
+
+
+        // public async Task<List<AssetTransferReceiptDtlPendingDto>> GetAllPendingAssetTransferDtlAsync(int assetTransferId)
+        // {
+        //      const string query = @"
+                // SELECT 
+                // A.Id AS AssetTransferId,
+                // B.AssetId,
+                // M.AssetCode,
+                // M.AssetName
+                // FROM FixedAsset.AssetTransferIssueHdr A
+                // INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
+                // INNER JOIN FixedAsset.AssetMaster M ON B.AssetId = M.Id
+                // INNER JOIN FixedAsset.MiscMaster C ON A.TransferType = C.Id
+                // INNER JOIN [Bannari].AppData.Unit D ON A.FromUnitId = D.Id
+                // INNER JOIN [Bannari].AppData.Unit E ON A.ToUnitId = E.Id
+                // INNER JOIN [Bannari].AppData.Department F ON A.FromDepartmentId = F.Id
+                // INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
+                // LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
+                // LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
+                // WHERE A.Status = 'Approved' 
+                // AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL)
+        		// AND A.Id=@assetTransferId";
+
+        //     var assetreceiptpendingdtl = await _dbConnection.QueryAsync<AssetTransferReceiptDtlPendingDto>(query, new { assetTransferId });
+
+        //     return assetreceiptpendingdtl.ToList();
+        // }
     }
 }

@@ -27,7 +27,8 @@ namespace SagaOrchestrator.Infrastructure.Services.MaintenanceServices
                 var departmentCreatedEvent = new DepartmentCreatedEvent
                 {
                     DepartmentId = department.DepartmentId,
-                    DepartmentName = department.DepartmentName
+                    DepartmentName = department.DepartmentName,
+                    ShortName = department.ShortName
                 };
 
                 await _publishEndpoint.Publish(departmentCreatedEvent);

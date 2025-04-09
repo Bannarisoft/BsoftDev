@@ -31,5 +31,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public IList<AssetAMCDTOById>? AssetAmc { get; set; }
         public AssetDisposalByIdDTO? AssetDisposal { get; set; }
         public IList<AssetInsuranceByIdDTO>? AssetInsurance { get; set; }
+        public IList<AssetAdditionalCostDto>? AssetAdditionalCost { get; set; }
     }
 }

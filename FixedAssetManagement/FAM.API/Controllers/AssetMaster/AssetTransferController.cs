@@ -114,11 +114,27 @@ namespace FAM.API.Controllers.AssetMaster
                 });
 
             var response = await Mediator.Send(command);
+              if (response.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status201Created, new 
+                { 
+                    StatusCode = StatusCodes.Status201Created,
+                    Message = response.Message,
+                    Data = response.Data
+                });
+            }
 
-            if (!response.IsSuccess)
-                return BadRequest(response);
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = response.Message,
+                Errors = ""
+            });
+            // if (!response.IsSuccess)
+                
+            //     return BadRequest(response);
 
-            return Ok(response);
+            // return Ok(response);
         }
 
         [HttpGet("{id}")]       
