@@ -9,7 +9,7 @@ namespace Core.Application.SwitchProfile.Queries.GetUnitProfile
     {
         public int UnitId { get; set; }
         public string UnitName { get; set; }
-        public int OldUnitId { get; set; }
+        public string OldUnitId { get; set; }
         public int DivisionId { get; set; }
         public string DivisionName { get; set; }
         public string DivisionShortName { get; set; }
