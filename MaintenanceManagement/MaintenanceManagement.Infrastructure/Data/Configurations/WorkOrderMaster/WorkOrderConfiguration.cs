@@ -57,6 +57,11 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .WithMany(mg => mg.WorkOrderRequestType)
                 .HasForeignKey(amg => amg.RequestTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
+                       
+             builder.Property(t => t.MachineCode)
+                .HasColumnName("MachineCode")
+                .HasColumnType("varchar(20)")
+                .IsRequired(false);   
             
             builder.Property(t => t.PriorityId)
                 .HasColumnName("PriorityId")
@@ -88,7 +93,15 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
 
             builder.Property(t => t.VendorId)
                 .HasColumnName("VendorId")
+                .HasColumnType("int")
+                .IsRequired(false); 
+            builder.Property(t => t.OldVendorId)
+                .HasColumnName("OldVendorId")
                 .HasColumnType("nvarchar(20)")
+                .IsRequired(false); 
+            builder.Property(t => t.VendorName)
+                .HasColumnName("VendorName")
+                .HasColumnType("nvarchar(250)")
                 .IsRequired(false); 
             
               builder.Property(t => t.RootCauseId)

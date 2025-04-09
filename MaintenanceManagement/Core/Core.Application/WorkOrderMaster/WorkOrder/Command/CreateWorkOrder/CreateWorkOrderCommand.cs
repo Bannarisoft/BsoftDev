@@ -5,8 +5,8 @@ using MediatR;
 
 namespace Core.Application.WorkOrderMaster.WorkOrder.Command.CreateWorkOrder
 {
-    public class CreateWorkOrderCommand : IRequest<ApiResponseDTO<Core.Domain.Entities.WorkOrderMaster.WorkOrder>>  
+    public class CreateWorkOrderCommand : IRequest<ApiResponseDTO<WorkOrderCombineDto>>  
     {
-       public WorkOrderCombineDto? AssetMaster { get; set; }       
+       public WorkOrderCombineDto? WorkOrder { get; set; }       
     }
 }

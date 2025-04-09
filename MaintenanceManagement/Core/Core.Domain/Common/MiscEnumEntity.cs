@@ -15,5 +15,9 @@ namespace Core.Domain.Common
         {
             public const string MiscCode = "RootCause";
         }     
+        public static class  WORequestType
+        {
+            public const string MiscCode = "RequestType";
+        }     
     }
 }

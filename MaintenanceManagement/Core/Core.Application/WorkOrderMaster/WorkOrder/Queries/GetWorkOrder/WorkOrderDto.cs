@@ -9,14 +9,23 @@ namespace Core.Application.WorkOrderMaster.WorkOrder.Queries.GetWorkOrder
         public int UnitId { get; set; } 
         public int? WorkOrderTypeId { get; set; }
         public string? WorkOrderTypeDesc { get; set; }         
-        public int RequestId { get; set; }
+        public string? RequestId { get; set; }
+        public int RequestTypeId { get; set; }  
+        public string? RequestTypeDesc { get; set; }  
+        public string? MachineCode { get; set; }
+        public string? MachineName { get; set; }
+        public string? MachineGroupName { get; set; }
+        public int? MachineGroupId { get; set; }
         public int PriorityId { get; set; }        
         public string? PriorityDesc { get; set; } 
         public string? Remarks { get; set; }
         public string? Image { get; set; }
         public int StatusId { get; set; }          
         public string? StatusDesc { get; set; } 
-        public string? VendorId { get; set; } 
+        public int? VendorId { get; set; } 
+        public string? OldVendorId { get; set; } 
+        public string? VendorName { get; set; }  
         public int RootCauseId { get; set; }                
+        public string? RootCauseDesc { get; set; }    
     }
 }

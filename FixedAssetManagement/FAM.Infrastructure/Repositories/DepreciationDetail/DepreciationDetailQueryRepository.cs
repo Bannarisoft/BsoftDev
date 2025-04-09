@@ -48,7 +48,7 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             return (depreciationList, totalCount);   
         }
 
-        public async Task<List<DepreciationDto>> CreateAsync(int companyId, int unitId, int finYearId,  int depreciationType,int depreciationPeriod)
+        public async Task<(string message, int statusCode)>  CreateAsync(int companyId, int unitId, int finYearId,  int depreciationType,int depreciationPeriod)
         {
             int userId = _ipAddressService.GetUserId();
             string username = _ipAddressService.GetUserName();
@@ -72,15 +72,25 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             parameters.Add("@CreatedIP", ipAddress);
 
            // Execute the stored procedure (ignoring return message)
-            await _dbConnection.ExecuteAsync(
+     /*      var result =  await _dbConnection.ExecuteAsync(
                 "dbo.FAM_DepreciationCalculation",
                 parameters,
                 commandType: CommandType.StoredProcedure
-            );          
-            (List<DepreciationDto> depreciationList, _) = await CalculateDepreciationAsync(
-                    companyId, unitId, finYearId, null, null, depreciationType,0,0, null,depreciationPeriod
-                );
-            return depreciationList;
+            );    */
+           var result = await _dbConnection.QueryAsync(
+                "dbo.FAM_DepreciationCalculation",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            // Assuming your stored procedure returns 'Status' and 'StatusCode'
+            var firstResult = result.FirstOrDefault();
+            if (firstResult != null)
+            {
+                return (firstResult.Status, firstResult.StatusCode);
+            }
+
+            return ("Unknown error", -1);
         } 
 
         public async Task<bool> ExistDataAsync(int companyId, int unitId, int finYearId, int depreciationType,int depreciationPeriod)

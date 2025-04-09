@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Core.Application.Common.HttpResponse;
+using Core.Application.WorkOrderMaster.WorkOrder.Queries.GetWorkOrder;
+using MediatR;
 
 namespace Core.Application.WorkOrderMaster.WorkOrder.Command.UpdateWorkOrder
 {
-    public class UpdateWorkOrderCommand
+    public class UpdateWorkOrderCommand : IRequest<ApiResponseDTO<WorkOrderCombineDto>>     
     {
-        
+        public WorkOrderCombineDto? WorkOrder { get; set; }    
     }
 }
