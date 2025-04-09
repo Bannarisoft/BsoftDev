@@ -7,7 +7,7 @@ namespace Core.Domain.Entities.AssetPurchase
 {
     public class AssetUnit
     {
-        public int OldUnitId { get; set; }
+        public string? OldUnitId { get; set; }
         public string? UnitName { get; set; }
     }
 }

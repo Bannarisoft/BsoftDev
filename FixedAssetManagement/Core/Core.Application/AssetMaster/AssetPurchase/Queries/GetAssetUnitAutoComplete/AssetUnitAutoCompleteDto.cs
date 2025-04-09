@@ -7,7 +7,7 @@ namespace Core.Application.AssetMaster.AssetPurchase
 {
     public class AssetUnitAutoCompleteDto
     {
-        public int OldUnitId { get; set; }
+        public string? OldUnitId { get; set; }
         public string? UnitName { get; set; }
     }
 }
