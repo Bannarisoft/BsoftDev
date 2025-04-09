@@ -1,15 +1,15 @@
 
+
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
 using Core.Application.WorkOrderMaster.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Events;
-using MassTransit.Mediator;
 using MediatR;
 
 namespace Core.Application.WorkOrderMaster.WorkOrder.Command.CreateWorkOrder
 {
-   /*  public class CreateWorkOrderCommandHandler : IRequestHandler<CreateWorkOrderCommand, ApiResponseDTO<WorkOrderCombineDto>>
+    public class CreateWorkOrderCommandHandler : IRequestHandler<CreateWorkOrderCommand, ApiResponseDTO<WorkOrderCombineDto>>
     {
         private readonly IMapper _mapper;
         private readonly IWorkOrderCommandRepository _workOrderRepository;
@@ -26,34 +26,34 @@ namespace Core.Application.WorkOrderMaster.WorkOrder.Command.CreateWorkOrder
 
         public async Task<ApiResponseDTO<WorkOrderCombineDto>> Handle(CreateWorkOrderCommand request, CancellationToken cancellationToken)
         {
-            var assetEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.AssetMaster);            
-            var result = await _workOrderRepository.CreateAsync(assetEntity, cancellationToken);
+            var woEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrder);            
+            var result = await _workOrderRepository.CreateAsync(woEntity, cancellationToken);
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
-                actionCode: assetEntity.AssetCode ?? string.Empty,
-                actionName: assetEntity.AssetName ?? string.Empty,
-                details: $"AssetMasterGeneral '{assetEntity.AssetName}' was created. Code: {assetEntity.AssetCode}",
-                module: "AssetMasterGeneral"
+                actionCode: "",
+                actionName: woEntity.RequestId ?? string.Empty,
+                details: $"WorkOrder '{woEntity.RequestId}' was created",
+                module: "WorkOrder"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
         
-            var assetMasterDTO = _mapper.Map<WorkOrderCombineDto>(result);
+            var woMasterDTO = _mapper.Map<WorkOrderCombineDto>(result);
             if (result.Id > 0)
             {
-                string tempFilePath = request.AssetMaster.AssetImage;
+                string tempFilePath = request.WorkOrder.Image;
                 if (!string.IsNullOrEmpty(tempFilePath) && File.Exists(tempFilePath))
                 {
                     string directory = Path.GetDirectoryName(tempFilePath) ?? string.Empty;
-                    string newFileName = $"{result.AssetCode}{Path.GetExtension(tempFilePath)}";
+                    string newFileName = $"{result.RequestId}{Path.GetExtension(tempFilePath)}";
                     string newFilePath = Path.Combine(directory, newFileName);
 
                     try
                     {
                         File.Move(tempFilePath, newFilePath);
-                        assetEntity.AssetImage = newFilePath.Replace(@"\", "/");
-                        await _assetMasterGeneralRepository.UpdateAsync(assetEntity);
+                        woEntity.Image = newFilePath.Replace(@"\", "/");
+                        await _workOrderRepository.UpdateAsync(woEntity);
                     }
                     catch (Exception ex)
                     {
@@ -63,15 +63,15 @@ namespace Core.Application.WorkOrderMaster.WorkOrder.Command.CreateWorkOrder
                 return new ApiResponseDTO<WorkOrderCombineDto>
                 {
                     IsSuccess = true,
-                    Message = "AssetMasterGeneral created successfully.",
-                    Data = assetMasterDTO
+                    Message = "Work Order created successfully.",
+                    Data = woMasterDTO
                 };
             }
             return new ApiResponseDTO<WorkOrderCombineDto>
             {
                 IsSuccess = false,
-                Message = "AssetMasterGeneral not created."
+                Message = "Work Order not created."
             };
         }
-    } */
+    } 
 }

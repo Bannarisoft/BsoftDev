@@ -11,7 +11,7 @@ namespace Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder
         Task<bool>  DeleteAsync(int workOrderId,Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder);     
         Task<bool> UpdateWOImageAsync(int workOrderId, string imageName);
         Task<WorkOrderDto?> GetByWOImageAsync(int workOrderId);
-        Task<bool> RemoveWOImageReferenceAsync(int workOrderId);    
-
+        Task<bool> RemoveWOImageReferenceAsync(int workOrderId); 
+        Task<string?> GetLatestRequestId(int CategoryId, CancellationToken cancellationToken);
     }
 }
