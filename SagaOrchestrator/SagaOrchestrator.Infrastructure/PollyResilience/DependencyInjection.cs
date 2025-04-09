@@ -1,8 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
+using SagaOrchestrator.Application.Orchestration.Interfaces.IMaintenance;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
-using SagaOrchestrator.Application.Orchestration.Services;
+using SagaOrchestrator.Application.Orchestration.Services.MaintenanceServices;
+using SagaOrchestrator.Application.Orchestration.Services.UserServices;
 
 namespace SagaOrchestrator.Infrastructure.PollyResilience
 {
@@ -13,6 +15,14 @@ namespace SagaOrchestrator.Infrastructure.PollyResilience
             services.AddHttpClient<IUserService, UserService>(client =>
             {
                 client.BaseAddress = new Uri("http://localhost:5174"); // URL of UserManagement API
+            })
+            .AddPolicyHandler(GetRetryPolicy())
+            .AddPolicyHandler(GetCircuitBreakerPolicy());
+
+            // HttpClient for IUserSessionService
+            services.AddHttpClient<IDepartmentService, DepartmentService>(client =>
+            {
+                client.BaseAddress = new Uri("http://localhost:5174"); // Same or different depending on your setup
             })
             .AddPolicyHandler(GetRetryPolicy())
             .AddPolicyHandler(GetCircuitBreakerPolicy());

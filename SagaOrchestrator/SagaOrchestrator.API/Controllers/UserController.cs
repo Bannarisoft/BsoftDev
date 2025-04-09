@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SagaOrchestrator.API.Models;
 using SagaOrchestrator.Infrastructure.Services;
+using SagaOrchestrator.Infrastructure.Services.UserServices;
 
 namespace SagaOrchestrator.API.Controllers
 {
@@ -14,11 +15,12 @@ namespace SagaOrchestrator.API.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly OrchestratorService _orchestratorService;
+        // private readonly OrchestratorService _orchestratorService;
+        private readonly UserSagaService _userSagaService;
 
-        public UserController(OrchestratorService orchestratorService)
+        public UserController(UserSagaService userSagaService)
         {
-            _orchestratorService = orchestratorService;
+            _userSagaService = userSagaService;
         }
         [HttpPost("user")]
         public async Task<IActionResult> TriggerUser([FromBody] TriggerUserRequest request)
@@ -28,7 +30,7 @@ namespace SagaOrchestrator.API.Controllers
             if (string.IsNullOrWhiteSpace(token))
                 return Unauthorized("Missing bearer token");
 
-            var user = await _orchestratorService.TriggerUserCreation(request.UserId, token);
+            var user = await _userSagaService.TriggerUserCreation(request.UserId, token);
 
             if (user == null)
                 return NotFound($"User with ID {request.UserId} not found.");

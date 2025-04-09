@@ -7,7 +7,7 @@ using SagaOrchestrator.Application.Models;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
 using Serilog;
 
-namespace SagaOrchestrator.Application.Orchestration.Services
+namespace SagaOrchestrator.Application.Orchestration.Services.UserServices
 {
     public class UserService : IUserService
     {
