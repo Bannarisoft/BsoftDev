@@ -25,7 +25,7 @@ namespace Core.Application.Common.Mappings.AssetMaster
             .ForMember(dest => dest.AssetId, opt => opt.MapFrom(src => src.AssetId))
             .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => src.LocationId))
             .ForMember(dest => dest.SubLocationId, opt => opt.MapFrom(src => src.SubLocationId))
-            .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => Convert.ToInt32(src.UserID)));
+            .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.UserID ?? 0));
 
 
             // CreateMap<AssetTransferIssueHdrIdDto, AssetTransferIssueHdr>()
