@@ -256,14 +256,13 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                     C.Description AS TransferType,
                     D.UnitName AS FromUnitName,
                     E.UnitName AS ToUnitName,
-                    A.FromDepartmentId,
                     F.DeptName AS FromDepartment,
                     G.DeptName AS ToDepartment,
                     A.FromCustodianName,
                     A.ToCustodianName,
-                    A.Status,
                     RH.Sdcno,
-                    RH.GatePassNo 
+                    RH.GatePassNo,
+                    RH.Remarks 
                 FROM FixedAsset.AssetTransferIssueHdr A
                 INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
                 INNER JOIN FixedAsset.AssetMaster M ON B.AssetId = M.Id
