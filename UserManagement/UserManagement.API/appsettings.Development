@@ -9,9 +9,9 @@
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "DefaultConnection":"Server={SERVER};Database=Bannari;User Id={USER_ID};Password={ENC_PASSWORD};Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=true;",
+    "DefaultConnection":"Server={SERVER};Database=FixedAsset;User Id={USER_ID};Password={ENC_PASSWORD};Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=true;",
     "HangfireConnection":"Server={SERVER};Database=Hangfire;User Id={USER_ID};Password={ENC_PASSWORD};Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=true;",
-    "MongoDbConnectionString": "mongodb://192.168.1.126:27017"
+    "MongoDbConnectionString": "mongodb://{SERVER}:27017"
   },  
   "Encryption": {
     "AESKey": "MySuperSecureKey1234567890123456",
@@ -20,8 +20,8 @@
     "DefaultEncryptedUserId":"ZrkAfHGUrFHWa8jnXpGy2w=="
   },
   "MongoDb": {
-    "DatabaseName": "Bannari" ,
-    "OutboxCollectionName": "OutboxMessages"    
+    "DatabaseName": "Bannari",
+    "OutboxCollectionName": "OutboxMessages"     
   },
   "MassTransit": {
   "RabbitMq": {
@@ -31,4 +31,4 @@
   }
 }
 
-} 
+}
