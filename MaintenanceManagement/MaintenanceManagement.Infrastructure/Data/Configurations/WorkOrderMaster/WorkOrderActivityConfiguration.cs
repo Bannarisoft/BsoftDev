@@ -44,7 +44,17 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
              builder.HasOne(amg => amg.ActivityMaster)
                 .WithMany(am => am.workOrderActivities)
                 .HasForeignKey(amg => amg.ActivityId)
-                .OnDelete(DeleteBehavior.Cascade);     
+                .OnDelete(DeleteBehavior.Cascade);    
+             
+            builder.Property(t => t.EstimatedTime)
+                .HasColumnName("EstimatedTime")
+                .HasColumnType("decimal(5,2)")
+                .IsRequired();   
+            
+            builder.Property(t => t.Description)
+                .HasColumnName("Description")
+                .HasColumnType("varchar(250)")
+                .IsRequired();   
 
              builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")
