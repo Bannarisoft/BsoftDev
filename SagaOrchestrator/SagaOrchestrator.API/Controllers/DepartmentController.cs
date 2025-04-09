@@ -38,7 +38,8 @@ namespace SagaOrchestrator.API.Controllers
             {
                 message = "Department creation process triggered successfully.",
                 departmentId = department.DepartmentId,
-                departmentName = department.DepartmentName
+                departmentName = department.DepartmentName,
+                shortName = department.ShortName
             });
         }
         // public async Task<IActionResult> TriggerDepartment(int departmentId)

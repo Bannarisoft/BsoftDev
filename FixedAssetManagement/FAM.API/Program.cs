@@ -4,6 +4,7 @@ using FAM.API.Validation.Common;
 using FAM.API.Configurations;
 using MassTransit;
 using Contracts.Events;
+using FAM.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +95,7 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors();
 app.UseAuthentication();
+app.UseMiddleware<TokenValidationMiddleware>();
 app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();

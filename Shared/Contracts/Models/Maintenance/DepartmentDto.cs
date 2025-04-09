@@ -11,6 +11,7 @@ namespace Contracts.Models.Maintenance
         [JsonPropertyName("id")]
         public int DepartmentId { get; set; }
         [JsonPropertyName("deptName")]
-        public string DepartmentName { get; set; }
+        public string? DepartmentName { get; set; }
+        public string? ShortName { get; set; }
     }
 }
