@@ -32,7 +32,6 @@ using Core.Application.Common.Interfaces.IMiscMaster;
 using FAM.Infrastructure.Repositories.MiscMaster;
 using FAM.Infrastructure.Repositories.Manufacture;
 using Core.Application.Common.Interfaces.IManufacture;
-using Core.Domain.Entities;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral;
 using Core.Application.Common.Interfaces.IUOM;
@@ -73,10 +72,7 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer;
 using Core.Application.Common.Interfaces.IExcelImport;
 using FAM.Infrastructure.Repositories.ExcelImport;
 using FAM.Application.Common;
-using System.Text;
-using System.Security.Cryptography;
 using FAM.Infrastructure.Helpers;
-using Contracts.Interfaces.IUser;
 
 namespace FAM.Infrastructure
 {
@@ -237,14 +233,6 @@ namespace FAM.Infrastructure
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddSingleton<EnvironmentEncryptionService>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
-
-            // HttpClient Registration using HttpClientFactory
-            services.AddHttpClient<IUserSessionService, UserSessionService>(client =>
-            {
-                client.BaseAddress = new Uri("http://localhost:5174/api"); // Or whatever your actual base URL is
-            });
-
-
 
             // AutoMapper profiles
             services.AddAutoMapper(
