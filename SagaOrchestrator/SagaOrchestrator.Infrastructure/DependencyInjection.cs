@@ -25,15 +25,18 @@ namespace SagaOrchestrator.Infrastructure
             // HttpClient Registration using HttpClientFactory
             services.AddHttpClient<IUserService, UserService>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:5174");
+                // client.BaseAddress = new Uri("http://localhost:5174");
+                client.BaseAddress = new Uri("http://192.168.1.126:81");
             });
             services.AddHttpClient<IAssetService, AssetService>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:5194");
+                // client.BaseAddress = new Uri("http://localhost:5194");
+                client.BaseAddress = new Uri("http://192.168.1.126:81");
             });
             services.AddHttpClient<IDepartmentService, DepartmentService>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:5174");
+                // client.BaseAddress = new Uri("http://localhost:5174");
+                client.BaseAddress = new Uri("http://192.168.1.126:81");
 
             });
 
