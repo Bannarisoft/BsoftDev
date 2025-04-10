@@ -16,15 +16,15 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
         private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly IMediator _mediator;
-        private readonly IEventPublisher _eventPublisher;  // Use IEventPublisher instead of IPublishEndpoint
+        // private readonly IEventPublisher _eventPublisher;  // Use IEventPublisher instead of IPublishEndpoint
 
-        public CreateAssetMasterGeneralCommandHandler(IMapper mapper, IAssetMasterGeneralCommandRepository assetMasterGeneralRepository, IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository, IMediator mediator, IEventPublisher eventPublisher)
+        public CreateAssetMasterGeneralCommandHandler(IMapper mapper, IAssetMasterGeneralCommandRepository assetMasterGeneralRepository, IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository, IMediator mediator)
         {
             _mapper = mapper;
             _assetMasterGeneralRepository = assetMasterGeneralRepository;
             _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
             _mediator = mediator;
-            _eventPublisher = eventPublisher;
+            // _eventPublisher = eventPublisher;
         }
 
         public async Task<ApiResponseDTO<AssetMasterDto>> Handle(CreateAssetMasterGeneralCommand request, CancellationToken cancellationToken)
@@ -47,21 +47,21 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
             await _mediator.Publish(domainEvent, cancellationToken);
 
 
-            // Use the ID generated from the database
-             var assetId = result.Id;
-            var assetCreatedEvent = new AssetCreatedEvent
-            {
-                CorrelationId = Guid.NewGuid(),
-                AssetId = assetId,
-                AssetName = assetEntity.AssetName
-                // UserId = assetEntity.UserId
-            };
+            // // Use the ID generated from the database
+            //  var assetId = result.Id;
+            // var assetCreatedEvent = new AssetCreatedEvent
+            // {
+            //     CorrelationId = Guid.NewGuid(),
+            //     AssetId = assetId,
+            //     AssetName = assetEntity.AssetName
+            //     // UserId = assetEntity.UserId
+            // };
 
-            // Save event to Outbox 
-            await _eventPublisher.SaveEventAsync(assetCreatedEvent);
+            // // Save event to Outbox 
+            // await _eventPublisher.SaveEventAsync(assetCreatedEvent);
 
-            // Triggering the publishing of pending events
-            await _eventPublisher.PublishPendingEventsAsync(); 
+            // // Triggering the publishing of pending events
+            // await _eventPublisher.PublishPendingEventsAsync(); 
 
 
             var assetMasterDTO = _mapper.Map<AssetMasterDto>(result);
