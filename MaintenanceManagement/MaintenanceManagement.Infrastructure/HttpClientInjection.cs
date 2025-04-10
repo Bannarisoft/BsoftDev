@@ -12,7 +12,8 @@ namespace MaintenanceManagement.Infrastructure
         {
             services.AddHttpClient<IDepartmentService, DepartmentService>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:5174");
+                // client.BaseAddress = new Uri("http://localhost:5174");
+                client.BaseAddress = new Uri("http://192.168.1.126:81");
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             });
 
