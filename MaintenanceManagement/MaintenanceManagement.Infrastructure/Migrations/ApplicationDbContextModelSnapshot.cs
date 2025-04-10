@@ -1222,9 +1222,13 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
-                    b.Property<string>("MachineCode")
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("MachineCode");
+                    b.Property<DateTimeOffset?>("LastActivityDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("LastActivityDate");
+
+                    b.Property<int?>("MachineId")
+                        .HasColumnType("int")
+                        .HasColumnName("MachineId");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
@@ -1324,6 +1328,15 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("CreatedIP")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("Description");
+
+                    b.Property<decimal>("EstimatedTime")
+                        .HasColumnType("decimal(5,2)")
+                        .HasColumnName("EstimatedTime");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
@@ -1461,11 +1474,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<TimeSpan>("DownTimeEndTime")
+                    b.Property<TimeSpan?>("DownTimeEndTime")
                         .HasColumnType("time")
                         .HasColumnName("DownTimeEndTime");
 
-                    b.Property<TimeSpan>("DownTimeStartTime")
+                    b.Property<TimeSpan?>("DownTimeStartTime")
                         .HasColumnType("time")
                         .HasColumnName("DownTimeStartTime");
 
@@ -1561,7 +1574,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("TechnicianName")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("TechnicianName");
 
                     b.Property<int>("WorkOrderId")
@@ -1916,6 +1929,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.MachineMaster", b =>
                 {
+                    b.Navigation("MaintenanceRequest");
+
                     b.Navigation("PreventiveSchedulerDtls");
                 });
 
@@ -1932,6 +1947,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Navigation("Frequency");
 
+                    b.Navigation("MaintenanceType");
+
+                    b.Navigation("RequestType");
+
                     b.Navigation("Schedule");
 
                     b.Navigation("WorkOrderPriority");
@@ -1941,18 +1960,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("WorkOrderRootCause");
 
                     b.Navigation("WorkOrderStatus");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MachineMaster", b =>
-                {
-                    b.Navigation("MaintenanceRequest");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
-                {
-                    b.Navigation("MaintenanceType");
-
-                    b.Navigation("RequestType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>

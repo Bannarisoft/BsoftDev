@@ -1,6 +1,6 @@
 
 
-using Core.Application.WorkOrderMaster.WorkOrder.Queries.GetWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrder;
 
 namespace Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder
 {

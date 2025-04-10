@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
-using Core.Application.WorkOrderMaster.WorkOrder.Queries.GetWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Common;
 using Dapper;
 using MassTransit;
@@ -18,6 +18,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
         {
             _dbConnection = dbConnection;
         }
+
+        public Task<(List<WorkOrderDto>, int)> GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> GetBaseDirectoryAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<WorkOrderDto> GetByIdAsync(int workOrderId)
         {
             throw new NotImplementedException();
@@ -93,7 +104,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
             return result.ToList();
         }
 
-        public async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity, IEnumerable<dynamic> Schedule, IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician)> GetWorkOrderByIdAsync(int workOrderId)
+        public async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity,  IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician)> GetWorkOrderByIdAsync(int workOrderId)
         {
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
@@ -194,7 +205,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
             var Item = await multi.ReadAsync<dynamic>();
             var Technician = await multi.ReadAsync<dynamic>();            
            
-            return (WorkOrderResult, Activity, Schedule, Item, Technician);
+            return (WorkOrderResult, Activity,  Item, Technician);
        
         }
 
@@ -211,7 +222,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
             return result.ToList();
         }
-        
+
     } 
 }
    
