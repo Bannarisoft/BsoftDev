@@ -79,10 +79,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                             .WithMessage($"{nameof(UpdateAssetMasterGeneralCommand.AssetMaster.Quantity)} {rule.Error}");    
                         RuleFor(x => x.AssetMaster.UOMId)
                             .NotEmpty()                            
-                            .WithMessage($"{nameof(UpdateAssetMasterGeneralCommand.AssetMaster.UOMId)} {rule.Error}");    
-                        RuleFor(x => x.AssetMaster.AssetDescription)
-                            .NotEmpty()                            
-                            .WithMessage($"{nameof(UpdateAssetMasterGeneralCommand.AssetMaster.AssetDescription)} {rule.Error}");    
+                            .WithMessage($"{nameof(UpdateAssetMasterGeneralCommand.AssetMaster.UOMId)} {rule.Error}");                             
                         RuleFor(x => x.AssetMaster.WorkingStatus)
                             .NotEmpty()                            
                             .WithMessage($"{nameof(UpdateAssetMasterGeneralCommand.AssetMaster.WorkingStatus)} {rule.Error}");   
@@ -161,7 +158,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                         RuleFor(x => x.AssetMaster.AssetDescription)
                             .MaximumLength(assetMasterGeneralDescriptionMaxLength) 
                             .WithMessage($"{nameof(UpdateAssetMasterGeneralCommand.AssetMaster.AssetDescription)} {rule.Error} {assetMasterGeneralDescriptionMaxLength}");
-                        RuleFor(x => x.AssetMaster.AssetDescription)
+                        RuleFor(x => x.AssetMaster.MachineCode)
                             .MaximumLength(assetMasterGeneralMachineCodeMaxLength) 
                             .WithMessage($"{nameof(UpdateAssetMasterGeneralCommand.AssetMaster.MachineCode)} {rule.Error} {assetMasterGeneralMachineCodeMaxLength}");
                         RuleForEach(x => x.AssetMaster.AssetPurchaseDetails)

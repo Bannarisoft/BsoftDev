@@ -21,6 +21,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
             var assetMasterGeneralCodeMaxLength = maxLengthProvider.GetMaxLength<AssetMasterGenerals>("AssetCode")??50;
             var assetMasterGeneralNameMaxLength = maxLengthProvider.GetMaxLength<AssetMasterGenerals>("AssetName")??100;                        
             var assetMasterGeneralMachineCodeMaxLength = maxLengthProvider.GetMaxLength<AssetMasterGenerals>("MachineCode")??50;  
+            var assetMasterGeneralDescriptionMaxLength = maxLengthProvider.GetMaxLength<AssetMasterGenerals>("AssetDescription")??1000;  
 
             var BudgetType = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("BudgetType") ?? 50;
             var OldUnitId = maxLengthProvider.GetMaxLength<AssetPurchaseDetails>("OldUnitId") ?? 2;
@@ -84,10 +85,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                             .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.Quantity)} {rule.Error}");    
                         RuleFor(x => x.AssetMaster.UOMId)
                             .NotEmpty()                            
-                            .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.UOMId)} {rule.Error}");    
-                        RuleFor(x => x.AssetMaster.AssetDescription)
-                            .NotEmpty()                            
-                            .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.AssetDescription)} {rule.Error}");    
+                            .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.UOMId)} {rule.Error}");                            
                         RuleFor(x => x.AssetMaster.WorkingStatus)
                             .NotEmpty()                            
                             .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.WorkingStatus)} {rule.Error}");   
@@ -182,8 +180,11 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                     case "MaxLength":                                              
                         RuleFor(x => x.AssetMaster.AssetName)
                             .MaximumLength(assetMasterGeneralNameMaxLength) 
-                            .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.AssetName)} {rule.Error} {assetMasterGeneralNameMaxLength}");                                                     
+                            .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.AssetName)} {rule.Error} {assetMasterGeneralNameMaxLength}");
                         RuleFor(x => x.AssetMaster.AssetDescription)
+                            .MaximumLength(assetMasterGeneralDescriptionMaxLength) 
+                            .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.AssetDescription)} {rule.Error} {assetMasterGeneralDescriptionMaxLength}");                                                     
+                        RuleFor(x => x.AssetMaster.MachineCode)
                             .MaximumLength(assetMasterGeneralMachineCodeMaxLength) 
                             .WithMessage($"{nameof(CreateAssetMasterGeneralCommand.AssetMaster.MachineCode)} {rule.Error} {assetMasterGeneralMachineCodeMaxLength}");
                         //Additional Cost
