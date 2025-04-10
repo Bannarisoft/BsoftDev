@@ -49,21 +49,12 @@ using Core.Application.MachineGroupUsers.Command.CreateMachineGroupUser;
 using Core.Application.MachineMaster.Command.DeleteMachineMaster;
 using Core.Application.MachineGroupUser.Command.UpdateMachineGroupUser;
 using Core.Application.MachineGroupUser.Command.DeleteMachineGroupUser;
-using Core.Application.WorkOrderMaster.WorkOrder.Command.CreateWorkOrder;
-using MaintenanceManagement.API.Validation.WorkOrderMaster.WorkOrder;
-using MaintenanceManagement.API.Validation.WorkOrderMaster.WorkOrderSchedule;
-using MaintenanceManagement.API.Validation.WorkOrderMaster.WorkOrderActivity;
-using Core.Application.WorkOrderMaster.WorkOrderSchedule.Command.CreateWorkOrderSchedule;
-using Core.Application.WorkOrderMaster.WorkOrderSchedule.Command.UpdateWorkOrderSchedule;
-using Core.Application.WorkOrderMaster.WorkOrderSchedule.Command.DeleteWorkOrderSchedule;
-using Core.Application.WorkOrderMaster.WorkOrderActivity.Command.CreateWorkOrderActivity;
-using Core.Application.WorkOrderMaster.WorkOrderActivity.Command.UpdateWorkOrderActivity;
-using Core.Application.WorkOrderMaster.WorkOrderActivity.Command.DeleteWorkOrderActivity;
-using Core.Application.WorkOrderMaster.WorkOrder.Command.UpdateWorkOrder;
-using Core.Application.WorkOrderMaster.WorkOrder.Command.DeleteWorkOrder;
 using Core.Application.ActivityCheckListMaster.Command.CreateActivityCheckListMaster;
 using MaintenanceManagement.API.Validation.ActivityCheckListMaster;
 using Core.Application.ActivityCheckListMaster.Command.UpdateActivityCheckListMaster;
+using Core.Application.WorkOrder.Command.CreateWorkOrder;
+using MaintenanceManagement.API.Validation.WorkOrder;
+using Core.Application.WorkOrder.Command.UpdateWorkOrder;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -114,17 +105,8 @@ namespace MaintenanceManagement.API.Validation.Common
         services.AddScoped<IValidator<UpdateMachineGroupUserCommand>, UpdateMachineGroupUserCommandValidator>();
         services.AddScoped<IValidator<DeleteMachineGroupUserCommand>, DeleteMachineGroupUserCommandValidator>();
 
-        // services.AddScoped<IValidator<CreateWorkOrderCommand>, CreateWorkOrderCommandValidator>();
-        // services.AddScoped<IValidator<UpdateWorkOrderCommand>, UpdateWorkOrderCommandValidator>();
-        // services.AddScoped<IValidator<DeleteWorkOrderCommand>, DeleteWorkOrderCommandValidator>();
-        
-        // services.AddScoped<IValidator<CreateWorkOrderScheduleCommand>, CreateWorkOrderScheduleCommandValidator>();
-        // services.AddScoped<IValidator<UpdateWorkOrderScheduleCommand>, UpdateWorkOrderScheduleCommandValidator>();
-        // services.AddScoped<IValidator<DeleteWorkOrderScheduleCommand>, DeleteWorkOrderScheduleCommandValidator>();
-        
-        // services.AddScoped<IValidator<CreateWorkOrderActivityCommand>, CreateWorkOrderActivityCommandValidator>();
-        // services.AddScoped<IValidator<UpdateWorkOrderActivityCommand>, UpdateWorkOrderActivityCommandValidator>();
-        // services.AddScoped<IValidator<DeleteWorkOrderActivityCommand>, DeleteWorkOrderActivityCommandValidator>();
+        services.AddScoped<IValidator<CreateWorkOrderCommand>, CreateWorkOrderCommandValidator>();
+        services.AddScoped<IValidator<UpdateWorkOrderCommand>, UpdateWorkOrderCommandValidator>();
 
         services.AddScoped<IValidator<CreateActivityCheckListMasterCommand>, CreateActivityCheckListMasterCommandValidator>();
         services.AddScoped<IValidator<UpdateActivityCheckListMasterCommand>, UpdateActivityCheckListMasterCommandValidator>();

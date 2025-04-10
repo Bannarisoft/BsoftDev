@@ -1,5 +1,6 @@
 using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
-using Core.Application.WorkOrderMaster.WorkOrder.Queries.GetWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Common;
 using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

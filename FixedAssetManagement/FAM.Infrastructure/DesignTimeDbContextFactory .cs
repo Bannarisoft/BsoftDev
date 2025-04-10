@@ -20,7 +20,7 @@ namespace FAM.Infrastructure
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
             // Build configuration
             IConfigurationRoot configuration = new ConfigurationBuilder()

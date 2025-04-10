@@ -68,7 +68,7 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new MaintenanceCategoryConfiguration());
             modelBuilder.ApplyConfiguration(new ActivityMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MachineMasterConfiguration());
-            modelBuilder.ApplyConfiguration( new ActivityMachineGroupConfiguration());
+            modelBuilder.ApplyConfiguration( new ActivityMachineGroupConfiguration());            
             modelBuilder.ApplyConfiguration( new WorkOrderConfiguration());
             modelBuilder.ApplyConfiguration( new WorkOrderActivityConfiguration());
             modelBuilder.ApplyConfiguration( new WorkOrderItemConfiguration());
@@ -80,7 +80,7 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration( new PreventiveSchedulerDtlConfiguration());
             modelBuilder.ApplyConfiguration( new PreventiveSchedulerItemsConfiguration());
             modelBuilder.ApplyConfiguration( new PreventiveSchedulerActivityConfiguration());
-
+            modelBuilder.ApplyConfiguration( new MachineGroupUserConfiguration());
             base.OnModelCreating(modelBuilder);
 
              

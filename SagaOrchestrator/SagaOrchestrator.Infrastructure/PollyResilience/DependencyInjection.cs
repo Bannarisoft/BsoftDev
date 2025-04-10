@@ -14,7 +14,8 @@ namespace SagaOrchestrator.Infrastructure.PollyResilience
         {
             services.AddHttpClient<IUserService, UserService>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:5174"); // URL of UserManagement API
+                // client.BaseAddress = new Uri("http://localhost:5174"); // URL of UserManagement API
+                client.BaseAddress = new Uri("http://192.168.1.126:81");
             })
             .AddPolicyHandler(GetRetryPolicy())
             .AddPolicyHandler(GetCircuitBreakerPolicy());
@@ -22,7 +23,8 @@ namespace SagaOrchestrator.Infrastructure.PollyResilience
             // HttpClient for IUserSessionService
             services.AddHttpClient<IDepartmentService, DepartmentService>(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:5174"); // Same or different depending on your setup
+                // client.BaseAddress = new Uri("http://localhost:5174"); // Same or different depending on your setup
+                client.BaseAddress = new Uri("http://192.168.1.126:81");
             })
             .AddPolicyHandler(GetRetryPolicy())
             .AddPolicyHandler(GetCircuitBreakerPolicy());
