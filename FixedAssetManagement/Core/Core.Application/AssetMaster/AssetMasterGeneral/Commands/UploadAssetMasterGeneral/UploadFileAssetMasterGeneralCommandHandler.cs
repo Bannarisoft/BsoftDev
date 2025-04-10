@@ -108,6 +108,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
                     AssetImageBase64 = base64Image  // ✅ Convert to Base64
                 };
 
+
                 return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = true, Data = response };
             }
             catch (Exception ex)
