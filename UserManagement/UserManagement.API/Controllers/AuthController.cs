@@ -45,6 +45,20 @@ namespace UserManagement.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] UserLoginCommand request)
         {  
+             var SessisonValidate = await _userLoginCommandValidator.ValidateAsync(request, options => 
+            {
+              options.IncludeRuleSets("UserSession");
+            });
+            if (!SessisonValidate.IsValid)
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode=StatusCodes.Status400BadRequest, 
+                    message = "Validation failed", 
+                    errors = SessisonValidate.Errors.Select(e => e.ErrorMessage).ToArray(),
+                    session = true 
+                });
+            }
               var validationResult = await _userLoginCommandValidator.ValidateAsync(request);
             if (!validationResult.IsValid)
             {
@@ -52,7 +66,8 @@ namespace UserManagement.API.Controllers
                 { 
                     StatusCode=StatusCodes.Status400BadRequest, 
                     message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray(),
+                    session = false  
                 });
             }
                       
@@ -74,7 +89,7 @@ namespace UserManagement.API.Controllers
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
-                Message = response.Message
+                message = response.Message
             }); 
         }
         
