@@ -231,7 +231,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
                 SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,
-                MM.Description+'\'+C.CompanyName+'\'+UN.ShortName +'\'+AM.AssetImage AssetImage,AM.AssetCategoryId,AM.AssetSubCategoryId,
+                MM.Description+'\'+C.CompanyName+'\'+trim(UN.unitname) +'\'+AM.AssetImage AssetImage,AM.AssetCategoryId,AM.AssetSubCategoryId,
                 AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
