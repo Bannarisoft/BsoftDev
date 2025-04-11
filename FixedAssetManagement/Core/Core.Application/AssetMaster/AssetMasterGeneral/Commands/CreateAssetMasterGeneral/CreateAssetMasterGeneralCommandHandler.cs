@@ -67,17 +67,27 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
             var assetMasterDTO = _mapper.Map<AssetMasterDto>(result);
             if (result.Id > 0)
             {
+                string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
                 string tempFilePath = request.AssetMaster.AssetImage;
-                if (!string.IsNullOrEmpty(tempFilePath) && File.Exists(tempFilePath))
+
+                  string companyFolder = Path.Combine(baseDirectory, request.AssetMaster.CompanyName?.Trim() ?? string.Empty);
+            
+
+                    string unitFolder = Path.Combine(companyFolder, request.AssetMaster.UnitName?.Trim() ?? string.Empty);
+              string filePath = Path.Combine(unitFolder, tempFilePath);
+
+            
+
+                if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
                 {
-                    string directory = Path.GetDirectoryName(tempFilePath) ?? string.Empty;
+                    string directory = Path.GetDirectoryName(filePath) ?? string.Empty;
                     string newFileName = $"{result.AssetCode}{Path.GetExtension(tempFilePath)}";
                     string newFilePath = Path.Combine(directory, newFileName);
 
                     try
                     {
-                        File.Move(tempFilePath, newFilePath);
-                        assetEntity.AssetImage = newFilePath.Replace(@"\", "/");
+                        File.Move(filePath, newFilePath);
+                        assetEntity.AssetImage = newFileName;
                         await _assetMasterGeneralRepository.UpdateAsync(assetEntity);
                     }
                     catch (Exception ex)
