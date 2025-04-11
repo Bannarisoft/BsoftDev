@@ -1,3 +1,4 @@
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
 using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral
@@ -25,7 +26,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public bool? NonDepreciated { get; set; }
         public bool? Tangible { get; set; }      
         public byte IsActive { get; set; }  
-        public AssetLocationCombineDto?  AssetLocation  { get; set; }
-        public ICollection<AssetPurchaseCombineDto>? AssetPurchaseDetails{ get; set; }    
+        public AssetLocationUpdateDto?  AssetLocation  { get; set; }
+        public ICollection<AssetPurchaseUpdateDto>? AssetPurchaseDetails{ get; set; }    
+        public ICollection<AssetAdditionalCostUpdateDto>? AssetAdditionalCost{ get; set; }     
     }
 }

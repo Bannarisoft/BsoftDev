@@ -67,32 +67,34 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
             var assetMasterDTO = _mapper.Map<AssetMasterDto>(result);
             if (result.Id > 0)
             {
-                string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
+             
                 string tempFilePath = request.AssetMaster.AssetImage;
-
-                  string companyFolder = Path.Combine(baseDirectory, request.AssetMaster.CompanyName?.Trim() ?? string.Empty);
+                if (tempFilePath != null){
+                    string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
+                    string companyFolder = Path.Combine(baseDirectory, request.AssetMaster.CompanyName?.Trim() ?? string.Empty);
             
 
                     string unitFolder = Path.Combine(companyFolder, request.AssetMaster.UnitName?.Trim() ?? string.Empty);
-              string filePath = Path.Combine(unitFolder, tempFilePath);
+                    string filePath = Path.Combine(unitFolder, tempFilePath);
 
             
 
-                if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
-                {
-                    string directory = Path.GetDirectoryName(filePath) ?? string.Empty;
-                    string newFileName = $"{result.AssetCode}{Path.GetExtension(tempFilePath)}";
-                    string newFilePath = Path.Combine(directory, newFileName);
+                    if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+                    {
+                        string directory = Path.GetDirectoryName(filePath) ?? string.Empty;
+                        string newFileName = $"{result.AssetCode}{Path.GetExtension(tempFilePath)}";
+                        string newFilePath = Path.Combine(directory, newFileName);
 
-                    try
-                    {
-                        File.Move(filePath, newFilePath);
-                        assetEntity.AssetImage = newFileName;
-                        await _assetMasterGeneralRepository.UpdateAsync(assetEntity);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed to rename file: {ex.Message}");
+                        try
+                        {
+                            File.Move(filePath, newFilePath);
+                            assetEntity.AssetImage = newFileName;
+                            await _assetMasterGeneralRepository.UpdateAsync(request.AssetMaster.Id, assetEntity);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Failed to rename file: {ex.Message}");
+                        }
                     }
                 }
                 return new ApiResponseDTO<AssetMasterDto>

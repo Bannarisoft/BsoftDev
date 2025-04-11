@@ -31,32 +31,68 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             }
             return false;
         }
-        public async Task<int> UpdateAsync(AssetMasterGenerals assetMaster)
+        public async Task<bool> UpdateAsync(int assetId,AssetMasterGenerals assetMaster)
         {
-            var existingDepGroup = await _applicationDbContext.AssetMasterGenerals.FirstOrDefaultAsync(u => u.Id == assetMaster.Id);    
-            if (existingDepGroup != null)
-            {                
-                existingDepGroup.AssetName = assetMaster.AssetName;                
-                existingDepGroup.AssetGroupId = assetMaster.AssetGroupId;
-                existingDepGroup.IsActive = assetMaster.IsActive;
-                existingDepGroup.AssetGroupId = assetMaster.AssetGroupId;
-                existingDepGroup.AssetCategoryId = assetMaster.AssetCategoryId;
-                existingDepGroup.AssetSubCategoryId = assetMaster.AssetSubCategoryId;
-                existingDepGroup.AssetParentId = assetMaster.AssetParentId;
-                existingDepGroup.AssetType = assetMaster.AssetType;
-                existingDepGroup.MachineCode = assetMaster.MachineCode;
-                existingDepGroup.Quantity = assetMaster.Quantity;
-                existingDepGroup.UOMId = assetMaster.UOMId;
-                existingDepGroup.AssetDescription = assetMaster.AssetDescription;
-                existingDepGroup.WorkingStatus = assetMaster.WorkingStatus;
-                existingDepGroup.AssetImage = assetMaster.AssetImage;
-                existingDepGroup.ISDepreciated = assetMaster.ISDepreciated;
-                existingDepGroup.IsTangible = assetMaster.IsTangible;
-                existingDepGroup.IsActive = assetMaster.IsActive;
-                _applicationDbContext.AssetMasterGenerals.Update(existingDepGroup);
-                return await _applicationDbContext.SaveChangesAsync();
-            }
-           return 0; 
+            var existingAssetGroup = await _applicationDbContext.AssetMasterGenerals
+                   .Include(cf => cf.AssetAdditionalCost)
+                   .Include(cf => cf.AssetPurchase)
+                   .Include(cf => cf.AssetLocation)
+                   .FirstOrDefaultAsync(u => u.Id ==assetId);
+
+               if (existingAssetGroup == null)
+                   return false;
+
+               
+               _applicationDbContext.AssetAdditionalCost.RemoveRange(
+                   _applicationDbContext.AssetAdditionalCost.Where(x => x.AssetId == assetId));
+
+               _applicationDbContext.AssetPurchaseDetails.RemoveRange(
+                   _applicationDbContext.AssetPurchaseDetails.Where(x => x.AssetId == assetId));
+
+               _applicationDbContext.AssetLocations.RemoveRange(
+                   _applicationDbContext.AssetLocations.Where(x => x.AssetId == assetId));
+
+                       
+                existingAssetGroup.AssetName = assetMaster.AssetName;                
+                existingAssetGroup.AssetGroupId = assetMaster.AssetGroupId;
+                existingAssetGroup.IsActive = assetMaster.IsActive;
+                existingAssetGroup.AssetGroupId = assetMaster.AssetGroupId;
+                existingAssetGroup.AssetCategoryId = assetMaster.AssetCategoryId;
+                existingAssetGroup.AssetSubCategoryId = assetMaster.AssetSubCategoryId;
+                existingAssetGroup.AssetParentId = assetMaster.AssetParentId;
+                existingAssetGroup.AssetType = assetMaster.AssetType;
+                existingAssetGroup.MachineCode = assetMaster.MachineCode;
+                existingAssetGroup.Quantity = assetMaster.Quantity;
+                existingAssetGroup.UOMId = assetMaster.UOMId;
+                existingAssetGroup.AssetDescription = assetMaster.AssetDescription;
+                existingAssetGroup.WorkingStatus = assetMaster.WorkingStatus;
+                existingAssetGroup.AssetImage = assetMaster.AssetImage;
+                existingAssetGroup.ISDepreciated = assetMaster.ISDepreciated;
+                existingAssetGroup.IsTangible = assetMaster.IsTangible;
+                existingAssetGroup.IsActive = assetMaster.IsActive;
+                
+            if (assetMaster.AssetAdditionalCost?.Any() == true)
+                   await _applicationDbContext.AssetAdditionalCost.AddRangeAsync(assetMaster.AssetAdditionalCost);
+
+              if (assetMaster.AssetPurchase?.Any() == true)
+                {
+                    foreach (var purchaseDetail in assetMaster.AssetPurchase)
+                    {
+                        purchaseDetail.QcCompleted = 'Y';
+                        purchaseDetail.AssetId = assetId;
+                    }
+                    
+                    await _applicationDbContext.AssetPurchaseDetails.AddRangeAsync(assetMaster.AssetPurchase);
+                }
+             /*   if (assetMaster.AssetLocation?.Any() == true)
+                   await _applicationDbContext.AssetLocations.AddRangeAsync(assetMaster.AssetLocation); */
+                if (assetMaster.AssetLocation != null)
+                {
+                    assetMaster.AssetLocation.AssetId = assetId; 
+                    await _applicationDbContext.AssetLocations.AddAsync(assetMaster.AssetLocation);
+                }
+               return await _applicationDbContext.SaveChangesAsync() > 0;
+          
         }     
         public async Task<AssetMasterGenerals?> GetByAssetCodeAsync(string assetCode)
         {
