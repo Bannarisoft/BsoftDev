@@ -232,7 +232,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 -- First Query: AssetMaster (One-to-One)
                 SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,
                 MM.Description+'\'+C.CompanyName+'\'+trim(UN.unitname) +'\'+AM.AssetImage AssetImage,AM.AssetCategoryId,AM.AssetSubCategoryId,
-                AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus
+                AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
                 INNER JOIN [FixedAsset].[AssetGroup] AG ON AM.AssetGroupId = AG.Id
@@ -255,7 +255,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 
 
                 -- Third Query: AssetPurchaseDetails (One-to-Many)
-                SELECT AP.Id,AP.VendorCode, AP.VendorName,U.UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
+                SELECT distinct AP.Id,AP.VendorCode, AP.VendorName,U.UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
                 AP.GrnSno,AP.GrnValue,AP.PoNo,Cast(AP.PoDate AS date) AS PoDate,AP.PurchaseValue,AP.AcceptedQty,AP.Uom,
                 AP.PoSno,AP.ItemCode,AP.ItemName,AP.BillNo,Cast(AP.BillDate AS date) AS BillDate ,AP.BinLocation 
                 ,AP.PjYear,AP.PjDocId,AP.PjDocSr,AP.PjDocNo,AP.AssetSourceId ,cast(AP.CapitalizationDate as date)CapitalizationDate
@@ -363,6 +363,103 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             }
 
             return (assetResult, locationResult, purchaseDetails, SpecDetails, WarrantyDetails, AMCDetails, DisposalResult, InsuranceDetails,AdditionalCost);
+       
+        }
+
+        public async Task<(dynamic AssetResult, dynamic LocationResult, IEnumerable<dynamic> PurchaseDetails, IEnumerable<dynamic> AdditionalCost)> GetAssetMasterSplitByIdAsync(int assetId)
+        {
+           var sqlQuery = @"
+                -- First Query: AssetMaster (One-to-One)
+                SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,
+                MM.Description+'\'+C.CompanyName+'\'+trim(UN.unitname) +'\'+AM.AssetImage AssetImage,AM.AssetCategoryId,AM.AssetSubCategoryId,
+                AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName
+                FROM [FixedAsset].[AssetMaster] AM
+                INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
+                INNER JOIN [FixedAsset].[AssetGroup] AG ON AM.AssetGroupId = AG.Id
+                INNER JOIN [FixedAsset].[AssetCategories] AC ON AM.AssetCategoryId = AC.Id
+                INNER JOIN [FixedAsset].[AssetSubCategories] ASUBC ON AM.AssetSubCategoryId = ASUBC.Id
+                LEFT JOIN [FixedAsset].[AssetMaster] AssetParent ON AM.AssetParentId = AssetParent.Id
+                LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'
+                LEFT JOIN Bannari.AppData.Unit UN on UN.Id=AM.UnitId
+                LEFT JOIN Bannari.AppData.Company C on C.Id=AM.CompanyId
+                WHERE AM.Id = @AssetId;
+
+                -- Second Query: AssetLocation (One-to-One)
+                SELECT U.UnitName,D.DeptName,L.LocationName,SL.SubLocationName,U.OldUnitId,AL.CustodianId,AL.UserId,AL.DepartmentId,AL.LocationId,AL.SubLocationId
+                FROM [FixedAsset].[AssetLocation] AL
+                INNER JOIN [FixedAsset].[Location] L ON L.Id=AL.LocationId
+                INNER JOIN [FixedAsset].[SubLocation] SL ON SL.Id=AL.SubLocationId
+                LEFT JOIN [Bannari].[AppData].[Unit] U ON AL.UnitId = U.Id
+                LEFT JOIN [Bannari].[AppData].[Department] D ON AL.DepartmentId=D.Id                
+                WHERE AL.AssetId = @AssetId;
+                
+
+                -- Third Query: AssetPurchaseDetails (One-to-Many)
+                SELECT distinct AP.Id,AP.VendorCode, AP.VendorName,U.UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
+                AP.GrnSno,AP.GrnValue,AP.PoNo,Cast(AP.PoDate AS date) AS PoDate,AP.PurchaseValue,AP.AcceptedQty,AP.Uom,
+                AP.PoSno,AP.ItemCode,AP.ItemName,AP.BillNo,Cast(AP.BillDate AS date) AS BillDate ,AP.BinLocation 
+                ,AP.PjYear,AP.PjDocId,AP.PjDocSr,AP.PjDocNo,AP.AssetSourceId ,cast(AP.CapitalizationDate as date)CapitalizationDate
+                FROM [FixedAsset].[AssetPurchaseDetails] AP
+                LEFT JOIN [Bannari].[AppData].[Unit] U ON AP.OldUnitId = U.OldUnitId
+                INNER JOIN [FixedAsset].[AssetSource] ASource ON ASource.Id=AP.AssetSourceId
+                WHERE AP.AssetId = @AssetId;             
+
+                SELECT AC.Id,AssetSourceId,Amount,JournalNo,CostType,MM.Code CostTypeDesc
+                FROM [FixedAsset].[AssetAdditionalCost]AC
+                inner join FixedAsset.MiscMaster MM on MM.id=CostType 
+                WHERE AssetId=@AssetId
+                ";
+
+            using var multi = await _dbConnection.QueryMultipleAsync(sqlQuery, new { AssetId = assetId });
+
+            var assetResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
+            var locationResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
+            var purchaseDetails = await multi.ReadAsync<dynamic>();          
+            var AdditionalCost = await multi.ReadAsync<dynamic>();
+
+       
+            if (locationResult != null && !string.IsNullOrEmpty(locationResult.OldUnitId))
+            {
+                // Fetch Custodian
+                if (locationResult.CustodianId > 0)
+                {
+                    var custodianParams = new
+                    {
+                        DivCode = locationResult.OldUnitId,
+                        EmpNo = locationResult.CustodianId
+                    };
+
+                    var custodianEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
+                        "dbo.GetEmployeeByDivision",
+                        custodianParams,
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                    if (custodianEmployee != null)
+                        locationResult.CustodianName = custodianEmployee.Empname;
+                }
+
+                // Fetch User
+                if (locationResult.UserId > 0)
+                {
+                    var userParams = new
+                    {
+                        DivCode = locationResult.OldUnitId,
+                        EmpNo = locationResult.UserId
+                    };
+
+                    var userEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
+                        "dbo.GetEmployeeByDivision",
+                        userParams,
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                    if (userEmployee != null)
+                        locationResult.UserName = userEmployee.Empname;
+                }
+            }
+
+            return (assetResult, locationResult, purchaseDetails, AdditionalCost);
        
         }
     }

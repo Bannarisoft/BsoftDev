@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral
 {
-    public class UpdateAssetMasterGeneralCommandHandler : IRequestHandler<UpdateAssetMasterGeneralCommand, ApiResponseDTO<AssetMasterUpdateDto>>
+    public class UpdateAssetMasterGeneralCommandHandler : IRequestHandler<UpdateAssetMasterGeneralCommand, ApiResponseDTO<bool>>
     {
         private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
@@ -25,11 +25,11 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<AssetMasterUpdateDto>> Handle(UpdateAssetMasterGeneralCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<bool>> Handle(UpdateAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         {
             var assetMaster = await _assetMasterGeneralQueryRepository.GetByIdAsync(request.AssetMaster.Id);
             if (assetMaster is null)
-            return new ApiResponseDTO<AssetMasterUpdateDto>
+            return new ApiResponseDTO<bool>
             {
                 IsSuccess = false,
                 Message = "Invalid AssetId. The specified AssetName does not exist or is inactive."
@@ -38,44 +38,34 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
             assetMaster.AssetName = request.AssetMaster.AssetName;
 
          
-            var updatedAssetMasterEntity = _mapper.Map<AssetMasterGenerals>(request);                   
-            var updateResult = await _assetMasterGeneralRepository.UpdateAsync( updatedAssetMasterEntity);            
+            var updatedAssetMasterEntity = _mapper.Map<AssetMasterGenerals>(request.AssetMaster);                   
+            var updateResult = await _assetMasterGeneralRepository.UpdateAsync( request.AssetMaster.Id,updatedAssetMasterEntity);            
 
-            var updatedAssetMaster =  await _assetMasterGeneralQueryRepository.GetByIdAsync(request.AssetMaster.Id);    
-            if (updatedAssetMaster != null)
-            {
-                var assetMasterDto = _mapper.Map<AssetMasterUpdateDto>(updatedAssetMaster);
+          
+                
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: assetMasterDto.AssetCode ?? string.Empty,
-                    actionName: assetMasterDto.AssetName ?? string.Empty,                            
-                    details: $"AssetMaster '{oldAssetName}' was updated to '{assetMasterDto.AssetName}'.  Code: {assetMasterDto.AssetCode}",
+                    actionCode: request.AssetMaster.AssetCode ?? string.Empty,
+                    actionName: request.AssetMaster.AssetName ?? string.Empty,                            
+                    details: $"AssetMaster '{oldAssetName}' was updated to '{request.AssetMaster.AssetName}'.  Code: {request.AssetMaster.AssetCode}",
                     module:"AssetMasterGeneral"
                 );            
                 await _mediator.Publish(domainEvent, cancellationToken);
-                if(updateResult>0)
+                if(updateResult)
                 {
-                    return new ApiResponseDTO<AssetMasterUpdateDto>
+                    return new ApiResponseDTO<bool>
                     {
                         IsSuccess = true,
-                        Message = "AssetMaster updated successfully.",
-                        Data = assetMasterDto
+                        Message = "AssetMaster updated successfully."                        
                     };
                 }
-                return new ApiResponseDTO<AssetMasterUpdateDto>
+                return new ApiResponseDTO<bool>
                 {
                     IsSuccess = false,
                     Message = "AssetMaster not updated."
                 };                
-            }
-            else
-            {
-                return new ApiResponseDTO<AssetMasterUpdateDto>{
-                    IsSuccess = false,
-                    Message = "AssetMaster not found."
-                };
-            }        
+          
         }
     }
 }

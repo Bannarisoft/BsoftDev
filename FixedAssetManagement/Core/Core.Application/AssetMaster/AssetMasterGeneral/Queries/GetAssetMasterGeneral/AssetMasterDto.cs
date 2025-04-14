@@ -7,7 +7,8 @@
     namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral
     {
         public class AssetMasterDto  : IMapFrom<AssetMasterGenerals>
-        {               
+        {          
+             public int Id { get; set; }     
             public int CompanyId { get; set; }
             public string? CompanyName { get; set; }   
             public int UnitId { get; set; }

@@ -8,8 +8,7 @@ namespace FAM.Infrastructure.Helpers
         
         public static string GetDefaultConnectionString(IConfiguration configuration)
         {
-            var environmentSetup = new EnvironmentSetup(configuration);
-            environmentSetup.SetupEnvironmentVariables();
+           
             var connectionString = configuration.GetConnectionString("DefaultConnection")
                                                 .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
                                                 .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
@@ -19,8 +18,7 @@ namespace FAM.Infrastructure.Helpers
 
         public static string GetHangfireConnectionString(IConfiguration configuration)
         {
-            var environmentSetup = new EnvironmentSetup(configuration);
-            environmentSetup.SetupEnvironmentVariables();
+          
             var connectionString = configuration.GetConnectionString("HangfireConnection")
                                                 .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
                                                 .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")

@@ -1,5 +1,6 @@
 using AutoMapper;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IExcelImport;
 using Core.Domain.Entities;
 using MediatR;
@@ -7,7 +8,7 @@ using OfficeOpenXml;
 
 namespace Core.Application.ExcelImport
 {
-    public class ImportAssetCommandHandler : IRequestHandler<ImportAssetCommand, bool>
+    public class ImportAssetCommandHandler : IRequestHandler<ImportAssetCommand, ApiResponseDTO<bool>>
     {
         private readonly IExcelImportCommandRepository _assetRepository;
         private readonly IExcelImportQueryRepository _assetQueryRepository;
@@ -20,11 +21,17 @@ namespace Core.Application.ExcelImport
             _mapper = mapper;
         }
 
-        public async Task<bool> Handle(ImportAssetCommand request, CancellationToken cancellationToken)
+        public async Task< ApiResponseDTO<bool>> Handle(ImportAssetCommand request, CancellationToken cancellationToken)
         {
             if (request.ImportDto == null || request.ImportDto.File == null || request.ImportDto.File.Length == 0)
             {
-                throw new ArgumentException("Invalid file uploaded.");
+                //throw new ArgumentException("Invalid file uploaded.");
+                  return new ApiResponseDTO<bool>
+                            {
+                                IsSuccess = false,
+                                Message = "Invalid file uploaded",
+                                Data = false
+                            };
             }
 
             var assetsDto = new List<AssetMasterDto>();
@@ -66,13 +73,25 @@ namespace Core.Application.ExcelImport
                         }
                         catch (Exception ex)
                         {
-                            throw new Exception($"Error at Excel Row {currentRow}: {ex.Message}");
+                            //throw new Exception($"Error at Excel Row {currentRow}: {ex.Message}");
+                            return new ApiResponseDTO<bool>
+                            {
+                                IsSuccess = false,
+                                Message = $"Error at Excel Row {currentRow}: {ex.Message}",
+                                Data = false
+                            };
                         }
                     }
                 }
             }
-
-            return await _assetRepository.ImportAssetsAsync(assetsDto, cancellationToken);
+            //return await _assetRepository.ImportAssetsAsync(assetsDto, cancellationToken);
+            var result = await _assetRepository.ImportAssetsAsync(assetsDto, cancellationToken);
+            return new ApiResponseDTO<bool>
+            {
+                IsSuccess = result,
+                Message = result ? "Assets imported successfully." : "Asset import failed.",
+                Data = result
+            };
         }
     }
 }

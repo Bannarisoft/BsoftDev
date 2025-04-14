@@ -8,19 +8,9 @@ using FAM.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
 
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-var appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{environment}.json");
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-
-// If environment is null or empty, set default to "Development"
-if (string.IsNullOrWhiteSpace(environment))
-{
-    environment = "Development";
-    Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
-
-}
 
 // Load configuration files based on the environment
 builder.Configuration
