@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById
 {
-    public class AssetMasterDTO
+    public class AssetMasterSplitDto
     {
-        public string? AssetName { get; set; }
+         public string? AssetName { get; set; }
         public string? AssetCode { get; set; }
         public int Quantity { get; set; }
         public string? UOMName { get; set; }
@@ -26,12 +26,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
 
         public AssetParentDTO? AssetParent { get; set; }
         public AssetLocationDTO? AssetLocation { get; set; }
-        public IList<AssetPurchaseDetailDTO>? AssetPurchaseDetails { get; set; }
-        public IList<AssetSpecDTO>? AssetSpecification { get; set; }
-        public IList<AssetWarrantyDTOById>? AssetWarranty { get; set; }
-        public IList<AssetAMCDTOById>? AssetAmc { get; set; }
-        public AssetDisposalByIdDTO? AssetDisposal { get; set; }
-        public IList<AssetInsuranceByIdDTO>? AssetInsurance { get; set; }
+        public IList<AssetPurchaseDetailDTO>? AssetPurchaseDetails { get; set; }        
         public IList<AssetAdditionalCostDto>? AssetAdditionalCost { get; set; }
     }
 }

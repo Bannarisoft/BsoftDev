@@ -5,6 +5,7 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAssetMa
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetCodePattern;
+using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterByIdSplit;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralAutoComplete;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById;
@@ -106,7 +107,38 @@ namespace FAM.API.Controllers.AssetMaster
 
             });
         }
+        [HttpGet("{id}/split")]
+        public async Task<IActionResult> GetByIdSplitAsync(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
 
+                    message = "Invalid Asset ID"
+                });
+            }
+
+            var result = await Mediator.Send(new GetAssetMasterByIdSplitQuery { Id = id });
+            if (result is null)
+
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+
+                    message = $"AssetId {id} not found",
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = result.Data
+
+            });
+        }
         // POST: api/AssetMasterGeneral
 
         [HttpPost]
@@ -410,10 +442,20 @@ namespace FAM.API.Controllers.AssetMaster
 
             var result = await Mediator.Send(new ImportAssetCommand(dto));
 
-            if (result)
-                return Ok("File uploaded and data saved successfully.");
-            else
-                return StatusCode(500, "An error occurred while processing the file.");
+            if (result.IsSuccess && result.Data)             
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message =result.Message,
+                errors = ""
+            });
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message =result.Message,
+                errors = ""
+            });            
         }       
     }
 }

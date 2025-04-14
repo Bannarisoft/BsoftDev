@@ -207,17 +207,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                         RuleFor(x => x.AssetMaster.Quantity)
                         .InclusiveBetween(1, int.MaxValue)
                         .WithMessage($"{nameof(UpdateAssetMasterGeneralCommand.AssetMaster.Quantity)} {rule.Error}");                       
-                        break;
-                    case "YesNoStatus":
-                      RuleForEach(x => x.AssetMaster.AssetPurchaseDetails)
-                            .ChildRules(purchase =>
-                            {
-                                 purchase.RuleFor(x => x.QcCompleted)
-                                      .NotEmpty()
-                        .Must(value => value.HasValue && System.Text.RegularExpressions.Regex.IsMatch(value.Value.ToString(), rule.Pattern))
-                        .WithMessage($"{nameof(UpdateAssetPurchaseDetailCommand.QcCompleted)} {rule.Error}");
-                            });                              
-                         break;   
+                        break;                  
                     default:                        
                         break;
                 }
