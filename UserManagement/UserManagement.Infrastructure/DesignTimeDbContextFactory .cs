@@ -24,9 +24,9 @@ namespace UserManagement.Infrastructure
                 .AddJsonFile($"appsettings.{environment}.json", optional: false, reloadOnChange: true)
                 .Build();
 
-          var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
+        //   var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
 
-            optionsBuilder.UseSqlServer(connectionString);
+        //     optionsBuilder.UseSqlServer(connectionString);
 
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             // Create a dummy or mock IPAddressService implementation
