@@ -16,7 +16,10 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5174",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DATABASE_SERVER":"192.168.1.126",
+        "DATABASE_USERID":"developer",
+        "DATABASE_PASSWORD":"Dev@#$456"
       }
     },
     "https": {
@@ -24,18 +27,24 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7031;http://localhost:5174",
+      "applicationUrl": "https://localhost:7031;http://localhost:5174"     ,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DATABASE_SERVER":"192.168.1.126",
+        "DATABASE_USERID":"developer",
+        "DATABASE_PASSWORD":"Dev@#$456"
       }
     },
     "IIS Express": {
       "commandName": "chrome",
       "launchBrowser": true,
-      "launchUrl": "swagger",
+      "launchUrl": "swagger"  ,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DATABASE_SERVER":"192.168.1.130",
+        "DATABASE_USERID":"developer",
+        "DATABASE_PASSWORD":"Dev@#$456"
+      }  
     }
   }
 }

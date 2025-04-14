@@ -8,23 +8,15 @@ using MassTransit;
 using UserManagement.Infrastructure.PollyResilience;
 
 var builder = WebApplication.CreateBuilder(args);
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-
-// If environment is null or empty, set default to "Development"
-if (string.IsNullOrWhiteSpace(environment))
-{
-    environment = "Development";
-    Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
-}
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ;
 
 builder.Configuration
-    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
-    .AddJsonFile("settings/emailsetting.json", optional: false, reloadOnChange: true)
-
-    .AddJsonFile("settings/smssetting.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true)
-    .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
-    .AddEnvironmentVariables();
+.AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+.AddJsonFile("settings/emailsetting.json", optional: false, reloadOnChange: true)
+.AddJsonFile("settings/smssetting.json", optional: false, reloadOnChange: true)
+.AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true)
+.AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
+.AddEnvironmentVariables();
 
 
 // Configure Serilog

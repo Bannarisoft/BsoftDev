@@ -71,7 +71,6 @@ using Core.Application.Common;
 using UserManagement.Infrastructure.Helpers;
 using Core.Application.Common.Interfaces.ICustomField;
 using UserManagement.Infrastructure.Repositories.CustomFields;
-using BackgroundService.Application.Interfaces;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
@@ -81,10 +80,12 @@ namespace UserManagement.Infrastructure
         {
 
             var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
-            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
-                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
-                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
-                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
+            var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);
+
+            // var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
+            //                                     .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
+            //                                     .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
+            //                                     .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
@@ -99,13 +100,13 @@ namespace UserManagement.Infrastructure
             /*  services.AddDbContext<ApplicationDbContext>(options =>
                  options.UseSqlServer(connectionString)); */
             services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(connectionString, sqlOptions =>
-        {
-            sqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 5, // Number of retry attempts
-                maxRetryDelay: TimeSpan.FromSeconds(30), // Delay between retries
-                errorNumbersToAdd: null); // Add specific SQL error numbers to retry on (optional)
-        }));
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5, // Number of retry attempts
+                    maxRetryDelay: TimeSpan.FromSeconds(30), // Delay between retries
+                    errorNumbersToAdd: null); // Add specific SQL error numbers to retry on (optional)
+            }));
 
             // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
