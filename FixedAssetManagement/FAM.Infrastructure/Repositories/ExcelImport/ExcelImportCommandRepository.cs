@@ -56,15 +56,11 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
                     catch (DbUpdateException dbEx) // 🔹 Capture EF Core Database Errors
                     {
                         await transaction.RollbackAsync(cancellationToken);
-                        Console.WriteLine($"Database Update Error: {dbEx.InnerException?.Message ?? dbEx.Message}");
-                        Console.WriteLine($"StackTrace: {dbEx.InnerException?.StackTrace ?? dbEx.StackTrace}");
                         throw new Exception($"Database Transaction Error: {dbEx.InnerException?.Message ?? dbEx.Message}");
                     }
                     catch (Exception ex)
                     {
-                        await transaction.RollbackAsync(cancellationToken);
-                        Console.WriteLine($"Unexpected Error: {ex.Message}");
-                        Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                        await transaction.RollbackAsync(cancellationToken);          
                         throw new Exception($"Unexpected Error: {ex.Message}");
                     }
                 }

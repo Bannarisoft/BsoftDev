@@ -7,20 +7,7 @@ using Contracts.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "development";
-
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-var appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), $"appsettings.{environment}.json");
-
-
-// If environment is null or empty, set default to "Development"
-if (string.IsNullOrWhiteSpace(environment))
-{
-    environment = "Development";
-    Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment, EnvironmentVariableTarget.Process);
-
-}
-
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
 // Load configuration files based on the environment
 builder.Configuration
