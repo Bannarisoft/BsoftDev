@@ -450,7 +450,7 @@ namespace FAM.API.Controllers.AssetMaster
                 errors = ""
             });
 
-            return Ok(new
+           return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
                 message =result.Message,

@@ -79,13 +79,17 @@ namespace UserManagement.Infrastructure
             (this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
         {
 
-            var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
-            var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);
-
-            // var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
-            //                                     .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
-            //                                     .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
-            //                                     .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
+            // var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
+            // var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
+                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
+                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
+            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
+                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
+                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
+                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");    
+            
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
