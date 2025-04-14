@@ -5,25 +5,36 @@ using MaintenanceManagement.Infrastructure.HttpClients.Departments;
 using MaintenanceManagement.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
+using Polly.Extensions.Http;
+using Shared.Infrastructure.HttpClientPolly;
 
 namespace MaintenanceManagement.Infrastructure
 {
     public static class HttpClientInjection
     {
-        public static IServiceCollection AddHttpClients(this IServiceCollection services)
+        public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddHttpClient<IDepartmentService, DepartmentService>(client =>
+            // DepartmentClient
+            services.AddHttpClient("DepartmentClient", client =>
             {
-                // client.BaseAddress = new Uri("http://localhost:5174");
-                client.BaseAddress = new Uri("http://192.168.1.126:81");
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:DepartmentService"]);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            });
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+            services.AddScoped<IDepartmentService, DepartmentService>();
 
-            services.AddHttpClient<IUserSessionService, UserSessionService>(client =>
+            // UserSessionClient
+            services.AddHttpClient("UserSessionClient", client =>
             {
-                // client.BaseAddress = new Uri("http://localhost:5174/api");
-                client.BaseAddress = new Uri("http://192.168.1.126:81/api");
-            });
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:UserSessionService"]);
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            })
+
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+            services.AddScoped<IUserSessionService, UserSessionService>();
 
             return services;
         }

@@ -1,5 +1,5 @@
 using System.Net.Http.Headers;
-using System.Text;
+using System.Net.Http.Json;
 using System.Text.Json;
 using Contracts.Interfaces.IUser;
 using Contracts.Models.Common;
@@ -9,17 +9,17 @@ namespace FAM.Infrastructure.Services
 {
     public class UserSessionService : IUserSessionService
     {
-        private readonly HttpClient _httpClient;
-        public UserSessionService(HttpClient httpClient)
+        private readonly IHttpClientFactory _httpClientFactory;
+        public UserSessionService(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
         }
         public async Task<UserSessionDto?> GetSessionByJwtIdAsync(string jwtId, string token)
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
+            var client = _httpClientFactory.CreateClient("UserSessionClient");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var response = await _httpClient.GetAsync($"api/Auth/session/{jwtId}");
+            var response = await client.GetAsync($"api/Auth/session/{jwtId}");
             if (!response.IsSuccessStatusCode)
                 return null;
 
@@ -34,23 +34,13 @@ namespace FAM.Infrastructure.Services
 
         public async Task<bool> UpdateSessionAsync(string jwtId, DateTimeOffset lastActivity, string token)
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                      new AuthenticationHeaderValue("Bearer", token);
+            var client = _httpClientFactory.CreateClient("UserSessionClient");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var payload = new { LastActivity = lastActivity };
-            var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+            var sessionUpdate = new { JwtId = jwtId, LastActivity = lastActivity };
+            var response = await client.PutAsJsonAsync($"api/Auth/session/{jwtId}", sessionUpdate);
 
-            var response = await _httpClient.PutAsync($"api/Auth/session/{jwtId}/activity", content);
-            if (!response.IsSuccessStatusCode)
-                return false;
-
-            var responseBody = await response.Content.ReadAsStringAsync();
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<bool>>(responseBody, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-
-            return apiResponse?.Data ?? false;
+            return response.IsSuccessStatusCode;
         }
     }
 }

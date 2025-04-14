@@ -15,7 +15,7 @@
           "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
         },
         "env": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
+          "ASPNETCORE_ENVIRONMENT": "QA"
         },
         "sourceFileMap": {
           "/Views": "${workspaceFolder}/SagaOrchestrator.API/Views"

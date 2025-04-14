@@ -26,10 +26,6 @@ namespace UserManagement.Infrastructure.Services
         {
             var message = new OutboxMessage
             {
-                // EventType = @event.GetType().Name,
-                // EventData = JsonSerializer.Serialize(@event),
-                // Processed = false,
-                // CreatedAt = DateTime.UtcNow
                 EventType = @event.GetType().AssemblyQualifiedName!,
                 EventData = JsonSerializer.Serialize(@event),
                 Processed = false,
@@ -73,22 +69,7 @@ namespace UserManagement.Infrastructure.Services
                 }
 
                 await _outboxCollection.ReplaceOneAsync(x => x.Id == message.Id, message);
-                // var pendingMessages = await _outboxCollection.Find(x => !x.Processed).ToListAsync();
-
-                // foreach (var message in pendingMessages)
-                // {
-                //     try
-                //     {
-                //         var @event = JsonSerializer.Deserialize<UserCreatedEvent>(message.EventData);
-                //         await _publishEndpoint.Publish(@event);
-
-                //         message.Processed = true;
-                //         await _outboxCollection.ReplaceOneAsync(x => x.Id == message.Id, message);
-                //     }
-                //     catch (Exception ex)
-                //     {
-                //         Log.Information($"Error publishing event: {ex.Message}");
-                //     }
+               
             }
         }
 

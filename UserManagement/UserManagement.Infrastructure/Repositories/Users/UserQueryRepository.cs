@@ -16,42 +16,17 @@ namespace UserManagement.Infrastructure.Repositories.Users
     {
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IDbConnection _dbConnection;
-        private readonly IAsyncPolicy _retryPolicy;
-        private readonly IAsyncPolicy _circuitBreakerPolicy;
-        private readonly IAsyncPolicy _timeoutPolicy;
-        private readonly IAsyncPolicy _fallbackPolicy;
+        // private readonly IAsyncPolicy _retryPolicy;
+        // private readonly IAsyncPolicy _circuitBreakerPolicy;
+        // private readonly IAsyncPolicy _timeoutPolicy;
+        // private readonly IAsyncPolicy _fallbackPolicy;
 
         public UserQueryRepository(ApplicationDbContext applicationDbContext,IDbConnection dbConnection)
         {
             _applicationDbContext = applicationDbContext;
 
             _dbConnection = dbConnection;
-        // Define Polly policies
-
-        // Retry policy: Retry 3 times with an exponential backoff strategy
-            _retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryAsync(3,
-                    retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
-                    (exception, timeSpan, retryCount, context) =>
-                    {
-                        Log.Warning($"Retry {retryCount} after {timeSpan.TotalSeconds}s due to {exception.GetType().Name}: {exception.Message}");
-                    });
-
-        // Circuit Breaker policy: Break after 2 consecutive failures for 30 seconds
-            _circuitBreakerPolicy = Policy.Handle<Exception>()
-                .CircuitBreakerAsync(2, TimeSpan.FromSeconds(30));
-
-        // Timeout policy: 5 seconds timeout for the queries
-          _timeoutPolicy = Policy.TimeoutAsync(5, TimeoutStrategy.Pessimistic, onTimeoutAsync: (context, timespan, task) =>
-            {
-                Log.Error($"Timeout after {timespan.TotalSeconds}s.");
-                return Task.CompletedTask;
-            });
-
-        // Fallback policy: Return an empty list in case of an error
-            // _fallbackPolicy = Policy<List<User>>.Handle<Exception>()
-            //     .FallbackAsync(new List<User>());
+       
         }
         public async Task<(List<User>,int)> GetAllUsersAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
@@ -92,10 +67,10 @@ namespace UserManagement.Infrastructure.Repositories.Users
                            Offset = (PageNumber - 1) * PageSize,
                            PageSize
                        };
-                    var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+                    // var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
 
-                    return await policyWrap.ExecuteAsync(async () =>
-                    {
+                    // return await policyWrap.ExecuteAsync(async () =>
+                    // {
                           var user = await _dbConnection.QueryMultipleAsync(query, parameters);
                           var userlist = (await user.ReadAsync<User>()).ToList();
                           int totalCount = (await user.ReadFirstAsync<int>());
@@ -104,7 +79,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
                         
 
                         
-                    });
+                    // });
         }
 
      public async Task<User?> GetByIdAsync(int userId)
@@ -216,12 +191,12 @@ namespace UserManagement.Infrastructure.Repositories.Users
                  parameters.Add("Id", id);
              }
             
-               var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+            //    var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
             
-               return await policyWrap.ExecuteAsync(async () =>
-               {
+            //    return await policyWrap.ExecuteAsync(async () =>
+            //    {
                    return await _dbConnection.QueryFirstOrDefaultAsync<User>(query, parameters);
-               });
+            //    });
           
         }
         public async Task<List<User>> GetUser(string searchPattern)
@@ -235,12 +210,12 @@ namespace UserManagement.Infrastructure.Repositories.Users
             var users = await _dbConnection.QueryAsync<User>(query, new { SearchPattern = $"%{searchPattern}%" });
             
             
-               var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+            //    var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
             
-               return await policyWrap.ExecuteAsync(async () =>
-               {
+            //    return await policyWrap.ExecuteAsync(async () =>
+            //    {
                    return users.ToList();
-               });
+            //    });
           
         }
         public async Task<List<string>> GetUserRolesAsync(int userId)
@@ -256,11 +231,11 @@ namespace UserManagement.Infrastructure.Repositories.Users
                 // WHERE u.UserId = @UserId";
 
                 
-                var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
-                return await policyWrap.ExecuteAsync(async () =>
-                {
+                // var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+                // return await policyWrap.ExecuteAsync(async () =>
+                // {
                 return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
-                });
+                // });
 
         }
           public async Task<bool> AlreadyExistsAsync(string username, int? id = null)

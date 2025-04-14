@@ -5,6 +5,10 @@ using SagaOrchestrator.Application.Orchestration.Interfaces.IMaintenance;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
 using SagaOrchestrator.Application.Orchestration.Services.MaintenanceServices;
 using SagaOrchestrator.Application.Orchestration.Services.UserServices;
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace SagaOrchestrator.Infrastructure.PollyResilience
 {
@@ -14,17 +18,16 @@ namespace SagaOrchestrator.Infrastructure.PollyResilience
         {
             services.AddHttpClient<IUserService, UserService>(client =>
             {
-                // client.BaseAddress = new Uri("http://localhost:5174"); // URL of UserManagement API
                 client.BaseAddress = new Uri("http://192.168.1.126:81");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             })
             .AddPolicyHandler(GetRetryPolicy())
             .AddPolicyHandler(GetCircuitBreakerPolicy());
 
-            // HttpClient for IUserSessionService
             services.AddHttpClient<IDepartmentService, DepartmentService>(client =>
             {
-                // client.BaseAddress = new Uri("http://localhost:5174"); // Same or different depending on your setup
                 client.BaseAddress = new Uri("http://192.168.1.126:81");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             })
             .AddPolicyHandler(GetRetryPolicy())
             .AddPolicyHandler(GetCircuitBreakerPolicy());
@@ -36,14 +39,30 @@ namespace SagaOrchestrator.Infrastructure.PollyResilience
         {
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
-                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+                .WaitAndRetryAsync(
+                    retryCount: 3,
+                    sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                    onRetry: (outcome, timespan, retryAttempt, context) =>
+                    {
+                        Console.WriteLine($"Retrying... Attempt {retryAttempt}");
+                    });
         }
 
         private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
         {
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
-                .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
+                .CircuitBreakerAsync(
+                    handledEventsAllowedBeforeBreaking: 5,
+                    durationOfBreak: TimeSpan.FromSeconds(30),
+                    onBreak: (result, timespan) =>
+                    {
+                        Console.WriteLine("Circuit broken!");
+                    },
+                    onReset: () =>
+                    {
+                        Console.WriteLine("Circuit reset!");
+                    });
         }
     }
 }

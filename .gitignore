@@ -18,3 +18,5 @@
 /BackgroundService/BackgroundService.Domain/obj
 /BackgroundService/BackgroundService.Infrastructure/bin
 /BackgroundService/BackgroundService.Infrastructure/obj
+/Shared/Shared.Infrastructure/obj
+/Shared/Shared.Infrastructure/bin
