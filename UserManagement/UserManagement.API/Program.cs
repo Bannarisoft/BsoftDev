@@ -8,15 +8,19 @@ using MassTransit;
 using UserManagement.Infrastructure.PollyResilience;
 
 var builder = WebApplication.CreateBuilder(args);
+
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ;
 
+
 builder.Configuration
+
 .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
 .AddJsonFile("settings/emailsetting.json", optional: false, reloadOnChange: true)
 .AddJsonFile("settings/smssetting.json", optional: false, reloadOnChange: true)
 .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true)
 .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
 .AddEnvironmentVariables();
+
 
 
 // Configure Serilog

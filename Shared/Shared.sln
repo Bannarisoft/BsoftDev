@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{F4F45B73-B266-4725-9E37-B7C0334B296F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{94EDF15E-9FFE-46A9-8D1E-09447C496B9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "Shared.Infrastructure\Shared.Infrastructure.csproj", "{903866B1-642E-44FF-AA78-BB1AA9A6887A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +24,9 @@ Global
 		{94EDF15E-9FFE-46A9-8D1E-09447C496B9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94EDF15E-9FFE-46A9-8D1E-09447C496B9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94EDF15E-9FFE-46A9-8D1E-09447C496B9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{903866B1-642E-44FF-AA78-BB1AA9A6887A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{903866B1-642E-44FF-AA78-BB1AA9A6887A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{903866B1-642E-44FF-AA78-BB1AA9A6887A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{903866B1-642E-44FF-AA78-BB1AA9A6887A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

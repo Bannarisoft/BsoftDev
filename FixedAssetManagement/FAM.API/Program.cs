@@ -4,10 +4,13 @@ using FAM.API.Validation.Common;
 using FAM.API.Configurations;
 using MassTransit;
 using Contracts.Events;
+using FAM.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
 
 // Load configuration files based on the environment
 builder.Configuration
@@ -29,6 +32,7 @@ builder.Services.AddSwaggerDocumentation();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
+builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
 builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
@@ -81,6 +85,7 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors();
 app.UseAuthentication();
+app.UseMiddleware<TokenValidationMiddleware>();
 app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();

@@ -81,7 +81,7 @@ namespace Core.Application.Users.Commands.CreateUser
 
             // 🔥 Publish UserCreatedEvent to RabbitMQ
             // Use the ID generated from the database
-          /*   var userid = userEntity.UserId;
+            var userid = userEntity.UserId;
             var userCreatedEvent = new UserCreatedEvent
             {
                 CorrelationId = Guid.NewGuid(),
@@ -95,7 +95,7 @@ namespace Core.Application.Users.Commands.CreateUser
 
             // Triggering the publishing of pending events
             await _eventPublisher.PublishPendingEventsAsync();
- */
+
 
             // Map the created user entity to DTO
             var userDto = _mapper.Map<UserDto>(createdUser);

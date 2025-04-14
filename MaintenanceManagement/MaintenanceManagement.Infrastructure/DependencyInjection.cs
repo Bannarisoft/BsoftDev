@@ -59,17 +59,17 @@ namespace MaintenanceManagement.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
         {
-              var connectionString = configuration.GetConnectionString("DefaultConnection");
-                var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
 
-                if (string.IsNullOrWhiteSpace(connectionString))
-                {
-                    throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
-                } 
-                if (string.IsNullOrWhiteSpace(HangfireConnectionString))
-                {
-                    throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
-                }
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
+            }
+            if (string.IsNullOrWhiteSpace(HangfireConnectionString))
+            {
+                throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
+            }
 
             // Register ApplicationDbContext with SQL Server
 
@@ -84,8 +84,8 @@ namespace MaintenanceManagement.Infrastructure
 
             // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
-    
-    
+
+
             // MongoDB Context
             services.AddSingleton<IMongoClient>(sp =>
             {
@@ -107,7 +107,7 @@ namespace MaintenanceManagement.Infrastructure
                 }
                 return new MongoDbContext(client, databaseName);
             });
-            
+
             // Optional: Register IMongoDatabase if needed directly
             services.AddSingleton(sp =>
             {
@@ -133,12 +133,12 @@ namespace MaintenanceManagement.Infrastructure
             });
             // Add the Hangfire server
             services.AddHangfireServer();
-            
+
             // Register ILogger<T>
             services.AddLogging(builder =>
             {
                 builder.AddSerilog();
-            }); 
+            });
 
             // Register IDateTime
             services.AddHttpContextAccessor();
@@ -148,12 +148,12 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<ICostCenterCommandRepository, CostCenterCommandRepository>();
             services.AddScoped<IWorkCenterQueryRepository, WorkCenterQueryRepository>();
             services.AddScoped<IWorkCenterCommandRepository, WorkCenterCommandRepository>();
-             services.AddScoped<IMachineGroupCommandRepository, MachineGroupCommandRepository>(); 
-             services.AddScoped<IMachineGroupQueryRepository, MachineGroupQueryRepository>();
-             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
-             services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();
-             services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
-             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
+            services.AddScoped<IMachineGroupCommandRepository, MachineGroupCommandRepository>();
+            services.AddScoped<IMachineGroupQueryRepository, MachineGroupQueryRepository>();
+            services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
+            services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();
+            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
+            services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
             services.AddScoped<IShiftMasterQuery, ShiftMasterQueryRepository>();
             services.AddScoped<IShiftMasterCommand, ShiftMasterCommandRepository>();
             services.AddScoped<IShiftMasterDetailQuery, ShiftMasterDetailQueryRepository>();
@@ -165,7 +165,7 @@ namespace MaintenanceManagement.Infrastructure
 
             services.AddScoped<IActivityMasterQueryRepository, ActivityMasterQueryRepository>();
 
-            services.AddScoped<IActivityMasterCommandRepository, ActivityMasterCommandRepository>();            
+            services.AddScoped<IActivityMasterCommandRepository, ActivityMasterCommandRepository>();
 
             services.AddScoped<IMachineGroupUserQueryRepository, MachineGroupUserQueryRepository>();
             services.AddScoped<IMachineGroupUserCommandRepository, MachineGroupUserCommandRepository>();
@@ -173,8 +173,8 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMachineMasterCommandRepository, MachineMasterCommandRepository>();
             services.AddScoped<IMachineMasterQueryRepository, MachineMasterQueryRepository>();
 
-             services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
-           services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
+            services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
+            services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
 
             // services.AddScoped<IWorkOrderActivityCommandRepository, WorkOrderActivityCommandRepository>();
             // services.AddScoped<IWorkOrderActivityQueryRepository, WorkOrderActivityQueryRepository>();
@@ -185,39 +185,37 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IActivityCheckListMasterCommandRepository, ActivityCheckListMasterCommandRepository>();
             services.AddScoped<IPreventiveSchedulerCommand, PreventiveSchedulerCommandRepository>();
             services.AddScoped<IPreventiveSchedulerQuery, PreventiveSchedulerQueryRepository>();
-            
+
             // Miscellaneous services
-            services.AddScoped<IIPAddressService, IPAddressService>(); 
+            services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddTransient<IFileUploadService, FileUploadRepository>();
-            services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
-            
+            services.AddSingleton<ITimeZoneService, TimeZoneService>();
+            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
+
+            // AutoMapper profiles
+            services.AddAutoMapper(
+            typeof(MachineGroupProfile),
+            typeof(MiscTypeMasterProfile),
+            typeof(MiscMasterProfile),
+            typeof(CostCenterProfile),
+
+            typeof(WorkCenterProfile),
+            typeof(MaintenanceTypeProfile),
+            typeof(MaintenanceCategoryProfile),
+            typeof(ShiftMasterProfile),
+            typeof(ShiftMasterDetailProfile),
+
+            typeof(ActivityMasterProfile),
+
+            typeof(MachineGroupUserProfile),
+            typeof(WorkOrderProfile),
+            typeof(WorkOrderScheduleProfile),
+            typeof(WorkOrderActivityProfile),
+            typeof(ActivityCheckListMasterProfile)
 
 
 
-
-                services.AddAutoMapper(
-                typeof(MachineGroupProfile),
-                typeof(MiscTypeMasterProfile),
-                typeof(MiscMasterProfile),
-				typeof(CostCenterProfile),
-
-                typeof(WorkCenterProfile),
-                typeof(MaintenanceTypeProfile),
-                typeof(MaintenanceCategoryProfile),
-                typeof(ShiftMasterProfile),
-                typeof(ShiftMasterDetailProfile),
-
-                typeof(ActivityMasterProfile),
-
-                typeof(MachineGroupUserProfile),
-                typeof(WorkOrderProfile),
-                typeof(WorkOrderScheduleProfile),
-                typeof(WorkOrderActivityProfile),                
-                typeof(ActivityCheckListMasterProfile)
-
-				
-
-             );
+         );
             return services;
         }
     }

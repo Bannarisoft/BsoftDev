@@ -23,11 +23,11 @@ namespace UserManagement.Infrastructure.Repositories
         private readonly ApplicationDbContext _applicationDbContext;
 
         private readonly IDbConnection _dbConnection;
-        private readonly IAsyncPolicy _retryPolicy;
-        private readonly IAsyncPolicy _circuitBreakerPolicy;
-        private readonly IAsyncPolicy _timeoutPolicy;
-        private readonly IAsyncPolicy _fallbackPolicy;
-        private readonly HttpClient _httpClient;
+        // private readonly IAsyncPolicy _retryPolicy;
+        // private readonly IAsyncPolicy _circuitBreakerPolicy;
+        // private readonly IAsyncPolicy _timeoutPolicy;
+        // private readonly IAsyncPolicy _fallbackPolicy;
+        // private readonly HttpClient _httpClient;
         private readonly IIPAddressService _ipAddressService;
         
 
@@ -39,30 +39,30 @@ namespace UserManagement.Infrastructure.Repositories
             _ipAddressService = ipAddressService;
 
         
-        // Create an HttpClient using IHttpClientFactory and the registered "ResilientHttpClient"
-            _httpClient = httpClientFactory.CreateClient("ResilientHttpClient");
-        // Define Polly policies
+        // // Create an HttpClient using IHttpClientFactory and the registered "ResilientHttpClient"
+        //     _httpClient = httpClientFactory.CreateClient("ResilientHttpClient");
+        // // Define Polly policies
 
-          // Retry policy: Retry 3 times with an exponential backoff strategy
-              _retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryAsync(3,
-                    retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
-                    (exception, timeSpan, retryCount, context) =>
-                    {
-                        Log.Warning($"Retry {retryCount} after {timeSpan.TotalSeconds}s due to {exception.GetType().Name}: {exception.Message}");
-                    });
+        //   // Retry policy: Retry 3 times with an exponential backoff strategy
+        //       _retryPolicy = Policy
+        //         .Handle<Exception>()
+        //         .WaitAndRetryAsync(3,
+        //             retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+        //             (exception, timeSpan, retryCount, context) =>
+        //             {
+        //                 Log.Warning($"Retry {retryCount} after {timeSpan.TotalSeconds}s due to {exception.GetType().Name}: {exception.Message}");
+        //             });
 
-        // Circuit Breaker policy: Break after 2 consecutive failures for 30 seconds
-            _circuitBreakerPolicy = Policy.Handle<Exception>()
-                .CircuitBreakerAsync(2, TimeSpan.FromSeconds(30));
+        // // Circuit Breaker policy: Break after 2 consecutive failures for 30 seconds
+        //     _circuitBreakerPolicy = Policy.Handle<Exception>()
+        //         .CircuitBreakerAsync(2, TimeSpan.FromSeconds(30));
 
-        // Timeout policy: 5 seconds timeout for the queries
-             _timeoutPolicy = Policy.TimeoutAsync(5, TimeoutStrategy.Pessimistic, onTimeoutAsync: (context, timespan, task) =>
-            {
-                Log.Error($"Timeout after {timespan.TotalSeconds}s.");
-                return Task.CompletedTask;
-            });
+        // // Timeout policy: 5 seconds timeout for the queries
+        //      _timeoutPolicy = Policy.TimeoutAsync(5, TimeoutStrategy.Pessimistic, onTimeoutAsync: (context, timespan, task) =>
+        //     {
+        //         Log.Error($"Timeout after {timespan.TotalSeconds}s.");
+        //         return Task.CompletedTask;
+        //     });
 
 
         }
@@ -89,9 +89,9 @@ namespace UserManagement.Infrastructure.Repositories
         public async Task<bool> DeleteAsync(int userId,User user)
         {
 
-            var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);         
-            return await policyWrap.ExecuteAsync(async () =>
-            {
+            // var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);         
+            // return await policyWrap.ExecuteAsync(async () =>
+            // {
                 var existingUser = await _applicationDbContext.User.FirstOrDefaultAsync(u => u.UserId == userId);
                 if (existingUser != null)
                 {
@@ -100,7 +100,7 @@ namespace UserManagement.Infrastructure.Repositories
                 }
                 
                  return false; // No user found
-            });
+            // });
       
         }
 
@@ -146,9 +146,9 @@ namespace UserManagement.Infrastructure.Repositories
 
         public async Task<int> UpdateAsync(int userId, User user)
         {
-            var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
-            return await policyWrap.ExecuteAsync(async () =>
-            {
+            // var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
+            // return await policyWrap.ExecuteAsync(async () =>
+            // {
                 var existingUser = await _applicationDbContext.User
                     .Include(uc => uc.UserCompanies)
                     .Include(ur => ur.UserRoleAllocations)
@@ -273,7 +273,7 @@ namespace UserManagement.Infrastructure.Repositories
                     return await _applicationDbContext.SaveChangesAsync();
                  }
                  return 0; // No user found
-            });
+            // });
         }
 
     }

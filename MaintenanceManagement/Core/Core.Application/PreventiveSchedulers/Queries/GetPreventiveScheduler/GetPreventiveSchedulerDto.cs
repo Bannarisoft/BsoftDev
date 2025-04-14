@@ -8,6 +8,8 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
     public class GetPreventiveSchedulerDto
     {
         public int Id { get; set; }
+        public int DepartmentId { get; set; }
+        public string DepartmentName { get; set; }
         public int DuePeriod { get; set; }
         public DateOnly EffectiveDate { get; set; }
         public int GraceDays { get; set; }

@@ -5,7 +5,7 @@ using Contracts.Interfaces.IUser;
 using Contracts.Models.Common;
 using Contracts.Models.Users;
 
-namespace FAM.Infrastructure.Services
+namespace MaintenanceManagement.Infrastructure.Services
 {
     public class UserSessionService : IUserSessionService
     {
