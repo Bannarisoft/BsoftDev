@@ -67,10 +67,10 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             }
             
             // 🔹 Construct the required file path
-            string companyFolder = Path.Combine(baseDirectory, request.CompanyName ?? string.Empty);
+            string companyFolder = Path.Combine(baseDirectory, request.CompanyName?.Trim() ?? string.Empty);
             EnsureDirectoryExists(companyFolder);
 
-            string unitFolder = Path.Combine(companyFolder, request.UnitName ?? string.Empty);
+            string unitFolder = Path.Combine(companyFolder, request.UnitName?.Trim() ?? string.Empty);
             EnsureDirectoryExists(unitFolder);
 
             string fileExtension = Path.GetExtension(request.File.FileName);
@@ -107,6 +107,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
                     AssetImage = formattedPath,  // ✅ Correctly formatted file path
                     AssetImageBase64 = base64Image  // ✅ Convert to Base64
                 };
+
 
                 return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = true, Data = response };
             }

@@ -6,7 +6,7 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral
 {
-    public class UpdateAssetMasterGeneralCommand : IRequest<ApiResponseDTO<AssetMasterUpdateDto>>     
+    public class UpdateAssetMasterGeneralCommand : IRequest<ApiResponseDTO<bool>>     
     {
         public AssetMasterUpdateDto? AssetMaster { get; set; }
        /*  public int Id { get; set; }       

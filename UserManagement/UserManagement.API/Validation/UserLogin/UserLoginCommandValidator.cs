@@ -20,6 +20,7 @@ namespace UserManagement.API.Validation.UserLogin
         private readonly IUserSessionRepository _userSessionRepository;
         public UserLoginCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userQueryRepository, ICompanyQuerySettings companyQuerySettings,IUserSessionRepository userSessionRepository)
         {
+            // CascadeMode = CascadeMode.Stop;
             var MaxLen = maxLengthProvider.GetMaxLength<User>("UserName") ?? 25;
             _validationRules = ValidationRuleLoader.LoadValidationRules();
             _companyQuerySettings = companyQuerySettings;
@@ -51,29 +52,40 @@ namespace UserManagement.API.Validation.UserLogin
  
                     case "NotFound":
                            RuleFor(x => x.Username )
+                           .Cascade(CascadeMode.Stop)
                            .MustAsync(async (Username, cancellation) => 
                         await _userQueryRepository.AlreadyExistsAsync(Username))             
                            .WithName("User Name")
-                            .WithMessage($"{rule.Error}");
-
-                            RuleFor(x => x.Username )
-                           .MustAsync(async (Username, cancellation) => 
+                            .WithMessage($"{rule.Error}")
+                            .MustAsync(async (Username, cancellation) => 
                         await _companyQuerySettings.BeforeLoginNotFoundValidation(Username))             
                            .WithName("User Name")
-                            .WithMessage("User Admin Settings not found");
+                            .WithMessage("User Admin Settings not found")
+                            .MustAsync(async (Username, cancellation) => 
+                        await _userQueryRepository.ValidateUserRolesAsync(Username))
+                            .WithMessage("User does not have any role assigned to it. Contact your admin.");
+                            
+                           
                             break;
+                            
                     case "UserSession":
+                     RuleSet("UserSession", () => 
+                      {
                            RuleFor(x => x.Username )
                            .MustAsync(async (Username, cancellation) => 
                         !await _userSessionRepository.ValidateUserSession(Username))
+                        .WhenAsync(async (request, cancellation) =>
+            await ValidatePassword(request.Username, request.Password))
                             .WithMessage($"{rule.Error}");
+                    });
                             break;  
-                    case "UserRole":
-                           RuleFor(x => x.Username )
-                           .MustAsync(async (Username, cancellation) => 
-                        await _userQueryRepository.ValidateUserRolesAsync(Username))
-                            .WithMessage($"{rule.Error}");
-                            break;
+                            
+                    // case "UserRole":
+                    //        RuleFor(x => x.Username )
+                    //        .MustAsync(async (Username, cancellation) => 
+                    //     await _userQueryRepository.ValidateUserRolesAsync(Username))
+                    //         .WithMessage($"{rule.Error}");
+                    //         break;
                     case "UserLock":
                            RuleFor(x => x.Username)
                            .MustAsync(async (UserName, cancellation) => !await _userQueryRepository.UserLockedAsync(UserName))
@@ -86,5 +98,14 @@ namespace UserManagement.API.Validation.UserLogin
                 }
             }
         }
+         private async Task<bool> ValidatePassword(string userName, string Password)
+           {
+               var user = await _userQueryRepository.GetByUsernameAsync(userName);
+               if (user != null)
+               {
+                   return BCrypt.Net.BCrypt.Verify(Password, user.PasswordHash);
+               }
+               return false;
+           }
     }
 }

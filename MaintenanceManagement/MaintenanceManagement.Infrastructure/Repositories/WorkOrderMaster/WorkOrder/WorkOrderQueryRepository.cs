@@ -4,13 +4,14 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
-using Core.Application.WorkOrderMaster.WorkOrder.Queries.GetWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Common;
 using Dapper;
+using MassTransit;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.WorkOrder
 {
-  /*   public class WorkOrderQueryRepository : IWorkOrderQueryRepository
+    public class WorkOrderQueryRepository : IWorkOrderQueryRepository
     {
         private readonly IDbConnection _dbConnection;
         public WorkOrderQueryRepository(IDbConnection dbConnection)
@@ -18,27 +19,92 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
             _dbConnection = dbConnection;
         }
 
-        public Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity, IEnumerable<dynamic> Schedule, IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician)> GetAllWorkOrderAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public Task<(List<WorkOrderDto>, int)> GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             throw new NotImplementedException();
         }
 
+        public Task<string> GetBaseDirectoryAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<WorkOrderDto> GetByIdAsync(int workOrderId)
+        {
+            throw new NotImplementedException();
+        }
+
+        /* public async Task<WorkOrderDto> GetByIdAsync(int workOrderId)
+       {
+            const string query = @"            
+           SELECT AM.Id, AM.CompanyId, AM.UnitId, AM.AssetCode, AM.AssetName, AM.AssetGroupId, AM.AssetCategoryId, AM.AssetSubCategoryId, AM.AssetParentId, 
+               AM.AssetType, AM.MachineCode, AM.Quantity, AM.UOMId, AM.AssetDescription, AM.WorkingStatus, AM.AssetImage, AM.ISDepreciated, AM.IsTangible, 
+               AM.IsActive, AM.CreatedBy, AM.CreatedDate, AM.CreatedByName, AM.CreatedIP, AM.ModifiedBy, AM.ModifiedDate, AM.ModifiedByName, AM.ModifiedIP,
+               AG.GroupName AS AssetGroupName, AC.CategoryName AS AssetCategoryDesc, A.Description AS AssetSubCategoryDesc, U.UOMName, 
+               MM.Description AS WorkingStatusDesc, M.Description AS AssetTypeDesc, ISNULL(AM1.AssetDescription, '') AS ParentAssetDesc,
+               (SELECT A.Id AS SpecificationId, A.SpecificationValue, SM.SpecificationName 
+                   FROM FixedAsset.AssetSpecifications AS A
+                   INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = A.SpecificationId    
+                   WHERE A.AssetId = AM.Id AND A.IsDeleted = 0 
+                   FOR JSON PATH) AS SpecificationsJson   
+           FROM FixedAsset.AssetMaster AM
+           INNER JOIN FixedAsset.AssetGroup AG ON AG.Id = AM.AssetGroupId
+           INNER JOIN FixedAsset.AssetCategories AC ON AC.Id = AM.AssetCategoryId
+           INNER JOIN FixedAsset.AssetSubCategories A ON A.Id = AM.AssetSubCategoryId
+           INNER JOIN FixedAsset.UOM U ON U.Id = AM.UOMId
+           INNER JOIN FixedAsset.MiscMaster MM ON MM.Id = AM.WorkingStatus
+           LEFT JOIN FixedAsset.MiscMaster M ON M.Id = AM.AssetType
+           LEFT JOIN FixedAsset.AssetMaster AM1 ON AM1.Id = AM.AssetParentId
+           WHERE AM.Id = @assetId AND AM.IsDeleted = 0";
+
+          var assetMaster = await _dbConnection.QueryFirstOrDefaultAsync<AssetMasterGeneralDTO>(query, new { assetId });
+
+           if (assetMaster is null)
+           {
+               throw new KeyNotFoundException($"DepreciationGroup with ID {assetId} not found.");
+           }
+
+           // 🔹 Deserialize JSON directly for the single object
+           if (!string.IsNullOrEmpty(assetMaster.SpecificationsJson))
+           {
+               assetMaster.Specifications = JsonConvert.DeserializeObject<List<AssetSpecificationDTO>>(assetMaster.SpecificationsJson) ?? new();
+           }
+           else
+           {
+               assetMaster.Specifications = new List<AssetSpecificationDTO>();
+           }
+           return assetMaster; 
+       }*/
+
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetWOPriorityDescAsync()
         {
             const string query = @"
-            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder,  M.IsActive
-            ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
+            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder            
             FROM Maintenance.MiscMaster M
             INNER JOIN Maintenance.MiscTypeMaster T on T.ID=M.MiscTypeId
             WHERE (MiscTypeCode = @MiscTypeCode) 
             AND  M.IsDeleted=0 and M.IsActive=1
-            ORDER BY M.ID DESC";    
+            ORDER BY SortOrder DESC";    
             var parameters = new { MiscTypeCode = MiscEnumEntity.WOPriority.MiscCode };        
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
             return result.ToList();
         }
 
-        public async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity, IEnumerable<dynamic> Schedule, IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician)> GetWorkOrderByIdAsync(int workOrderId)
+        public async Task<List<Core.Domain.Entities.MiscMaster>> GetWORequestTypeDescAsync()
+        {
+            const string query = @"
+            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder           
+            FROM Maintenance.MiscMaster M
+            INNER JOIN Maintenance.MiscTypeMaster T on T.ID=M.MiscTypeId
+            WHERE (MiscTypeCode = @MiscTypeCode) 
+            AND  M.IsDeleted=0 and M.IsActive=1
+            ORDER BY SortOrder DESC";    
+            var parameters = new { MiscTypeCode = MiscEnumEntity.WORequestType.MiscCode };        
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+            return result.ToList();
+        }
+
+        public async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity,  IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician)> GetWorkOrderByIdAsync(int workOrderId)
         {
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
@@ -131,78 +197,32 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
                 WHERE AssetId=@AssetId
                 ";
 
-            using var multi = await _dbConnection.QueryMultipleAsync(sqlQuery, new { AssetId = assetId });
+            using var multi = await _dbConnection.QueryMultipleAsync(sqlQuery, new { AssetId = workOrderId });
 
-            var assetResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
-            var locationResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
-            var purchaseDetails = await multi.ReadAsync<dynamic>();
-            var SpecDetails = await multi.ReadAsync<dynamic>();
-            var WarrantyDetails = await multi.ReadAsync<dynamic>();
-            var AMCDetails = await multi.ReadAsync<dynamic>();
-            var DisposalResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
-            var InsuranceDetails = await multi.ReadAsync<dynamic>();
-
-       
-            if (locationResult != null && !string.IsNullOrEmpty(locationResult.OldUnitId))
-            {
-                // Fetch Custodian
-                if (locationResult.CustodianId > 0)
-                {
-                    var custodianParams = new
-                    {
-                        DivCode = locationResult.OldUnitId,
-                        EmpNo = locationResult.CustodianId
-                    };
-
-                    var custodianEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
-                        "dbo.GetEmployeeByDivision",
-                        custodianParams,
-                        commandType: CommandType.StoredProcedure
-                    );
-
-                    if (custodianEmployee != null)
-                        locationResult.CustodianName = custodianEmployee.Empname;
-                }
-
-                // Fetch User
-                if (locationResult.UserId > 0)
-                {
-                    var userParams = new
-                    {
-                        DivCode = locationResult.OldUnitId,
-                        EmpNo = locationResult.UserId
-                    };
-
-                    var userEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
-                        "dbo.GetEmployeeByDivision",
-                        userParams,
-                        commandType: CommandType.StoredProcedure
-                    );
-
-                    if (userEmployee != null)
-                        locationResult.UserName = userEmployee.Empname;
-                }
-            }
-
-            return (assetResult, locationResult, purchaseDetails, SpecDetails, WarrantyDetails, AMCDetails, DisposalResult, InsuranceDetails);
+            var WorkOrderResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
+            var Activity = await multi.ReadFirstOrDefaultAsync<dynamic>();
+            var Schedule = await multi.ReadAsync<dynamic>();
+            var Item = await multi.ReadAsync<dynamic>();
+            var Technician = await multi.ReadAsync<dynamic>();            
+           
+            return (WorkOrderResult, Activity,  Item, Technician);
        
         }
 
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetWOStatusDescAsync()
         {
            const string query = @"
-            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder,  M.IsActive
-            ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
+            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder            
             FROM Maintenance.MiscMaster M
             INNER JOIN Maintenance.MiscTypeMaster T on T.ID=M.MiscTypeId
             WHERE (MiscTypeCode = @MiscTypeCode) 
             AND  M.IsDeleted=0 and M.IsActive=1
-            ORDER BY M.ID DESC";    
+            ORDER BY SortOrder DESC";    
             var parameters = new { MiscTypeCode = MiscEnumEntity.WOStatus.MiscCode };        
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
             return result.ToList();
         }
-        
-    } */
+
+    } 
 }
    

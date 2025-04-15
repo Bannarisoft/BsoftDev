@@ -43,7 +43,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .IsRequired();  
             builder.Property(t => t.TechnicianName)
                 .HasColumnName("TechnicianName")
-                .HasColumnType("varchar(50)")
+                .HasColumnType("varchar(100)")
                 .IsRequired();  
             
             builder.Property(t => t.HoursSpent)

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SagaOrchestrator.Infrastructure.Services;
+using SagaOrchestrator.Infrastructure.Services.AssetServices;
 
 namespace SagaOrchestrator.API.Controllers
 {
@@ -13,17 +14,18 @@ namespace SagaOrchestrator.API.Controllers
     [Route("api/[controller]")]
     public class AssetController : ControllerBase
     {
-        private readonly OrchestratorService _orchestratorService;
+        // private readonly OrchestratorService _orchestratorService;
+        private readonly AssetSagaService _assetSagaService;
 
-        public AssetController(OrchestratorService orchestratorService)
+        public AssetController(AssetSagaService assetSagaService)
         {
-            _orchestratorService = orchestratorService;
+            _assetSagaService = assetSagaService;
         }
 
         [HttpPost("asset")]
         public async Task<IActionResult> TriggerAsset(int userId, int assetId)
         {
-            await _orchestratorService.TriggerAssetCreation(userId, assetId);
+            await _assetSagaService.TriggerAssetCreation(userId, assetId);
             return Ok(new
             {
                 message = "Asset creation process triggered successfully.",

@@ -1223,6 +1223,14 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
+                    b.Property<DateTimeOffset?>("LastActivityDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("LastActivityDate");
+
+                    b.Property<int?>("MachineId")
+                        .HasColumnType("int")
+                        .HasColumnName("MachineId");
+
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
@@ -1234,6 +1242,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
+
+                    b.Property<string>("OldVendorId")
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("OldVendorId");
 
                     b.Property<int>("PriorityId")
                         .HasColumnType("int")
@@ -1264,9 +1276,13 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("UnitId");
 
-                    b.Property<string>("VendorId")
-                        .HasColumnType("nvarchar(20)")
+                    b.Property<int?>("VendorId")
+                        .HasColumnType("int")
                         .HasColumnName("VendorId");
+
+                    b.Property<string>("VendorName")
+                        .HasColumnType("nvarchar(250)")
+                        .HasColumnName("VendorName");
 
                     b.Property<int>("WorkOrderTypeId")
                         .HasColumnType("int")
@@ -1313,6 +1329,15 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("CreatedIP")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("Description");
+
+                    b.Property<decimal>("EstimatedTime")
+                        .HasColumnType("decimal(5,2)")
+                        .HasColumnName("EstimatedTime");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
@@ -1450,11 +1475,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<TimeSpan>("DownTimeEndTime")
+                    b.Property<TimeSpan?>("DownTimeEndTime")
                         .HasColumnType("time")
                         .HasColumnName("DownTimeEndTime");
 
-                    b.Property<TimeSpan>("DownTimeStartTime")
+                    b.Property<TimeSpan?>("DownTimeStartTime")
                         .HasColumnType("time")
                         .HasColumnName("DownTimeStartTime");
 
@@ -1550,7 +1575,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("TechnicianName")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("TechnicianName");
 
                     b.Property<int>("WorkOrderId")

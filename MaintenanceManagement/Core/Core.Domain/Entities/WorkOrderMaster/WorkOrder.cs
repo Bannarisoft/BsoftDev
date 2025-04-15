@@ -10,14 +10,18 @@ namespace Core.Domain.Entities.WorkOrderMaster
         public MaintenanceCategory CategoryType { get; set; } = null!; 
         public string? RequestId { get; set; }
         public int RequestTypeId { get; set; }          
-        public MiscMaster MiscRequestType { get; set; } = null!; 
+        public MiscMaster MiscRequestType { get; set; } = null!;         
+        public int? MachineId { get; set; }
         public int PriorityId { get; set; }        
         public MiscMaster MiscPriority { get; set; } = null!; 
         public string? Remarks { get; set; }
         public string? Image { get; set; }
         public int StatusId { get; set; }   
+        public DateTimeOffset? LastActivityDate { get; set; }   
         public MiscMaster MiscStatus { get; set; } = null!;                
-        public string? VendorId { get; set; }      
+        public int? VendorId { get; set; }      
+        public string? OldVendorId { get; set; }      
+        public string? VendorName { get; set; }      
         public int RootCauseId { get; set; }          
         public MiscMaster MiscRootCause { get; set; } = null!; 
         

@@ -32,7 +32,6 @@ namespace UserManagement.API.Controllers
         private readonly IValidator<FirstTimeUserPasswordCommand> _firstTimeUserPasswordCommandValidator;
         private readonly IValidator<ChangeUserPasswordCommand> _changeUserPasswordCommandValidator;
         private readonly ILogger<UserController> _logger;
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly IValidator<ForgotUserPasswordCommand> _forgotUserPasswordCommandValidator;
         private readonly IValidator<ResetUserPasswordCommand> _resetUserPasswordCommandValidator;
@@ -43,7 +42,7 @@ namespace UserManagement.API.Controllers
                              ApplicationDbContext dbContext, 
                              IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator, 
                              IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
-                             ILogger<UserController> logger,IHttpClientFactory httpClientFactory,
+                             ILogger<UserController> logger,
                              IValidator<ForgotUserPasswordCommand> forgotUserPasswordCommandValidator,
                              IValidator<ResetUserPasswordCommand> resetUserPasswordCommandValidator,
                              IPublishEndpoint publishEndpoint) 
@@ -56,7 +55,6 @@ namespace UserManagement.API.Controllers
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
             _logger = logger;
-            _httpClientFactory = httpClientFactory;
             _publishEndpoint = publishEndpoint;
             _forgotUserPasswordCommandValidator = forgotUserPasswordCommandValidator;
             _resetUserPasswordCommandValidator = resetUserPasswordCommandValidator;

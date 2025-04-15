@@ -68,10 +68,9 @@ using UserManagement.Infrastructure.Repositories.Profile;
 using Core.Application.Common.Interfaces.IUserGroup;
 using UserManagement.Infrastructure.Repositories.UserGroup;
 using Core.Application.Common;
-using UserManagement.Infrastructure.Helpers;
+// using UserManagement.Infrastructure.Helpers;
 using Core.Application.Common.Interfaces.ICustomField;
 using UserManagement.Infrastructure.Repositories.CustomFields;
-using BackgroundService.Application.Interfaces;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
@@ -79,26 +78,32 @@ namespace UserManagement.Infrastructure
         public static IServiceCollection AddInfrastructureServices
             (this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
         {
-                
-            var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
+
+            // var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
+            // var HangfireConnectionString = ConnectionStringHelper.GetHangfireConnectionString(configuration);
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
+                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
+                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
             var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
                                                 .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
                                                 .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
-                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");   
+                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");    
+            
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
-            } 
+            }
             if (string.IsNullOrWhiteSpace(HangfireConnectionString))
             {
                 throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
             }
 
             // Register ApplicationDbContext with SQL Server
-           /*  services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString)); */
-                services.AddDbContext<ApplicationDbContext>(options =>
+            /*  services.AddDbContext<ApplicationDbContext>(options =>
+                 options.UseSqlServer(connectionString)); */
+            services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString, sqlOptions =>
             {
                 sqlOptions.EnableRetryOnFailure(
@@ -107,43 +112,43 @@ namespace UserManagement.Infrastructure
                     errorNumbersToAdd: null); // Add specific SQL error numbers to retry on (optional)
             }));
 
-                // Register IDbConnection for Dapper
+            // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
-    
-    
-             // MongoDB Context
-        services.AddSingleton<IMongoClient>(sp =>
-        {
-            var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
-            if (string.IsNullOrWhiteSpace(mongoConnectionString))
-            {
-                throw new InvalidOperationException("MongoDB connection string is missing or empty.");
-            }
-            return new MongoClient(mongoConnectionString);
-        });
 
-        services.AddSingleton<IMongoDbContext>(sp =>
-        {
-            var client = sp.GetRequiredService<IMongoClient>();
-            var databaseName = configuration["MongoDb:DatabaseName"];
-            if (string.IsNullOrWhiteSpace(databaseName))
-            {
-                throw new InvalidOperationException("MongoDB database name is missing or empty.");
-            }
-            return new MongoDbContext(client, databaseName);
-        });
 
-      // Optional: Register IMongoDatabase if needed directly
-        services.AddSingleton(sp =>
-        {
-            var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
-            return mongoDbContext.GetDatabase();
-        });
+            // MongoDB Context
+            services.AddSingleton<IMongoClient>(sp =>
+            {
+                var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
+                if (string.IsNullOrWhiteSpace(mongoConnectionString))
+                {
+                    throw new InvalidOperationException("MongoDB connection string is missing or empty.");
+                }
+                return new MongoClient(mongoConnectionString);
+            });
+
+            services.AddSingleton<IMongoDbContext>(sp =>
+            {
+                var client = sp.GetRequiredService<IMongoClient>();
+                var databaseName = configuration["MongoDb:DatabaseName"];
+                if (string.IsNullOrWhiteSpace(databaseName))
+                {
+                    throw new InvalidOperationException("MongoDB database name is missing or empty.");
+                }
+                return new MongoDbContext(client, databaseName);
+            });
+
+            // Optional: Register IMongoDatabase if needed directly
+            services.AddSingleton(sp =>
+            {
+                var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
+                return mongoDbContext.GetDatabase();
+            });
 
             // Configure JWT settings
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));       
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
-          // Register Hangfire services
+            // Register Hangfire services
             services.AddHangfire(config =>
             {
                 config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -163,32 +168,32 @@ namespace UserManagement.Infrastructure
             // Add the Hangfire server
             services.AddHangfireServer();
 
-        // Register ILogger<T>
-        services.AddLogging(builder =>
-        {
-            builder.AddSerilog();
+            // Register ILogger<T>
+            services.AddLogging(builder =>
+            {
+                builder.AddSerilog();
 
 
-        }); 
+            });
 
-        services.AddHttpClient("BackgroundService", client =>
-{
-    client.BaseAddress = new Uri("http://localhost:5011"); // BackgroundService runs here
-});
+            services.AddHttpClient("BackgroundService", client =>
+            {
+                client.BaseAddress = new Uri("http://localhost:5011"); // BackgroundService runs here
+            });
 
-        // services.AddDistributedMemoryCache();
-        // services.AddSession(options =>
-        // {
-        //     options.IdleTimeout = TimeSpan.FromHours(1);
-        //     options.Cookie.HttpOnly = true;
-        //     options.Cookie.IsEssential = true;
-        // });
-        // Register Polly Policies
-        // services.AddPollyPolicies(configuration);
-            
+            // services.AddDistributedMemoryCache();
+            // services.AddSession(options =>
+            // {
+            //     options.IdleTimeout = TimeSpan.FromHours(1);
+            //     options.Cookie.HttpOnly = true;
+            //     options.Cookie.IsEssential = true;
+            // });
+            // Register Polly Policies
+            // services.AddPollyPolicies(configuration);
+
 
             // Register repositories
-             services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+            services.AddScoped<IUserQueryRepository, UserQueryRepository>();
             services.AddScoped<IUserCommandRepository, UserCommandRepository>();
             services.AddScoped<IUserRoleAllocationQueryRepository, UserRoleAllocationQueryRepository>();
             services.AddScoped<IUserRoleAllocationCommandRepository, UserRoleAllocationCommandRepository>();
@@ -214,25 +219,25 @@ namespace UserManagement.Infrastructure
             services.AddScoped<IStateQueryRepository, StateQueryRepository>();
             services.AddScoped<ICityCommandRepository, CityCommandRepository>();
             services.AddScoped<ICityQueryRepository, CityQueryRepository>();
-            services.AddScoped<IAuditLogRepository, AuditLogRepository>();    
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             services.AddScoped<IUserSessionRepository, UserSessionRepository>();
- 			services.AddTransient<NotificationsQueryHandler>();  
-            services.AddTransient<INotificationsQueryRepository, NotificationsQueryRepository>();                             
-			services.AddScoped<IPasswordComplexityRuleQueryRepository,  PasswordComplexityRuleQueryRepository>();
+            services.AddTransient<NotificationsQueryHandler>();
+            services.AddTransient<INotificationsQueryRepository, NotificationsQueryRepository>();
+            services.AddScoped<IPasswordComplexityRuleQueryRepository, PasswordComplexityRuleQueryRepository>();
             services.AddScoped<IPasswordComplexityRuleCommandRepository, PasswordComplexityRuleCommandRepository>();
-            services.AddScoped<IAdminSecuritySettingsQueryRepository,  AdminSecuritySettingsQueryRepository>();
-            services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();            
-            services.AddScoped<IFinancialYearQueryRepository,  FinancialYearQueryRepository>();
-            services.AddScoped<IFinancialYearCommandRepository , FinancialYearCommandRepository>();
-            services.AddHttpContextAccessor();            
-            services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();   
+            services.AddScoped<IAdminSecuritySettingsQueryRepository, AdminSecuritySettingsQueryRepository>();
+            services.AddScoped<IAdminSecuritySettingsCommandRepository, AdminSecuritySettingsCommandRepository>();
+            services.AddScoped<IFinancialYearQueryRepository, FinancialYearQueryRepository>();
+            services.AddScoped<IFinancialYearCommandRepository, FinancialYearCommandRepository>();
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();
             services.AddScoped<ICurrencyQueryRepository, CurrencyQueryRepository>();
             services.AddScoped<ICurrencyCommandRepository, CurrencyCommandRepository>();
             services.AddScoped<ITimeZonesQueryRepository, TimeZonesQueryRepository>();
             services.AddScoped<ICompanyCommandSettings, CompanySettingsCommandRepository>();
             services.AddScoped<ICompanyQuerySettings, CompanySettingsQueryRepository>();
             services.AddScoped<ILanguageCommand, LanguageCommandRepository>();
-            services.AddScoped<ILanguageQuery, LanguageQueryRepository>(); 
+            services.AddScoped<ILanguageQuery, LanguageQueryRepository>();
             services.AddScoped<IMenuQuery, MenuQueryRepository>();
             services.AddScoped<IProfileQuery, ProfileQueryRepository>();
             services.AddScoped<IProfileCommand, ProfileCommandRepository>();
@@ -240,24 +245,23 @@ namespace UserManagement.Infrastructure
             services.AddScoped<IUserGroupCommandRepository, UserGroupCommandRepository>();
             services.AddScoped<ICustomFieldQuery, CustomFieldQuery>();
             services.AddScoped<ICustomFieldCommand, CustomFieldCommand>();
-            
-            
+
+
             // Miscellaneous services
-            services.AddScoped<IIPAddressService, IPAddressService>();            
+            services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddTransient<IFileUploadService, FileUploadRepository>();
-            services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
-            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();            
-            services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
-            services.AddScoped<IChangePassword, PasswordChangeRepository>();            
-            
+            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
+            services.AddSingleton<ITimeZoneService, TimeZoneService>();
+            services.AddScoped<IChangePassword, PasswordChangeRepository>();
+
 
             /*services.Configure<EmailJobSettings>(configuration.GetSection("EmailJobSettings"));
             services.Configure<EmailJobSettings>(configuration.GetSection("EmailSettings"));            
-             services.AddHostedService<EmailJobService>();     */          
-            services.AddHttpClient(); 
+             services.AddHostedService<EmailJobService>();     */
+            services.AddHttpClient();
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.Configure<SmsSettings>(configuration.GetSection("SmsSettings"));
-            services.AddSingleton<IEmailService,EmailService>();            
+            services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<ISmsService, SmsService>();
             services.AddSingleton<EnvironmentEncryptionService>();
 
@@ -266,18 +270,18 @@ namespace UserManagement.Infrastructure
                 typeof(UserProfile),
                 typeof(RoleEntitlementMappingProfile),
                 typeof(ModuleProfile),
-                typeof(ChangePasswordProfile),             
-				typeof(PasswordComplexityRuleProfile),
+                typeof(ChangePasswordProfile),
+                typeof(PasswordComplexityRuleProfile),
                 typeof(EntityProfile),
- 				typeof(AdminSecuritySettingsProfile),
-				typeof(DepartmentProfile),
+                 typeof(AdminSecuritySettingsProfile),
+                typeof(DepartmentProfile),
                 typeof(FinancialYearProfile),
                 typeof(CurrencyProfile),
                 typeof(UnitsProfile),
-				typeof(CompanySettingsProfile)
+                typeof(CompanySettingsProfile)
             );
 
             return services;
-        }      
+        }
     }
 }

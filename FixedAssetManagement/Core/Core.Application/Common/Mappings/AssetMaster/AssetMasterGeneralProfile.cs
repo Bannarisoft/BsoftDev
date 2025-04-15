@@ -26,9 +26,9 @@ namespace Core.Application.Common.Mappings.AssetMaster
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))            
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted)); 
 
-             CreateMap<UpdateAssetMasterGeneralCommand, AssetMasterGenerals>()
+            /*  CreateMap<UpdateAssetMasterGeneralCommand, AssetMasterGenerals>()
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.AssetMaster.IsActive ==1 ? Status.Active : Status.Inactive))
-            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore());
+            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore()); */
              
             CreateMap<AssetMasterGeneralDTO,AssetMasterGeneralAutoCompleteDTO>();    
             CreateMap<AssetMasterGenerals, AssetMasterGeneralDTO>();  
@@ -38,8 +38,25 @@ namespace Core.Application.Common.Mappings.AssetMaster
             .ForMember(dest => dest.AssetPurchase, opt => opt.MapFrom(src => src.AssetPurchaseDetails))
             .ForMember(dest => dest.AssetLocation, opt => opt.MapFrom(src => src.AssetLocation)) 
             .ForMember(dest => dest.AssetAdditionalCost, opt => opt.MapFrom(src => src.AssetAdditionalCost)) 
-            .ForMember(dest => dest.AssetSpecification, opt => opt.MapFrom(src => src.AssetSpecification))
-            .ForMember(dest => dest.Id, opt => opt.Ignore());              
+            .ForMember(dest => dest.AssetSpecification, opt => opt.MapFrom(src => src.AssetSpecification))            
+            .ForMember(dest => dest.Id, opt => opt.Ignore()); 
+
+
+            CreateMap<AssetMasterUpdateDto, AssetMasterGenerals>()
+            .ForMember(dest => dest.AssetPurchase, opt => opt.MapFrom(src => src.AssetPurchaseDetails))
+            .ForMember(dest => dest.AssetLocation, opt => opt.MapFrom(src => src.AssetLocation)) 
+            .ForMember(dest => dest.AssetAdditionalCost, opt => opt.MapFrom(src => src.AssetAdditionalCost))                        
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive))
+            .ForMember(dest => dest.Id, opt => opt.Ignore());      
+
+             CreateMap<AssetLocationUpdateDto, Core.Domain.Entities.AssetMaster.AssetLocation>()
+                .ReverseMap(); 
+            CreateMap<AssetAdditionalCostUpdateDto, Core.Domain.Entities.AssetPurchase.AssetAdditionalCost>()
+                .ReverseMap(); 
+            CreateMap<AssetPurchaseUpdateDto, AssetPurchaseDetails>()
+             .ForMember(dest => dest.CapitalizationDate,
+                       opt => opt.MapFrom(src => src.CapitalizationDate.ToDateTime(TimeOnly.MinValue)));            
+             
 
             // **Add these mappings to clear your error:**
             CreateMap<AssetPurchaseCombineDto, AssetPurchaseDetails>()

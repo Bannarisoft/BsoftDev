@@ -22,6 +22,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public int? AssetType { get; set; }                
         public int? UOMId { get; set; }
         public int? WorkingStatus { get; set; }
+        public string? AssetImageName { get; set; }     
 
         public AssetParentDTO? AssetParent { get; set; }
         public AssetLocationDTO? AssetLocation { get; set; }
@@ -31,5 +32,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public IList<AssetAMCDTOById>? AssetAmc { get; set; }
         public AssetDisposalByIdDTO? AssetDisposal { get; set; }
         public IList<AssetInsuranceByIdDTO>? AssetInsurance { get; set; }
+        public IList<AssetAdditionalCostDto>? AssetAdditionalCost { get; set; }
     }
 }
