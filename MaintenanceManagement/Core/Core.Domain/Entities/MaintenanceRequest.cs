@@ -17,23 +17,23 @@ namespace Core.Domain.Entities
        public int  CompanyId { get; set; }
        public int  UnitId { get; set; }
        public int DepartmentId { get; set; }
-    //    public int SourceId { get; set; }
-    //    public int? VendorId  { get; set; }
-    //    public int? OldVendorId  { get; set; }
-    //    public int? ServiceTypeId { get; set;}
-    //    public MiscMaster? ServiceType { get; set; } 
-    //    public int? ServiceLocationId { get; set;}
-    //    public MiscMaster? ServiceLocation { get; set; } 
-    //    public string? ModeOfDispatchId { get; set;}
-    //    public MiscMaster? ModeOfDispatchType { get; set; }        
-    //    public DateTimeOffset? ExpectedDispatchDate { get; set; }
-    //    public int? SparesTypeId { get; set; }
-    //    public MiscMaster? SpareType { get; set; }         
-    //    public decimal? EstimatedServiceCost { get; set;} = null!;
-    //    public decimal? EstimatedSpareCost { get; set;}
+       public int SourceId { get; set; }
+       public int? VendorId  { get; set; }
+       public int? OldVendorId  { get; set; }
+       public int? ServiceTypeId { get; set;}
+       public MiscMaster? ServiceType { get; set; } 
+       public int? ServiceLocationId { get; set;}
+       public MiscMaster? ServiceLocation { get; set; } 
+       public int? ModeOfDispatchId { get; set;}
+       public MiscMaster? ModeOfDispatchType { get; set; }        
+       public DateTimeOffset? ExpectedDispatchDate { get; set; }
+       public int? SparesTypeId { get; set; }
+       public MiscMaster? SpareType { get; set; }         
+       public decimal? EstimatedServiceCost { get; set;} = null!;
+       public decimal? EstimatedSpareCost { get; set;}
        public string? RequestId { get; set;}
        public string? Remarks { get; set; } 
-       public int  RequestStatusId { get; set; }  
+       public int?  RequestStatusId { get; set; }  
        public MiscMaster? RequestStatus { get; set; }      
 
     }

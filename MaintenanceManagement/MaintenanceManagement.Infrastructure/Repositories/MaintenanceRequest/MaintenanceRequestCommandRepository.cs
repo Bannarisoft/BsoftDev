@@ -35,9 +35,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                     existingRequest.MaintenanceTypeId = maintenanceRequest.MaintenanceTypeId;
                     existingRequest.MachineId = maintenanceRequest.MachineId;
                     existingRequest.DepartmentId = maintenanceRequest.DepartmentId;
-                    existingRequest.SourceId = maintenanceRequest.SourceId;
-                    existingRequest.VendorId = maintenanceRequest.VendorId;
-                    existingRequest.OldVendorId = maintenanceRequest.OldVendorId;
+                    // existingRequest.SourceId = maintenanceRequest.SourceId;
+                    // existingRequest.VendorId = maintenanceRequest.VendorId;
+                    // existingRequest.OldVendorId = maintenanceRequest.OldVendorId;
                     existingRequest.Remarks = maintenanceRequest.Remarks;
                     existingRequest.IsActive = maintenanceRequest.IsActive;
 
