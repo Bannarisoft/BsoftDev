@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250409071927_MaintenanceRequestaddrequestid")]
+    partial class MaintenanceRequestaddrequestid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,26 +321,22 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsActive");
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDeleted");
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
 
                     b.Property<int>("MachineGroupId")
                         .HasColumnType("int");
@@ -346,13 +345,13 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("ModifiedDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -361,7 +360,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasIndex("MachineGroupId");
 
-                    b.ToTable("MachineGroupUser", "Maintenance");
+                    b.ToTable("MachineGroupUser");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MachineMaster", b =>
@@ -525,12 +524,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -545,16 +542,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DepartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("EstimatedServiceCost")
-                        .HasColumnType("decimal");
-
-                    b.Property<decimal?>("EstimatedSpareCost")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTimeOffset?>("ExpectedDispatchDate")
-                        .HasColumnType("DateTimeOffset");
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
 
                     b.Property<int>("IsActive")
                         .HasColumnType("int");
@@ -563,13 +552,12 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("MachineId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("MachineId");
 
                     b.Property<int>("MaintenanceTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ModeOfDispatchId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("MaintenanceTypeId");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
@@ -584,35 +572,26 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OldVendorId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("OldVendorId");
 
                     b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Remarks");
+
+                    b.Property<string>("RequestId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RequestStatusId")
-                        .HasColumnType("int");
-
                     b.Property<int>("RequestTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ServiceLocationId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ServiceTypeId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("RequestTypeId");
 
                     b.Property<int>("SourceId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SparesTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("SparesTypeId");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("VendorId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("VendorId");
 
                     b.HasKey("Id");
 
@@ -620,17 +599,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasIndex("MaintenanceTypeId");
 
-                    b.HasIndex("ModeOfDispatchId");
-
-                    b.HasIndex("RequestStatusId");
-
                     b.HasIndex("RequestTypeId");
-
-                    b.HasIndex("ServiceLocationId");
-
-                    b.HasIndex("ServiceTypeId");
-
-                    b.HasIndex("SparesTypeId");
 
                     b.ToTable("MaintenanceRequest", "Maintenance");
                 });
@@ -1255,14 +1224,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
-                    b.Property<DateTimeOffset?>("LastActivityDate")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("LastActivityDate");
-
-                    b.Property<int?>("MachineId")
-                        .HasColumnType("int")
-                        .HasColumnName("MachineId");
-
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
@@ -1274,10 +1235,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<string>("OldVendorId")
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("OldVendorId");
 
                     b.Property<int>("PriorityId")
                         .HasColumnType("int")
@@ -1308,13 +1265,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("UnitId");
 
-                    b.Property<int?>("VendorId")
-                        .HasColumnType("int")
+                    b.Property<string>("VendorId")
+                        .HasColumnType("nvarchar(20)")
                         .HasColumnName("VendorId");
-
-                    b.Property<string>("VendorName")
-                        .HasColumnType("nvarchar(250)")
-                        .HasColumnName("VendorName");
 
                     b.Property<int>("WorkOrderTypeId")
                         .HasColumnType("int")
@@ -1361,15 +1314,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("CreatedIP")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Description");
-
-                    b.Property<decimal>("EstimatedTime")
-                        .HasColumnType("decimal(5,2)")
-                        .HasColumnName("EstimatedTime");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
@@ -1507,11 +1451,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<TimeSpan?>("DownTimeEndTime")
+                    b.Property<TimeSpan>("DownTimeEndTime")
                         .HasColumnType("time")
                         .HasColumnName("DownTimeEndTime");
 
-                    b.Property<TimeSpan?>("DownTimeStartTime")
+                    b.Property<TimeSpan>("DownTimeStartTime")
                         .HasColumnType("time")
                         .HasColumnName("DownTimeStartTime");
 
@@ -1607,7 +1551,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("TechnicianName")
                         .IsRequired()
-                        .HasColumnType("varchar(100)")
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("TechnicianName");
 
                     b.Property<int>("WorkOrderId")
@@ -1656,7 +1600,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.MachineGroup", "MachineGroup")
                         .WithMany("MachineGroupUser")
                         .HasForeignKey("MachineGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("MachineGroup");
@@ -1711,52 +1655,17 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "ModeOfDispatchType")
-                        .WithMany("ModeOfDispatchType")
-                        .HasForeignKey("ModeOfDispatchId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "RequestStatus")
-                        .WithMany("RequestStatus")
-                        .HasForeignKey("RequestStatusId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscRequestType")
                         .WithMany("RequestType")
                         .HasForeignKey("RequestTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "ServiceLocation")
-                        .WithMany("ServiceLocation")
-                        .HasForeignKey("ServiceLocationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "ServiceType")
-                        .WithMany("ServiceType")
-                        .HasForeignKey("ServiceTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "SpareType")
-                        .WithMany("SpareType")
-                        .HasForeignKey("SparesTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Machine");
 
                     b.Navigation("MiscMaintenanceType");
 
                     b.Navigation("MiscRequestType");
-
-                    b.Navigation("ModeOfDispatchType");
-
-                    b.Navigation("RequestStatus");
-
-                    b.Navigation("ServiceLocation");
-
-                    b.Navigation("ServiceType");
-
-                    b.Navigation("SpareType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
@@ -2017,19 +1926,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Navigation("MaintenanceType");
 
-                    b.Navigation("ModeOfDispatchType");
-
-                    b.Navigation("RequestStatus");
-
                     b.Navigation("RequestType");
 
                     b.Navigation("Schedule");
-
-                    b.Navigation("ServiceLocation");
-
-                    b.Navigation("ServiceType");
-
-                    b.Navigation("SpareType");
 
                     b.Navigation("WorkOrderPriority");
 

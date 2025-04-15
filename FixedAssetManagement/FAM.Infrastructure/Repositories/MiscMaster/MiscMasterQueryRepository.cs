@@ -84,14 +84,14 @@ namespace FAM.Infrastructure.Repositories.MiscMaster
             return miscmaster.ToList();
         }
 
-        public async Task<Core.Domain.Entities.MiscMaster?> GetByMiscMasterCodeAsync(string name, int? id = null)
+        public async Task<Core.Domain.Entities.MiscMaster?> GetByMiscMasterCodeAsync(string name, int miscTypeId, int? id = null)
         {
               var query = """
                  SELECT * FROM FixedAsset.MiscMaster
-                 WHERE Code = @Name AND IsDeleted = 0
+                 WHERE Code = @Name AND MiscTypeId = @MiscTypeId AND IsDeleted = 0
                  """;
 
-             var parameters = new DynamicParameters(new { Name = name });
+             var parameters = new DynamicParameters(new { Name = name , MiscTypeId = miscTypeId });
 
              if (id is not null)
              {

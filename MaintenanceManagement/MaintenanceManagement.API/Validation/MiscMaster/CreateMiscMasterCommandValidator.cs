@@ -54,11 +54,20 @@ namespace MaintenanceManagement.API.Validation.MiscMaster
                             .WithMessage($"{nameof(CreateMiscMasterCommand.Description)} {rule.Error}");
                         break;
                         case "AlreadyExists":
-                           RuleFor(x => x.Code)
-                           .MustAsync(async (Code, cancellation) => !await _miscMasterQuery.AlreadyExistsAsync(Code))
-                           .WithName("Misc Code")
-                            .WithMessage($"{rule.Error}");
-                        break;
+                        RuleFor(x => x)
+                            .MustAsync(async (command, cancellation) =>
+                            {
+                                return !await _miscMasterQuery.AlreadyExistsAsync(command.Code, command.MiscTypeId);
+                            })
+                            .WithMessage($"{rule.Error}")
+                            .WithName("Misc Code");
+                        break;      
+                        // case "AlreadyExists":
+                        //    RuleFor(x => x.Code)
+                        //    .MustAsync(async (Code, cancellation) => !await _miscMasterQuery.AlreadyExistsAsync(Code,miscTypeId))
+                        //    .WithName("Misc Code")
+                        //     .WithMessage($"{rule.Error}");
+                        // break;
                         
                 }
 
