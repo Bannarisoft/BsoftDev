@@ -109,21 +109,44 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
            var query = "SELECT ISNULL(MAX(SortOrder), 0) FROM Maintenance.MiscMaster WHERE IsDeleted = 0";
            return await _dbConnection.QueryFirstOrDefaultAsync<int>(query);
        }
+        
+        public async Task<bool> AlreadyExistsAsync(string code, int miscTypeId, int? id = null)
+        {
+            var query = @"SELECT COUNT(1) 
+                        FROM Maintenance.MiscMaster 
+                        WHERE Code = @Code 
+                            AND MiscTypeId = @MiscTypeId 
+                            AND IsDeleted = 0";
 
-        public async Task<bool> AlreadyExistsAsync(string code, int? id = null)
-        {   
+            var parameters = new DynamicParameters(new 
+            { 
+                Code = code, 
+                MiscTypeId = miscTypeId 
+            });
 
-              var query = "SELECT COUNT(1) FROM Maintenance.MiscMaster WHERE Code = @code AND IsDeleted = 0";
-                var parameters = new DynamicParameters(new { Code = code });
+            if (id is not null)
+            {
+                query += " AND Id != @Id";
+                parameters.Add("Id", id);
+            }
 
-             if (id is not null)
-             {
-                 query += " AND Id != @Id";
-                 parameters.Add("Id", id);
-             }
-                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
-                return count > 0;
-        } 
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+            return count > 0;
+        }
+        // public async Task<bool> AlreadyExistsAsync(string code,  int miscTypeId,int? id = null)
+        // {   
+
+        //       var query = "SELECT COUNT(1) FROM Maintenance.MiscMaster WHERE Code = @code AND MiscTypeId=@miscTypeId AND IsDeleted = 0";
+        //         var parameters = new DynamicParameters(new { Code = code });
+
+        //      if (id is not null)
+        //      {
+        //          query += " AND Id != @Id";
+        //          parameters.Add("Id", id);
+        //      }
+        //         var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+        //         return count > 0;
+        // } 
 
 
            public async Task<bool> NotFoundAsync(int id)

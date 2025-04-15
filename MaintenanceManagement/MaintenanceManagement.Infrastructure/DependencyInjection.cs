@@ -49,6 +49,8 @@ using System.Diagnostics;
 using Core.Application.Common.Interfaces.IActivityCheckListMaster;
 using Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListMaster;
 using MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMaster;
+using Core.Application.Common.Interfaces.IMaintenanceRequest;
+using MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -181,11 +183,14 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>(); */
             services.AddScoped<IActivityCheckListMasterQueryRepository, ActivityCheckListMasterQueryRepository>();
             services.AddScoped<IActivityCheckListMasterCommandRepository, ActivityCheckListMasterCommandRepository>();
+            services.AddScoped<IMaintenanceRequestQueryRepository, MaintenanceRequestQueryRepository>();
+            services.AddScoped<IMaintenanceRequestCommandRepository, MaintenanceRequestCommandRepository>();
             
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>(); 
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>(); 
+
             
 
 
@@ -209,7 +214,8 @@ namespace MaintenanceManagement.Infrastructure
                 typeof(WorkOrderProfile),
                 typeof(WorkOrderScheduleProfile),
                 typeof(WorkOrderActivityProfile),                
-                typeof(ActivityCheckListMasterProfile)
+                typeof(ActivityCheckListMasterProfile),
+                typeof(MaintenanceRequestProfile)
 
 				
 
