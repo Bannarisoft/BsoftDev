@@ -58,11 +58,13 @@ namespace MaintenanceManagement.API.Validation.MiscMaster
 
 
                     case "AlreadyExists":
-                           RuleFor(x =>  new { x.Code, x.Id })
-                           .MustAsync(async (misccode, cancellation) => 
-                        !await _miscMasterQuery.AlreadyExistsAsync(misccode.Code, misccode.Id))             
-                           .WithName("Misc Code")
-                            .WithMessage($"{rule.Error}");
+                        RuleFor(x => x)
+                            .MustAsync(async (command, cancellation) =>
+                            {
+                                return !await _miscMasterQuery.AlreadyExistsAsync(command.Code, command.MiscTypeId);
+                            })
+                            .WithMessage($"{rule.Error}")
+                            .WithName("Misc Code");
                             break; 
                     case "NotFound":
                            RuleFor(x => x.Id )

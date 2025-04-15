@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250409071927_MaintenanceRequestaddrequestid")]
+    partial class MaintenanceRequestaddrequestid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -357,7 +360,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasIndex("MachineGroupId");
 
-                    b.ToTable("MachineGroupUser", "Maintenance");
+                    b.ToTable("MachineGroupUser");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MachineMaster", b =>
@@ -577,9 +580,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnName("Remarks");
 
                     b.Property<string>("RequestId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("RequestId");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RequestTypeId")
                         .HasColumnType("int")

@@ -1,4 +1,5 @@
 {
+
     "version": "0.2.0",
     "configurations": [
       {
@@ -20,7 +21,13 @@
         "sourceFileMap": {
           "/Views": "${workspaceFolder}/SagaOrchestrator.API/Views"
         }
-      }
-    ]
-  }
+
   
+    },
+    {
+      "name": "C#: Launch Startup Project",
+      "type": "dotnet",
+      "request": "launch"
+    }
+  ]
+}

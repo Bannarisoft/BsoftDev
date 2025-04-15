@@ -49,6 +49,8 @@ using System.Diagnostics;
 using Core.Application.Common.Interfaces.IActivityCheckListMaster;
 using Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListMaster;
 using MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMaster;
+using Core.Application.Common.Interfaces.IMaintenanceRequest;
+using MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers;
 
@@ -59,8 +61,10 @@ namespace MaintenanceManagement.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
         {
+
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
+
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
@@ -138,6 +142,7 @@ namespace MaintenanceManagement.Infrastructure
             services.AddLogging(builder =>
             {
                 builder.AddSerilog();
+
             });
 
             // Register IDateTime
@@ -148,6 +153,7 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<ICostCenterCommandRepository, CostCenterCommandRepository>();
             services.AddScoped<IWorkCenterQueryRepository, WorkCenterQueryRepository>();
             services.AddScoped<IWorkCenterCommandRepository, WorkCenterCommandRepository>();
+
             services.AddScoped<IMachineGroupCommandRepository, MachineGroupCommandRepository>();
             services.AddScoped<IMachineGroupQueryRepository, MachineGroupQueryRepository>();
             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
@@ -165,6 +171,7 @@ namespace MaintenanceManagement.Infrastructure
 
             services.AddScoped<IActivityMasterQueryRepository, ActivityMasterQueryRepository>();
 
+
             services.AddScoped<IActivityMasterCommandRepository, ActivityMasterCommandRepository>();
 
             services.AddScoped<IMachineGroupUserQueryRepository, MachineGroupUserQueryRepository>();
@@ -174,21 +181,29 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMachineMasterQueryRepository, MachineMasterQueryRepository>();
 
             services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
+
             services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
+
 
             // services.AddScoped<IWorkOrderActivityCommandRepository, WorkOrderActivityCommandRepository>();
             // services.AddScoped<IWorkOrderActivityQueryRepository, WorkOrderActivityQueryRepository>();
+
 
             // services.AddScoped<IWorkOrderScheduleCommandRepository, WorkOrderScheduleCommandRepository>();
             // services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>(); 
             services.AddScoped<IActivityCheckListMasterQueryRepository, ActivityCheckListMasterQueryRepository>();
             services.AddScoped<IActivityCheckListMasterCommandRepository, ActivityCheckListMasterCommandRepository>();
+            services.AddScoped<IMaintenanceRequestQueryRepository, MaintenanceRequestQueryRepository>();
+            services.AddScoped<IMaintenanceRequestCommandRepository, MaintenanceRequestCommandRepository>();
+            
             services.AddScoped<IPreventiveSchedulerCommand, PreventiveSchedulerCommandRepository>();
             services.AddScoped<IPreventiveSchedulerQuery, PreventiveSchedulerQueryRepository>();
 
             // Miscellaneous services
+
             services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddTransient<IFileUploadService, FileUploadRepository>();
+            
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
 
@@ -206,6 +221,7 @@ namespace MaintenanceManagement.Infrastructure
             typeof(ShiftMasterDetailProfile),
 
             typeof(ActivityMasterProfile),
+
 
             typeof(MachineGroupUserProfile),
             typeof(WorkOrderProfile),
