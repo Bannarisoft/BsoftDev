@@ -99,9 +99,9 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                  .HasColumnType("nvarchar(max)")
                  .IsRequired(false);
 
-                 builder.Property(m => m.RequestId)                 
-                 .HasColumnType("nvarchar(max)")
-                 .IsRequired(false);
+                //  builder.Property(m => m.RequestId)                 
+                //  .HasColumnType("nvarchar(max)")
+                //  .IsRequired(false);
 
                  builder.Property(m => m.RequestStatusId)                 
                  .HasColumnType("int")

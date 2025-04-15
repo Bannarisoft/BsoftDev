@@ -31,8 +31,8 @@ namespace Core.Application.Common.Mappings
             // .ForMember(dest => dest.SourceId, opt => opt.MapFrom(src => src.SourceId))
             // .ForMember(dest => dest.VendorId, opt => opt.MapFrom(src => src.VendorId))
             // .ForMember(dest => dest.OldVendorId, opt => opt.MapFrom(src => src.OldVendorId))
-            .ForMember(dest => dest.Remarks, opt => opt.MapFrom(src => src.Remarks))
-            .ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.RequestId));
+            .ForMember(dest => dest.Remarks, opt => opt.MapFrom(src => src.Remarks));
+            // .ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.RequestId));
 
             CreateMap<Core.Domain.Entities.ExistingVendorDetails, GetExistingVendorDetailsDto>();
           
