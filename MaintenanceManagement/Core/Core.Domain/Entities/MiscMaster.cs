@@ -21,9 +21,20 @@ namespace Core.Domain.Entities
         public ICollection<WorkOrder>? WorkOrderStatus  {get; set;}  
         public ICollection<WorkOrder>? WorkOrderRootCause  {get; set;}  
         public ICollection<WorkOrder>? WorkOrderRequestType  {get; set;}  
-        public ICollection<PreventiveSchedulerHdr>? Schedule { get; set; }
-        public ICollection<PreventiveSchedulerHdr>? DueType { get; set; }
-        public ICollection<PreventiveSchedulerHdr>? Frequency { get; set; }
+        public ICollection<PreventiveSchedulerHeader>? Schedule { get; set; }
+        public ICollection<PreventiveSchedulerHeader>? DueType { get; set; }
+        public ICollection<PreventiveSchedulerHeader>? Frequency { get; set; }      
+        public ICollection<MaintenanceRequest>? ServiceType { get; set; }
+        public ICollection<MaintenanceRequest>? ServiceLocation { get; set; }
+        public ICollection<MaintenanceRequest>? SpareType { get; set; }
+
+        public ICollection<MaintenanceRequest>? RequestStatus { get; set; }
+
+        public ICollection<MaintenanceRequest>? ModeOfDispatchType { get; set; }
+
+
+
+
 		
   		    
     }

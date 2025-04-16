@@ -15,19 +15,19 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
     public class UpdatePreventiveSchedulerCommandHandler : IRequestHandler<UpdatePreventiveSchedulerCommand, ApiResponseDTO<bool>>
     {
         private readonly IPreventiveSchedulerCommand _preventiveSchedulerCommand;
-        private readonly IMapper _imapper;
+        private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper imapper, IMediator mediator)
+        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
-            _imapper = imapper;
+            _mapper = mapper;
             _mediator = mediator;
         }
         public async Task<ApiResponseDTO<bool>> Handle(UpdatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
         {
-            var preventiveScheduler  = _imapper.Map<PreventiveSchedulerHdr>(request);
+            var preventiveScheduler  = _mapper.Map<PreventiveSchedulerHeader>(request);
          
-                var preventiveSchedulerresult = await _preventiveSchedulerCommand.UpdateAsync(preventiveScheduler);
+                var response  = await _preventiveSchedulerCommand.UpdateAsync(preventiveScheduler);
 
                 
                     var domainEvent = new AuditLogsDomainEvent(
@@ -39,7 +39,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
                     );               
                     await _mediator.Publish(domainEvent, cancellationToken); 
               
-                if(preventiveSchedulerresult)
+                if(response)
                 {
                     return new ApiResponseDTO<bool>
                     {

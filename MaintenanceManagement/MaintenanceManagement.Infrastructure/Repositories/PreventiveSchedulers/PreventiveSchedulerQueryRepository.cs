@@ -86,12 +86,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             using var multi = await _dbConnection.QueryMultipleAsync(query, parameters);
             var preventiveSchedulers = await multi.ReadAsync<dynamic>();
-            var totalCount = multi.ReadFirst<int>();
+            var totalCount = await multi.ReadFirstAsync<int>();
 
             return (preventiveSchedulers, totalCount);
         }
 
-        public async Task<PreventiveSchedulerHdr> GetByIdAsync(int id)
+        public async Task<PreventiveSchedulerHeader> GetByIdAsync(int id)
         {
             const string query = @"
             SELECT  
@@ -119,9 +119,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHdrId = PS.Id
                 LEFT JOIN [Maintenance].[PreventiveSchedulerItems] PSI ON PSI.PreventiveSchedulerId = PS.Id
                 WHERE PS.IsDeleted = 0 AND PS.Id = @Id";
-            var PreventiveSchedulerDictionary = new Dictionary<int, PreventiveSchedulerHdr>();
+            var PreventiveSchedulerDictionary = new Dictionary<int, PreventiveSchedulerHeader>();
 
-    var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHdr,PreventiveSchedulerActivity,PreventiveSchedulerItems, PreventiveSchedulerHdr>(
+    var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader,PreventiveSchedulerActivity,PreventiveSchedulerItems, PreventiveSchedulerHeader>(
         query,
         (preventiveScheduler, preventiveSchedulerActivity, preventiveSchedulerItems) =>
         {
@@ -133,17 +133,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 PreventiveSchedulerDictionary[preventiveScheduler.Id] = existingPreventiveScheduler;
             }
 
+                existingPreventiveScheduler.PreventiveSchedulerActivities!.Add(preventiveSchedulerActivity);
+          
+                existingPreventiveScheduler.PreventiveSchedulerItems!.Add(preventiveSchedulerItems);
             
-            if (preventiveSchedulerActivity != null)
-            {
-                existingPreventiveScheduler.PreventiveSchedulerActivities.Add(preventiveSchedulerActivity);
-            }
-
-            
-            if (preventiveSchedulerItems != null )
-            {
-                existingPreventiveScheduler.PreventiveSchedulerItems.Add(preventiveSchedulerItems);
-            }
 
             return existingPreventiveScheduler;
         },
@@ -151,10 +144,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         splitOn: "ActivityId,OldItemId" 
         );
 
-            return PreventiveSchedulerResponse.FirstOrDefault();
+            return PreventiveSchedulerResponse.FirstOrDefault()!;
         }
 
-        public Task<List<PreventiveSchedulerHdr>> GetPreventiveScheduler(string searchPattern)
+        public Task<List<PreventiveSchedulerHeader>> GetPreventiveScheduler(string searchPattern)
         {
             throw new NotImplementedException();
         }

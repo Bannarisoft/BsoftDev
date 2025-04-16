@@ -32,7 +32,7 @@ namespace Core.Application.MiscMaster.Command.UpdateMiscMaster
            public async Task<ApiResponseDTO<bool>> Handle(UpdateMiscMasterCommand request, CancellationToken cancellationToken)
         {
                    
-                var existingMisctype = await _miscMasterQueryRepository.GetByMiscMasterCodeAsync(request.Code,request.Id);
+                var existingMisctype = await _miscMasterQueryRepository.GetByMiscMasterCodeAsync(request.Code,request.MiscTypeId,request.Id );
 
                 if (existingMisctype != null)
                 {

@@ -45,9 +45,9 @@ namespace MaintenanceManagement.Infrastructure.Data
         
 
         public DbSet<ActivityCheckListMaster>  ActivityCheckListMaster { get; set; }
-        public DbSet<PreventiveSchedulerHdr>  PreventiveSchedulerHdr { get; set; }
+        public DbSet<PreventiveSchedulerHeader>  PreventiveSchedulerHdr { get; set; }
         public DbSet<MaintenanceRequest> MaintenanceRequest { get; set;}
-        public DbSet<PreventiveSchedulerDtl>  PreventiveSchedulerDtl { get; set; }
+        public DbSet<PreventiveSchedulerDetail>  PreventiveSchedulerDtl { get; set; }
         public DbSet<PreventiveSchedulerItems>  PreventiveSchedulerItems { get; set; }
         public DbSet<PreventiveSchedulerActivity>  PreventiveSchedulerActivity { get; set; }
 
@@ -56,7 +56,6 @@ namespace MaintenanceManagement.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 
         {            
-         //  modelBuilder.ApplyConfiguration(new MachineGroupConfiguration());
            modelBuilder.ApplyConfiguration( new MachineGroupConfiguration());
            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());

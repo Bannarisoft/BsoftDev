@@ -28,46 +28,87 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
 
                 // Primary Key
                    builder.HasKey(m => m.Id);
-                builder.Property(m => m.Id)
-                .HasColumnName("Id")
+                builder.Property(m => m.Id)                
                 .HasColumnType("int")
                 .IsRequired();
                 
-                 builder.Property(m => m.RequestTypeId)
-                 .HasColumnName("RequestTypeId")
+                 builder.Property(m => m.RequestTypeId)                
                  .HasColumnType("int")
                  .IsRequired();
 
-                 builder.Property(m => m.MaintenanceTypeId)
-                 .HasColumnName("MaintenanceTypeId")
+                 builder.Property(m => m.MaintenanceTypeId)                
                  .HasColumnType("int")                 
                  .IsRequired();
 
-                 builder.Property(m => m.MachineId)
-                 .HasColumnName("MachineId")
+                 builder.Property(m => m.MachineId)               
                  .HasColumnType("int")
                  .IsRequired();
 
-                 builder.Property(m => m.DepartmentId)
-                 .HasColumnName("DepartmentId")
+                 builder.Property(m => m.CompanyId)                
                  .HasColumnType("int")
                  .IsRequired();
 
-                 builder.Property(m => m.VendorId)
-                 .HasColumnName("VendorId")
+                 builder.Property(m => m.UnitId)                
                  .HasColumnType("int")
-                 .IsRequired(false);
+                 .IsRequired();
 
-                 builder.Property(m => m.Remarks)
-                 .HasColumnName("Remarks")
-                 .HasColumnType("nvarchar")
-                 .IsRequired(false);
+                 builder.Property(m => m.DepartmentId)                 
+                 .HasColumnType("int")
+                 .IsRequired();
 
-                  builder.Property(m => m.OldVendorId)
-                 .HasColumnName("OldVendorId")
+                 builder.Property(m => m.SourceId)                
+                 .HasColumnType("int")
+                 .IsRequired();
+
+                 builder.Property(m => m.VendorId)                 
+                 .HasColumnType("int")
+                 .IsRequired(false);                            
+
+                  builder.Property(m => m.OldVendorId)                
                  .HasColumnType("nvarchar(max)");
 
-                  builder.HasOne(b => b.MiscRequestType)
+                 builder.Property(m => m.ServiceTypeId)                 
+                 .HasColumnType("int") ;
+
+                 builder.Property(m => m.ServiceLocationId)
+               
+                 .HasColumnType("int");
+
+                 builder.Property(m => m.ModeOfDispatchId)
+                 
+                 .HasColumnType("int");
+
+                 builder.Property(m => m.ExpectedDispatchDate)
+                 
+                 .HasColumnType("DateTimeOffset")
+                 .IsRequired(false);
+
+                 builder.Property(m => m.SparesTypeId)
+                 .HasColumnName("SparesTypeId")
+                 .HasColumnType("int");
+
+                 builder.Property(m => m.EstimatedServiceCost)                
+                 .HasColumnType("decimal")
+                 .IsRequired(false);
+
+                 builder.Property(m => m.EstimatedServiceCost)                 
+                 .HasColumnType("decimal")
+                 .IsRequired(false);
+
+                builder.Property(m => m.Remarks)                 
+                 .HasColumnType("nvarchar(max)")
+                 .IsRequired(false);
+
+                //  builder.Property(m => m.RequestId)                 
+                //  .HasColumnType("nvarchar(max)")
+                //  .IsRequired(false);
+
+                 builder.Property(m => m.RequestStatusId)                 
+                 .HasColumnType("int")
+                 .IsRequired(false);
+
+
+                builder.HasOne(b => b.MiscRequestType)
                 .WithMany(b => b.RequestType)
                 .HasForeignKey(b => b.RequestTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -82,11 +123,32 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasForeignKey(b => b.MachineId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+                builder.HasOne(b => b.ServiceType)
+                .WithMany(b => b.ServiceType)
+                .HasForeignKey(b => b.ServiceTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                builder.HasOne(b => b.ServiceLocation)
+                .WithMany(b => b.ServiceLocation)
+                .HasForeignKey(b => b.ServiceLocationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                builder.HasOne(b => b.SpareType)
+                .WithMany(b => b.SpareType)
+                .HasForeignKey(b => b.SparesTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                builder.HasOne(b => b.RequestStatus)
+                .WithMany(b => b.RequestStatus)
+                .HasForeignKey(b => b.RequestStatusId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                builder.HasOne(b => b.ModeOfDispatchType)
+                .WithMany(b => b.ModeOfDispatchType)
+                .HasForeignKey(b => b.ModeOfDispatchId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
-
-
-                
             
         }
 

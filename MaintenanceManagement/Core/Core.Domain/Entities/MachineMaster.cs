@@ -25,9 +25,10 @@ namespace Core.Domain.Entities
         public DateTimeOffset? InstallationDate { get; set; }
 
         public int AssetId { get; set; }   
-        public ICollection<PreventiveSchedulerDtl>? PreventiveSchedulerDtls { get; set; }
+        public ICollection<PreventiveSchedulerDetail>? PreventiveSchedulerDetail { get; set; }
 
-        public ICollection<MaintenanceRequest> MaintenanceRequest { get; set; } = null!;              
+        public ICollection<MaintenanceRequest> MaintenanceRequest { get; set; } = null!;  
+                    
 
 
         

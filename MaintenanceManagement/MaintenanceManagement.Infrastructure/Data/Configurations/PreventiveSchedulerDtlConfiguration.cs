@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MaintenanceManagement.Infrastructure.Data.Configurations
 {
-    public class PreventiveSchedulerDtlConfiguration : IEntityTypeConfiguration<PreventiveSchedulerDtl>
+    public class PreventiveSchedulerDtlConfiguration : IEntityTypeConfiguration<PreventiveSchedulerDetail>
     {
-        public void Configure(EntityTypeBuilder<PreventiveSchedulerDtl> builder)
+        public void Configure(EntityTypeBuilder<PreventiveSchedulerDetail> builder)
         {
-            builder.ToTable("PreventiveSchedulerDtl", "Maintenance");
+            builder.ToTable("PreventiveSchedulerDetail", "Maintenance");
             builder.HasKey(t => t.Id);
             builder.Property(t => t.PreventiveSchedulerId)
                 .HasColumnName("PreventiveSchedulerId")
@@ -34,13 +34,17 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("date")
                 .IsRequired();
 
+            builder.Property(t => t.RescheduleReason)
+                .HasColumnName("RescheduleReason")
+                .HasColumnType("nvarchar(max)");
+
                 builder.HasOne(t => t.PreventiveScheduler)
-                .WithMany(t => t.PreventiveSchedulerDtls)
+                .WithMany(t => t.PreventiveSchedulerDetails)
                 .HasForeignKey(t => t.PreventiveSchedulerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
                  builder.HasOne(t => t.Machine)
-                .WithMany(t => t.PreventiveSchedulerDtls)
+                .WithMany(t => t.PreventiveSchedulerDetail)
                 .HasForeignKey(t => t.MachineId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

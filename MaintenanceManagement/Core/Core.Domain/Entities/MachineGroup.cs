@@ -11,7 +11,7 @@ namespace Core.Domain.Entities
          public ICollection<ActivityMachineGroup>? ActivityMachineGroups { get; set; }   
          public ICollection<MachineGroupUser>? MachineGroupUser { get; set; }             
         public ICollection<MachineMaster>? MachineMasters { get; set; }
-        public ICollection<PreventiveSchedulerHdr>? PreventiveSchedulerHdr { get; set; }   
+        public ICollection<PreventiveSchedulerHeader>? PreventiveSchedulerHeaders { get; set; }   
         
     }
 }
