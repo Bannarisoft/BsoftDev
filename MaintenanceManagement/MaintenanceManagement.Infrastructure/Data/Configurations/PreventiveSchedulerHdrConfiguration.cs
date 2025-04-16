@@ -10,9 +10,9 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace MaintenanceManagement.Infrastructure.Data.Configurations
 {
-    public class PreventiveSchedulerHdrConfiguration : IEntityTypeConfiguration<PreventiveSchedulerHdr>
+    public class PreventiveSchedulerHdrConfiguration : IEntityTypeConfiguration<PreventiveSchedulerHeader>
     {
-        public void Configure(EntityTypeBuilder<PreventiveSchedulerHdr> builder)
+        public void Configure(EntityTypeBuilder<PreventiveSchedulerHeader> builder)
         {
             var isActiveConverter = new ValueConverter<Status, bool>
                (
@@ -26,7 +26,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                  v => v ? IsDelete.Deleted : IsDelete.NotDeleted 
                 );
                 
-            builder.ToTable("PreventiveSchedulerHdr", "Maintenance");
+            builder.ToTable("PreventiveSchedulerHeader", "Maintenance");
 
             builder.HasKey(b => b.Id);
 
@@ -111,12 +111,12 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(255)");
                 
                 builder.HasOne(b => b.MachineGroup)
-                .WithMany(b => b.PreventiveSchedulerHdr)
+                .WithMany(b => b.PreventiveSchedulerHeaders)
                 .HasForeignKey(b => b.MachineGroupId)
                 .OnDelete(DeleteBehavior.Restrict);
 
                 builder.HasOne(b => b.MaintenanceCategory)
-                .WithMany(b => b.PreventiveSchedulerHdr)
+                .WithMany(b => b.PreventiveSchedulerHeaders)
                 .HasForeignKey(b => b.MaintenanceCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 

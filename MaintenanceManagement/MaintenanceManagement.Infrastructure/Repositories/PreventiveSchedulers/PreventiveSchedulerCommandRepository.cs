@@ -17,16 +17,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<int> CreateAsync(PreventiveSchedulerHdr preventiveSchedulerHdr)
+        public async Task<int> CreateAsync(PreventiveSchedulerHeader preventiveSchedulerHdr)
         {
-            var entry =_applicationDbContext.Entry(preventiveSchedulerHdr);
+            _applicationDbContext.Entry(preventiveSchedulerHdr);
             await _applicationDbContext.PreventiveSchedulerHdr.AddAsync(preventiveSchedulerHdr);
             await _applicationDbContext.SaveChangesAsync();
 
             return preventiveSchedulerHdr.Id;
         }
 
-        public async Task<bool> DeleteAsync(int id, PreventiveSchedulerHdr preventiveSchedulerHdr)
+        public async Task<bool> DeleteAsync(int id, PreventiveSchedulerHeader preventiveSchedulerHdr)
         {
              var PreventiveSchedulerToDelete = await _applicationDbContext.PreventiveSchedulerHdr.FirstOrDefaultAsync(u => u.Id == id);
             if (PreventiveSchedulerToDelete != null)
@@ -37,10 +37,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return false; 
         }
 
-        public async Task<bool> UpdateAsync(PreventiveSchedulerHdr preventiveSchedulerHdr)
+        public async Task<bool> UpdateAsync(PreventiveSchedulerHeader preventiveSchedulerHdr)
         {
             var existingPreventiveScheduler = await _applicationDbContext.PreventiveSchedulerHdr
-            .Include(ps => ps.PreventiveSchedulerDtls)
+            .Include(ps => ps.PreventiveSchedulerDetails)
             .Include(ps => ps.PreventiveSchedulerActivities)
             .Include(ps => ps.PreventiveSchedulerItems)
             .FirstOrDefaultAsync(ps => ps.Id == preventiveSchedulerHdr.Id);
@@ -74,8 +74,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 existingPreventiveScheduler.IsActive = preventiveSchedulerHdr.IsActive;
                 _applicationDbContext.PreventiveSchedulerHdr.Update(existingPreventiveScheduler);
 
-                 if (preventiveSchedulerHdr.PreventiveSchedulerDtls?.Any() == true)
-                   await _applicationDbContext.PreventiveSchedulerDtl.AddRangeAsync(preventiveSchedulerHdr.PreventiveSchedulerDtls);
+                 if (preventiveSchedulerHdr.PreventiveSchedulerDetails?.Any() == true)
+                   await _applicationDbContext.PreventiveSchedulerDtl.AddRangeAsync(preventiveSchedulerHdr.PreventiveSchedulerDetails);
 
                if (preventiveSchedulerHdr.PreventiveSchedulerActivities?.Any() == true)
                    await _applicationDbContext.PreventiveSchedulerActivity.AddRangeAsync(preventiveSchedulerHdr.PreventiveSchedulerActivities);
