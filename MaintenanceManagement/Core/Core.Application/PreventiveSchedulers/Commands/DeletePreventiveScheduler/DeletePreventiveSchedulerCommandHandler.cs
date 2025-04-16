@@ -16,16 +16,16 @@ namespace Core.Application.PreventiveSchedulers.Commands.DeletePreventiveSchedul
         private readonly IPreventiveSchedulerCommand _preventiveSchedulerCommand;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        public DeletePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper imapper, IMediator mediator)
+        public DeletePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
-            _mapper = imapper;
+            _mapper = mapper;
             _mediator = mediator;
         }
         public async Task<ApiResponseDTO<bool>> Handle(DeletePreventiveSchedulerCommand request, CancellationToken cancellationToken)
         {
-             var preventiveScheduler  = _mapper.Map<PreventiveSchedulerHdr>(request);
-            var preventiveSchedulerresult = await _preventiveSchedulerCommand.DeleteAsync(request.Id,preventiveScheduler);
+             var preventiveScheduler  = _mapper.Map<PreventiveSchedulerHeader>(request);
+            var response = await _preventiveSchedulerCommand.DeleteAsync(request.Id,preventiveScheduler);
 
 
                   //Domain Event  
@@ -38,7 +38,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.DeletePreventiveSchedul
                     );               
                     await _mediator.Publish(domainEvent, cancellationToken);  
 
-                 if(preventiveSchedulerresult)
+                 if(response)
                 {
                     return new ApiResponseDTO<bool>
                     {

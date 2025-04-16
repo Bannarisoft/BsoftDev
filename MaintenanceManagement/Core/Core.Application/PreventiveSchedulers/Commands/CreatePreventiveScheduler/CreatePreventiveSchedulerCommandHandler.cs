@@ -14,22 +14,22 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
     public class CreatePreventiveSchedulerCommandHandler : IRequestHandler<CreatePreventiveSchedulerCommand, ApiResponseDTO<int>>
     {
         private readonly IPreventiveSchedulerCommand _preventiveSchedulerCommand;
-        private readonly IMapper _imapper;
+        private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        public CreatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper imapper, IMediator mediator)
+        public CreatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
-            _imapper = imapper;
+            _mapper = mapper;
             _mediator = mediator;
         }
         public async Task<ApiResponseDTO<int>> Handle(CreatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
         {
-            var preventiveScheduler  = _imapper.Map<PreventiveSchedulerHdr>(request);
+            var preventiveScheduler  = _mapper.Map<PreventiveSchedulerHeader>(request);
 
-                var preventiveSchedulerresult = await _preventiveSchedulerCommand.CreateAsync(preventiveScheduler);
+                var response = await _preventiveSchedulerCommand.CreateAsync(preventiveScheduler);
                 
                 
-                if (preventiveSchedulerresult > 0)
+                if (response > 0)
                 {
                     var domainEvent = new AuditLogsDomainEvent(
                      actionDetail: "Create",
@@ -44,7 +44,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                     {
                         IsSuccess = true, 
                         Message = "Preventive scheduler created successfully",
-                         Data = preventiveSchedulerresult
+                         Data = response
                     };
                 }
                

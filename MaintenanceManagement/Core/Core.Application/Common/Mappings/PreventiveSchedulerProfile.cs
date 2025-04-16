@@ -16,7 +16,7 @@ namespace Core.Application.Common.Mappings
     {
         public PreventiveSchedulerProfile()
         {
-            CreateMap<CreatePreventiveSchedulerCommand, PreventiveSchedulerHdr>()
+            CreateMap<CreatePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
             .ForMember(dest => dest.PreventiveSchedulerActivities, opt => opt.MapFrom(src => src.Activity))
             .ForMember(dest => dest.PreventiveSchedulerItems, opt => opt.MapFrom(src => src.Items))
             .ForMember(dest => dest.DownTimeEstimateHrs, opt => opt.MapFrom(src => src.DownTimeEstimateHrs))
@@ -28,7 +28,7 @@ namespace Core.Application.Common.Mappings
              CreateMap<PreventiveSchedulerItemsDto, PreventiveSchedulerItems>()
              .ForMember(dest => dest.OldItemId, opt => opt.MapFrom(src => src.ItemId));
 
-             CreateMap<UpdatePreventiveSchedulerCommand, PreventiveSchedulerHdr>()
+             CreateMap<UpdatePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
             .ForMember(dest => dest.PreventiveSchedulerActivities, opt => opt.MapFrom(src => src.Activity))
              .ForMember(dest => dest.PreventiveSchedulerItems, opt => opt.MapFrom(src => src.Items))
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
@@ -36,10 +36,10 @@ namespace Core.Application.Common.Mappings
             CreateMap<PreventiveSchedulerActivityUpdateDto, PreventiveSchedulerActivity>();
             CreateMap<PreventiveSchedulerItemUpdateDto, PreventiveSchedulerItems>();
 
-            CreateMap<DeletePreventiveSchedulerCommand, PreventiveSchedulerHdr>()
+            CreateMap<DeletePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
 
-             CreateMap<PreventiveSchedulerHdr, PreventiveSchedulerHdrByIdDto>()
+             CreateMap<PreventiveSchedulerHeader, PreventiveSchedulerHdrByIdDto>()
             .ForMember(dest => dest.Activity, opt => opt.MapFrom(src => src.PreventiveSchedulerActivities)) 
             .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.PreventiveSchedulerItems));
 
