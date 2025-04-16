@@ -71,7 +71,6 @@ using FAM.Infrastructure.Repositories.AssetTransferReceipt;
 using FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer;
 using Core.Application.Common.Interfaces.IExcelImport;
 using FAM.Infrastructure.Repositories.ExcelImport;
-using FAM.Application.Common;
 using FAM.Infrastructure.Helpers;
 
 namespace FAM.Infrastructure
@@ -233,8 +232,7 @@ namespace FAM.Infrastructure
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddTransient<IFileUploadService, FileUploadRepository>();
-            services.AddSingleton<ITimeZoneService, TimeZoneService>();
-            services.AddSingleton<EnvironmentEncryptionService>();
+            services.AddSingleton<ITimeZoneService, TimeZoneService>();            
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
 
             // AutoMapper profiles
