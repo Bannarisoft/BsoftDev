@@ -49,9 +49,13 @@ using Core.Application.MachineGroupUsers.Command.CreateMachineGroupUser;
 using Core.Application.MachineMaster.Command.DeleteMachineMaster;
 using Core.Application.MachineGroupUser.Command.UpdateMachineGroupUser;
 using Core.Application.MachineGroupUser.Command.DeleteMachineGroupUser;
+
 using Core.Application.ActivityCheckListMaster.Command.CreateActivityCheckListMaster;
 using MaintenanceManagement.API.Validation.ActivityCheckListMaster;
 using Core.Application.ActivityCheckListMaster.Command.UpdateActivityCheckListMaster;
+using Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest;
+using MaintenanceManagement.API.Validation.MaintenanceRequest;
+using Core.Application.MaintenanceRequest.Command.UpdateMaintenanceRequestCommand;
 using Core.Application.WorkOrder.Command.CreateWorkOrder;
 using MaintenanceManagement.API.Validation.WorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder;
@@ -105,11 +109,14 @@ namespace MaintenanceManagement.API.Validation.Common
         services.AddScoped<IValidator<UpdateMachineGroupUserCommand>, UpdateMachineGroupUserCommandValidator>();
         services.AddScoped<IValidator<DeleteMachineGroupUserCommand>, DeleteMachineGroupUserCommandValidator>();
 
+
         services.AddScoped<IValidator<CreateWorkOrderCommand>, CreateWorkOrderCommandValidator>();
         services.AddScoped<IValidator<UpdateWorkOrderCommand>, UpdateWorkOrderCommandValidator>();
 
         services.AddScoped<IValidator<CreateActivityCheckListMasterCommand>, CreateActivityCheckListMasterCommandValidator>();
         services.AddScoped<IValidator<UpdateActivityCheckListMasterCommand>, UpdateActivityCheckListMasterCommandValidator>();
+        services.AddScoped<IValidator<CreateMaintenanceRequestCommand>, CreateMaintenanceRequestCommandValidator>();
+        services.AddScoped<IValidator<UpdateMaintenanceRequestCommand>, UpdateMaintenanceRequestCommandValidator>();
         }  
     }
 }

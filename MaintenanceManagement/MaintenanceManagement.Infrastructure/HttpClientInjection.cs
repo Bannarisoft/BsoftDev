@@ -19,6 +19,7 @@ namespace MaintenanceManagement.Infrastructure
                 client.BaseAddress = new Uri(configuration["HttpClientSettings:DepartmentService"]);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             })
+             .AddHttpMessageHandler<AuthTokenHandler>()
             .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
             services.AddScoped<IDepartmentService, DepartmentService>();
@@ -29,7 +30,7 @@ namespace MaintenanceManagement.Infrastructure
                 client.BaseAddress = new Uri(configuration["HttpClientSettings:UserSessionService"]);
                 client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             })
-
+            // .AddHttpMessageHandler<AuthTokenHandler>()
             .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
             services.AddScoped<IUserSessionService, UserSessionService>();

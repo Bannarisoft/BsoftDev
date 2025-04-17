@@ -9,8 +9,8 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
     public interface IPreventiveSchedulerQuery
     {
         Task<(IEnumerable<dynamic> PreventiveSchedulerList,int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm);
-        Task<PreventiveSchedulerHdr> GetByIdAsync(int id);
-        Task<List<PreventiveSchedulerHdr>> GetPreventiveScheduler(string searchPattern);
+        Task<PreventiveSchedulerHeader> GetByIdAsync(int id);
+        Task<List<PreventiveSchedulerHeader>> GetPreventiveScheduler(string searchPattern);
         Task<bool> SoftDeleteValidation(int Id); 
         Task<bool> AlreadyExistsAsync(string ShiftName,int? id = null);
         Task<bool> NotFoundAsync(int id );

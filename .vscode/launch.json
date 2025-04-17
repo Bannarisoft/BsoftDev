@@ -1,4 +1,5 @@
 {
+
     "version": "0.2.0",
     "configurations": [
       {
@@ -15,12 +16,18 @@
           "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
         },
         "env": {
-          "ASPNETCORE_ENVIRONMENT": "QA"
+          "ASPNETCORE_ENVIRONMENT": "Development"
         },
         "sourceFileMap": {
           "/Views": "${workspaceFolder}/SagaOrchestrator.API/Views"
         }
-      }
-    ]
-  }
+
   
+    },
+    {
+      "name": "C#: Launch Startup Project",
+      "type": "dotnet",
+      "request": "launch"
+    }
+  ]
+}

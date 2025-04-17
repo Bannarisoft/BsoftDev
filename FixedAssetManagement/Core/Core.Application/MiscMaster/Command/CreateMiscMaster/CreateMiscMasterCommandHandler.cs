@@ -31,7 +31,7 @@ namespace Core.Application.MiscMaster.Command.CreateMiscMaster
         public  async Task<ApiResponseDTO<GetMiscMasterDto>> Handle(CreateMiscMasterCommand request, CancellationToken cancellationToken)
         {
                 // 🔹 Check if a MiscTypeMaster with the same name already exists
-            var existingMiscMaster = await _miscMasterQueryRepository.GetByMiscMasterCodeAsync(request.Code);
+            var existingMiscMaster = await _miscMasterQueryRepository.GetByMiscMasterCodeAsync(request.Code,request.MiscTypeId) ;
 
             if (existingMiscMaster != null)
             {

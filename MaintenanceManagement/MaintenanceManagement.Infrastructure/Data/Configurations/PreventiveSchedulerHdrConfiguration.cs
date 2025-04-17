@@ -10,9 +10,9 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace MaintenanceManagement.Infrastructure.Data.Configurations
 {
-    public class PreventiveSchedulerHdrConfiguration : IEntityTypeConfiguration<PreventiveSchedulerHdr>
+    public class PreventiveSchedulerHdrConfiguration : IEntityTypeConfiguration<PreventiveSchedulerHeader>
     {
-        public void Configure(EntityTypeBuilder<PreventiveSchedulerHdr> builder)
+        public void Configure(EntityTypeBuilder<PreventiveSchedulerHeader> builder)
         {
             var isActiveConverter = new ValueConverter<Status, bool>
                (
@@ -26,7 +26,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                  v => v ? IsDelete.Deleted : IsDelete.NotDeleted 
                 );
                 
-            builder.ToTable("PreventiveSchedulerHdr", "Maintenance");
+            builder.ToTable("PreventiveSchedulerHeader", "Maintenance");
 
             builder.HasKey(b => b.Id);
 
@@ -47,16 +47,16 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnName("ScheduleId")
                 .HasColumnType("int")
                 .IsRequired();
-            builder.Property(b => b.DueTypeId)
-                .HasColumnName("DueTypeId")
+            builder.Property(b => b.FrequencyTypeId)
+                .HasColumnName("FrequencyTypeId")
                 .HasColumnType("int")
                 .IsRequired();
-            builder.Property(b => b.DuePeriod)
-                .HasColumnName("DuePeriod")
+            builder.Property(b => b.FrequencyInterval)
+                .HasColumnName("FrequencyInterval")
                 .HasColumnType("int")
                 .IsRequired();
-            builder.Property(b => b.FrequencyId)
-                .HasColumnName("FrequencyId")
+            builder.Property(b => b.FrequencyUnitId)
+                .HasColumnName("FrequencyUnitId")
                 .HasColumnType("int")
                 .IsRequired();
             builder.Property(b => b.EffectiveDate)
@@ -111,12 +111,12 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(255)");
                 
                 builder.HasOne(b => b.MachineGroup)
-                .WithMany(b => b.PreventiveSchedulerHdr)
+                .WithMany(b => b.PreventiveSchedulerHeaders)
                 .HasForeignKey(b => b.MachineGroupId)
                 .OnDelete(DeleteBehavior.Restrict);
 
                 builder.HasOne(b => b.MaintenanceCategory)
-                .WithMany(b => b.PreventiveSchedulerHdr)
+                .WithMany(b => b.PreventiveSchedulerHeaders)
                 .HasForeignKey(b => b.MaintenanceCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -125,14 +125,14 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasForeignKey(b => b.ScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                builder.HasOne(b => b.MiscDueType)
-                .WithMany(b => b.DueType)
-                .HasForeignKey(b => b.DueTypeId)
+                builder.HasOne(b => b.MiscFrequencyType)
+                .WithMany(b => b.FrequencyType)
+                .HasForeignKey(b => b.FrequencyTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                builder.HasOne(b => b.MiscFrequency)
-                .WithMany(b => b.Frequency)
-                .HasForeignKey(b => b.FrequencyId)
+                builder.HasOne(b => b.MiscFrequencyUnit)
+                .WithMany(b => b.FrequencyUnit)
+                .HasForeignKey(b => b.FrequencyUnitId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

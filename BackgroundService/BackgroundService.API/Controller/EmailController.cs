@@ -1,26 +1,31 @@
-using Contracts.Models.Email;
-using MassTransit;
+using Contracts.Events.Notifications;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackgroundService.API.Controller
 {
-     [Route("api/email")]
+    [Route("api/email")]
     [ApiController]
     public class EmailController : ControllerBase
     {
-        private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IMediator _mediator;
 
-        public EmailController(IPublishEndpoint publishEndpoint)
+        public EmailController(IMediator mediator)
         {
-            _publishEndpoint = publishEndpoint;
+            _mediator = mediator;
         }
 
         [HttpPost("send")]
-        public async Task<IActionResult> PublishEmail([FromBody] EmailEventDto email)
+        [AllowAnonymous]
+        public async Task<IActionResult> SendEmail([FromBody] SendEmailCommand command)
         {
-            await _publishEndpoint.Publish(email);
-            return Ok("Email published");
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok(new { Message = "Email sent successfully" });
+
+            return BadRequest(new { Message = "Email sending failed" });
         }
     }
+
 }
-    

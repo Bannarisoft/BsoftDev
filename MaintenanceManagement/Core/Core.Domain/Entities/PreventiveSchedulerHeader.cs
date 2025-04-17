@@ -6,27 +6,27 @@ using Core.Domain.Common;
 
 namespace Core.Domain.Entities
 {
-    public class PreventiveSchedulerHdr : BaseEntity
+    public class PreventiveSchedulerHeader : BaseEntity
     {
         public int MachineGroupId { get; set; }
-        public MachineGroup MachineGroup { get; set; }
+        public required MachineGroup MachineGroup { get; set; }
         public int DepartmentId { get; set; }
         public int MaintenanceCategoryId { get; set; }
-        public MaintenanceCategory MaintenanceCategory { get; set; }
+        public required MaintenanceCategory MaintenanceCategory { get; set; }
         public int ScheduleId { get; set; }
-        public MiscMaster MiscSchedule { get; set; }
-        public int DueTypeId { get; set; }
-        public MiscMaster MiscDueType { get; set; }
-        public int DuePeriod { get; set; }
-        public int FrequencyId { get; set; }
-        public MiscMaster MiscFrequency { get; set; }
+        public required MiscMaster MiscSchedule { get; set; }
+        public int FrequencyTypeId { get; set; }
+        public required MiscMaster MiscFrequencyType { get; set; }
+        public int 	FrequencyInterval { get; set; }
+        public int FrequencyUnitId { get; set; }
+        public required MiscMaster MiscFrequencyUnit { get; set; }
         public DateOnly EffectiveDate { get; set; }
         public int GraceDays { get; set; }
         public int ReminderWorkOrderDays { get; set; }
         public int ReminderMaterialReqDays { get; set; }
         public byte IsDownTimeRequired { get; set; }
         public decimal DownTimeEstimateHrs { get; set; }
-        public ICollection<PreventiveSchedulerDtl>? PreventiveSchedulerDtls { get; set; }
+        public ICollection<PreventiveSchedulerDetail>? PreventiveSchedulerDetails { get; set; }
         public ICollection<PreventiveSchedulerActivity>? PreventiveSchedulerActivities { get; set; }
         public ICollection<PreventiveSchedulerItems>? PreventiveSchedulerItems { get; set; }
     }
