@@ -5,8 +5,6 @@ using MaintenanceManagement.Infrastructure.HttpClients.Departments;
 using MaintenanceManagement.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Polly;
-using Polly.Extensions.Http;
 using Shared.Infrastructure.HttpClientPolly;
 
 namespace MaintenanceManagement.Infrastructure

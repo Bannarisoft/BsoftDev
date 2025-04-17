@@ -5,10 +5,8 @@ using MediatR;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
-using Serilog;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces;
-using MassTransit;
 using Contracts.Events.Users;
 
 
