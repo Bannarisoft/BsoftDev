@@ -17,11 +17,16 @@
     <PackageReference Include="Polly" Version="8.5.1" />
     <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
     <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
+    <PackageReference Include="Hangfire" Version="1.8.17"/>
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.17"/>
+    <PackageReference Include="Hangfire.Core" Version="1.8.17"/>
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.17"/>
 
   </ItemGroup>
  <ItemGroup>
     <ProjectReference Include="..\BackgroundService.Domain\BackgroundService.Domain.csproj" />
-    <ProjectReference Include="..\BackgroundService.Application\BackgroundService.Application.csproj" />
+    <ProjectReference Include="..\BackgroundService.Application\BackgroundService.Application.csproj" />    
     <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
+    <ProjectReference Include="..\..\UserManagement\Core\Core.Application\Core.Application.csproj"/>  
   </ItemGroup>
 </Project>

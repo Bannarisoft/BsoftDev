@@ -37,8 +37,8 @@ namespace SagaOrchestrator.Infrastructure
             {
                 // client.BaseAddress = new Uri("http://localhost:5174");
                 client.BaseAddress = new Uri("http://192.168.1.126:81");
-
             });
+
 
             // Register OrchestratorService
             // services.AddScoped<OrchestratorService>();
