@@ -27,17 +27,18 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
            var query = $@"
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
-                FROM [Maintenance].[PreventiveSchedulerHdr] PS
+                FROM [Maintenance].[PreventiveSchedulerHeader] PS
                 INNER JOIN [Maintenance].[MaintenanceCategory] MC ON MC.Id = PS.MaintenanceCategoryId
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
-                INNER JOIN [Maintenance].[MiscMaster] DueType ON DueType.Id = PS.DueTypeId
-                INNER JOIN [Maintenance].[MiscMaster] Frequency ON Frequency.Id = PS.FrequencyId
+                INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
+                INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
                 WHERE PS.IsDeleted = 0
-                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MC.CategoryName LIKE @Search OR Schedule.Code LIKE @Search OR DueType.Code LIKE @Search OR Frequency.Code LIKE @Search)")};
+                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MC.CategoryName LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")};
 
                 SELECT  
                     PS.Id,
-                    PS.DuePeriod,
+                    PS.DepartmentId,
+                    PS.FrequencyInterval,
                     PS.EffectiveDate,
                     PS.GraceDays,
                     PS.ReminderWorkOrderDays,
@@ -59,16 +60,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     MC.CategoryName ,
                     Schedule.Id AS ScheduleId,
                     Schedule.Code AS Schedule,
-                    DueType.Id AS DueTypeId,
-                    DueType.Code AS DueType,
-                    Frequency.Id AS FrequencyId,
-                    Frequency.Code AS Frequency
-                FROM [Maintenance].[PreventiveSchedulerHdr] PS
+                    FrequencyType.Id AS FrequencyTypeId,
+                    FrequencyType.Code AS FrequencyType,
+                    FrequencyUnit.Id AS FrequencyUnitId,
+                    FrequencyUnit.Code AS FrequencyUnit
+                FROM [Maintenance].[PreventiveSchedulerHeader] PS
                 INNER JOIN [Maintenance].[MachineGroup] MG ON PS.MachineGroupId = MG.Id
                 INNER JOIN [Maintenance].[MaintenanceCategory] MC ON MC.Id = PS.MaintenanceCategoryId
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
-                INNER JOIN [Maintenance].[MiscMaster] DueType ON DueType.Id = PS.DueTypeId
-                INNER JOIN [Maintenance].[MiscMaster] Frequency ON Frequency.Id = PS.FrequencyId
+                INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
+                INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
                 WHERE PS.IsDeleted = 0
                 {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.CategoryName LIKE @Search OR Schedule.Code LIKE @Search OR DueType.Code LIKE @Search OR Frequency.Code LIKE @Search)")}
                 ORDER BY PS.Id DESC
@@ -115,7 +116,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PSA.Description,
                     PSI.OldItemId,
                     PSI.RequiredQty
-                FROM [Maintenance].[PreventiveSchedulerHdr] PS
+                FROM [Maintenance].[PreventiveSchedulerHeader] PS
                 INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHdrId = PS.Id
                 LEFT JOIN [Maintenance].[PreventiveSchedulerItems] PSI ON PSI.PreventiveSchedulerId = PS.Id
                 WHERE PS.IsDeleted = 0 AND PS.Id = @Id";

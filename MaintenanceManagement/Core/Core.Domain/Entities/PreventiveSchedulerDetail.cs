@@ -13,7 +13,7 @@ namespace Core.Domain.Entities
         public int MachineId { get; set; }
         public required MachineMaster Machine { get; set; }
         public DateOnly StartDate { get; set; }
-        public DateOnly NextDueDate { get; set; }
+        public DateOnly? NextDueDate { get; set; }
         public string? RescheduleReason { get; set; }
     }
 }
