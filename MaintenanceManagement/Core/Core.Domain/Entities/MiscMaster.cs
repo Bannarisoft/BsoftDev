@@ -16,11 +16,9 @@ namespace Core.Domain.Entities
             
         public MiscTypeMaster? MiscTypeMaster { get; set; } 
         public ICollection<MaintenanceRequest>? RequestType { get; set; }
-        public ICollection<MaintenanceRequest>? MaintenanceType { get; set; }
-        public ICollection<WorkOrder>? WorkOrderPriority  {get; set;} 
+        public ICollection<MaintenanceRequest>? MaintenanceType { get; set; }        
         public ICollection<WorkOrder>? WorkOrderStatus  {get; set;}  
-        public ICollection<WorkOrder>? WorkOrderRootCause  {get; set;}  
-        public ICollection<WorkOrder>? WorkOrderRequestType  {get; set;}  
+        public ICollection<WorkOrder>? WorkOrderRootCause  {get; set;}          
         public ICollection<PreventiveSchedulerHeader>? Schedule { get; set; }
         public ICollection<PreventiveSchedulerHeader>? DueType { get; set; }
         public ICollection<PreventiveSchedulerHeader>? Frequency { get; set; }      

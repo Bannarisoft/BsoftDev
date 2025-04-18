@@ -9,16 +9,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
     public class WorkOrderItemConfiguration  : IEntityTypeConfiguration<WorkOrderItem>
     {       
        public void Configure(EntityTypeBuilder<WorkOrderItem> builder)
-        { 
-            var statusConverter = new ValueConverter<Status, bool>(
-                v => v == Status.Active,                   
-                v => v ? Status.Active : Status.Inactive   
-            );
-            var isDeleteConverter = new ValueConverter<IsDelete, bool>(
-                v => v == IsDelete.Deleted,                 
-                v => v ? IsDelete.Deleted : IsDelete.NotDeleted 
-            );
-            
+        {            
             builder.ToTable("WorkOrderItem", "Maintenance");
 
             builder.HasKey(t => t.Id);
@@ -38,59 +29,43 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
 
             builder.Property(t => t.DepartmentId)
                 .HasColumnName("DepartmentId")
-                .HasColumnType("int")
+                .HasColumnType("smallint")
                 .IsRequired();  
             
-            builder.Property(t => t.ItemCode)
-                .HasColumnName("ItemCode")
-                .HasColumnType("nvarchar(20))")
-                .IsRequired();
+            builder.Property(t => t.ItemId)
+                .HasColumnName("ItemId")
+                .HasColumnType("smallint")
+                .IsRequired(false);
             
+            builder.Property(t => t.OldItemId)
+                .HasColumnName("OldItemId")
+                .HasColumnType("smallint")
+                .IsRequired(false);
+
             builder.Property(t => t.ItemName)
                 .HasColumnName("ItemName")
-                .HasColumnType("varchar(100))")
-                .IsRequired();
+                .HasColumnType("varchar(250))")
+                .IsRequired(false);
+
+             builder.Property(t => t.SourceId)
+                .HasColumnName("SourceId")
+                .HasColumnType("smallint)")
+                .IsRequired(false);
 
             builder.Property(t => t.AvailableQty)
                 .HasColumnName("AvailableQty")
-                .HasColumnType("decimal(10,2)")
+                .HasColumnType("int")
                 .IsRequired();
 
             builder.Property(t => t.UsedQty)
                 .HasColumnName("UsedQty")
-                .HasColumnType("decimal(10,2)")
+                .HasColumnType("int")
                 .IsRequired();       
             
             builder.Property(t => t.Image)
                 .HasColumnName("Image")
                 .HasColumnType("varchar(250)")
-                .IsRequired(false);
-
-            builder.Property(b => b.IsActive)
-                .HasColumnName("IsActive")
-                .HasColumnType("bit")
-                .HasConversion(statusConverter)
-                .IsRequired();
-
-            builder.Property(b => b.IsDeleted)
-                .HasColumnName("IsDeleted")
-                .HasColumnType("bit")
-                .HasConversion(isDeleteConverter)
-                .IsRequired();
-
-            builder.Property(b => b.CreatedByName)
-                .IsRequired()
-                .HasColumnType("varchar(50)");
-                    
-            builder.Property(b => b.CreatedIP)
-                .IsRequired()
-                .HasColumnType("varchar(255)");
-
-            builder.Property(b => b.ModifiedByName)
-                .HasColumnType("varchar(50)");
-
-            builder.Property(b => b.ModifiedIP)
-                .HasColumnType("varchar(255)");               
+                .IsRequired(false);                    
         }
     }
 }

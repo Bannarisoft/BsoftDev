@@ -26,52 +26,58 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasColumnName("Id")
                 .HasColumnType("int")
                 .IsRequired();
+
             builder.Property(t => t.CompanyId)
                 .HasColumnName("CompanyId")
-                .HasColumnType("int")
-                .IsRequired();
-            builder.Property(t => t.UnitId)
-                .HasColumnName("UnitId")
-                .HasColumnType("int")
+                .HasColumnType("smallint")
                 .IsRequired();
 
-            builder.Property(t => t.WorkOrderTypeId)
-                .HasColumnName("WorkOrderTypeId")
-                .HasColumnType("int")
-                .IsRequired();
-            builder.HasOne(amg => amg.CategoryType)
-                .WithMany(am => am.WorkOrderType)
-                .HasForeignKey(amg => amg.WorkOrderTypeId)
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.Property(t => t.UnitId)
+                .HasColumnName("UnitId")
+                .HasColumnType("smallint")
+                .IsRequired();  
+            
+            builder.Property(t => t.WorkOrderDocNo)
+                .HasColumnName("WorkOrderDocNo")
+                .HasColumnType("varchar(50)")
+                .IsRequired();             
 
             builder.Property(t => t.RequestId)
                 .HasColumnName("RequestId")
-                .HasColumnType("varchar(25)")
-                .IsRequired();  
+                .HasColumnType("int")
+                .IsRequired(false);
+            builder.HasOne(amg => amg.WOMaintenanceRequest)
+                .WithMany(mg => mg.WorkOrdersRequest)
+                .HasForeignKey(amg => amg.RequestId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            builder.Property(t => t.PreventiveScheduleId)
+                .HasColumnName("PreventiveScheduleId")
+                .HasColumnType("int")
+                .IsRequired(false);
+            builder.HasOne(amg => amg.WOPreventiveScheduler)
+                .WithMany(mg => mg.WorkOrdersSchedule)
+                .HasForeignKey(amg => amg.PreventiveScheduleId)
+                .OnDelete(DeleteBehavior.Restrict);           
+
+            builder.Property(t => t.StatusId)
+                .HasColumnName("StatusId")
+                .HasColumnType("smallint")
+                .IsRequired();           
+            builder.HasOne(amg => amg.MiscStatus)
+                .WithMany(mg => mg.WorkOrderStatus)
+                .HasForeignKey(amg => amg.StatusId)
+                .OnDelete(DeleteBehavior.Restrict);         
             
-             builder.Property(t => t.RequestTypeId)
-                .HasColumnName("RequestTypeId")
-                .HasColumnType("int")
-                .IsRequired();   
-            builder.HasOne(amg => amg.MiscRequestType)
-                .WithMany(mg => mg.WorkOrderRequestType)
-                .HasForeignKey(amg => amg.RequestTypeId)
-                .OnDelete(DeleteBehavior.Restrict);
-                       
-             builder.Property(t => t.MachineId)
-                .HasColumnName("MachineId")
-                .HasColumnType("int")
-                .IsRequired(false);   
+            builder.Property(t => t.RootCauseId)
+                .HasColumnName("RootCauseId")
+                .HasColumnType("smallint")
+                .IsRequired();     
+            builder.HasOne(amg => amg.MiscRootCause)
+                .WithMany(am => am.WorkOrderRootCause)
+                .HasForeignKey(amg => amg.RootCauseId)
+                .OnDelete(DeleteBehavior.Restrict);    
             
-            builder.Property(t => t.PriorityId)
-                .HasColumnName("PriorityId")
-                .HasColumnType("int")
-                .IsRequired();   
-            builder.HasOne(amg => amg.MiscPriority)
-                .WithMany(mg => mg.WorkOrderPriority)
-                .HasForeignKey(amg => amg.PriorityId)
-                .OnDelete(DeleteBehavior.Restrict);
-               
             builder.Property(t => t.Remarks)
                 .HasColumnName("Remarks")
                 .HasColumnType("varchar(1000)")
@@ -81,48 +87,18 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasColumnName("Image")
                 .HasColumnType("varchar(250)")
                 .IsRequired(false);
-
-            builder.Property(t => t.StatusId)
-                .HasColumnName("StatusId")
-                .HasColumnType("int")
-                .IsRequired();           
-            builder.HasOne(amg => amg.MiscStatus)
-                .WithMany(mg => mg.WorkOrderStatus)
-                .HasForeignKey(amg => amg.StatusId)
-                .OnDelete(DeleteBehavior.Restrict);
             
-            builder.Property(t => t.LastActivityDate)
-                .HasColumnName("LastActivityDate")
-                .HasColumnType("datetimeoffset")
-                .IsRequired(false); 
-
-
-            builder.Property(t => t.VendorId)
-                .HasColumnName("VendorId")
-                .HasColumnType("int")
-                .IsRequired(false); 
-
-            builder.Property(t => t.OldVendorId)
-                .HasColumnName("OldVendorId")
-                .HasColumnType("nvarchar(20)")
-                .IsRequired(false); 
-
-            builder.Property(t => t.VendorName)
-                .HasColumnName("VendorName")
-                .HasColumnType("nvarchar(250)")
-                .IsRequired(false); 
+            builder.Property(t => t.TotalManPower)
+                .HasColumnName("TotalManPower")
+                .HasColumnType("smallint")
+                .IsRequired(false);   
             
-              builder.Property(t => t.RootCauseId)
-                .HasColumnName("RootCauseId")
-                .HasColumnType("int")
-                .IsRequired();     
-             builder.HasOne(amg => amg.MiscRootCause)
-                .WithMany(am => am.WorkOrderRootCause)
-                .HasForeignKey(amg => amg.RootCauseId)
-                .OnDelete(DeleteBehavior.Restrict);    
+            builder.Property(t => t.TotalSpentHours)
+                .HasColumnName("TotalSpentHours")
+                .HasColumnType("decimal(5,2)")
+                .IsRequired(false);
 
-
-             builder.Property(b => b.IsActive)
+            builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
                 .HasConversion(statusConverter)

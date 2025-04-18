@@ -5,12 +5,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMaster
 {
-    public class WorkOrderActivityConfiguration   : IEntityTypeConfiguration<WorkOrderActivity>
+    public class WorkOrderCheckListConfiguration  : IEntityTypeConfiguration<WorkOrderCheckList>
     {       
-       public void Configure(EntityTypeBuilder<WorkOrderActivity> builder)
-        {            
-            
-            builder.ToTable("WorkOrderActivity", "Maintenance");
+        public void Configure(EntityTypeBuilder<WorkOrderCheckList> builder)
+        {
+            builder.ToTable("WorkOrderCheckList", "Maintenance");
 
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Id)
@@ -22,24 +21,24 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasColumnName("WorkOrderId")
                 .HasColumnType("int")
                 .IsRequired();
-            builder.HasOne(amg => amg.WOActivity)
-                .WithMany(am => am.Activity)
+            builder.HasOne(amg => amg.WOCheckList)
+                .WithMany(am => am.CheckLists)
                 .HasForeignKey(amg => amg.WorkOrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Property(t => t.ActivityId)
-                .HasColumnName("ActivityId")
-                .HasColumnType("smallint")
-                .IsRequired();  
-            builder.HasOne(amg => amg.ActivityMaster)
-                .WithMany(am => am.workOrderActivities)
-                .HasForeignKey(amg => amg.ActivityId)
+            builder.Property(t => t.CheckListId)
+                .HasColumnName("CheckListId")
+                .HasColumnType("int")
+                .IsRequired();
+            builder.HasOne(amg => amg.CheckListMaster)
+                .WithMany(am => am.WOCheckLists)
+                .HasForeignKey(amg => amg.CheckListId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(t => t.Description)
-                .HasColumnName("Description")
+                .HasColumnName("Description")                
                 .HasColumnType("varchar(1000)")
-                .IsRequired(false);
+                .IsRequired(false);      
         }
     }
 }

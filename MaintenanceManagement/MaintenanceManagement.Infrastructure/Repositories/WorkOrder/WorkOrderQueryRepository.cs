@@ -9,7 +9,7 @@ using Core.Domain.Common;
 using Dapper;
 using MassTransit;
 
-namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.WorkOrder
+namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
     public class WorkOrderQueryRepository : IWorkOrderQueryRepository
     {
@@ -30,6 +30,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
         }
 
         public Task<WorkOrderDto> GetByIdAsync(int workOrderId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string?> GetLatestWorkOrderDocNo(string maintenanceType)
         {
             throw new NotImplementedException();
         }
@@ -75,54 +80,45 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
            }
            return assetMaster; 
        }*/
-
-        public async Task<List<Core.Domain.Entities.MiscMaster>> GetWOPriorityDescAsync()
+       
+        public Task<List<Core.Domain.Entities.MiscMaster>> GetWORootCauseDescAsync()
         {
-            const string query = @"
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<Core.Domain.Entities.MiscMaster>> GetWOStatusDescAsync()
+        {
+           const string query = @"
             SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder            
             FROM Maintenance.MiscMaster M
             INNER JOIN Maintenance.MiscTypeMaster T on T.ID=M.MiscTypeId
             WHERE (MiscTypeCode = @MiscTypeCode) 
             AND  M.IsDeleted=0 and M.IsActive=1
             ORDER BY SortOrder DESC";    
-            var parameters = new { MiscTypeCode = MiscEnumEntity.WOPriority.MiscCode };        
+            var parameters = new { MiscTypeCode = MiscEnumEntity.WOStatus.MiscCode };        
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
             return result.ToList();
         }
 
-        public async Task<List<Core.Domain.Entities.MiscMaster>> GetWORequestTypeDescAsync()
-        {
-            const string query = @"
-            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder           
-            FROM Maintenance.MiscMaster M
-            INNER JOIN Maintenance.MiscTypeMaster T on T.ID=M.MiscTypeId
-            WHERE (MiscTypeCode = @MiscTypeCode) 
-            AND  M.IsDeleted=0 and M.IsActive=1
-            ORDER BY SortOrder DESC";    
-            var parameters = new { MiscTypeCode = MiscEnumEntity.WORequestType.MiscCode };        
-            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
-            return result.ToList();
-        }
-
-        public async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity,  IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician)> GetWorkOrderByIdAsync(int workOrderId)
+        public async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity, IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician, IEnumerable<dynamic> checkList, IEnumerable<dynamic> schedule)> IWorkOrderQueryRepository.GetWorkOrderByIdAsync(int workOrderId)
         {
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
 
-            SELECT  WorkOrderTypeId,MC.CategoryName WorkOrderTypeDesc,	RequestId,MM1.Id PriorityId,M1.Code PriorityDesc,Remarks,
-            MM2.Description+'\'+C.CompanyName+'\'+UN.ShortName +'\'+WO.Image WOImage,MM.Id StatusId,MM1.Code StatusDesc,VendorId,RootCauseId,MM3.Code RootCauseDesc
-            FROM Maintenance.WorkOrder WO
-            INNER JOIN Maintenance.MaintenanceCategory MC on MC.Id=WO.WorkOrderTypeId
-            INNER JOIN Maintenance.MiscTypeMaster MM ON MM.MiscTypeCode='Status'
-            INNER JOIN Maintenance.MiscMaster  M ON M.MiscTypeId=MM.Id
-            INNER JOIN Maintenance.MiscTypeMaster MM1 ON MM1.MiscTypeCode='Priority'
-            INNER JOIN Maintenance.MiscMaster  M1 ON M1.MiscTypeId=MM1.Id
-            INNER JOIN Maintenance.MiscTypeMaster MM2 on MM2.MiscTypeCode ='WOImage'
-            INNER JOIN Maintenance.MiscTypeMaster MM3 ON MM3.MiscTypeCode='RootCause'
-            INNER JOIN Maintenance.MiscMaster  M2 ON M2.MiscTypeId=MM3.Id
-            LEFT JOIN Bannari.AppData.Unit UN on UN.Id=WO.UnitId
-            LEFT JOIN Bannari.AppData.Company C on C.Id=WO.CompanyId
-            WHERE AM.Id = @workOrderId;
+                SELECT  WorkOrderTypeId,MC.CategoryName WorkOrderTypeDesc,	RequestId,MM1.Id PriorityId,M1.Code PriorityDesc,Remarks,
+                MM2.Description+'\'+C.CompanyName+'\'+UN.ShortName +'\'+WO.Image WOImage,MM.Id StatusId,MM1.Code StatusDesc,VendorId,RootCauseId,MM3.Code RootCauseDesc
+                FROM Maintenance.WorkOrder WO
+                INNER JOIN Maintenance.MaintenanceCategory MC on MC.Id=WO.WorkOrderTypeId
+                INNER JOIN Maintenance.MiscTypeMaster MM ON MM.MiscTypeCode='Status'
+                INNER JOIN Maintenance.MiscMaster  M ON M.MiscTypeId=MM.Id
+                INNER JOIN Maintenance.MiscTypeMaster MM1 ON MM1.MiscTypeCode='Priority'
+                INNER JOIN Maintenance.MiscMaster  M1 ON M1.MiscTypeId=MM1.Id
+                INNER JOIN Maintenance.MiscTypeMaster MM2 on MM2.MiscTypeCode ='WOImage'
+                INNER JOIN Maintenance.MiscTypeMaster MM3 ON MM3.MiscTypeCode='RootCause'
+                INNER JOIN Maintenance.MiscMaster  M2 ON M2.MiscTypeId=MM3.Id
+                LEFT JOIN Bannari.AppData.Unit UN on UN.Id=WO.UnitId
+                LEFT JOIN Bannari.AppData.Company C on C.Id=WO.CompanyId
+                WHERE AM.Id = @workOrderId;
 
                 SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,
                 MM.Description+'\'+C.CompanyName+'\'+UN.ShortName +'\'+AM.AssetImage AssetImage,AM.AssetCategoryId,AM.AssetSubCategoryId,
@@ -195,7 +191,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
                 VendorCode,RenewalStatus,CAST(RenewedDate AS DATE) AS RenewedDate,IsActive
                 FROM Maintenance.[AssetInsurance]
                 WHERE AssetId=@AssetId
-                ";
+            ";
 
             using var multi = await _dbConnection.QueryMultipleAsync(sqlQuery, new { AssetId = workOrderId });
 
@@ -204,25 +200,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.Work
             var Schedule = await multi.ReadAsync<dynamic>();
             var Item = await multi.ReadAsync<dynamic>();
             var Technician = await multi.ReadAsync<dynamic>();            
+            var checkList = await multi.ReadAsync<dynamic>(); 
+
            
-            return (WorkOrderResult, Activity,  Item, Technician);
-       
+            return (WorkOrderResult, Activity,  Item, Technician,checkList,Schedule);
         }
-
-        public async Task<List<Core.Domain.Entities.MiscMaster>> GetWOStatusDescAsync()
-        {
-           const string query = @"
-            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder            
-            FROM Maintenance.MiscMaster M
-            INNER JOIN Maintenance.MiscTypeMaster T on T.ID=M.MiscTypeId
-            WHERE (MiscTypeCode = @MiscTypeCode) 
-            AND  M.IsDeleted=0 and M.IsActive=1
-            ORDER BY SortOrder DESC";    
-            var parameters = new { MiscTypeCode = MiscEnumEntity.WOStatus.MiscCode };        
-            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
-            return result.ToList();
-        }
-
     } 
 }
    
