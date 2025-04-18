@@ -34,24 +34,21 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
             var departments = await _departmentService.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            // Declare dictionary if needed
+            
             var PreventiveSchedulerDictionary = new Dictionary<int, GetPreventiveSchedulerDto>();
 
-            // Assign DepartmentName from lookup
+            
             foreach (var data in preventiveSchedulerList)
             {
-                if (!PreventiveSchedulerDictionary.TryGetValue(data.DepartmentId, out var existingPreventiveScheduler))
-                {
-                    if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName))
+              
+                    if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName )&& departmentName != null)
                     {
                         data.DepartmentName = departmentName;
                     }
 
                     PreventiveSchedulerDictionary[data.DepartmentId] = data;
-                }
+                
             }
-
-            //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetPreventiveScheduler",
                 actionCode: "",

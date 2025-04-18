@@ -19,14 +19,13 @@ namespace Core.Application.Common.Mappings
             CreateMap<CreatePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
             .ForMember(dest => dest.PreventiveSchedulerActivities, opt => opt.MapFrom(src => src.Activity))
             .ForMember(dest => dest.PreventiveSchedulerItems, opt => opt.MapFrom(src => src.Items))
-            .ForMember(dest => dest.DownTimeEstimateHrs, opt => opt.MapFrom(src => src.DownTimeEstimateHrs))
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
-             CreateMap<PreventiveSchedulerActivityDto, PreventiveSchedulerActivity>()
-             .ForMember(dest => dest.EstimatedTimeHrs, opt => opt.MapFrom(src => src.EstimatedTimeHrs));
+             CreateMap<PreventiveSchedulerActivityDto, PreventiveSchedulerActivity>();
              CreateMap<PreventiveSchedulerItemsDto, PreventiveSchedulerItems>()
-             .ForMember(dest => dest.OldItemId, opt => opt.MapFrom(src => src.ItemId));
+             .ForMember(dest => dest.OldItemId, opt => opt.MapFrom(src => src.ItemId))
+             .ForMember(dest => dest.ItemId, opt => opt.Ignore());
 
              CreateMap<UpdatePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
             .ForMember(dest => dest.PreventiveSchedulerActivities, opt => opt.MapFrom(src => src.Activity))

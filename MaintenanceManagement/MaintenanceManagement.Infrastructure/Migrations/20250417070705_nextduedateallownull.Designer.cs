@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250417070705_nextduedateallownull")]
+    partial class nextduedateallownull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -249,92 +252,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CostCenter", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.ItemTransactions", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CatDesc")
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("CatDesc");
-
-                    b.Property<DateTime>("CreatedDt")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("DepName")
-                        .HasColumnType("nvarchar(200)")
-                        .HasColumnName("DepName");
-
-                    b.Property<DateTime>("DocDt")
-                        .HasColumnType("datetime");
-
-                    b.Property<int>("DocNo")
-                        .HasColumnType("int")
-                        .HasColumnName("DocNo");
-
-                    b.Property<int>("DocSNo")
-                        .HasColumnType("int")
-                        .HasColumnName("DocSNo");
-
-                    b.Property<string>("GrpName")
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("GrpName");
-
-                    b.Property<string>("ItemCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("ItemCode");
-
-                    b.Property<string>("ItemName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("ItemName");
-
-                    b.Property<int>("LifeSpan")
-                        .HasColumnType("int")
-                        .HasColumnName("LifeSpan");
-
-                    b.Property<string>("LifeType")
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("LifeType");
-
-                    b.Property<string>("OldUnitCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("OldUnitCode");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<int>("TC")
-                        .HasColumnType("int")
-                        .HasColumnName("TC");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("Type");
-
-                    b.Property<string>("UOM")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("UOM");
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,3)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ItemTransactions", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MachineGroup", b =>

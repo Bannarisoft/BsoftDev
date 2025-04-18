@@ -176,10 +176,16 @@ namespace UserManagement.Infrastructure
 
             });
 
-            services.AddHttpClient("BackgroundService", client =>
+        /*     services.AddHttpClient("BackgroundService", client =>
             {
                 client.BaseAddress = new Uri("http://localhost:5011"); // BackgroundService runs here
+            }); */
+
+            services.AddHttpClient("BackgroundServiceClient", client =>
+            {
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:BackgroundService"]);
             });
+
 
             // services.AddDistributedMemoryCache();
             // services.AddSession(options =>
@@ -254,16 +260,10 @@ namespace UserManagement.Infrastructure
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddScoped<IChangePassword, PasswordChangeRepository>();
 
+            services.AddHttpClient();                                
+            services.AddScoped<IEmailService, EmailSenderService>();
+            services.AddScoped<ISmsService, SmsSenderService>();
 
-            /*services.Configure<EmailJobSettings>(configuration.GetSection("EmailJobSettings"));
-            services.Configure<EmailJobSettings>(configuration.GetSection("EmailSettings"));            
-             services.AddHostedService<EmailJobService>();     */
-            services.AddHttpClient();
-            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
-            services.Configure<SmsSettings>(configuration.GetSection("SmsSettings"));
-            services.AddSingleton<IEmailService, EmailService>();
-            services.AddSingleton<ISmsService, SmsService>();
-            services.AddSingleton<EnvironmentEncryptionService>();
 
             // AutoMapper profiles
             services.AddAutoMapper(

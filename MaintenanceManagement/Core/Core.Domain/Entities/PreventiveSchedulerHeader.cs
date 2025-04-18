@@ -15,11 +15,11 @@ namespace Core.Domain.Entities
         public required MaintenanceCategory MaintenanceCategory { get; set; }
         public int ScheduleId { get; set; }
         public required MiscMaster MiscSchedule { get; set; }
-        public int DueTypeId { get; set; }
-        public required MiscMaster MiscDueType { get; set; }
-        public int DuePeriod { get; set; }
-        public int FrequencyId { get; set; }
-        public required MiscMaster MiscFrequency { get; set; }
+        public int FrequencyTypeId { get; set; }
+        public required MiscMaster MiscFrequencyType { get; set; }
+        public int 	FrequencyInterval { get; set; }
+        public int FrequencyUnitId { get; set; }
+        public required MiscMaster MiscFrequencyUnit { get; set; }
         public DateOnly EffectiveDate { get; set; }
         public int GraceDays { get; set; }
         public int ReminderWorkOrderDays { get; set; }

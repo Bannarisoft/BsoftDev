@@ -5,26 +5,26 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackgroundService.API.Controller
 {
-    [Route("api/email")]
+    [Route("api/sms")]
     [ApiController]
-    public class EmailController : ControllerBase
+    public class SmsController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public EmailController(IMediator mediator)
+        public SmsController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         [HttpPost("send")]
         [AllowAnonymous]
-        public async Task<IActionResult> SendEmail([FromBody] SendEmailCommand command)
+        public async Task<IActionResult> SendSms([FromBody] SendSmsCommand command)
         {
             var result = await _mediator.Send(command);
             if (result)
-                return Ok(new { Message = "Email sent successfully" });
+                return Ok(new { Message = "sms sent successfully" });
 
-            return BadRequest(new { Message = "Email sending failed" });
+            return BadRequest(new { Message = "sms sending failed" });
         }
     }
 
