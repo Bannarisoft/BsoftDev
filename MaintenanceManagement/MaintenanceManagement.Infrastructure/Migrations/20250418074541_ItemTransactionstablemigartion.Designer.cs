@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250418074541_ItemTransactionstablemigartion")]
+    partial class ItemTransactionstablemigartion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -944,7 +947,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("MachineId");
 
-                    b.Property<DateOnly?>("NextDueDate")
+                    b.Property<DateOnly>("NextDueDate")
                         .HasColumnType("date")
                         .HasColumnName("NextDueDate");
 
@@ -998,21 +1001,21 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<decimal>("DownTimeEstimateHrs")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("DuePeriod")
+                        .HasColumnType("int")
+                        .HasColumnName("DuePeriod");
+
+                    b.Property<int>("DueTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("DueTypeId");
+
                     b.Property<DateOnly>("EffectiveDate")
                         .HasColumnType("date")
                         .HasColumnName("EffectiveDate");
 
-                    b.Property<int>("FrequencyInterval")
+                    b.Property<int>("FrequencyId")
                         .HasColumnType("int")
-                        .HasColumnName("FrequencyInterval");
-
-                    b.Property<int>("FrequencyTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("FrequencyTypeId");
-
-                    b.Property<int>("FrequencyUnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("FrequencyUnitId");
+                        .HasColumnName("FrequencyId");
 
                     b.Property<int>("GraceDays")
                         .HasColumnType("int")
@@ -1064,9 +1067,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FrequencyTypeId");
+                    b.HasIndex("DueTypeId");
 
-                    b.HasIndex("FrequencyUnitId");
+                    b.HasIndex("FrequencyId");
 
                     b.HasIndex("MachineGroupId");
 
@@ -1902,15 +1905,15 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerHeader", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscFrequencyType")
-                        .WithMany("FrequencyType")
-                        .HasForeignKey("FrequencyTypeId")
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscDueType")
+                        .WithMany("DueType")
+                        .HasForeignKey("DueTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscFrequencyUnit")
-                        .WithMany("FrequencyUnit")
-                        .HasForeignKey("FrequencyUnitId")
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscFrequency")
+                        .WithMany("Frequency")
+                        .HasForeignKey("FrequencyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1936,9 +1939,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Navigation("MaintenanceCategory");
 
-                    b.Navigation("MiscFrequencyType");
+                    b.Navigation("MiscDueType");
 
-                    b.Navigation("MiscFrequencyUnit");
+                    b.Navigation("MiscFrequency");
 
                     b.Navigation("MiscSchedule");
                 });
@@ -2103,9 +2106,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
-                    b.Navigation("FrequencyType");
+                    b.Navigation("DueType");
 
-                    b.Navigation("FrequencyUnit");
+                    b.Navigation("Frequency");
 
                     b.Navigation("MaintenanceType");
 
