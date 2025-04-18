@@ -47,8 +47,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             
             if (existingPreventiveScheduler != null)
             {
-                 _applicationDbContext.PreventiveSchedulerDtl.RemoveRange(
-                   _applicationDbContext.PreventiveSchedulerDtl.Where(x => x.PreventiveSchedulerId == preventiveSchedulerHdr.Id));
 
                _applicationDbContext.PreventiveSchedulerActivity.RemoveRange(
                    _applicationDbContext.PreventiveSchedulerActivity.Where(x => x.PreventiveSchedulerHdrId == preventiveSchedulerHdr.Id));
@@ -60,10 +58,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 existingPreventiveScheduler.DepartmentId = preventiveSchedulerHdr.DepartmentId;
                 existingPreventiveScheduler.MaintenanceCategoryId = preventiveSchedulerHdr.MaintenanceCategoryId;
                 existingPreventiveScheduler.ScheduleId = preventiveSchedulerHdr.ScheduleId;
-                existingPreventiveScheduler.DueTypeId = preventiveSchedulerHdr.DueTypeId;
-                existingPreventiveScheduler.DuePeriod = preventiveSchedulerHdr.DuePeriod;
+                existingPreventiveScheduler.FrequencyTypeId = preventiveSchedulerHdr.FrequencyTypeId;
+                existingPreventiveScheduler.FrequencyInterval = preventiveSchedulerHdr.FrequencyInterval;
                 existingPreventiveScheduler.EffectiveDate = preventiveSchedulerHdr.EffectiveDate;
-                existingPreventiveScheduler.FrequencyId = preventiveSchedulerHdr.FrequencyId;
+                existingPreventiveScheduler.FrequencyUnitId = preventiveSchedulerHdr.FrequencyUnitId;
                 existingPreventiveScheduler.EffectiveDate = preventiveSchedulerHdr.EffectiveDate;
                 existingPreventiveScheduler.GraceDays = preventiveSchedulerHdr.GraceDays;
                 existingPreventiveScheduler.ReminderWorkOrderDays = preventiveSchedulerHdr.ReminderWorkOrderDays;
@@ -73,9 +71,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 existingPreventiveScheduler.IsDeleted = preventiveSchedulerHdr.IsDeleted;
                 existingPreventiveScheduler.IsActive = preventiveSchedulerHdr.IsActive;
                 _applicationDbContext.PreventiveSchedulerHdr.Update(existingPreventiveScheduler);
-
-                 if (preventiveSchedulerHdr.PreventiveSchedulerDetails?.Any() == true)
-                   await _applicationDbContext.PreventiveSchedulerDtl.AddRangeAsync(preventiveSchedulerHdr.PreventiveSchedulerDetails);
 
                if (preventiveSchedulerHdr.PreventiveSchedulerActivities?.Any() == true)
                    await _applicationDbContext.PreventiveSchedulerActivity.AddRangeAsync(preventiveSchedulerHdr.PreventiveSchedulerActivities);

@@ -31,8 +31,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
 
             builder.Property(t => t.NextDueDate)
                 .HasColumnName("NextDueDate")
-                .HasColumnType("date")
-                .IsRequired();
+                .HasColumnType("date");
 
             builder.Property(t => t.RescheduleReason)
                 .HasColumnName("RescheduleReason")

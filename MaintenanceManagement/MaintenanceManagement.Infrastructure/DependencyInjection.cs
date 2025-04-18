@@ -147,6 +147,7 @@ namespace MaintenanceManagement.Infrastructure
 
             // Register IDateTime
             services.AddHttpContextAccessor();
+            services.AddTransient<AuthTokenHandler>();
 
             // Register repositories
             services.AddScoped<ICostCenterQueryRepository, CostCenterQueryRepository>();

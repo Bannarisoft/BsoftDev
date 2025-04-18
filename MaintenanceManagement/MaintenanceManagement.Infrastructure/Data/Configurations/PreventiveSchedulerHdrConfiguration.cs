@@ -47,16 +47,16 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnName("ScheduleId")
                 .HasColumnType("int")
                 .IsRequired();
-            builder.Property(b => b.DueTypeId)
-                .HasColumnName("DueTypeId")
+            builder.Property(b => b.FrequencyTypeId)
+                .HasColumnName("FrequencyTypeId")
                 .HasColumnType("int")
                 .IsRequired();
-            builder.Property(b => b.DuePeriod)
-                .HasColumnName("DuePeriod")
+            builder.Property(b => b.FrequencyInterval)
+                .HasColumnName("FrequencyInterval")
                 .HasColumnType("int")
                 .IsRequired();
-            builder.Property(b => b.FrequencyId)
-                .HasColumnName("FrequencyId")
+            builder.Property(b => b.FrequencyUnitId)
+                .HasColumnName("FrequencyUnitId")
                 .HasColumnType("int")
                 .IsRequired();
             builder.Property(b => b.EffectiveDate)
@@ -125,14 +125,14 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasForeignKey(b => b.ScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                builder.HasOne(b => b.MiscDueType)
-                .WithMany(b => b.DueType)
-                .HasForeignKey(b => b.DueTypeId)
+                builder.HasOne(b => b.MiscFrequencyType)
+                .WithMany(b => b.FrequencyType)
+                .HasForeignKey(b => b.FrequencyTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                builder.HasOne(b => b.MiscFrequency)
-                .WithMany(b => b.Frequency)
-                .HasForeignKey(b => b.FrequencyId)
+                builder.HasOne(b => b.MiscFrequencyUnit)
+                .WithMany(b => b.FrequencyUnit)
+                .HasForeignKey(b => b.FrequencyUnitId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
