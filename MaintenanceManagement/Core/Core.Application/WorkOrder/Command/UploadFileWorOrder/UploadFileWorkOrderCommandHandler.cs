@@ -3,7 +3,7 @@
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
-using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
+using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -50,15 +50,16 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
             }
             
             // 🔹 Construct the required file path
-            string companyFolder = Path.Combine(baseDirectory, request.CompanyName?.Trim() ?? string.Empty);
+          /*   string companyFolder = Path.Combine(baseDirectory, request.CompanyName?.Trim() ?? string.Empty);
             EnsureDirectoryExists(companyFolder);
 
             string unitFolder = Path.Combine(companyFolder, request.UnitName?.Trim() ?? string.Empty);
-            EnsureDirectoryExists(unitFolder);
+            EnsureDirectoryExists(unitFolder); */
 
             string fileExtension = Path.GetExtension(request.File.FileName);            
             string dummyFileName = $"TEMP_{Guid.NewGuid()}{fileExtension}";
-            string filePath = Path.Combine(unitFolder, dummyFileName);
+            //string filePath = Path.Combine(unitFolder, dummyFileName);
+            string filePath = Path.Combine("", dummyFileName);
 
             try
             {
@@ -77,8 +78,8 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
                 string formattedPath = dummyFileName;
                  var response = new WorkOrderImageDto
                 {
-                    AssetImage = formattedPath,  // ✅ Correctly formatted file path
-                    AssetImageBase64 = base64Image  // ✅ Convert to Base64
+                    WorkOrderImage = formattedPath,  // ✅ Correctly formatted file path
+                    WorkOrderImageBase64 = base64Image  // ✅ Convert to Base64
                 };
 
                 return new ApiResponseDTO<WorkOrderImageDto> { IsSuccess = true, Data = response };

@@ -107,7 +107,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 return false;  // Asset not found
             }
             // Store only relative path (e.g., "HomeTextile/HomeTextile-COMP-MOU-1.png")
-            asset.AssetImage = imageName.Replace(@"\", "/"); 
+           // asset.AssetImage = imageName.Replace(@"\", "/"); 
 
             asset.AssetImage = imageName;
             await _applicationDbContext.SaveChangesAsync();

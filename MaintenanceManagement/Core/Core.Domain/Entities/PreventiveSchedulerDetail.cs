@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Domain.Entities.WorkOrderMaster;
 
 namespace Core.Domain.Entities
 {
@@ -15,5 +16,7 @@ namespace Core.Domain.Entities
         public DateOnly StartDate { get; set; }
         public DateOnly? NextDueDate { get; set; }
         public string? RescheduleReason { get; set; }
+        public ICollection<WorkOrder>? workOrdersSchedule  {get; set;}   
+        
     }
 }
