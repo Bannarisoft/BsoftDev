@@ -6,6 +6,7 @@ using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Domain.Entities;
 using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using static Core.Domain.Common.BaseEntity;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 {
@@ -26,6 +27,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return preventiveSchedulerHdr.Id;
         }
 
+        public async Task<bool> CreateDetailAsync(List<PreventiveSchedulerDetail> preventiveSchedulerDetail)
+        {
+            await _applicationDbContext.PreventiveSchedulerDtl.AddRangeAsync(preventiveSchedulerDetail);
+            return await _applicationDbContext.SaveChangesAsync() > 0;
+        }
+
         public async Task<bool> DeleteAsync(int id, PreventiveSchedulerHeader preventiveSchedulerHdr)
         {
              var PreventiveSchedulerToDelete = await _applicationDbContext.PreventiveSchedulerHdr.FirstOrDefaultAsync(u => u.Id == id);
@@ -44,10 +51,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             .Include(ps => ps.PreventiveSchedulerActivities)
             .Include(ps => ps.PreventiveSchedulerItems)
             .FirstOrDefaultAsync(ps => ps.Id == preventiveSchedulerHdr.Id);
+
             
             if (existingPreventiveScheduler != null)
             {
 
+                   
                _applicationDbContext.PreventiveSchedulerActivity.RemoveRange(
                    _applicationDbContext.PreventiveSchedulerActivity.Where(x => x.PreventiveSchedulerHdrId == preventiveSchedulerHdr.Id));
 
@@ -77,6 +86,24 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                if (preventiveSchedulerHdr.PreventiveSchedulerItems?.Any() == true)
                    await _applicationDbContext.PreventiveSchedulerItems.AddRangeAsync(preventiveSchedulerHdr.PreventiveSchedulerItems);
+
+                    if (preventiveSchedulerHdr.PreventiveSchedulerDetails?.Any() == true)
+                  {
+                      foreach (var incomingDetail in preventiveSchedulerHdr.PreventiveSchedulerDetails)
+                      {
+                          var PreventiveSchedulerDetail = await _applicationDbContext.PreventiveSchedulerDtl
+                              .FirstOrDefaultAsync(d => d.Id == incomingDetail.Id);
+
+                          if (PreventiveSchedulerDetail != null)
+                          {
+                              
+                              PreventiveSchedulerDetail.IsActive = incomingDetail.IsActive;
+                              PreventiveSchedulerDetail.WorkOrderCreationStartDate = incomingDetail.WorkOrderCreationStartDate;
+                              PreventiveSchedulerDetail.ActualWorkOrderDate = incomingDetail.ActualWorkOrderDate;
+                              PreventiveSchedulerDetail.MaterialReqStartDays = incomingDetail.MaterialReqStartDays;
+                          }
+                      }
+                  }
 
                 return await _applicationDbContext.SaveChangesAsync() >0;
             }
