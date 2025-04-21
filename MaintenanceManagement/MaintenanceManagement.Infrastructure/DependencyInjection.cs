@@ -40,6 +40,7 @@ using MaintenanceManagement.Infrastructure.Repositories.MachineMaster;
 using MaintenanceManagement.Infrastructure.Repositories.MachineGroupUser;
 using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.Common.Interfaces.IActivityCheckListMaster;
+using Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListMaster;
 using MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMaster;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest;
@@ -47,6 +48,8 @@ using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers;
 using MaintenanceManagement.Infrastructure.Repositories.WorkOrder;
 
+using Core.Application.Common.Interfaces.IItem;
+using MaintenanceManagement.Infrastructure.Repositories.Item;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -184,6 +187,7 @@ namespace MaintenanceManagement.Infrastructure
             
             services.AddScoped<IPreventiveSchedulerCommand, PreventiveSchedulerCommandRepository>();
             services.AddScoped<IPreventiveSchedulerQuery, PreventiveSchedulerQueryRepository>();
+             services.AddScoped<IItemQueryRepository, ItemQueryRepository>();
 
             // Miscellaneous services
 
@@ -211,7 +215,8 @@ namespace MaintenanceManagement.Infrastructure
 
             typeof(MachineGroupUserProfile),
             typeof(WorkOrderProfile),            
-            typeof(ActivityCheckListMasterProfile)
+            typeof(ActivityCheckListMasterProfile),
+            typeof(ItemProfile)
 
 
 
