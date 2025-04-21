@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Contracts.Events.Users;
 using Core.Application.Common.Interfaces;
-using Core.Domain.Entities;
 using MassTransit;
 using MongoDB.Driver;
 using Serilog;

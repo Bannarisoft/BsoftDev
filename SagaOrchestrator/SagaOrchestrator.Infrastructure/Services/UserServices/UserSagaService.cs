@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Contracts.Events.Users;
-using Contracts.Models.Users;
+using Contracts.Dtos.Users;
 using MassTransit;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
 

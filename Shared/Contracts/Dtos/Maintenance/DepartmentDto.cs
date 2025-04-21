@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Contracts.Models.Maintenance
+namespace Contracts.Dtos.Maintenance
 {
     public class DepartmentDto
     {
