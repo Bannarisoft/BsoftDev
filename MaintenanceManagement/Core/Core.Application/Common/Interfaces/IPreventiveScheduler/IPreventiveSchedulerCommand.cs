@@ -10,6 +10,7 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
     {
         Task<int> CreateAsync(PreventiveSchedulerHeader preventiveSchedulerHdr);     
         Task<bool> UpdateAsync(PreventiveSchedulerHeader preventiveSchedulerHdr);
-        Task<bool> DeleteAsync(int id,PreventiveSchedulerHeader preventiveSchedulerHdr); 
+        Task<bool> DeleteAsync(int id,PreventiveSchedulerHeader preventiveSchedulerHdr);
+        Task<bool> CreateDetailAsync(List<PreventiveSchedulerDetail> preventiveSchedulerDetail);      
     }
 }

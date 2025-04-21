@@ -14,5 +14,7 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<bool> SoftDeleteValidation(int Id); 
         Task<bool> AlreadyExistsAsync(string ShiftName,int? id = null);
         Task<bool> NotFoundAsync(int id );
+        Task<(DateTime nextDate, DateTime reminderDate)> CalculateNextScheduleDate(DateTime startDate, int interval, string unit,int reminderDays);
+        Task<List<PreventiveSchedulerDetail>> GetPreventiveSchedulerDetail(int PreventiveSchedulerId);
     }
 }
