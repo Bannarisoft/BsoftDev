@@ -7,9 +7,11 @@ namespace Core.Application.Common.Interfaces.IMaintenanceRequest
 {
     public interface IMaintenanceRequestCommandRepository  
     {
-          Task<Core.Domain.Entities.MaintenanceRequest> CreateAsync(Core.Domain.Entities.MaintenanceRequest maintenanceRequest);   
+          Task<int> CreateAsync(Core.Domain.Entities.MaintenanceRequest maintenanceRequest);   
 
             Task<bool> UpdateAsync(Core.Domain.Entities.MaintenanceRequest maintenanceRequest);
+
+            Task<bool> UpdateStatusAsync(int id);
 
     }
 }

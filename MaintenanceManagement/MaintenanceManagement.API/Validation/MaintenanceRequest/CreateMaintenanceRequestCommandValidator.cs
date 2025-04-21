@@ -37,9 +37,9 @@ namespace MaintenanceManagement.API.Validation.MaintenanceRequest
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateMaintenanceRequestCommand.MaintenanceTypeId)} {rule.Error}");
 
-                        RuleFor(x => x.RequestId)
+                        RuleFor(x => x.RequestStatusId)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateMaintenanceRequestCommand.RequestId)} {rule.Error}");
+                            .WithMessage($"{nameof(CreateMaintenanceRequestCommand.RequestStatusId)} {rule.Error}");
 
                         RuleFor(x => x.MachineId)
                             .NotEmpty()
@@ -51,15 +51,12 @@ namespace MaintenanceManagement.API.Validation.MaintenanceRequest
 
                         RuleFor(x => x.MachineId)
                             .GreaterThan(0)
-                            .WithMessage("MachineId is required.");
+                            .WithMessage($"{nameof(CreateMaintenanceRequestCommand.MachineId)} {rule.Error}");
 
                         RuleFor(x => x.RequestTypeId)
                             .GreaterThan(0)
-                            .WithMessage("RequestTypeId is required.");
-
-                        RuleFor(x => x.MaintenanceTypeId)
-                            .GreaterThan(0)
-                            .WithMessage("MaintenanceTypeId is required.");
+                             .WithMessage($"{nameof(CreateMaintenanceRequestCommand.RequestTypeId)} {rule.Error}");
+                       
                         break;
 
                     default:
