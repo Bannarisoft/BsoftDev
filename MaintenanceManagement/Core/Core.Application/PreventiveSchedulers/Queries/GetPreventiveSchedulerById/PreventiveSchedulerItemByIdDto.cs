@@ -8,7 +8,7 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerBy
     public class PreventiveSchedulerItemByIdDto
     {
         public int Id { get; set; }
-        public int PreventiveSchedulerId { get; set; }
+        public int PreventiveSchedulerHdrId { get; set; }
         public string OldItemId { get; set; }
         public int RequiredQty { get; set; }
     }
