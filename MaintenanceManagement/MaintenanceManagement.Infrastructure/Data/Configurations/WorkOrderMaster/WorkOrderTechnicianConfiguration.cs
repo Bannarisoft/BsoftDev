@@ -21,24 +21,28 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasColumnType("int")
                 .IsRequired();
             builder.HasOne(amg => amg.WOTechnician)
-                .WithMany(am => am.Technicians)
+                .WithMany(am => am.WorkOrderTechnicians)
                 .HasForeignKey(amg => amg.WorkOrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(t => t.TechnicianId)
                 .HasColumnName("TechnicianId")
-                .HasColumnType("smallint")
+                .HasColumnType("int")
                 .IsRequired();  
             
              builder.Property(t => t.OldTechnicianId)
                 .HasColumnName("OldTechnicianId")
-                .HasColumnType("smallint")
+                .HasColumnType("int")
                 .IsRequired();
             
-             builder.Property(t => t.SourceId)
+            builder.Property(t => t.SourceId)
                 .HasColumnName("SourceId")
-                .HasColumnType("smallint")
+                .HasColumnType("int")
                 .IsRequired();
+            builder.HasOne(amg => amg.MiscSource)
+                .WithMany(am => am.WorkOrderTechnicianSource)
+                .HasForeignKey(amg => amg.SourceId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(t => t.TechnicianName)
                 .HasColumnName("TechnicianName")

@@ -9,15 +9,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
     public class WorkOrderConfiguration  : IEntityTypeConfiguration<WorkOrder>
     {       
        public void Configure(EntityTypeBuilder<WorkOrder> builder)
-        { 
-            var statusConverter = new ValueConverter<Status, bool>(
-                v => v == Status.Active,                   
-                v => v ? Status.Active : Status.Inactive   
-            );
-            var isDeleteConverter = new ValueConverter<IsDelete, bool>(
-                v => v == IsDelete.Deleted,                 
-                v => v ? IsDelete.Deleted : IsDelete.NotDeleted 
-            );
+        {           
             
             builder.ToTable("WorkOrder", "Maintenance");
 
@@ -29,12 +21,12 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
 
             builder.Property(t => t.CompanyId)
                 .HasColumnName("CompanyId")
-                .HasColumnType("smallint")
+                .HasColumnType("int")
                 .IsRequired();
 
             builder.Property(t => t.UnitId)
                 .HasColumnName("UnitId")
-                .HasColumnType("smallint")
+                .HasColumnType("int")
                 .IsRequired();  
             
             builder.Property(t => t.WorkOrderDocNo)
@@ -44,25 +36,25 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
 
             builder.Property(t => t.RequestId)
                 .HasColumnName("RequestId")
-                .HasColumnType("int")
-                .IsRequired(false);
+                .HasColumnType("int");               
             builder.HasOne(amg => amg.WOMaintenanceRequest)
                 .WithMany(mg => mg.WorkOrdersRequest)
                 .HasForeignKey(amg => amg.RequestId)
+                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict); 
 
             builder.Property(t => t.PreventiveScheduleId)
                 .HasColumnName("PreventiveScheduleId")
-                .HasColumnType("int")
-                .IsRequired(false);
+                .HasColumnType("int");                
             builder.HasOne(amg => amg.WOPreventiveScheduler)
-                .WithMany(mg => mg.WorkOrdersSchedule)
+                .WithMany(mg => mg.workOrdersSchedule)
                 .HasForeignKey(amg => amg.PreventiveScheduleId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);           
 
             builder.Property(t => t.StatusId)
                 .HasColumnName("StatusId")
-                .HasColumnType("smallint")
+                .HasColumnType("int")
                 .IsRequired();           
             builder.HasOne(amg => amg.MiscStatus)
                 .WithMany(mg => mg.WorkOrderStatus)
@@ -71,8 +63,8 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
             
             builder.Property(t => t.RootCauseId)
                 .HasColumnName("RootCauseId")
-                .HasColumnType("smallint")
-                .IsRequired();     
+                .HasColumnType("int")
+                .IsRequired(false);     
             builder.HasOne(amg => amg.MiscRootCause)
                 .WithMany(am => am.WorkOrderRootCause)
                 .HasForeignKey(amg => amg.RootCauseId)
@@ -90,39 +82,37 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
             
             builder.Property(t => t.TotalManPower)
                 .HasColumnName("TotalManPower")
-                .HasColumnType("smallint")
+                .HasColumnType("int")
                 .IsRequired(false);   
             
             builder.Property(t => t.TotalSpentHours)
                 .HasColumnName("TotalSpentHours")
                 .HasColumnType("decimal(5,2)")
                 .IsRequired(false);
-
-            builder.Property(b => b.IsActive)
-                .HasColumnName("IsActive")
-                .HasColumnType("bit")
-                .HasConversion(statusConverter)
-                .IsRequired();
-
-            builder.Property(b => b.IsDeleted)
-                .HasColumnName("IsDeleted")
-                .HasColumnType("bit")
-                .HasConversion(isDeleteConverter)
-                .IsRequired();
-
+            
+            builder.Property(t => t.DowntimeStart)
+                .HasColumnName("DowntimeStart")                
+                .HasColumnType("DateTimeOffset")
+                .IsRequired(false);   
+            
+            builder.Property(t => t.DowntimeEnd)
+                .HasColumnName("DowntimeEnd")                
+                .HasColumnType("DateTimeOffset")
+                .IsRequired(false);   
+          
             builder.Property(b => b.CreatedByName)
                 .IsRequired()
                 .HasColumnType("varchar(50)");
                     
             builder.Property(b => b.CreatedIP)
                 .IsRequired()
-                .HasColumnType("varchar(255)");
+                .HasColumnType("varchar(100)");
 
             builder.Property(b => b.ModifiedByName)
                 .HasColumnType("varchar(50)");
 
             builder.Property(b => b.ModifiedIP)
-                .HasColumnType("varchar(255)"); 
+                .HasColumnType("varchar(100)"); 
         }
     }
 }

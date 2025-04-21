@@ -1,13 +1,13 @@
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
+using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Events;
 using MediatR;
 
 namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
 {
-    public class UpdateWorkOrderCommandHandler : IRequestHandler<UpdateWorkOrderCommand, ApiResponseDTO<WorkOrderCombineDto>>
+    public class UpdateWorkOrderCommandHandler : IRequestHandler<UpdateWorkOrderCommand, ApiResponseDTO<bool>>
     { 
         private readonly IWorkOrderCommandRepository _workOrderRepository;
         private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
@@ -22,57 +22,44 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<WorkOrderCombineDto>> Handle(UpdateWorkOrderCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<bool>> Handle(UpdateWorkOrderCommand request, CancellationToken cancellationToken)
         {
-            var assetMaster = await _workOrderQueryRepository.GetByIdAsync(request.WorkOrder.Id);
+            var assetMaster = await _workOrderRepository.GetByIdAsync(request.WorkOrder.Id);
             if (assetMaster is null)
-            return new ApiResponseDTO<WorkOrderCombineDto>
+            return new ApiResponseDTO<bool>
             {
                 IsSuccess = false,
                 Message = "Invalid AssetId. The specified AssetName does not exist or is inactive."
-            };
-            var oldAssetName = assetMaster.RequestId;
-            assetMaster.RequestId = request.WorkOrder.RequestId;
+            };  
+            var oldAssetName = assetMaster.WorkOrderDocNo;
+            assetMaster.WorkOrderDocNo = request.WorkOrder.WorkOrderDocNo;
 
          
             var updatedAssetMasterEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request);                   
-            var updateResult = await _workOrderRepository.UpdateAsync( updatedAssetMasterEntity);            
-
-            var updatedAssetMaster =  await _workOrderQueryRepository.GetByIdAsync(request.WorkOrder.Id);    
-            if (updatedAssetMaster != null)
-            {
-                var assetMasterDto = _mapper.Map<WorkOrderCombineDto>(updatedAssetMaster);
+            var updateResult = await _workOrderRepository.UpdateAsync(updatedAssetMasterEntity.Id, updatedAssetMasterEntity);            
+         
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: assetMasterDto.RequestId ?? string.Empty,
+                    actionCode: request.WorkOrder.WorkOrderDocNo ?? string.Empty,
                     actionName: "",                            
-                    details: $"WorkOrder '{oldAssetName}' was updated to '{assetMasterDto.RequestId}'",
+                    details: $"WorkOrder '{oldAssetName}' was updated to '{request.WorkOrder.RequestId}'",
                     module:"WorkOrder"
                 );            
                 await _mediator.Publish(domainEvent, cancellationToken);
-                if(updateResult>0)
+                if(updateResult)
                 {
-                    return new ApiResponseDTO<WorkOrderCombineDto>
+                    return new ApiResponseDTO<bool>
                     {
                         IsSuccess = true,
-                        Message = "AssetMaster updated successfully.",
-                        Data = assetMasterDto
+                        Message = "WorkOrder updated successfully.",                        
                     };
                 }
-                return new ApiResponseDTO<WorkOrderCombineDto>
+                return new ApiResponseDTO<bool>
                 {
                     IsSuccess = false,
-                    Message = "AssetMaster not updated."
+                    Message = "WorkOrder not updated."
                 };                
-            }
-            else
-            {
-                return new ApiResponseDTO<WorkOrderCombineDto>{
-                    IsSuccess = false,
-                    Message = "AssetMaster not found."
-                };
-            }        
+            }          
         }
-    }
-}
+ }

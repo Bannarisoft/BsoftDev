@@ -21,17 +21,17 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasColumnType("int")
                 .IsRequired();
             builder.HasOne(amg => amg.WOSchedule)
-                .WithMany(am => am.Schedule)
+                .WithMany(am => am.WorkOrderSchedules)
                 .HasForeignKey(amg => amg.WorkOrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Property(t => t.RepairStartTime)
-                .HasColumnName("RepairStartTime")                
+            builder.Property(t => t.StartTime)
+                .HasColumnName("StartTime")                
                 .HasColumnType("DateTimeOffset")
                 .IsRequired();   
             
-            builder.Property(t => t.RepairEndTime)
-                .HasColumnName("RepairEndTime")                
+            builder.Property(t => t.EndTime)
+                .HasColumnName("EndTime")                
                 .IsRequired()
                 .HasColumnType("DateTimeOffset");           
         }

@@ -16,7 +16,7 @@ namespace Core.Domain.Entities
         public DateOnly StartDate { get; set; }
         public DateOnly? NextDueDate { get; set; }
         public string? RescheduleReason { get; set; }
-        public ICollection<WorkOrder>? WorkOrdersSchedule  {get; set;}   
+        public ICollection<WorkOrder>? workOrdersSchedule  {get; set;}   
         
     }
 }

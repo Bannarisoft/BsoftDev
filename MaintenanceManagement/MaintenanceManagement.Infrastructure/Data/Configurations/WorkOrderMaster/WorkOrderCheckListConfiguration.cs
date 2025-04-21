@@ -22,7 +22,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasColumnType("int")
                 .IsRequired();
             builder.HasOne(amg => amg.WOCheckList)
-                .WithMany(am => am.CheckLists)
+                .WithMany(am => am.WorkOrderCheckLists)
                 .HasForeignKey(amg => amg.WorkOrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -34,6 +34,14 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .WithMany(am => am.WOCheckLists)
                 .HasForeignKey(amg => amg.CheckListId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(c => c.ISCompleted)                
+                .HasColumnType("bit")
+                .HasConversion(
+                    v => v == 1, 
+                    v => v ? (byte)1 : (byte)0 
+                )
+                .IsRequired();
 
             builder.Property(t => t.Description)
                 .HasColumnName("Description")                

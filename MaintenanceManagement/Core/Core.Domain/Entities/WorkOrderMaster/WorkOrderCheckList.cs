@@ -7,7 +7,8 @@ namespace Core.Domain.Entities.WorkOrderMaster
         public int WorkOrderId { get; set; }
         public WorkOrder WOCheckList { get; set; } = null!;         
         public int CheckListId { get; set; }
-        public ActivityCheckListMaster CheckListMaster { get; set; } = null!;        
+        public ActivityCheckListMaster CheckListMaster { get; set; } = null!;   
+        public byte ISCompleted { get; set; }     
         public string? Description { get; set; }
     }
 }

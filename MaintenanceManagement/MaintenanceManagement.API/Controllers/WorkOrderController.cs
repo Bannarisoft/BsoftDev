@@ -1,8 +1,13 @@
 using Core.Application.WorkOrder.Command.CreateWorkOrder;
 using Core.Application.WorkOrder.Command.DeleteFileWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder;
+using Core.Application.WorkOrder.Command.UpdateWorkOrder.Schedule;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrderRootCause;
+using Core.Application.WorkOrder.Queries.GetWorkOrderSource;
+using Core.Application.WorkOrder.Queries.GetWorkOrderStatus;
 using FluentValidation;
+using MaintenanceManagement.API.Validation.WorkOrder;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,21 +19,22 @@ namespace MaintenanceManagement.API.Controllers
     {
         private readonly IValidator<CreateWorkOrderCommand> _createWorkOrderCommandValidator;
         private readonly IValidator<UpdateWorkOrderCommand> _updateWorkOrderCommandValidator;
+        private readonly IValidator<UpdateWOScheduleCommand> _updateWoScheduleCommandValidator;        
         private readonly IValidator<UploadFileWorkOrderCommand> _uploadFileCommandValidator;        
 
-        public WorkOrderController(
-
-            ISender mediator, 
+        public WorkOrderController( ISender mediator, 
             IValidator<CreateWorkOrderCommand> createWorkOrderCommandValidator, 
-            IValidator<UpdateWorkOrderCommand> updateWorkOrderCommandValidator, 
-            IValidator<UploadFileWorkOrderCommand> uploadFileCommandValidator            
+            IValidator<UpdateWorkOrderCommand> updateWorkOrderCommandValidator ,
+            IValidator<UpdateWOScheduleCommand> updateWoScheduleCommandValidator ,
+             IValidator<UploadFileWorkOrderCommand> uploadFileCommandValidator            
             ) 
             : base(mediator)
 
         {
             _createWorkOrderCommandValidator = createWorkOrderCommandValidator;
             _updateWorkOrderCommandValidator = updateWorkOrderCommandValidator;
-            _uploadFileCommandValidator = uploadFileCommandValidator;
+            _updateWoScheduleCommandValidator=updateWoScheduleCommandValidator;
+             _uploadFileCommandValidator = uploadFileCommandValidator;
         }
        [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateWorkOrderCommand command)
@@ -43,9 +49,7 @@ namespace MaintenanceManagement.API.Controllers
                     message = "Validation failed",
                     errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
                 });
-
-            }
-            
+            }            
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
@@ -75,6 +79,38 @@ namespace MaintenanceManagement.API.Controllers
         {
             var validationResult = await _updateWorkOrderCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                });
+
+            }
+            var result = await Mediator.Send(command);
+            if (result.IsSuccess)
+            {
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+
+                    message = result.Message,
+                    asset = result.Data
+                });
+            }
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = result.Message
+            });
+        }
+        [HttpPut("schedule")]
+        public async Task<IActionResult> UpdateScheduleAsync(UpdateWOScheduleCommand command)
+        {
+            var validationResult = await _updateWoScheduleCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)            
             {
                 return BadRequest(new
                 {
@@ -166,6 +202,64 @@ namespace MaintenanceManagement.API.Controllers
                 StatusCode = StatusCodes.Status200OK,
                 message = file.Message,
                 errors = ""
+            });
+        }
+        [HttpGet("Status")]
+        public async Task<IActionResult> GetWorkOrderStatus()
+        {
+            var result = await Mediator.Send(new GetWorkOrderStatusQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No WorkOrder Status found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "WorkOrder Status fetched successfully.",
+                data = result.Data
+            });
+        }
+        [HttpGet("RootCause")]
+        public async Task<IActionResult> GetWorkOrderRootCause()
+        {
+            var result = await Mediator.Send(new GetWorkOrderRootCauseQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No WorkOrder Status found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "WorkOrder Status fetched successfully.",
+                data = result.Data
+            });
+        }
+        
+        [HttpGet("Source")]
+        public async Task<IActionResult> GetWorkOrderSource()
+        {
+            var result = await Mediator.Send(new GetWorkOrderSourceQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No WorkOrder Status found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "WorkOrder Status fetched successfully.",
+                data = result.Data
             });
         }
 

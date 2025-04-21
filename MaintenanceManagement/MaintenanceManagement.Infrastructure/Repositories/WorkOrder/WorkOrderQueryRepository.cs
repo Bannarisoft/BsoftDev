@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
-using Core.Application.WorkOrder.Queries.GetWorkOrder;
+using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrderById;
+
+// using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Common;
 using Dapper;
 using MassTransit;
@@ -14,12 +13,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
     public class WorkOrderQueryRepository : IWorkOrderQueryRepository
     {
         private readonly IDbConnection _dbConnection;
-        public WorkOrderQueryRepository(IDbConnection dbConnection)
+        private readonly IIPAddressService _ipAddressService;
+        public WorkOrderQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
         }
 
-        public Task<(List<WorkOrderDto>, int)> GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public Task<(List<GetWorkOrderByIdDto>, int)> GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             throw new NotImplementedException();
         }
@@ -27,16 +28,22 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         public Task<string> GetBaseDirectoryAsync()
         {
             throw new NotImplementedException();
-        }
+        }   
 
-        public Task<WorkOrderDto> GetByIdAsync(int workOrderId)
+        public async Task<string?> GetLatestWorkOrderDocNo(int TypeId)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<string?> GetLatestWorkOrderDocNo(string maintenanceType)
-        {
-            throw new NotImplementedException();
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
+            var parameters = new DynamicParameters();
+            parameters.Add("@CompanyId", companyId);
+            parameters.Add("@UnitId", unitId);
+            parameters.Add("@TypeId", TypeId);
+            var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
+                "dbo.FAM_GetWorkOrderDocNo", 
+                parameters, 
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 120);
+            return newAssetCode; 
         }
 
         /* public async Task<WorkOrderDto> GetByIdAsync(int workOrderId)
@@ -81,9 +88,32 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
            return assetMaster; 
        }*/
        
-        public Task<List<Core.Domain.Entities.MiscMaster>> GetWORootCauseDescAsync()
+        public async Task<List<Core.Domain.Entities.MiscMaster>> GetWORootCauseDescAsync()
         {
-            throw new NotImplementedException();
+             const string query = @"
+            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder            
+            FROM Maintenance.MiscMaster M
+            INNER JOIN Maintenance.MiscTypeMaster T on T.ID=M.MiscTypeId
+            WHERE (MiscTypeCode = @MiscTypeCode) 
+            AND  M.IsDeleted=0 and M.IsActive=1
+            ORDER BY SortOrder DESC";    
+            var parameters = new { MiscTypeCode = MiscEnumEntity.WORootCause.MiscCode };        
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+            return result.ToList();
+        }
+
+        public async Task<List<Core.Domain.Entities.MiscMaster>> GetWOSourceDescAsync()
+        {
+            const string query = @"
+            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder            
+            FROM Maintenance.MiscMaster M
+            INNER JOIN Maintenance.MiscTypeMaster T on T.ID=M.MiscTypeId
+            WHERE (MiscTypeCode = @MiscTypeCode) 
+            AND  M.IsDeleted=0 and M.IsActive=1
+            ORDER BY SortOrder DESC";    
+            var parameters = new { MiscTypeCode = MiscEnumEntity.WOSource.MiscCode };        
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+            return result.ToList();
         }
 
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetWOStatusDescAsync()
@@ -100,7 +130,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             return result.ToList();
         }
 
-        public async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity, IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician, IEnumerable<dynamic> checkList, IEnumerable<dynamic> schedule)> IWorkOrderQueryRepository.GetWorkOrderByIdAsync(int workOrderId)
+        Task<(List<GetWorkOrderByIdDto>, int)> IWorkOrderQueryRepository.GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm)
+        {
+            throw new NotImplementedException();
+        }            
+
+        async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity, IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician, IEnumerable<dynamic> checkList, IEnumerable<dynamic> schedule)> IWorkOrderQueryRepository.GetWorkOrderByIdAsync(int workOrderId)
         {
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)

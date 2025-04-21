@@ -10,6 +10,7 @@ namespace Core.Domain.Entities.WorkOrderMaster
         public int TechnicianId { get; set; }
         public int OldTechnicianId { get; set; }        
         public int SourceId { get; set; }
+        public MiscMaster MiscSource { get; set; } = null!;   
         public string? TechnicianName { get; set; }
         public decimal HoursSpent { get; set; }        
     }

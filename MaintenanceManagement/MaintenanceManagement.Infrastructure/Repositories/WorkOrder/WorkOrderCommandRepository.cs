@@ -1,6 +1,9 @@
-using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
-using Core.Application.WorkOrder.Queries.GetWorkOrder;
+using Core.Application.Common.Interfaces.IWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrderById;
+
+// using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Common;
+using Core.Domain.Entities.WorkOrderMaster;
 using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,21 +18,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, CancellationToken cancellationToken)
         {
-           var entry =_applicationDbContext.Entry(workOrder);
+            var entry =_applicationDbContext.Entry(workOrder);
             await _applicationDbContext.WorkOrder.AddAsync(workOrder);
             await _applicationDbContext.SaveChangesAsync();
-             return workOrder;   
-        }
-        public async Task<bool> DeleteAsync(int Id, Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder)
-        {
-            var workOrderToDelete = await _applicationDbContext.WorkOrder.FirstOrDefaultAsync(u => u.Id == Id);
-            if (workOrderToDelete != null)
-            {
-                workOrderToDelete.IsDeleted = workOrder.IsDeleted;              
-                return await _applicationDbContext.SaveChangesAsync()>0;
-            }
-            return false;
-        }
+            return workOrder;   
+        }      
         public async Task<bool> UpdateAsync(int workOrderId,Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder)
         {
              var existingWorkOrder = await _applicationDbContext.WorkOrder
@@ -50,18 +43,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                    _applicationDbContext.WorkOrderCheckList.Where(x => x.WorkOrderId == workOrderId));
 
                _applicationDbContext.WorkOrderItem.RemoveRange(
-                   _applicationDbContext.WorkOrderItem.Where(x => x.WorkOrderId == workOrderId));
-                
-                _applicationDbContext.WorkOrderSchedule.RemoveRange(
-                   _applicationDbContext.WorkOrderSchedule.Where(x => x.WorkOrderId == workOrderId));
-
+                   _applicationDbContext.WorkOrderItem.Where(x => x.WorkOrderId == workOrderId));                
+           
                 _applicationDbContext.WorkOrderTechnician.RemoveRange(
                    _applicationDbContext.WorkOrderTechnician.Where(x => x.WorkOrderId == workOrderId));
 
                        
                 existingWorkOrder. StatusId = workOrder.StatusId;                
-                existingWorkOrder.RootCauseId = workOrder.RootCauseId;
-                existingWorkOrder.IsActive = workOrder.IsActive;
+                existingWorkOrder.RootCauseId = workOrder.RootCauseId;                
                 existingWorkOrder.Remarks = workOrder.Remarks;
                 existingWorkOrder.Image = workOrder.Image;
                 existingWorkOrder.TotalManPower = workOrder.TotalManPower;
@@ -70,9 +59,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 if (workOrder.WorkOrderActivities?.Any() == true)
                    await _applicationDbContext.WorkOrderActivity.AddRangeAsync(workOrder.WorkOrderActivities);
                 if (workOrder.WorkOrderItems?.Any() == true)
-                   await _applicationDbContext.WorkOrderItem.AddRangeAsync(workOrder.WorkOrderItems);
-                if (workOrder.WorkOrderSchedules?.Any() == true)
-                   await _applicationDbContext.WorkOrderSchedule.AddRangeAsync(workOrder.WorkOrderSchedules);
+                   await _applicationDbContext.WorkOrderItem.AddRangeAsync(workOrder.WorkOrderItems);              
                 if (workOrder.WorkOrderTechnicians?.Any() == true)
                    await _applicationDbContext.WorkOrderTechnician.AddRangeAsync(workOrder.WorkOrderTechnicians);
                 if (workOrder.WorkOrderCheckLists?.Any() == true)
@@ -96,17 +83,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             return true;
         }
 
-        public async Task<WorkOrderDto?> GetByWOImageAsync(int workOrderId)
-        {
-            return await _applicationDbContext.WorkOrder
-            .Where(a => a.Id == workOrderId)
-            .Select(a => new WorkOrderDto
-            {
-                Id = a.Id,
-                Image = a.Image                
-            })
-            .FirstOrDefaultAsync();
-        }
+        // public async Task<WorkOrderDto?> GetByWOImageAsync(int workOrderId)
+        // {
+        //     return await _applicationDbContext.WorkOrder
+        //     .Where(a => a.Id == workOrderId)
+        //     .Select(a => new WorkOrderDto
+        //     {
+        //         Id = a.Id,
+        //         Image = a.Image                
+        //     })
+        //     .FirstOrDefaultAsync();
+        // }
 
         public async Task<bool> RemoveWOImageReferenceAsync(int workOrderId)
         {
@@ -119,6 +106,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             asset.Image = null;
             await _applicationDbContext.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<int> CreateScheduleAsync(int workOrderId, Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule workOrderSchedule)
+        {           
+       
+            await _applicationDbContext.WorkOrderSchedule.AddAsync(workOrderSchedule);
+            await _applicationDbContext.SaveChangesAsync();
+            return workOrderSchedule.Id;   
+                    
+        }
+        public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> GetByIdAsync(int workOrderId)
+        {
+           return await _applicationDbContext.WorkOrder
+                     .FirstOrDefaultAsync(x => x.Id == workOrderId);
         }
     }
 }

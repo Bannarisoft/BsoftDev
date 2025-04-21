@@ -23,6 +23,10 @@ namespace Core.Domain.Common
         public static class  WORequestType
         {
             public const string MiscCode = "RequestType";
-        }     
+        }   
+        public static class  WOSource
+        {
+            public const string MiscCode = "Source";
+        }       
     }
 }

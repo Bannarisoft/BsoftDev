@@ -23,13 +23,13 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasColumnType("int")
                 .IsRequired();
             builder.HasOne(amg => amg.WOActivity)
-                .WithMany(am => am.Activity)
+                .WithMany(am => am.WorkOrderActivities)
                 .HasForeignKey(amg => amg.WorkOrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(t => t.ActivityId)
                 .HasColumnName("ActivityId")
-                .HasColumnType("smallint")
+                .HasColumnType("int")
                 .IsRequired();  
             builder.HasOne(amg => amg.ActivityMaster)
                 .WithMany(am => am.workOrderActivities)
