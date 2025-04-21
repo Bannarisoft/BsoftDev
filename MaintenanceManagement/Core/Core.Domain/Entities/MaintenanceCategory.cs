@@ -11,7 +11,7 @@ namespace Core.Domain.Entities
     {
         public string? CategoryName { get; set; }
         public string? Description { get; set; }
-        public ICollection<WorkOrder>? WorkOrderType  {get; set;} 
+        // public ICollection<WorkOrder>? WorkOrderType  {get; set;} 
         public ICollection<PreventiveSchedulerHeader>? PreventiveSchedulerHeaders { get; set; }
     }
 }

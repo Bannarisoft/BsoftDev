@@ -22,6 +22,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             throw new NotImplementedException();
         }
 
+        public async Task<(DateTime nextDate, DateTime reminderDate)> CalculateNextScheduleDate(DateTime startDate, int interval, string unit, int reminderDays)
+        {
+             DateTime nextDate = unit.ToLower() switch
+              {
+                  "days" => startDate.AddDays(interval),
+                  "months" => startDate.AddMonths(interval),
+                  "years" => startDate.AddYears(interval),
+                  _ => throw new ArgumentException("Unsupported frequency unit.")
+              };
+               DateTime reminderDate = nextDate.AddDays(-reminderDays);
+
+            return (nextDate, reminderDate);
+        }
+
         public async Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
            var query = $@"
@@ -101,9 +115,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PS.DepartmentId,
                     PS.MaintenanceCategoryId,
                     PS.ScheduleId,
-                    PS.DueTypeId,
-                    PS.DuePeriod,
-                    PS.FrequencyId,
+                    PS.FrequencyTypeId,
+                    PS.FrequencyInterval,
+                    PS.FrequencyUnitId,
                     PS.EffectiveDate,
                     PS.GraceDays,
                     PS.ReminderWorkOrderDays,
@@ -111,9 +125,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PS.IsDownTimeRequired,
                     PS.DownTimeEstimateHrs,
                     PS.IsActive,
+                    PSA.Id,
+                    PSA.PreventiveSchedulerHdrId,
                     PSA.ActivityId,
                     PSA.EstimatedTimeHrs,
                     PSA.Description,
+                    PSI.Id,
+                    PSI.PreventiveSchedulerId AS PreventiveSchedulerHdrId,
                     PSI.OldItemId,
                     PSI.RequiredQty
                 FROM [Maintenance].[PreventiveSchedulerHeader] PS
@@ -142,7 +160,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return existingPreventiveScheduler;
         },
         new { id },
-        splitOn: "ActivityId,OldItemId" 
+        splitOn: "Id,Id" 
         );
 
             return PreventiveSchedulerResponse.FirstOrDefault()!;
@@ -151,6 +169,30 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         public Task<List<PreventiveSchedulerHeader>> GetPreventiveScheduler(string searchPattern)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<List<PreventiveSchedulerDetail>> GetPreventiveSchedulerDetail(int PreventiveSchedulerId)
+        {
+            var query = $@"
+                SELECT  
+                    Id,
+                    PreventiveSchedulerId,
+                    MachineId,
+                    WorkOrderCreationStartDate,
+                    ActualWorkOrderDate,
+                    RescheduleReason,
+                    MaterialReqStartDays
+                    
+                FROM [Maintenance].[PreventiveSchedulerDetail] WHERE PreventiveSchedulerId =@PreventiveSchedulerId AND IsDeleted = 0
+            ";
+
+            var parameters = new
+            {
+                PreventiveSchedulerId = PreventiveSchedulerId
+            };
+            var result = await _dbConnection.QueryAsync<PreventiveSchedulerDetail>(query, parameters);
+            
+            return result.ToList();
         }
 
         public Task<bool> NotFoundAsync(int id)

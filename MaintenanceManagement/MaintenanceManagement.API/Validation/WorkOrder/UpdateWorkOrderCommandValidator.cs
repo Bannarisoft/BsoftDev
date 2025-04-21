@@ -1,7 +1,6 @@
 
 
 using Core.Application.WorkOrder.Command.UpdateWorkOrder;
-using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
 
@@ -14,11 +13,12 @@ namespace MaintenanceManagement.API.Validation.WorkOrder
         public UpdateWorkOrderCommandValidator(MaxLengthProvider maxLengthProvider)
         {
             // Get max lengths dynamically using MaxLengthProvider
-            var woRemarksMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrder>("AssetCode")??1000;
-            var woItemMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderItem>("ItemName")??100;                        
+            var woRemarksMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrder>("Remarks")??1000;
+            var woItemMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderItem>("ItemName")??250;                        
             var woTechnicianMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderTechnician>("TechnicianName")??100;  
-            var woActivityMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderActivity>("Description")??250; 
-            
+            var woActivityMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderActivity>("Description")??100; 
+            var woCheckListMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderCheckList>("Description")??1000; 
+
             _validationRules = ValidationRuleLoader.LoadValidationRules();
             if (_validationRules is null || !_validationRules.Any())
             {
@@ -30,41 +30,17 @@ namespace MaintenanceManagement.API.Validation.WorkOrder
             {
                 switch (rule.Rule)
                 {
-                    case "NotEmpty":                        
-                        RuleFor(x => x.WorkOrder.WorkOrderTypeId)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateWorkOrderCommand.WorkOrder.WorkOrderTypeId)} {rule.Error}");                       
-                        RuleFor(x => x.WorkOrder.RequestId)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateWorkOrderCommand.WorkOrder.RequestId)} {rule.Error}");
-                        RuleFor(x => x.WorkOrder.RequestTypeId)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateWorkOrderCommand.WorkOrder.RequestTypeId)} {rule.Error}");
-                        RuleFor(x => x.WorkOrder.PriorityId)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateWorkOrderCommand.WorkOrder.PriorityId)} {rule.Error}");
-                        RuleFor(x => x.WorkOrder.StatusId)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateWorkOrderCommand.WorkOrder.StatusId)} {rule.Error}");
-                        RuleFor(x => x.WorkOrder.RootCauseId)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateWorkOrderCommand.WorkOrder.RootCauseId)} {rule.Error}");                        
+                    case "NotEmpty":                                                         
                         //Item
                          RuleForEach(x => x.WorkOrder.WorkOrderItem)
                             .ChildRules(woItem =>
-                            {
-                                woItem.RuleFor(x => x.DepartmentId)
-                                    .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderItemDto.DepartmentId)} {rule.Error}");                                    
-                                woItem.RuleFor(x => x.ItemCode)
-                                    .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderItemDto.ItemCode)} {rule.Error}"); 
+                            {                                                                                              
                                  woItem.RuleFor(x => x.AvailableQty)
                                     .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderItemDto.AvailableQty)} {rule.Error}");
+                                    .WithMessage($"{nameof(WorkOrderItemUpdateDto.AvailableQty)} {rule.Error}");
                                 woItem.RuleFor(x => x.UsedQty)
                                     .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderItemDto.UsedQty)} {rule.Error}");
+                                    .WithMessage($"{nameof(WorkOrderItemUpdateDto.UsedQty)} {rule.Error}");
                             });
                         //Activity
                         RuleForEach(x => x.WorkOrder.WorkOrderActivity)
@@ -72,33 +48,16 @@ namespace MaintenanceManagement.API.Validation.WorkOrder
                             {
                                 woActivity.RuleFor(x => x.ActivityId)
                                     .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderActivityDto.ActivityId)} {rule.Error}");                                                                   
+                                    .WithMessage($"{nameof(WorkOrderActivityUpdateDto.ActivityId)} {rule.Error}");                                                                   
                         });
                           //Technician
                         RuleForEach(x => x.WorkOrder.WorkOrderTechnician)
                             .ChildRules(woTechnician =>
-                            {
-                                woTechnician.RuleFor(x => x.TechnicianId)
-                                    .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderTechnicianDto.TechnicianId)} {rule.Error}");    
-                                woTechnician.RuleFor(x => x.TechnicianName)
-                                    .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderTechnicianDto.TechnicianName)} {rule.Error}");  
+                            {                               
                                 woTechnician.RuleFor(x => x.HoursSpent)
                                     .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderTechnicianDto.HoursSpent)} {rule.Error}");                                                               
-                        });
-                        //WorkOrderSchedule
-                        RuleForEach(x => x.WorkOrder.WorkOrderSchedule)
-                            .ChildRules(woTechnician =>
-                            {
-                                woTechnician.RuleFor(x => x.RepairStartTime)
-                                    .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderScheduleDto.RepairStartTime)} {rule.Error}");    
-                                woTechnician.RuleFor(x => x.RepairEndTime)
-                                    .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderScheduleDto.RepairEndTime)} {rule.Error}");
-                            });
+                                    .WithMessage($"{nameof(WorkOrderTechnicianUpdateDto.HoursSpent)} {rule.Error}");                                                               
+                        });                     
                         break;
                     case "MaxLength":                                              
                         RuleFor(x => x.WorkOrder.Remarks)
@@ -110,7 +69,7 @@ namespace MaintenanceManagement.API.Validation.WorkOrder
                             {
                                 woItem.RuleFor(x => x.ItemName)
                                     .MaximumLength(woItemMaxLength)
-                                .WithMessage($"{nameof(WorkOrderItemDto.ItemName)} {rule.Error}{woItemMaxLength}");                              
+                                .WithMessage($"{nameof(WorkOrderItemUpdateDto.ItemName)} {rule.Error}{woItemMaxLength}");                              
                             });
                          //Technician
                         RuleForEach(x => x.WorkOrder.WorkOrderTechnician)
@@ -118,7 +77,7 @@ namespace MaintenanceManagement.API.Validation.WorkOrder
                             {
                                 woTechnician.RuleFor(x => x.TechnicianName)
                                     .MaximumLength(woTechnicianMaxLength)
-                                .WithMessage($"{nameof(WorkOrderItemDto.ItemName)} {rule.Error}{woTechnicianMaxLength}");                              
+                                .WithMessage($"{nameof(WorkOrderItemUpdateDto.ItemName)} {rule.Error}{woTechnicianMaxLength}");                              
                             }); 
                          //Activity
                         RuleForEach(x => x.WorkOrder.WorkOrderActivity)
@@ -126,30 +85,44 @@ namespace MaintenanceManagement.API.Validation.WorkOrder
                             {
                                 woActivity.RuleFor(x => x.Description)
                                     .MaximumLength(woActivityMaxLength)
-                                .WithMessage($"{nameof(WorkOrderActivityDto.Description)} {rule.Error}{woActivityMaxLength}");                              
-                            });                          
+                                .WithMessage($"{nameof(WorkOrderActivityUpdateDto.Description)} {rule.Error}{woActivityMaxLength}");                              
+                            });     
+                         //CheckList
+                        RuleForEach(x => x.WorkOrder.WorkOrderCheckList)
+                            .ChildRules(woCheckList =>
+                            {
+                                woCheckList.RuleFor(x => x.Description)
+                                    .MaximumLength(woActivityMaxLength)
+                                .WithMessage($"{nameof(WorkOrderCheckListUpdateDto.Description)} {rule.Error}{woCheckListMaxLength}");                              
+                            });                      
                         break;    
                      case "NumericOnly":       
+                        RuleFor(x => x.WorkOrder.TotalManPower)
+                            .InclusiveBetween(1, int.MaxValue)
+                            .WithMessage($"{nameof(UpdateWorkOrderCommand.WorkOrder.TotalManPower)} {rule.Error}");           
+                        RuleFor(x => x.WorkOrder.TotalSpentHours)
+                            .InclusiveBetween(1, int.MaxValue)
+                            .WithMessage($"{nameof(UpdateWorkOrderCommand.WorkOrder.TotalSpentHours)} {rule.Error}");  
+                        //Item
                         RuleForEach(x => x.WorkOrder.WorkOrderItem)
                             .ChildRules(woItem =>
                             {                               
                                 woItem.RuleFor(x => x.AvailableQty.ToString())
                                 .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                                .WithMessage($"{nameof(WorkOrderItemDto.AvailableQty)} {rule.Error}");
+                                .WithMessage($"{nameof(WorkOrderItemUpdateDto.AvailableQty)} {rule.Error}");
 
                                  woItem.RuleFor(x => x.UsedQty.ToString())
                                 .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                                .WithMessage($"{nameof(WorkOrderItemDto.UsedQty)} {rule.Error}");
-                            });  
-                        break;            
-                     case "NumericWithDecimal":
+                                .WithMessage($"{nameof(WorkOrderItemUpdateDto.UsedQty)} {rule.Error}");
+                            });                      
+                        //Technician                     
                         RuleForEach(x => x.WorkOrder.WorkOrderTechnician)
                             .ChildRules(woTechnician =>
                             {                               
                                 woTechnician.RuleFor(x => x.HoursSpent.ToString())
                                 .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                                .WithMessage($"{nameof(WorkOrderTechnicianDto.HoursSpent)} {rule.Error}");
-                            });                        
+                                .WithMessage($"{nameof(WorkOrderTechnicianUpdateDto.HoursSpent)} {rule.Error}");
+                            });       
                         break;        
                 }
             }  

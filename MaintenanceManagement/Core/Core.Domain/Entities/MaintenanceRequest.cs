@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Domain.Common;
+using Core.Domain.Entities.WorkOrderMaster;
 
 namespace Core.Domain.Entities
 {
@@ -19,7 +20,7 @@ namespace Core.Domain.Entities
        public int DepartmentId { get; set; }
        public int SourceId { get; set; }
        public int? VendorId  { get; set; }
-       public int? OldVendorId  { get; set; }
+       public string? OldVendorId  { get; set; }
        public int? ServiceTypeId { get; set;}
        public MiscMaster? ServiceType { get; set; } 
        public int? ServiceLocationId { get; set;}
@@ -34,7 +35,8 @@ namespace Core.Domain.Entities
     //   public string? RequestId { get; set;}
        public string? Remarks { get; set; } 
        public int?  RequestStatusId { get; set; }  
-       public MiscMaster? RequestStatus { get; set; }      
+       public MiscMaster? RequestStatus { get; set; }    
+       public ICollection<WorkOrder>? WorkOrdersRequest  {get; set;}        
 
     }
 }

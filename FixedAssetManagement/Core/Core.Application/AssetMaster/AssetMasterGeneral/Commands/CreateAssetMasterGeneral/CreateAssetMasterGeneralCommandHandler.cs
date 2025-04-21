@@ -88,8 +88,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
                         try
                         {
                             File.Move(filePath, newFilePath);
-                            assetEntity.AssetImage = newFileName;
-                            await _assetMasterGeneralRepository.UpdateAsync(request.AssetMaster.Id, assetEntity);
+                            //assetEntity.AssetImage = newFileName;
+                            await _assetMasterGeneralRepository.UpdateAssetImageAsync(assetEntity.Id, newFileName);
                         }
                         catch (Exception ex)
                         {

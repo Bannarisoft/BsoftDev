@@ -7,8 +7,6 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
 {
     public class UploadFileWorkOrderCommand : IRequest<ApiResponseDTO<WorkOrderImageDto>>
     {
-         public IFormFile? File { get; set; }
-        public string? CompanyName { get; set; }  
-        public string? UnitName { get; set; }
+         public IFormFile? File { get; set; }       
     }
 }
