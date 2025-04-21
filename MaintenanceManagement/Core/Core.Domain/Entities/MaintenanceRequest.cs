@@ -19,7 +19,7 @@ namespace Core.Domain.Entities
        public int DepartmentId { get; set; }
        public int SourceId { get; set; }
        public int? VendorId  { get; set; }
-       public int? OldVendorId  { get; set; }
+       public string? OldVendorId  { get; set; }
        public int? ServiceTypeId { get; set;}
        public MiscMaster? ServiceType { get; set; } 
        public int? ServiceLocationId { get; set;}

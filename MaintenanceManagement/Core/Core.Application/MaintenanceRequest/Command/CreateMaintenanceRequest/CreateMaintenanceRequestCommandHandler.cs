@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
 {
-    public class CreateMaintenanceRequestCommandHandler : IRequestHandler<CreateMaintenanceRequestCommand, ApiResponseDTO<GetMaintenanceRequestDto>>
+    public class CreateMaintenanceRequestCommandHandler : IRequestHandler<CreateMaintenanceRequestCommand, ApiResponseDTO<int>>
     {
        
 
@@ -29,7 +29,7 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
            _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
        }
 
-        public async Task<ApiResponseDTO<GetMaintenanceRequestDto>> Handle(CreateMaintenanceRequestCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<int>> Handle(CreateMaintenanceRequestCommand request, CancellationToken cancellationToken)
         {
             // 🔹 Map request to domain entity
             var maintenanceRequest = _imapper.Map<Core.Domain.Entities.MaintenanceRequest>(request);
@@ -37,37 +37,36 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
             // 🔹 Insert into the database
             var result = await _maintenanceRequestCommandRepository.CreateAsync(maintenanceRequest);
 
-            if (result.Id <= 0)
+            if (result <= 0)
             {
-                return new ApiResponseDTO<GetMaintenanceRequestDto>
+                return new ApiResponseDTO<int>
                 {
                     IsSuccess = false,
-                    Message = "Failed to create Maintenance Request",
-                    Data = null
+                    Message = "Failed to create Maintenance Request"
                 };
             }
 
             // 🔹 Fetch newly created record
-            var createdMaintenanceRequest = await _maintenanceRequestQueryRepository.GetByIdAsync(result.Id);
-            var mappedResult = _imapper.Map<GetMaintenanceRequestDto>(createdMaintenanceRequest);
+           // var createdMaintenanceRequest = await _maintenanceRequestQueryRepository.GetByIdAsync(result.Id);
+           // var mappedResult = _imapper.Map<GetMaintenanceRequestDto>(createdMaintenanceRequest);
 
             // 🔹 Publish domain event for auditing/logging
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
-                actionCode: createdMaintenanceRequest.Machine?.MachineName ?? "Unknown Machine",
-                actionName: createdMaintenanceRequest.Remarks ?? "No remarks",
-                details: $"Maintenance Request '{createdMaintenanceRequest.Machine?.MachineName}' was created.",
+                actionCode: request.MachineId.ToString(),
+                actionName: "Maintenance Request Created",
+                details: $"Maintenance Request was created.",
                 module: "MaintenanceRequest"
             );
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
             // 🔹 Return success response
-            return new ApiResponseDTO<GetMaintenanceRequestDto>
+            return new ApiResponseDTO<int>
             {
                 IsSuccess = true,
                 Message = "Maintenance Request created successfully",
-                Data = mappedResult
+                Data = result
             };
         }
     }

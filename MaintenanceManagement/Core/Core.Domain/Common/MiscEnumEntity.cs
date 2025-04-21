@@ -23,6 +23,15 @@ namespace Core.Domain.Common
         public static class  WORequestType
         {
             public const string MiscCode = "RequestType";
-        }     
+        } 
+         public static class  MaintenanceStatus
+        {
+        public const string MiscCode = "MaintenanceStatus";
+        }
+
+        public static class  MaintenanceStatusUpdate
+        {
+        public const string Code = "Closed";
+        }    
     }
 }
