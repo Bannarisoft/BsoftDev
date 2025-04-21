@@ -17,7 +17,7 @@ namespace Core.Application.Notification.Queries
 
         private readonly ILogger<NotificationsQueryHandler> _logger;
 
-              private readonly IMediator _Imediator;
+        private readonly IMediator _Imediator;
 
         public NotificationsQueryHandler(INotificationsQueryRepository INotificationsQueryRepository,ILogger<NotificationsQueryHandler> logger,IMediator Imediator)
         {
@@ -106,9 +106,6 @@ namespace Core.Application.Notification.Queries
             Message="Your password is still valid."
         };
         }
-
-        
-      
     }
        
     }

@@ -9,9 +9,10 @@ namespace Core.Domain.Entities
     {
         public int Id { get; set; }
         public int PreventiveSchedulerHdrId { get; set; }
-        public PreventiveSchedulerHdr PreventiveScheduler { get; set; }
+        public required PreventiveSchedulerHeader PreventiveScheduler { get; set; }
         public int ItemId { get; set; }
         public int RequiredQty { get; set; }
-        public string OldItemId { get; set; }
+        public int? SourceId { get; set; }
+        public string? OldItemId { get; set; }
     }
 }

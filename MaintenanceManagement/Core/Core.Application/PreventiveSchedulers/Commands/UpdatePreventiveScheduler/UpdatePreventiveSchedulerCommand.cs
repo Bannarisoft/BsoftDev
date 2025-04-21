@@ -24,7 +24,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
         public byte IsDownTimeRequired { get; set; }
         public decimal DownTimeEstimateHrs { get; set; }
         public byte IsActive { get; set; }
-        public List<PreventiveSchedulerActivityUpdateDto> Activity { get; set; }
-        public List<PreventiveSchedulerItemUpdateDto> Items { get; set; }
+        public List<PreventiveSchedulerActivityUpdateDto>? Activity { get; set; }
+        public List<PreventiveSchedulerItemUpdateDto>? Items { get; set; }
     }
 }

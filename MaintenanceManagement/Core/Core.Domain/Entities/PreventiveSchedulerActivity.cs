@@ -9,10 +9,10 @@ namespace Core.Domain.Entities
     {
         public int Id { get; set; }
         public int PreventiveSchedulerHdrId { get; set; }
-        public PreventiveSchedulerHdr PreventiveScheduler { get; set; }
+        public required PreventiveSchedulerHeader PreventiveScheduler { get; set; }
         public int ActivityId { get; set; }
-        public ActivityMaster Activity { get; set; }
+        public required ActivityMaster Activity { get; set; }
         public decimal EstimatedTimeHrs { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 }

@@ -1,13 +1,14 @@
 
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
+using Core.Application.Common.Interfaces.IWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrderById;
 using Core.Domain.Events;
 using MediatR;
 
 namespace Core.Application.WorkOrder.Queries.GetWorkOrder
 {
-    public class GetWorkOrderQueryHandler : IRequestHandler<GetWorkOrderQuery, ApiResponseDTO<List<WorkOrderDto>>>
+    public class GetWorkOrderQueryHandler : IRequestHandler<GetWorkOrderQuery, ApiResponseDTO<List<GetWorkOrderByIdDto>>>
     {
         private readonly IWorkOrderQueryRepository _workOrderRepository;
         private readonly IMapper _mapper;
@@ -19,10 +20,10 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<List<WorkOrderDto>>> Handle(GetWorkOrderQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<GetWorkOrderByIdDto>>> Handle(GetWorkOrderQuery request, CancellationToken cancellationToken)
         {
             var (assetMaster, totalCount) = await _workOrderRepository.GetAllWOAsync(request.PageNumber, request.PageSize, request.SearchTerm);
-            var assetMasterList = _mapper.Map<List<WorkOrderDto>>(assetMaster);
+            var assetMasterList = _mapper.Map<List<GetWorkOrderByIdDto>>(assetMaster);
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -33,7 +34,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
                 module:"WorkOrderDetails"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<WorkOrderDto>>
+            return new ApiResponseDTO<List<GetWorkOrderByIdDto>>
             {
                 IsSuccess = true,
                 Message = "Success",

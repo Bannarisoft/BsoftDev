@@ -49,8 +49,8 @@ app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
 app.UseCors();// Enable CORS
 app.UseAuthentication();
-app.UseMiddleware<TokenValidationMiddleware>();
-app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
+//app.UseMiddleware<TokenValidationMiddleware>();
+//app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();

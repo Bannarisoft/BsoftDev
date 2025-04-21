@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using Contracts.Models.Maintenance;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IDepartment;
 
 namespace MaintenanceManagement.Infrastructure.HttpClients.Departments
@@ -15,8 +16,18 @@ namespace MaintenanceManagement.Infrastructure.HttpClients.Departments
         public async Task<List<DepartmentDto>> GetAllDepartmentAsync()
         {
             var client = _httpClientFactory.CreateClient("DepartmentClient");
-            var response = await client.GetFromJsonAsync<List<DepartmentDto>>("api/Department");
-            return response ?? new List<DepartmentDto>();
+
+    var request = new HttpRequestMessage(HttpMethod.Get, "api/Department/by-name");
+    var response = await client.SendAsync(request);
+
+    if (response.IsSuccessStatusCode)
+    {
+        var result = await response.Content.ReadFromJsonAsync<ApiResponseDTO<List<DepartmentDto>>>();
+        return result?.Data ?? new List<DepartmentDto>();
+    }
+
+    // Optional: handle failure
+    return new List<DepartmentDto>();
         }
     }
 }

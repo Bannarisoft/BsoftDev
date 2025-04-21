@@ -1,7 +1,7 @@
 
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
+using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Domain.Events;
 using MediatR;
 
@@ -22,7 +22,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
         public async Task<ApiResponseDTO<GetWorkOrderByIdDto>> Handle(GetWorkOrderByIdQuery request, CancellationToken cancellationToken)
         {
           //  var assetMaster = await _assetMasterRepository.GetByIdAsync(request.Id);
-          var (woResult, woActivity, woItem,woTechnician) = await _workOrderQueryRepository.GetWorkOrderByIdAsync(request.Id);
+          var (woResult, woActivity, woItem,woTechnician,woSchedule,woCheckList) = await _workOrderQueryRepository.GetWorkOrderByIdAsync(request.Id);
           var asset = _mapper.Map<GetWorkOrderByIdDto>(woResult);
 
             if (woActivity != null)
@@ -36,6 +36,14 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
              if (woTechnician != null)
              {
                 asset.workOrderTechnician = _mapper.Map<List<GetWorkOrderTechnicianByIdDto>>(woTechnician);
+             }       
+              if (woSchedule != null)
+             {
+                asset.workOrderSchedule = _mapper.Map<List<GetWorkOrderScheduleByIdDto>>(woSchedule);
+             }       
+              if (woCheckList != null)
+             {
+                asset.workOrderTechnician = _mapper.Map<List<GetWorkOrderCheckListByIdDto>>(woCheckList);
              }           
 
             if (asset is null)

@@ -24,7 +24,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {
-           var preventivescheduler = await Mediator.Send(
+           var response = await Mediator.Send(
             new GetPreventiveSchedulerQuery
             {
                 PageNumber = PageNumber, 
@@ -35,10 +35,10 @@ namespace MaintenanceManagement.API.Controllers
             return Ok( new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
-                data = preventivescheduler.Data,
-                TotalCount = preventivescheduler.TotalCount,
-                PageNumber = preventivescheduler.PageNumber,
-                PageSize = preventivescheduler.PageSize
+                data = response.Data,
+                TotalCount = response.TotalCount,
+                PageNumber = response.PageNumber,
+                PageSize = response.PageSize
                 });
         }
          [HttpPost]
