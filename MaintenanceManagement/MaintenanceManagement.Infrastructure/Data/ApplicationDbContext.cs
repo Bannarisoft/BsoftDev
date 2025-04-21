@@ -50,7 +50,7 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<PreventiveSchedulerDetail>  PreventiveSchedulerDtl { get; set; }
         public DbSet<PreventiveSchedulerItems>  PreventiveSchedulerItems { get; set; }
         public DbSet<PreventiveSchedulerActivity>  PreventiveSchedulerActivity { get; set; }
-
+        public DbSet<ItemTransactions>  ItemTransactions { get; set; }
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -80,6 +80,7 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration( new PreventiveSchedulerItemsConfiguration());
             modelBuilder.ApplyConfiguration( new PreventiveSchedulerActivityConfiguration());
             modelBuilder.ApplyConfiguration( new MachineGroupUserConfiguration());
+            modelBuilder.ApplyConfiguration( new ItemTransactionsConfiguration());
             base.OnModelCreating(modelBuilder);
 
              

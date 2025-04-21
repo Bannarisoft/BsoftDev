@@ -53,6 +53,8 @@ using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers;
+using Core.Application.Common.Interfaces.IItem;
+using MaintenanceManagement.Infrastructure.Repositories.Item;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -199,6 +201,7 @@ namespace MaintenanceManagement.Infrastructure
             
             services.AddScoped<IPreventiveSchedulerCommand, PreventiveSchedulerCommandRepository>();
             services.AddScoped<IPreventiveSchedulerQuery, PreventiveSchedulerQueryRepository>();
+             services.AddScoped<IItemQueryRepository, ItemQueryRepository>();
 
             // Miscellaneous services
 
@@ -228,7 +231,8 @@ namespace MaintenanceManagement.Infrastructure
             typeof(WorkOrderProfile),
             typeof(WorkOrderScheduleProfile),
             typeof(WorkOrderActivityProfile),
-            typeof(ActivityCheckListMasterProfile)
+            typeof(ActivityCheckListMasterProfile),
+            typeof(ItemProfile)
 
 
 
