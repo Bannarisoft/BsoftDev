@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Domain.Common;
+using Core.Domain.Entities.WorkOrderMaster;
 
 namespace Core.Domain.Entities
 {
@@ -17,6 +18,7 @@ namespace Core.Domain.Entities
          
         
          public ActivityMaster? ActivityMaster { get; set; }  
+         public ICollection<WorkOrderCheckList>? WOCheckLists {get; set;} 
 
         
     }

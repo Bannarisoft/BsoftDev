@@ -2,8 +2,8 @@
 
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
-using Core.Application.WorkOrder.Queries.GetWorkOrder;
+using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Domain.Events;
 using MediatR;
 
@@ -15,51 +15,43 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
         private readonly IWorkOrderCommandRepository _workOrderRepository;
         private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
         private readonly IMediator _mediator;
+        private readonly IIPAddressService _ipAddressService;
 
-        public CreateWorkOrderCommandHandler(IMapper mapper, IWorkOrderCommandRepository workOrderRepository, IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator)
+        public CreateWorkOrderCommandHandler(IMapper mapper, IWorkOrderCommandRepository workOrderRepository, IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IIPAddressService ipAddressService)
         {
             _mapper = mapper;
             _workOrderRepository = workOrderRepository;
             _workOrderQueryRepository = workOrderQueryRepository;
-            _mediator = mediator;            
+            _mediator = mediator;     
+            _ipAddressService = ipAddressService;    
         }
 
         public async Task<ApiResponseDTO<WorkOrderCombineDto>> Handle(CreateWorkOrderCommand request, CancellationToken cancellationToken)
         {
-            var woEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrder);            
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
+            var latestWoCode = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(request.WorkOrderDto.RequestTypeId);            
+            var woEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrderDto);   
+            woEntity.WorkOrderDocNo = latestWoCode;         
+            woEntity.CompanyId = companyId; 
+            woEntity.UnitId = unitId; 
+            woEntity.TotalManPower=0;
+            woEntity.TotalSpentHours=0;            
             var result = await _workOrderRepository.CreateAsync(woEntity, cancellationToken);
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
                 actionCode: "",
-                actionName: woEntity.RequestId ?? string.Empty,
-                details: $"WorkOrder '{woEntity.RequestId}' was created",
+                actionName: woEntity.WorkOrderDocNo??string.Empty,
+                details: $"WorkOrder '{latestWoCode}' was created",
                 module: "WorkOrder"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
         
             var woMasterDTO = _mapper.Map<WorkOrderCombineDto>(result);
             if (result.Id > 0)
-            {
-                string tempFilePath = request.WorkOrder.Image;
-                if (!string.IsNullOrEmpty(tempFilePath) && File.Exists(tempFilePath))
-                {
-                    string directory = Path.GetDirectoryName(tempFilePath) ?? string.Empty;
-                    string newFileName = $"{result.RequestId}{Path.GetExtension(tempFilePath)}";
-                    string newFilePath = Path.Combine(directory, newFileName);
-
-                    try
-                    {
-                        File.Move(tempFilePath, newFilePath);
-                        woEntity.Image = newFilePath.Replace(@"\", "/");
-                        await _workOrderRepository.UpdateAsync(woEntity);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed to rename file: {ex.Message}");
-                    }
-                }
+            {                
                 return new ApiResponseDTO<WorkOrderCombineDto>
                 {
                     IsSuccess = true,
