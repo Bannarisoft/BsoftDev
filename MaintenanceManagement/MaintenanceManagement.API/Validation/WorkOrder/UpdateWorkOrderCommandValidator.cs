@@ -1,5 +1,6 @@
 
 
+using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
@@ -8,124 +9,131 @@ namespace MaintenanceManagement.API.Validation.WorkOrder
 {
     public class UpdateWorkOrderCommandValidator  : AbstractValidator<UpdateWorkOrderCommand>
     {
-         private readonly List<ValidationRule> _validationRules;
+        private readonly IWorkOrderCommandRepository _workOrderRepository;
 
-        public UpdateWorkOrderCommandValidator(MaxLengthProvider maxLengthProvider)
+        public UpdateWorkOrderCommandValidator(MaxLengthProvider maxLengthProvider,IWorkOrderCommandRepository workOrderRepository)
         {
-            // Get max lengths dynamically using MaxLengthProvider
-            var woRemarksMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrder>("Remarks")??1000;
-            var woItemMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderItem>("ItemName")??250;                        
-            var woTechnicianMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderTechnician>("TechnicianName")??100;  
-            var woActivityMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderActivity>("Description")??100; 
-            var woCheckListMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderCheckList>("Description")??1000; 
+            _workOrderRepository = workOrderRepository;
 
-            _validationRules = ValidationRuleLoader.LoadValidationRules();
-            if (_validationRules is null || !_validationRules.Any())
-            {
-                throw new InvalidOperationException("Validation rules could not be loaded.");
-            }
+            RuleFor(x => x.WorkOrder).NotNull().WithMessage("WorkOrder cannot be null.");
+            RuleFor(x => x.WorkOrder.Id)
+                .MustAsync(WorkOrderExists)
+                .WithMessage("Invalid WorkOrderId. WorkOrder does not exist.");
 
-            // Loop through the rules and apply them
-            foreach (var rule in _validationRules)
+            When(x => x.WorkOrder != null, () =>
             {
-                switch (rule.Rule)
+                ApplyIdExclusivityRule();
+                ApplyNotEmptyRules();
+                ApplyMaxLengthRules(maxLengthProvider);
+                ApplyNumericOnlyRules();
+            });
+        }
+
+        private void ApplyIdExclusivityRule()
+        {
+            RuleFor(x => x.WorkOrder)
+                .Must(x =>
+                    (x.RequestId.HasValue && !x.PreventiveScheduleId.HasValue) ||
+                    (!x.RequestId.HasValue && x.PreventiveScheduleId.HasValue))
+                .WithMessage("Either RequestId or PreventiveScheduleId must be provided, not both.");
+        }
+
+        private void ApplyNotEmptyRules()
+        {
+            RuleForEach(x => x.WorkOrder.WorkOrderItem)
+                .ChildRules(woItem =>
                 {
-                    case "NotEmpty":                                                         
-                        //Item
-                         RuleForEach(x => x.WorkOrder.WorkOrderItem)
-                            .ChildRules(woItem =>
-                            {                                                                                              
-                                 woItem.RuleFor(x => x.AvailableQty)
-                                    .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderItemUpdateDto.AvailableQty)} {rule.Error}");
-                                woItem.RuleFor(x => x.UsedQty)
-                                    .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderItemUpdateDto.UsedQty)} {rule.Error}");
-                            });
-                        //Activity
-                        RuleForEach(x => x.WorkOrder.WorkOrderActivity)
-                            .ChildRules(woActivity =>
-                            {
-                                woActivity.RuleFor(x => x.ActivityId)
-                                    .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderActivityUpdateDto.ActivityId)} {rule.Error}");                                                                   
-                        });
-                          //Technician
-                        RuleForEach(x => x.WorkOrder.WorkOrderTechnician)
-                            .ChildRules(woTechnician =>
-                            {                               
-                                woTechnician.RuleFor(x => x.HoursSpent)
-                                    .NotEmpty()
-                                    .WithMessage($"{nameof(WorkOrderTechnicianUpdateDto.HoursSpent)} {rule.Error}");                                                               
-                        });                     
-                        break;
-                    case "MaxLength":                                              
-                        RuleFor(x => x.WorkOrder.Remarks)
-                            .MaximumLength(woRemarksMaxLength) 
-                            .WithMessage($"{nameof(UpdateWorkOrderCommand.WorkOrder.Remarks)} {rule.Error} {woRemarksMaxLength}");                                                                            
-                        //Item
-                        RuleForEach(x => x.WorkOrder.WorkOrderItem)
-                            .ChildRules(woItem =>
-                            {
-                                woItem.RuleFor(x => x.ItemName)
-                                    .MaximumLength(woItemMaxLength)
-                                .WithMessage($"{nameof(WorkOrderItemUpdateDto.ItemName)} {rule.Error}{woItemMaxLength}");                              
-                            });
-                         //Technician
-                        RuleForEach(x => x.WorkOrder.WorkOrderTechnician)
-                            .ChildRules(woTechnician =>
-                            {
-                                woTechnician.RuleFor(x => x.TechnicianName)
-                                    .MaximumLength(woTechnicianMaxLength)
-                                .WithMessage($"{nameof(WorkOrderItemUpdateDto.ItemName)} {rule.Error}{woTechnicianMaxLength}");                              
-                            }); 
-                         //Activity
-                        RuleForEach(x => x.WorkOrder.WorkOrderActivity)
-                            .ChildRules(woActivity =>
-                            {
-                                woActivity.RuleFor(x => x.Description)
-                                    .MaximumLength(woActivityMaxLength)
-                                .WithMessage($"{nameof(WorkOrderActivityUpdateDto.Description)} {rule.Error}{woActivityMaxLength}");                              
-                            });     
-                         //CheckList
-                        RuleForEach(x => x.WorkOrder.WorkOrderCheckList)
-                            .ChildRules(woCheckList =>
-                            {
-                                woCheckList.RuleFor(x => x.Description)
-                                    .MaximumLength(woActivityMaxLength)
-                                .WithMessage($"{nameof(WorkOrderCheckListUpdateDto.Description)} {rule.Error}{woCheckListMaxLength}");                              
-                            });                      
-                        break;    
-                     case "NumericOnly":       
-                        RuleFor(x => x.WorkOrder.TotalManPower)
-                            .InclusiveBetween(1, int.MaxValue)
-                            .WithMessage($"{nameof(UpdateWorkOrderCommand.WorkOrder.TotalManPower)} {rule.Error}");           
-                        RuleFor(x => x.WorkOrder.TotalSpentHours)
-                            .InclusiveBetween(1, int.MaxValue)
-                            .WithMessage($"{nameof(UpdateWorkOrderCommand.WorkOrder.TotalSpentHours)} {rule.Error}");  
-                        //Item
-                        RuleForEach(x => x.WorkOrder.WorkOrderItem)
-                            .ChildRules(woItem =>
-                            {                               
-                                woItem.RuleFor(x => x.AvailableQty.ToString())
-                                .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                                .WithMessage($"{nameof(WorkOrderItemUpdateDto.AvailableQty)} {rule.Error}");
+                    woItem.RuleFor(x => x.AvailableQty).NotEmpty().WithMessage("AvailableQty is required.");
+                    woItem.RuleFor(x => x.UsedQty).NotEmpty().WithMessage("UsedQty is required.");
+                });
 
-                                 woItem.RuleFor(x => x.UsedQty.ToString())
-                                .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                                .WithMessage($"{nameof(WorkOrderItemUpdateDto.UsedQty)} {rule.Error}");
-                            });                      
-                        //Technician                     
-                        RuleForEach(x => x.WorkOrder.WorkOrderTechnician)
-                            .ChildRules(woTechnician =>
-                            {                               
-                                woTechnician.RuleFor(x => x.HoursSpent.ToString())
-                                .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                                .WithMessage($"{nameof(WorkOrderTechnicianUpdateDto.HoursSpent)} {rule.Error}");
-                            });       
-                        break;        
-                }
-            }  
+            RuleForEach(x => x.WorkOrder.WorkOrderActivity)
+                .ChildRules(woActivity =>
+                {
+                    woActivity.RuleFor(x => x.ActivityId).NotEmpty().WithMessage("ActivityId is required.");
+                });
+
+            RuleForEach(x => x.WorkOrder.WorkOrderTechnician)
+                .ChildRules(woTech =>
+                {
+                    woTech.RuleFor(x => x.HoursSpent).GreaterThanOrEqualTo(0).WithMessage("HoursSpent is required.");
+                    woTech.RuleFor(x => x.MinutesSpent).GreaterThanOrEqualTo(0).WithMessage("MinutesSpent is required.");
+                });
+        }
+
+        private void ApplyMaxLengthRules(MaxLengthProvider maxLengthProvider)
+        {
+            int woRemarksMax = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrder>("Remarks") ?? 1000;
+            int woItemMax = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderItem>("ItemName") ?? 250;
+            int woTechMax = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderTechnician>("TechnicianName") ?? 100;
+            int woActivityMax = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderActivity>("Description") ?? 100;
+            int woCheckMax = maxLengthProvider.GetMaxLength<Core.Domain.Entities.WorkOrderMaster.WorkOrderCheckList>("Description") ?? 1000;
+
+            RuleFor(x => x.WorkOrder.Remarks)
+                .MaximumLength(woRemarksMax)
+                .WithMessage($"Remarks exceeded max length of {woRemarksMax}");
+
+            RuleForEach(x => x.WorkOrder.WorkOrderItem)
+                .ChildRules(woItem =>
+                {
+                    woItem.RuleFor(x => x.ItemName)
+                        .MaximumLength(woItemMax)
+                        .WithMessage($"ItemName exceeded max length of {woItemMax}");
+                });
+
+            RuleForEach(x => x.WorkOrder.WorkOrderTechnician)
+                .ChildRules(woTech =>
+                {
+                    woTech.RuleFor(x => x.TechnicianName)
+                        .MaximumLength(woTechMax)
+                        .WithMessage($"TechnicianName exceeded max length of {woTechMax}");
+                });
+
+            RuleForEach(x => x.WorkOrder.WorkOrderActivity)
+                .ChildRules(woActivity =>
+                {
+                    woActivity.RuleFor(x => x.Description)
+                        .MaximumLength(woActivityMax)
+                        .WithMessage($"Activity Description exceeded max length of {woActivityMax}");
+                });
+
+            RuleForEach(x => x.WorkOrder.WorkOrderCheckList)
+                .ChildRules(woCheck =>
+                {
+                    woCheck.RuleFor(x => x.Description)
+                        .MaximumLength(woCheckMax)
+                        .WithMessage($"CheckList Description exceeded max length of {woCheckMax}");
+                });
+        }
+
+        private void ApplyNumericOnlyRules()
+        {
+            var numericRegex = new System.Text.RegularExpressions.Regex(@"^\d+$");
+
+            RuleFor(x => x.WorkOrder.TotalManPower)
+                .InclusiveBetween(1, int.MaxValue)
+                .WithMessage("TotalManPower must be a positive integer.");
+
+            RuleFor(x => x.WorkOrder.TotalSpentHours)
+                .InclusiveBetween(1, int.MaxValue)
+                .WithMessage("TotalSpentHours must be a positive number.");
+
+            RuleForEach(x => x.WorkOrder.WorkOrderItem)
+                .ChildRules(woItem =>
+                {
+                    woItem.RuleFor(x => x.AvailableQty.ToString())
+                        .Matches(numericRegex)
+                        .WithMessage("AvailableQty must be numeric.");
+                    
+                    woItem.RuleFor(x => x.UsedQty.ToString())
+                        .Matches(numericRegex)
+                        .WithMessage("UsedQty must be numeric.");
+                });
+        }
+        private async Task<bool> WorkOrderExists(int workOrderId, CancellationToken cancellationToken)
+        {
+            var workOrder = await _workOrderRepository.GetByIdAsync(workOrderId);
+            return workOrder != null;
         }
     }
 }

@@ -20,31 +20,31 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
             _mediator = mediator;            
         }
         public async Task<ApiResponseDTO<GetWorkOrderByIdDto>> Handle(GetWorkOrderByIdQuery request, CancellationToken cancellationToken)
-        {
-          //  var assetMaster = await _assetMasterRepository.GetByIdAsync(request.Id);
-          var (woResult, woActivity, woItem,woTechnician,woSchedule,woCheckList) = await _workOrderQueryRepository.GetWorkOrderByIdAsync(request.Id);
-          var asset = _mapper.Map<GetWorkOrderByIdDto>(woResult);
-
+        {          
+            var (woResult, woActivity, woItem,woTechnician,woCheckList,woSchedule) = await _workOrderQueryRepository.GetWorkOrderByIdAsync(request.Id);
+            var asset = _mapper.Map<GetWorkOrderByIdDto>(woResult);
+            
+     
             if (woActivity != null)
-             {
-                 asset.workOrderActivity = _mapper.Map<GetWorkOrderActivityByIdDto>(woResult);
-             }
-             if (woItem != null)
-             {
-                 asset.workOrderItem = _mapper.Map<GetWorkOrderItemByIdDto>(woItem);
-             }
-             if (woTechnician != null)
-             {
-                asset.workOrderTechnician = _mapper.Map<List<GetWorkOrderTechnicianByIdDto>>(woTechnician);
-             }       
-              if (woSchedule != null)
-             {
-                asset.workOrderSchedule = _mapper.Map<List<GetWorkOrderScheduleByIdDto>>(woSchedule);
-             }       
-              if (woCheckList != null)
-             {
-                asset.workOrderTechnician = _mapper.Map<List<GetWorkOrderCheckListByIdDto>>(woCheckList);
-             }           
+            {
+                asset.WorkOrderActivity  = _mapper.Map<List<GetWorkOrderActivityByIdDto>>(woActivity);
+            }
+            if (woItem != null)
+            {
+                asset.WorkOrderItem  = _mapper.Map<List<GetWorkOrderItemByIdDto>>(woItem);
+            }
+            if (woTechnician != null)
+            {
+                asset.WorkOrderTechnician  = _mapper.Map<List<GetWorkOrderTechnicianByIdDto>>(woTechnician);
+            }       
+            if (woSchedule != null)
+            {
+                asset.WorkOrderSchedule  = _mapper.Map<List<GetWorkOrderScheduleByIdDto>>(woSchedule);
+            }       
+            if (woCheckList != null)
+            {
+                asset.WorkOrderCheckList  = _mapper.Map<List<GetWorkOrderCheckListByIdDto>>(woCheckList);
+            }           
 
             if (asset is null)
             {                

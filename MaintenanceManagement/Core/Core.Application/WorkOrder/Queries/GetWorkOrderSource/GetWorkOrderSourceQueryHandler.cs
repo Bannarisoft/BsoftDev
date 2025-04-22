@@ -20,7 +20,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderSource
 
         public async Task<ApiResponseDTO<List<GetMiscMasterDto>>> Handle(GetWorkOrderSourceQuery request, CancellationToken cancellationToken)
         {
-            var DepMethod = await _repository.GetWOStatusDescAsync();
+            var DepMethod = await _repository.GetWOSourceDescAsync();
             var DepMethodDtoList = _mapper.Map<List<GetMiscMasterDto>>(DepMethod);
 
             return new ApiResponseDTO<List<GetMiscMasterDto>>
