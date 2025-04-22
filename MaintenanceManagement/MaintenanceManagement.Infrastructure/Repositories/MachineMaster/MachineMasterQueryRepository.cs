@@ -91,6 +91,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             var machineMasters = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
             return machineMasters.ToList();
         }
+
+        public async Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroupAsync(int MachineGroupId)
+        {
+             const string query = @"
+                    SELECT Id 
+                    FROM Maintenance.MachineMaster 
+                    WHERE MachineGroupId = @MachineGroupId AND IsDeleted = 0";
+
+                    var machineMaster = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, new { MachineGroupId });
+                    return machineMaster.ToList();
+        }
         // public async Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroup(int MachineGroupId)
         // {
         //     searchPattern = searchPattern ?? string.Empty; // Prevent null issues

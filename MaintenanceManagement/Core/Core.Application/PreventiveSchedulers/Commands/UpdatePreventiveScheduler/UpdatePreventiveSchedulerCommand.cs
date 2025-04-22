@@ -14,9 +14,9 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
         public int DepartmentId { get; set; }
         public int MaintenanceCategoryId { get; set; }
         public int ScheduleId { get; set; }
-        public int DueTypeId { get; set; }
-        public int DuePeriod { get; set; }
-        public int FrequencyId { get; set; }
+        public int FrequencyTypeId { get; set; }
+        public int FrequencyInterval { get; set; }
+        public int FrequencyUnitId { get; set; }
         public DateOnly EffectiveDate { get; set; }
         public int GraceDays { get; set; }
         public int ReminderWorkOrderDays { get; set; }

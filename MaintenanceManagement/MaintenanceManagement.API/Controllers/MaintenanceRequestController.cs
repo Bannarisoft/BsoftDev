@@ -15,6 +15,7 @@ using Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest;
 using Core.Application.MaintenanceRequest.Command.UpdateMaintenanceRequestCommand;
 using Core.Application.MaintenanceRequest.Queries.GetExistingVendorDetails;
 using Core.Application.Common.Interfaces.IMaintenanceCategory;
+using Core.Application.MaintenanceRequest.Command.UpdateMaintenanceRequestStatusCommand;
 
 namespace MaintenanceManagement.API.Controllers
 {
@@ -159,6 +160,49 @@ namespace MaintenanceManagement.API.Controllers
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, Data = result.Data });
         }
+
+
+        [HttpPatch("status/{id}")]
+            public async Task<IActionResult> UpdateMaintenanceRequestStatus([FromRoute] int id)
+            {
+                var command = new UpdateMaintenanceRequestStatusCommand
+                {
+                    Id = id
+                };
+
+                var result = await Mediator.Send(command);
+
+                if (!result.IsSuccess)
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = result.Message
+                    });
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = result.Message,
+                    Data = result.Data
+                });
+            }
+
+        //    [HttpPatch("{id}/status")]
+        //     public async Task<IActionResult> UpdateStatus(  UpdateStatusDto dto)
+        //     {
+        //         var command = new UpdateMaintenanceRequestStatusCommand
+        //         {
+        //             Id = dto.Id,
+                  
+        //         };
+
+        //         var result = await Mediator.Send(command);
+        //          return Ok(new
+        //             {
+        //                 StatusCode = StatusCodes.Status200OK,
+        //                 Data = result.Data
+        //             });
+        //     }
         
     }
 }

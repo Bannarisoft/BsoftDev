@@ -17,6 +17,7 @@ namespace Core.Application.Common.Interfaces.IMiscMaster
         Task<bool> AlreadyExistsAsync(string code, int miscTypeId, int? id = null);
         Task<bool> NotFoundAsync(int id );
         Task<bool> FKColumnValidation(int ShiftMasterId );
+        Task<Core.Domain.Entities.MiscMaster>  GetMiscMasterByName(string miscTypeCode,string miscTypeName);
 
             
     }

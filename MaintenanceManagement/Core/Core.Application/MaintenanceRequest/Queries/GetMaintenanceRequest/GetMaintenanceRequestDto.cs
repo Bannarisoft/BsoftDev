@@ -7,24 +7,36 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
 {
     public class GetMaintenanceRequestDto
     {  
-         public int Id { get; set; }
-      public string? RequestId { get; set; }
+       public int Id { get; set; }
        public int RequestTypeId  { get; set; }  
-       public string? RequestTypeName  { get; set; }   
+       public string? RequestType  { get; set; }   
        public int MaintenanceTypeId  { get; set; }    
-       public string? MaintenanceTypeName { get; set; }  
+       public string? MaintenanceType { get; set; }  
        public int MachineId { get; set; }
        public string? MachineName { get; set; }
+       public int  CompanyId { get; set; }
+       public   int  UnitId { get; set; }       
        public int DepartmentId { get; set; }
-       public string? DepartmentName { get; set; }
        public int SourceId { get; set; }
        public int? VendorId  { get; set; }
        public string? VendorName  { get; set; } = null;
        public string? OldVendorId  { get; set; }
-
        public string?   OldVendorName  { get; set; }
+       public int?  ServiceTypeId { get; set; }
+       public string? ServiceType { get; set; }
+       public int?  ServiceLocationId { get; set; }
+       public string? ServiceLocation { get; set; }
+       public int?  ModeOfDispatchId { get; set; }
+       public string? ModeOfDispatch { get; set; }
+       public string? ExpectedDispatchDate { get; set; }
+       public int?  SparesTypeId { get; set; }
+       public string? SparesType { get; set; }     
+        public decimal EstimatedServiceCost { get; set; }
+        public decimal EstimatedSpareCost { get; set; }
        public string? Remarks { get; set; }
-
+       public int RequestStatusId { get; set; }
+       public string? RequestStatus { get; set; }
+       
        
     }
 } 
