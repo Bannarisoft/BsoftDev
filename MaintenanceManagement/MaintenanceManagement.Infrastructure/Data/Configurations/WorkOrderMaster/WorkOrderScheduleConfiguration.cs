@@ -32,7 +32,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
             
             builder.Property(t => t.EndTime)
                 .HasColumnName("EndTime")                
-                .IsRequired()
+                .IsRequired(false)
                 .HasColumnType("DateTimeOffset");           
         }
     }
