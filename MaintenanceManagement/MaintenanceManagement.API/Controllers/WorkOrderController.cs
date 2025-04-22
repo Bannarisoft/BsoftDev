@@ -4,9 +4,11 @@ using Core.Application.WorkOrder.Command.DeleteFileWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrderById;
 using Core.Application.WorkOrder.Queries.GetWorkOrderRootCause;
 using Core.Application.WorkOrder.Queries.GetWorkOrderSource;
 using Core.Application.WorkOrder.Queries.GetWorkOrderStatus;
+using Core.Application.WorkOrder.Queries.GetWorkOrderStoreType;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.WorkOrder;
 using MediatR;
@@ -276,8 +278,7 @@ namespace MaintenanceManagement.API.Controllers
                 message = "WorkOrder Status fetched successfully.",
                 data = result.Data
             });
-        }
-        
+        }        
         [HttpGet("Source")]
         public async Task<IActionResult> GetWorkOrderSource()
         {
@@ -297,6 +298,54 @@ namespace MaintenanceManagement.API.Controllers
                 data = result.Data
             });
         }
+        [HttpGet("StoreType")]
+        public async Task<IActionResult> GetStoreType()
+        {
+            var result = await Mediator.Send(new GetWorkOrderStoreTypeQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No StoreType found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "StoreType fetched successfully.",
+                data = result.Data
+            });
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(int id)
+        {
+            if (id <= 0)
+            {
 
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+
+                    message = "Invalid Asset ID"
+                });
+            }
+            var result = await Mediator.Send(new GetWorkOrderByIdQuery { Id = id });
+            if (result is null)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+
+                    message = $"AssetId {id} not found",
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = result.Data
+
+            });
+        }
     }
 }

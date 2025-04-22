@@ -72,8 +72,6 @@ namespace FAM.API.Controllers.AssetMaster
             });
         }
 
-        // GET by ID: api/AssetMasterGeneral/5
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {

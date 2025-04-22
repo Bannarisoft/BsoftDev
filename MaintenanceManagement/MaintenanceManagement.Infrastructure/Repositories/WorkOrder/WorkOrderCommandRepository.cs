@@ -41,14 +41,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
            
                 _applicationDbContext.WorkOrderTechnician.RemoveRange(
                    _applicationDbContext.WorkOrderTechnician.Where(x => x.WorkOrderId == workOrderId));
-
-                       
-             /*    existingWorkOrder. StatusId = workOrder.StatusId;                
-                existingWorkOrder.RootCauseId = workOrder.RootCauseId;                
-                existingWorkOrder.Remarks = workOrder.Remarks;
-                existingWorkOrder.Image = workOrder.Image;
-                existingWorkOrder.TotalManPower = workOrder.TotalManPower;
-                existingWorkOrder.TotalSpentHours = workOrder.TotalSpentHours; */
+           
                 var createdBy = existingWorkOrder.CreatedBy;
                 var createdByName = existingWorkOrder.CreatedByName;
                 var createdIP  = existingWorkOrder.CreatedIP ;
@@ -62,8 +55,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderActivities ?? []);
                 await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderItems ?? []);
                 await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderTechnicians ?? []);
-                await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderCheckLists ?? []);;             
-               
+                await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderCheckLists ?? []);               
                 return await _applicationDbContext.SaveChangesAsync() > 0;
         }
 

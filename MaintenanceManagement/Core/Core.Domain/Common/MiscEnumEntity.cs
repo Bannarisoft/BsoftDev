@@ -36,7 +36,11 @@ namespace Core.Domain.Common
 
         public static class  MaintenanceStatusUpdate
         {
-        public const string Code = "Closed";
-        }    
+            public const string Code = "Closed";
+        }  
+        public static class  GetWOStoreType
+        {
+            public const string StoreType = "StoreType";
+        }     
     }
 }
