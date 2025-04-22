@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
+using Shared.Infrastructure.HttpClientPolly;
 
 namespace UserManagement.Infrastructure.PollyResilience
 {
@@ -16,24 +17,11 @@ namespace UserManagement.Infrastructure.PollyResilience
             {
                 client.BaseAddress = new Uri("http://localhost:5194/api/AssetMasterGeneral/");
             })
-            .AddPolicyHandler(GetRetryPolicy())
-            .AddPolicyHandler(GetCircuitBreakerPolicy());
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             return services;
         }
 
-        private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
-        {
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-        }
-
-        private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
-        {
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
-        }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Contracts.Models.Users
+namespace Contracts.Dtos.Users
 {
     public class UserDto
     {

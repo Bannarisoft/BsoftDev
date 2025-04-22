@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Contracts.Models.Maintenance;
+using Contracts.Dtos.Maintenance;
 using Polly;
 using Polly.Retry;
 using SagaOrchestrator.Application.Models;
