@@ -23,7 +23,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
         {
              await _dbContext.MaintenanceRequest.AddAsync(maintenanceRequest);
                return await _dbContext.SaveChangesAsync();
-                return maintenanceRequest.Id;
+              //  return maintenanceRequest.Id;
         }
          
          public async Task<bool> UpdateAsync( Core.Domain.Entities.MaintenanceRequest maintenanceRequest)
@@ -60,22 +60,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                 return false;
         }
 
-        //  public async Task<bool> UpdateStatusAsync(int id, int requestStatusId)
-        //     {
-        //         var entity = await _dbContext.MaintenanceRequest.FindAsync(id);
-
-        //         if (entity == null )
-        //             return false;
-
-        //         entity.RequestStatusId = requestStatusId;
-        //         entity.ModifiedDate = DateTime.UtcNow;
-
-        //         _dbContext.MaintenanceRequest.Update(entity);
-        //         await _dbContext.SaveChangesAsync();
-
-        //         return true;
-        //     }
-
+  
         public async Task<bool> UpdateStatusAsync(int id)
         {
             // Step 1: Get the maintenance status from MiscMaster (e.g., "Closed")

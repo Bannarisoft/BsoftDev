@@ -98,23 +98,68 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                 }
 
 
-                public async Task<Core.Domain.Entities.MaintenanceRequest?> GetByIdAsync(int Id)
+                // public async Task<Core.Domain.Entities.MaintenanceRequest?> GetByIdAsync(int Id)
+                // {
+                //     const string query = @"
+                //         SELECT 
+                //             A.Id,
+                //             A.RequestTypeId,                           
+                //             A.MaintenanceTypeId,                         
+                //             A.MachineId,
+                //             A.DepartmentId,                            
+                //             A.SourceId,
+                //             A.VendorId,
+                //             A.OldVendorId,
+                //             A.Remarks,
+                //             A.IsActive
+                //         FROM Maintenance.MaintenanceRequest A
+                //         WHERE A.Id = @Id AND A.IsDeleted = 0";
+                //      return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MaintenanceRequest>(query, new { Id });
+                // }
+                                public async Task<dynamic?> GetByIdAsync(int id)
                 {
-                    const string query = @"
+                    var query = @"
                         SELECT 
                             A.Id,
-                            A.RequestTypeId,                           
-                            A.MaintenanceTypeId,                         
-                            A.MachineId,
-                            A.DepartmentId,                            
+                            A.DepartmentId,
                             A.SourceId,
                             A.VendorId,
                             A.OldVendorId,
                             A.Remarks,
-                            A.IsActive
+                            B.Id AS RequestTypeId,
+                            B.Code AS RequestType,
+                            C.Id AS MaintenanceTypeId,
+                            C.Code AS MaintenanceType,
+                            E.Id AS MachineId,
+                            E.MachineName AS MachineName,
+                            F.Id AS ServiceTypeId,
+                            F.Code AS ServiceType,
+                            CAST(A.ExpectedDispatchDate AS DATE) AS ExpectedDispatchDate,
+                            G.Id AS ServiceLocationId,
+                            G.Code AS ServiceLocation,
+                            H.Id AS ModeOfDispatchId,
+                            H.Code AS ModeOfDispatch,
+                            I.Id AS SparesTypeId,
+                            I.Code AS SparesType,
+                            J.Id AS RequestStatusId,
+                            J.Code AS RequestStatus
+
                         FROM Maintenance.MaintenanceRequest A
-                        WHERE A.Id = @Id AND A.IsDeleted = 0";
-                     return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MaintenanceRequest>(query, new { Id });
+                        INNER JOIN Maintenance.MiscMaster B ON A.RequestTypeId = B.Id
+                        INNER JOIN Maintenance.MiscMaster C ON A.MaintenanceTypeId = C.Id
+                        INNER JOIN Maintenance.MachineMaster E ON A.MachineId = E.Id
+                        LEFT JOIN Maintenance.MiscMaster F ON A.ServiceTypeId = F.Id
+                        LEFT JOIN Maintenance.MiscMaster G ON A.ServiceLocationId = G.Id
+                        LEFT JOIN Maintenance.MiscMaster H ON A.ModeOfDispatchId = H.Id
+                        LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id
+                        LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
+
+                        WHERE A.IsDeleted = 0 AND A.Id = @Id;
+                    ";
+
+                    var result = await _dbConnection.QueryFirstOrDefaultAsync<dynamic>(query, new { Id = id });
+
+                    return result;
                 }
 
 
@@ -179,6 +224,28 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                     {
                         MiscTypeCode = MiscEnumEntity.MaintenanceStatus.MiscCode,
                         MiscCode = MiscEnumEntity.MaintenanceStatusUpdate.Code
+                    };
+
+                    var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query, parameters);
+                    return result.ToList();
+                }
+
+                public async Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceOpenstatusAsync()
+                {
+                    const string query = @"
+                        SELECT M.Id, MiscTypeId, Code, M.Description, SortOrder, M.IsActive,
+                            M.CreatedBy, M.CreatedDate, M.CreatedByName, M.CreatedIP,
+                            M.ModifiedBy, M.ModifiedDate, M.ModifiedByName, M.ModifiedIP
+                        FROM Maintenance.MiscMaster M
+                        INNER JOIN Maintenance.MiscTypeMaster T ON T.ID = M.MiscTypeId
+                        WHERE T.MiscTypeCode = @MiscTypeCode AND M.Code = @MiscCode
+                        AND M.IsDeleted = 0 AND M.IsActive = 1
+                        ORDER BY M.ID DESC";
+
+                    var parameters = new
+                    {
+                        MiscTypeCode = MiscEnumEntity.MaintenanceStatus.MiscCode,
+                        MiscCode = MiscEnumEntity.MaintenanceOpenStatus.Code
                     };
 
                     var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query, parameters);

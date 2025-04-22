@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
+using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest;
 using Core.Domain.Events;
 using MediatR;
@@ -19,23 +20,39 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
        private readonly IMapper _imapper;
        private readonly IMediator _mediator;
        private readonly IMaintenanceRequestQueryRepository  _maintenanceRequestQueryRepository;
+       private readonly IWorkOrderCommandRepository _workOrderCommandRepository;
+       private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
        
 
-       public CreateMaintenanceRequestCommandHandler( IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository, IMapper imapper, IMediator mediator, IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository)
+       public CreateMaintenanceRequestCommandHandler( IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository, IMapper imapper, IMediator mediator, IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IWorkOrderCommandRepository workOrderCommandRepository , IWorkOrderQueryRepository workOrderQueryRepository )
        {
            _maintenanceRequestCommandRepository = maintenanceRequestCommandRepository;
            _imapper = imapper;
            _mediator = mediator;
            _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
+           _workOrderCommandRepository = workOrderCommandRepository;
+           _workOrderQueryRepository = workOrderQueryRepository;
        }
 
         public async Task<ApiResponseDTO<int>> Handle(CreateMaintenanceRequestCommand request, CancellationToken cancellationToken)
         {
+
+               // Misc status
+              var statuses = await _maintenanceRequestQueryRepository.GetMaintenanceOpenstatusAsync();
+                    var openStatus = statuses.FirstOrDefault();
+
+
             // 🔹 Map request to domain entity
             var maintenanceRequest = _imapper.Map<Core.Domain.Entities.MaintenanceRequest>(request);
 
+            // 🔹 Override status from Misc
+                maintenanceRequest.RequestStatusId = openStatus.Id;
+
             // 🔹 Insert into the database
             var result = await _maintenanceRequestCommandRepository.CreateAsync(maintenanceRequest);
+        var WorkorderDocNo = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(maintenanceRequest.RequestTypeId);
+        var workorderData = _imapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(maintenanceRequest);
+        workorderData.WorkOrderDocNo = WorkorderDocNo;
 
             if (result <= 0)
             {
@@ -46,10 +63,7 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
                 };
             }
 
-            // 🔹 Fetch newly created record
-           // var createdMaintenanceRequest = await _maintenanceRequestQueryRepository.GetByIdAsync(result.Id);
-           // var mappedResult = _imapper.Map<GetMaintenanceRequestDto>(createdMaintenanceRequest);
-
+           
             // 🔹 Publish domain event for auditing/logging
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",

@@ -38,5 +38,9 @@ namespace Core.Domain.Common
         {
         public const string Code = "Closed";
         }    
+        public static class  MaintenanceOpenStatus
+        {
+        public const string Code = "Open";
+        } 
     }
 }
