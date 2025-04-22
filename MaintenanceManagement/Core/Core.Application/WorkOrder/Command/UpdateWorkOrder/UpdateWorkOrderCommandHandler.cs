@@ -24,28 +24,17 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
 
         public async Task<ApiResponseDTO<bool>> Handle(UpdateWorkOrderCommand request, CancellationToken cancellationToken)
         {
-            var assetMaster = await _workOrderRepository.GetByIdAsync(request.WorkOrder.Id);
-            if (assetMaster is null)
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = false,
-                Message = "Invalid AssetId. The specified AssetName does not exist or is inactive."
-            };  
-            var oldAssetName = assetMaster.WorkOrderDocNo;
-            assetMaster.WorkOrderDocNo = request.WorkOrder.WorkOrderDocNo;
+                var updatedEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrder);
+                var updateResult = await _workOrderRepository.UpdateAsync(updatedEntity.Id, updatedEntity);
 
-         
-            var updatedAssetMasterEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request);                   
-            var updateResult = await _workOrderRepository.UpdateAsync(updatedAssetMasterEntity.Id, updatedAssetMasterEntity);            
-         
-                //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "Update",
-                    actionCode: request.WorkOrder.WorkOrderDocNo ?? string.Empty,
-                    actionName: "",                            
-                    details: $"WorkOrder '{oldAssetName}' was updated to '{request.WorkOrder.RequestId}'",
-                    module:"WorkOrder"
-                );            
+                    actionCode: updatedEntity.WorkOrderDocNo ?? string.Empty,
+                    actionName: "WorkOrder Update",
+                    details: $"WorkOrder updated for ID {updatedEntity.Id}",
+                    module: "WorkOrder"
+                );
+
                 await _mediator.Publish(domainEvent, cancellationToken);
                 if(updateResult)
                 {

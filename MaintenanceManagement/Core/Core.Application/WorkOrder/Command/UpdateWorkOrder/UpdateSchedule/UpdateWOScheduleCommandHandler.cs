@@ -5,20 +5,18 @@ using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Domain.Events;
 using MediatR;
 
-namespace Core.Application.WorkOrder.Command.UpdateWorkOrder.Schedule
+namespace Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule
 {
     public class UpdateWOScheduleCommandHandler : IRequestHandler<UpdateWOScheduleCommand, ApiResponseDTO<bool>>
     { 
-        private readonly IWorkOrderCommandRepository _workOrderRepository;
-        private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
+        private readonly IWorkOrderCommandRepository _workOrderRepository;        
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
 
-        public UpdateWOScheduleCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper,IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator)
+        public UpdateWOScheduleCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper,IMediator mediator)
         {
             _workOrderRepository = workOrderRepository;
-            _mapper = mapper;
-            _workOrderQueryRepository = workOrderQueryRepository;
+            _mapper = mapper;            
             _mediator = mediator;
         }
 
@@ -32,8 +30,8 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder.Schedule
                     Message = "Schedule data is missing."
                 };
             }   
-            var updatedAssetMasterEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule>(request.WOSchedule);                   
-            var updateResult = await _workOrderRepository.CreateScheduleAsync(updatedAssetMasterEntity.WorkOrderId, updatedAssetMasterEntity);            
+            var updatedWOEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule>(request.WOSchedule);                   
+            var updateResult = await _workOrderRepository.UpdateScheduleAsync(updatedWOEntity.WorkOrderId, updatedWOEntity);            
         
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -41,10 +39,10 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder.Schedule
                 actionCode: request.WOSchedule.WorkOrderId.ToString(),
                 actionName: "",                            
                 details: $"WorkOrder Schedule '{request.WOSchedule.WorkOrderId}' was updated",
-                module:"WorkOrderSchedule"
+                module:"WorkOrderSchedule Update"
             );            
             await _mediator.Publish(domainEvent, cancellationToken);
-            if(updateResult!=0)
+            if(updateResult)
             {
                 return new ApiResponseDTO<bool>
                 {

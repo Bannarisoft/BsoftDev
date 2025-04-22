@@ -1,7 +1,8 @@
 using Core.Application.WorkOrder.Command.CreateWorkOrder;
+using Core.Application.WorkOrder.Command.CreateWorkOrder.CreateSchedule;
 using Core.Application.WorkOrder.Command.DeleteFileWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder;
-using Core.Application.WorkOrder.Command.UpdateWorkOrder.Schedule;
+using Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrderRootCause;
 using Core.Application.WorkOrder.Queries.GetWorkOrderSource;
@@ -20,13 +21,15 @@ namespace MaintenanceManagement.API.Controllers
         private readonly IValidator<CreateWorkOrderCommand> _createWorkOrderCommandValidator;
         private readonly IValidator<UpdateWorkOrderCommand> _updateWorkOrderCommandValidator;
         private readonly IValidator<UpdateWOScheduleCommand> _updateWoScheduleCommandValidator;        
+        private readonly IValidator<CreateWOScheduleCommand> _createWoScheduleCommandValidator;  
         private readonly IValidator<UploadFileWorkOrderCommand> _uploadFileCommandValidator;        
 
         public WorkOrderController( ISender mediator, 
             IValidator<CreateWorkOrderCommand> createWorkOrderCommandValidator, 
             IValidator<UpdateWorkOrderCommand> updateWorkOrderCommandValidator ,
             IValidator<UpdateWOScheduleCommand> updateWoScheduleCommandValidator ,
-             IValidator<UploadFileWorkOrderCommand> uploadFileCommandValidator            
+            IValidator<CreateWOScheduleCommand> createWoScheduleCommandValidator ,
+            IValidator<UploadFileWorkOrderCommand> uploadFileCommandValidator            
             ) 
             : base(mediator)
 
@@ -34,6 +37,7 @@ namespace MaintenanceManagement.API.Controllers
             _createWorkOrderCommandValidator = createWorkOrderCommandValidator;
             _updateWorkOrderCommandValidator = updateWorkOrderCommandValidator;
             _updateWoScheduleCommandValidator=updateWoScheduleCommandValidator;
+            _createWoScheduleCommandValidator=createWoScheduleCommandValidator;
              _uploadFileCommandValidator = uploadFileCommandValidator;
         }
        [HttpPost]
@@ -106,7 +110,38 @@ namespace MaintenanceManagement.API.Controllers
                 message = result.Message
             });
         }
-        [HttpPut("schedule")]
+        [HttpPost("schedule/Create")]
+        public async Task<IActionResult> CreateScheduleAsync(CreateWOScheduleCommand command)
+        {
+            var validationResult = await _createWoScheduleCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)            
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                });
+
+            }
+            var result = await Mediator.Send(command);
+            if (result.IsSuccess)
+            {
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    message = result.Message,
+                    //asset = result.Data
+                });
+            }
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = result.Message
+            });
+        }
+          [HttpPut("schedule/Update")]
         public async Task<IActionResult> UpdateScheduleAsync(UpdateWOScheduleCommand command)
         {
             var validationResult = await _updateWoScheduleCommandValidator.ValidateAsync(command);
