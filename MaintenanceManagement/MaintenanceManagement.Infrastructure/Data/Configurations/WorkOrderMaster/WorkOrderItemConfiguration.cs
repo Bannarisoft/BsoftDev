@@ -28,7 +28,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
             builder.Property(t => t.StoreTypeId)
                 .HasColumnName("StoreTypeId")
                 .HasColumnType("int")
-                .IsRequired();
+                .IsRequired(false);
             builder.HasOne(amg => amg.MiscStoreType)
                 .WithMany(am => am.WorkOrderItemStoreType)
                 .HasForeignKey(amg => amg.StoreTypeId)
@@ -52,7 +52,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
              builder.Property(t => t.SourceId)
                 .HasColumnName("SourceId")
                 .HasColumnType("int")
-                .IsRequired();
+                .IsRequired(false);
             builder.HasOne(amg => amg.MiscSource)
                 .WithMany(am => am.WorkOrderItemSource)
                 .HasForeignKey(amg => amg.SourceId)

@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250422052317_Workorder_Itemnew")]
+    partial class Workorder_Itemnew
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1535,6 +1538,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("varchar(250)")
                         .HasColumnName("ItemName");
 
+                    b.Property<int>("MiscSourceId")
+                        .HasColumnType("int");
+
                     b.Property<string>("OldItemCode")
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("OldItemCode");
@@ -1542,10 +1548,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<int?>("ScarpQty")
                         .HasColumnType("int")
                         .HasColumnName("ScarpQty");
-
-                    b.Property<int?>("SourceId")
-                        .HasColumnType("int")
-                        .HasColumnName("SourceId");
 
                     b.Property<int?>("StoreTypeId")
                         .HasColumnType("int")
@@ -1565,7 +1567,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SourceId");
+                    b.HasIndex("MiscSourceId");
 
                     b.HasIndex("StoreTypeId");
 
@@ -1975,8 +1977,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                 {
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscSource")
                         .WithMany("WorkOrderItemSource")
-                        .HasForeignKey("SourceId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("MiscSourceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscStoreType")
                         .WithMany("WorkOrderItemStoreType")

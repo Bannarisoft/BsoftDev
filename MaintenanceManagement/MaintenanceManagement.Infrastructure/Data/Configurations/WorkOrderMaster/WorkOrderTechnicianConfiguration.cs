@@ -51,8 +51,13 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
             
             builder.Property(t => t.HoursSpent)
                 .HasColumnName("HoursSpent")
-                .HasColumnType("decimal(10,2)")
-                .IsRequired();                     
+                .HasColumnType("int")
+                .IsRequired(); 
+
+            builder.Property(t => t.MinutesSpent)
+                .HasColumnName("MinutesSpent")
+                .HasColumnType("int")
+                .IsRequired();                       
           
         }
     }

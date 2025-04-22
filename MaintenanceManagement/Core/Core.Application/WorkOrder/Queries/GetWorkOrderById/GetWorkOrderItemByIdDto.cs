@@ -2,12 +2,17 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
 {
     public class GetWorkOrderItemByIdDto
     {
-        public int? DeptId { get; set; }
-        public string? DeptName { get; set; }
-        public string? ItemId { get; set; }
-        public string? ItemName { get; set; }
+        public int StoreTypeId { get; set; }        
+        public string? StoreTypeDesc { get; set; }
+        public string? ItemCode { get; set; }   
+        public string? OldItemCode { get; set; }   
+        public int SourceId { get; set; }   
+        public string? SourceDesc { get; set; }   
+        public string? ItemName { get; set; }        
         public int AvailableQty { get; set; }
         public int UsedQty { get; set; }
+        public int? ScarpQty { get; set; }
+        public int? ToSubStoreQty { get; set; }
         public string? Image { get; set; }
     }
 }
