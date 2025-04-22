@@ -11,6 +11,10 @@ using MediatR;
 using Contracts.Events.PreventScheduler;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.Common.Interfaces.IMiscMaster;
+using Core.Application.WorkOrder.Command.CreateWorkOrder;
+using static Core.Domain.Common.MiscEnumEntity;
+using Hangfire;
+using Core.Application.Common.Interfaces.IWorkOrder;
 
 namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler
 {
@@ -35,6 +39,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
         }
         public async Task<ApiResponseDTO<int>> Handle(CreatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
         {
+            try{
             var preventiveScheduler  = _mapper.Map<PreventiveSchedulerHeader>(request);
 
                 var response = await _preventiveSchedulerCommand.CreateAsync(preventiveScheduler);
@@ -46,14 +51,46 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                 
                 var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
                 var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
-                
+                var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode,StatusOpen.Code);
                  foreach (var detail in details)
                  {
                      detail.PreventiveSchedulerId = response;
                      detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate); 
                      detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
                      detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
+
+                      
+                        var workOrderRequest =  _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(preventiveScheduler);
+               
+                     workOrderRequest.StatusId = miscdetail.Id;
+                 
+                 var delay = reminderDate - DateTime.Now;
+
+                   string newJobId;
+                  if (delay.TotalSeconds > 0)
+                  {
+                      newJobId = BackgroundJob.Schedule<IWorkOrderCommandRepository>(
+                          job => job.CreateAsync(workOrderRequest,cancellationToken),
+                          delay
+                      );
+                  }
+                  else
+                  {
+                      newJobId = BackgroundJob.Enqueue<IWorkOrderCommandRepository>(
+                          job => job.CreateAsync(workOrderRequest,cancellationToken)
+                          );
+                  }
+                  detail.HangfireJobId = newJobId;
+                    //  {
+                    //      PreventiveScheduleId = response,
+                    //      StatusId = miscdetail.Id,
+                    //      WorkOrderActivity = _mapper.Map<List<WorkOrderActivityDto>>(preventiveScheduler.PreventiveSchedulerActivities),
+                    //      WorkOrderItem = _mapper.Map<List<WorkOrderItemDto>>(preventiveScheduler.PreventiveSchedulerItems)
+                    //  };
                  }
+                
+
+
                  var detailsResponse = await _preventiveSchedulerCommand.CreateDetailAsync(details);
                  if(!detailsResponse)
                  {
@@ -65,6 +102,8 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                      };
                  }
               
+               
+               
                     var domainEvent = new AuditLogsDomainEvent(
                      actionDetail: "Create",
                      actionCode: "Create preventive scheduler",
@@ -80,6 +119,14 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                         Message = "Preventive scheduler created successfully",
                          Data = response
                     };
+            }
+                    catch (AutoMapperMappingException ex)
+                    {
+                        Console.WriteLine("AutoMapper Error: " + ex.Message);
+                        if (ex.InnerException != null)
+                            Console.WriteLine("Inner: " + ex.InnerException.Message);
+                            throw new Exception($"Error at Excel Row : {ex.Message}");
+                    }
                 
         }
        

@@ -9,5 +9,6 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
     {
         public string ItemId { get; set; }
         public int RequiredQty { get; set; }
+        public int? SourceId { get; set; }
     }
 }

@@ -21,6 +21,7 @@ namespace Core.Domain.Entities
         public DateOnly MaterialReqStartDays { get; set; }
         public string? RescheduleReason { get; set; }
         public ICollection<WorkOrder>? workOrdersSchedule  {get; set;}   
+        public string? HangfireJobId { get; set; }
         
     }
 }
