@@ -1,4 +1,3 @@
-using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.Common.HttpResponse;
 using MediatR;
 

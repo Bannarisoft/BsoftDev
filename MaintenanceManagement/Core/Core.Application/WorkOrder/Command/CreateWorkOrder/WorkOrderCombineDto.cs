@@ -10,9 +10,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
         public string? Remarks { get; set; }        
         public int RequestTypeId { get; set; } 
         
-        public ICollection<WorkOrderActivityDto>? WorkOrderActivity{ get; set; }       
-        public ICollection<WorkOrderScheduleDto>? WorkOrderSchedule{ get; set; }       
-        public ICollection<WorkOrderTechnicianDto>? WorkOrderTechnician{ get; set; } 
+        public ICollection<WorkOrderActivityDto>? WorkOrderActivity{ get; set; }                          
         public ICollection<WorkOrderItemDto>? WorkOrderItem{ get; set; } 
         public ICollection<WorkOrderCheckListDto>? WorkOrderCheckList{ get; set; } 
     }

@@ -6,6 +6,6 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
     {
         public int? WorkOrderId { get; set; }
         public DateTimeOffset StartTime { get; set; }
-        public DateTimeOffset EndTime { get; set; }     
+        public DateTimeOffset? EndTime { get; set; }     
     }
 }

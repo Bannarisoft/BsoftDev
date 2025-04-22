@@ -36,7 +36,10 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
             woEntity.CompanyId = companyId; 
             woEntity.UnitId = unitId; 
             woEntity.TotalManPower=0;
-            woEntity.TotalSpentHours=0;            
+            woEntity.TotalSpentHours=0;    
+            woEntity.CreatedByName=     _ipAddressService.GetUserName();   
+            woEntity.CreatedBy=      int.Parse(_ipAddressService.GetCurrentUserId());
+            woEntity.CreatedIP=     _ipAddressService.GetSystemIPAddress();
             var result = await _workOrderRepository.CreateAsync(woEntity, cancellationToken);
 
             //Domain Event

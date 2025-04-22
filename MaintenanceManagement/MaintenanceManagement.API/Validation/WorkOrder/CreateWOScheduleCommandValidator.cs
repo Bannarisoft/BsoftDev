@@ -1,16 +1,15 @@
 
-
 using Core.Application.Common.Interfaces.IWorkOrder;
-using Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule;
+using Core.Application.WorkOrder.Command.CreateWorkOrder.CreateSchedule;
 using FluentValidation;
 
 namespace MaintenanceManagement.API.Validation.WorkOrder
 {
-    public class UpdateWOScheduleCommandValidator  : AbstractValidator<UpdateWOScheduleCommand>
+    public class CreateWOScheduleCommandValidator : AbstractValidator<CreateWOScheduleCommand>
     {
         private readonly IWorkOrderCommandRepository _workOrderRepository;
 
-        public UpdateWOScheduleCommandValidator(IWorkOrderCommandRepository workOrderRepository)
+        public CreateWOScheduleCommandValidator(IWorkOrderCommandRepository workOrderRepository)
         {
             _workOrderRepository = workOrderRepository;
 
@@ -26,10 +25,15 @@ namespace MaintenanceManagement.API.Validation.WorkOrder
                     .MustAsync(WorkOrderExists)
                     .WithMessage("WorkOrderId does not exist.");
 
-                RuleFor(x => x.WOSchedule.EndTime)
-                    .NotNull()
-                    .WithMessage("EndTime is required.");
-             
+                RuleFor(x => x.WOSchedule.StartTime)
+                    .NotEmpty()
+                    .WithMessage("StartTime is required.");
+
+                /*   RuleFor(x => x.WOSchedule)
+                    .Must(schedule =>
+                        schedule.EndTime.HasValue && schedule.StartTime < schedule.EndTime)
+                    .WithMessage("StartTime must be before EndTime.")
+                    .When(schedule => schedule.WOSchedule.EndTime.HasValue); */
             });
         }
 
