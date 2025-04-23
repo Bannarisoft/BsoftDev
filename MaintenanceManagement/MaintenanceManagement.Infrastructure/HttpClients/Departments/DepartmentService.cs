@@ -1,5 +1,5 @@
 using System.Net.Http.Json;
-using Contracts.Models.Maintenance;
+using Contracts.Dtos.Maintenance;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IDepartment;
 

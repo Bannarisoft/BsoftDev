@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Contracts.Events.Maintenance;
-using Contracts.Models.Maintenance;
+using Contracts.Dtos.Maintenance;
 using MassTransit;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IMaintenance;
 

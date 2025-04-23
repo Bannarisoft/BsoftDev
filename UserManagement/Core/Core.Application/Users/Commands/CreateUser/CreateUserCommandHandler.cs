@@ -5,10 +5,8 @@ using MediatR;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
-using Serilog;
 using Microsoft.Extensions.Logging;
 using Core.Application.Common.Interfaces;
-using MassTransit;
 using Contracts.Events.Users;
 
 
@@ -22,22 +20,15 @@ namespace Core.Application.Users.Commands.CreateUser
 
         private readonly IMediator _mediator;
         private readonly ILogger<CreateUserCommandHandler> _logger;
-        private readonly IUserQueryRepository _userQueryRepository;
-        private readonly IEmailService _emailService;
-        private readonly ISmsService _smsService;
         private readonly IEventPublisher _eventPublisher;  // Use IEventPublisher instead of IPublishEndpoint
 
 
-        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator, ILogger<CreateUserCommandHandler> logger, IEmailService emailService, ISmsService smsService, IUserQueryRepository userQueryRepository
-        , IEventPublisher eventPublisher)
+        public CreateUserCommandHandler(IUserCommandRepository userRepository, IMapper mapper, IMediator mediator, ILogger<CreateUserCommandHandler> logger, IEventPublisher eventPublisher)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _mediator = mediator;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _userQueryRepository = userQueryRepository;
-            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
-            _smsService = smsService ?? throw new ArgumentNullException(nameof(smsService));
             _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
 
         }
@@ -59,6 +50,16 @@ namespace Core.Application.Users.Commands.CreateUser
             if (createdUser == null)
             {
                 _logger.LogError("Failed to create user for Username: {Username}", request.UserName);
+
+                // Optional: publish failure event for saga
+                var failedEvent = new UserCreationFailedEvent
+                {
+                    CorrelationId = Guid.NewGuid(),
+                    Reason = $"Repository returned null for user '{request.UserName}'"
+                };
+                await _eventPublisher.SaveEventAsync(failedEvent);
+                await _eventPublisher.PublishPendingEventsAsync();
+
                 return new ApiResponseDTO<UserDto>
                 {
                     IsSuccess = false,
@@ -71,7 +72,7 @@ namespace Core.Application.Users.Commands.CreateUser
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
-                actionCode: createdUser.UserName,
+                actionCode: createdUser.UserName ?? string.Empty,
                 actionName: createdUser.FirstName + " " + createdUser.LastName,
                 details: $"User '{createdUser.UserName}' was created. FirstName: {createdUser.FirstName}, {createdUser.LastName}",
 
