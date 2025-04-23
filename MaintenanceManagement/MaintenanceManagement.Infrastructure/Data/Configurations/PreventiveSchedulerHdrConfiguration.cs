@@ -115,8 +115,8 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasForeignKey(b => b.MachineGroupId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                builder.HasOne(b => b.MaintenanceCategory)
-                .WithMany(b => b.PreventiveSchedulerHeaders)
+                builder.HasOne(b => b.MiscMaintenanceCategory)
+                .WithMany(b => b.MaintenanceCategory)
                 .HasForeignKey(b => b.MaintenanceCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 

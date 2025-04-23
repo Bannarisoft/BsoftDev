@@ -26,8 +26,9 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
         private readonly IMachineMasterQueryRepository _machineMasterQueryRepository;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
+        private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
         
-        public CreatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMachineMasterQueryRepository machineMasterQueryRepository, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery)
+        public CreatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMachineMasterQueryRepository machineMasterQueryRepository, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderQueryRepository workOrderQueryRepository)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
@@ -35,11 +36,12 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
             _machineMasterQueryRepository = machineMasterQueryRepository;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
+            _workOrderQueryRepository = workOrderQueryRepository;
             
         }
         public async Task<ApiResponseDTO<int>> Handle(CreatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
         {
-            try{
+            
             var preventiveScheduler  = _mapper.Map<PreventiveSchedulerHeader>(request);
 
                 var response = await _preventiveSchedulerCommand.CreateAsync(preventiveScheduler);
@@ -49,20 +51,33 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                 var details = _mapper.Map<List<PreventiveSchedulerDetail>>(machineMaster);
                 var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(request.FrequencyUnitId);
                 
-                var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
-                var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
                 var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode,StatusOpen.Code);
                  foreach (var detail in details)
                  {
-                     detail.PreventiveSchedulerId = response;
+                        var lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(detail.MachineId);
+
+                 DateTime baseDate = (!lastMaintenanceDate.HasValue || lastMaintenanceDate.Value < request.EffectiveDate.ToDateTime(TimeOnly.MinValue))
+                  ? request.EffectiveDate.ToDateTime(TimeOnly.MinValue)
+                  : lastMaintenanceDate.Value;
+
+                var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(baseDate, request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
+                var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(baseDate, request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
+
+                     detail.PreventiveSchedulerHeaderId = response;
                      detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate); 
                      detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
                      detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
 
-                      
-                        var workOrderRequest =  _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(preventiveScheduler);
+                    var detailsResponse = await _preventiveSchedulerCommand.CreateDetailAsync(detail);
+                     var workorderDocno =await _workOrderQueryRepository.GetLatestWorkOrderDocNo(preventiveScheduler.MaintenanceCategoryId);
+                        var workOrderRequest =  _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(preventiveScheduler, opt =>
+                        {
+                            opt.Items["StatusId"] = miscdetail.Id;
+                            opt.Items["WorkOrderDocNo"] = workorderDocno;
+                            opt.Items["PreventiveSchedulerDetailId"] = detailsResponse.Id;
+                        });
                
-                     workOrderRequest.StatusId = miscdetail.Id;
+                     
                  
                  var delay = reminderDate - DateTime.Now;
 
@@ -76,11 +91,13 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                   }
                   else
                   {
-                      newJobId = BackgroundJob.Enqueue<IWorkOrderCommandRepository>(
-                          job => job.CreateAsync(workOrderRequest,cancellationToken)
-                          );
+                       newJobId = BackgroundJob.Schedule<IWorkOrderCommandRepository>(
+                          job => job.CreateAsync(workOrderRequest, cancellationToken),
+                          TimeSpan.FromMinutes(15)
+                      );
                   }
-                  detail.HangfireJobId = newJobId;
+                  
+                  await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id,newJobId);
                     //  {
                     //      PreventiveScheduleId = response,
                     //      StatusId = miscdetail.Id,
@@ -91,16 +108,16 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                 
 
 
-                 var detailsResponse = await _preventiveSchedulerCommand.CreateDetailAsync(details);
-                 if(!detailsResponse)
-                 {
-                      await _preventiveSchedulerCommand.DeleteAsync(response,preventiveScheduler);
-                     return new ApiResponseDTO<int>
-                     {
-                         IsSuccess = false, 
-                         Message = "Preventive scheduler not created"
-                     };
-                 }
+                 
+                //  if(!detailsResponse)
+                //  {
+                //       await _preventiveSchedulerCommand.DeleteAsync(response,preventiveScheduler);
+                //      return new ApiResponseDTO<int>
+                //      {
+                //          IsSuccess = false, 
+                //          Message = "Preventive scheduler not created"
+                //      };
+                //  }
               
                
                
@@ -119,14 +136,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                         Message = "Preventive scheduler created successfully",
                          Data = response
                     };
-            }
-                    catch (AutoMapperMappingException ex)
-                    {
-                        Console.WriteLine("AutoMapper Error: " + ex.Message);
-                        if (ex.InnerException != null)
-                            Console.WriteLine("Inner: " + ex.InnerException.Message);
-                            throw new Exception($"Error at Excel Row : {ex.Message}");
-                    }
+            
                 
         }
        

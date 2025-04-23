@@ -14,8 +14,8 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
         {
             builder.ToTable("PreventiveSchedulerItems", "Maintenance");
             builder.HasKey(t => t.Id);
-             builder.Property(t => t.PreventiveSchedulerHdrId)
-                .HasColumnName("PreventiveSchedulerId")
+             builder.Property(t => t.PreventiveSchedulerHeaderId)
+                .HasColumnName("PreventiveSchedulerHeaderId")
                 .HasColumnType("int")
                 .IsRequired();
 
@@ -32,10 +32,16 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
             builder.Property(t => t.OldItemId)
                 .HasColumnName("OldItemId")
                 .HasColumnType("varchar(50)");
+                  builder.Property(t => t.OldCategoryDescription)
+                .HasColumnName("OldCategoryDescription")
+                .HasColumnType("varchar(50)");
+                  builder.Property(t => t.OldGroupName)
+                .HasColumnName("OldGroupName")
+                .HasColumnType("varchar(50)");
 
                 builder.HasOne(t => t.PreventiveScheduler)
                 .WithMany(t => t.PreventiveSchedulerItems)
-                .HasForeignKey(t => t.PreventiveSchedulerHdrId)
+                .HasForeignKey(t => t.PreventiveSchedulerHeaderId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
