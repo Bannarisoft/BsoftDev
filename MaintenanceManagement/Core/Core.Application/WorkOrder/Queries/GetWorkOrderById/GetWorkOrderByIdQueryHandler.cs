@@ -23,27 +23,37 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
         {          
             var (woResult, woActivity, woItem,woTechnician,woCheckList,woSchedule) = await _workOrderQueryRepository.GetWorkOrderByIdAsync(request.Id);
             var asset = _mapper.Map<GetWorkOrderByIdDto>(woResult);
-            
+           //  var asset = new GetWorkOrderByIdDto
+            // {
+            //     WorkOrderDocNo = woResult.WorkOrderDocNo,
+            //     Remarks = woResult.Remarks,
+            //     Image = woResult.Image,
+            //     StatusId = woResult.StatusId,
+            //     StatusDesc = woResult.StatusDesc,
+            //     RootCauseId = woResult.RootCauseId,
+            //     RootCauseDesc = woResult.RootCauseDesc,
+            //     Id = woResult.Id
+            // };
      
             if (woActivity != null)
             {
-                asset.WorkOrderActivity  = _mapper.Map<List<GetWorkOrderActivityByIdDto>>(woActivity);
+                asset.WOActivity  = _mapper.Map<List<GetWorkOrderActivityByIdDto>>(woActivity);
             }
             if (woItem != null)
             {
-                asset.WorkOrderItem  = _mapper.Map<List<GetWorkOrderItemByIdDto>>(woItem);
+                asset.WOItem  = _mapper.Map<List<GetWorkOrderItemByIdDto>>(woItem);
             }
             if (woTechnician != null)
             {
-                asset.WorkOrderTechnician  = _mapper.Map<List<GetWorkOrderTechnicianByIdDto>>(woTechnician);
+                asset.WOTechnician  = _mapper.Map<List<GetWorkOrderTechnicianByIdDto>>(woTechnician);
             }       
             if (woSchedule != null)
             {
-                asset.WorkOrderSchedule  = _mapper.Map<List<GetWorkOrderScheduleByIdDto>>(woSchedule);
+                asset.WOSchedule  = _mapper.Map<List<GetWorkOrderScheduleByIdDto>>(woSchedule);
             }       
             if (woCheckList != null)
             {
-                asset.WorkOrderCheckList  = _mapper.Map<List<GetWorkOrderCheckListByIdDto>>(woCheckList);
+                asset.WOCheckList  = _mapper.Map<List<GetWorkOrderCheckListByIdDto>>(woCheckList);
             }           
 
             if (asset is null)

@@ -2,11 +2,8 @@ using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrderById;
-
-// using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Common;
 using Dapper;
-using MassTransit;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
@@ -20,9 +17,26 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _ipAddressService = ipAddressService;
         }
 
-        public Task<(List<GetWorkOrderByIdDto>, int)> GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<GetWorkOrderByIdDto>, int)> GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-            throw new NotImplementedException();
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
+            var parameters = new DynamicParameters();
+            parameters.Add("@CompanyId", companyId);
+            parameters.Add("@UnitId", unitId);
+            parameters.Add("@PageNumber", PageNumber );
+            parameters.Add("@PageSize", PageSize );
+            parameters.Add("@SearchTerm", SearchTerm);
+
+                // ✅ Ensure using statement to properly handle GridReader disposal
+            using var multiResult = await _dbConnection.QueryMultipleAsync(
+                "dbo.GetWorkOrder", parameters, commandType: CommandType.StoredProcedure);
+
+            // ✅ Read all data before exiting the using block
+            var depreciationList = (await multiResult.ReadAsync<DepreciationDto>()).ToList();
+            int totalCount = await multiResult.ReadFirstOrDefaultAsync<int>();
+
+            return (depreciationList, totalCount); 
         }
 
         public Task<string> GetBaseDirectoryAsync()
@@ -98,12 +112,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             var parameters = new { MiscTypeCode = MiscEnumEntity.WOStatus.MiscCode };        
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
             return result.ToList();
-        }
-
-        Task<(List<GetWorkOrderByIdDto>, int)> IWorkOrderQueryRepository.GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm)
-        {
-            throw new NotImplementedException();
-        }            
+        }             
 
         public async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity, IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician, IEnumerable<dynamic> checkList, IEnumerable<dynamic> schedule)> GetWorkOrderByIdAsync(int workOrderId)         
         {
@@ -117,35 +126,30 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 where WO.Id= @workOrderId;
 
                 SELECT WA.ActivityId,AM.ActivityName,WA.Description
-                FROM Maintenance.WorkOrder WO
-                INNER JOIN Maintenance.WorkOrderActivity  WA ON WA.WorkOrderId=WO.Id
+                FROM Maintenance.WorkOrderActivity  WA 
                 INNER JOIN Maintenance.ActivityMaster  AM ON AM.ID=WA.ActivityId
-                where WO.Id= @workOrderId;
+                where WA.WorkOrderId= @workOrderId;
 
-                SELECT WI.StoreTypeId,M.description StoreTypeDesc,WI.ItemCode,WI.OldItemCode,WI.SourceId,M1.description SourceDesc,WI.ItemName,WI.AvailableQty,WI.UsedQty,WI.ScarpQty,WI.ToSubStoreQty,MM1.Description+'/'+WO.Image Image
-                FROM Maintenance.WorkOrder WO
-                INNER JOIN Maintenance.WorkOrderItem  WI ON WI.WorkOrderId=WO.Id
+                SELECT WI.StoreTypeId,M.description StoreTypeDesc,WI.ItemCode,WI.OldItemCode,WI.SourceId,M1.description SourceDesc,WI.ItemName,WI.AvailableQty,WI.UsedQty,WI.ScarpQty,WI.ToSubStoreQty,MM1.Description+'/'+WI.Image Image
+                FROM  Maintenance.WorkOrderItem  WI 
                 LEFT JOIN Maintenance.MiscMaster  M ON M.Id=WI.StoreTypeId
                 LEFT JOIN Maintenance.MiscMaster  M1 ON M1.Id=WI.SourceId
                 INNER JOIN Maintenance.MiscTypeMaster MM1 on MM1.MiscTypeCode ='WOItemImage'
-                where WO.Id=@workOrderId         
+                where WI.WorkOrderId=@workOrderId         
                 
                 SELECT WT.TechnicianId,WT.OldTechnicianId,WT.TechnicianName,WT.SourceId,M1.description SourceDesc,WT.HoursSpent,WT.MinutesSpent
-                FROM Maintenance.WorkOrder WO
-                INNER JOIN Maintenance.WorkOrderTechnician  WT ON WT.WorkOrderId=WO.Id
+                FROM  Maintenance.WorkOrderTechnician  WT 
                 LEFT JOIN Maintenance.MiscMaster  M1 ON M1.Id=WT.SourceId
-                where WO.Id=@workOrderId 
+                where WT.WorkOrderId=@workOrderId 
                 
                 SELECT WC.CheckListId,AC.ActivityCheckList, WC.Description,WC.ISCompleted,WC.Description
-                FROM Maintenance.WorkOrder WO
-                INNER JOIN Maintenance.WorkOrderCheckList  WC ON WC.WorkOrderId=WO.Id
+                FROM  Maintenance.WorkOrderCheckList  WC 
                 INNER JOIN Maintenance.ActivityCheckListMaster  AC ON AC.Id=WC.CheckListId
-                where WO.Id=@workOrderId
+                where WC.WorkOrderId=@workOrderId
 
                 SELECT WS.StartTime,WS.EndTime
-                FROM Maintenance.WorkOrder WO
-                INNER JOIN Maintenance.WorkOrderSchedule  WS ON WS.WorkOrderId=WO.Id
-                where WO.Id=@workOrderId
+                FROM  Maintenance.WorkOrderSchedule  WS
+                where WS.WorkOrderId=@workOrderId
             ";
 
             using var multi = await _dbConnection.QueryMultipleAsync(sqlQuery, new { WorkOrderId = workOrderId });

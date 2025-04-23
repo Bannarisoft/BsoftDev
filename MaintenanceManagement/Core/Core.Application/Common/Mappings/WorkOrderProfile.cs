@@ -25,22 +25,15 @@ namespace Core.Application.Common.Mappings
             CreateMap<WorkOrderItemUpdateDto, WorkOrderItem>().ReverseMap();
             CreateMap<WorkOrderTechnicianUpdateDto, WorkOrderTechnician>().ReverseMap();
             CreateMap<WorkOrderCheckListUpdateDto, WorkOrderCheckList>().ReverseMap();
-
             
             CreateMap<WorkOrderCombineDto,Core.Domain.Entities.WorkOrderMaster.WorkOrder>();
 
             CreateMap<WorkOrderItemDto, WorkOrderItem>().ReverseMap();
             CreateMap<WorkOrderCheckListDto, WorkOrderCheckList>().ReverseMap();
-            CreateMap<WorkOrderActivityDto, WorkOrderActivity>().ReverseMap();         
-
-            CreateMap<dynamic, GetWorkOrderByIdDto>().ReverseMap();
-            CreateMap<dynamic, GetWorkOrderActivityByIdDto>().ReverseMap();
-            CreateMap<dynamic, GetWorkOrderItemByIdDto>().ReverseMap();
-            CreateMap<dynamic, GetWorkOrderTechnicianByIdDto>().ReverseMap();
-            CreateMap<dynamic, GetWorkOrderCheckListByIdDto>().ReverseMap();
-            CreateMap<dynamic, GetWorkOrderScheduleByIdDto>().ReverseMap();
+            CreateMap<WorkOrderActivityDto, WorkOrderActivity>().ReverseMap();
             
-                
+         
+          
         }     
     }
 }
