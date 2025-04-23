@@ -28,8 +28,8 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
 
         public async Task<ApiResponseDTO<WorkOrderCombineDto>> Handle(CreateWorkOrderCommand request, CancellationToken cancellationToken)
         {
-            var companyId = _ipAddressService.GetCompanyId();
-            var unitId = _ipAddressService.GetUnitId();
+            var companyId = 1;//_ipAddressService.GetCompanyId();
+            var unitId = 41;//_ipAddressService.GetUnitId();
             var latestWoCode = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(request.WorkOrderDto.RequestTypeId);            
             var woEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrderDto);   
             woEntity.WorkOrderDocNo = latestWoCode;         
@@ -54,7 +54,37 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
         
             var woMasterDTO = _mapper.Map<WorkOrderCombineDto>(result);
             if (result.Id > 0)
-            {                
+            {           
+                string tempFilePath = request.WorkOrderDto.Image;
+                if (tempFilePath != null){
+                    string baseDirectory = await _workOrderQueryRepository.GetBaseDirectoryAsync();
+
+                    var (companyName, unitName) = await _workOrderQueryRepository.GetCompanyUnitAsync(companyId, unitId);
+
+                    string companyFolder = Path.Combine(baseDirectory, companyName.Trim());
+                    string unitFolder = Path.Combine(companyFolder,unitName.Trim());
+                    string filePath = Path.Combine(unitFolder, tempFilePath);
+
+            
+
+                    if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+                    {
+                        string directory = Path.GetDirectoryName(filePath) ?? string.Empty;
+                        string newFileName = $"{latestWoCode}{Path.GetExtension(tempFilePath)}";
+                        string newFilePath = Path.Combine(directory, newFileName);
+
+                        try
+                        {
+                            File.Move(filePath, newFilePath);
+                            //assetEntity.AssetImage = newFileName;
+                            await _workOrderRepository.UpdateAssetImageAsync(woEntity.Id, newFileName);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Failed to rename file: {ex.Message}");
+                        }
+                    }                    
+                }
                 return new ApiResponseDTO<WorkOrderCombineDto>
                 {
                     IsSuccess = true,
@@ -67,6 +97,6 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
                 IsSuccess = false,
                 Message = "Work Order not created."
             };
-        }
-    } 
+        }         
+    }
 }

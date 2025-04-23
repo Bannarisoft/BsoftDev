@@ -127,5 +127,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
            return await _applicationDbContext.WorkOrder
                      .FirstOrDefaultAsync(x => x.Id == workOrderId);
         }
+
+        public async Task<bool> UpdateAssetImageAsync(int WoId, string imageName)
+        {
+            var workOrder = await _applicationDbContext.WorkOrder.FindAsync(WoId);
+            if (workOrder == null)
+            {
+                return false;  
+            }          
+            workOrder.Image = imageName;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }

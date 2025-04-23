@@ -7,10 +7,19 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
         public string? WorkOrderDocNo { get; set; }                   
         public string? Remarks { get; set; }
         public string? Image { get; set; }
+        public string? ImagePath { get; set; }
         public int StatusId { get; set; }                         
         public string? StatusDesc { get; set; }
         public int RootCauseId { get; set; }  
         public string? RootCauseDesc { get; set; }
+        public DateTimeOffset? CreatedDate { get; set; }
+        public DateTimeOffset? DownTimeStart { get; set; }
+        public DateTimeOffset? DownTimeEnd { get; set; }
+        public string? Machine { get; set; }
+        public string? Department { get; set; }
+        public int? RequestId { get; set; }
+    
+        
         
 
         public IList<GetWorkOrderActivityByIdDto>? WOActivity { get; set; }

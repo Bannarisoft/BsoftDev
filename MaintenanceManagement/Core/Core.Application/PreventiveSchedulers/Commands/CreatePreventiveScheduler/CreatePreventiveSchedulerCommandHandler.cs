@@ -8,7 +8,6 @@ using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Domain.Entities;
 using Core.Domain.Events;
 using MediatR;
-using Contracts.Events.PreventScheduler;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.Common.Interfaces.IMiscMaster;
 

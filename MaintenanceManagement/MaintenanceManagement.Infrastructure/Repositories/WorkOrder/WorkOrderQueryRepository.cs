@@ -1,7 +1,7 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IWorkOrder;
-using Core.Application.WorkOrder.Queries.GetWorkOrderById;
+using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Common;
 using Dapper;
 
@@ -17,31 +17,42 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _ipAddressService = ipAddressService;
         }
 
-        public async Task<(List<GetWorkOrderByIdDto>, int)> GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<WorkOrderWithScheduleDto>, int)> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,string? requestType, int PageNumber, int PageSize, string? SearchTerm)
         {
             var companyId = _ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", companyId);
             parameters.Add("@UnitId", unitId);
+            parameters.Add("@FromDate", fromDate);
+            parameters.Add("@ToDate", toDate);
+            parameters.Add("@RequestType", requestType);
             parameters.Add("@PageNumber", PageNumber );
             parameters.Add("@PageSize", PageSize );
             parameters.Add("@SearchTerm", SearchTerm);
 
-                // ✅ Ensure using statement to properly handle GridReader disposal
-            using var multiResult = await _dbConnection.QueryMultipleAsync(
-                "dbo.GetWorkOrder", parameters, commandType: CommandType.StoredProcedure);
+            List<WorkOrderWithScheduleDto> workOrderList;
+            int totalCount;
 
-            // ✅ Read all data before exiting the using block
-            var depreciationList = (await multiResult.ReadAsync<DepreciationDto>()).ToList();
-            int totalCount = await multiResult.ReadFirstOrDefaultAsync<int>();
-
-            return (depreciationList, totalCount); 
+            using (var multiResult = await _dbConnection.QueryMultipleAsync(
+                "dbo.GetWorkOrder", parameters, commandType: CommandType.StoredProcedure))
+            {
+                workOrderList = (await multiResult.ReadAsync<WorkOrderWithScheduleDto>()).ToList();
+                totalCount = await multiResult.ReadFirstOrDefaultAsync<int>();
+            }
+            return (workOrderList, totalCount);
         }
 
-        public Task<string> GetBaseDirectoryAsync()
+        public async Task<string> GetBaseDirectoryAsync()
         {
-            throw new NotImplementedException();
+            const string query = @"
+            SELECT Description AS BaseDirectory  
+                FROM Maintenance.MiscTypeMaster 
+                WHERE MiscTypeCode='WOImage'  
+                AND IsDeleted=0
+            ";
+             var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
+            return result;               
         }   
 
         public async Task<string?> GetLatestWorkOrderDocNo(int TypeId)
@@ -118,11 +129,21 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         {
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
-                SELECT WorkOrderDocNo,WO.Remarks,MM1.Description+'/'+WO.Image Image,WO.StatusId,M.description StatusDesc,WO.RootCauseId,M1.description RootCauseDesc
+                SELECT WorkOrderDocNo,WO.Remarks,MM1.Description+'/'+WO.Image Image,WO.StatusId,M.description StatusDesc,WO.RootCauseId,M1.description RootCauseDesc,
+                WO.CreatedDate,WO.DownTimeStart,WO.DownTimeEnd,case when isnull(requestid,0)<>0 then MA.MachineCode else MA1.MachineCode end  Machine,
+                case when isnull(requestid,0)<>0 then D.DeptName else D1.DeptName end Department,
+                case when isnull(requestid,0)<>0 then  requestid else PreventiveScheduleId end RequestId
                 FROM Maintenance.WorkOrder WO
                 INNER JOIN Maintenance.MiscMaster  M ON M.Id=WO.StatusId
                 INNER JOIN Maintenance.MiscTypeMaster MM1 on MM1.MiscTypeCode ='WOImage'
                 INNER JOIN Maintenance.MiscMaster  M1 ON M1.Id=WO.RootCauseId
+                LEFT JOIN [Maintenance].[MaintenanceRequest]  MR on MR.ID=WO.RequestId
+                LEFT JOIN [Maintenance].[PreventiveSchedulerDetail]  PS on PS.ID=WO.PreventiveScheduleId
+                LEFT JOIN [Maintenance].[PreventiveSchedulerHeader] PH on PH.Id=PS.PreventiveSchedulerId
+                LEFT JOIN [Maintenance].[MachineMaster] MA on MA.ID=MR.MachineId
+                LEFT JOIN [Maintenance].[MachineMaster] MA1 on MA1.ID=PS.MachineId
+                LEFT JOIN Bannari.AppData.Department D on D.Id=MR.DepartmentId
+                LEFT JOIN Bannari.AppData.Department D1 on D1.Id=PH.DepartmentId
                 where WO.Id= @workOrderId;
 
                 SELECT WA.ActivityId,AM.ActivityName,WA.Description
@@ -162,6 +183,27 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             var Schedule = await multi.ReadAsync<dynamic>(); 
            
             return (WorkOrderResult, Activity,  Item, Technician,checkList,Schedule);
+        }
+
+        public async Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId,int unitId)
+        {
+            const string query = @"
+                SELECT CompanyName 
+                FROM Bannari.AppData.Company 
+                WHERE Id = @CompanyId;
+
+                SELECT UnitName  
+                FROM Bannari.AppData.Unit 
+                WHERE Id = @UnitId;
+            ";
+            using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { CompanyId = companyId, UnitId = unitId });
+
+            var companyName = await multiQuery.ReadFirstOrDefaultAsync<string>();
+            var unitName = await multiQuery.ReadFirstOrDefaultAsync<string>();
+
+            return (companyName ?? "Unknown Company", unitName ?? "Unknown Unit");
+
+
         }
     } 
 }

@@ -18,6 +18,7 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
         private readonly IWorkOrderCommandRepository _woCommandRepository;
         private readonly IWorkOrderQueryRepository _woQueryRepository;
         private readonly ILogger<UploadFileWorkOrderCommandHandler> _logger;
+         private readonly IIPAddressService _ipAddressService;
 
         public UploadFileWorkOrderCommandHandler(
             IFileUploadService fileUploadService,
@@ -25,7 +26,7 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
             IMapper mapper,
             IWorkOrderCommandRepository woCommandRepository,
             IWorkOrderQueryRepository woQueryRepository,
-            ILogger<UploadFileWorkOrderCommandHandler> logger)
+            ILogger<UploadFileWorkOrderCommandHandler> logger, IIPAddressService ipAddressService)
         {
             _fileUploadService = fileUploadService;
             _mediator = mediator;
@@ -33,6 +34,7 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
             _woCommandRepository = woCommandRepository;
             _woQueryRepository = woQueryRepository;
             _logger = logger;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<ApiResponseDTO<WorkOrderImageDto>> Handle(UploadFileWorkOrderCommand request, CancellationToken cancellationToken)
@@ -48,18 +50,20 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
                _logger.LogError("Base directory path not found in database.");
                 return new ApiResponseDTO<WorkOrderImageDto> { IsSuccess = false, Message = "Base directory not configured." };
             }
-            
+            var companyId =1; //_ipAddressService.GetCompanyId();
+            var unitId = 41;//_ipAddressService.GetUnitId();
+            var (companyName, unitName) = await _woQueryRepository.GetCompanyUnitAsync(companyId, unitId);
+
             // 🔹 Construct the required file path
-          /*   string companyFolder = Path.Combine(baseDirectory, request.CompanyName?.Trim() ?? string.Empty);
+             string companyFolder = Path.Combine(baseDirectory,companyName);
             EnsureDirectoryExists(companyFolder);
 
-            string unitFolder = Path.Combine(companyFolder, request.UnitName?.Trim() ?? string.Empty);
-            EnsureDirectoryExists(unitFolder); */
+            string unitFolder = Path.Combine(companyFolder,unitName);
+            EnsureDirectoryExists(unitFolder); 
 
             string fileExtension = Path.GetExtension(request.File.FileName);            
-            string dummyFileName = $"TEMP_{Guid.NewGuid()}{fileExtension}";
-            //string filePath = Path.Combine(unitFolder, dummyFileName);
-            string filePath = Path.Combine("", dummyFileName);
+            string dummyFileName = $"TEMP_{Guid.NewGuid()}{fileExtension}";            
+            string filePath = Path.Combine(unitFolder, dummyFileName);
 
             try
             {

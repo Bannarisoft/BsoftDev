@@ -2,6 +2,7 @@
 using AutoMapper;
 using Core.Application.WorkOrder.Command.CreateWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrderById;
 using Core.Domain.Entities.WorkOrderMaster;
 using static Core.Domain.Common.BaseEntity;
@@ -33,7 +34,47 @@ namespace Core.Application.Common.Mappings
             CreateMap<WorkOrderActivityDto, WorkOrderActivity>().ReverseMap();
             
          
-          
+              // Use AfterMap to group schedules
+            CreateMap<List<WorkOrderWithScheduleDto>, List<GetWorkOrderDto>>()
+                .ConvertUsing(src => MapGroupedWorkOrders(src));
+        
+        }
+        private List<GetWorkOrderDto> MapGroupedWorkOrders(List<WorkOrderWithScheduleDto> source)
+        {
+            return source
+                .GroupBy(x => new
+                {
+                    x.Id,
+                    x.WorkOrderDocNo,
+                    x.Department,
+                    x.Machine,
+                    x.RequestDate,
+                    x.RequestType,
+                    x.Status,
+                    x.MaintenanceType,
+                    x.RequestId
+                })
+                .Select(g => new GetWorkOrderDto
+                {
+                    Id = g.Key.Id,
+                    WorkOrderDocNo = g.Key.WorkOrderDocNo,
+                    Department = g.Key.Department,
+                    Machine = g.Key.Machine,
+                    RequestDate = g.Key.RequestDate,
+                    RequestType = g.Key.RequestType,
+                    Status = g.Key.Status,
+                    MaintenanceType = g.Key.MaintenanceType,
+                    RequestId = g.Key.RequestId,
+                    Schedules = g
+                        .Where(s => s.ScheduleStartTime.HasValue || s.ScheduleEndTime.HasValue)
+                        .Select(s => new ScheduleDto
+                        {
+                            Start = s.ScheduleStartTime,
+                            End = s.ScheduleEndTime
+                        })
+                        .ToList()
+                })
+                .ToList();
         }     
     }
 }

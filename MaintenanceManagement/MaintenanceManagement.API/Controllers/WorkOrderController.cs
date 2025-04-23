@@ -4,6 +4,7 @@ using Core.Application.WorkOrder.Command.DeleteFileWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrderById;
 using Core.Application.WorkOrder.Queries.GetWorkOrderRootCause;
 using Core.Application.WorkOrder.Queries.GetWorkOrderSource;
@@ -212,7 +213,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpDelete("delete-image")]
         public async Task<IActionResult> DeleteLogo([FromBody] DeleteFileWorkOrderCommand deleteFileCommand)
         {
-            if (deleteFileCommand == null || string.IsNullOrWhiteSpace(deleteFileCommand.assetPath))
+            if (deleteFileCommand == null || string.IsNullOrWhiteSpace(deleteFileCommand.Image))
             {
                 return BadRequest(new 
                 { 
@@ -345,6 +346,47 @@ namespace MaintenanceManagement.API.Controllers
                 StatusCode = StatusCodes.Status200OK,
                 data = result.Data
 
+            });
+        }
+         [HttpGet]
+        public async Task<IActionResult> GetByAllAsync( [FromQuery] string? fromDate,[FromQuery] string? toDate,[FromQuery] string? requestType
+        , [FromQuery] int pageNumber,[FromQuery] int pageSize,[FromQuery] string? searchTerm)
+        {            
+            DateTimeOffset? parsedStartDate = null;
+            DateTimeOffset? parsedEndDate = null;
+
+            if (!string.IsNullOrWhiteSpace(fromDate))  // Allow null or empty values
+            {
+                if (!DateTimeOffset.TryParse(fromDate, out var parsedDate))
+                {
+                    return BadRequest(new { message = "Invalid fromDate format. Use yyyy-MM-dd." });
+                }
+                parsedStartDate = parsedDate;
+            }
+
+            if (!string.IsNullOrWhiteSpace(toDate))  // Allow null or empty values
+            {
+                if (!DateTimeOffset.TryParse(toDate, out var parsedDate))
+                {
+                    return BadRequest(new { message = "Invalid toDate format. Use yyyy-MM-dd." });
+                }
+                parsedEndDate = parsedDate;
+            } 
+             var workOrder = await Mediator.Send(
+                new GetWorkOrderQuery
+                {                   
+                    fromDate=parsedStartDate,
+                    toDate=parsedEndDate,
+                    requestType=requestType,
+                    PageNumber = pageNumber, 
+                    PageSize = pageSize, 
+                    SearchTerm = searchTerm                  
+                });
+            return Ok(new 
+            { 
+                StatusCode = StatusCodes.Status200OK, 
+                message = workOrder.Message,
+                data = workOrder.Data.ToList()               
             });
         }
     }

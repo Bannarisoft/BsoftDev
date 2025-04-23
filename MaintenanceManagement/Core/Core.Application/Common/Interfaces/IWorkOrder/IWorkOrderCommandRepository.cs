@@ -8,7 +8,7 @@ namespace Core.Application.Common.Interfaces.IWorkOrder
         Task<int>  CreateScheduleAsync(int workOrderId,Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule workOrderSchedule);   
         Task<bool>  UpdateScheduleAsync(int workOrderId,Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule workOrderSchedule);   
         Task<bool> UpdateWOImageAsync(int workOrderId, string imageName);
-        //Task<GetWorkOrderByIdDto?> GetByWOImageAsync(int workOrderId);
+        Task<bool> UpdateAssetImageAsync(int WoId, string imageName);
         Task<bool> RemoveWOImageReferenceAsync(int workOrderId);         
         Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder>  GetByIdAsync(int workOrderId);  
     }
