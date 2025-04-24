@@ -42,7 +42,7 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
                 if (tempFilePath != null){
                     string baseDirectory = await _workOrderQueryRepository.GetBaseDirectoryAsync();
 
-                    var (companyName, unitName) = await _workOrderQueryRepository.GetCompanyUnitAsync(request.WorkOrder.CompanyId, request.WorkOrder.UnitId);
+                    var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(request.WorkOrder.CompanyId, request.WorkOrder.UnitId);
 
                     string companyFolder = Path.Combine(baseDirectory, companyName.Trim());
                     string unitFolder = Path.Combine(companyFolder,unitName.Trim());
@@ -58,14 +58,14 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
                         {
                             File.Move(filePath, newFilePath);
                             //assetEntity.AssetImage = newFileName;
-                            await _workOrderRepository.UpdateAssetImageAsync(request.WorkOrder.Id, newFileName);
+                            await _workOrderRepository.UpdateWOImageAsync(request.WorkOrder.Id, newFileName);
                         }
                         catch (Exception ex)
                         {
                             Console.WriteLine($"Failed to rename file: {ex.Message}");
                         }
                     }
-                }     
+                }                    
                 return new ApiResponseDTO<bool>
                 {
                     IsSuccess = true,

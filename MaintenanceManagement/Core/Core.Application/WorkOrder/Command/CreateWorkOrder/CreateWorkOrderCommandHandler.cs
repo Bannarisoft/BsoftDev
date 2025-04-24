@@ -59,7 +59,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
                 if (tempFilePath != null){
                     string baseDirectory = await _workOrderQueryRepository.GetBaseDirectoryAsync();
 
-                    var (companyName, unitName) = await _workOrderQueryRepository.GetCompanyUnitAsync(companyId, unitId);
+                    var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(companyId, unitId);
 
                     string companyFolder = Path.Combine(baseDirectory, companyName.Trim());
                     string unitFolder = Path.Combine(companyFolder,unitName.Trim());
@@ -77,7 +77,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
                         {
                             File.Move(filePath, newFilePath);
                             //assetEntity.AssetImage = newFileName;
-                            await _workOrderRepository.UpdateAssetImageAsync(woEntity.Id, newFileName);
+                            await _workOrderRepository.UpdateWOImageAsync(woEntity.Id, newFileName);
                         }
                         catch (Exception ex)
                         {

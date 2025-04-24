@@ -36,7 +36,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             parameters.Add("@UnitId", unitId);
             parameters.Add("@TypeId", TypeId);
             var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
-                "dbo.FAM_GetWorkOrderDocNo", 
+                "dbo.GetWorkOrderDocNo", 
                 parameters, 
                 commandType: CommandType.StoredProcedure,
                 commandTimeout: 120);
@@ -89,42 +89,97 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
                 existingWorkOrder.TotalManPower = technicianCount;
                 existingWorkOrder.TotalSpentHours = (decimal?)Math.Round(totalHours, 2);
-            }
+            }                 
 
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderActivities ?? []);
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderItems ?? []);
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderTechnicians ?? []);
-            await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderCheckLists ?? []);               
-            return await _applicationDbContext.SaveChangesAsync() > 0;
-        }
-
-
-        public async Task<bool> UpdateWOImageAsync(int workOrderId, string imageName)
-        {
-            var imageExists = await _applicationDbContext.WorkOrder.FindAsync(workOrderId);
-            if (imageExists == null)
+            await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderCheckLists ?? []);   
+            var result= await _applicationDbContext.SaveChangesAsync();
+              int docSerialNumber = 1;
+            foreach (var item in workOrder.WorkOrderItems ?? [])
             {
-                return false; 
-            }            
-            imageExists.Image = imageName.Replace(@"\", "/"); 
+                if ((item.UsedQty > 0) || (item.ToSubStoreQty > 0))
+                {
+                    var parameters = new DynamicParameters();
+                    parameters.Add("@OldUnitCode", "01");                                        
+                    parameters.Add("@DocNo", workOrder.Id);
+                    parameters.Add("@DocSNo", docSerialNumber);                    
+                    parameters.Add("@ItemCode", item.OldItemCode);
+                    parameters.Add("@ItemName", item.ItemName);                    
+                    parameters.Add("@UsedQty", item.UsedQty);                    
+                    parameters.Add("@SubStoreQty", item.ToSubStoreQty);                                       
 
-            imageExists.Image = imageName;
-            await _applicationDbContext.SaveChangesAsync();
-            return true;
+                    await _dbConnection.ExecuteAsync(
+                        "usp_InsertStockLedger",  // your stored procedure name
+                        parameters,
+                        commandType: CommandType.StoredProcedure
+                    );                     
+                }
+                string tempItemFilePath = item.Image;
+                if (tempItemFilePath != null){
+                    string baseDirectory =await GetBaseDirectoryItemAsync();
+
+                    var (companyName, unitName) = await GetCompanyUnitAsync(workOrder.CompanyId, workOrder.UnitId);
+
+                    string companyFolder = Path.Combine(baseDirectory, companyName.Trim());
+                    string unitFolder = Path.Combine(companyFolder,unitName.Trim());
+                    string filePath = Path.Combine(unitFolder, tempItemFilePath);                
+
+                    if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+                    {
+                        string directory = Path.GetDirectoryName(filePath) ?? string.Empty;
+                        string newFileName = $"{workOrder.WorkOrderDocNo}-{docSerialNumber}{Path.GetExtension(tempItemFilePath)}";
+                        string newFilePath = Path.Combine(directory, newFileName);
+
+                        try
+                        {
+                            File.Move(filePath, newFilePath);
+                            //assetEntity.AssetImage = newFileName;
+                            await UpdateWOItemImageAsync(item.Id, newFileName);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Failed to rename file: {ex.Message}");
+                        }
+                    }
+                }
+                docSerialNumber++;
+            }       
+          
+
+            return result> 0;
         }
+        public async Task<string> GetBaseDirectoryItemAsync()
+        {
+            const string query = @"
+            SELECT Description AS BaseDirectory  
+                FROM Maintenance.MiscTypeMaster 
+                WHERE MiscTypeCode='WOItemImage'  
+                AND IsDeleted=0
+            ";
+             var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
+            return result;               
+        }  
+        
+        public async Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId,int unitId)
+        {
+            const string query = @"
+                SELECT CompanyName 
+                FROM Bannari.AppData.Company 
+                WHERE Id = @CompanyId;
 
-        // public async Task<WorkOrderDto?> GetByWOImageAsync(int workOrderId)
-        // {
-        //     return await _applicationDbContext.WorkOrder
-        //     .Where(a => a.Id == workOrderId)
-        //     .Select(a => new WorkOrderDto
-        //     {
-        //         Id = a.Id,
-        //         Image = a.Image                
-        //     })
-        //     .FirstOrDefaultAsync();
-        // }
+                SELECT UnitName  
+                FROM Bannari.AppData.Unit 
+                WHERE Id = @UnitId;
+            ";
+            using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { CompanyId = companyId, UnitId = unitId });
 
+            var companyName = await multiQuery.ReadFirstOrDefaultAsync<string>();
+            var unitName = await multiQuery.ReadFirstOrDefaultAsync<string>();
+
+            return (companyName ?? "Unknown Company", unitName ?? "Unknown Unit");
+        }    
         public async Task<bool> RemoveWOImageReferenceAsync(int workOrderId)
         {
             var asset = await _applicationDbContext.WorkOrder.FindAsync(workOrderId);
@@ -186,15 +241,47 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
            return await _applicationDbContext.WorkOrder
                      .FirstOrDefaultAsync(x => x.Id == workOrderId);
         }
-
-        public async Task<bool> UpdateAssetImageAsync(int WoId, string imageName)
+        public async Task<bool> UpdateWOImageAsync(int workOrderId, string imageName)
         {
-            var workOrder = await _applicationDbContext.WorkOrder.FindAsync(WoId);
+            var workOrder = await _applicationDbContext.WorkOrder.FindAsync(workOrderId);
             if (workOrder == null)
             {
                 return false;  
             }          
             workOrder.Image = imageName;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> DeleteWOImageAsync(string imageName)
+        {
+            var workOrder = await _applicationDbContext.WorkOrder.FirstOrDefaultAsync(x => x.Image == imageName);
+            if (workOrder == null)
+            {
+                return false;  
+            }          
+            workOrder.Image = "";
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> UpdateWOItemImageAsync(int workOrderId, string imageName)
+        {
+            var workOrder = await _applicationDbContext.WorkOrderItem.FindAsync(workOrderId);
+            if (workOrder == null)
+            {
+                return false;  
+            }          
+            workOrder.Image = imageName;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> DeleteItemImageAsync(string imageName)
+        {
+            var workOrder = await _applicationDbContext.WorkOrderItem.FirstOrDefaultAsync(x => x.Image == imageName);
+            if (workOrder == null)
+            {
+                return false;  
+            }          
+            workOrder.Image = "";
             await _applicationDbContext.SaveChangesAsync();
             return true;
         }

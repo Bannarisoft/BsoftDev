@@ -7,10 +7,14 @@ namespace Core.Application.Common.Interfaces.IWorkOrder
         public Task<bool>  UpdateAsync(int workOrderId,Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder);         
         Task<int>  CreateScheduleAsync(int workOrderId,Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule workOrderSchedule);   
         Task<bool>  UpdateScheduleAsync(int workOrderId,Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule workOrderSchedule);   
-        Task<bool> UpdateWOImageAsync(int workOrderId, string imageName);
-        Task<bool> UpdateAssetImageAsync(int WoId, string imageName);
+        Task<bool> UpdateWOImageAsync(int workOrderId, string imageName);        
+        Task<bool> DeleteWOImageAsync(string imageName);     
+        Task<bool> DeleteItemImageAsync(string imageName);     
+        Task<bool> UpdateWOItemImageAsync(int workOrderId, string imageName);   
         Task<bool> RemoveWOImageReferenceAsync(int workOrderId);         
         Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder>  GetByIdAsync(int workOrderId);  
-        Task<string?> GetLatestWorkOrderDocNo   (int TypeId);
+        Task<string?> GetLatestWorkOrderDocNo   (int TypeId); 
+        Task<string> GetBaseDirectoryItemAsync();      
+        Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId,int unitId);
     }
 }

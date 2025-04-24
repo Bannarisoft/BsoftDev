@@ -53,7 +53,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             ";
              var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
             return result;               
-        }         
+        }    
+       
       
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetWORootCauseDescAsync()
         {
@@ -169,26 +170,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             return (WorkOrderResult, Activity,  Item, Technician,checkList,Schedule);
         }
 
-        public async Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId,int unitId)
-        {
-            const string query = @"
-                SELECT CompanyName 
-                FROM Bannari.AppData.Company 
-                WHERE Id = @CompanyId;
-
-                SELECT UnitName  
-                FROM Bannari.AppData.Unit 
-                WHERE Id = @UnitId;
-            ";
-            using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { CompanyId = companyId, UnitId = unitId });
-
-            var companyName = await multiQuery.ReadFirstOrDefaultAsync<string>();
-            var unitName = await multiQuery.ReadFirstOrDefaultAsync<string>();
-
-            return (companyName ?? "Unknown Company", unitName ?? "Unknown Unit");
-
-
-        }
     } 
 }
    

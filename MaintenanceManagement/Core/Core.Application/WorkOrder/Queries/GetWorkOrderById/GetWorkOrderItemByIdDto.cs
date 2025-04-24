@@ -6,8 +6,6 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
         public string? StoreTypeDesc { get; set; }
         public string? ItemCode { get; set; }   
         public string? OldItemCode { get; set; }   
-        public int SourceId { get; set; }   
-        public string? SourceDesc { get; set; }   
         public string? ItemName { get; set; }        
         public int AvailableQty { get; set; }
         public int UsedQty { get; set; }
