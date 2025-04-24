@@ -55,6 +55,9 @@ using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers;
 using Core.Application.Common.Interfaces.IItem;
 using MaintenanceManagement.Infrastructure.Repositories.Item;
+using MaintenanceManagement.Infrastructure.Data.Configurations;
+using Core.Application.Common.Interfaces.IStcokLedger;
+using MaintenanceManagement.Infrastructure.Repositories.StockLedger;
 
 
 namespace MaintenanceManagement.Infrastructure
@@ -201,7 +204,8 @@ namespace MaintenanceManagement.Infrastructure
             
             services.AddScoped<IPreventiveSchedulerCommand, PreventiveSchedulerCommandRepository>();
             services.AddScoped<IPreventiveSchedulerQuery, PreventiveSchedulerQueryRepository>();
-             services.AddScoped<IItemQueryRepository, ItemQueryRepository>();
+            services.AddScoped<IItemQueryRepository, ItemQueryRepository>();
+            services.AddScoped<IStockLedgerQueryRepository, StockLedgerQueryRepository>();
 
             // Miscellaneous services
 

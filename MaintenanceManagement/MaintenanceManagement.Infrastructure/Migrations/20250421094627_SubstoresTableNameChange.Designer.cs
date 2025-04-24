@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250421094627_SubstoresTableNameChange")]
+    partial class SubstoresTableNameChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1242,79 +1245,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasIndex("ShiftMasterId");
 
                     b.ToTable("ShiftMasterDetails", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.StockLedger", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<DateTime>("DocDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<int>("DocNo")
-                        .HasColumnType("int")
-                        .HasColumnName("DocNo");
-
-                    b.Property<int>("DocSNo")
-                        .HasColumnType("int")
-                        .HasColumnName("DocSNo");
-
-                    b.Property<decimal>("IssueQty")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(18,3)")
-                        .HasDefaultValue(0.00m);
-
-                    b.Property<decimal>("IssueValue")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(18,3)")
-                        .HasDefaultValue(0.00m);
-
-                    b.Property<string>("ItemCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("ItemCode");
-
-                    b.Property<string>("ItemName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("ItemName");
-
-                    b.Property<string>("OldUnitCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("OldUnitCode");
-
-                    b.Property<decimal>("ReceivedQty")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(18,3)")
-                        .HasDefaultValue(0.00m);
-
-                    b.Property<decimal>("ReceivedValue")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(18,3)")
-                        .HasDefaultValue(0.00m);
-
-                    b.Property<string>("TransactionType")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("TransactionType");
-
-                    b.Property<string>("UOM")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("UOM");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("StockLedger", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.WorkCenter", b =>
