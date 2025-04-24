@@ -12,9 +12,9 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerBy
         public int DepartmentId { get; set; }
         public int MaintenanceCategoryId { get; set; }
         public int ScheduleId { get; set; }
-        public int DueTypeId { get; set; }
-        public int DuePeriod { get; set; }
-        public int FrequencyId { get; set; }
+        public int FrequencyTypeId { get; set; }
+        public int FrequencyInterval { get; set; }
+        public int FrequencyUnitId { get; set; }
         public DateOnly EffectiveDate { get; set; }
         public int GraceDays { get; set; }
         public int ReminderWorkOrderDays { get; set; }
@@ -22,7 +22,8 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerBy
         public int IsDownTimeRequired { get; set; }
         public decimal DownTimeEstimateHrs { get; set; }
         public byte IsActive { get; set; }
-        public List<PreventiveSchedulerActivityByIdDto> Activity { get; set; }
-        public List<PreventiveSchedulerItemByIdDto> Items { get; set; }
+        public required List<PreventiveSchedulerActivityByIdDto> Activity { get; set; }
+        public List<PreventiveSchedulerItemByIdDto>? Items { get; set; }
+        public required List<PreventiveSchedulerDtlByIdDto> PreventiveSchedulerDtl { get; set; }
     }
 }

@@ -164,6 +164,25 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
                 var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = MiscMasterId });
                 return count > 0;
         }
+          public async Task<Core.Domain.Entities.MiscMaster>  GetMiscMasterByName(string miscTypeCode,string miscTypeName)
+        {
+            
+
+            const string query = @"SELECT Id,Code   FROM Maintenance.MiscMaster M
+            INNER JOIN [Maintenance].[MiscTypeMaster] MT ON MT.Id = M.MiscTypeId
+                WHERE IsDeleted = 0 AND MT.MiscTypeCode= @MiscTypeCode AND Code=@MiscTypeName ";
+                
+            
+            var parameters = new 
+              { 
+                  MiscTypeName = miscTypeName,
+                  MiscTypeCode = miscTypeCode 
+             
+              };
+
+            var miscmaster = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MiscMaster>(query, parameters);
+            return miscmaster;
+        }
                   
     }   
 

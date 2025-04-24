@@ -1,6 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
-using Contracts.Models.Users;
+using Contracts.Dtos.Users;
 using Polly;
 using Polly.Retry;
 using SagaOrchestrator.Application.Models;

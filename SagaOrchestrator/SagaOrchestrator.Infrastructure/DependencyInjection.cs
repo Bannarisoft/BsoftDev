@@ -1,4 +1,3 @@
-using Contracts.Models.Email;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,22 +39,16 @@ namespace SagaOrchestrator.Infrastructure
             });
 
 
-            // Register OrchestratorService
+            // Register OrchestratorServices
             // services.AddScoped<OrchestratorService>();
             services.AddScoped<UserSagaService>();
             services.AddScoped<AssetSagaService>();
             services.AddScoped<DepartmentSagaService>();
 
-            //services.Configure<MailSettings>(configuration.GetSection("EmailSettings"));     
-            var emailSettings = new MailSettings();
-            configuration.GetSection("EmailSettings").Bind(emailSettings);
-            services.AddSingleton(emailSettings);
-
             // Configure MassTransit with RabbitMQ
             services.AddMassTransit(x =>
             {
                 x.AddSagaStateMachine<UserAssetStateMachine, UserAssetState>()
-                //.InMemoryRepository();
                 .MongoDbRepository(r =>
                       {
                           r.Connection = "mongodb://192.168.1.126:27017";
@@ -63,10 +56,9 @@ namespace SagaOrchestrator.Infrastructure
                       });
 
 
-                //   x.AddConsumer<UserCreatedEventConsumer>();
-                //   x.AddConsumer<AssetCreatedEventConsumer>();
-                //   x.AddConsumer<SagaCompletedEventConsumer>();
-                x.AddConsumer<EmailEventConsumer>();
+                  x.AddConsumer<UserCreatedEventConsumer>();
+                  x.AddConsumer<AssetCreatedEventConsumer>();
+                  x.AddConsumer<SagaCompletedEventConsumer>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
 
@@ -78,20 +70,12 @@ namespace SagaOrchestrator.Infrastructure
                     // Automatically configure endpoints for sagas and consumers
                     cfg.ConfigureEndpoints(context);
 
-
-
-
-                    cfg.ReceiveEndpoint("email-queue", e =>
-                    {
-                        e.ConfigureConsumer<EmailEventConsumer>(context);
-                    });
-
                 });
             });
 
 
             // Register IPublishEndpoint from MassTransit
-            services.AddScoped<IPublishEndpoint>(provider => provider.GetRequiredService<IBus>());
+            // services.AddScoped<IPublishEndpoint>(provider => provider.GetRequiredService<IBus>());
 
             return services;
         }

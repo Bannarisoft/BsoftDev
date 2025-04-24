@@ -36,9 +36,7 @@ namespace MaintenanceManagement.API.Validation.MaintenanceRequest
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateMaintenanceRequestCommand.MaintenanceTypeId)} {rule.Error}");
 
-                        RuleFor(x => x.RequestId)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateMaintenanceRequestCommand.RequestId)} {rule.Error}");
+                        
 
                         RuleFor(x => x.MachineId)
                             .NotEmpty()

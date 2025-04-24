@@ -38,14 +38,7 @@ using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.Common.Interfaces.IMachineGroupUser;
 using MaintenanceManagement.Infrastructure.Repositories.MachineMaster;
 using MaintenanceManagement.Infrastructure.Repositories.MachineGroupUser;
-using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrder;
-using MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.WorkOrder;
-using MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.WorkOrderActivity;
-using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrderActivity;
-using Core.Application.Common.Interfaces.IWorkOrderMaster.IWorkOrderSchedule;
-using MaintenanceManagement.Infrastructure.Repositories.WorkOrderMaster.WorkOrderSchedule;
-using Core.Application.Common.Mappings.WorkOrderMaster;
-using System.Diagnostics;
+using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.Common.Interfaces.IActivityCheckListMaster;
 using Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListMaster;
 using MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMaster;
@@ -53,12 +46,13 @@ using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers;
+using MaintenanceManagement.Infrastructure.Repositories.WorkOrder;
+
 using Core.Application.Common.Interfaces.IItem;
 using MaintenanceManagement.Infrastructure.Repositories.Item;
 using MaintenanceManagement.Infrastructure.Data.Configurations;
 using Core.Application.Common.Interfaces.IStcokLedger;
 using MaintenanceManagement.Infrastructure.Repositories.StockLedger;
-
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -186,17 +180,9 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMachineMasterCommandRepository, MachineMasterCommandRepository>();
             services.AddScoped<IMachineMasterQueryRepository, MachineMasterQueryRepository>();
 
-            services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
+             services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
+             services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
 
-            services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
-
-
-            // services.AddScoped<IWorkOrderActivityCommandRepository, WorkOrderActivityCommandRepository>();
-            // services.AddScoped<IWorkOrderActivityQueryRepository, WorkOrderActivityQueryRepository>();
-
-
-            // services.AddScoped<IWorkOrderScheduleCommandRepository, WorkOrderScheduleCommandRepository>();
-            // services.AddScoped<IWorkOrderScheduleQueryRepository, WorkOrderScheduleQueryRepository>(); 
             services.AddScoped<IActivityCheckListMasterQueryRepository, ActivityCheckListMasterQueryRepository>();
             services.AddScoped<IActivityCheckListMasterCommandRepository, ActivityCheckListMasterCommandRepository>();
             services.AddScoped<IMaintenanceRequestQueryRepository, MaintenanceRequestQueryRepository>();
@@ -232,9 +218,7 @@ namespace MaintenanceManagement.Infrastructure
 
 
             typeof(MachineGroupUserProfile),
-            typeof(WorkOrderProfile),
-            typeof(WorkOrderScheduleProfile),
-            typeof(WorkOrderActivityProfile),
+            typeof(WorkOrderProfile),            
             typeof(ActivityCheckListMasterProfile),
             typeof(ItemProfile)
 

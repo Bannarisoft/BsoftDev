@@ -9,9 +9,12 @@ namespace Core.Application.Common.Interfaces.IMaintenanceRequest
     public interface IMaintenanceRequestQueryRepository
     {
 
-          Task<(List<Core.Domain.Entities.MaintenanceRequest>,int)> GetAllMaintenanceRequestAsync(int PageNumber, int PageSize, string? SearchTerm);
-          Task<Core.Domain.Entities.MaintenanceRequest?> GetByIdAsync(int Id);
-           Task<List<Core.Domain.Entities.ExistingVendorDetails>> GetVendorDetails(string OldUnitId,string? VendorCode);
+          Task<(IEnumerable<dynamic> MaintenanceRequestList, int)> GetAllMaintenanceRequestAsync(int PageNumber, int PageSize, string? SearchTerm);
+         Task<Core.Domain.Entities.MaintenanceRequest?> GetByIdAsync(int Id);
+         //  Task<IEnumerable<dynamic>> GetByIdAsync(int id);
+           
+           Task<List<Core.Domain.Entities.ExistingVendorDetails>> GetVendorDetails(string OldUnitId,string? VendorCode);       
+          Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenancestatusAsync();
 
     }
 }
