@@ -30,9 +30,9 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
         {
             var companyId = 1;//_ipAddressService.GetCompanyId();
             var unitId = 41;//_ipAddressService.GetUnitId();
-            var latestWoCode = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(request.WorkOrderDto.RequestTypeId);            
+            //var latestWoCode = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(request.WorkOrderDto.RequestTypeId);            
             var woEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrderDto);   
-            woEntity.WorkOrderDocNo = latestWoCode;         
+            //woEntity.WorkOrderDocNo = latestWoCode;         
             woEntity.CompanyId = companyId; 
             woEntity.UnitId = unitId; 
             woEntity.TotalManPower=0;
@@ -40,14 +40,14 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
             woEntity.CreatedByName=     _ipAddressService.GetUserName();   
             woEntity.CreatedBy=      int.Parse(_ipAddressService.GetCurrentUserId());
             woEntity.CreatedIP=     _ipAddressService.GetSystemIPAddress();
-            var result = await _workOrderRepository.CreateAsync(woEntity, cancellationToken);
+            var result = await _workOrderRepository.CreateAsync(woEntity,request.WorkOrderDto.RequestTypeId, cancellationToken);
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
                 actionCode: "",
                 actionName: woEntity.WorkOrderDocNo??string.Empty,
-                details: $"WorkOrder '{latestWoCode}' was created",
+                details: $"WorkOrder '{woEntity.WorkOrderDocNo}' was created",
                 module: "WorkOrder"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
@@ -70,7 +70,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
                     if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
                     {
                         string directory = Path.GetDirectoryName(filePath) ?? string.Empty;
-                        string newFileName = $"{latestWoCode}{Path.GetExtension(tempFilePath)}";
+                        string newFileName = $"{woEntity.WorkOrderDocNo}{Path.GetExtension(tempFilePath)}";
                         string newFilePath = Path.Combine(directory, newFileName);
 
                         try

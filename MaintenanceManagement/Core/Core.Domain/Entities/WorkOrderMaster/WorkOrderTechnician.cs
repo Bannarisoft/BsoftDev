@@ -1,4 +1,4 @@
-using Core.Domain.Common;
+ using Core.Domain.Common;
 
 namespace Core.Domain.Entities.WorkOrderMaster
 {

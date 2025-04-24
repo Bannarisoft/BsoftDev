@@ -15,7 +15,10 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
         public string? Remarks { get; set; }
         public string? Image { get; set; }           
         public int? TotalManPower { get; set; }         
-        public decimal? TotalSpentHours { get; set; }         
+        public decimal? TotalSpentHours { get; set; } 
+        public DateTimeOffset? DownTimeStart { get; set; } 
+        public DateTimeOffset? DownTimeEnd { get; set; }          
+        
         
         public ICollection<WorkOrderActivityUpdateDto>? WorkOrderActivity{ get; set; }               
         public ICollection<WorkOrderTechnicianUpdateDto>? WorkOrderTechnician{ get; set; } 

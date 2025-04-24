@@ -53,23 +53,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             ";
              var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
             return result;               
-        }   
-
-        public async Task<string?> GetLatestWorkOrderDocNo(int TypeId)
-        {
-            var companyId = _ipAddressService.GetCompanyId();
-            var unitId = _ipAddressService.GetUnitId();
-            var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", companyId);
-            parameters.Add("@UnitId", unitId);
-            parameters.Add("@TypeId", TypeId);
-            var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
-                "dbo.FAM_GetWorkOrderDocNo", 
-                parameters, 
-                commandType: CommandType.StoredProcedure,
-                commandTimeout: 120);
-            return newAssetCode; 
-        }
+        }         
       
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetWORootCauseDescAsync()
         {
