@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.ActivityCheckListMaster.Command.UpdateActivityCheckListMaster;
 using Core.Application.ActivityMaster.Command.CreateActivityMaster;
 using Core.Application.ActivityMaster.Command.UpdateActivityMster;
 using Core.Application.ActivityMaster.Queries.GetAllActivityMaster;
@@ -24,11 +25,13 @@ namespace MaintenanceManagement.API.Controllers
         private readonly IActivityMasterCommandRepository _activityMasterCommandRepository;
 
          private  readonly IValidator<CreateActivityMasterCommand>  _createactivityMasterCommandValidator;
+         private readonly IValidator<UpdateActivityMasterCommand>  _updateActivityMasterCommandValidator;
 
-        public ActivityMasterController(ISender mediator ,IActivityMasterCommandRepository activityMasterCommandRepository ,IValidator<CreateActivityMasterCommand> createactivityMasterCommandValidator   ):base(mediator)
+        public ActivityMasterController(ISender mediator ,IActivityMasterCommandRepository activityMasterCommandRepository ,IValidator<CreateActivityMasterCommand> createactivityMasterCommandValidator ,IValidator<UpdateActivityMasterCommand> updateActivityMasterCommandValidator   ):base(mediator)
         {
             _activityMasterCommandRepository = activityMasterCommandRepository;
             _createactivityMasterCommandValidator = createactivityMasterCommandValidator;
+            _updateActivityMasterCommandValidator = updateActivityMasterCommandValidator;
           
         }
 
@@ -135,6 +138,8 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> UpdateActivityMaster([FromBody] UpdateActivityMasterCommand command)
         {
+
+              var validationResult = await _updateActivityMasterCommandValidator.ValidateAsync(command);
             if (command == null)
             {
                 return BadRequest(new ApiResponseDTO<int>
@@ -146,13 +151,23 @@ namespace MaintenanceManagement.API.Controllers
 
             var result = await Mediator.Send(command);
 
-            if (!result.IsSuccess)
-            {
-                return BadRequest(result); // Return 400 if update fails
-            }
+                        if (!result.IsSuccess)
+                {
+                    return BadRequest(new
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = result.Message,
+                        errors = "" 
+                    });
+                }
 
-            return Ok(result); // Return 200 if update succeeds
-        }
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = result.Message,
+                    errors = "" 
+                });
+          }
 
 
 

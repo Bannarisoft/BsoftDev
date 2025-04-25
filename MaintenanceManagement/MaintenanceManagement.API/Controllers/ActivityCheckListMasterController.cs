@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MaintenanceManagement.API.Controllers
 {
-    [Route("[controller]")]
+      [Route("api/[controller]")]
     public class ActivityCheckListMasterController : ApiControllerBase
     {
        private readonly IActivityMasterCommandRepository _activityMasterCommandRepository;

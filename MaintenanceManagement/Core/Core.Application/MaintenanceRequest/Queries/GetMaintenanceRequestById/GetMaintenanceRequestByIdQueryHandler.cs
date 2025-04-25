@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest;
 using Core.Domain.Events;
@@ -17,17 +18,20 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequestById
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
 
-
-           public GetMaintenanceRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator)
+          private readonly IDepartmentService _departmentService;
+           public GetMaintenanceRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator , IDepartmentService departmentService)
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
+            _departmentService = departmentService;
         }
 
          public async Task<ApiResponseDTO<GetMaintenanceRequestDto>> Handle(GetMaintenanceRequestByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _maintenanceRequestQueryRepository.GetByIdAsync(request.Id);
+
+
             if (result is null)
             {
                 return new ApiResponseDTO<GetMaintenanceRequestDto>
@@ -38,7 +42,16 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequestById
                 };
             }
 
-            var maintenanceRequest = _mapper.Map<GetMaintenanceRequestDto>(result);
+                    var maintenanceRequest = _mapper.Map<GetMaintenanceRequestDto>(result);
+
+            var departments = await _departmentService.GetAllDepartmentAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            if (departmentLookup.TryGetValue(maintenanceRequest.DepartmentId, out string departmentName) && departmentName != null)
+            {
+                maintenanceRequest.DepartmentName = departmentName;
+            }
+
 
             // Domain Event
             var domainEvent = new AuditLogsDomainEvent(

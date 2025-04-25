@@ -14,8 +14,8 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
        public int RequestTypeId  { get; set; }       
        public int MaintenanceTypeId  { get; set; }     
        public int MachineId { get; set; } 
-       public int CompanyId { get; set; }
-       public int  UnitId { get; set; }           
+      //  public int CompanyId { get; set; }
+      //  public int  UnitId { get; set; }           
        public int DepartmentId { get; set; }
        public int? SourceId { get; set; }
        public int? VendorId  { get; set; }
@@ -28,9 +28,7 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
        public decimal? EstimatedServiceCost { get; set; }
        public decimal? EstimatedSpareCost { get; set; }
        public string? Remarks { get; set; }
-       public int RequestStatusId { get; set; }
-
-
+      // public int RequestStatusId { get; set; }
         
     }
 }
