@@ -87,6 +87,8 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.WorkOrderId, opt => opt.Ignore())
             // .ForMember(dest => dest.Sou, opt => opt.MapFrom(src => src.SourceId))
             .ForMember(dest => dest.OldItemCode, opt => opt.MapFrom(src => src.OldItemId));
+            CreateMap<PreventiveSchedulerDetail, PreventiveSchedulerDetail>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
         }
     }
 }

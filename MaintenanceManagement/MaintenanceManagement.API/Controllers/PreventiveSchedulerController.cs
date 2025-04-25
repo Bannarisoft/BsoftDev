@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.DeletePreventiveScheduler;
+using Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive;
 using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerById;
@@ -168,6 +169,39 @@ namespace MaintenanceManagement.API.Controllers
                 errors = "" 
             });
             
+        }
+          [HttpPut("reschedule")]
+        public async Task<IActionResult> Reschedule( ReshedulePreventiveCommand command )
+        {
+            // var validationResult = await _updateCustomFieldCommandValidator.ValidateAsync(command);
+            // if (!validationResult.IsValid)
+            // {
+            //      return BadRequest(new 
+            //     {
+            //         StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+            //         errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+            //     });
+            // }
+
+             var response = await Mediator.Send(command);
+             if(response.IsSuccess)
+             {
+                 return Ok(new 
+                 { 
+                    StatusCode=StatusCodes.Status200OK, 
+                    message = response.Message, 
+                    errors = "" 
+                });
+             }
+            
+           
+
+            return BadRequest( new 
+            { 
+                StatusCode=StatusCodes.Status400BadRequest, 
+                message = response.Message, 
+                errors = "" 
+            }); 
         }
     }
 }
