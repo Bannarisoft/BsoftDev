@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Polly;
 using Polly.Extensions.Http;
@@ -8,7 +9,7 @@ using Serilog;
 
 namespace Shared.Infrastructure.HttpClientPolly
 {
-    public class HttpClientPolicyExtensions
+    public static class HttpClientPolicyExtensions
     {
         public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
         {

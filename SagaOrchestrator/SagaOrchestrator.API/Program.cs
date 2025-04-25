@@ -1,4 +1,3 @@
-using Contracts.Models.Email;
 using MassTransit;
 using Microsoft.OpenApi.Models;
 using SagaOrchestrator.Infrastructure;
@@ -6,45 +5,6 @@ using SagaOrchestrator.Infrastructure.PollyResilience;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// builder.Services.AddHttpClient<IUserService, UserService>(client =>
-// {
-//     client.BaseAddress = new Uri("http://localhost:5174");
-// });
-// builder.Services.AddHttpClient<IAssetService, AssetService>(client =>
-// {
-//     client.BaseAddress = new Uri("http://localhost:5194");
-// });
-// builder.Services.AddMassTransit(x =>
-// {
-//     x.UsingRabbitMq((context, cfg) =>
-//     {
-//         cfg.Host("localhost", "/", h =>
-//         {
-//             h.Username("guest");
-//             h.Password("guest");
-//         });
-//     });
-// });
-
-
-
-// // Register OrchestratorService
-// builder.Services.AddScoped<OrchestratorService>();
-
-// // Register IPublishEndpoint from MassTransit
-// builder.Services.AddScoped<IPublishEndpoint>(provider => provider.GetRequiredService<IBus>());
-// Load settings
-builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-    builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("EmailSettings"));
-
-builder.Services.AddSingleton(resolver =>
-{
-    var config = resolver.GetRequiredService<IConfiguration>();
-    var settings = new MailSettings();
-    config.GetSection("EmailSettings").Bind(settings);
-    return settings;
-});
 
 // Add services to the container.
 builder.Services.AddControllers();

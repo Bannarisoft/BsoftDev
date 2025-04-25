@@ -260,18 +260,18 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CatDesc")
+                    b.Property<string>("CategoryDescription")
                         .HasColumnType("nvarchar(100)")
-                        .HasColumnName("CatDesc");
+                        .HasColumnName("CategoryDescription");
 
-                    b.Property<DateTime>("CreatedDt")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime");
 
-                    b.Property<string>("DepName")
+                    b.Property<string>("DepartmentName")
                         .HasColumnType("nvarchar(200)")
-                        .HasColumnName("DepName");
+                        .HasColumnName("DepartmentName");
 
-                    b.Property<DateTime>("DocDt")
+                    b.Property<DateTime>("DocDate")
                         .HasColumnType("datetime");
 
                     b.Property<int>("DocNo")
@@ -282,9 +282,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("DocSNo");
 
-                    b.Property<string>("GrpName")
+                    b.Property<string>("GroupName")
                         .HasColumnType("nvarchar(100)")
-                        .HasColumnName("GrpName");
+                        .HasColumnName("GroupName");
 
                     b.Property<string>("ItemCode")
                         .IsRequired()
@@ -319,10 +319,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("TC");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("TransactionType")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
-                        .HasColumnName("Type");
+                        .HasColumnName("TransactionType");
 
                     b.Property<string>("UOM")
                         .IsRequired()
@@ -334,7 +334,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ItemTransactions", "Maintenance");
+                    b.ToTable("SubStores", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MachineGroup", b =>
@@ -1293,6 +1293,79 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("ShiftMasterDetails", "Maintenance");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.StockLedger", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime>("DocDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("DocNo")
+                        .HasColumnType("int")
+                        .HasColumnName("DocNo");
+
+                    b.Property<int>("DocSNo")
+                        .HasColumnType("int")
+                        .HasColumnName("DocSNo");
+
+                    b.Property<decimal>("IssueQty")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,3)")
+                        .HasDefaultValue(0.00m);
+
+                    b.Property<decimal>("IssueValue")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,3)")
+                        .HasDefaultValue(0.00m);
+
+                    b.Property<string>("ItemCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("ItemCode");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("ItemName");
+
+                    b.Property<string>("OldUnitCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("OldUnitCode");
+
+                    b.Property<decimal>("ReceivedQty")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,3)")
+                        .HasDefaultValue(0.00m);
+
+                    b.Property<decimal>("ReceivedValue")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,3)")
+                        .HasDefaultValue(0.00m);
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("TransactionType");
+
+                    b.Property<string>("UOM")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(10)")
+                        .HasColumnName("UOM");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StockLedger", "Maintenance");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.WorkCenter", b =>
                 {
                     b.Property<int>("Id")
@@ -1554,10 +1627,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ScarpQty");
 
-                    b.Property<int?>("SourceId")
-                        .HasColumnType("int")
-                        .HasColumnName("SourceId");
-
                     b.Property<int?>("StoreTypeId")
                         .HasColumnType("int")
                         .HasColumnName("StoreTypeId");
@@ -1575,8 +1644,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnName("WorkOrderId");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SourceId");
 
                     b.HasIndex("StoreTypeId");
 
@@ -1984,11 +2051,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrderItem", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscSource")
-                        .WithMany("WorkOrderItemSource")
-                        .HasForeignKey("SourceId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscStoreType")
                         .WithMany("WorkOrderItemStoreType")
                         .HasForeignKey("StoreTypeId")
@@ -1999,8 +2061,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasForeignKey("WorkOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("MiscSource");
 
                     b.Navigation("MiscStoreType");
 
@@ -2104,8 +2164,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("ServiceType");
 
                     b.Navigation("SpareType");
-
-                    b.Navigation("WorkOrderItemSource");
 
                     b.Navigation("WorkOrderItemStoreType");
 

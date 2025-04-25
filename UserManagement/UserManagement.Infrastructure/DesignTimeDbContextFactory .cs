@@ -2,10 +2,8 @@ using UserManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using System.IO;
 using Core.Application.Common.Interfaces;
 using UserManagement.Infrastructure.Repositories;
-using MongoDB.Driver;
 using Microsoft.AspNetCore.Http;
 using UserManagement.Infrastructure.Services;
 // using UserManagement.Infrastructure.Helpers;  // Ensure this is included if needed for IHttpContextAccessor

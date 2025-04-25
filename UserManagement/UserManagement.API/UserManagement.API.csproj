@@ -30,7 +30,5 @@
   </None>
         
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
-  </ItemGroup>
+
 </Project>

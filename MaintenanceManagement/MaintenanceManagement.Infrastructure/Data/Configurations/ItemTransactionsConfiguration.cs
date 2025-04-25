@@ -12,7 +12,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<ItemTransactions> builder)
         {
-           builder.ToTable("ItemTransactions", "Maintenance");
+           builder.ToTable("SubStores", "Maintenance");
                 // Primary Key
             builder.HasKey(b => b.Id);
             builder.Property(b => b.Id)
@@ -30,8 +30,8 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired(); 
 
-             builder.Property(ag => ag.Type)
-                .HasColumnName("Type")
+             builder.Property(ag => ag.TransactionType)
+                .HasColumnName("TransactionType")
                 .HasColumnType("varchar(50)")
                 .IsRequired();  
 
@@ -45,7 +45,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired(); 
 
-              builder.Property(b => b.DocDt)
+              builder.Property(b => b.DocDate)
                 .HasColumnType("datetime")
                 .IsRequired();
 
@@ -76,12 +76,12 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("decimal(18,3)")                
                 .IsRequired();
 
-                 builder.Property(ag => ag.CatDesc)
-                .HasColumnName("CatDesc")
+                 builder.Property(ag => ag.CategoryDescription)
+                .HasColumnName("CategoryDescription")
                 .HasColumnType("nvarchar(100)");
 
-                builder.Property(ag => ag.GrpName)
-                .HasColumnName("GrpName")
+                builder.Property(ag => ag.GroupName)
+                .HasColumnName("GroupName")
                 .HasColumnType("nvarchar(100)");
 
                  builder.Property(ag => ag.LifeType)
@@ -92,12 +92,12 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnName("LifeSpan")
                 .HasColumnType("int");
 
-                 builder.Property(ag => ag.DepName)
-                .HasColumnName("DepName")
+                 builder.Property(ag => ag.DepartmentName)
+                .HasColumnName("DepartmentName")
                 .HasColumnType("nvarchar(200)");
 
 
-                builder.Property(b => b.CreatedDt)
+                builder.Property(b => b.CreatedDate)
                 .HasColumnType("datetime")
                 .IsRequired();
         }

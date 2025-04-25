@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Contracts.Models.Email
+namespace Contracts.Dtos.Email
 {
     public class EmailEventDto
     {
