@@ -24,7 +24,12 @@ namespace Core.Domain.Common
         {
             public const string MiscCode = "RequestType";
 
-        }   
+        }  
+        public static class  MaintenanceRequestType
+        {
+            public const string MiscCode = "RequestType";
+
+        } 
          public static class  MaintenanceStatus
         {
         public const string MiscCode = "MaintenanceStatus";
@@ -35,8 +40,9 @@ namespace Core.Domain.Common
         }       
 
         public static class  MaintenanceStatusUpdate
-        {
-
+        {        
+            public const string Code = "Closed";
+        } 
 
         public static class  GetWOStoreType
         {
@@ -45,6 +51,16 @@ namespace Core.Domain.Common
         public static class  MaintenanceOpenStatus
         {
         public const string Code = "Open";
-        } 
+        }       
+
+        public static class MaintenanceRequestTypeInternal
+        {
+            public const string Code = "Internal";
+        }
+         public static class MaintenanceRequestTypeExternal
+         
+        {
+            public const string Code = "External";
+        }
     }
 }

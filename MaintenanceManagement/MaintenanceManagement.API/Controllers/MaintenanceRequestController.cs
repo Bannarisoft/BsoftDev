@@ -16,6 +16,9 @@ using Core.Application.MaintenanceRequest.Command.UpdateMaintenanceRequestComman
 using Core.Application.MaintenanceRequest.Queries.GetExistingVendorDetails;
 using Core.Application.Common.Interfaces.IMaintenanceCategory;
 using Core.Application.MaintenanceRequest.Command.UpdateMaintenanceRequestStatusCommand;
+using Core.Application.MaintenanceRequest.Queries.GetMaintenanceExternalRequest;
+using Core.Application.MaintenanceRequest.Command.CreateExternalRequestWorkOrder;
+using Core.Application.MaintenanceRequest.Queries.GetExternalRequestById;
 
 namespace MaintenanceManagement.API.Controllers
 {
@@ -41,8 +44,9 @@ namespace MaintenanceManagement.API.Controllers
            
         }
 
-        [HttpGet] 
-          public async Task<IActionResult> GetAllMaintenanceRequestAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+
+         [HttpGet("InternalRequest")]         
+         public async Task<IActionResult> GetAllMaintenanceRequestAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {
             var maintenancerequest = await Mediator.Send(
             new GetMaintenanceRequestQuery
@@ -62,6 +66,28 @@ namespace MaintenanceManagement.API.Controllers
                 PageSize = maintenancerequest.PageSize
             });
         }
+         [HttpGet("ExternalRequest")] 
+        public async Task<IActionResult> GetAllMaintenanceExternalRequestAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        {
+            var maintenanceexternalrequest = await Mediator.Send(
+            new GetMaintenanceExternalRequestQuery
+            {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
+           
+
+            return Ok(new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                data = maintenanceexternalrequest.Data,
+                TotalCount = maintenanceexternalrequest.TotalCount,
+                PageNumber = maintenanceexternalrequest.PageNumber,
+                PageSize = maintenanceexternalrequest.PageSize
+            });
+        }
+
 
           [HttpGet("{id}")]
         [ActionName(nameof(GetByIdAsync))]
@@ -76,6 +102,46 @@ namespace MaintenanceManagement.API.Controllers
             }
             return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = maintenancerequest.Message });   
         }
+
+        [HttpGet("external-requests/by-ids")]
+            public async Task<IActionResult> GetExternalRequestsByIds([FromQuery] string ids)
+            {
+                if (string.IsNullOrWhiteSpace(ids))
+                {
+                    return BadRequest(new ApiResponseDTO<List<GetExternalRequestByIdDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "No IDs provided.",
+                        Data = new List<GetExternalRequestByIdDto>()
+                    });
+                }
+
+                var parsedIds = ids
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(id => int.TryParse(id, out var parsed) ? parsed : (int?)null)
+                    .Where(id => id.HasValue)
+                    .Select(id => id.Value)
+                    .ToList();
+
+                if (!parsedIds.Any())
+                {
+                    return BadRequest(new ApiResponseDTO<List<GetExternalRequestByIdDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "No valid IDs found.",
+                        Data = new List<GetExternalRequestByIdDto>()
+                    });
+                }
+
+                var query = new GetExternalRequestsByIdsQuery
+                {
+                    Ids = parsedIds
+                };
+
+                var result = await Mediator.Send(query);
+
+                return Ok(result);
+            }
 
         [HttpPost("create")]
         public async Task<ActionResult<ApiResponseDTO<GetMaintenanceRequestDto>>> Create([FromBody] CreateMaintenanceRequestCommand command)
@@ -103,7 +169,21 @@ namespace MaintenanceManagement.API.Controllers
                     message = response.Message,
                     errors = ""
                 });
-        }    
+        }   
+            [HttpPost("create-from-request")]
+            public async Task<ActionResult> CreateFromExternalRequest(CreateExternalRequestWorkOrderCommand command)
+            {
+         
+                // var command = new CreateExternalRequestWorkOrderCommand { Ids = new List<int> { id } };
+               
+                var response = await Mediator.Send(command);
+             
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response);
+                }    
+                return Ok(response);
+            }
         [HttpPut]
         public async Task<IActionResult> Update(UpdateMaintenanceRequestCommand command)
         {
