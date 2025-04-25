@@ -18,8 +18,7 @@ namespace Core.Domain.Entities
         public ICollection<MaintenanceRequest>? RequestType { get; set; }
         public ICollection<MaintenanceRequest>? MaintenanceType { get; set; }        
         public ICollection<WorkOrder>? WorkOrderStatus  {get; set;}  
-        public ICollection<WorkOrder>? WorkOrderRootCause  {get; set;}          
-        public ICollection<WorkOrderItem>? WorkOrderItemSource  {get; set;}     
+        public ICollection<WorkOrder>? WorkOrderRootCause  {get; set;}                  
         public ICollection<WorkOrderItem>? WorkOrderItemStoreType  {get; set;}   
         public ICollection<WorkOrderTechnician>? WorkOrderTechnicianSource  {get; set;}   
         public ICollection<PreventiveSchedulerHeader>? Schedule { get; set; }
@@ -32,6 +31,7 @@ namespace Core.Domain.Entities
         public ICollection<MaintenanceRequest>? RequestStatus { get; set; }
 
         public ICollection<MaintenanceRequest>? ModeOfDispatchType { get; set; }
+        public ICollection<PreventiveSchedulerHeader>? MaintenanceCategory { get; set; }
         
 
 
