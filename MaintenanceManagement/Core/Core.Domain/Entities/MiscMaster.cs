@@ -31,6 +31,7 @@ namespace Core.Domain.Entities
         public ICollection<MaintenanceRequest>? RequestStatus { get; set; }
 
         public ICollection<MaintenanceRequest>? ModeOfDispatchType { get; set; }
+        public ICollection<PreventiveSchedulerHeader>? MaintenanceCategory { get; set; }
         
 
 
