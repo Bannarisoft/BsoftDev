@@ -81,7 +81,7 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
             workOrder.CompanyId = _ipAddressService.GetCompanyId();           
             workOrder.UnitId = _ipAddressService.GetUnitId();
 
-            await _workOrderCommandRepository.CreateAsync(workOrder, cancellationToken);  
+            await _workOrderCommandRepository.CreateAsync(workOrder,request.MaintenanceTypeId, cancellationToken);  
 
             }                                     
             // 🔹 Publish domain event for auditing/logging

@@ -63,12 +63,12 @@ namespace Core.Application.MaintenanceRequest.Command.CreateExternalRequestWorkO
                 // Process each external request
                 foreach (var externalRequest in externalRequests)
                 {
-                    var docNo = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(externalRequest.MaintenanceTypeId);
+                    // var docNo = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(externalRequest.MaintenanceTypeId);
 
                     var workOrder = new Core.Domain.Entities.WorkOrderMaster.WorkOrder
                     {
                         
-                        WorkOrderDocNo = docNo,
+                        // WorkOrderDocNo = docNo,
                         RequestId = externalRequest.Id,
                         StatusId = openStatus.Id,
                         MiscStatus = openStatus,
@@ -76,7 +76,7 @@ namespace Core.Application.MaintenanceRequest.Command.CreateExternalRequestWorkO
                         UnitId = externalRequest.UnitId
                     };
 
-                    var result = await _workOrderCommandRepository.CreateAsync(workOrder, cancellationToken);
+                    var result = await _workOrderCommandRepository.CreateAsync(workOrder,externalRequest.MaintenanceTypeId, cancellationToken);
                     // if (result?.Id > 0)
                     // {
                     //     createdIds.Add(result.Id);
