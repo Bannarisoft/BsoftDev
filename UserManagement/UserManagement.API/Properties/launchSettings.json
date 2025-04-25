@@ -17,9 +17,9 @@
       "applicationUrl": "http://localhost:5174",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "DATABASE_SERVER":"192.168.1.130",
-        "DATABASE_USERID":"tester",
-        "DATABASE_PASSWORD":"Test@#$777"
+        "DATABASE_SERVER":"192.168.1.126",
+        "DATABASE_USERID":"developer",
+        "DATABASE_PASSWORD":"Dev@#$456"
       }
     },
     "https": {
@@ -30,9 +30,9 @@
       "applicationUrl": "https://localhost:7031;http://localhost:5174"     ,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "DATABASE_SERVER":"192.168.1.130",
-        "DATABASE_USERID":"tester",
-        "DATABASE_PASSWORD":"Test@#$777"
+        "DATABASE_SERVER":"192.168.1.126",
+        "DATABASE_USERID":"developer",
+        "DATABASE_PASSWORD":"Dev@#$456"
       }
     },
     "IIS Express": {
