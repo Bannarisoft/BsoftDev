@@ -65,17 +65,17 @@ namespace Core.Application.MaintenanceRequest.Command.CreateExternalRequestWorkO
                 {
                     // var docNo = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(externalRequest.MaintenanceTypeId);
 
-                    var workOrder = new Core.Domain.Entities.WorkOrderMaster.WorkOrder
-                    {
+                    // var workOrder = new Core.Domain.Entities.WorkOrderMaster.WorkOrder
+                    // {
                         
-                        // WorkOrderDocNo = docNo,
-                        RequestId = externalRequest.Id,
-                        StatusId = openStatus.Id,
-                        MiscStatus = openStatus,
-                        CompanyId = externalRequest.CompanyId,
-                        UnitId = externalRequest.UnitId
-                    };
-
+                    //     // WorkOrderDocNo = docNo,
+                    //     RequestId = externalRequest.Id,
+                    //     StatusId = openStatus.Id,
+                    //     MiscStatus = openStatus,
+                    //     CompanyId = externalRequest.CompanyId,
+                    //     UnitId = externalRequest.UnitId
+                    // };
+            var workOrder = _imapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(externalRequest);
                     var result = await _workOrderCommandRepository.CreateAsync(workOrder,externalRequest.MaintenanceTypeId, cancellationToken);
                     // if (result?.Id > 0)
                     // {
