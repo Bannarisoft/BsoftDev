@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.StockLedger.Queries.GetCurrentAllStockItems;
 using Core.Application.StockLedger.Queries.GetCurrentStock;
+using Core.Application.StockLedger.Queries.GetCurrentStockItemsById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -57,6 +59,52 @@ namespace MaintenanceManagement.API.Controllers
             {
                 statusCode = StatusCodes.Status404NotFound,
                 message = stock.Message ?? "Stock not found"
+            });
+        }
+
+         [HttpGet("item-codes/{oldUnitCode}")]
+        [ActionName(nameof(GetStockItemCodesAsync))]
+        public async Task<IActionResult> GetStockItemCodesAsync(string oldUnitCode)
+        {
+            var result = await Mediator.Send(new GetCurrentStockItemsByIdQuery { OldUnitcode = oldUnitCode });
+
+            if (result.IsSuccess)
+            {
+                return Ok(new 
+                { 
+                    StatusCode = StatusCodes.Status200OK, 
+                    data = result.Data, 
+                    message = result.Message 
+                });
+            }
+
+            return NotFound(new 
+            { 
+                StatusCode = StatusCodes.Status404NotFound, 
+                message = result.Message 
+            });
+        }
+
+        [HttpGet("CurrentStock/{oldUnitCode}")]
+        [ActionName(nameof(GetAllStockItemDetails))]
+        public async Task<IActionResult> GetAllStockItemDetails(string oldUnitCode)
+        {
+            var result = await Mediator.Send(new GetCurrentAllStockItemsQuery { OldUnitcode = oldUnitCode });
+
+            if (result.IsSuccess)
+            {
+                return Ok(new 
+                { 
+                    StatusCode = StatusCodes.Status200OK, 
+                    data = result.Data, 
+                    message = result.Message 
+                });
+            }
+
+            return NotFound(new 
+            { 
+                StatusCode = StatusCodes.Status404NotFound, 
+                message = result.Message 
             });
         }
 
