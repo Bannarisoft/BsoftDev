@@ -8,7 +8,7 @@ namespace Core.Domain.Entities
     public class PreventiveSchedulerActivity
     {
         public int Id { get; set; }
-        public int PreventiveSchedulerHdrId { get; set; }
+        public int PreventiveSchedulerHeaderId { get; set; }
         public required PreventiveSchedulerHeader PreventiveScheduler { get; set; }
         public int ActivityId { get; set; }
         public required ActivityMaster Activity { get; set; }

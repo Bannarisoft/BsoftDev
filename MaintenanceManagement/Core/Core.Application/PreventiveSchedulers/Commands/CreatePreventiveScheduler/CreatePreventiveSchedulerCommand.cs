@@ -24,5 +24,6 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
         public decimal DownTimeEstimateHrs { get; set; }
         public List<PreventiveSchedulerActivityDto>? Activity { get; set; }
         public List<PreventiveSchedulerItemsDto>? Items { get; set; }
+        // public List<PreventiveSchedulerDtlDto>? Machines { get; set; }
     }
 }
