@@ -117,14 +117,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 SELECT WorkOrderDocNo,WO.Remarks,MM1.Description+'/'+WO.Image Image,WO.StatusId,M.description StatusDesc,WO.RootCauseId,M1.description RootCauseDesc,
                 WO.CreatedDate,WO.DownTimeStart,WO.DownTimeEnd,case when isnull(requestid,0)<>0 then MA.MachineCode else MA1.MachineCode end  Machine,
                 case when isnull(requestid,0)<>0 then D.DeptName else D1.DeptName end Department,
-                case when isnull(requestid,0)<>0 then  requestid else PreventiveScheduleId end RequestId
+                case when isnull(requestid,0)<>0 then  requestid else PreventiveSchedulerHeaderId end RequestId
                 FROM Maintenance.WorkOrder WO
                 INNER JOIN Maintenance.MiscMaster  M ON M.Id=WO.StatusId
                 INNER JOIN Maintenance.MiscTypeMaster MM1 on MM1.MiscTypeCode ='WOImage'
                 INNER JOIN Maintenance.MiscMaster  M1 ON M1.Id=WO.RootCauseId
                 LEFT JOIN [Maintenance].[MaintenanceRequest]  MR on MR.ID=WO.RequestId
                 LEFT JOIN [Maintenance].[PreventiveSchedulerDetail]  PS on PS.ID=WO.PreventiveScheduleId
-                LEFT JOIN [Maintenance].[PreventiveSchedulerHeader] PH on PH.Id=PS.PreventiveSchedulerId
+                LEFT JOIN [Maintenance].[PreventiveSchedulerHeader] PH on PH.Id=PS.PreventiveSchedulerHeaderId
                 LEFT JOIN [Maintenance].[MachineMaster] MA on MA.ID=MR.MachineId
                 LEFT JOIN [Maintenance].[MachineMaster] MA1 on MA1.ID=PS.MachineId
                 LEFT JOIN Bannari.AppData.Department D on D.Id=MR.DepartmentId
@@ -136,10 +136,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 INNER JOIN Maintenance.ActivityMaster  AM ON AM.ID=WA.ActivityId
                 where WA.WorkOrderId= @workOrderId;
 
-                SELECT WI.StoreTypeId,M.description StoreTypeDesc,WI.ItemCode,WI.OldItemCode,WI.SourceId,M1.description SourceDesc,WI.ItemName,WI.AvailableQty,WI.UsedQty,WI.ScarpQty,WI.ToSubStoreQty,MM1.Description+'/'+WI.Image Image
+                SELECT WI.StoreTypeId,M.description StoreTypeDesc,WI.ItemCode,WI.OldItemCode,WI.ItemName,WI.AvailableQty,WI.UsedQty,WI.ScarpQty,WI.ToSubStoreQty,MM1.Description+'/'+WI.Image Image
                 FROM  Maintenance.WorkOrderItem  WI 
-                LEFT JOIN Maintenance.MiscMaster  M ON M.Id=WI.StoreTypeId
-                LEFT JOIN Maintenance.MiscMaster  M1 ON M1.Id=WI.SourceId
+                LEFT JOIN Maintenance.MiscMaster  M ON M.Id=WI.StoreTypeId                
                 INNER JOIN Maintenance.MiscTypeMaster MM1 on MM1.MiscTypeCode ='WOItemImage'
                 where WI.WorkOrderId=@workOrderId         
                 
