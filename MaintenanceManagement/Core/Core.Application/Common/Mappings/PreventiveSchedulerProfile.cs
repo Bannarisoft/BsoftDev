@@ -67,8 +67,8 @@ namespace Core.Application.Common.Mappings
                 ctx.Items.ContainsKey("PreventiveSchedulerDetailId") ? (int)ctx.Items["PreventiveSchedulerDetailId"] : 0))
             .ForMember(dest => dest.StatusId, opt => opt.MapFrom((src, dest, destMember, ctx) =>
                 ctx.Items.ContainsKey("StatusId") ? (int)ctx.Items["StatusId"] : 0))
-            .ForMember(dest => dest.WorkOrderDocNo, opt => opt.MapFrom((src, dest, destMember, ctx) =>
-                ctx.Items.ContainsKey("WorkOrderDocNo")))
+            // .ForMember(dest => dest.WorkOrderDocNo, opt => opt.MapFrom((src, dest, destMember, ctx) =>
+            //     ctx.Items.ContainsKey("WorkOrderDocNo")))
             .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => _ipAddressService.GetCompanyId()))
             .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => _ipAddressService.GetUnitId()))
             .ForMember(dest => dest.WorkOrderActivities, opt => opt.MapFrom(src => src.PreventiveSchedulerActivities))
@@ -85,7 +85,7 @@ namespace Core.Application.Common.Mappings
               CreateMap<PreventiveSchedulerItems, WorkOrderItem>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.WorkOrderId, opt => opt.Ignore())
-            .ForMember(dest => dest.SourceId, opt => opt.MapFrom(src => src.SourceId))
+            // .ForMember(dest => dest.Sou, opt => opt.MapFrom(src => src.SourceId))
             .ForMember(dest => dest.OldItemCode, opt => opt.MapFrom(src => src.OldItemId));
         }
     }

@@ -68,11 +68,11 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                      detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
 
                     var detailsResponse = await _preventiveSchedulerCommand.CreateDetailAsync(detail);
-                     var workorderDocno =await _workOrderQueryRepository.GetLatestWorkOrderDocNo(preventiveScheduler.MaintenanceCategoryId);
+                  //   var workorderDocno =await _workOrderQueryRepository.GetLatestWorkOrderDocNo(preventiveScheduler.MaintenanceCategoryId);
                         var workOrderRequest =  _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(preventiveScheduler, opt =>
                         {
                             opt.Items["StatusId"] = miscdetail.Id;
-                            opt.Items["WorkOrderDocNo"] = workorderDocno;
+                            // opt.Items["WorkOrderDocNo"] = workorderDocno;
                             opt.Items["PreventiveSchedulerDetailId"] = detailsResponse.Id;
                         });
                
@@ -84,14 +84,14 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                   if (delay.TotalSeconds > 0)
                   {
                       newJobId = BackgroundJob.Schedule<IWorkOrderCommandRepository>(
-                          job => job.CreateAsync(workOrderRequest,cancellationToken),
+                          job => job.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId,cancellationToken),
                           delay
                       );
                   }
                   else
                   {
                        newJobId = BackgroundJob.Schedule<IWorkOrderCommandRepository>(
-                          job => job.CreateAsync(workOrderRequest, cancellationToken),
+                          job => job.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId, cancellationToken),
                           TimeSpan.FromMinutes(15)
                       );
                   }
