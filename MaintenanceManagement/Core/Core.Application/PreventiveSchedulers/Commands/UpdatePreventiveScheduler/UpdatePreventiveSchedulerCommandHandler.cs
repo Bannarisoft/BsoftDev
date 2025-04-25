@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Application.Common.Interfaces.IWorkOrder;
@@ -24,7 +25,10 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
-        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderQueryRepository workOrderQueryRepository)
+        private readonly IWorkOrderCommandRepository _workOrderRepository;
+        private readonly IIPAddressService _ipAddressService;
+        private readonly ITimeZoneService _timeZoneService;
+        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderQueryRepository workOrderQueryRepository, IWorkOrderCommandRepository workOrderRepository, IIPAddressService ipAddressService, ITimeZoneService timeZoneService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
@@ -32,18 +36,30 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _workOrderQueryRepository = workOrderQueryRepository;
+            _workOrderRepository = workOrderRepository;
+            _ipAddressService = ipAddressService;
+            _timeZoneService = timeZoneService;
         }
         public async Task<ApiResponseDTO<bool>> Handle(UpdatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
         {
+           
             var preventiveScheduler  = _mapper.Map<PreventiveSchedulerHeader>(request);
 
               var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(request.FrequencyUnitId);
                 
-                var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
-                var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
+                
                 var DetailResult = await _preventiveSchedulerQuery.GetPreventiveSchedulerDetail(request.Id);
                  foreach (var detail in DetailResult)
                  {
+                            var lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(detail.MachineId);
+
+                          DateTimeOffset baseDate = (!lastMaintenanceDate.HasValue || lastMaintenanceDate.Value < request.EffectiveDate.ToDateTime(TimeOnly.MinValue))
+                           ? request.EffectiveDate.ToDateTime(TimeOnly.MinValue)
+                                : lastMaintenanceDate.Value;
+
+                            var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(baseDate.DateTime, request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
+                            var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(baseDate.DateTime, request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
+
                      detail.PreventiveSchedulerHeaderId = request.Id;
                      detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate); 
                      detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
@@ -72,24 +88,33 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
                             opt.Items["PreventiveSchedulerDetailId"] = detail.Id;
                         });
                
+                       string currentIp = _ipAddressService.GetSystemIPAddress();
+                     int userId = _ipAddressService.GetUserId(); 
+                     string username = _ipAddressService.GetUserName();
+                     var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+                     var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
                      
+                     workOrderRequest.CreatedIP = currentIp;
+                     workOrderRequest.CreatedDate = currentTime;
+                     workOrderRequest.CreatedBy = userId;
+                     workOrderRequest.CreatedByName = username;
                  
-                       var delay = reminderDate - DateTime.Now;
+                       var delay = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
 
                          string newJobId;
                         if (delay.TotalSeconds > 0)
                         {
-                            newJobId = BackgroundJob.Schedule<IWorkOrderCommandRepository>(
-                                job => job.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId,cancellationToken),
-                                delay
-                            );
+                            
+                            newJobId =  BackgroundJob.Schedule(() => 
+                            _workOrderRepository.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId, cancellationToken),
+                             delay);
                         }
                         else
                         {
-                             newJobId = BackgroundJob.Schedule<IWorkOrderCommandRepository>(
-                                job => job.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId, cancellationToken),
-                                TimeSpan.FromMinutes(15)
-                            );
+                            
+                            newJobId =  BackgroundJob.Schedule(() => 
+                            _workOrderRepository.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId, cancellationToken),
+                             TimeSpan.FromMinutes(15));
                         }
                         await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id,newJobId);
                 }

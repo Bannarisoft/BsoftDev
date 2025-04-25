@@ -126,17 +126,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PS.DownTimeEstimateHrs,
                     PS.IsActive,
                     PSA.Id,
-                    PSA.PreventiveSchedulerHdrId,
+                    PSA.PreventiveSchedulerHeaderId,
                     PSA.ActivityId,
                     PSA.EstimatedTimeHrs,
                     PSA.Description,
                     PSI.Id,
-                    PSI.PreventiveSchedulerId AS PreventiveSchedulerHdrId,
+                    PSI.PreventiveSchedulerHeaderId,
                     PSI.OldItemId,
                     PSI.RequiredQty
                 FROM [Maintenance].[PreventiveSchedulerHeader] PS
-                INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHdrId = PS.Id
-                LEFT JOIN [Maintenance].[PreventiveSchedulerItems] PSI ON PSI.PreventiveSchedulerId = PS.Id
+                INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId = PS.Id
+                LEFT JOIN [Maintenance].[PreventiveSchedulerItems] PSI ON PSI.PreventiveSchedulerHeaderId = PS.Id
                 WHERE PS.IsDeleted = 0 AND PS.Id = @Id";
             var PreventiveSchedulerDictionary = new Dictionary<int, PreventiveSchedulerHeader>();
 
@@ -176,7 +176,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var query = $@"
                 SELECT  
                     Id,
-                    PreventiveSchedulerId,
+                    PreventiveSchedulerHeaderId,
                     MachineId,
                     WorkOrderCreationStartDate,
                     ActualWorkOrderDate,
@@ -184,7 +184,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     MaterialReqStartDays,
                     HangfireJobId
                     
-                FROM [Maintenance].[PreventiveSchedulerDetail] WHERE PreventiveSchedulerId =@PreventiveSchedulerId AND IsDeleted = 0
+                FROM [Maintenance].[PreventiveSchedulerDetail] WHERE PreventiveSchedulerHeaderId =@PreventiveSchedulerId AND IsDeleted = 0
             ";
 
             var parameters = new
@@ -205,7 +205,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         {
             throw new NotImplementedException();
         }
-       public async Task<DateTime?> GetLastMaintenanceDateAsync(int machineId)
+       public async Task<DateTimeOffset?> GetLastMaintenanceDateAsync(int machineId)
         {
             const string query = @"
                  SELECT MAX(WS.EndTime) AS EndTime   FROM [Maintenance].[WorkOrder] W
@@ -223,9 +223,34 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 StatusCode = "Closed"
             };
 
-            var result = await _dbConnection.QueryFirstOrDefaultAsync<DateTime?>(query, parameters);
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<DateTimeOffset?>(query, parameters);
             return result;
         }
+
+            public async Task<PreventiveSchedulerDetail> GetPreventiveSchedulerDetailById(int Id)
+           {
+               var query = $@"
+                   SELECT  
+                       Id,
+                       PreventiveSchedulerId,
+                       MachineId,
+                       WorkOrderCreationStartDate,
+                       ActualWorkOrderDate,
+                       RescheduleReason,
+                       MaterialReqStartDays,
+                       HangfireJobId
+                       
+                   FROM [Maintenance].[PreventiveSchedulerDetail] WHERE Id =@Id AND IsDeleted = 0
+               ";
+    
+               var parameters = new
+               {
+                   Id = Id
+               };
+               var result = await _dbConnection.QueryFirstOrDefaultAsync<PreventiveSchedulerDetail>(query, parameters);
+               
+               return result;
+           }
 
     }
 }
