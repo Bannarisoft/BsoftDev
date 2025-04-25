@@ -49,36 +49,7 @@ namespace SagaOrchestrator.Application.Orchestration.Services.UserServices
                 Log.Error(ex, "Failed to fetch User ID: {UserId}", userId);
                 return null;
             }
-            // try
-            // {
-            //     var response = await _retryPolicy.ExecuteAsync(() =>
-            //         _httpClient.GetAsync($"/api/User/{userId}")
-            //     );
 
-            //     response.EnsureSuccessStatusCode();
-
-            //     var content = await response.Content.ReadAsStringAsync();
-            //     var user = JsonSerializer.Deserialize<UserDto>(content, new JsonSerializerOptions
-            //     {
-            //         PropertyNameCaseInsensitive = true
-            //     });
-
-            //     if (user == null)
-            //     {
-            //         Log.Warning("Deserialization returned null for User ID: {UserId}", userId);
-            //     }
-
-            //     return user;
-            // }
-            // catch (Exception ex)
-            // {
-            //     Log.Error(ex, "Failed to fetch User ID: {UserId}", userId);
-            //     return null;
-            // }
-            // var response = await _httpClient.GetAsync($"/api/User/{userId}");
-            // response.EnsureSuccessStatusCode();
-            // var content = await response.Content.ReadAsStringAsync();
-            // return JsonSerializer.Deserialize<UserDto>(content);
         }
     }
 }
