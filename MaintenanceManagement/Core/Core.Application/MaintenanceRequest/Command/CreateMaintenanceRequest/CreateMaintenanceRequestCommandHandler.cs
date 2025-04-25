@@ -4,10 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
+using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest;
+using Core.Domain.Common;
 using Core.Domain.Events;
 using MediatR;
+using static Core.Domain.Common.MiscEnumEntity;
 
 namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
 {
@@ -19,23 +23,38 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
        private readonly IMapper _imapper;
        private readonly IMediator _mediator;
        private readonly IMaintenanceRequestQueryRepository  _maintenanceRequestQueryRepository;
+       private readonly IWorkOrderCommandRepository _workOrderCommandRepository;
+         private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
+        private readonly IIPAddressService _ipAddressService;
        
 
-       public CreateMaintenanceRequestCommandHandler( IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository, IMapper imapper, IMediator mediator, IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository)
+       public CreateMaintenanceRequestCommandHandler( IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository, IMapper imapper, IMediator mediator, IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IWorkOrderCommandRepository workOrderCommandRepository , IWorkOrderQueryRepository workOrderQueryQueryRepository , IIPAddressService ipAddressService )
        {
            _maintenanceRequestCommandRepository = maintenanceRequestCommandRepository;
            _imapper = imapper;
            _mediator = mediator;
            _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
+           _workOrderCommandRepository = workOrderCommandRepository;
+           _workOrderQueryRepository = workOrderQueryQueryRepository;
+           _ipAddressService = ipAddressService;
        }
 
         public async Task<ApiResponseDTO<int>> Handle(CreateMaintenanceRequestCommand request, CancellationToken cancellationToken)
         {
+               // Misc status
+              var statuses = await _maintenanceRequestQueryRepository.GetMaintenanceOpenstatusAsync();
+                    var openStatus = statuses.FirstOrDefault();
+
             // 🔹 Map request to domain entity
             var maintenanceRequest = _imapper.Map<Core.Domain.Entities.MaintenanceRequest>(request);
 
+            // 🔹 Override status from Misc
+                maintenanceRequest.RequestStatusId = openStatus.Id;
+                maintenanceRequest.CompanyId=_ipAddressService.GetCompanyId(); 
+                maintenanceRequest.UnitId = _ipAddressService.GetUnitId();
+
             // 🔹 Insert into the database
-            var result = await _maintenanceRequestCommandRepository.CreateAsync(maintenanceRequest);
+            var result = await _maintenanceRequestCommandRepository.CreateAsync(maintenanceRequest);            
 
             if (result <= 0)
             {
@@ -45,11 +64,26 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
                     Message = "Failed to create Maintenance Request"
                 };
             }
+            
+           // var internalTypeId = await _maintenanceRequestQueryRepository.GetMaintenanceRequestTypeAsync();
+            var requestTypes = await _maintenanceRequestQueryRepository.GetMaintenanceRequestTypeAsync();
+            var internalTypeId = requestTypes.FirstOrDefault()?.Id;
 
-            // 🔹 Fetch newly created record
-           // var createdMaintenanceRequest = await _maintenanceRequestQueryRepository.GetByIdAsync(result.Id);
-           // var mappedResult = _imapper.Map<GetMaintenanceRequestDto>(createdMaintenanceRequest);
+            if (internalTypeId.HasValue && maintenanceRequest.RequestTypeId == internalTypeId.Value)
+           {
+                // Proceed to create WorkOrder
 
+                  //var docNo = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(maintenanceRequest.MaintenanceTypeId);
+            // 🔹 Map WorkOrder manually and assign doc no
+            var workOrder = _imapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(maintenanceRequest);
+           // workOrder.Id = 0; // important!
+            workOrder.RequestId = request.MaintenanceTypeId;
+            workOrder.CompanyId = _ipAddressService.GetCompanyId();           
+            workOrder.UnitId = _ipAddressService.GetUnitId();
+
+            await _workOrderCommandRepository.CreateAsync(workOrder,request.MaintenanceTypeId, cancellationToken);  
+
+            }                                     
             // 🔹 Publish domain event for auditing/logging
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",

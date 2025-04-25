@@ -22,13 +22,19 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
         public async Task<int> CreateAsync(Core.Domain.Entities.MaintenanceRequest maintenanceRequest)
         {
              await _dbContext.MaintenanceRequest.AddAsync(maintenanceRequest);
-               return await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
                 return maintenanceRequest.Id;
         }
-         
+
+        public async Task<int> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, CancellationToken cancellationToken)
+        {
+            _dbContext.WorkOrder.Add(workOrder);
+            return await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+                
          public async Task<bool> UpdateAsync( Core.Domain.Entities.MaintenanceRequest maintenanceRequest)
         {
-                    var existingRequest = await _dbContext.MaintenanceRequest
+                var existingRequest = await _dbContext.MaintenanceRequest
                     .FirstOrDefaultAsync(m => m.Id == maintenanceRequest.Id);
 
                 if (existingRequest != null)
@@ -50,8 +56,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                     existingRequest.EstimatedServiceCost = maintenanceRequest.EstimatedServiceCost;
                     existingRequest.EstimatedSpareCost = maintenanceRequest.EstimatedSpareCost;
                     existingRequest.RequestStatusId = maintenanceRequest.RequestStatusId;
-                    existingRequest.Remarks = maintenanceRequest.Remarks;
-                    
+                    existingRequest.Remarks = maintenanceRequest.Remarks; 
 
                     _dbContext.MaintenanceRequest.Update(existingRequest);
                     return await _dbContext.SaveChangesAsync() > 0;
@@ -60,22 +65,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                 return false;
         }
 
-        //  public async Task<bool> UpdateStatusAsync(int id, int requestStatusId)
-        //     {
-        //         var entity = await _dbContext.MaintenanceRequest.FindAsync(id);
-
-        //         if (entity == null )
-        //             return false;
-
-        //         entity.RequestStatusId = requestStatusId;
-        //         entity.ModifiedDate = DateTime.UtcNow;
-
-        //         _dbContext.MaintenanceRequest.Update(entity);
-        //         await _dbContext.SaveChangesAsync();
-
-        //         return true;
-        //     }
-
+  
         public async Task<bool> UpdateStatusAsync(int id)
         {
             // Step 1: Get the maintenance status from MiscMaster (e.g., "Closed")

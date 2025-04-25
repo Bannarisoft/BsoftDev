@@ -49,16 +49,18 @@ namespace SagaOrchestrator.Infrastructure
             services.AddMassTransit(x =>
             {
                 x.AddSagaStateMachine<UserAssetStateMachine, UserAssetState>()
-                .MongoDbRepository(r =>
-                      {
-                          r.Connection = "mongodb://192.168.1.126:27017";
-                          r.DatabaseName = "saga_orchestrator_db";
-                      });
+                 .InMemoryRepository();
+                // .MongoDbRepository(r =>
+                //       {
+                //           r.Connection = "mongodb://192.168.1.126:27017";
+                //           r.DatabaseName = "saga_orchestrator_db";
+                //       });
 
 
-                  x.AddConsumer<UserCreatedEventConsumer>();
-                  x.AddConsumer<AssetCreatedEventConsumer>();
-                  x.AddConsumer<SagaCompletedEventConsumer>();
+                x.AddConsumer<UserCreatedEventConsumer>();
+                x.AddConsumer<AssetCreatedEventConsumer>();
+                x.AddConsumer<SagaCompletedEventConsumer>();
+                x.AddConsumer<DeleteUserCommandConsumer>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
 
@@ -69,6 +71,11 @@ namespace SagaOrchestrator.Infrastructure
                     });
                     // Automatically configure endpoints for sagas and consumers
                     cfg.ConfigureEndpoints(context);
+                    // Register the queue for the rollback command
+                    // cfg.ReceiveEndpoint("delete-user-saga-queue", e =>
+                    // {
+                    //     e.ConfigureConsumer<DeleteUserCommandConsumer>(context);
+                    // });
 
                 });
             });

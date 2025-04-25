@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
+namespace Core.Application.MaintenanceRequest.Queries.GetExternalRequestById
 {
-    public class GetMaintenanceRequestDto
-    {  
-       public int Id { get; set; }
+    public class GetExternalRequestByIdDto
+    {
+         public int Id { get; set; }
        public int RequestTypeId  { get; set; }  
        public string? RequestType  { get; set; }   
        public int MaintenanceTypeId  { get; set; }    
@@ -37,7 +37,5 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
        public string? Remarks { get; set; }
        public int RequestStatusId { get; set; }
        public string? RequestStatus { get; set; }
-       
-       
     }
-} 
+}

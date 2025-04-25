@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IStcokLedger;
 using Core.Application.StockLedger.Queries.GetCurrentStock;
+using Core.Application.StockLedger.Queries.GetCurrentStockItemsById;
 using Dapper;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
@@ -16,6 +17,63 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
         {
             _dbConnection = dbConnection;
         }
+
+        public async Task<List<CurrentStockDto>> GetStockDetails(string OldUnitcode)
+        {
+             OldUnitcode = OldUnitcode ?? string.Empty; // Prevent null issues
+
+            const string query = @"
+                SELECT 
+                    Oldunitcode as OldUnitId,
+                    ItemCode,
+                    ItemName,
+					Uom,
+                    SUM(ReceivedQty) - SUM(IssueQty) AS StockQty,
+                    SUM(ReceivedValue) - SUM(IssueValue) AS StockValue
+                FROM 
+                    Maintenance.StockLedger
+                WHERE
+                    Oldunitcode = @OldUnitcode 
+                GROUP BY 
+                    ItemCode, ItemName, Oldunitcode,Uom
+                HAVING
+                    SUM(ReceivedQty) - SUM(IssueQty) > 0";
+
+            var parameters = new 
+            { 
+                OldUnitcode // match exactly, no wildcards
+            };
+
+            var itemcodes = await _dbConnection.QueryAsync<CurrentStockDto>(query, parameters);
+            return itemcodes.ToList();
+        }
+
+        public async Task<List<StockItemCodeDto>> GetStockItemCodes(string OldUnitcode)
+        {
+            OldUnitcode = OldUnitcode ?? string.Empty; // Prevent null issues
+
+            const string query = @"
+                SELECT 
+                    ItemCode,
+                    ItemName
+                FROM 
+                    Maintenance.StockLedger
+                WHERE
+                    Oldunitcode = @OldUnitcode 
+                GROUP BY 
+                    ItemCode, ItemName, Oldunitcode
+                HAVING
+                    SUM(ReceivedQty) - SUM(IssueQty) > 0";
+
+            var parameters = new 
+            { 
+                OldUnitcode // match exactly, no wildcards
+            };
+
+            var itemcodes = await _dbConnection.QueryAsync<StockItemCodeDto>(query, parameters);
+            return itemcodes.ToList();
+        }
+
         public async Task<CurrentStockDto?> GetSubStoresCurrentStock(string OldUnitcode, string Itemcode)
         {
             const string query = @"

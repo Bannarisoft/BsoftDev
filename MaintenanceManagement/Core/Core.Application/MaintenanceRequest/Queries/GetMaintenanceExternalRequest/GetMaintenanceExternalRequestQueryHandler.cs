@@ -9,16 +9,17 @@ using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using Core.Domain.Events;
 using MediatR;
 
-namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
+namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceExternalRequest
 {
-    public class GetMaintenanceRequestQueryHandler: IRequestHandler<GetMaintenanceRequestQuery, ApiResponseDTO<List<GetMaintenanceRequestDto>>>
+    public class GetMaintenanceExternalRequestQueryHandler : IRequestHandler<GetMaintenanceExternalRequestQuery, ApiResponseDTO<List<GetMaintenanceExternalRequestDto>>>
     {
+        
         private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IDepartmentService _departmentService;
 
-        public GetMaintenanceRequestQueryHandler(
+        public GetMaintenanceExternalRequestQueryHandler(
             IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository,
             IMapper mapper,
             IMediator mediator,
@@ -30,15 +31,15 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
             _departmentService = departmentService;
         }
 
-        public async Task<ApiResponseDTO<List<GetMaintenanceRequestDto>>> Handle(GetMaintenanceRequestQuery request, CancellationToken cancellationToken)
+         public async Task<ApiResponseDTO<List<GetMaintenanceExternalRequestDto>>> Handle(GetMaintenanceExternalRequestQuery request, CancellationToken cancellationToken)
         {
-            var (maintenanceRequests, totalCount) = await _maintenanceRequestQueryRepository.GetAllMaintenanceRequestAsync(request.PageNumber, request.PageSize, request.SearchTerm);
-            var maintenanceRequestList = _mapper.Map<List<GetMaintenanceRequestDto>>(maintenanceRequests);
+            var (maintenanceExternalRequests, totalCount) = await _maintenanceRequestQueryRepository.GetAllMaintenanceExternalRequestAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+            var maintenanceRequestList = _mapper.Map<List<GetMaintenanceExternalRequestDto>>(maintenanceExternalRequests);
 
             var departments = await _departmentService.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            var maintenanceRequestDictionary = new Dictionary<int, GetMaintenanceRequestDto>();
+            var maintenanceRequestDictionary = new Dictionary<int, GetMaintenanceExternalRequestDto>();
 
                  foreach (var data in maintenanceRequestList)
             {
@@ -62,7 +63,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<List<GetMaintenanceRequestDto>>
+            return new ApiResponseDTO<List<GetMaintenanceExternalRequestDto>>
             {
                 IsSuccess = true,
                 Message = "Success",
@@ -72,5 +73,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
                 PageSize = request.PageSize
             };
         }
+
+        
     }
 }
