@@ -181,7 +181,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     WorkOrderCreationStartDate,
                     ActualWorkOrderDate,
                     RescheduleReason,
-                    MaterialReqStartDays
+                    MaterialReqStartDays,
+                    HangfireJobId
                     
                 FROM [Maintenance].[PreventiveSchedulerDetail] WHERE PreventiveSchedulerId =@PreventiveSchedulerId AND IsDeleted = 0
             ";
@@ -204,5 +205,27 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         {
             throw new NotImplementedException();
         }
+       public async Task<DateTime?> GetLastMaintenanceDateAsync(int machineId)
+        {
+            const string query = @"
+                 SELECT MAX(WS.EndTime) AS EndTime   FROM [Maintenance].[WorkOrder] W
+            INNER JOIN [Maintenance].[WorkOrderSchedule] WS ON W.Id=WS.WorkOrderId
+            INNER JOIN Maintenance.MiscMaster M ON W.StatusId=M.Id
+            INNER JOIN Maintenance.MiscTypeMaster MT ON MT.Id =M.MiscTypeId
+            INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.Id=W.PreventiveScheduleId
+            where MT.MiscTypeCode='Status' AND M.Code='Closed' AND PSD.MachineId=@MachineId
+            ";
+
+            var parameters = new
+            {
+                MachineId = machineId,
+                StatusTypeCode = "Status",
+                StatusCode = "Closed"
+            };
+
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<DateTime?>(query, parameters);
+            return result;
+        }
+
     }
 }

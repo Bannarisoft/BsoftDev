@@ -1,12 +1,9 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IWorkOrder;
-using Core.Application.WorkOrder.Queries.GetWorkOrderById;
-
-// using Core.Application.WorkOrder.Queries.GetWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Common;
 using Dapper;
-using MassTransit;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
@@ -20,31 +17,44 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _ipAddressService = ipAddressService;
         }
 
-        public Task<(List<GetWorkOrderByIdDto>, int)> GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<string> GetBaseDirectoryAsync()
-        {
-            throw new NotImplementedException();
-        }   
-
-        public async Task<string?> GetLatestWorkOrderDocNo(int TypeId)
+        public async Task<(List<WorkOrderWithScheduleDto>, int)> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,string? requestType, int PageNumber, int PageSize, string? SearchTerm)
         {
             var companyId = _ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", companyId);
             parameters.Add("@UnitId", unitId);
-            parameters.Add("@TypeId", TypeId);
-            var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
-                "dbo.FAM_GetWorkOrderDocNo", 
-                parameters, 
-                commandType: CommandType.StoredProcedure,
-                commandTimeout: 120);
-            return newAssetCode; 
+            parameters.Add("@FromDate", fromDate);
+            parameters.Add("@ToDate", toDate);
+            parameters.Add("@RequestType", requestType);
+            parameters.Add("@PageNumber", PageNumber );
+            parameters.Add("@PageSize", PageSize );
+            parameters.Add("@SearchTerm", SearchTerm);
+
+            List<WorkOrderWithScheduleDto> workOrderList;
+            int totalCount;
+
+            using (var multiResult = await _dbConnection.QueryMultipleAsync(
+                "dbo.GetWorkOrder", parameters, commandType: CommandType.StoredProcedure))
+            {
+                workOrderList = (await multiResult.ReadAsync<WorkOrderWithScheduleDto>()).ToList();
+                totalCount = await multiResult.ReadFirstOrDefaultAsync<int>();
+            }
+            return (workOrderList, totalCount);
         }
+
+        public async Task<string> GetBaseDirectoryAsync()
+        {
+            const string query = @"
+            SELECT Description AS BaseDirectory  
+                FROM Maintenance.MiscTypeMaster 
+                WHERE MiscTypeCode='WOImage'  
+                AND IsDeleted=0
+            ";
+             var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
+            return result;               
+        }    
+       
       
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetWORootCauseDescAsync()
         {
@@ -98,57 +108,18 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             var parameters = new { MiscTypeCode = MiscEnumEntity.WOStatus.MiscCode };        
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
             return result.ToList();
-        }
-
-        Task<(List<GetWorkOrderByIdDto>, int)> IWorkOrderQueryRepository.GetAllWOAsync(int PageNumber, int PageSize, string? SearchTerm)
-        {
-            throw new NotImplementedException();
-        }            
+        }             
 
         public async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity, IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician, IEnumerable<dynamic> checkList, IEnumerable<dynamic> schedule)> GetWorkOrderByIdAsync(int workOrderId)         
         {
-            var sqlQuery = @"
-                -- First Query: AssetMaster (One-to-One)
-                SELECT WorkOrderDocNo,WO.Remarks,MM1.Description+'/'+WO.Image Image,WO.StatusId,M.description StatusDesc,WO.RootCauseId,M1.description RootCauseDesc
-                FROM Maintenance.WorkOrder WO
-                INNER JOIN Maintenance.MiscMaster  M ON M.Id=WO.StatusId
-                INNER JOIN Maintenance.MiscTypeMaster MM1 on MM1.MiscTypeCode ='WOImage'
-                INNER JOIN Maintenance.MiscMaster  M1 ON M1.Id=WO.RootCauseId
-                where WO.Id= @workOrderId;
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
+            var parameters = new DynamicParameters();
+            parameters.Add("@CompanyId", companyId);
+            parameters.Add("@UnitId", unitId);
+            parameters.Add("@WorkOrderId", workOrderId);
 
-                SELECT WA.ActivityId,AM.ActivityName,WA.Description
-                FROM Maintenance.WorkOrder WO
-                INNER JOIN Maintenance.WorkOrderActivity  WA ON WA.WorkOrderId=WO.Id
-                INNER JOIN Maintenance.ActivityMaster  AM ON AM.ID=WA.ActivityId
-                where WO.Id= @workOrderId;
-
-                SELECT WI.StoreTypeId,M.description StoreTypeDesc,WI.ItemCode,WI.OldItemCode,WI.SourceId,M1.description SourceDesc,WI.ItemName,WI.AvailableQty,WI.UsedQty,WI.ScarpQty,WI.ToSubStoreQty,MM1.Description+'/'+WO.Image Image
-                FROM Maintenance.WorkOrder WO
-                INNER JOIN Maintenance.WorkOrderItem  WI ON WI.WorkOrderId=WO.Id
-                LEFT JOIN Maintenance.MiscMaster  M ON M.Id=WI.StoreTypeId
-                LEFT JOIN Maintenance.MiscMaster  M1 ON M1.Id=WI.SourceId
-                INNER JOIN Maintenance.MiscTypeMaster MM1 on MM1.MiscTypeCode ='WOItemImage'
-                where WO.Id=@workOrderId         
-                
-                SELECT WT.TechnicianId,WT.OldTechnicianId,WT.TechnicianName,WT.SourceId,M1.description SourceDesc,WT.HoursSpent,WT.MinutesSpent
-                FROM Maintenance.WorkOrder WO
-                INNER JOIN Maintenance.WorkOrderTechnician  WT ON WT.WorkOrderId=WO.Id
-                LEFT JOIN Maintenance.MiscMaster  M1 ON M1.Id=WT.SourceId
-                where WO.Id=@workOrderId 
-                
-                SELECT WC.CheckListId,AC.ActivityCheckList, WC.Description,WC.ISCompleted,WC.Description
-                FROM Maintenance.WorkOrder WO
-                INNER JOIN Maintenance.WorkOrderCheckList  WC ON WC.WorkOrderId=WO.Id
-                INNER JOIN Maintenance.ActivityCheckListMaster  AC ON AC.Id=WC.CheckListId
-                where WO.Id=@workOrderId
-
-                SELECT WS.StartTime,WS.EndTime
-                FROM Maintenance.WorkOrder WO
-                INNER JOIN Maintenance.WorkOrderSchedule  WS ON WS.WorkOrderId=WO.Id
-                where WO.Id=@workOrderId
-            ";
-
-            using var multi = await _dbConnection.QueryMultipleAsync(sqlQuery, new { WorkOrderId = workOrderId });
+            using var multi = await _dbConnection.QueryMultipleAsync("dbo.Usp_GetWorkOrderById", parameters, commandType: CommandType.StoredProcedure);
 
             var WorkOrderResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
             var Activity = await multi.ReadAsync<dynamic>();
@@ -159,6 +130,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
            
             return (WorkOrderResult, Activity,  Item, Technician,checkList,Schedule);
         }
+
     } 
 }
    

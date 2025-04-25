@@ -16,5 +16,6 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<bool> NotFoundAsync(int id );
         Task<(DateTime nextDate, DateTime reminderDate)> CalculateNextScheduleDate(DateTime startDate, int interval, string unit,int reminderDays);
         Task<List<PreventiveSchedulerDetail>> GetPreventiveSchedulerDetail(int PreventiveSchedulerId);
+        Task<DateTime?> GetLastMaintenanceDateAsync(int PreventiveSchedulerId);
     }
 }

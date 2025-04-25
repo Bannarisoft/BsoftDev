@@ -8,7 +8,5 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
     public class PreventiveSchedulerDtlDto
     {
         public int MachineId { get; set; }
-        public DateOnly StartDate { get; set; }
-        public DateOnly NextDueDate { get; set; }
     }
 }

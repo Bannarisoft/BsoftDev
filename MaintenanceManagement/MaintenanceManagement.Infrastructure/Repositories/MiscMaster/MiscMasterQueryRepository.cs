@@ -168,9 +168,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
         {
             
 
-            const string query = @"SELECT Id,Code   FROM Maintenance.MiscMaster M
+            const string query = @"SELECT M.Id,M.Code   FROM Maintenance.MiscMaster M
             INNER JOIN [Maintenance].[MiscTypeMaster] MT ON MT.Id = M.MiscTypeId
-                WHERE IsDeleted = 0 AND MT.MiscTypeCode= @MiscTypeCode AND Code=@MiscTypeName ";
+                WHERE M.IsDeleted = 0 AND MT.IsDeleted = 0 AND MT.MiscTypeCode= @MiscTypeCode AND Code=@MiscTypeName ";
                 
             
             var parameters = new 

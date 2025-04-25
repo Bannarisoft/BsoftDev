@@ -7,7 +7,5 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
     {
         public string? WorkOrderImage { get; set; }
         public string? WorkOrderImageBase64 { get; set; } 
-        public string? WorkOrderItemImage { get; set; }
-        public string? WorkOrderImageItemBase64 { get; set; } 
     }
 }

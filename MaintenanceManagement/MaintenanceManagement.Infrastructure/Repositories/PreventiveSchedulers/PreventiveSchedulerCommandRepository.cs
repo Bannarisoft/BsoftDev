@@ -27,10 +27,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return preventiveSchedulerHdr.Id;
         }
 
-        public async Task<bool> CreateDetailAsync(List<PreventiveSchedulerDetail> preventiveSchedulerDetail)
+        public async Task<PreventiveSchedulerDetail> CreateDetailAsync(PreventiveSchedulerDetail preventiveSchedulerDetail)
         {
             await _applicationDbContext.PreventiveSchedulerDtl.AddRangeAsync(preventiveSchedulerDetail);
-            return await _applicationDbContext.SaveChangesAsync() > 0;
+             await _applicationDbContext.SaveChangesAsync(); 
+             return preventiveSchedulerDetail;
         }
 
         public async Task<bool> DeleteAsync(int id, PreventiveSchedulerHeader preventiveSchedulerHdr)
@@ -44,7 +45,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return false; 
         }
 
-        public async Task<bool> UpdateAsync(PreventiveSchedulerHeader preventiveSchedulerHdr)
+        public async Task<PreventiveSchedulerHeader> UpdateAsync(PreventiveSchedulerHeader preventiveSchedulerHdr)
         {
             var existingPreventiveScheduler = await _applicationDbContext.PreventiveSchedulerHdr
             .Include(ps => ps.PreventiveSchedulerDetails)
@@ -58,10 +59,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                    
                _applicationDbContext.PreventiveSchedulerActivity.RemoveRange(
-                   _applicationDbContext.PreventiveSchedulerActivity.Where(x => x.PreventiveSchedulerHdrId == preventiveSchedulerHdr.Id));
+                   _applicationDbContext.PreventiveSchedulerActivity.Where(x => x.PreventiveSchedulerHeaderId == preventiveSchedulerHdr.Id));
 
                _applicationDbContext.PreventiveSchedulerItems.RemoveRange(
-                   _applicationDbContext.PreventiveSchedulerItems.Where(x => x.PreventiveSchedulerHdrId == preventiveSchedulerHdr.Id));
+                   _applicationDbContext.PreventiveSchedulerItems.Where(x => x.PreventiveSchedulerHeaderId == preventiveSchedulerHdr.Id));
 
                 existingPreventiveScheduler.MachineGroupId = preventiveSchedulerHdr.MachineGroupId;
                 existingPreventiveScheduler.DepartmentId = preventiveSchedulerHdr.DepartmentId;
@@ -105,10 +106,25 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                       }
                   }
 
-                return await _applicationDbContext.SaveChangesAsync() >0;
+                 await _applicationDbContext.SaveChangesAsync() ;
+                 return preventiveSchedulerHdr;
             }
             
-            return false; 
+            return preventiveSchedulerHdr; 
+        }
+
+        public async Task<bool> UpdateDetailAsync(int id,string HangfireJobId)
+        {
+             var existingPreventiveScheduler = await _applicationDbContext.PreventiveSchedulerDtl.FirstOrDefaultAsync(u => u.Id == id);
+
+            if (existingPreventiveScheduler != null)
+            {
+                existingPreventiveScheduler.HangfireJobId = HangfireJobId;
+                 _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
+                return await _applicationDbContext.SaveChangesAsync() >0;
+            }
+            return false;
+       
         }
     }
 }

@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Contracts.Events;
-using Contracts.Events.Maintenance;
 using Contracts.Events.Users;
 using MassTransit;
 using Serilog;
@@ -29,6 +23,8 @@ namespace SagaOrchestrator.Application
         public Event<UserCreatedEvent> UserCreatedEvent { get; private set; }
         public Event<AssetCreatedEvent> AssetCreatedEvent { get; private set; }
         public Event<SagaCompletedEvent> SagaCompletedEvent { get; private set; }
+        public Event<UserCreationFailedEvent> UserCreationFailedEvent { get; private set; }
+        public Event<AssetCreationFailedEvent> AssetCreationFailedEvent { get; private set; }
 
         public UserAssetStateMachine()
         {
@@ -37,6 +33,8 @@ namespace SagaOrchestrator.Application
             Event(() => UserCreatedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
             Event(() => AssetCreatedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
             Event(() => SagaCompletedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
+            Event(() => UserCreationFailedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
+            Event(() => AssetCreationFailedEvent, x => x.CorrelateById(m => m.Message.CorrelationId));
 
             // Initial saga state handling
             Initially(
@@ -47,7 +45,15 @@ namespace SagaOrchestrator.Application
                         Log.Information("🔥 [SAGA] UserCreatedEvent received - UserId: {UserId}, State: {State}",
                             context.Message.UserId, nameof(UserCreated));
                     })
-                    .TransitionTo(UserCreated)
+                    .TransitionTo(UserCreated),
+
+                     When(UserCreationFailedEvent)
+                    .Then(context =>
+                    {
+                        Log.Error("❌ [SAGA] User creation failed - Reason: {Reason}", context.Message.Reason);
+                        // TODO: Send compensation commands if needed
+                    })
+                    .Finalize()
             );
             // Transition from UserCreated to AssetAssigned
             During(UserCreated,
@@ -58,7 +64,15 @@ namespace SagaOrchestrator.Application
                         Log.Information("🛠️ [SAGA] AssetCreatedEvent received - AssetId: {AssetId}, AssetName: {AssetName}, State: {State}",
                             context.Message.AssetId, context.Message.AssetName, nameof(AssetAssigned));
                     })
-                    .TransitionTo(AssetAssigned)
+                    .TransitionTo(AssetAssigned),
+                    
+                     When(AssetCreationFailedEvent)
+                    .Then(context =>
+                    {
+                        Log.Error("❌ [SAGA] Asset creation failed - Reason: {Reason}", context.Message.Reason);
+                        // TODO: Send compensation commands, e.g., delete user
+                    })
+                    .Finalize()
             );
             // Finalize saga on completion
             During(AssetAssigned,
