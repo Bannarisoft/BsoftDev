@@ -12,7 +12,7 @@ namespace Core.Domain.Entities
         public required MachineGroup MachineGroup { get; set; }
         public int DepartmentId { get; set; }
         public int MaintenanceCategoryId { get; set; }
-        public required MaintenanceCategory MaintenanceCategory { get; set; }
+        public required MiscMaster MiscMaintenanceCategory { get; set; }
         public int ScheduleId { get; set; }
         public required MiscMaster MiscSchedule { get; set; }
         public int FrequencyTypeId { get; set; }

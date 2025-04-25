@@ -1,9 +1,12 @@
 using Core.Application.WorkOrder.Command.CreateWorkOrder;
 using Core.Application.WorkOrder.Command.CreateWorkOrder.CreateSchedule;
 using Core.Application.WorkOrder.Command.DeleteFileWorkOrder;
+using Core.Application.WorkOrder.Command.DeleteFileWorkOrder.Item;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder;
+using Core.Application.WorkOrder.Command.UploadFileWorOrder.Item;
+using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrderById;
 using Core.Application.WorkOrder.Queries.GetWorkOrderRootCause;
 using Core.Application.WorkOrder.Queries.GetWorkOrderSource;
@@ -25,13 +28,15 @@ namespace MaintenanceManagement.API.Controllers
         private readonly IValidator<UpdateWOScheduleCommand> _updateWoScheduleCommandValidator;        
         private readonly IValidator<CreateWOScheduleCommand> _createWoScheduleCommandValidator;  
         private readonly IValidator<UploadFileWorkOrderCommand> _uploadFileCommandValidator;        
+        private readonly IValidator<UploadFileItemCommand> _uploadItemCommandValidator;     
 
         public WorkOrderController( ISender mediator, 
             IValidator<CreateWorkOrderCommand> createWorkOrderCommandValidator, 
             IValidator<UpdateWorkOrderCommand> updateWorkOrderCommandValidator ,
             IValidator<UpdateWOScheduleCommand> updateWoScheduleCommandValidator ,
             IValidator<CreateWOScheduleCommand> createWoScheduleCommandValidator ,
-            IValidator<UploadFileWorkOrderCommand> uploadFileCommandValidator            
+            IValidator<UploadFileWorkOrderCommand> uploadFileCommandValidator,
+            IValidator<UploadFileItemCommand> uploadItemCommandValidator
             ) 
             : base(mediator)
 
@@ -40,7 +45,8 @@ namespace MaintenanceManagement.API.Controllers
             _updateWorkOrderCommandValidator = updateWorkOrderCommandValidator;
             _updateWoScheduleCommandValidator=updateWoScheduleCommandValidator;
             _createWoScheduleCommandValidator=createWoScheduleCommandValidator;
-             _uploadFileCommandValidator = uploadFileCommandValidator;
+            _uploadFileCommandValidator = uploadFileCommandValidator;
+            _uploadItemCommandValidator = uploadItemCommandValidator;
         }
        [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateWorkOrderCommand command)
@@ -175,7 +181,7 @@ namespace MaintenanceManagement.API.Controllers
                 message = result.Message
             });
         }
-         [HttpPost("upload-image")]
+        [HttpPost("upload-image")]
         public async Task<IActionResult> UploadLogo(UploadFileWorkOrderCommand uploadFileCommand)
         {
             var validationResult = await _uploadFileCommandValidator.ValidateAsync(uploadFileCommand);
@@ -212,12 +218,78 @@ namespace MaintenanceManagement.API.Controllers
         [HttpDelete("delete-image")]
         public async Task<IActionResult> DeleteLogo([FromBody] DeleteFileWorkOrderCommand deleteFileCommand)
         {
-            if (deleteFileCommand == null || string.IsNullOrWhiteSpace(deleteFileCommand.assetPath))
+            if (deleteFileCommand == null || string.IsNullOrWhiteSpace(deleteFileCommand.Image))
             {
                 return BadRequest(new 
                 { 
                     StatusCode = StatusCodes.Status400BadRequest, 
-                    message = "Invalid request. 'assetPath' cannot be null or empty.",
+                    message = "Invalid request. 'ImagePath' cannot be null or empty.",
+                    errors = ""
+                });
+            }
+
+            var file = await Mediator.Send(deleteFileCommand);
+            if (!file.IsSuccess)
+            {
+
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = file.Message,
+                    errors = ""
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = file.Message,
+                errors = ""
+            });
+        }
+        [HttpPost("upload-image/Item")]
+        public async Task<IActionResult> UploadItemLogo(UploadFileItemCommand uploadFileCommand)
+        {
+            var validationResult = await _uploadItemCommandValidator.ValidateAsync(uploadFileCommand);
+            if (!validationResult.IsValid)
+            {
+
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                });
+            }
+            var file = await Mediator.Send(uploadFileCommand);
+            if (!file.IsSuccess)
+            {
+
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = file.Message,
+                    errors = ""
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = file.Message,
+                data = file.Data,
+                errors = ""
+            });
+        }
+        [HttpDelete("delete-image/Item")]
+        public async Task<IActionResult> DeleteItemLogo([FromBody] DeleteFileItemCommand deleteFileCommand)
+        {
+            if (deleteFileCommand == null || string.IsNullOrWhiteSpace(deleteFileCommand.Image))
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode = StatusCodes.Status400BadRequest, 
+                    message = "Invalid request. 'ImagePath' cannot be null or empty.",
                     errors = ""
                 });
             }
@@ -345,6 +417,47 @@ namespace MaintenanceManagement.API.Controllers
                 StatusCode = StatusCodes.Status200OK,
                 data = result.Data
 
+            });
+        }
+         [HttpGet]
+        public async Task<IActionResult> GetByAllAsync( [FromQuery] string? fromDate,[FromQuery] string? toDate,[FromQuery] string? requestType
+        , [FromQuery] int pageNumber,[FromQuery] int pageSize,[FromQuery] string? searchTerm)
+        {            
+            DateTimeOffset? parsedStartDate = null;
+            DateTimeOffset? parsedEndDate = null;
+
+            if (!string.IsNullOrWhiteSpace(fromDate))  // Allow null or empty values
+            {
+                if (!DateTimeOffset.TryParse(fromDate, out var parsedDate))
+                {
+                    return BadRequest(new { message = "Invalid fromDate format. Use yyyy-MM-dd." });
+                }
+                parsedStartDate = parsedDate;
+            }
+
+            if (!string.IsNullOrWhiteSpace(toDate))  // Allow null or empty values
+            {
+                if (!DateTimeOffset.TryParse(toDate, out var parsedDate))
+                {
+                    return BadRequest(new { message = "Invalid toDate format. Use yyyy-MM-dd." });
+                }
+                parsedEndDate = parsedDate;
+            } 
+             var workOrder = await Mediator.Send(
+                new GetWorkOrderQuery
+                {                   
+                    fromDate=parsedStartDate,
+                    toDate=parsedEndDate,
+                    requestType=requestType,
+                    PageNumber = pageNumber, 
+                    PageSize = pageSize, 
+                    SearchTerm = searchTerm                  
+                });
+            return Ok(new 
+            { 
+                StatusCode = StatusCodes.Status200OK, 
+                message = workOrder.Message,
+                data = workOrder.Data.ToList()               
             });
         }
     }

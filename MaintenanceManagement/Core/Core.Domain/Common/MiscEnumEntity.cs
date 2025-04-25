@@ -36,11 +36,20 @@ namespace Core.Domain.Common
 
         public static class  MaintenanceStatusUpdate
         {
+
             public const string Code = "Closed";
         }  
+         public static class  StatusOpen
+        {
+        public const string Code = "Open";
+        }     
         public static class  GetWOStoreType
         {
             public const string StoreType = "StoreType";
-        }     
+        }    
+        public static class  GetStatusId
+        {
+            public const string Status = "InProgress";
+        }   
     }
 }

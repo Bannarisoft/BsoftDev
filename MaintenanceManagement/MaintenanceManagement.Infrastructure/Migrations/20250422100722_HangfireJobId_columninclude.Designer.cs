@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250422100722_HangfireJobId_columninclude")]
+    partial class HangfireJobId_columninclude
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -260,18 +263,18 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CategoryDescription")
+                    b.Property<string>("CatDesc")
                         .HasColumnType("nvarchar(100)")
-                        .HasColumnName("CategoryDescription");
+                        .HasColumnName("CatDesc");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("CreatedDt")
                         .HasColumnType("datetime");
 
-                    b.Property<string>("DepartmentName")
+                    b.Property<string>("DepName")
                         .HasColumnType("nvarchar(200)")
-                        .HasColumnName("DepartmentName");
+                        .HasColumnName("DepName");
 
-                    b.Property<DateTime>("DocDate")
+                    b.Property<DateTime>("DocDt")
                         .HasColumnType("datetime");
 
                     b.Property<int>("DocNo")
@@ -282,9 +285,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("DocSNo");
 
-                    b.Property<string>("GroupName")
+                    b.Property<string>("GrpName")
                         .HasColumnType("nvarchar(100)")
-                        .HasColumnName("GroupName");
+                        .HasColumnName("GrpName");
 
                     b.Property<string>("ItemCode")
                         .IsRequired()
@@ -319,10 +322,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("TC");
 
-                    b.Property<string>("TransactionType")
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
-                        .HasColumnName("TransactionType");
+                        .HasColumnName("Type");
 
                     b.Property<string>("UOM")
                         .IsRequired()
@@ -334,7 +337,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SubStores", "Maintenance");
+                    b.ToTable("ItemTransactions", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MachineGroup", b =>
@@ -919,15 +922,15 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("EstimatedTimeHrs");
 
-                    b.Property<int>("PreventiveSchedulerHeaderId")
+                    b.Property<int>("PreventiveSchedulerHdrId")
                         .HasColumnType("int")
-                        .HasColumnName("PreventiveSchedulerHeaderId");
+                        .HasColumnName("PreventiveSchedulerHdrId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ActivityId");
 
-                    b.HasIndex("PreventiveSchedulerHeaderId");
+                    b.HasIndex("PreventiveSchedulerHdrId");
 
                     b.ToTable("PreventiveSchedulerActivity", "Maintenance");
                 });
@@ -989,9 +992,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("PreventiveSchedulerHeaderId")
+                    b.Property<int>("PreventiveSchedulerId")
                         .HasColumnType("int")
-                        .HasColumnName("PreventiveSchedulerHeaderId");
+                        .HasColumnName("PreventiveSchedulerId");
 
                     b.Property<string>("RescheduleReason")
                         .HasColumnType("nvarchar(max)")
@@ -1005,7 +1008,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasIndex("MachineId");
 
-                    b.HasIndex("PreventiveSchedulerHeaderId");
+                    b.HasIndex("PreventiveSchedulerId");
 
                     b.ToTable("PreventiveSchedulerDetail", "Maintenance");
                 });
@@ -1130,21 +1133,13 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ItemId");
 
-                    b.Property<string>("OldCategoryDescription")
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("OldCategoryDescription");
-
-                    b.Property<string>("OldGroupName")
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("OldGroupName");
-
                     b.Property<string>("OldItemId")
                         .HasColumnType("varchar(50)")
                         .HasColumnName("OldItemId");
 
-                    b.Property<int>("PreventiveSchedulerHeaderId")
+                    b.Property<int>("PreventiveSchedulerHdrId")
                         .HasColumnType("int")
-                        .HasColumnName("PreventiveSchedulerHeaderId");
+                        .HasColumnName("PreventiveSchedulerId");
 
                     b.Property<int>("RequiredQty")
                         .HasColumnType("int")
@@ -1156,7 +1151,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PreventiveSchedulerHeaderId");
+                    b.HasIndex("PreventiveSchedulerHdrId");
 
                     b.ToTable("PreventiveSchedulerItems", "Maintenance");
                 });
@@ -1291,79 +1286,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasIndex("ShiftMasterId");
 
                     b.ToTable("ShiftMasterDetails", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.StockLedger", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<DateTime>("DocDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<int>("DocNo")
-                        .HasColumnType("int")
-                        .HasColumnName("DocNo");
-
-                    b.Property<int>("DocSNo")
-                        .HasColumnType("int")
-                        .HasColumnName("DocSNo");
-
-                    b.Property<decimal>("IssueQty")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(18,3)")
-                        .HasDefaultValue(0.00m);
-
-                    b.Property<decimal>("IssueValue")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(18,3)")
-                        .HasDefaultValue(0.00m);
-
-                    b.Property<string>("ItemCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("ItemCode");
-
-                    b.Property<string>("ItemName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("ItemName");
-
-                    b.Property<string>("OldUnitCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("OldUnitCode");
-
-                    b.Property<decimal>("ReceivedQty")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(18,3)")
-                        .HasDefaultValue(0.00m);
-
-                    b.Property<decimal>("ReceivedValue")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(18,3)")
-                        .HasDefaultValue(0.00m);
-
-                    b.Property<string>("TransactionType")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("TransactionType");
-
-                    b.Property<string>("UOM")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("UOM");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("StockLedger", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.WorkCenter", b =>
@@ -1627,7 +1549,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ScarpQty");
 
-                    b.Property<int?>("StoreTypeId")
+                    b.Property<int>("SourceId")
+                        .HasColumnType("int")
+                        .HasColumnName("SourceId");
+
+                    b.Property<int>("StoreTypeId")
                         .HasColumnType("int")
                         .HasColumnName("StoreTypeId");
 
@@ -1645,6 +1571,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("SourceId");
+
                     b.HasIndex("StoreTypeId");
 
                     b.HasIndex("WorkOrderId");
@@ -1661,7 +1589,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTimeOffset?>("EndTime")
+                    b.Property<DateTimeOffset>("EndTime")
                         .HasColumnType("DateTimeOffset")
                         .HasColumnName("EndTime");
 
@@ -1689,13 +1617,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("HoursSpent")
-                        .HasColumnType("int")
+                    b.Property<decimal>("HoursSpent")
+                        .HasColumnType("decimal(10,2)")
                         .HasColumnName("HoursSpent");
-
-                    b.Property<int>("MinutesSpent")
-                        .HasColumnType("int")
-                        .HasColumnName("MinutesSpent");
 
                     b.Property<int>("OldTechnicianId")
                         .HasColumnType("int")
@@ -1886,7 +1810,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasOne("Core.Domain.Entities.PreventiveSchedulerHeader", "PreventiveScheduler")
                         .WithMany("PreventiveSchedulerActivities")
-                        .HasForeignKey("PreventiveSchedulerHeaderId")
+                        .HasForeignKey("PreventiveSchedulerHdrId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1905,7 +1829,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasOne("Core.Domain.Entities.PreventiveSchedulerHeader", "PreventiveScheduler")
                         .WithMany("PreventiveSchedulerDetails")
-                        .HasForeignKey("PreventiveSchedulerHeaderId")
+                        .HasForeignKey("PreventiveSchedulerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1934,8 +1858,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscMaintenanceCategory")
-                        .WithMany("MaintenanceCategory")
+                    b.HasOne("Core.Domain.Entities.MaintenanceCategory", "MaintenanceCategory")
+                        .WithMany("PreventiveSchedulerHeaders")
                         .HasForeignKey("MaintenanceCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1948,11 +1872,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Navigation("MachineGroup");
 
+                    b.Navigation("MaintenanceCategory");
+
                     b.Navigation("MiscFrequencyType");
 
                     b.Navigation("MiscFrequencyUnit");
-
-                    b.Navigation("MiscMaintenanceCategory");
 
                     b.Navigation("MiscSchedule");
                 });
@@ -1961,7 +1885,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                 {
                     b.HasOne("Core.Domain.Entities.PreventiveSchedulerHeader", "PreventiveScheduler")
                         .WithMany("PreventiveSchedulerItems")
-                        .HasForeignKey("PreventiveSchedulerHeaderId")
+                        .HasForeignKey("PreventiveSchedulerHdrId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -2051,16 +1975,25 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrderItem", b =>
                 {
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscSource")
+                        .WithMany("WorkOrderItemSource")
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Core.Domain.Entities.MiscMaster", "MiscStoreType")
                         .WithMany("WorkOrderItemStoreType")
                         .HasForeignKey("StoreTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.WorkOrderMaster.WorkOrder", "WOItem")
                         .WithMany("WorkOrderItems")
                         .HasForeignKey("WorkOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MiscSource");
 
                     b.Navigation("MiscStoreType");
 
@@ -2136,6 +2069,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("PreventiveSchedulerDetail");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.MaintenanceCategory", b =>
+                {
+                    b.Navigation("PreventiveSchedulerHeaders");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.MaintenanceRequest", b =>
                 {
                     b.Navigation("WorkOrdersRequest");
@@ -2146,8 +2084,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("FrequencyType");
 
                     b.Navigation("FrequencyUnit");
-
-                    b.Navigation("MaintenanceCategory");
 
                     b.Navigation("MaintenanceType");
 
@@ -2164,6 +2100,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("ServiceType");
 
                     b.Navigation("SpareType");
+
+                    b.Navigation("WorkOrderItemSource");
 
                     b.Navigation("WorkOrderItemStoreType");
 

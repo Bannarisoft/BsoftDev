@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.WorkOrder.Queries.GetWorkOrder
 {
-    public class GetWorkOrderQueryHandler : IRequestHandler<GetWorkOrderQuery, ApiResponseDTO<List<GetWorkOrderByIdDto>>>
+    public class GetWorkOrderQueryHandler : IRequestHandler<GetWorkOrderQuery, ApiResponseDTO<List<Dictionary<string, List<GetWorkOrderDto>>>>>
     {
         private readonly IWorkOrderQueryRepository _workOrderRepository;
         private readonly IMapper _mapper;
@@ -20,10 +20,18 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<List<GetWorkOrderByIdDto>>> Handle(GetWorkOrderQuery request, CancellationToken cancellationToken)
+  
+        public async Task<ApiResponseDTO<List<Dictionary<string, List<GetWorkOrderDto>>>>> Handle(GetWorkOrderQuery request, CancellationToken cancellationToken)
         {
-            var (assetMaster, totalCount) = await _workOrderRepository.GetAllWOAsync(request.PageNumber, request.PageSize, request.SearchTerm);
-            var assetMasterList = _mapper.Map<List<GetWorkOrderByIdDto>>(assetMaster);
+           var (workOrder, totalCount) = await _workOrderRepository.GetAllWOAsync(request.fromDate,request.toDate, request.requestType, request.PageNumber, request.PageSize, request.SearchTerm);            
+           var mappedWorkOrders = _mapper.Map<List<GetWorkOrderDto>>(workOrder);
+            var groupedWorkOrders = mappedWorkOrders
+            .GroupBy(w => w.MaintenanceType ?? "Unknown")
+            .Select(g => new Dictionary<string, List<GetWorkOrderDto>>
+            {
+                [g.Key] = g.ToList()
+            })
+            .ToList();
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -34,15 +42,15 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
                 module:"WorkOrderDetails"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetWorkOrderByIdDto>>
+           return new ApiResponseDTO<List<Dictionary<string, List<GetWorkOrderDto>>>>
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = assetMasterList,
+                Data = groupedWorkOrders,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
-            };            
+            };     
         }
     }
 }

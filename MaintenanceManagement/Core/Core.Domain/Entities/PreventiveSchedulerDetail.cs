@@ -11,7 +11,7 @@ namespace Core.Domain.Entities
     public class PreventiveSchedulerDetail : BaseEntity
     {
 
-        public int PreventiveSchedulerId { get; set; }
+        public int PreventiveSchedulerHeaderId { get; set; }
         public required PreventiveSchedulerHeader PreventiveScheduler { get; set; }
         public int MachineId { get; set; }
         public required MachineMaster Machine { get; set; }
@@ -21,6 +21,7 @@ namespace Core.Domain.Entities
         public DateOnly MaterialReqStartDays { get; set; }
         public string? RescheduleReason { get; set; }
         public ICollection<WorkOrder>? workOrdersSchedule  {get; set;}   
+        public string? HangfireJobId { get; set; }
         
     }
 }
