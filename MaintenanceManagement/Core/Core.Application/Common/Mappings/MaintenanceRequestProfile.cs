@@ -14,7 +14,7 @@ namespace Core.Application.Common.Mappings
 {
     public class MaintenanceRequestProfile : Profile
     {
-        private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
+        
         private readonly IIPAddressService _ipAddressService;
 
         public MaintenanceRequestProfile()
@@ -32,7 +32,7 @@ namespace Core.Application.Common.Mappings
             CreateMap<Core.Domain.Entities.MaintenanceRequest, Core.Domain.Entities.WorkOrderMaster.WorkOrder>()
              .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.RequestId, opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.WorkOrderDocNo, opt => opt.MapFrom(src => _workOrderQueryRepository.GetLatestWorkOrderDocNo(src.RequestTypeId)))
+            // .ForMember(dest => dest.WorkOrderDocNo, opt => opt.MapFrom(src => _workOrderQueryRepository.GetLatestWorkOrderDocNo(src.RequestTypeId)))
             .ForMember(dest => dest.StatusId, opt => opt.MapFrom(src => src.RequestStatusId))
             .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => _ipAddressService.GetCompanyId()))
             .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => _ipAddressService.GetUnitId()));
