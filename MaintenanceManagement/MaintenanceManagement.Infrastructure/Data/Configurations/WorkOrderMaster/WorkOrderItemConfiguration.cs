@@ -48,16 +48,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasColumnName("ItemName")
                 .HasColumnType("varchar(250)")
                 .IsRequired(false);
-
-             builder.Property(t => t.SourceId)
-                .HasColumnName("SourceId")
-                .HasColumnType("int")
-                .IsRequired(false);
-            builder.HasOne(amg => amg.MiscSource)
-                .WithMany(am => am.WorkOrderItemSource)
-                .HasForeignKey(amg => amg.SourceId)
-                .OnDelete(DeleteBehavior.Cascade);
-
+            
             builder.Property(t => t.AvailableQty)
                 .HasColumnName("AvailableQty")
                 .HasColumnType("int")

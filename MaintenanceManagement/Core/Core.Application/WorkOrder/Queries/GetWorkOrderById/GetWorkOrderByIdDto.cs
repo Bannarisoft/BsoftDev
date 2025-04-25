@@ -3,20 +3,29 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
 {
     public class GetWorkOrderByIdDto
     {   
-        public int Id { get; set; }       
+        
         public string? WorkOrderDocNo { get; set; }                   
         public string? Remarks { get; set; }
         public string? Image { get; set; }
+        public string? ImagePath { get; set; }
         public int StatusId { get; set; }                         
         public string? StatusDesc { get; set; }
         public int RootCauseId { get; set; }  
         public string? RootCauseDesc { get; set; }
+        public DateTimeOffset? CreatedDate { get; set; }
+        public DateTimeOffset? DownTimeStart { get; set; }
+        public DateTimeOffset? DownTimeEnd { get; set; }
+        public string? Machine { get; set; }
+        public string? Department { get; set; }
+        public int? RequestId { get; set; }
+    
+        
         
 
-        public IList<GetWorkOrderActivityByIdDto>? WorkOrderActivity { get; set; }
-        public IList<GetWorkOrderItemByIdDto>? WorkOrderItem { get; set; }        
-        public IList<GetWorkOrderTechnicianByIdDto>? WorkOrderTechnician { get; set; }
-        public IList<GetWorkOrderCheckListByIdDto>? WorkOrderCheckList { get; set; }
-        public IList<GetWorkOrderScheduleByIdDto>? WorkOrderSchedule { get; set; }
+        public IList<GetWorkOrderActivityByIdDto>? WOActivity { get; set; }
+        public IList<GetWorkOrderItemByIdDto>? WOItem { get; set; }        
+        public IList<GetWorkOrderTechnicianByIdDto>? WOTechnician { get; set; }
+        public IList<GetWorkOrderCheckListByIdDto>? WOCheckList { get; set; }
+        public IList<GetWorkOrderScheduleByIdDto>? WOSchedule { get; set; }
     } 
 }

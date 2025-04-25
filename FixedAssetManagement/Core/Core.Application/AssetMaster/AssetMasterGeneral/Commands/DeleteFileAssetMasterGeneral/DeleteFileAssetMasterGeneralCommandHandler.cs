@@ -30,6 +30,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
                 _logger.LogError("Base directory path not found in database.");
                 return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Base directory not configured." };                
             }
+            
             string companyFolder = Path.Combine(baseDirectory, request.CompanyName ?? string.Empty);
             string unitFolder = Path.Combine(companyFolder, request.UnitName ?? string.Empty);
             

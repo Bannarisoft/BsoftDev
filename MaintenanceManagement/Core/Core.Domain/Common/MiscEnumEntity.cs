@@ -41,6 +41,10 @@ namespace Core.Domain.Common
         public static class  GetWOStoreType
         {
             public const string StoreType = "StoreType";
-        }     
+        }    
+        public static class  GetStatusId
+        {
+            public const string Status = "InProgress";
+        }   
     }
 }

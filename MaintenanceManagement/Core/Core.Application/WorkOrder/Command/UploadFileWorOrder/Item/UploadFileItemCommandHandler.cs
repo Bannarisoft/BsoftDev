@@ -1,5 +1,4 @@
 
-
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
@@ -8,37 +7,35 @@ using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
+namespace Core.Application.WorkOrder.Command.UploadFileWorOrder.Item
 {
-    public class UploadFileWorkOrderCommandHandler : IRequestHandler<UploadFileWorkOrderCommand, ApiResponseDTO<WorkOrderImageDto>>
-    {  
-        private readonly IWorkOrderQueryRepository _woQueryRepository;
+    public class UploadFileItemCommandHandler : IRequestHandler<UploadFileItemCommand, ApiResponseDTO<ItemImageDto>>
+    {
+        
         private readonly ILogger<UploadFileWorkOrderCommandHandler> _logger;
          private readonly IIPAddressService _ipAddressService;
          private readonly IWorkOrderCommandRepository _workOrderRepository;
 
-        public UploadFileWorkOrderCommandHandler( 
-            IWorkOrderQueryRepository woQueryRepository,
+        public UploadFileItemCommandHandler(                       
             ILogger<UploadFileWorkOrderCommandHandler> logger, IIPAddressService ipAddressService,IWorkOrderCommandRepository workOrderRepository)
-        {           
-            _woQueryRepository = woQueryRepository;
+        {               
             _logger = logger;
             _ipAddressService = ipAddressService;
             _workOrderRepository = workOrderRepository;
         }
 
-        public async Task<ApiResponseDTO<WorkOrderImageDto>> Handle(UploadFileWorkOrderCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<ItemImageDto>> Handle(UploadFileItemCommand request, CancellationToken cancellationToken)
         {
             if (request.File == null || request.File.Length == 0)
             {
-                return new ApiResponseDTO<WorkOrderImageDto> { IsSuccess = false, Message = "No file uploaded" };
+                return new ApiResponseDTO<ItemImageDto> { IsSuccess = false, Message = "No file uploaded" };
             }           
              // 🔹 Fetch Base Directory from Database
-            string baseDirectory = await _woQueryRepository.GetBaseDirectoryAsync();
+            string baseDirectory = await _workOrderRepository.GetBaseDirectoryItemAsync();
             if (string.IsNullOrWhiteSpace(baseDirectory))
             {
                _logger.LogError("Base directory path not found in database.");
-                return new ApiResponseDTO<WorkOrderImageDto> { IsSuccess = false, Message = "Base directory not configured." };
+                return new ApiResponseDTO<ItemImageDto> { IsSuccess = false, Message = "Base directory not configured." };
             }
             var companyId =1; //_ipAddressService.GetCompanyId();
             var unitId = 41;//_ipAddressService.GetUnitId();
@@ -70,18 +67,18 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
 
                 // ✅ Ensure the correct format before saving in DB
                 string formattedPath = dummyFileName;
-                 var response = new WorkOrderImageDto
+                 var response = new ItemImageDto
                 {
-                    WorkOrderImage = formattedPath,  // ✅ Correctly formatted file path
-                    WorkOrderImageBase64 = base64Image  // ✅ Convert to Base64
+                    WorkOrderItemImage = formattedPath,  // ✅ Correctly formatted file path
+                    WorkOrderImageItemBase64 = base64Image  // ✅ Convert to Base64
                 };
 
-                return new ApiResponseDTO<WorkOrderImageDto> { IsSuccess = true, Data = response };
+                return new ApiResponseDTO<ItemImageDto> { IsSuccess = true, Data = response };
             }
             catch (Exception ex)
             {
                 _logger.LogError($"File upload failed: {ex.Message}");
-                return new ApiResponseDTO<WorkOrderImageDto> { IsSuccess = false, Message = $"File upload failed: {ex.Message}" };
+                return new ApiResponseDTO<ItemImageDto> { IsSuccess = false, Message = $"File upload failed: {ex.Message}" };
             }
         }   
         private void EnsureDirectoryExists(string path)
