@@ -27,7 +27,7 @@ namespace Core.Domain.Entities.WorkOrderMaster
         public ICollection<WorkOrderTechnician>? WorkOrderTechnicians {get; set;} 
         public ICollection<WorkOrderCheckList>? WorkOrderCheckLists {get; set;} 
 
-         public MaintenanceRequest? WOMaintenanceRequests { get; set; }
+         
         
        
 
