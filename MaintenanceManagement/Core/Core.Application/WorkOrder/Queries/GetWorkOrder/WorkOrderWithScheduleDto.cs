@@ -18,5 +18,6 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
         public int RequestId { get; set; }
         public DateTimeOffset? ScheduleStartTime { get; set; }
         public DateTimeOffset? ScheduleEndTime { get; set; }
+        public byte? ISCompleted { get; set; }
     }
 }

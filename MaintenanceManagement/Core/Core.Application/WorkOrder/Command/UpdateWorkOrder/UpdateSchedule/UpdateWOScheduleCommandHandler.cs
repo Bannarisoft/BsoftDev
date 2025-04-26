@@ -47,13 +47,13 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule
                 return new ApiResponseDTO<bool>
                 {
                     IsSuccess = true,
-                    Message = "WorkOrder Schedule inserted successfully.",                        
+                    Message = "WorkOrder Schedule Updated successfully.",                        
                 };
             }
             return new ApiResponseDTO<bool>
             {
                 IsSuccess = false,
-                Message = "WorkOrder Schedule not inserted."
+                Message = "WorkOrder Schedule not Updated."
             };                
         }          
     }

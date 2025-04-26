@@ -22,19 +22,16 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
         public async Task<ApiResponseDTO<GetWorkOrderByIdDto>> Handle(GetWorkOrderByIdQuery request, CancellationToken cancellationToken)
         {          
             var (woResult, woActivity, woItem,woTechnician,woCheckList,woSchedule) = await _workOrderQueryRepository.GetWorkOrderByIdAsync(request.Id);
-            var asset = _mapper.Map<GetWorkOrderByIdDto>(woResult);
-           //  var asset = new GetWorkOrderByIdDto
-            // {
-            //     WorkOrderDocNo = woResult.WorkOrderDocNo,
-            //     Remarks = woResult.Remarks,
-            //     Image = woResult.Image,
-            //     StatusId = woResult.StatusId,
-            //     StatusDesc = woResult.StatusDesc,
-            //     RootCauseId = woResult.RootCauseId,
-            //     RootCauseDesc = woResult.RootCauseDesc,
-            //     Id = woResult.Id
-            // };
-     
+            if (woResult == null)
+            {
+                return new ApiResponseDTO<GetWorkOrderByIdDto>
+                {
+                    IsSuccess = false,
+                    Message = $"WorkOrder with ID {request.Id} not found."
+                };
+            }
+
+            var asset = _mapper.Map<GetWorkOrderByIdDto>(woResult);         
             if (woActivity != null)
             {
                 asset.WOActivity  = _mapper.Map<List<GetWorkOrderActivityByIdDto>>(woActivity);
@@ -55,15 +52,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
             {
                 asset.WOCheckList  = _mapper.Map<List<GetWorkOrderCheckListByIdDto>>(woCheckList);
             }           
-
-            if (asset is null)
-            {                
-                return new ApiResponseDTO<GetWorkOrderByIdDto>
-                {
-                    IsSuccess = false,
-                    Message = "AssetName with ID {request.Id} not found."
-                };   
-            }       
+         
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetById",

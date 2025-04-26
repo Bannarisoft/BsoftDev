@@ -70,10 +70,13 @@ namespace Core.Domain.Common
         {
             public const string Code = "Internal";
         }
-         public static class MaintenanceRequestTypeExternal
-         
+        public static class MaintenanceRequestTypeExternal         
         {
             public const string Code = "External";
+        }
+        public static class GetRequestType
+        {
+            public const string Code = "RequestType";
         }
     }
 }
