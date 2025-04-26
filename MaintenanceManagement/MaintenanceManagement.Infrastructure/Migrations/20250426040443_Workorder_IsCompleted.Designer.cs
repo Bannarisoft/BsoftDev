@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250426040443_Workorder_IsCompleted")]
+    partial class Workorder_IsCompleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1465,6 +1468,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("DateTimeOffset")
                         .HasColumnName("DowntimeStart");
 
+                    b.Property<bool?>("ISCompleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Image")
                         .HasColumnType("varchar(250)")
                         .HasColumnName("Image");
@@ -1664,9 +1670,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("EndTime")
                         .HasColumnType("DateTimeOffset")
                         .HasColumnName("EndTime");
-
-                    b.Property<bool?>("ISCompleted")
-                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("StartTime")
                         .HasColumnType("DateTimeOffset")

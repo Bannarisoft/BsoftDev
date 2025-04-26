@@ -6,6 +6,7 @@ using Core.Application.WorkOrder.Command.UpdateWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder.Item;
+using Core.Application.WorkOrder.Queries.GetRequestType;
 using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrderById;
 using Core.Application.WorkOrder.Queries.GetWorkOrderRootCause;
@@ -386,6 +387,25 @@ namespace MaintenanceManagement.API.Controllers
             {
                 StatusCode = StatusCodes.Status200OK,
                 message = "StoreType fetched successfully.",
+                data = result.Data
+            });
+        }
+        [HttpGet("RequestType")]
+        public async Task<IActionResult> GetRequestType()
+        {
+            var result = await Mediator.Send(new GetRequestTypeQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Request Type found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "RequestType fetched successfully.",
                 data = result.Data
             });
         }

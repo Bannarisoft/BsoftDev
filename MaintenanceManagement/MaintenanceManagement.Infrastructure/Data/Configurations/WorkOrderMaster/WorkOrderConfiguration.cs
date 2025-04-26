@@ -98,7 +98,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
             builder.Property(t => t.DowntimeEnd)
                 .HasColumnName("DowntimeEnd")                
                 .HasColumnType("DateTimeOffset")
-                .IsRequired(false);   
+                .IsRequired(false);              
           
             builder.Property(b => b.CreatedByName)
                 .IsRequired()
