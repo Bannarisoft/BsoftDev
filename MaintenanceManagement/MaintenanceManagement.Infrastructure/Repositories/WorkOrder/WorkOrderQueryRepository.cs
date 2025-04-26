@@ -19,8 +19,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
         public async Task<(List<WorkOrderWithScheduleDto>, int)> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,string? requestType, int PageNumber, int PageSize, string? SearchTerm)
         {
-            var companyId = 1;//_ipAddressService.GetCompanyId();
-            var unitId =53;// _ipAddressService.GetUnitId();
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", companyId);
             parameters.Add("@UnitId", unitId);
@@ -125,8 +125,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
         public async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity, IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician, IEnumerable<dynamic> checkList, IEnumerable<dynamic> schedule)> GetWorkOrderByIdAsync(int workOrderId)         
         {
-            var companyId =1;// _ipAddressService.GetCompanyId();
-            var unitId = 53;//_ipAddressService.GetUnitId();
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", companyId);
             parameters.Add("@UnitId", unitId);
