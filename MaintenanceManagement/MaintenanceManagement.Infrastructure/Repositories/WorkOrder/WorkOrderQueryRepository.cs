@@ -17,7 +17,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _ipAddressService = ipAddressService;
         }
 
-        public async Task<(List<WorkOrderWithScheduleDto>, int)> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,string? requestType, int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<WorkOrderWithScheduleDto>, int)> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,int requestType, int PageNumber, int PageSize, string? SearchTerm)
         {
             var companyId = _ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
