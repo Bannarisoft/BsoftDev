@@ -28,8 +28,8 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
 
         public async Task<ApiResponseDTO<WorkOrderCombineDto>> Handle(CreateWorkOrderCommand request, CancellationToken cancellationToken)
         {
-            var companyId = 1;//_ipAddressService.GetCompanyId();
-            var unitId = 41;//_ipAddressService.GetUnitId();
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
             //var latestWoCode = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(request.WorkOrderDto.RequestTypeId);            
             var woEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrderDto);   
             //woEntity.WorkOrderDocNo = latestWoCode;         
