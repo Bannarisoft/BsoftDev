@@ -48,7 +48,6 @@ namespace MaintenanceManagement.API.Validation.ActivityMaster
                             .WithMessage("Activity name already exists.");
                         break;    
 
-
           
                 }
             }

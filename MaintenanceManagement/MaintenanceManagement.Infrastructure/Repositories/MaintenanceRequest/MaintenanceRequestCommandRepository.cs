@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
+using Core.Application.Common.Interfaces.IWorkOrder;
 using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,11 +15,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
 
          private readonly ApplicationDbContext _dbContext;
          private  readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
+
+         public readonly IWorkOrderCommandRepository _workOrderCommandRepository;
+
+         private readonly IIPAddressService _ipAddressService;
+        private readonly ITimeZoneService _timeZoneService;
+
          
-          public MaintenanceRequestCommandRepository(ApplicationDbContext applicationDbContext , IMaintenanceRequestQueryRepository maintenanceRequest)
+          public MaintenanceRequestCommandRepository(ApplicationDbContext applicationDbContext , IMaintenanceRequestQueryRepository maintenanceRequest, IWorkOrderCommandRepository workOrderCommandRepository, IIPAddressService ipAddressService, ITimeZoneService timeZoneService)
         {
             _dbContext = applicationDbContext;
             _maintenanceRequestQueryRepository = maintenanceRequest;
+            _workOrderCommandRepository = workOrderCommandRepository;
+            _ipAddressService = ipAddressService;
+            _timeZoneService = timeZoneService;
         }      
         public async Task<int> CreateAsync(Core.Domain.Entities.MaintenanceRequest maintenanceRequest)
         {
@@ -39,11 +50,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
 
                 if (existingRequest != null)
                 {
+                      bool maintenanceTypeChanged = existingRequest.MaintenanceTypeId != maintenanceRequest.MaintenanceTypeId;
+
                     existingRequest.RequestTypeId = maintenanceRequest.RequestTypeId;
                     existingRequest.MaintenanceTypeId = maintenanceRequest.MaintenanceTypeId;
                     existingRequest.MachineId = maintenanceRequest.MachineId;
-                    existingRequest.CompanyId = maintenanceRequest.CompanyId;
-                    existingRequest.UnitId = maintenanceRequest.UnitId;
+                   // existingRequest.CompanyId = maintenanceRequest.CompanyId;
+                   // existingRequest.UnitId = maintenanceRequest.UnitId;
                     existingRequest.DepartmentId = maintenanceRequest.DepartmentId;
                     existingRequest.SourceId = maintenanceRequest.SourceId;
                     existingRequest.VendorId = maintenanceRequest.VendorId;
@@ -58,9 +71,41 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                     existingRequest.RequestStatusId = maintenanceRequest.RequestStatusId;
                     existingRequest.Remarks = maintenanceRequest.Remarks; 
 
+                  //  _dbContext.MaintenanceRequest.Update(existingRequest);
+                   // return await _dbContext.SaveChangesAsync() > 0;
+                 if (maintenanceTypeChanged)
+                   {
+                    // Get latest WorkOrderDocNo
+                    var latestDocNo = await _workOrderCommandRepository.GetLatestWorkOrderDocNo(existingRequest.MaintenanceTypeId); // or MaintenanceTypeId
+
+                    // Find the related WorkOrder
+                    var workOrder = await _dbContext.WorkOrder
+                        .FirstOrDefaultAsync(w => w.RequestId == maintenanceRequest.Id);
+
+                    if (workOrder != null)
+                    {
+                          string currentIp = _ipAddressService.GetSystemIPAddress();
+                        int userId = _ipAddressService.GetUserId(); 
+                        string username = _ipAddressService.GetUserName();
+                        var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+                        var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);  
+
+                        workOrder.WorkOrderDocNo = latestDocNo;
+                        workOrder.ModifiedDate = DateTimeOffset.UtcNow;                         
+                        workOrder.ModifiedBy = userId;
+                        workOrder.ModifiedDate = currentTime;
+                        workOrder.ModifiedByName = username;
+                        workOrder.ModifiedIP = currentIp;
+
+                        _dbContext.WorkOrder.Update(workOrder);
+                    }
+                 }
+
                     _dbContext.MaintenanceRequest.Update(existingRequest);
                     return await _dbContext.SaveChangesAsync() > 0;
+
                 }
+                
 
                 return false;
         }
@@ -68,7 +113,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
   
         public async Task<bool> UpdateStatusAsync(int id)
         {
+
             // Step 1: Get the maintenance status from MiscMaster (e.g., "Closed")
+            var WOstatusclosed = await _maintenanceRequestQueryRepository.GetWOclosedOrInProgressAsync(id );
+           if (!WOstatusclosed)
+                return false;
+
             var statusList = await _maintenanceRequestQueryRepository.GetMaintenancestatusAsync();
             var status = statusList.FirstOrDefault();
 

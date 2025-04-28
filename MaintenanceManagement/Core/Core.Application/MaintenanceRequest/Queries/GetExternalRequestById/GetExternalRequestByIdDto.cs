@@ -7,7 +7,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetExternalRequestById
 {
     public class GetExternalRequestByIdDto
     {
-         public int Id { get; set; }
+        public int Id { get; set; }
        public int RequestTypeId  { get; set; }  
        public string? RequestType  { get; set; }   
        public int MaintenanceTypeId  { get; set; }    

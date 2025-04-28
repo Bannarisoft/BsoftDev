@@ -135,6 +135,10 @@
     {
         "rule": "FKColumnDelete",      
         "error": "{PropertyName} is inactive/deleted."
+    },
+    {
+        "rule": "WOclosedStatusCheck",      
+        "error": "{PropertyName} Work Order  has been   InProgress or closed."
     }
     
 ]
