@@ -37,8 +37,8 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder.Item
                _logger.LogError("Base directory path not found in database.");
                 return new ApiResponseDTO<ItemImageDto> { IsSuccess = false, Message = "Base directory not configured." };
             }
-            var companyId =1; //_ipAddressService.GetCompanyId();
-            var unitId = 41;//_ipAddressService.GetUnitId();
+            var companyId =_ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
             var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(companyId, unitId);
 
             // 🔹 Construct the required file path

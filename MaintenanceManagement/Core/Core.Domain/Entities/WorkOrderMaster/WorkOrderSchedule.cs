@@ -9,5 +9,6 @@ namespace Core.Domain.Entities.WorkOrderMaster
         public WorkOrder WOSchedule { get; set; } = null!; 
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset? EndTime { get; set; }   
+        public byte? ISCompleted { get; set; }   =0;
     }
 }

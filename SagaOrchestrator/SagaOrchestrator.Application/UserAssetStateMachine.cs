@@ -1,3 +1,4 @@
+using Contracts.Commands.Users;
 using Contracts.Events.Users;
 using MassTransit;
 using Serilog;
@@ -67,10 +68,18 @@ namespace SagaOrchestrator.Application
                     .TransitionTo(AssetAssigned),
                     
                      When(AssetCreationFailedEvent)
-                    .Then(context =>
+                    .Then(async context =>
                     {
                         Log.Error("❌ [SAGA] Asset creation failed - Reason: {Reason}", context.Message.Reason);
                         // TODO: Send compensation commands, e.g., delete user
+                        // 🔁 Rollback by sending DeleteUserCommand
+                        await context.Publish(new DeleteUserCommand
+                        {
+                            UserId = context.Saga.UserId,
+                            Reason = $"Asset creation failed: {context.Message.Reason}"
+                        });
+
+                        Log.Warning("🧹 DeleteUserCommand published for rollback - UserId: {UserId}", context.Saga.UserId);
                     })
                     .Finalize()
             );

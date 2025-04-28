@@ -6,6 +6,7 @@ using Core.Application.WorkOrder.Command.UpdateWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder.Item;
+using Core.Application.WorkOrder.Queries.GetRequestType;
 using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrderById;
 using Core.Application.WorkOrder.Queries.GetWorkOrderRootCause;
@@ -389,6 +390,25 @@ namespace MaintenanceManagement.API.Controllers
                 data = result.Data
             });
         }
+        [HttpGet("RequestType")]
+        public async Task<IActionResult> GetRequestType()
+        {
+            var result = await Mediator.Send(new GetRequestTypeQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Request Type found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "RequestType fetched successfully.",
+                data = result.Data
+            });
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
@@ -399,7 +419,7 @@ namespace MaintenanceManagement.API.Controllers
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
 
-                    message = "Invalid Asset ID"
+                    message = "Invalid WorkOrder ID"
                 });
             }
             var result = await Mediator.Send(new GetWorkOrderByIdQuery { Id = id });
@@ -409,7 +429,7 @@ namespace MaintenanceManagement.API.Controllers
                 {
                     StatusCode = StatusCodes.Status404NotFound,
 
-                    message = $"AssetId {id} not found",
+                    message = $"WorkOrder ID {id} not found",
                 });
             }
             return Ok(new
@@ -420,7 +440,7 @@ namespace MaintenanceManagement.API.Controllers
             });
         }
          [HttpGet]
-        public async Task<IActionResult> GetByAllAsync( [FromQuery] string? fromDate,[FromQuery] string? toDate,[FromQuery] string? requestType
+        public async Task<IActionResult> GetByAllAsync( [FromQuery] string? fromDate,[FromQuery] string? toDate,[FromQuery] int requestTypeId
         , [FromQuery] int pageNumber,[FromQuery] int pageSize,[FromQuery] string? searchTerm)
         {            
             DateTimeOffset? parsedStartDate = null;
@@ -443,12 +463,15 @@ namespace MaintenanceManagement.API.Controllers
                 }
                 parsedEndDate = parsedDate;
             } 
+            if (requestTypeId <= 0){
+               return BadRequest(new { message = "Invalid Request Id" }); 
+            }
              var workOrder = await Mediator.Send(
                 new GetWorkOrderQuery
                 {                   
                     fromDate=parsedStartDate,
                     toDate=parsedEndDate,
-                    requestType=requestType,
+                    requestType=requestTypeId,
                     PageNumber = pageNumber, 
                     PageSize = pageSize, 
                     SearchTerm = searchTerm                  

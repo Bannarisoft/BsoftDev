@@ -45,6 +45,7 @@ namespace Core.Domain.Common
         {   
                         public const string Code = "Closed";
 
+
         } 
 
          public static class  StatusOpen
@@ -69,8 +70,8 @@ namespace Core.Domain.Common
         {
             public const string Code = "Internal";
         }
-         public static class MaintenanceRequestTypeExternal
-         
+
+        public static class MaintenanceRequestTypeExternal         
         {
             public const string Code = "External";
         }
@@ -95,5 +96,9 @@ namespace Core.Domain.Common
             public const string MiscCode = "MaintenanceDispatchMode";
         }
 
+        public static class GetRequestType
+        {
+            public const string Code = "RequestType";
+        }
     }
 }

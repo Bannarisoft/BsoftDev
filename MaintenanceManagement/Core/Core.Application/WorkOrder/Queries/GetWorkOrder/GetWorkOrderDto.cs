@@ -5,6 +5,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
     {
         public DateTimeOffset? Start { get; set; }
         public DateTimeOffset? End { get; set; }
+        public byte ISCompleted { get; set; } 
     }
     public class GetWorkOrderDto
     {
