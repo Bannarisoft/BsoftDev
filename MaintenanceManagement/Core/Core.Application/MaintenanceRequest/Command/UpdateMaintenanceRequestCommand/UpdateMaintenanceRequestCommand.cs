@@ -10,11 +10,9 @@ namespace Core.Application.MaintenanceRequest.Command.UpdateMaintenanceRequestCo
     public class UpdateMaintenanceRequestCommand   :  IRequest<ApiResponseDTO<bool>>
     { 
        public int Id { get; set; }
-        public int RequestTypeId  { get; set; }       
+       public int RequestTypeId  { get; set; }       
        public int MaintenanceTypeId  { get; set; }     
        public int MachineId { get; set; } 
-       public int CompanyId { get; set; }
-       public int  UnitId { get; set; }           
        public int DepartmentId { get; set; }
        public int? SourceId { get; set; }
        public int? VendorId  { get; set; }

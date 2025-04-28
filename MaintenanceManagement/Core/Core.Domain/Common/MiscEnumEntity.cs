@@ -42,9 +42,8 @@ namespace Core.Domain.Common
 
         public static class  MaintenanceStatusUpdate
 
-        {        
-
-            public const string Code = "Closed";
+        {   
+                        public const string Code = "Closed";
 
         } 
 
@@ -75,5 +74,26 @@ namespace Core.Domain.Common
         {
             public const string Code = "External";
         }
+
+        public static class MaintenanceServiceType
+        {
+            public const string MiscCode = "MaintenanceServiceType";
+        }
+
+         public static class MaintenanceServiceLocation
+        {
+            public const string MiscCode = "MaintenanceServiceLocation";
+        }
+
+          public static class MaintenanceSpareType
+        {
+            public const string MiscCode = "MaintenanceSpares";
+        }
+
+           public static class MaintenanceDispatchMode
+        {
+            public const string MiscCode = "MaintenanceDispatchMode";
+        }
+
     }
 }

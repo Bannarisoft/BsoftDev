@@ -63,26 +63,19 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
                     IsSuccess = false,
                     Message = "Failed to create Maintenance Request"
                 };
-            }
-            
-           // var internalTypeId = await _maintenanceRequestQueryRepository.GetMaintenanceRequestTypeAsync();
+            }            
             var requestTypes = await _maintenanceRequestQueryRepository.GetMaintenanceRequestTypeAsync();
             var internalTypeId = requestTypes.FirstOrDefault()?.Id;
 
             if (internalTypeId.HasValue && maintenanceRequest.RequestTypeId == internalTypeId.Value)
-           {
-                // Proceed to create WorkOrder
-
-                  //var docNo = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(maintenanceRequest.MaintenanceTypeId);
-            // 🔹 Map WorkOrder manually and assign doc no
+           {               
             var workOrder = _imapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(maintenanceRequest);
            // workOrder.Id = 0; // important!
-            workOrder.RequestId = request.MaintenanceTypeId;
+            workOrder.RequestId = result;
             workOrder.CompanyId = _ipAddressService.GetCompanyId();           
             workOrder.UnitId = _ipAddressService.GetUnitId();
-
+            
             await _workOrderCommandRepository.CreateAsync(workOrder,request.MaintenanceTypeId, cancellationToken);  
-
             }                                     
             // 🔹 Publish domain event for auditing/logging
             var domainEvent = new AuditLogsDomainEvent(
