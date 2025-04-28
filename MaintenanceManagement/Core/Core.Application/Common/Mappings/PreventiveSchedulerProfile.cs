@@ -22,6 +22,8 @@ namespace Core.Application.Common.Mappings
             CreateMap<CreatePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
             .ForMember(dest => dest.PreventiveSchedulerActivities, opt => opt.MapFrom(src => src.Activity))
             .ForMember(dest => dest.PreventiveSchedulerItems, opt => opt.MapFrom(src => src.Items))
+            .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => _ipAddressService.GetCompanyId()))
+            .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => _ipAddressService.GetUnitId()))
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
@@ -69,8 +71,8 @@ namespace Core.Application.Common.Mappings
                 ctx.Items.ContainsKey("StatusId") ? (int)ctx.Items["StatusId"] : 0))
             // .ForMember(dest => dest.WorkOrderDocNo, opt => opt.MapFrom((src, dest, destMember, ctx) =>
             //     ctx.Items.ContainsKey("WorkOrderDocNo")))
-            .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => _ipAddressService.GetCompanyId()))
-            .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => _ipAddressService.GetUnitId()))
+            // .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => _ipAddressService.GetCompanyId()))
+            // .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => _ipAddressService.GetUnitId()))
             .ForMember(dest => dest.WorkOrderActivities, opt => opt.MapFrom(src => src.PreventiveSchedulerActivities))
             .ForMember(dest => dest.WorkOrderItems, opt => opt.MapFrom(src => src.PreventiveSchedulerItems))
             .ForMember(dest => dest.DowntimeStart, opt => opt.Ignore())

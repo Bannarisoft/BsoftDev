@@ -63,6 +63,8 @@ using Core.Application.WorkOrder.Command.UploadFileWorOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule;
 using Core.Application.WorkOrder.Command.CreateWorkOrder.CreateSchedule;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder.Item;
+using Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler;
+using MaintenanceManagement.API.Validation.PreventiveSchedulers;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -124,7 +126,8 @@ namespace MaintenanceManagement.API.Validation.Common
         services.AddScoped<IValidator<CreateMaintenanceRequestCommand>, CreateMaintenanceRequestCommandValidator>();
         services.AddScoped<IValidator<UpdateMaintenanceRequestCommand>, UpdateMaintenanceRequestCommandValidator>();
         services.AddScoped<IValidator<UpdateWOScheduleCommand>, UpdateWOScheduleCommandValidator>();
-        services.AddScoped<IValidator<CreateWOScheduleCommand>, CreateWOScheduleCommandValidator>();        
+        services.AddScoped<IValidator<CreateWOScheduleCommand>, CreateWOScheduleCommandValidator>();
+        services.AddScoped<IValidator<CreatePreventiveSchedulerCommand>, CreatePreventiveSchedulerCommandValidator>();        
         }  
     }
 }

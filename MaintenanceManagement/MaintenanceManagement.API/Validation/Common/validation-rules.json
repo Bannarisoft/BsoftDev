@@ -131,6 +131,10 @@
     {
         "rule": "PastDateValidation",      
         "error": "{PropertyName} cannot be in the past."
+    },
+    {
+        "rule": "FKColumnDelete",      
+        "error": "{PropertyName} is inactive/deleted."
     }
     
 ]
