@@ -8,7 +8,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
     {
         public DateTimeOffset? fromDate {get; set;}
         public DateTimeOffset? toDate {get; set;}
-        public string? requestType {get; set;}
+        public int requestType {get; set;}
         public int PageNumber { get; set; }
         public int PageSize { get; set; } 
         public string? SearchTerm { get; set; }
