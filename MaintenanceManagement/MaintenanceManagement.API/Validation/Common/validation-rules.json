@@ -131,6 +131,10 @@
     {
         "rule": "PastDateValidation",      
         "error": "{PropertyName} cannot be in the past."
+    },
+    {
+        "rule": "WOclosedStatusCheck",      
+        "error": "{PropertyName} Work Order  has been   InProgress or closed."
     }
     
 ]
