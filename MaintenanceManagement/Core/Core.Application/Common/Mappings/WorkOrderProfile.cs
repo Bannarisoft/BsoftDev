@@ -3,9 +3,7 @@ using AutoMapper;
 using Core.Application.WorkOrder.Command.CreateWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrder;
-using Core.Application.WorkOrder.Queries.GetWorkOrderById;
 using Core.Domain.Entities.WorkOrderMaster;
-using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.Common.Mappings
 {
@@ -70,7 +68,8 @@ namespace Core.Application.Common.Mappings
                         .Select(s => new ScheduleDto
                         {
                             Start = s.ScheduleStartTime,
-                            End = s.ScheduleEndTime
+                            End = s.ScheduleEndTime,
+                            ISCompleted=(byte)(s.ISCompleted ?? 0)
                         })
                         .ToList()
                 })

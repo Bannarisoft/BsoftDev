@@ -20,7 +20,7 @@ namespace Core.Application.Common.Interfaces.IMachineGroup
          Task<List<Core.Domain.Entities.MachineGroup>> GetMachineGroupAutoComplete(string searchPattern);
           Task<bool> NotFoundAsync(int id );
 
-
+        Task<bool> FKColumnExistValidation(int machineGroupId);
     //  Task<bool> GetByMachineGroupCodeAsync(string groupName); 
 
        // Task<bool> ExistsByMachineGroupNameAsync(string? GroupName);

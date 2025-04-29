@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MaintenanceManagement.API.Controllers
 {
-    [Route("[controller]")]
+      [Route("api/[controller]")]
     public class ActivityCheckListMasterController : ApiControllerBase
     {
        private readonly IActivityMasterCommandRepository _activityMasterCommandRepository;
@@ -141,21 +141,43 @@ namespace MaintenanceManagement.API.Controllers
                 Errors = "" 
             });
         }
-         [HttpGet("ByActivityId/{id}")]
-        [ActionName(nameof(GetCheckListByActivityIdAsync))]
-        public async Task<IActionResult> GetCheckListByActivityIdAsync(int id)
-        {
-           
-            var activityCheckList = await Mediator.Send(new GetActivityCheckListByActivityIdQuery() { Id = id});
+        //  [HttpGet("ByActivityId")]        
+        //  public async Task<IActionResult> GetCheckListByActivityIdAsync( List<int> ids)
+        // {
+        //     if (ids == null || !ids.Any())
+        //     {
+        //         return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = "No activity IDs provided." });
+        //     }
+        //     var activityCheckList = await Mediator.Send(new GetActivityCheckListByActivityIdQuery() { Ids= ids});
           
-             if(activityCheckList.IsSuccess)
+        //      if(activityCheckList.IsSuccess)
+        //     {
+        //          return Ok(new { StatusCode=StatusCodes.Status200OK, data = activityCheckList.Data,message=activityCheckList.Message});
+        //     }
+
+        //     return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"ActivityCheckList ID {ids} not found.", errors = "" });
+           
+        // }
+
+       [HttpPost("ByActivityId")]
+        public async Task<IActionResult> GetCheckListByActivityIdAsync([FromBody] GetActivityCheckListByActivityIdQuery command)
+        {
+            // if (ids == null || !ids.Any())
+            // {
+            //     return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = "No activity IDs provided." });
+            // }
+
+            var activityCheckList = await Mediator.Send(command);
+
+            if (activityCheckList.IsSuccess)
             {
-                 return Ok(new { StatusCode=StatusCodes.Status200OK, data = activityCheckList.Data,message=activityCheckList.Message});
+                return Ok(new { StatusCode = StatusCodes.Status200OK, data = activityCheckList.Data, message = activityCheckList.Message });
             }
 
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"ActivityCheckList ID {id} not found.", errors = "" });
-           
+            return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"command"});
         }
+
+        
 
         
 

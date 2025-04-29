@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetailById
 {
-    public class ShiftMasterDetailDTO
+    public class ShiftMasterDetailByIdDto
     {
         public int Id { get; set; }
         public int ShiftMasterId { get; set; }

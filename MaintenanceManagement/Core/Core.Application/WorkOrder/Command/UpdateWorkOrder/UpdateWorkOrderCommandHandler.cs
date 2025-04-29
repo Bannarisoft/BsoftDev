@@ -1,8 +1,12 @@
 using AutoMapper;
+using Contracts.Events.Maintenance;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IWorkOrder;
+using Core.Domain.Common;
 using Core.Domain.Events;
+using MassTransit;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
 {
@@ -12,13 +16,17 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
         private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;         
+        private readonly IPublishEndpoint _publishEndpoint;
+        private readonly ILogger<UpdateWorkOrderCommandHandler> _logger;
 
-        public UpdateWorkOrderCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper,IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator)
+        public UpdateWorkOrderCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper,IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IPublishEndpoint publishEndpoint, ILogger<UpdateWorkOrderCommandHandler> logger)
         {
             _workOrderRepository = workOrderRepository;
             _mapper = mapper;
             _workOrderQueryRepository = workOrderQueryRepository;
-            _mediator = mediator;            
+            _mediator = mediator;         
+            _publishEndpoint = publishEndpoint;
+            _logger = logger;   
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(UpdateWorkOrderCommand request, CancellationToken cancellationToken)
@@ -38,6 +46,27 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
             await _mediator.Publish(domainEvent, cancellationToken);
             if(updateResult)
             {
+               
+                var miscMaster = await _workOrderRepository.GetMiscMasterByCodeAsync(MiscEnumEntity.MaintenanceStatusUpdate.Code);
+                // Check if the code matches
+              
+                    //var closedStatusId = miscMaster.Id;                
+                    if (updatedEntity.StatusId == miscMaster.Id  && updatedEntity.PreventiveScheduleId.HasValue)                
+                    {
+                        var correlationId = Guid.NewGuid(); // ✅ Always create new correlationId
+
+                        await _publishEndpoint.Publish(new WorkOrderClosedEvent
+                        {
+                            CorrelationId = correlationId,
+                            PreventiveSchedulerDetailId = updatedEntity.PreventiveScheduleId.Value,
+                            WorkOrderId = updatedEntity.Id
+                        });
+
+                        _logger.LogInformation("✅ WorkOrderClosedEvent published. CorrelationId: {CorrelationId}, WorkOrderId: {WorkOrderId}",
+                            correlationId, updatedEntity.Id);
+                    }
+                
+                
                 string tempFilePath = request.WorkOrder.Image;
                 if (tempFilePath != null){
                     string baseDirectory = await _workOrderQueryRepository.GetBaseDirectoryAsync();

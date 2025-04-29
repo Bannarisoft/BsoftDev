@@ -182,7 +182,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
 
             var miscmaster = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MiscMaster>(query, parameters);
             return miscmaster;
-        }
+        }      
+
+
+
                   
     }   
 

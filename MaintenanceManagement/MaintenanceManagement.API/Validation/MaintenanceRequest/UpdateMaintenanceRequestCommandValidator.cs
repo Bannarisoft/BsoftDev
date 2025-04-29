@@ -59,6 +59,13 @@ namespace MaintenanceManagement.API.Validation.MaintenanceRequest
                             .WithMessage("MaintenanceTypeId is required.");
                         break;
 
+                        case "WOclosedStatusCheck":
+                        RuleFor(x => x.Id)
+                            .MustAsync(async (Id, cancellation) =>
+                                !await _maintenanceRequestQueryRepository.GetWOclosedOrInProgressAsync(Id))
+                             .WithMessage(x => $"{x.Id} {rule.Error}");
+                        break;  
+
                     default:
                         break;
                 }

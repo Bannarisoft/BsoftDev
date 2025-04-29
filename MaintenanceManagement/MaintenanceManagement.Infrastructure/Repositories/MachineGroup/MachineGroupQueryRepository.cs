@@ -111,7 +111,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
                    };
                var machineGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineGroup>(query, parameters);
                    return machineGroups.ToList();
-               }          
+               }  
+            public async Task<bool> FKColumnExistValidation(int machineGroupId)
+            {
+                var sql = "SELECT COUNT(1) FROM Maintenance.MachineGroup WHERE Id = @Id AND IsDeleted = 0 AND IsActive = 1";
+                  var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = machineGroupId });
+                  return count > 0;
+            }        
 
     }
 }

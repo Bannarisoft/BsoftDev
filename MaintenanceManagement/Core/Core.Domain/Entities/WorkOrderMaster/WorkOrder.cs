@@ -20,11 +20,16 @@ namespace Core.Domain.Entities.WorkOrderMaster
         public int? TotalManPower { get; set; }
         public decimal? TotalSpentHours { get; set; }       
         public DateTimeOffset? DowntimeStart { get; set; }  
-        public DateTimeOffset? DowntimeEnd { get; set; }   
+        public DateTimeOffset? DowntimeEnd { get; set; }           
         public ICollection<WorkOrderItem>? WorkOrderItems  {get; set;}  
         public ICollection<WorkOrderActivity>? WorkOrderActivities  {get; set;}  
         public ICollection<WorkOrderSchedule>? WorkOrderSchedules  {get; set;}  
         public ICollection<WorkOrderTechnician>? WorkOrderTechnicians {get; set;} 
         public ICollection<WorkOrderCheckList>? WorkOrderCheckLists {get; set;} 
+
+         
+        
+       
+
     }
 }
