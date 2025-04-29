@@ -5,6 +5,8 @@ using Core.Domain.Common;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Contracts.Events.Maintenance;
+using MassTransit;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
@@ -13,11 +15,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         private readonly ApplicationDbContext _applicationDbContext;       
         private readonly IIPAddressService _ipAddressService; 
         private readonly IDbConnection _dbConnection;
-        public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService,IDbConnection dbConnection )
+        private readonly IPublishEndpoint _publishEndpoint;   
+        public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService,IDbConnection dbConnection, IPublishEndpoint publishEndpoint )
         {
             _applicationDbContext = applicationDbContext; 
             _ipAddressService = ipAddressService;     
             _dbConnection = dbConnection;     
+            _publishEndpoint = publishEndpoint;
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, CancellationToken cancellationToken)
         {
@@ -74,29 +78,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _applicationDbContext.Entry(existingWorkOrder).CurrentValues.SetValues(workOrder);
             existingWorkOrder.CreatedBy = createdBy;
             existingWorkOrder.CreatedByName = createdByName;
-            existingWorkOrder.CreatedIP = createdIP;
-
-             // ✅ Update TotalManPower and TotalSpentHours if status is "Closed"
-            var closedStatusId = await _applicationDbContext.MiscMaster
-                .Where(x => x.Code == MiscEnumEntity.MaintenanceStatusUpdate.Code)
-                .Select(x => x.Id)
-                .FirstOrDefaultAsync();
-
-            if (workOrder.StatusId == closedStatusId)
-            {
-                var technicianCount = workOrder.WorkOrderTechnicians?.Count ?? 0;
-                var totalHours = workOrder.WorkOrderTechnicians?.Sum(t => t.HoursSpent + (t.MinutesSpent / 60.0)) ?? 0;
-
-                existingWorkOrder.TotalManPower = technicianCount;
-                existingWorkOrder.TotalSpentHours = (decimal?)Math.Round(totalHours, 2);
-            }                 
+            existingWorkOrder.CreatedIP = createdIP;           
 
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderActivities ?? []);
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderItems ?? []);
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderTechnicians ?? []);
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderCheckLists ?? []);   
-            var result= await _applicationDbContext.SaveChangesAsync();
-              int docSerialNumber = 1;
+            var result= await _applicationDbContext.SaveChangesAsync();         
+
+            int docSerialNumber = 1;
             foreach (var item in workOrder.WorkOrderItems ?? [])
             {
                 if ((item.UsedQty > 0) || (item.ToSubStoreQty > 0))
@@ -146,7 +136,32 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 }
                 docSerialNumber++;
             }       
-          
+            // ✅ Update TotalManPower and TotalSpentHours if status is "Closed"
+            var closedStatusId = await _applicationDbContext.MiscMaster
+                .Where(x => x.Code == MiscEnumEntity.MaintenanceStatusUpdate.Code)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            if (workOrder.StatusId == closedStatusId)
+            {
+                var technicianCount = workOrder.WorkOrderTechnicians?.Count ?? 0;
+                var totalHours = workOrder.WorkOrderTechnicians?.Sum(t => t.HoursSpent + (t.MinutesSpent / 60.0)) ?? 0;
+
+                existingWorkOrder.TotalManPower = technicianCount;
+                existingWorkOrder.TotalSpentHours = (decimal?)Math.Round(totalHours, 2);
+
+                  // 🔥 Publish event for next scheduler creation
+               /*  if (workOrder.PreventiveScheduleId.HasValue)
+                {
+                    var correlationId = Guid.NewGuid();
+                    await  _publishEndpoint.Publish (new WorkOrderClosedEvent
+                    {
+                        CorrelationId = correlationId, 
+                        PreventiveSchedulerDetailId =workOrder.PreventiveScheduleId.Value,
+                        WorkOrderId = workOrder.Id
+                    });
+                }                 */
+            }               
 
             return result> 0;
         }
@@ -285,6 +300,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             workOrder.Image = "";
             await _applicationDbContext.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<Core.Domain.Entities.MiscMaster?> GetMiscMasterByCodeAsync(string code)
+        {
+            return await _applicationDbContext.MiscMaster
+                .FirstOrDefaultAsync(x => x.Code == code);
         }
     }
 }

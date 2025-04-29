@@ -18,9 +18,9 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
         public string? Machine { get; set; }
         public string? Department { get; set; }
         public int? RequestId { get; set; }
-    
-        
-        
+        public string? AssetCode { get; set; }
+        public string? AssetLocation { get; set; }        
+        public string? RequestDesc { get; set; }
 
         public IList<GetWorkOrderActivityByIdDto>? WOActivity { get; set; }
         public IList<GetWorkOrderItemByIdDto>? WOItem { get; set; }        

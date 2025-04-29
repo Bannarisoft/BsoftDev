@@ -13,7 +13,7 @@ namespace Core.Application.Common.Interfaces.IMiscMaster
 
        Task<bool> UpdateAsync(int id, Core.Domain.Entities.MiscMaster miscMaster);
 
-        Task<bool> DeleteAsync(int id,Core.Domain.Entities.MiscMaster miscMaster); 
+        Task<bool> DeleteAsync(int id,Core.Domain.Entities.MiscMaster miscMaster);         
 
     }
 }
