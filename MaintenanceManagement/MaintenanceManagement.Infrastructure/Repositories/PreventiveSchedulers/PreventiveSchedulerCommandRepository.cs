@@ -149,7 +149,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         }
          public async Task<bool> CreateNextSchedulerDetailAsync(int Id)
         {
-            var existingPreventiveScheduler = await _applicationDbContext.PreventiveSchedulerDtl.FirstOrDefaultAsync(u => u.Id == Id);
+            var existingPreventiveScheduler = await _applicationDbContext.PreventiveSchedulerDtl
+            .Include(ps => ps.PreventiveScheduler)
+            .FirstOrDefaultAsync(u => 
+                u.Id == Id &&
+                u.IsActive == Status.Active &&
+                u.IsDeleted == IsDelete.NotDeleted);
             
 
             if (existingPreventiveScheduler != null)

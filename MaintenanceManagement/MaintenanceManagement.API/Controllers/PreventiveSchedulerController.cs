@@ -8,6 +8,7 @@ using Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive;
 using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerById;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,9 +18,11 @@ namespace MaintenanceManagement.API.Controllers
     [Route("api/[controller]")]
     public class PreventiveSchedulerController : ApiControllerBase
     {
-        public PreventiveSchedulerController(ISender mediator) 
+        private readonly IValidator<CreatePreventiveSchedulerCommand> _createPreventiveSchedulerCommand;
+        public PreventiveSchedulerController(ISender mediator,IValidator<CreatePreventiveSchedulerCommand> createPreventiveSchedulerCommand) 
         : base(mediator)
         {
+            _createPreventiveSchedulerCommand = createPreventiveSchedulerCommand;
         }
         [Route("[action]")]
         [HttpGet]
@@ -46,16 +49,16 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> CreateAsync(CreatePreventiveSchedulerCommand command)
         {
             
-            // var validationResult = await _createCustomFieldCommandValidator.ValidateAsync(command);
+            var validationResult = await _createPreventiveSchedulerCommand.ValidateAsync(command);
             
-            // if (!validationResult.IsValid)
-            // {
-            //     return BadRequest(new 
-            //     {
-            //         StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-            //         errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-            //     });
-            // }
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+            }
             var response = await Mediator.Send(command);
             if(response.IsSuccess)
             {

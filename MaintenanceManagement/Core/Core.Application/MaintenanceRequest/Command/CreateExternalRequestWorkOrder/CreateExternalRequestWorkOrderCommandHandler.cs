@@ -22,7 +22,8 @@ namespace Core.Application.MaintenanceRequest.Command.CreateExternalRequestWorkO
        private readonly IWorkOrderCommandRepository _workOrderCommandRepository;
          private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
         private readonly IIPAddressService _ipAddressService;
-        public CreateExternalRequestWorkOrderCommandHandler(IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository,IMapper mapper,IMediator mediator,IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository,IWorkOrderCommandRepository workOrderCommandRepository,IWorkOrderQueryRepository workOrderQueryQueryRepository,IIPAddressService ipAddressService)
+        private readonly ITimeZoneService _timeZoneService;
+        public CreateExternalRequestWorkOrderCommandHandler(IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository,IMapper mapper,IMediator mediator,IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository,IWorkOrderCommandRepository workOrderCommandRepository,IWorkOrderQueryRepository workOrderQueryQueryRepository,IIPAddressService ipAddressService,ITimeZoneService timeZoneService)
         {
              _maintenanceRequestCommandRepository = maintenanceRequestCommandRepository;
              _imapper = mapper;
@@ -31,9 +32,10 @@ namespace Core.Application.MaintenanceRequest.Command.CreateExternalRequestWorkO
              _workOrderCommandRepository = workOrderCommandRepository;
              _workOrderQueryRepository = workOrderQueryQueryRepository;
              _ipAddressService = ipAddressService;
+             _timeZoneService = timeZoneService;
         }
 
-                public async Task<ApiResponseDTO<List<int>>> Handle(CreateExternalRequestWorkOrderCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<int>>> Handle(CreateExternalRequestWorkOrderCommand request, CancellationToken cancellationToken)
             {
                 // var createdIds = new List<int>();             
                 //             var requestIds = request.Ids
@@ -76,6 +78,17 @@ namespace Core.Application.MaintenanceRequest.Command.CreateExternalRequestWorkO
                     //     UnitId = externalRequest.UnitId
                     // };
             var workOrder = _imapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(externalRequest);
+
+                string currentIp = _ipAddressService.GetSystemIPAddress();
+                int userId = _ipAddressService.GetUserId(); 
+                string username = _ipAddressService.GetUserName();
+                var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+                var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);  
+
+                      workOrder.CreatedBy = userId;
+                      workOrder.CreatedDate = currentTime;
+                      workOrder.CreatedByName = username;
+                      workOrder.CreatedIP = currentIp;
                     var result = await _workOrderCommandRepository.CreateAsync(workOrder,externalRequest.MaintenanceTypeId, cancellationToken);
                     // if (result?.Id > 0)
                     // {

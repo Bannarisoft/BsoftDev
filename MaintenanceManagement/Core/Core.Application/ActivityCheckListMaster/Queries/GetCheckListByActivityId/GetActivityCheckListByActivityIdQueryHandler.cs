@@ -29,26 +29,27 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetCheckListByActivit
 
         public async Task<ApiResponseDTO<List<GetActivityCheckListByActivityIdDto>>> Handle(GetActivityCheckListByActivityIdQuery request, CancellationToken cancellationToken)
         {
-            var result = await _activityCheckListMasterQueryRepository.GetCheckListByActivityIdAsync(request.Id);
+            var result = await _activityCheckListMasterQueryRepository.GetCheckListByActivityIdsAsync(request.Ids);
 
             if (result == null || !result.Any())
             {
                 return new ApiResponseDTO<List<GetActivityCheckListByActivityIdDto>>
                 {
                     IsSuccess = false,
-                    Message = $"No activity checklists found for ActivityId {request.Id}.",
+                    Message = $"No activity checklists found for ActivityIds: {string.Join(", ", request.Ids)}.",
                     Data = null
                 };
             }
 
             var checklistDtos = _mapper.Map<List<GetActivityCheckListByActivityIdDto>>(result);
 
-            var domainEvent = new AuditLogsDomainEvent(
+               var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetByActivityId",
-                actionCode: request.Id.ToString(),
+                actionCode: string.Join(", ", request.Ids),  // Ensure activity IDs are joined as a string
                 actionName: "ActivityCheckList",
-                details: $"Fetched {checklistDtos.Count} checklist(s) for ActivityId {request.Id}.",
-                module: "ActivityCheckListMaster");
+                details: $"Fetched {checklistDtos.Count} checklist(s) for ActivityIds: {string.Join(", ", request.Ids)}.", // Better message formatting
+                module: "ActivityCheckListMaster"
+            );
 
             await _mediator.Publish(domainEvent, cancellationToken);
 

@@ -19,6 +19,11 @@ using Core.Application.MaintenanceRequest.Command.UpdateMaintenanceRequestStatus
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceExternalRequest;
 using Core.Application.MaintenanceRequest.Command.CreateExternalRequestWorkOrder;
 using Core.Application.MaintenanceRequest.Queries.GetExternalRequestById;
+using Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequestType;
+using Core.Application.MaintenanceRequest.Queries.GetMaintenanceServiceType;
+using Core.Application.MaintenanceRequest.Queries.GetMaintenanceServiceLocation;
+using Core.Application.MaintenanceRequest.Queries.GetMaintenanceSparesType;
+using Core.Application.MaintenanceRequest.Queries.GetMaintenanceDipatchMode;
 
 namespace MaintenanceManagement.API.Controllers
 {
@@ -89,7 +94,7 @@ namespace MaintenanceManagement.API.Controllers
         }
 
 
-          [HttpGet("{id}")]
+          [HttpGet("external-requests/{id}")]
         [ActionName(nameof(GetByIdAsync))]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
@@ -170,12 +175,9 @@ namespace MaintenanceManagement.API.Controllers
                     errors = ""
                 });
         }   
-            [HttpPost("create-from-request")]
+            [HttpPost("create-WO-from-external-request/by-ids")]
             public async Task<ActionResult> CreateFromExternalRequest(CreateExternalRequestWorkOrderCommand command)
             {
-         
-                // var command = new CreateExternalRequestWorkOrderCommand { Ids = new List<int> { id } };
-               
                 var response = await Mediator.Send(command);
              
                 if (!response.IsSuccess)
@@ -242,7 +244,7 @@ namespace MaintenanceManagement.API.Controllers
         }
 
 
-        [HttpPatch("status/{id}")]
+        [HttpPatch("status-Closed/{id}")]
             public async Task<IActionResult> UpdateMaintenanceRequestStatus([FromRoute] int id)
             {
                 var command = new UpdateMaintenanceRequestStatusCommand
@@ -256,7 +258,8 @@ namespace MaintenanceManagement.API.Controllers
                     return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
-                        Message = result.Message
+                        Message =  $" Maintenance Request with ID {id} Status is Closed or In Progress."
+                        
                     });
 
                 return Ok(new
@@ -266,23 +269,107 @@ namespace MaintenanceManagement.API.Controllers
                     Data = result.Data
                 });
             }
+            [HttpGet("RequestType")]
+                public async Task<IActionResult> GetMaintenanceStatusDescAsync()
+                {
+                    var result = await Mediator.Send(new GetMaintenanceRequestTypeQuery());
+                    if (result == null || result.Data == null || result.Data.Count == 0)
+                    {
+                        return NotFound(new
+                        {
+                            StatusCode = StatusCodes.Status404NotFound,
+                            message = "No RequestType  found."
+                        });
+                    }
+                    return Ok(new
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        message = "RequestType  fetched successfully.",
+                        data = result.Data
+                    });
+                }
 
-        //    [HttpPatch("{id}/status")]
-        //     public async Task<IActionResult> UpdateStatus(  UpdateStatusDto dto)
-        //     {
-        //         var command = new UpdateMaintenanceRequestStatusCommand
-        //         {
-        //             Id = dto.Id,
-                  
-        //         };
+                [HttpGet("ServiceType")]
+                public async Task<IActionResult> GetMaintenanceServiceDescAsync()
+                {
+                    var result = await Mediator.Send(new GetMaintenanceServiceTypeQuery());
+                    if (result == null || result.Data == null || result.Data.Count == 0)
+                    {
+                        return NotFound(new
+                        {
+                            StatusCode = StatusCodes.Status404NotFound,
+                            message = "No ServiceType Status found."
+                        });
+                    }
+                    return Ok(new
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        message = "ServiceType  fetched successfully.",
+                        data = result.Data
+                    });
+                }
 
-        //         var result = await Mediator.Send(command);
-        //          return Ok(new
-        //             {
-        //                 StatusCode = StatusCodes.Status200OK,
-        //                 Data = result.Data
-        //             });
-        //     }
+                [HttpGet("ServiceLocation")]
+                public async Task<IActionResult> GetMaintenanceServiceLocationDescAsync()
+                {
+                    var result = await Mediator.Send(new GetMaintenanceServiceLocationQuery());
+                    if (result == null || result.Data == null || result.Data.Count == 0)
+                    {
+                        return NotFound(new
+                        {
+                            StatusCode = StatusCodes.Status404NotFound,
+                            message = "No ServiceLocation  found."
+                        });
+                    }
+                    return Ok(new
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        message = "ServiceLocation  fetched successfully.",
+                        data = result.Data
+                    });
+                }
+
+                 [HttpGet("SparesType")]
+                public async Task<IActionResult> GetMaintenanceSparesTypeDescAsync()
+                {
+                    var result = await Mediator.Send(new GetMaintenanceSparesTypeQuery());
+                    if (result == null || result.Data == null || result.Data.Count == 0)
+                    {
+                        return NotFound(new
+                        {
+                            StatusCode = StatusCodes.Status404NotFound,
+                            message = "No SparesType  found."
+                        });
+                    }
+                    return Ok(new
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        message = "SparesType  fetched successfully.",
+                        data = result.Data
+                    });
+                }
+
+                 [HttpGet("DispatchMode")]
+                public async Task<IActionResult> GetMaintenanceDispatchModeDescAsync()
+                {
+                    var result = await Mediator.Send(new GetMaintenanceDispatchModeQuery());
+                    if (result == null || result.Data == null || result.Data.Count == 0)
+                    {
+                        return NotFound(new
+                        {
+                            StatusCode = StatusCodes.Status404NotFound,
+                            message = "No DispatchMode  found."
+                        });
+                    }
+                    return Ok(new
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        message = "DispatchMode  fetched successfully.",
+                        data = result.Data
+                    });
+                }
+
+      
         
     }
 }

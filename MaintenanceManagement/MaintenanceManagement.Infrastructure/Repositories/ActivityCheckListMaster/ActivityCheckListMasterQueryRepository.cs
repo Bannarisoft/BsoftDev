@@ -130,8 +130,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
         } 
 
 
-                    public async Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdAsync(int id)
+           // public async Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdAsync(int id)
+
+           public async Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdsAsync(List<int> ids)
             {
+                 if (ids == null || !ids.Any())
+                {
+                    return new List<GetActivityCheckListByActivityIdDto>();
+                }
                 const string query = @"
                     SELECT 
                         aclm.Id AS ChecklistId,
@@ -151,9 +157,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                     FROM Maintenance.Maintenance.ActivityCheckListMaster aclm
                     INNER JOIN Maintenance.Maintenance.ActivityMaster am 
                         ON aclm.ActivityID = am.Id
-                    WHERE aclm.ActivityID = @id AND aclm.IsDeleted = 0";
+                    WHERE aclm.ActivityID IN  @ids AND aclm.IsDeleted = 0";
 
-                var result = await _dbConnection.QueryAsync<GetActivityCheckListByActivityIdDto>(query, new { id });
+                var result = await _dbConnection.QueryAsync<GetActivityCheckListByActivityIdDto>(query, new { ids });
                 return result.ToList();
             }
 

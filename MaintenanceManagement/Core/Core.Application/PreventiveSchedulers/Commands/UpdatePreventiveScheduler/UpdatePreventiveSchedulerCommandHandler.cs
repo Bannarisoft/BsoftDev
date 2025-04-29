@@ -24,18 +24,16 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
         private readonly IMediator _mediator;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
-        private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
         private readonly IWorkOrderCommandRepository _workOrderRepository;
         private readonly IIPAddressService _ipAddressService;
         private readonly ITimeZoneService _timeZoneService;
-        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderQueryRepository workOrderQueryRepository, IWorkOrderCommandRepository workOrderRepository, IIPAddressService ipAddressService, ITimeZoneService timeZoneService)
+        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderCommandRepository workOrderRepository, IIPAddressService ipAddressService, ITimeZoneService timeZoneService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
             _mediator = mediator;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
-            _workOrderQueryRepository = workOrderQueryRepository;
             _workOrderRepository = workOrderRepository;
             _ipAddressService = ipAddressService;
             _timeZoneService = timeZoneService;
