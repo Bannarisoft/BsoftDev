@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventive;
 using Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.DeletePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive;
@@ -19,10 +20,16 @@ namespace MaintenanceManagement.API.Controllers
     public class PreventiveSchedulerController : ApiControllerBase
     {
         private readonly IValidator<CreatePreventiveSchedulerCommand> _createPreventiveSchedulerCommand;
-        public PreventiveSchedulerController(ISender mediator,IValidator<CreatePreventiveSchedulerCommand> createPreventiveSchedulerCommand) 
+        private readonly IValidator<UpdatePreventiveSchedulerCommand> _updatePreventiveSchedulerCommand;
+        private readonly IValidator<DeletePreventiveSchedulerCommand> _deletePreventiveSchedulerCommand;
+        private readonly IValidator<ActiveInActivePreventiveCommand> _activeInActivePreventiveCommand;
+        public PreventiveSchedulerController(ISender mediator,IValidator<CreatePreventiveSchedulerCommand> createPreventiveSchedulerCommand,IValidator<UpdatePreventiveSchedulerCommand> updatePreventiveSchedulerCommand,IValidator<DeletePreventiveSchedulerCommand> deletePreventiveSchedulerCommand,IValidator<ActiveInActivePreventiveCommand> activeInActivePreventiveCommand) 
         : base(mediator)
         {
             _createPreventiveSchedulerCommand = createPreventiveSchedulerCommand;
+            _updatePreventiveSchedulerCommand = updatePreventiveSchedulerCommand;
+            _deletePreventiveSchedulerCommand = deletePreventiveSchedulerCommand;
+            _activeInActivePreventiveCommand = activeInActivePreventiveCommand;
         }
         [Route("[action]")]
         [HttpGet]
@@ -106,15 +113,15 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPut]
         public async Task<IActionResult> Update( UpdatePreventiveSchedulerCommand command )
         {
-            // var validationResult = await _updateCustomFieldCommandValidator.ValidateAsync(command);
-            // if (!validationResult.IsValid)
-            // {
-            //      return BadRequest(new 
-            //     {
-            //         StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-            //         errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-            //     });
-            // }
+            var validationResult = await _updatePreventiveSchedulerCommand.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                 return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+            }
 
              var response = await Mediator.Send(command);
              if(response.IsSuccess)
@@ -143,15 +150,15 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeletePreventiveSchedulerCommand { Id = id };
-            //  var validationResult = await  _deleteCustomFieldCommandValidator.ValidateAsync(command);
-            //    if (!validationResult.IsValid)
-            //     {
-            //         return BadRequest(new 
-            //     {
-            //         StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-            //         errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-            //     });
-            //     }
+             var validationResult = await  _deletePreventiveSchedulerCommand.ValidateAsync(command);
+               if (!validationResult.IsValid)
+                {
+                    return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+                }
            var updatedPreventiveScheduler = await Mediator.Send(command);
 
            if(updatedPreventiveScheduler.IsSuccess)
@@ -185,6 +192,39 @@ namespace MaintenanceManagement.API.Controllers
             //         errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
             //     });
             // }
+
+             var response = await Mediator.Send(command);
+             if(response.IsSuccess)
+             {
+                 return Ok(new 
+                 { 
+                    StatusCode=StatusCodes.Status200OK, 
+                    message = response.Message, 
+                    errors = "" 
+                });
+             }
+            
+           
+
+            return BadRequest( new 
+            { 
+                StatusCode=StatusCodes.Status400BadRequest, 
+                message = response.Message, 
+                errors = "" 
+            }); 
+        }
+          [HttpPut("UpdateActiveStatus")]
+        public async Task<IActionResult> UpdateActiveInActive( ActiveInActivePreventiveCommand command )
+        {
+            var validationResult = await _activeInActivePreventiveCommand.ValidateAsync(command);
+            if (!validationResult.IsValid)
+            {
+                 return BadRequest(new 
+                {
+                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+                });
+            }
 
              var response = await Mediator.Send(command);
              if(response.IsSuccess)

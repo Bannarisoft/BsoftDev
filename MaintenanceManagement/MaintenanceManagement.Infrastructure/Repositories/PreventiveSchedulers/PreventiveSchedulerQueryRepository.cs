@@ -17,9 +17,21 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         {
             _dbConnection = dbConnection;
         }
-        public Task<bool> AlreadyExistsAsync(string ShiftName, int? id = null)
+        public async Task<bool> AlreadyExistsAsync(int activityId,int machinegroupId,int? id = null)
         {
-            throw new NotImplementedException();
+            var query = @"
+                    SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] PSH
+                 INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId = PSH.Id
+                   WHERE PSA.ActivityId = @ActivityId AND PSA.MachineGroupId =@MachineGroupId   AND PSH.IsDeleted = 0";
+                var parameters = new DynamicParameters(new { ActivityId = activityId, MachineGroupId =machinegroupId });
+
+             if (id is not null)
+             {
+                 query += " AND PSH.Id != @Id";
+                 parameters.Add("Id", id);
+             }
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
         }
 
         public async Task<(DateTime nextDate, DateTime reminderDate)> CalculateNextScheduleDate(DateTime startDate, int interval, string unit, int reminderDays)
@@ -196,16 +208,19 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return result.ToList();
         }
 
-        public Task<bool> NotFoundAsync(int id)
+        public async Task<bool> NotFoundAsync(int id)
         {
-            throw new NotImplementedException();
+            var query = "SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] WHERE Id = @Id AND IsDeleted = 0";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+                return count > 0;
         }
 
         public Task<bool> SoftDeleteValidation(int Id)
         {
             throw new NotImplementedException();
         }
-       public async Task<DateTimeOffset?> GetLastMaintenanceDateAsync(int machineId)
+       public async Task<DateTimeOffset?> GetLastMaintenanceDateAsync(int machineId,int PreventiveSchedulerId,string miscType,string misccode)
         {
             const string query = @"
                  SELECT MAX(WS.EndTime) AS EndTime   FROM [Maintenance].[WorkOrder] W
@@ -213,14 +228,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             INNER JOIN Maintenance.MiscMaster M ON W.StatusId=M.Id
             INNER JOIN Maintenance.MiscTypeMaster MT ON MT.Id =M.MiscTypeId
             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.Id=W.PreventiveScheduleId
-            where MT.MiscTypeCode='Status' AND M.Code='Closed' AND PSD.MachineId=@MachineId
+            where MT.MiscTypeCode=@StatusTypeCode AND M.Code=@StatusCode AND PSD.MachineId=@MachineId AND PSD.PreventiveSchedulerHeaderId=@PreventiveSchedulerId
             ";
 
             var parameters = new
             {
                 MachineId = machineId,
-                StatusTypeCode = "Status",
-                StatusCode = "Closed"
+                StatusTypeCode = miscType,
+                StatusCode = misccode,
+                PreventiveSchedulerId =PreventiveSchedulerId
             };
 
             var result = await _dbConnection.QueryFirstOrDefaultAsync<DateTimeOffset?>(query, parameters);
@@ -251,6 +267,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                
                return result;
            }
+             public async Task<bool> UpdateValidation(int id)
+             {
+                 var query = @"SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] PSH
+                 INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
+                 [Maintenance].[WorkOrder] W ON W.PreventiveScheduleId =PSD.Id
+                  WHERE PSH.Id = @Id AND PSH.IsDeleted = 0";
+
+                     var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+                     return count > 0;
+             }
+             
 
     }
 }

@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
 using MediatR;
 
-namespace Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetailById
+namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventive
 {
-    public class GetShiftMasterByIdQuery : IRequest<ApiResponseDTO<ShiftMasterDetailByIdDto>>
+    public class ActiveInActivePreventiveCommand : IRequest<ApiResponseDTO<bool>>
     {
         public int Id { get; set; }
+        public byte IsActive { get; set; }
     }
 }
