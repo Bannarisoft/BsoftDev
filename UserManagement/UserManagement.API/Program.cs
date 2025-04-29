@@ -6,6 +6,7 @@ using UserManagement.API.Configurations;
 using Core.Domain.Entities;
 using MassTransit;
 using UserManagement.Infrastructure.PollyResilience;
+using UserManagement.API.GrpcServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +42,13 @@ builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
+// Register gRPC
+builder.Services.AddGrpc();
+
 var app = builder.Build();
+// builder.Services.AddScoped<SessionGrpcService>();
+
+
 // Configure the HTTP request pipeline. 
 //if (app.Environment.IsDevelopment())
 //{
@@ -58,6 +65,8 @@ app.UseMiddleware<TokenValidationMiddleware>();
 
 app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
+app.MapGrpcService<SessionGrpcService>();
+app.MapGrpcService<DepartmentGrpcService>();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
 app.Run();

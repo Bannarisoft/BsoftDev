@@ -4,27 +4,32 @@
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>Shared.Contracts</AssemblyName>
     <RootNamespace>Contracts</RootNamespace>
-    
-    <!-- Enable automatic .nupkg generation on build -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    
-    <!-- Ensures all .cs files (like DTOs, Interfaces, etc.) are included -->
     <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
 
-    <!-- NuGet Package Info -->
     <PackageId>Shared.Contracts</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.1</Version>
     <Authors>BSoft</Authors>
     <Company>BSoft</Company>
     <Description>Contracts for DTOs, Interfaces, and Events in microservices</Description>
     <PackageTags>DTOs;Interfaces;Microservices;CQRS</PackageTags>
-    <RepositoryUrl>https://github.com/BSoft/Shared.Contracts</RepositoryUrl> <!-- optional -->
+    <RepositoryUrl>https://github.com/BSoft/Shared.Contracts</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Required external dependencies -->
     <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
+
+    <!-- ✅ Required for generated .cs files -->
+    <PackageReference Include="Google.Protobuf" Version="3.30.2" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.71.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Protos\department.proto" GrpcServices="Both" />
+    <Protobuf Include="Protos\session.proto" GrpcServices="Both" /> 
   </ItemGroup>
 
 </Project>

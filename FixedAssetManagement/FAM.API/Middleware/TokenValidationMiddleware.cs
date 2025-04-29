@@ -1,7 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
-using Contracts.Interfaces.IUser;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +22,7 @@ namespace FAM.API.Middleware
             _timeZoneService = timeZoneService;
         }
 
-        public async Task Invoke(HttpContext context, IJwtTokenHelper jwtTokenHelper, IUserSessionService sessionService)
+        public async Task Invoke(HttpContext context, IJwtTokenHelper jwtTokenHelper, IUserSessionGrpcClient sessionService)
         {
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
             var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);             
@@ -69,7 +69,7 @@ namespace FAM.API.Middleware
                 // Update session's last activity
                 session.LastActivity = currentTime;
                 // await sessionService.UpdateSessionAsync(session);
-                await sessionService.UpdateSessionAsync(jti, currentTime,token);
+                await sessionService.UpdateSessionAsync(jti, currentTime, token);
 
                 // Set the User principal
                 context.User = principal;

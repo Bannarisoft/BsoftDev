@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Version>0.1.7</Version>
+    <Version>1.0.1</Version>
     <PackageId>Shared.Infrastructure</PackageId>
     <Authors>BSoft</Authors>
     <Description>Reusable policies and infrastructure helpers like Polly, Serilog</Description>

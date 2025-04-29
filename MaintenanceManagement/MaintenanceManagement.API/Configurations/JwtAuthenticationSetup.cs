@@ -16,6 +16,7 @@ namespace MaintenanceManagement.API.Configurations
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
+                    options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -40,7 +41,7 @@ namespace MaintenanceManagement.API.Configurations
                         }
                     };
                 });
-
+            services.AddAuthorization();
             IdentityModelEventSource.ShowPII = true; // Enable detailed logs for JWT issues
         }
     }

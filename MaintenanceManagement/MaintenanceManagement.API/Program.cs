@@ -2,7 +2,6 @@ using Core.Application;
 using MaintenanceManagement.Infrastructure;
 using MaintenanceManagement.API.Configurations;
 using MaintenanceManagement.API.Validation.Common;
-using MassTransit;
 using MaintenanceManagement.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,8 +48,8 @@ app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
 app.UseCors();// Enable CORS
 app.UseAuthentication();
-//app.UseMiddleware<TokenValidationMiddleware>();
-//app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
+app.UseMiddleware<TokenValidationMiddleware>();
+app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
