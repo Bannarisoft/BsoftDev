@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
+using Core.Application.Consumers;
 using MaintenanceManagement.Infrastructure.Persistence;
 using MaintenanceManagement.Infrastructure.Services;
 using MassTransit;
@@ -30,12 +31,17 @@ namespace MaintenanceManagement.Infrastructure
             // Configure MassTransit with RabbitMQ
             services.AddMassTransit(x =>
             {
+                 x.AddConsumer<CreateNextSchedulerConsumer>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host("localhost", "/", h =>
                     {
                         h.Username("guest");
                         h.Password("guest");
+                    });
+                     cfg.ReceiveEndpoint("create-next-scheduler-queue", e =>
+                    {
+                        e.ConfigureConsumer<CreateNextSchedulerConsumer>(context);
                     });
                 });
             });

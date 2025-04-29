@@ -2,9 +2,11 @@ using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SagaOrchestrator.Application;
+using SagaOrchestrator.Application.Orchestration;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IAssets;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IMaintenance;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
+using SagaOrchestrator.Application.Orchestration.Models;
 using SagaOrchestrator.Application.Orchestration.Services.AssetServices;
 using SagaOrchestrator.Application.Orchestration.Services.MaintenanceServices;
 using SagaOrchestrator.Application.Orchestration.Services.UserServices;
@@ -50,6 +52,8 @@ namespace SagaOrchestrator.Infrastructure
             {
                 x.AddSagaStateMachine<UserAssetStateMachine, UserAssetState>()
                  .InMemoryRepository();
+                x.AddSagaStateMachine<WorkOrderSchedulerStateMachine, WorkOrderSchedulerState>()
+                .InMemoryRepository();
                 // .MongoDbRepository(r =>
                 //       {
                 //           r.Connection = "mongodb://192.168.1.126:27017";
@@ -71,11 +75,11 @@ namespace SagaOrchestrator.Infrastructure
                     });
                     // Automatically configure endpoints for sagas and consumers
                     cfg.ConfigureEndpoints(context);
-                    // Register the queue for the rollback command
-                    // cfg.ReceiveEndpoint("delete-user-saga-queue", e =>
-                    // {
-                    //     e.ConfigureConsumer<DeleteUserCommandConsumer>(context);
-                    // });
+                    cfg.ReceiveEndpoint("workorder-saga-queue", e =>
+                    {
+                        e.ConfigureSaga<WorkOrderSchedulerState>(context);
+                    });
+                
 
                 });
             });
