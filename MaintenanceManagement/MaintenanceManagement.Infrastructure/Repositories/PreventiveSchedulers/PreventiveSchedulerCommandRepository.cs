@@ -171,9 +171,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                   var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(lastMaintenanceDate.Value.DateTime, headerInfo.FrequencyInterval, miscdetail.Code ?? "", headerInfo.ReminderMaterialReqDays);
 
                   var details = _mapper.Map<PreventiveSchedulerDetail>(existingPreventiveScheduler);
-                    // existingPreventiveScheduler.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate); 
-                    //  existingPreventiveScheduler.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
-                    //  existingPreventiveScheduler.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
+                   // 🔥 Set new dates
+                    details.Id = 0;
+                    details.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
+                    details.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
+                    details.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
                      
 
                      await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(details);
