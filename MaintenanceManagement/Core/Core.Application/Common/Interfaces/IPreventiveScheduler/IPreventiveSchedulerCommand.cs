@@ -14,6 +14,7 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<PreventiveSchedulerDetail> CreateDetailAsync(PreventiveSchedulerDetail preventiveSchedulerDetail); 
         Task<bool> UpdateDetailAsync(int id,string HangfireJobId); 
         Task<bool> UpdateRescheduleDate(int id,DateOnly RescheduleDate);
-        Task<bool> CreateNextSchedulerDetailAsync(int Id);      
+        Task<bool> CreateNextSchedulerDetailAsync(int Id);
+        Task<bool> ScheduleInActive(PreventiveSchedulerHeader preventiveSchedulerHdr);      
     }
 }

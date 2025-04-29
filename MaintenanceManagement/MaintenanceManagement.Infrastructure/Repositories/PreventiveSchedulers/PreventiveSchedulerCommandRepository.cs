@@ -9,6 +9,7 @@ using Core.Domain.Entities;
 using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using static Core.Domain.Common.BaseEntity;
+using static Core.Domain.Common.MiscEnumEntity;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 {
@@ -86,8 +87,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 existingPreventiveScheduler.ReminderMaterialReqDays = preventiveSchedulerHdr.ReminderMaterialReqDays;
                 existingPreventiveScheduler.IsDownTimeRequired = preventiveSchedulerHdr.IsDownTimeRequired;
                 existingPreventiveScheduler.DownTimeEstimateHrs = preventiveSchedulerHdr.DownTimeEstimateHrs;
-                existingPreventiveScheduler.IsDeleted = preventiveSchedulerHdr.IsDeleted;
-                existingPreventiveScheduler.IsActive = preventiveSchedulerHdr.IsActive;
+                // existingPreventiveScheduler.IsDeleted = preventiveSchedulerHdr.IsDeleted;
+                // existingPreventiveScheduler.IsActive = preventiveSchedulerHdr.IsActive;
                 _applicationDbContext.PreventiveSchedulerHdr.Update(existingPreventiveScheduler);
 
                if (preventiveSchedulerHdr.PreventiveSchedulerActivities?.Any() == true)
@@ -159,7 +160,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             if (existingPreventiveScheduler != null)
             {
-                DateTimeOffset? lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(existingPreventiveScheduler.MachineId);
+                DateTimeOffset? lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(existingPreventiveScheduler.MachineId,existingPreventiveScheduler.PreventiveSchedulerHeaderId,WOStatus.MiscCode,MaintenanceStatusUpdate.Code);
 
                  var headerInfo = await _preventiveSchedulerQuery.GetByIdAsync(existingPreventiveScheduler.PreventiveSchedulerHeaderId);
                  var miscdetail = await _miscMasterQueryRepository.GetByIdAsync(headerInfo.FrequencyUnitId);
@@ -183,6 +184,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             
              return false;
+        }
+
+        public async Task<bool> ScheduleInActive(PreventiveSchedulerHeader preventiveSchedulerHdr)
+        {
+             var existingPreventiveScheduler = await _applicationDbContext.PreventiveSchedulerHdr
+            .FirstOrDefaultAsync(ps => ps.Id == preventiveSchedulerHdr.Id);
+
+            if(existingPreventiveScheduler !=null )
+            {
+                existingPreventiveScheduler.IsActive = preventiveSchedulerHdr.IsActive;
+                _applicationDbContext.PreventiveSchedulerHdr.Update(existingPreventiveScheduler);
+                return await _applicationDbContext.SaveChangesAsync() > 0 ;
+            }
+            return false;
         }
     }
 }

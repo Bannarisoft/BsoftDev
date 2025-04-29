@@ -6,76 +6,78 @@ using Core.Application.Common.Interfaces.IActivityMaster;
 using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
-using Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler;
+using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
 
 namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
 {
-    public class CreatePreventiveSchedulerCommandValidator : AbstractValidator<CreatePreventiveSchedulerCommand>
+    public class UpdatePreventiveSchedulerCommandValidator : AbstractValidator<UpdatePreventiveSchedulerCommand>
     {
         private readonly List<ValidationRule> _validationRules;
         private readonly IMachineGroupQueryRepository _machineGroupQueryRepository;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
-        public CreatePreventiveSchedulerCommandValidator(MaxLengthProvider maxLengthProvider, IMachineGroupQueryRepository machineGroupQueryRepository,IMiscMasterQueryRepository miscMasterQueryRepository,IActivityMasterQueryRepository activityMasterQueryRepository,IPreventiveSchedulerQuery preventiveSchedulerQuery)
+        public UpdatePreventiveSchedulerCommandValidator(IMachineGroupQueryRepository machineGroupQueryRepository,IMiscMasterQueryRepository miscMasterQueryRepository,IActivityMasterQueryRepository activityMasterQueryRepository,IPreventiveSchedulerQuery preventiveSchedulerQuery)
         {
-            _validationRules = ValidationRuleLoader.LoadValidationRules();
+             _validationRules = ValidationRuleLoader.LoadValidationRules();
             _machineGroupQueryRepository = machineGroupQueryRepository;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _activityMasterQueryRepository = activityMasterQueryRepository;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
-             if (_validationRules == null || !_validationRules.Any())
+              if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
             }
-            
-            foreach (var rule in _validationRules)
+             foreach (var rule in _validationRules)
             {
                 switch (rule.Rule)
                 {
                     case "NotEmpty":
+                     RuleFor(x => x.Id)
+                                .NotEmpty()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.Id)} {rule.Error}");
                         RuleFor(x => x.MachineGroupId)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.MachineGroupId)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.MachineGroupId)} {rule.Error}");
                         RuleFor(x => x.DepartmentId)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.DepartmentId)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.DepartmentId)} {rule.Error}");
                         RuleFor(x => x.MaintenanceCategoryId)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.MachineGroupId)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.MaintenanceCategoryId)} {rule.Error}");
                         RuleFor(x => x.ScheduleId)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ScheduleId)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.ScheduleId)} {rule.Error}");
                         RuleFor(x => x.FrequencyTypeId)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.FrequencyTypeId)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.FrequencyTypeId)} {rule.Error}");
                         RuleFor(x => x.FrequencyInterval)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.FrequencyInterval)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.FrequencyInterval)} {rule.Error}");
                         RuleFor(x => x.FrequencyUnitId)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.FrequencyUnitId)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.FrequencyUnitId)} {rule.Error}");
                         RuleFor(x => x.EffectiveDate)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.EffectiveDate)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.EffectiveDate)} {rule.Error}");
 
                          RuleFor(x => x.GraceDays)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.GraceDays)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.GraceDays)} {rule.Error}");
                         RuleFor(x => x.ReminderWorkOrderDays)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ReminderWorkOrderDays)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.ReminderWorkOrderDays)} {rule.Error}");
                         RuleFor(x => x.ReminderMaterialReqDays)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ReminderMaterialReqDays)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.ReminderMaterialReqDays)} {rule.Error}");
                         RuleFor(x => x.IsDownTimeRequired)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.IsDownTimeRequired)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.IsDownTimeRequired)} {rule.Error}");
                         RuleFor(x => x.DownTimeEstimateHrs)
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.DownTimeEstimateHrs)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.DownTimeEstimateHrs)} {rule.Error}");
                         RuleFor(x => x.Activity)
                             .NotNull()
                             .WithMessage($"{rule.Error}")
@@ -122,20 +124,33 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                                 .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
                                 .WithMessage($"{rule.Error}"); 
                     break;
-                      case "AlreadyExists":
+                    case "NotFound":
+                     RuleFor(x => x.Id )
+                           .MustAsync(async (Id, cancellation) => 
+                        await _preventiveSchedulerQuery.NotFoundAsync(Id))
+                            .WithMessage($"{rule.Error}");
+                            break;  
+                  case "WorkOrderValidate":
+                     RuleFor(x => x.Id )
+                           .MustAsync(async (Id, cancellation) => 
+                        await _preventiveSchedulerQuery.UpdateValidation(Id))
+                            .WithMessage($"{rule.Error}");
+                            break;  
+                  case "AlreadyExists":
                         RuleForEach(x => x.Activity)
                          .MustAsync(async (command, activityDto, context, cancellation) =>
                          {
                              return !await _preventiveSchedulerQuery.AlreadyExistsAsync(
                                  activityDto.ActivityId, 
-                                 command.MachineGroupId                    
+                                 command.MachineGroupId,        
+                                 command.Id                     
                              );
                          }) 
                          .WithMessage($"{rule.Error}");  
                          
-                            break; 
+                            break;  
                     default:                        
-                        break;
+                        break;   
                 }
             }
         }
