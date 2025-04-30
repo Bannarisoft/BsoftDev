@@ -7,8 +7,10 @@ using Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.DeletePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive;
 using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
+using Core.Application.PreventiveSchedulers.Queries.GetDetailSchedulerByDate;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerById;
+using Core.Application.PreventiveSchedulers.Queries.GetSchedulerByDate;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -245,6 +247,32 @@ namespace MaintenanceManagement.API.Controllers
                 message = response.Message, 
                 errors = "" 
             }); 
+        }
+          [HttpGet("SchedulerAbstractByDate")]
+        public async Task<IActionResult> GetScheduler()
+        {
+           var response = await Mediator.Send(
+            new GetSchedulerByDateQuery
+            {
+
+            });
+           
+            return Ok( new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                data = response.Data
+            });
+        }
+          [HttpPost("SchedulerDetailByDate")]
+        public async Task<IActionResult> GetSchedulerDetail(GetDetailSchedulerByDateQuery command)
+        {
+           var response =  await Mediator.Send(command);
+           
+            return Ok( new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                data = response.Data
+            });
         }
     }
 }

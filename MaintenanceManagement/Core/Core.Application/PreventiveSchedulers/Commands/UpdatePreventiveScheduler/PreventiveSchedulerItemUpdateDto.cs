@@ -10,5 +10,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
         public int PreventiveSchedulerHeaderId { get; set; }
         public string? ItemId { get; set; }
         public int RequiredQty { get; set; }
+        public string? OldCategoryDescription { get; set; }
+        public string? OldGroupName{ get; set; }
     }
 }
