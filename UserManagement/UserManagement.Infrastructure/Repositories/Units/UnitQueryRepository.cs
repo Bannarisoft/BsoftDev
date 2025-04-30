@@ -148,6 +148,24 @@ namespace UserManagement.Infrastructure.Repositories.Units
                 var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = Id });
                 return count > 0;
           }
+            public async Task<List<Unit>> GetUnit_SuperAdmin(string searchPattern)
+        {
+             const string query = @"
+                SELECT 
+                U.Id, 
+                U.UnitName,
+                U.DivisionId
+            FROM AppData.Unit U
+            Inner join [AppSecurity].[UserUnit] UU on UU.UnitId = U.Id where IsDeleted = 0 
+            and UnitName like @SearchPattern";
+                
+              var result = await _dbConnection.QueryAsync<Unit>(query, new 
+            { 
+                SearchPattern = $"%{searchPattern}%"
+            
+             });
+            return result.ToList();
+        }
   
 
                   

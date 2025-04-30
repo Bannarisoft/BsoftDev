@@ -21,8 +21,9 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
      private readonly IMapper _mapper;
        private readonly ILogger<GetRolesAutocompleteQueryHandler> _logger;
      private readonly IMediator _mediator;
+     private readonly IIPAddressService _ipAddressService;
 
-        public GetRolesAutocompleteQueryHandler(IUserRoleQueryRepository userRoleRepository, IMapper mapper, IMediator mediator,ILogger<GetRolesAutocompleteQueryHandler> logger)
+        public GetRolesAutocompleteQueryHandler(IUserRoleQueryRepository userRoleRepository, IMapper mapper, IMediator mediator,ILogger<GetRolesAutocompleteQueryHandler> logger,IIPAddressService ipAddressService)
         {
            _userRoleRepository = userRoleRepository;
             _mapper =mapper;
@@ -30,12 +31,27 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
             _mediator=mediator;
 
             _logger = logger;
+            _ipAddressService = ipAddressService;
 
 
         }
 
         public async Task<ApiResponseDTO<List<GetUserRoleAutocompleteDto>>> Handle(GetRolesAutocompleteQuery request, CancellationToken cancellationToken)
         {
+            var groupcode = _ipAddressService.GetGroupcode();
+
+            if(groupcode == "SUPER_ADMIN")
+                {
+                    var Adminresult = await _userRoleRepository.GetRoles_SuperAdmin(request.SearchTerm);
+                    var AdminRoleDto = _mapper.Map<List<GetUserRoleAutocompleteDto>>(Adminresult);
+
+                    return new ApiResponseDTO<List<GetUserRoleAutocompleteDto>>
+                   {
+                       IsSuccess = true,
+                       Message = "Success",
+                       Data = AdminRoleDto
+                   }; 
+                }
 
                   _logger.LogInformation($"Handling GetUserRoleAutoCompleteSearchQuery with search pattern: {request.SearchTerm}");
 
