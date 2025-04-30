@@ -32,9 +32,9 @@
     <ProjectReference Include="..\FAM.Infrastructure\FAM.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- <ItemGroup>
   <Protobuf Include="..\..\Shared\Protos\department.proto" GrpcServices="Server" />
   <Protobuf Include="..\..\Shared\Protos\session.proto" GrpcServices="Server" />
-  </ItemGroup>
+  </ItemGroup> -->
 
 </Project>

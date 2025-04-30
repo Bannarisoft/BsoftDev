@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using MediatR;
 
@@ -16,15 +15,11 @@ namespace Core.Application.MaintenanceRequest.Queries.GetExternalRequestById
         private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-
-        private readonly IDepartmentService _departmentService;
-
-           public GetExternalRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator , IDepartmentService departmentService)
+        public GetExternalRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator)
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentService = departmentService;
         }
 
         // public async Task<ApiResponseDTO<List<GetExternalRequestByIdDto>>> Handle(GetExternalRequestsByIdsQuery request, CancellationToken cancellationToken)

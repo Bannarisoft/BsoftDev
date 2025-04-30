@@ -22,24 +22,18 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
         }
         public async Task<ApiResponseDTO<List<GetPreventiveSchedulerDto>>> Handle(GetPreventiveSchedulerQuery request, CancellationToken cancellationToken)
         {
-
-
             var (preventiveScheduler, totalCount) = await _preventiveSchedulerQuery.GetAllPreventiveSchedulerAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var preventiveSchedulerList = _mapper.Map<List<GetPreventiveSchedulerDto>>(preventiveScheduler);
 
             // var departments = await _departmentService.GetAllUserDepartmentAsync();
-            // 🔥 gRPC call now
+            // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentsAsync(); // ✅ Clean call
 
             // var departments = departmentResponse.Departments.ToList();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-
-
-
             var PreventiveSchedulerDictionary = new Dictionary<int, GetPreventiveSchedulerDto>();
-
-
+            // 🔥 Map department names to preventiveScheduler
             foreach (var data in preventiveSchedulerList)
             {
 
