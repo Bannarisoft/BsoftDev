@@ -31,7 +31,10 @@ namespace MaintenanceManagement.Infrastructure
             // Configure MassTransit with RabbitMQ
             services.AddMassTransit(x =>
             {
-                 x.AddConsumer<CreateNextSchedulerConsumer>();
+                // Register Consumer
+                x.AddConsumer<ScheduleNextPreventiveTaskConsumer>();
+                x.AddConsumer<RollbackWorkOrderConsumer>();                
+
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host("localhost", "/", h =>
@@ -39,10 +42,16 @@ namespace MaintenanceManagement.Infrastructure
                         h.Username("guest");
                         h.Password("guest");
                     });
-                     cfg.ReceiveEndpoint("create-next-scheduler-queue", e =>
+
+                    // ✅ Named consumer queue
+                    cfg.ReceiveEndpoint("schedule-next-task-queue", e =>
                     {
-                        e.ConfigureConsumer<CreateNextSchedulerConsumer>(context);
+                        e.ConfigureConsumer<ScheduleNextPreventiveTaskConsumer>(context);                     
                     });
+                    cfg.ReceiveEndpoint("rollback-workorder-queue", e =>
+                    {
+                        e.ConfigureConsumer<RollbackWorkOrderConsumer>(context);
+                    });                 
                 });
             });
 
