@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.Common.Interfaces.IMaintenanceCategory;
 using Core.Application.MachineMaster.Queries.GetMachineMaster;
@@ -18,11 +19,15 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMasterById
         private readonly IMachineMasterQueryRepository _imachineMasterQueryRepository;        
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        public GetMachineMasterByIdQueryHandler(IMachineMasterQueryRepository imachineMasterQueryRepository, IMapper mapper, IMediator mediator)
+         private readonly IDepartmentService _departmentService;
+
+
+        public GetMachineMasterByIdQueryHandler(IMachineMasterQueryRepository imachineMasterQueryRepository, IMapper mapper, IMediator mediator , IDepartmentService departmentService)
         {
             _imachineMasterQueryRepository = imachineMasterQueryRepository;            
             _mapper = mapper;
             _mediator = mediator;
+            _departmentService = departmentService;
         }
 
         public async Task<ApiResponseDTO<MachineMasterDto>> Handle(GetMachineMasterByIdQuery request, CancellationToken cancellationToken)
@@ -35,7 +40,17 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMasterById
             }
             // Map a single entity
             var machineMaster = _mapper.Map<MachineMasterDto>(result);
-
+            var departments = await _departmentService.GetAllDepartmentAsync();
+                var dept = departments.FirstOrDefault(d => d.DepartmentId == machineMaster.DepartmentId);
+                if (dept != null)
+                {
+                    machineMaster.DepartmentName = dept.DepartmentName;
+                }
+                else
+                {
+                    // Optional: handle missing department
+                    machineMaster.DepartmentName = "Unknown";
+                }
           //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetById",

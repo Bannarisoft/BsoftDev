@@ -41,6 +41,8 @@ namespace Core.Application.ActivityMaster.Queries.GetMachineGroupById
 
         var machineGroups = _mapper.Map<List<GetMachineGroupNameByIdDto>>(result); // Map the list
 
+        
+
         // Domain Event
         var domainEvent = new AuditLogsDomainEvent(
             actionDetail: "GetById",

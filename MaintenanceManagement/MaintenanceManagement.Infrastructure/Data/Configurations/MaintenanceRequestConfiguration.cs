@@ -64,14 +64,14 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                  .HasColumnType("int")
                  .IsRequired(false); 
 
-                //  builder.Property(m => m.VendorName)
-                //  .HasColumnType("nvarchar(max)");                                                            
+                 builder.Property(m => m.VendorName)
+                 .HasColumnType("nvarchar(max)");                                                            
 
                   builder.Property(m => m.OldVendorId)                
                  .HasColumnType("nvarchar(max)");
 
-                //  builder.Property(m => m.OldVendorName)
-                //  .HasColumnType("nvarchar(max)");                 
+                 builder.Property(m => m.OldVendorName)
+                 .HasColumnType("nvarchar(max)");                 
 
                  builder.Property(m => m.ServiceTypeId)                 
                  .HasColumnType("int") ;
