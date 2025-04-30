@@ -37,6 +37,7 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                 {
                     case "NotEmpty":
                         RuleFor(x => x.MachineGroupId)
+                                .NotNull()
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.MachineGroupId)} {rule.Error}");
                         RuleFor(x => x.DepartmentId)

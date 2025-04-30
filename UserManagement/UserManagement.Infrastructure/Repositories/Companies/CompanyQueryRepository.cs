@@ -14,10 +14,12 @@ namespace UserManagement.Infrastructure.Repositories.Companies
 {
     public class CompanyQueryRepository : ICompanyQueryRepository
     {
-        private readonly IDbConnection _dbConnection;        
-         public CompanyQueryRepository(IDbConnection dbConnection)
+        private readonly IDbConnection _dbConnection;  
+        private readonly IIPAddressService _ipAddressService;       
+         public CompanyQueryRepository(IDbConnection dbConnection,IIPAddressService ipAddressService)
         {
          _dbConnection = dbConnection;
+         _ipAddressService = ipAddressService;
         }
 
          public async Task<(List<Company>,int)> GetAllCompaniesAsync(int PageNumber, int PageSize, string? SearchTerm)
@@ -132,7 +134,7 @@ namespace UserManagement.Infrastructure.Repositories.Companies
         
          public async Task<List<Company>>  GetCompany(int userId,string searchPattern = null)
         {
-             
+             var entityId = _ipAddressService.GetEntityId();
 
             const string query = @"
                 SELECT 
@@ -140,13 +142,14 @@ namespace UserManagement.Infrastructure.Repositories.Companies
                 C.CompanyName
             FROM AppData.Company C
             Inner JOIN [AppSecurity].[UserCompany] UC ON UC.CompanyId = C.Id 
-            where IsDeleted = 0 and CompanyName like @SearchPattern and UC.UserId = @UserId  and UC.IsActive = 1"; 
+            where IsDeleted = 0 and CompanyName like @SearchPattern and UC.UserId = @UserId  and UC.IsActive = 1 AND C.EntityId=@EntityId"; 
                 
             
             var result = await _dbConnection.QueryAsync<Company>(query, new 
             { 
                 SearchPattern = $"%{searchPattern}%",
-                 UserId = userId
+                 UserId = userId,
+                 EntityId =entityId
             
              });
             return result.ToList();
@@ -186,6 +189,26 @@ namespace UserManagement.Infrastructure.Repositories.Companies
                 var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = companyId });
                 return count > 0;
           }
+             public async Task<List<Company>>  GetCompany_SuperAdmin(string searchPattern = null)
+        {
+             var entityId = _ipAddressService.GetEntityId();
+
+            const string query = @"
+                SELECT 
+                C.Id, 
+                C.CompanyName
+            FROM AppData.Company C
+            where IsDeleted = 0 and CompanyName like @SearchPattern  AND C.EntityId=@EntityId"; 
+                
+            
+            var result = await _dbConnection.QueryAsync<Company>(query, new 
+            { 
+                SearchPattern = $"%{searchPattern}%",
+                 EntityId =entityId
+            
+             });
+            return result.ToList();
+        }
         
     }
 }

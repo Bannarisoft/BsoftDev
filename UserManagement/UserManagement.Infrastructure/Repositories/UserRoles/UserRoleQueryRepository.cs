@@ -7,6 +7,7 @@ using Core.Application.Common.Interfaces.IUserRole;
 using System.Data;
 using Dapper;
 using Core.Application.UserRole.Queries.GetRole;
+using Core.Application.Common.Interfaces;
 
 namespace UserManagement.Infrastructure.Repositories.UserRoles
 {
@@ -14,10 +15,12 @@ namespace UserManagement.Infrastructure.Repositories.UserRoles
     {
         
          private readonly IDbConnection _dbConnection;  
+         private readonly IIPAddressService _ipAddressService;       
 
-    public  UserRoleQueryRepository(IDbConnection dbConnection)
+    public  UserRoleQueryRepository(IDbConnection dbConnection,IIPAddressService ipAddressService)
     {
         _dbConnection = dbConnection;
+        _ipAddressService = ipAddressService;
     }
 
 
@@ -80,16 +83,20 @@ namespace UserManagement.Infrastructure.Repositories.UserRoles
             }   
                 public async Task<List<UserRole>> GetRolesAsync(string searchTerm = null)
             {
+                var companyId = _ipAddressService.GetCompanyId();
+                var userId = _ipAddressService.GetUserId();
                 const string query = @"
-                    SELECT Id, RoleName, Description, CompanyId, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
-                        ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP, IsDeleted
-                    FROM AppSecurity.UserRole 
-                    WHERE (RoleName LIKE @searchTerm OR CAST(Id AS NVARCHAR) LIKE @searchTerm) AND IsDeleted = 0
+                    SELECT U.Id, U.RoleName, U.Description
+                    FROM AppSecurity.UserRole U
+                    INNER JOIN [AppSecurity].[UserRoleAllocation] URA ON URA.UserRoleId=U.Id AND URA.IsActive=1
+                    WHERE (U.RoleName LIKE @searchTerm OR CAST(U.Id AS NVARCHAR) LIKE @searchTerm) AND U.IsDeleted = 0 AND U.CompanyId=@CompanyId AND URA.UserId=@UserId
                     ORDER BY Id DESC";
                 
                 var parameters = new
                 {
-                    searchTerm = $"%{searchTerm ?? string.Empty}%"
+                    searchTerm = $"%{searchTerm ?? string.Empty}%",
+                    CompanyId = companyId,
+                    UserId = userId
                 };
 
                 var userRoles = await _dbConnection.QueryAsync<UserRole>(query, parameters);
@@ -129,18 +136,20 @@ namespace UserManagement.Infrastructure.Repositories.UserRoles
                 var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = Id });
                 return count > 0;
           }
-             public async Task<List<UserRole>> GetRoles_SuperAdmin(string searchTerm = null)
+           public async Task<List<UserRole>> GetRoles_SuperAdmin(string searchTerm = null)
             {
+                var companyId = _ipAddressService.GetCompanyId();
                 const string query = @"
-                    SELECT Id, RoleName, Description, CompanyId, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
-                        ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP, IsDeleted
-                    FROM AppSecurity.UserRole 
-                    WHERE (RoleName LIKE @searchTerm OR CAST(Id AS NVARCHAR) LIKE @searchTerm) AND IsDeleted = 0
+                    SELECT U.Id, U.RoleName, U.Description
+                    FROM AppSecurity.UserRole U
+                    
+                    WHERE (U.RoleName LIKE @searchTerm OR CAST(U.Id AS NVARCHAR) LIKE @searchTerm) AND U.IsDeleted = 0 AND U.CompanyId=@CompanyId 
                     ORDER BY Id DESC";
                 
                 var parameters = new
                 {
-                    searchTerm = $"%{searchTerm ?? string.Empty}%"
+                    searchTerm = $"%{searchTerm ?? string.Empty}%",
+                    CompanyId = companyId
                 };
 
                 var userRoles = await _dbConnection.QueryAsync<UserRole>(query, parameters);
