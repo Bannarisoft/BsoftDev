@@ -277,6 +277,43 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                      var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
                      return count > 0;
              }
+               public async Task<IEnumerable<dynamic>> GetAbstractSchedulerByDate()
+                {
+                       var query = $@"
+                            SELECT  
+                                COUNT(PSD.MachineId) AS TotalScheduleCount,Cast(PSD.ActualWorkOrderDate as varchar) AS ScheduleDate
+                            FROM [Maintenance].[PreventiveSchedulerHeader] PS
+                            INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
+                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 
+                            GROUP BY PSD.ActualWorkOrderDate
+                            ORDER BY PSD.ActualWorkOrderDate ASC
+                        ";
+                         using var multi = await _dbConnection.QueryMultipleAsync(query);
+                        var preventiveSchedulers = await multi.ReadAsync<dynamic>();
+
+                        return preventiveSchedulers;
+                }
+                 public async Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate)
+                {
+                       var query = $@"
+                            SELECT  
+                                PSD.Id,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
+                            FROM [Maintenance].[PreventiveSchedulerHeader] PS
+                            INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
+                            INNER JOIN [Maintenance].[MachineMaster] M ON M.Id =PSD.MachineId
+                            INNER JOIN [Maintenance].[MachineGroup] MG ON MG.Id = PS.MachineGroupId
+                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PSD.ActualWorkOrderDate=@ActualWorkOrderDate
+                            ORDER BY PS.Id ASC
+                        ";
+                        var parameters = new
+                        {
+                            ActualWorkOrderDate = schedulerDate
+                        };
+                         using var multi = await _dbConnection.QueryMultipleAsync(query,parameters);
+                        var preventiveSchedulers = await multi.ReadAsync<dynamic>();
+
+                        return preventiveSchedulers;
+                }
              
 
     }

@@ -19,5 +19,7 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<DateTimeOffset?> GetLastMaintenanceDateAsync(int machineId,int PreventiveSchedulerId,string miscType,string misccode);
         Task<PreventiveSchedulerDetail> GetPreventiveSchedulerDetailById(int Id);
         Task<bool> UpdateValidation(int id);
+        Task<IEnumerable<dynamic>> GetAbstractSchedulerByDate();
+        Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate);
     }
 }
