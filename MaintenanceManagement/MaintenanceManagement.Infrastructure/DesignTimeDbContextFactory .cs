@@ -15,15 +15,18 @@ namespace MaintenanceManagement.Infrastructure
         public ApplicationDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-
-            // Build configuration
-            IConfigurationRoot configuration = new ConfigurationBuilder()
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";                        
+            // Build configuration 
+             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../MaintenanceManagement.Api"))
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment}.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
+          var connectionString = configuration.GetConnectionString("DefaultConnection")
+                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
+                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
+                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
+
 
             optionsBuilder.UseSqlServer(connectionString);
 

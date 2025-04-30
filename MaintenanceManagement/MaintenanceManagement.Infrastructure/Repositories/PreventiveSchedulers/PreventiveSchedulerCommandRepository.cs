@@ -172,13 +172,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                   var details = _mapper.Map<PreventiveSchedulerDetail>(existingPreventiveScheduler);
                    // 🔥 Set new dates
-                    details.Id = 0;
+                    details.Id = 75896;
                     details.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
                     details.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
                     details.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
                      
 
-                     await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(details);
+                    await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(details);
                     await _applicationDbContext.SaveChangesAsync(); 
                     return true;
             }

@@ -7,6 +7,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Contracts.Events.Maintenance;
 using MassTransit;
+using Microsoft.Extensions.Logging;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
@@ -16,12 +17,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         private readonly IIPAddressService _ipAddressService; 
         private readonly IDbConnection _dbConnection;
         private readonly IPublishEndpoint _publishEndpoint;   
-        public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService,IDbConnection dbConnection, IPublishEndpoint publishEndpoint )
+        private readonly ILogger<WorkOrderCommandRepository> _logger;
+
+        public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService,IDbConnection dbConnection, IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger )
         {
             _applicationDbContext = applicationDbContext; 
             _ipAddressService = ipAddressService;     
             _dbConnection = dbConnection;     
             _publishEndpoint = publishEndpoint;
+            _logger = logger;
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, CancellationToken cancellationToken)
         {
@@ -307,5 +311,30 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             return await _applicationDbContext.MiscMaster
                 .FirstOrDefaultAsync(x => x.Code == code);
         }
+
+        public async Task<bool> RevertWorkOrderStatusAsync(int workOrderId)
+        {
+              var workOrder = await _applicationDbContext.WorkOrder.FindAsync(workOrderId);
+
+                if (workOrder == null)
+                {
+                    _logger.LogWarning("⚠️ Work order not found for rollback. ID: {id}", workOrderId);
+                    return false;
+                }
+                var openStatusId = await _applicationDbContext.MiscMaster
+                .Where(x => x.Code == MiscEnumEntity.StatusOpen.Code)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
+
+                workOrder.StatusId = openStatusId; // Or use a lookup
+
+                workOrder.ModifiedDate = DateTime.UtcNow;
+
+                _applicationDbContext.WorkOrder.Update(workOrder);
+                await _applicationDbContext.SaveChangesAsync();
+
+                _logger.LogInformation("✅ Work order status reverted for ID: {id}", workOrderId);
+                return true;
+            }                      
     }
 }
