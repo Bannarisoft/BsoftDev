@@ -7,6 +7,7 @@ using Core.Application.Common;
 using Core.Domain.Events;
 using Core.Application.Common.HttpResponse;
 using Microsoft.Extensions.Logging;
+using Core.Application.Common.Interfaces;
 
 namespace Core.Application.Entity.Queries.GetEntityAutoComplete
 {
@@ -17,19 +18,35 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
         private readonly IMediator _mediator; 
 
         private readonly ILogger<GetEntityAutocompleteQueryHandler> _logger;
+        private readonly IIPAddressService _ipAddressService;
 
 
-    public GetEntityAutocompleteQueryHandler(IEntityQueryRepository entityRepository,  IMapper mapper,IMediator mediator,ILogger<GetEntityAutocompleteQueryHandler> logger)
+    public GetEntityAutocompleteQueryHandler(IEntityQueryRepository entityRepository,  IMapper mapper,IMediator mediator,ILogger<GetEntityAutocompleteQueryHandler> logger,IIPAddressService ipAddressService)
     {
          _entityRepository = entityRepository;
          _mapper =mapper;
          _mediator = mediator;
          _logger = logger?? throw new ArgumentNullException(nameof(logger));
+         _ipAddressService = ipAddressService;
     }
 
     public async Task<ApiResponseDTO<List<EntityAutoCompleteDto>>> Handle(GetEntityAutocompleteQuery request, CancellationToken cancellationToken)
     {
 
+            var groupcode = _ipAddressService.GetGroupcode();
+
+            if(groupcode == "SUPER_ADMIN")
+                {
+                    var Adminresult = await _entityRepository.GetByEntityName_SuperAdmin(request.SearchPattern);
+                    var Admindivision = _mapper.Map<List<EntityAutoCompleteDto>>(Adminresult);
+
+                    return new ApiResponseDTO<List<EntityAutoCompleteDto>>
+                   {
+                       IsSuccess = true,
+                       Message = "Success",
+                       Data = Admindivision
+                   }; 
+                }
                  _logger.LogInformation($"Search pattern started: {request.SearchPattern}");
                 var entities = await _entityRepository.GetByEntityNameAsync(request.SearchPattern);
 

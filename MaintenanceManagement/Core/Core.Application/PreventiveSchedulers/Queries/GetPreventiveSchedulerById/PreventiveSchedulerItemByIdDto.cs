@@ -11,5 +11,8 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerBy
         public int PreventiveSchedulerHdrId { get; set; }
         public string OldItemId { get; set; }
         public int RequiredQty { get; set; }
+        public string OldCategoryDescription { get; set; }
+        public string OldGroupName { get; set; }
+
     }
 }

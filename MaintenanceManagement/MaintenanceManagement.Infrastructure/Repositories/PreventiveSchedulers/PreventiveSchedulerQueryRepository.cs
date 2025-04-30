@@ -22,7 +22,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var query = @"
                     SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] PSH
                  INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId = PSH.Id
-                   WHERE PSA.ActivityId = @ActivityId AND PSA.MachineGroupId =@MachineGroupId   AND PSH.IsDeleted = 0";
+                   WHERE PSA.ActivityId = @ActivityId AND PSH.MachineGroupId =@MachineGroupId   AND PSH.IsDeleted = 0";
                 var parameters = new DynamicParameters(new { ActivityId = activityId, MachineGroupId =machinegroupId });
 
              if (id is not null)
@@ -140,12 +140,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PSA.Id,
                     PSA.PreventiveSchedulerHeaderId,
                     PSA.ActivityId,
-                    PSA.EstimatedTimeHrs,
-                    PSA.Description,
                     PSI.Id,
                     PSI.PreventiveSchedulerHeaderId,
                     PSI.OldItemId,
-                    PSI.RequiredQty
+                    PSI.RequiredQty,
+                    PSI.OldCategoryDescription,
+                    PSI.OldGroupName
                 FROM [Maintenance].[PreventiveSchedulerHeader] PS
                 INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId = PS.Id
                 LEFT JOIN [Maintenance].[PreventiveSchedulerItems] PSI ON PSI.PreventiveSchedulerHeaderId = PS.Id

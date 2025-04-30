@@ -52,7 +52,7 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<PreventiveSchedulerItems>  PreventiveSchedulerItems { get; set; }
         public DbSet<PreventiveSchedulerActivity>  PreventiveSchedulerActivity { get; set; }
         public DbSet<ItemTransactions> SubStores { get; set; }
-        public DbSet<StockLedger> StockLedger { get; set; }
+        public DbSet<StockLedger> StockLedger { get; set; }       
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

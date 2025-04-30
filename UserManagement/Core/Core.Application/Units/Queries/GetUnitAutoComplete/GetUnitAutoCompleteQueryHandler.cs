@@ -35,7 +35,7 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
         {     
             var groupcode = _ipAddressService.GetGroupcode();
 
-            if(groupcode == "SUPER_ADMIN")
+            if(groupcode == "SUPER_ADMIN" || groupcode == "ADMIN")
                 {
                     var Adminresult = await _unitRepository.GetUnit_SuperAdmin(request.SearchPattern);
                     var AdminunitDto = _mapper.Map<List<UnitAutoCompleteDTO>>(Adminresult);

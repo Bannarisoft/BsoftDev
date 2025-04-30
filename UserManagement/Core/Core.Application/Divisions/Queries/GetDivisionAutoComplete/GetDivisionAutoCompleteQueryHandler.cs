@@ -24,18 +24,35 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
         private readonly IDivisionQueryRepository _divisionRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-         public GetDivisionAutoCompleteQueryHandler(IDivisionQueryRepository divisionRepository, IMapper mapper, IMediator mediator)
+        private readonly IIPAddressService _ipAddressService;
+         public GetDivisionAutoCompleteQueryHandler(IDivisionQueryRepository divisionRepository, IMapper mapper, IMediator mediator,IIPAddressService ipAddressService)
          {
             _divisionRepository =divisionRepository;
             _mapper =mapper;
             _mediator = mediator;
+            _ipAddressService = ipAddressService;
          }  
           public async Task<ApiResponseDTO<List<DivisionAutoCompleteDTO>>> Handle(GetDivisionAutoCompleteQuery request, CancellationToken cancellationToken)
           {
-                var companies = JsonSerializer.Deserialize<List<UserCompanyDTO>>(request.Companies) ?? new List<UserCompanyDTO>();
-             var companylist =   _mapper.Map<List<UserCompany>>(companies);
+             var groupcode = _ipAddressService.GetGroupcode();
+
+            if(groupcode == "SUPER_ADMIN" || groupcode == "ADMIN")
+                {
+                    var Adminresult = await _divisionRepository.GetDivision_SuperAdmin(request.SearchPattern);
+                    var Admindivision = _mapper.Map<List<DivisionAutoCompleteDTO>>(Adminresult);
+
+                    return new ApiResponseDTO<List<DivisionAutoCompleteDTO>>
+                   {
+                       IsSuccess = true,
+                       Message = "Success",
+                       Data = Admindivision
+                   }; 
+                }
+
+            //     var companies = JsonSerializer.Deserialize<List<UserCompanyDTO>>(request.Companies) ?? new List<UserCompanyDTO>();
+            //  var companylist =   _mapper.Map<List<UserCompany>>(companies);
              
-            var result = await _divisionRepository.GetDivision(request.SearchPattern,companylist);
+            var result = await _divisionRepository.GetDivision(request.SearchPattern);
             var division = _mapper.Map<List<DivisionAutoCompleteDTO>>(result);
              //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(

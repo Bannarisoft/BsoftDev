@@ -28,8 +28,8 @@
     <PackageReference Include="RabbitMQ.Client" Version="6.7.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
     <PackageReference Include="Dapper" Version="2.1.44" /> 
-    <PackageReference Include="Shared.Contracts" Version="1.0.0" />
-    <PackageReference Include="Shared.Infrastructure" Version="1.0.0" />   
+    <PackageReference Include="Shared.Contracts" Version="1.0.1" />
+    <PackageReference Include="Shared.Infrastructure" Version="1.0.1" />   
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.Application\Core.Application.csproj" />

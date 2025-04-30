@@ -18,5 +18,6 @@ namespace Core.Application.Common.Interfaces.IWorkOrder
         Task<string> GetBaseDirectoryItemAsync();      
         Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId,int unitId);
         Task<Core.Domain.Entities.MiscMaster> GetMiscMasterByCodeAsync(string code); 
+        Task<bool> RevertWorkOrderStatusAsync(int workOrderId);
     }
 }
