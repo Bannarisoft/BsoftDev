@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using Core.Domain.Events;
 using MediatR;
@@ -16,18 +12,19 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
         private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentService _departmentService;
+        private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
 
         public GetMaintenanceRequestQueryHandler(
             IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository,
             IMapper mapper,
             IMediator mediator,
-            IDepartmentService departmentService)
+            IDepartmentGrpcClient departmentGrpcClient)
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentService = departmentService;
+            _departmentGrpcClient = departmentGrpcClient;
+
         }
 
         public async Task<ApiResponseDTO<List<GetMaintenanceRequestDto>>> Handle(GetMaintenanceRequestQuery request, CancellationToken cancellationToken)
@@ -35,12 +32,14 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
             var (maintenanceRequests, totalCount) = await _maintenanceRequestQueryRepository.GetAllMaintenanceRequestAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var maintenanceRequestList = _mapper.Map<List<GetMaintenanceRequestDto>>(maintenanceRequests);
 
-            var departments = await _departmentService.GetAllDepartmentAsync();
+            // 🔥 Fetch departments using gRPC
+            var departments = await _departmentGrpcClient.GetAllDepartmentsAsync(); // ✅ Clean call
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
             var maintenanceRequestDictionary = new Dictionary<int, GetMaintenanceRequestDto>();
-
-                 foreach (var data in maintenanceRequestList)
+            
+            // 🔥 Map department names to MaintenanceRequest
+            foreach (var data in maintenanceRequestList)
             {
               
                     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName )&& departmentName != null)

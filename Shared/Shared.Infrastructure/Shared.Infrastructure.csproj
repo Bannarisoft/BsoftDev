@@ -3,17 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Version>0.1.7</Version>
+    <Version>1.0.1</Version>
     <PackageId>Shared.Infrastructure</PackageId>
     <Authors>BSoft</Authors>
     <Description>Reusable policies and infrastructure helpers like Polly, Serilog</Description>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Include="**\*.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Polly" Version="8.5.1" />
