@@ -10,7 +10,5 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerBy
         public int Id { get; set; }
         public int PreventiveSchedulerHdrId { get; set; }
         public int ActivityId { get; set; }
-        public decimal EstimatedTimeHrs { get; set; }
-        public string Description { get; set; }
     }
 }

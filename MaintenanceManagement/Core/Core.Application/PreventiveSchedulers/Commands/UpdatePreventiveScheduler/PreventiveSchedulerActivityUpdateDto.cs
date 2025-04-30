@@ -9,7 +9,5 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
     {
         public int PreventiveSchedulerHeaderId { get; set; }
         public int ActivityId { get; set; }
-        public decimal EstimatedTimeHrs { get; set; }
-        public string? Description { get; set; }
     }
 }

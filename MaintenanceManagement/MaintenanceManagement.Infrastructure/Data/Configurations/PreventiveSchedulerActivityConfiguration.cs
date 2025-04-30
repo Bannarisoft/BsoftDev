@@ -24,14 +24,6 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(t => t.EstimatedTimeHrs)
-                .HasColumnName("EstimatedTimeHrs")
-                .HasColumnType("decimal(18,2)")
-                .IsRequired();
-            builder.Property(t => t.Description)
-                .HasColumnName("Description")
-                .HasColumnType("varchar(250)");
-
                 builder.HasOne(t => t.PreventiveScheduler)
                 .WithMany(t => t.PreventiveSchedulerActivities)
                 .HasForeignKey(t => t.PreventiveSchedulerHeaderId)

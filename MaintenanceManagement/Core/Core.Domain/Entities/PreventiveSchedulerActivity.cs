@@ -12,7 +12,5 @@ namespace Core.Domain.Entities
         public required PreventiveSchedulerHeader PreventiveScheduler { get; set; }
         public int ActivityId { get; set; }
         public required ActivityMaster Activity { get; set; }
-        public decimal EstimatedTimeHrs { get; set; }
-        public string? Description { get; set; }
     }
 }
