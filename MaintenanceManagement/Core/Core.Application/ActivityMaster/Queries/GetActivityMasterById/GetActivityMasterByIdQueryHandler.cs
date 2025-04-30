@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Domain.Events;
@@ -17,12 +18,15 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
+        private readonly IDepartmentService _departmentService;
+        
 
-         public GetActivityMasterByIdQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator)
+         public GetActivityMasterByIdQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentService departmentService)
         {
             _activityMasterQueryRepository = activityMasterQueryRepository;
             _mapper =mapper;
             _mediator = mediator;
+            _departmentService =departmentService;
         } 
 
          public async Task<ApiResponseDTO<GetActivityMasterByIdDto>> Handle(GetActivityMasterByIdQuery request, CancellationToken cancellationToken)
@@ -40,6 +44,17 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
             }
             
             var machineGroup = _mapper.Map<GetActivityMasterByIdDto>(result);
+
+               var departments = await _departmentService.GetAllDepartmentAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            var activityMasterDictionary = new Dictionary<int, GetActivityMasterByIdDto>();
+
+           // ✅ No foreach needed
+                    if (departmentLookup.TryGetValue(machineGroup.DepartmentId, out var departmentName) && departmentName != null)
+                    {
+                        machineGroup.Department = departmentName;
+                    }
 
             // Domain Event
             var domainEvent = new AuditLogsDomainEvent(
