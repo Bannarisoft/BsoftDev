@@ -29,20 +29,34 @@ namespace UserManagement.API.Validation.Users
                 {
                     case "NotEmpty":
                         RuleFor(x => x.FirstName)
+                            .NotNull()
+                             .WithMessage($"{nameof(UpdateUserCommand.FirstName)} {rule.Error}")
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateUserCommand.FirstName)} {rule.Error}");
 
                         RuleFor(x => x.LastName)
+                            .NotNull()
+                            .WithMessage($"{nameof(UpdateUserCommand.LastName)} {rule.Error}")
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateUserCommand.LastName)} {rule.Error}");
 
                         RuleFor(x => x.UserName)
+                            .NotNull()
+                             .WithMessage($"{nameof(UpdateUserCommand.UserName)} {rule.Error}")
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateUserCommand.UserName)} {rule.Error}");
 
                              RuleFor(x => x.UserId)
+                             .NotNull()
+                             .WithMessage($"{nameof(UpdateUserCommand.UserId)} {rule.Error}")
                             .NotEmpty()
-                            .WithMessage($"{nameof(UpdateUserCommand.UserName)} {rule.Error}");
+                            .WithMessage($"{nameof(UpdateUserCommand.UserId)} {rule.Error}");
+
+                            RuleFor(x => x.UserGroupId)
+                             .NotNull()
+                             .WithMessage($"{nameof(UpdateUserCommand.UserGroupId)} {rule.Error}")
+                            .NotEmpty()
+                            .WithMessage($"{nameof(UpdateUserCommand.UserGroupId)} {rule.Error}");
                         break;
 
                     case "MaxLength":

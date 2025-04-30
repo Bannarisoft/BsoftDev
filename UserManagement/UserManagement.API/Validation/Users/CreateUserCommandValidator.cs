@@ -50,41 +50,60 @@ namespace UserManagement.API.Validation.Users
                 {
                     case "NotEmpty":
                         RuleFor(x => x.FirstName)
+                             .NotNull()
+                             .WithMessage($"{nameof(CreateUserCommand.FirstName)} {rule.Error}")
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateUserCommand.FirstName)} {rule.Error}");
 
                         RuleFor(x => x.LastName)
+                            .NotNull()
+                            .WithMessage($"{nameof(CreateUserCommand.LastName)} {rule.Error}")
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateUserCommand.LastName)} {rule.Error}");
 
                         RuleFor(x => x.UserName)
+                        .NotNull()
+                             .WithMessage($"{nameof(CreateUserCommand.UserName)} {rule.Error}")
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateUserCommand.UserName)} {rule.Error}");
 
+                        RuleFor(x => x.UserGroupId)
+                             .NotNull()
+                             .WithMessage($"{nameof(CreateUserCommand.UserGroupId)} {rule.Error}")
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateUserCommand.UserGroupId)} {rule.Error}");
+
                         RuleFor(x => x.UserCompanies)
+                        .Cascade(CascadeMode.Stop)
                         .NotNull()
                         .WithMessage($"{rule.Error}")
                         .Must(x => x.Count > 0)
-                        .WithMessage($"{rule.Error}");
+                        .WithMessage($"{rule.Error}")
+                        .When(x => _ipAddressService.GetGroupcode() == "USER");
 
                         RuleFor(x => x.userUnits)
+                        .Cascade(CascadeMode.Stop)
                         .NotNull()
                         .WithMessage($"{rule.Error}")
                         .Must(x => x.Count > 0)
-                        .WithMessage($"{rule.Error}");
+                        .WithMessage($"{rule.Error}")
+                        .When(x => _ipAddressService.GetGroupcode() == "USER");
 
                         RuleFor(x => x.userDivisions)
+                        .Cascade(CascadeMode.Stop)
                         .NotNull()
                         .WithMessage($"{rule.Error}")
                         .Must(x => x.Count > 0)
-                        .When(x => _ipAddressService.GetGroupcode() == "USER")
-                        .WithMessage($"{rule.Error}");
+                        .WithMessage($"{rule.Error}")
+                        .When(x => _ipAddressService.GetGroupcode() == "USER");
 
                          RuleFor(x => x.userDepartments)
+                         .Cascade(CascadeMode.Stop)
                          .NotNull()
                         .WithMessage($"{rule.Error}")
                         .Must(x => x.Count > 0)
-                        .WithMessage($"{rule.Error}");
+                        .WithMessage($"{rule.Error}")
+                        .When(x => _ipAddressService.GetGroupcode() == "USER");
 
                         RuleFor(x => x.userRoleAllocations)
                          .NotNull()
@@ -159,21 +178,25 @@ namespace UserManagement.API.Validation.Users
                                  companyRule.MustAsync(async (company, cancellation) => 
                                      await _companyQueryRepository.FKColumnExistValidation(company.CompanyId))
                                      .WithMessage($"{rule.Error}");  
-                             });
+                             })
+                             .When(x => _ipAddressService.GetGroupcode() == "USER");
+                             
                      RuleFor(x => x.userDivisions)
                              .ForEach(divisionRule =>
                              {
                                  divisionRule.MustAsync(async (division, cancellation) => 
                                      await _divisionQueryRepository.FKColumnExistValidation(division.DivisionId))
                                      .WithMessage($"{rule.Error}");  
-                             });
+                             })
+                             .When(x => _ipAddressService.GetGroupcode() == "USER");
                         RuleFor(x => x.userUnits)
                              .ForEach(unitRule =>
                              {
                                  unitRule.MustAsync(async (unit, cancellation) => 
                                      await _unitQueryRepository.FKColumnExistValidation(unit.UnitId))
                                      .WithMessage($"{rule.Error}");  
-                             });
+                             })
+                             .When(x => _ipAddressService.GetGroupcode() == "USER");
                         RuleFor(x => x.userRoleAllocations)
                              .ForEach(RoleRule =>
                              {
@@ -188,7 +211,8 @@ namespace UserManagement.API.Validation.Users
                                  departmentRule.MustAsync(async (department, cancellation) => 
                                      await _departmentQueryRepository.FKColumnExistValidation(department.DepartmentId))
                                      .WithMessage($"{rule.Error}");  
-                             });
+                             })
+                             .When(x => _ipAddressService.GetGroupcode() == "USER");
                              
                         break; 
 
