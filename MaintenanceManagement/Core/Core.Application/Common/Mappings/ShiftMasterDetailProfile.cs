@@ -6,6 +6,7 @@ using AutoMapper;
 using Core.Application.ShiftMasterDetails.Commands.CreateShiftMasterDetail;
 using Core.Application.ShiftMasterDetails.Commands.DeleteShiftMasterDetail;
 using Core.Application.ShiftMasterDetails.Commands.UpdateShiftMasterDetail;
+using Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetail;
 using Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetailById;
 using Core.Domain.Entities;
 using static Core.Domain.Common.BaseEntity;
@@ -30,7 +31,8 @@ namespace Core.Application.Common.Mappings
             CreateMap<DeleteShiftMasterDetailCommand, ShiftMasterDetail>()
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
             
-            CreateMap<ShiftMasterDetail, ShiftMasterDetailDTO>();
+            
+            CreateMap<ShiftMasterDetail, ShiftMasterDetailByIdDto>();
         }
     }
 }

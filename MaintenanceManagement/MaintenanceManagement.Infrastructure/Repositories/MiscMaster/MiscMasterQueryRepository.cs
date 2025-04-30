@@ -70,9 +70,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
         {
             
 
-            const string query = @"SELECT Id,Code   FROM Maintenance.MiscMaster M
+            const string query = @"SELECT M.Id,M.Code   FROM Maintenance.MiscMaster M
             INNER JOIN [Maintenance].[MiscTypeMaster] MT ON MT.Id = M.MiscTypeId
-                WHERE IsDeleted = 0 AND MT.MiscTypeCode= @MiscTypeCode AND Code LIKE @SearchPattern ";
+                WHERE M.IsDeleted = 0 AND MT.MiscTypeCode= @MiscTypeCode AND M.Code LIKE @SearchPattern ";
                 
             
             var parameters = new 
@@ -168,9 +168,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
         {
             
 
-            const string query = @"SELECT M.Id,M.Code   FROM Maintenance.MiscMaster M
-            INNER JOIN [Maintenance].[MiscTypeMaster] MT ON MT.Id = M.MiscTypeId
-                WHERE M.IsDeleted = 0 AND MT.IsDeleted = 0 AND MT.MiscTypeCode= @MiscTypeCode AND Code=@MiscTypeName ";
+            const string query = @"SELECT M.Id,M.Code  FROM Maintenance.MiscMaster AS M
+                                INNER JOIN Maintenance.MiscTypeMaster AS MT 
+                                ON MT.Id = M.MiscTypeId
+                                WHERE M.IsDeleted = 0 AND MT.IsDeleted = 0 AND MT.MiscTypeCode= @MiscTypeCode AND M.Code=@MiscTypeName ";
                 
             
             var parameters = new 

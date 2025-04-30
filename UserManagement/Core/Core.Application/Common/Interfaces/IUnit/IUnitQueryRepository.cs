@@ -11,7 +11,8 @@ namespace Core.Application.Common.Interfaces.IUnit
        Task<Unit> GetByIdAsync(int Id);     
        Task<List<Unit>> GetUnit(string searchPattern,int userId,int CompanyId); 
        Task<List<Unit>> GetUnitByUserId(int userId,int CompanyId); 
-       Task<bool> FKColumnExistValidation(int Id);            
+       Task<bool> FKColumnExistValidation(int Id); 
+       Task<List<Unit>> GetUnit_SuperAdmin(string searchPattern);           
     }
     
    

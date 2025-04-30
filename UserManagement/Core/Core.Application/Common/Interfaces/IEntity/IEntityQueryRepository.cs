@@ -17,6 +17,7 @@ namespace Core.Application.Common.Interfaces.IEntity
       Task<List<Entity>> GetByEntityNameAsync(string entity);
       Task<string> GenerateEntityCodeAsync();
       Task<bool> SoftDeleteValidation(int Id);
+      Task<List<Entity>> GetByEntityName_SuperAdmin(string entity);
        
     }
 }

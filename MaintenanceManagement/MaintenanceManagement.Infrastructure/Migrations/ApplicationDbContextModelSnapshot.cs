@@ -672,6 +672,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("OldVendorId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OldVendorName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
@@ -699,6 +702,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<int?>("VendorId")
                         .HasColumnType("int");
+
+                    b.Property<string>("VendorName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -911,23 +917,15 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ActivityId");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Description");
-
-                    b.Property<decimal>("EstimatedTimeHrs")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("EstimatedTimeHrs");
-
-                    b.Property<int>("PreventiveSchedulerHdrId")
+                    b.Property<int>("PreventiveSchedulerHeaderId")
                         .HasColumnType("int")
-                        .HasColumnName("PreventiveSchedulerHdrId");
+                        .HasColumnName("PreventiveSchedulerHeaderId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ActivityId");
 
-                    b.HasIndex("PreventiveSchedulerHdrId");
+                    b.HasIndex("PreventiveSchedulerHeaderId");
 
                     b.ToTable("PreventiveSchedulerActivity", "Maintenance");
                 });
@@ -958,6 +956,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
+                    b.Property<string>("HangfireJobId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("IsActive");
@@ -986,9 +987,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("PreventiveSchedulerId")
+                    b.Property<int>("PreventiveSchedulerHeaderId")
                         .HasColumnType("int")
-                        .HasColumnName("PreventiveSchedulerId");
+                        .HasColumnName("PreventiveSchedulerHeaderId");
 
                     b.Property<string>("RescheduleReason")
                         .HasColumnType("nvarchar(max)")
@@ -1002,7 +1003,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasIndex("MachineId");
 
-                    b.HasIndex("PreventiveSchedulerId");
+                    b.HasIndex("PreventiveSchedulerHeaderId");
 
                     b.ToTable("PreventiveSchedulerDetail", "Maintenance");
                 });
@@ -1016,7 +1017,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CompanyId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("CompanyId");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -1104,7 +1106,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnName("ScheduleId");
 
                     b.Property<int>("UnitId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
 
                     b.HasKey("Id");
 
@@ -1133,25 +1136,29 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ItemId");
 
+                    b.Property<string>("OldCategoryDescription")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("OldCategoryDescription");
+
+                    b.Property<string>("OldGroupName")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("OldGroupName");
+
                     b.Property<string>("OldItemId")
                         .HasColumnType("varchar(50)")
                         .HasColumnName("OldItemId");
 
-                    b.Property<int>("PreventiveSchedulerHdrId")
+                    b.Property<int>("PreventiveSchedulerHeaderId")
                         .HasColumnType("int")
-                        .HasColumnName("PreventiveSchedulerId");
+                        .HasColumnName("PreventiveSchedulerHeaderId");
 
                     b.Property<int>("RequiredQty")
                         .HasColumnType("int")
                         .HasColumnName("RequiredQty");
 
-                    b.Property<int?>("SourceId")
-                        .HasColumnType("int")
-                        .HasColumnName("SourceId");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("PreventiveSchedulerHdrId");
+                    b.HasIndex("PreventiveSchedulerHeaderId");
 
                     b.ToTable("PreventiveSchedulerItems", "Maintenance");
                 });
@@ -1884,7 +1891,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasOne("Core.Domain.Entities.PreventiveSchedulerHeader", "PreventiveScheduler")
                         .WithMany("PreventiveSchedulerActivities")
-                        .HasForeignKey("PreventiveSchedulerHdrId")
+                        .HasForeignKey("PreventiveSchedulerHeaderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1903,7 +1910,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasOne("Core.Domain.Entities.PreventiveSchedulerHeader", "PreventiveScheduler")
                         .WithMany("PreventiveSchedulerDetails")
-                        .HasForeignKey("PreventiveSchedulerId")
+                        .HasForeignKey("PreventiveSchedulerHeaderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1932,8 +1939,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.MaintenanceCategory", "MaintenanceCategory")
-                        .WithMany("PreventiveSchedulerHeaders")
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscMaintenanceCategory")
+                        .WithMany("MaintenanceCategory")
                         .HasForeignKey("MaintenanceCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1946,11 +1953,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Navigation("MachineGroup");
 
-                    b.Navigation("MaintenanceCategory");
-
                     b.Navigation("MiscFrequencyType");
 
                     b.Navigation("MiscFrequencyUnit");
+
+                    b.Navigation("MiscMaintenanceCategory");
 
                     b.Navigation("MiscSchedule");
                 });
@@ -1959,7 +1966,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                 {
                     b.HasOne("Core.Domain.Entities.PreventiveSchedulerHeader", "PreventiveScheduler")
                         .WithMany("PreventiveSchedulerItems")
-                        .HasForeignKey("PreventiveSchedulerHdrId")
+                        .HasForeignKey("PreventiveSchedulerHeaderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -2134,11 +2141,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("PreventiveSchedulerDetail");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.MaintenanceCategory", b =>
-                {
-                    b.Navigation("PreventiveSchedulerHeaders");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.MaintenanceRequest", b =>
                 {
                     b.Navigation("WorkOrdersRequest");
@@ -2149,6 +2151,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("FrequencyType");
 
                     b.Navigation("FrequencyUnit");
+
+                    b.Navigation("MaintenanceCategory");
 
                     b.Navigation("MaintenanceType");
 

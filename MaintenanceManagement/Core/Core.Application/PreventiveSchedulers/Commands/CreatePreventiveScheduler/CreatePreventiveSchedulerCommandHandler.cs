@@ -53,14 +53,14 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                 var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode,StatusOpen.Code);
                  foreach (var detail in details)
                  {
-                        var lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(detail.MachineId);
+                        // var lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(detail.MachineId);
 
-                     DateTime baseDate = (!lastMaintenanceDate.HasValue || lastMaintenanceDate.Value < request.EffectiveDate.ToDateTime(TimeOnly.MinValue))
-                     ? request.EffectiveDate.ToDateTime(TimeOnly.MinValue)
-                     : lastMaintenanceDate.Value.DateTime;
+                    //  DateTime baseDate = (!lastMaintenanceDate.HasValue || lastMaintenanceDate.Value < request.EffectiveDate.ToDateTime(TimeOnly.MinValue))
+                    //  ? request.EffectiveDate.ToDateTime(TimeOnly.MinValue)
+                    //  : lastMaintenanceDate.Value.DateTime;
 
-                        var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(baseDate, request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
-                        var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(baseDate, request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
+                        var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
+                        var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
 
                      detail.PreventiveSchedulerHeaderId = response;
                      detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate); 

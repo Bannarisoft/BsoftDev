@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Application.Common.Interfaces.IMiscMaster;
+using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
@@ -17,12 +18,14 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
         private readonly IMachineGroupQueryRepository _machineGroupQueryRepository;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
-        public CreatePreventiveSchedulerCommandValidator(MaxLengthProvider maxLengthProvider, IMachineGroupQueryRepository machineGroupQueryRepository,IMiscMasterQueryRepository miscMasterQueryRepository,IActivityMasterQueryRepository activityMasterQueryRepository)
+        private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
+        public CreatePreventiveSchedulerCommandValidator(MaxLengthProvider maxLengthProvider, IMachineGroupQueryRepository machineGroupQueryRepository,IMiscMasterQueryRepository miscMasterQueryRepository,IActivityMasterQueryRepository activityMasterQueryRepository,IPreventiveSchedulerQuery preventiveSchedulerQuery)
         {
             _validationRules = ValidationRuleLoader.LoadValidationRules();
             _machineGroupQueryRepository = machineGroupQueryRepository;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _activityMasterQueryRepository = activityMasterQueryRepository;
+            _preventiveSchedulerQuery = preventiveSchedulerQuery;
              if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -34,43 +37,69 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                 {
                     case "NotEmpty":
                         RuleFor(x => x.MachineGroupId)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.MachineGroupId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.MachineGroupId)} {rule.Error}");
                         RuleFor(x => x.DepartmentId)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.DepartmentId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.DepartmentId)} {rule.Error}");
                         RuleFor(x => x.MaintenanceCategoryId)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.MachineGroupId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.MachineGroupId)} {rule.Error}");
                         RuleFor(x => x.ScheduleId)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ScheduleId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ScheduleId)} {rule.Error}");
                         RuleFor(x => x.FrequencyTypeId)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.FrequencyTypeId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.FrequencyTypeId)} {rule.Error}");
                         RuleFor(x => x.FrequencyInterval)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.FrequencyInterval)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.FrequencyInterval)} {rule.Error}");
                         RuleFor(x => x.FrequencyUnitId)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.FrequencyUnitId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.FrequencyUnitId)} {rule.Error}");
                         RuleFor(x => x.EffectiveDate)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.EffectiveDate)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.EffectiveDate)} {rule.Error}");
 
                          RuleFor(x => x.GraceDays)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.GraceDays)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.GraceDays)} {rule.Error}");
                         RuleFor(x => x.ReminderWorkOrderDays)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ReminderWorkOrderDays)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ReminderWorkOrderDays)} {rule.Error}");
                         RuleFor(x => x.ReminderMaterialReqDays)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ReminderMaterialReqDays)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ReminderMaterialReqDays)} {rule.Error}");
                         RuleFor(x => x.IsDownTimeRequired)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.IsDownTimeRequired)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.IsDownTimeRequired)} {rule.Error}");
                         RuleFor(x => x.DownTimeEstimateHrs)
+                                .NotNull()
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.DownTimeEstimateHrs)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.DownTimeEstimateHrs)} {rule.Error}");
                         RuleFor(x => x.Activity)
@@ -119,6 +148,18 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                                 .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
                                 .WithMessage($"{rule.Error}"); 
                     break;
+                      case "AlreadyExists":
+                        RuleForEach(x => x.Activity)
+                         .MustAsync(async (command, activityDto, context, cancellation) =>
+                         {
+                             return !await _preventiveSchedulerQuery.AlreadyExistsAsync(
+                                 activityDto.ActivityId, 
+                                 command.MachineGroupId                    
+                             );
+                         }) 
+                         .WithMessage($"{rule.Error}");  
+                         
+                            break; 
                     default:                        
                         break;
                 }

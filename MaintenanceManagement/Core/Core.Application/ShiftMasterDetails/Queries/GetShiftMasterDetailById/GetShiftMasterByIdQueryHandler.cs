@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetailById
 {
-    public class GetShiftMasterByIdQueryHandler : IRequestHandler<GetShiftMasterByIdQuery, ApiResponseDTO<ShiftMasterDetailDTO>>
+    public class GetShiftMasterByIdQueryHandler : IRequestHandler<GetShiftMasterByIdQuery, ApiResponseDTO<ShiftMasterDetailByIdDto>>
     {
         private readonly IShiftMasterDetailQuery _shiftMasterQuery;
         private readonly IMapper _mapper;
@@ -21,10 +21,10 @@ namespace Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetailById
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<ShiftMasterDetailDTO>> Handle(GetShiftMasterByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<ShiftMasterDetailByIdDto>> Handle(GetShiftMasterByIdQuery request, CancellationToken cancellationToken)
         {
               var result = await _shiftMasterQuery.GetByIdAsync(request.Id);
-            var shiftMaster = _mapper.Map<ShiftMasterDetailDTO>(result);
+            var shiftMaster = _mapper.Map<ShiftMasterDetailByIdDto>(result);
 
           //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
@@ -35,7 +35,7 @@ namespace Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetailById
                     module:"Shift master"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-              return new ApiResponseDTO<ShiftMasterDetailDTO> 
+              return new ApiResponseDTO<ShiftMasterDetailByIdDto> 
               { 
             IsSuccess = true, 
             Message = "Success", 

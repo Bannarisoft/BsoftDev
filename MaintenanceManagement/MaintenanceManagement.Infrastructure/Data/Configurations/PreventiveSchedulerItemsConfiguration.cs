@@ -26,9 +26,9 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnName("RequiredQty")
                 .HasColumnType("int")
                 .IsRequired();
-            builder.Property(t => t.SourceId)
-                .HasColumnName("SourceId")
-                .HasColumnType("int");
+            // builder.Property(t => t.UnitId)
+            //     .HasColumnName("UnitId")
+            //     .HasColumnType("int");
             builder.Property(t => t.OldItemId)
                 .HasColumnName("OldItemId")
                 .HasColumnType("varchar(50)");

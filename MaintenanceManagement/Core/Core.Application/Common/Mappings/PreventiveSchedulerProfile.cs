@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.Interfaces;
+using Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventive;
 using Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.DeletePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
@@ -34,8 +35,8 @@ namespace Core.Application.Common.Mappings
 
              CreateMap<UpdatePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
             .ForMember(dest => dest.PreventiveSchedulerActivities, opt => opt.MapFrom(src => src.Activity))
-             .ForMember(dest => dest.PreventiveSchedulerItems, opt => opt.MapFrom(src => src.Items))
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
+             .ForMember(dest => dest.PreventiveSchedulerItems, opt => opt.MapFrom(src => src.Items));
+            // .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
 
             CreateMap<PreventiveSchedulerActivityUpdateDto, PreventiveSchedulerActivity>();
             CreateMap<PreventiveSchedulerItemUpdateDto, PreventiveSchedulerItems>()
@@ -91,6 +92,9 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.OldItemCode, opt => opt.MapFrom(src => src.OldItemId));
             CreateMap<PreventiveSchedulerDetail, PreventiveSchedulerDetail>()
             .ForMember(dest => dest.Id, opt => opt.Ignore());
+
+            CreateMap<ActiveInActivePreventiveCommand, PreventiveSchedulerHeader>()
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
         }
     }
 }
