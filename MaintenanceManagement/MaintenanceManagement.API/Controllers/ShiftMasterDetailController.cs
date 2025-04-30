@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.ShiftMasterDetails.Commands.CreateShiftMasterDetail;
 using Core.Application.ShiftMasterDetails.Commands.DeleteShiftMasterDetail;
 using Core.Application.ShiftMasterDetails.Commands.UpdateShiftMasterDetail;
+using Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetail;
 using Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetailById;
 using FluentValidation;
 using MediatR;
@@ -25,6 +26,27 @@ namespace MaintenanceManagement.API.Controllers
             _createShiftMasterDetailCommandValidator = createShiftMasterDetailCommandValidator;
             _updateShiftMasterDetailCommandValidator = updateShiftMasterDetailCommandValidator;
             _deleteShiftMasterDetailCommandValidator = deleteShiftMasterDetailCommandValidator;
+        }
+
+           [HttpGet]
+        public async Task<IActionResult> GetAllShiftMasterDetailsAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        {
+           var response = await Mediator.Send(
+            new GetShiftMasterDetailQuery
+            {
+                PageNumber = PageNumber, 
+                PageSize = PageSize, 
+                SearchTerm = SearchTerm
+            });
+           
+            return Ok( new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                data = response.Data,
+                TotalCount = response.TotalCount,
+                PageNumber = response.PageNumber,
+                PageSize = response.PageSize
+                });
         }
          
          [HttpPost]

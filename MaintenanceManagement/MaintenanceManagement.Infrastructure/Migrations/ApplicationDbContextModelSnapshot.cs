@@ -1024,6 +1024,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
@@ -1108,6 +1111,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<int>("ScheduleId")
                         .HasColumnType("int")
                         .HasColumnName("ScheduleId");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -1670,9 +1676,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("EndTime")
                         .HasColumnType("DateTimeOffset")
                         .HasColumnName("EndTime");
-
-                    b.Property<bool?>("ISCompleted")
-                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("StartTime")
                         .HasColumnType("DateTimeOffset")

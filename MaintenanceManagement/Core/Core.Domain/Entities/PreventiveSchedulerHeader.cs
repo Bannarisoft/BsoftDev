@@ -26,6 +26,8 @@ namespace Core.Domain.Entities
         public int ReminderMaterialReqDays { get; set; }
         public byte IsDownTimeRequired { get; set; }
         public decimal DownTimeEstimateHrs { get; set; }
+        public int UnitId { get; set; }
+        public int CompanyId { get; set; }
         public ICollection<PreventiveSchedulerDetail>? PreventiveSchedulerDetails { get; set; }
         public ICollection<PreventiveSchedulerActivity>? PreventiveSchedulerActivities { get; set; }
         public ICollection<PreventiveSchedulerItems>? PreventiveSchedulerItems { get; set; }

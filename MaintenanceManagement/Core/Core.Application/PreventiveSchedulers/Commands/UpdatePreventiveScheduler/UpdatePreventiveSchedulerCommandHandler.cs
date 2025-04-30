@@ -24,18 +24,16 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
         private readonly IMediator _mediator;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
-        private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
         private readonly IWorkOrderCommandRepository _workOrderRepository;
         private readonly IIPAddressService _ipAddressService;
         private readonly ITimeZoneService _timeZoneService;
-        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderQueryRepository workOrderQueryRepository, IWorkOrderCommandRepository workOrderRepository, IIPAddressService ipAddressService, ITimeZoneService timeZoneService)
+        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderCommandRepository workOrderRepository, IIPAddressService ipAddressService, ITimeZoneService timeZoneService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
             _mediator = mediator;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
-            _workOrderQueryRepository = workOrderQueryRepository;
             _workOrderRepository = workOrderRepository;
             _ipAddressService = ipAddressService;
             _timeZoneService = timeZoneService;
@@ -51,14 +49,14 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
                 var DetailResult = await _preventiveSchedulerQuery.GetPreventiveSchedulerDetail(request.Id);
                  foreach (var detail in DetailResult)
                  {
-                            var lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(detail.MachineId);
+                            // var lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(detail.MachineId);
 
-                          DateTimeOffset baseDate = (!lastMaintenanceDate.HasValue || lastMaintenanceDate.Value < request.EffectiveDate.ToDateTime(TimeOnly.MinValue))
-                           ? request.EffectiveDate.ToDateTime(TimeOnly.MinValue)
-                                : lastMaintenanceDate.Value;
+                        //   DateTimeOffset baseDate = (!lastMaintenanceDate.HasValue || lastMaintenanceDate.Value < request.EffectiveDate.ToDateTime(TimeOnly.MinValue))
+                        //    ? request.EffectiveDate.ToDateTime(TimeOnly.MinValue)
+                        //         : lastMaintenanceDate.Value;
 
-                            var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(baseDate.DateTime, request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
-                            var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(baseDate.DateTime, request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
+                            var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
+                            var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
 
                      detail.PreventiveSchedulerHeaderId = request.Id;
                      detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate); 

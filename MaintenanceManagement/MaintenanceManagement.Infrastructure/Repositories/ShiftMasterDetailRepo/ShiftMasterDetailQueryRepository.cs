@@ -32,26 +32,31 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
                 return count > 0;
         }
 
-        public async Task<(List<Core.Domain.Entities.ShiftMaster>, int)> GetAllShiftMasterDetailAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(IEnumerable<dynamic>, int)> GetAllShiftMasterDetailAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
               var query = $$"""
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
-               FROM [Maintenance].[ShiftMaster] 
-              WHERE IsDeleted = 0
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShiftName LIKE @Search OR ShiftCode LIKE @Search)")}};
+               FROM [Maintenance].[ShiftMaster] SM
+            INNER JOIN [Maintenance].[ShiftMasterDetails] SMD ON SMD.ShiftMasterId=SM.Id
+              WHERE SMD.IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SM.ShiftName LIKE @Search OR SM.ShiftCode LIKE @Search)")}};
 
                 SELECT 
-                Id, 
-                ShiftCode,
-                ShiftName,
-                EffectiveDate,
-                IsActive
-            FROM [Maintenance].[ShiftMaster] 
+                SMD.Id,
+                SM.ShiftCode,
+                SM.ShiftName,
+                SMD.StartTime,
+                SMD.EndTime,
+                SMD.DurationInHours,
+                SMD.BreakDurationInMinutes,
+                 Cast(SMD.EffectiveDate as varchar) AS EffectiveDate
+            FROM [Maintenance].[ShiftMaster] SM
+            INNER JOIN [Maintenance].[ShiftMasterDetails] SMD ON SMD.ShiftMasterId=SM.Id
             WHERE 
-            IsDeleted = 0
-                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShiftName LIKE @Search OR ShiftCode LIKE @Search )")}}
-                ORDER BY Id desc
+            SMD.IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SM.ShiftName LIKE @Search OR SM.ShiftCode LIKE @Search )")}}
+                ORDER BY SMD.Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
                 SELECT @TotalCount AS TotalCount;
@@ -66,7 +71,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
                        };
 
              var shiftmaster = await _dbConnection.QueryMultipleAsync(query, parameters);
-             var shiftMasterlist = (await shiftmaster.ReadAsync<Core.Domain.Entities.ShiftMaster>()).ToList();
+             var shiftMasterlist = await shiftmaster.ReadAsync<dynamic>();
              int totalCount = (await shiftmaster.ReadFirstAsync<int>());
 
             return (shiftMasterlist, totalCount);
