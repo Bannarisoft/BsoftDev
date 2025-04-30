@@ -129,6 +129,23 @@ namespace UserManagement.Infrastructure.Repositories.UserRoles
                 var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = Id });
                 return count > 0;
           }
+             public async Task<List<UserRole>> GetRoles_SuperAdmin(string searchTerm = null)
+            {
+                const string query = @"
+                    SELECT Id, RoleName, Description, CompanyId, IsActive, CreatedBy, CreatedAt, CreatedByName, CreatedIP, 
+                        ModifiedBy, ModifiedAt, ModifiedByName, ModifiedIP, IsDeleted
+                    FROM AppSecurity.UserRole 
+                    WHERE (RoleName LIKE @searchTerm OR CAST(Id AS NVARCHAR) LIKE @searchTerm) AND IsDeleted = 0
+                    ORDER BY Id DESC";
+                
+                var parameters = new
+                {
+                    searchTerm = $"%{searchTerm ?? string.Empty}%"
+                };
+
+                var userRoles = await _dbConnection.QueryAsync<UserRole>(query, parameters);
+                return userRoles.ToList();
+            }
 
    
     }
