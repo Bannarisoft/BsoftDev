@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Domain.Events;
 using MediatR;
@@ -15,17 +16,38 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMaster
         private readonly IMachineMasterQueryRepository _imachineMasterQueryRepository;        
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
-         public GetMachineMasterQueryHandler(IMachineMasterQueryRepository imachineMasterQueryRepository, IMapper mapper, IMediator mediator)
+        private readonly IDepartmentService _departmentService;
+
+         public GetMachineMasterQueryHandler(IMachineMasterQueryRepository imachineMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentService departmentService)
         {
             _imachineMasterQueryRepository = imachineMasterQueryRepository;            
             _mapper = mapper;
-            _mediator = mediator;   
+            _mediator = mediator;  
+            _departmentService = departmentService; 
         }
 
         public async Task<ApiResponseDTO<List<MachineMasterDto>>> Handle(GetMachineMasterQuery request, CancellationToken cancellationToken)
         {
            var (MachineMaster, totalCount) = await _imachineMasterQueryRepository.GetAllMachineAsync(request.PageNumber, request.PageSize, request.SearchTerm);
                var machineMastersgroup = _mapper.Map<List<MachineMasterDto>>(MachineMaster);
+
+               
+               var departments = await _departmentService.GetAllDepartmentAsync();
+                var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+                // 4. Enrich each DTO, unwrapping the nullable DepartmentId and setting DepartmentName
+                foreach (var dto in machineMastersgroup)
+                {
+                    // Only proceed if DepartmentId has a value
+                    if (dto.DepartmentId.HasValue)
+                    {
+                        var deptId = dto.DepartmentId.Value;              // unwrap the int?
+                        if (departmentLookup.TryGetValue(deptId, out var name))
+                        {
+                            dto.DepartmentName = name;                    // set the *Name* property
+                        }
+                    }
+                }
 
              //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(

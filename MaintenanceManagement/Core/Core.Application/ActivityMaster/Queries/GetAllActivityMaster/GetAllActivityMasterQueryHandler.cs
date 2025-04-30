@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.ActivityMaster.Queries.GetAllActivityMaster;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using Core.Domain.Events;
 using MediatR;
@@ -16,13 +17,15 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
+          private readonly IDepartmentService _departmentService;
 
 
-        public GetAllActivityMasterQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator)
+        public GetAllActivityMasterQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator , IDepartmentService departmentService)
         {
             _activityMasterQueryRepository = activityMasterQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
+            _departmentService = departmentService;
         }
          public async Task<ApiResponseDTO<List<GetAllActivityMasterDto>>> Handle(GetAllActivityMasterQuery request, CancellationToken cancellationToken)
         {
@@ -31,6 +34,24 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
 
             // Map domain entities to DTOs
             var activityList = _mapper.Map<List<GetAllActivityMasterDto>>(activities);
+
+
+             var departments = await _departmentService.GetAllDepartmentAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            var activityMasterDictionary = new Dictionary<int, GetAllActivityMasterDto>();
+
+                 foreach (var data in activityList)
+            {
+              
+                    if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName )&& departmentName != null)
+                    {
+                        data.Department = departmentName;
+                    }
+
+                    activityMasterDictionary[data.DepartmentId] = data;
+                
+            }
 
             // Publish domain event for auditing
             var domainEvent = new AuditLogsDomainEvent(

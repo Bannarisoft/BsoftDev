@@ -12,7 +12,7 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
     {
 
           public string? SearchPattern { get; set; }
-          public string MiscTypeCode { get; set; }
+          public string? MiscTypeCode { get; set; }
         
     }
 }
