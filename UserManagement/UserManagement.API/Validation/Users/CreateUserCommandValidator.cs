@@ -12,6 +12,7 @@ using Core.Application.Common.Interfaces.IDivision;
 using Core.Application.Common.Interfaces.IDepartment;
 using Core.Application.Common.Interfaces.IUserRole;
 using Core.Application.Common.Interfaces.IUnit;
+using Core.Application.Common.Interfaces;
 
 namespace UserManagement.API.Validation.Users
 {
@@ -24,8 +25,9 @@ namespace UserManagement.API.Validation.Users
         private readonly IDepartmentQueryRepository _departmentQueryRepository;
         private readonly IUserRoleQueryRepository _userRoleQueryRepository;
         private readonly IUnitQueryRepository _unitQueryRepository;
+        private readonly IIPAddressService _ipAddressService; 
 
-        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userRepository, ICompanyQueryRepository companyQueryRepository, IDivisionQueryRepository divisionQueryRepository, IDepartmentQueryRepository departmentQueryRepository, IUserRoleQueryRepository userRoleQueryRepository, IUnitQueryRepository unitQueryRepository)
+        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userRepository, ICompanyQueryRepository companyQueryRepository, IDivisionQueryRepository divisionQueryRepository, IDepartmentQueryRepository departmentQueryRepository, IUserRoleQueryRepository userRoleQueryRepository, IUnitQueryRepository unitQueryRepository,IIPAddressService ipAddressService)
         {
            var MaxLen = maxLengthProvider.GetMaxLength<User>("FirstName") ?? 25;
 
@@ -36,6 +38,7 @@ namespace UserManagement.API.Validation.Users
             _departmentQueryRepository = departmentQueryRepository;
             _userRoleQueryRepository = userRoleQueryRepository;
             _unitQueryRepository = unitQueryRepository;
+            _ipAddressService = ipAddressService;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -74,6 +77,7 @@ namespace UserManagement.API.Validation.Users
                         .NotNull()
                         .WithMessage($"{rule.Error}")
                         .Must(x => x.Count > 0)
+                        .When(x => _ipAddressService.GetGroupcode() == "USER")
                         .WithMessage($"{rule.Error}");
 
                          RuleFor(x => x.userDepartments)

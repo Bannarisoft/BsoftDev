@@ -16,6 +16,7 @@ namespace Core.Application.Common.Interfaces.ICompany
         Task<bool> CompanyExistsAsync(string companyName);
         Task<bool> SoftDeleteValidation(int Id); 
         Task<bool> FKColumnExistValidation(int companyId);
+        Task<List<Company>> GetCompany_SuperAdmin(string searchPattern);
        
     }
 }

@@ -38,9 +38,9 @@ namespace Core.Application.UserRole.Queries.GetRolesAutocomplete
 
         public async Task<ApiResponseDTO<List<GetUserRoleAutocompleteDto>>> Handle(GetRolesAutocompleteQuery request, CancellationToken cancellationToken)
         {
-            var groupcode = _ipAddressService.GetGroupcode();
+             var groupcode = _ipAddressService.GetGroupcode();
 
-            if(groupcode == "SUPER_ADMIN")
+            if(groupcode == "SUPER_ADMIN" || groupcode == "ADMIN")
                 {
                     var Adminresult = await _userRoleRepository.GetRoles_SuperAdmin(request.SearchTerm);
                     var AdminRoleDto = _mapper.Map<List<GetUserRoleAutocompleteDto>>(Adminresult);
