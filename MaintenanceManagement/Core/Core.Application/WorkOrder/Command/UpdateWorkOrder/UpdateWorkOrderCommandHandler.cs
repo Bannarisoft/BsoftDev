@@ -67,7 +67,7 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
                     // Save and publish event (RabbitMQ/Saga)
                     await _eventPublisher.SaveEventAsync(@event);
                     await _eventPublisher.PublishPendingEventsAsync();
-                  // 🧾 Check MongoDB for rollback failure
+         /*          // 🧾 Check MongoDB for rollback failure
 
                 var connectionError = await _logQueryService.GetLatestConnectionFailureAsync();
                 if (!string.IsNullOrEmpty(connectionError))
@@ -88,7 +88,7 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
                         Message = rollbackError
                     };
                 }
-                        
+                   */      
                     _logger.LogInformation("✅ WorkOrderClosedEvent published. CorrelationId: {CorrelationId}, WorkOrderId: {WorkOrderId}",
                         correlationId, updatedEntity.Id);
                 }

@@ -34,8 +34,8 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
     <PackageReference Include="Serilog.Sinks.MongoDB" Version="7.0.0"/>
-    <PackageReference Include="Shared.Contracts" Version="1.0.1" />
-    <PackageReference Include="Shared.Infrastructure" Version="1.0.1" />
+    <PackageReference Include="Shared.Contracts" Version="1.0.0" />
+    <PackageReference Include="Shared.Infrastructure" Version="1.0.0" />
     <PackageReference Include="Hangfire" Version="1.8.17"/>
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.17"/>
     <PackageReference Include="Hangfire.Core" Version="1.8.17"/>
