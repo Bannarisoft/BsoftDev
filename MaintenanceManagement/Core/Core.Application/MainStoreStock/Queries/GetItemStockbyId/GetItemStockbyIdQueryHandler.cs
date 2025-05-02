@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.IMainStoreStock;
+using Core.Domain.Events;
+using MediatR;
+
+namespace Core.Application.MainStoreStock.Queries.GetItemStockbyId
+{
+    public class GetItemStockbyIdQueryHandler : IRequestHandler<GetItemStockbyIdQuery,ApiResponseDTO<MainStoreItemStockDto>>
+    {
+        private readonly IMainStoreStockQueryRepository _imainStoreStockQueryRepository;        
+        private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
+
+        public GetItemStockbyIdQueryHandler(IMainStoreStockQueryRepository imainStoreStockQueryRepository, IMapper mapper, IMediator mediator)
+        {
+            _imainStoreStockQueryRepository = imainStoreStockQueryRepository;            
+            _mapper = mapper;
+            _mediator = mediator;
+        }
+
+        public async Task<ApiResponseDTO<MainStoreItemStockDto>> Handle(GetItemStockbyIdQuery request, CancellationToken cancellationToken)
+        {
+            var result = await _imainStoreStockQueryRepository.GetByItemCodeIdAsync(request.OldUnitcode, request.ItemCode);
+            // Check if the entity exists
+            if (result is null)
+            {
+                return new ApiResponseDTO<MainStoreItemStockDto> { IsSuccess = false, Message =$"Stock ItemCode {request.ItemCode} not found." };
+            }
+            // Map a single entity
+            var itemStockDto = _mapper.Map<MainStoreItemStockDto>(result);
+
+          //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "GetById",
+                    actionCode: "GetByItemCodeIdAsync",        
+                    actionName: itemStockDto.StockQty.ToString(),
+                    details: $"Stock Item details {itemStockDto.StockQty} was fetched.",
+                    module:"MainstoreStockItemsFetched"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
+                return new ApiResponseDTO<MainStoreItemStockDto> { IsSuccess = true, Message = "Success", Data = itemStockDto };
+        }
+    }
+}
