@@ -1,9 +1,8 @@
 using Grpc.Core;
 using GrpcServices.Maintenance;
-using Contracts.Dtos.Maintenance;
-using Contracts.Interfaces.External.IUser;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Http;
+using Contracts.Interfaces.External.IUser;
 
 namespace MaintenanceManagement.Infrastructure.GrpcClients
 {

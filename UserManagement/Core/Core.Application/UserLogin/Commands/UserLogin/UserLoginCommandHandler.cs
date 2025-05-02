@@ -31,8 +31,9 @@ namespace Core.Application.UserLogin.Commands.UserLogin
         private readonly ITimeZoneService _timeZoneService;
         private static readonly ConcurrentDictionary<string, UserLockoutInfo> _userLockoutInfo = new();
         private readonly ICompanyQuerySettings _companyQuerySettings;
+        private readonly IBackgroundServiceClient  _backgroundServiceClient;
 
-        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository, IMediator mediator,ILogger<UserLoginCommandHandler> logger,IUserSessionRepository userSessionRepository, IHttpContextAccessor httpContextAccessor, IIPAddressService ipAddressService, IOptions<JwtSettings> jwtSettings, ITimeZoneService timeZoneService, ICompanyQuerySettings companyQuerySettings)
+        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository, IMediator mediator,ILogger<UserLoginCommandHandler> logger,IUserSessionRepository userSessionRepository, IHttpContextAccessor httpContextAccessor, IIPAddressService ipAddressService, IOptions<JwtSettings> jwtSettings, ITimeZoneService timeZoneService, ICompanyQuerySettings companyQuerySettings,IBackgroundServiceClient backgroundServiceClient)
         {
             _userRepository = userRepository;
             _userQueryRepository = userQueryRepository;
@@ -44,7 +45,8 @@ namespace Core.Application.UserLogin.Commands.UserLogin
              _mediator = mediator; 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));   
             _timeZoneService = timeZoneService;  
-            _companyQuerySettings = companyQuerySettings;       
+            _companyQuerySettings = companyQuerySettings;      
+            _backgroundServiceClient=backgroundServiceClient;     
         }
 
        public async Task<ApiResponseDTO<LoginResponse>> Handle(UserLoginCommand request, CancellationToken cancellationToken)
@@ -159,7 +161,8 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                     userInfo.UnlockTime = currentTime.AddMinutes(companySettings.AutoReleaseTime);
                     _userRepository.lockUser(username);
                     // Schedule Hangfire job to unlock user
-                    BackgroundJob.Schedule<IUserCommandRepository>(service =>service.UnlockUser(username), TimeSpan.FromMinutes(companySettings.AutoReleaseTime));
+                    await _backgroundServiceClient.UserUnlock(username, companySettings.AutoReleaseTime);
+                    //BackgroundJob.Schedule<IUserCommandRepository>(service =>service.UnlockUser(username), TimeSpan.FromMinutes(companySettings.AutoReleaseTime));
 
                     _logger.LogWarning("User {Username} is locked due to too many invalid login attempts.", username);
 

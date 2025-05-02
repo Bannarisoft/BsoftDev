@@ -38,8 +38,8 @@
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.17" />
     <PackageReference Include="Hangfire.Core" Version="1.8.17" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.8.17" />
-    <PackageReference Include="Shared.Contracts" Version="1.0.1" />
-    <PackageReference Include="Shared.Infrastructure" Version="1.0.1" />
+    <PackageReference Include="Shared.Contracts" Version="1.0.0" />
+    <PackageReference Include="Shared.Infrastructure" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

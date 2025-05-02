@@ -23,6 +23,7 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
         private readonly ISmsService _smsService;
         private readonly ITimeZoneService _timeZoneService;
         private readonly IEmailService _emailService;
+        private readonly IBackgroundServiceClient  _backgroundServiceClient;
 
         public ForgotUserPasswordCommandHandler(
             IUserQueryRepository userQueryRepository,
@@ -30,7 +31,7 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
             IChangePassword changePasswordService,
             ILogger<ForgotUserPasswordCommandHandler> logger,
             INotificationsQueryRepository notificationsQueryRepository,
-            IMediator mediator,ISmsService smsService, ITimeZoneService timeZoneService,IEmailService emailService)
+            IMediator mediator,ISmsService smsService, ITimeZoneService timeZoneService,IEmailService emailService,IBackgroundServiceClient backgroundServiceClient)
         {
             _userQueryRepository = userQueryRepository;
             _mapper = mapper;
@@ -41,6 +42,7 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
             _smsService = smsService ?? throw new ArgumentNullException(nameof(smsService));
             _timeZoneService = timeZoneService;    
             _emailService = emailService;
+            _backgroundServiceClient=backgroundServiceClient;
         }
 
         public async Task<ApiResponseDTO<ForgotPasswordResponse>> Handle(ForgotUserPasswordCommand request, CancellationToken cancellationToken)
@@ -51,21 +53,11 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
             // Generate verification code
             string verificationCode = await _changePasswordService.GenerateVerificationCode(6);
             int expiryMinutes = await _notificationsQueryRepository.GetResetCodeExpiryMinutes();
-            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
-            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId); 
+            // var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            // var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId); 
 
-            // Store verification code in memory
-            ForgotPasswordCache.CodeStorage[request.UserName] = new VerificationCodeDetails
-            {
-                Code = verificationCode,
-                ExpiryTime = currentTime.AddMinutes(expiryMinutes)
-            };
+            await _backgroundServiceClient.ScheduleVerificationCodeCleanupAsync(request.UserName, expiryMinutes);
 
-            // Schedule Hangfire job to remove the code after expiry
-            Hangfire.BackgroundJob.Schedule(
-            () => ForgotPasswordCache.RemoveVerificationCode(request.UserName), 
-            TimeSpan.FromMinutes(expiryMinutes)
-            );
             //Email
             var emailCommand = new SendEmailCommand
             {
