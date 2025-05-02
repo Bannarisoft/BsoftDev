@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.IMRS;
+using Core.Domain.Events;
+using MediatR;
+
+namespace Core.Application.MRS.Queries.GetSubCostCenter
+{
+    public class GetSubCostCenterQueryHandler : IRequestHandler<GetSubCostCenterQuery, ApiResponseDTO<List<MSubCostCenterDto>>>
+    {
+         private readonly IMRSQueryRepository _imRSQueryRepository;        
+         private readonly IMapper _mapper;
+         private readonly IMediator _mediator;
+          public GetSubCostCenterQueryHandler(IMRSQueryRepository imRSQueryRepository, IMapper mapper, IMediator mediator)
+         {
+                _imRSQueryRepository = imRSQueryRepository;            
+                _mapper = mapper;
+                _mediator = mediator;
+         }
+
+        public async Task<ApiResponseDTO<List<MSubCostCenterDto>>> Handle(GetSubCostCenterQuery request, CancellationToken cancellationToken)
+        {
+            var result = await _imRSQueryRepository.GetSubCostCenter(request.OldUnitcode);
+
+        if (result == null || !result.Any())
+        {
+            return new ApiResponseDTO<List<MSubCostCenterDto>> { IsSuccess = false, Message = $"Department {request.OldUnitcode} not found." };
+        }
+
+        var departmentDtos = _mapper.Map<List<MSubCostCenterDto>>(result);
+
+        var domainEvent = new AuditLogsDomainEvent(
+            actionDetail: "GetById",
+            actionCode: "GetSubCostCenterQuery",
+            actionName: request.OldUnitcode,
+            details: $"SubCost Center {request.OldUnitcode} was fetched.",
+            module: "GetSubcostCenter"
+        );
+
+        await _mediator.Publish(domainEvent, cancellationToken);
+
+        return new ApiResponseDTO<List<MSubCostCenterDto>> { IsSuccess = true, Message = "Success", Data = departmentDtos };
+        }
+    }
+}

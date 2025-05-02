@@ -53,7 +53,12 @@ using MaintenanceManagement.Infrastructure.Repositories.Item;
 using MaintenanceManagement.Infrastructure.Data.Configurations;
 using Core.Application.Common.Interfaces.IStcokLedger;
 using MaintenanceManagement.Infrastructure.Repositories.StockLedger;
+using Core.Application.Common.Interfaces.IMainStoreStock;
 using MaintenanceManagement.Infrastructure.Repositories;
+using Core.Application.MainStoreStock.Queries.GetMainStoreStock;
+using MaintenanceManagement.Infrastructure.Repositories.MainStoreStock;
+using Core.Application.Common.Interfaces.IMRS;
+using MaintenanceManagement.Infrastructure.Repositories.MRS;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -61,6 +66,7 @@ namespace MaintenanceManagement.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
         {
+
 
               var connectionString = configuration.GetConnectionString("DefaultConnection")
                                                 .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
@@ -200,6 +206,9 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IPreventiveSchedulerQuery, PreventiveSchedulerQueryRepository>();
             services.AddScoped<IItemQueryRepository, ItemQueryRepository>();
             services.AddScoped<IStockLedgerQueryRepository, StockLedgerQueryRepository>();
+            services.AddScoped<IMainStoreStockQueryRepository, MainStoreStockQueryRepository>();
+            services.AddScoped<IMRSQueryRepository, MRSQueryRepository>();
+            services.AddScoped<IMRSCommandRepository, MRSCommandRepository>();
 
             // Miscellaneous services
 
@@ -207,6 +216,7 @@ namespace MaintenanceManagement.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
+
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();                     
             services.AddScoped<ILogQueryService, LogQueryService>();   
             

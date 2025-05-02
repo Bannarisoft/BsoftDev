@@ -12,6 +12,6 @@ namespace Core.Application.MaintenanceType.Queries.GetMaintenanceType
         public string? TypeName { get; set; }
         public Status IsActive { get; set; }
 
-
+        
     }
 }
