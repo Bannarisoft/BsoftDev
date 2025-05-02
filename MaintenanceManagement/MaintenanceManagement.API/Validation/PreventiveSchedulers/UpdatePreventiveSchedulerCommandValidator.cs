@@ -36,48 +36,75 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                 {
                     case "NotEmpty":
                      RuleFor(x => x.Id)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.Id)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.Id)} {rule.Error}");
                         RuleFor(x => x.MachineGroupId)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.MachineGroupId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.MachineGroupId)} {rule.Error}");
                         RuleFor(x => x.DepartmentId)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.DepartmentId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.DepartmentId)} {rule.Error}");
                         RuleFor(x => x.MaintenanceCategoryId)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.MaintenanceCategoryId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.MaintenanceCategoryId)} {rule.Error}");
                         RuleFor(x => x.ScheduleId)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.ScheduleId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.ScheduleId)} {rule.Error}");
                         RuleFor(x => x.FrequencyTypeId)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.FrequencyTypeId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.FrequencyTypeId)} {rule.Error}");
                         RuleFor(x => x.FrequencyInterval)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.FrequencyInterval)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.FrequencyInterval)} {rule.Error}");
                         RuleFor(x => x.FrequencyUnitId)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.FrequencyUnitId)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.FrequencyUnitId)} {rule.Error}");
                         RuleFor(x => x.EffectiveDate)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.EffectiveDate)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.EffectiveDate)} {rule.Error}");
 
                          RuleFor(x => x.GraceDays)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.GraceDays)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.GraceDays)} {rule.Error}");
                         RuleFor(x => x.ReminderWorkOrderDays)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.ReminderWorkOrderDays)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.ReminderWorkOrderDays)} {rule.Error}");
                         RuleFor(x => x.ReminderMaterialReqDays)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.ReminderMaterialReqDays)} {rule.Error}")
                                 .NotEmpty()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.ReminderMaterialReqDays)} {rule.Error}");
                         RuleFor(x => x.IsDownTimeRequired)
-                                .NotEmpty()
+                                .NotNull()
                                 .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.IsDownTimeRequired)} {rule.Error}");
                         RuleFor(x => x.DownTimeEstimateHrs)
+                                .NotNull()
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.DownTimeEstimateHrs)} {rule.Error}")
                                 .NotEmpty()
-                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.DownTimeEstimateHrs)} {rule.Error}");
+                                .WithMessage($"{nameof(UpdatePreventiveSchedulerCommand.DownTimeEstimateHrs)} {rule.Error}")
+                                .When(x => x.IsDownTimeRequired == 1);
                         RuleFor(x => x.Activity)
                             .NotNull()
                             .WithMessage($"{rule.Error}")

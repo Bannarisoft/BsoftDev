@@ -94,14 +94,13 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ReminderMaterialReqDays)} {rule.Error}");
                         RuleFor(x => x.IsDownTimeRequired)
                                 .NotNull()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.IsDownTimeRequired)} {rule.Error}")
-                                .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.IsDownTimeRequired)} {rule.Error}");
                         RuleFor(x => x.DownTimeEstimateHrs)
                                 .NotNull()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.DownTimeEstimateHrs)} {rule.Error}")
                                 .NotEmpty()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.DownTimeEstimateHrs)} {rule.Error}");
+                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.DownTimeEstimateHrs)} {rule.Error}")
+                                .When(x => x.IsDownTimeRequired == 1);
                         RuleFor(x => x.Activity)
                             .NotNull()
                             .WithMessage($"{rule.Error}")
