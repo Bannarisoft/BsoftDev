@@ -53,6 +53,11 @@ using MaintenanceManagement.Infrastructure.Repositories.Item;
 using MaintenanceManagement.Infrastructure.Data.Configurations;
 using Core.Application.Common.Interfaces.IStcokLedger;
 using MaintenanceManagement.Infrastructure.Repositories.StockLedger;
+using Core.Application.Common.Interfaces.IMainStoreStock;
+using Core.Application.MainStoreStock.Queries.GetMainStoreStock;
+using MaintenanceManagement.Infrastructure.Repositories.MainStoreStock;
+using Core.Application.Common.Interfaces.IMRS;
+using MaintenanceManagement.Infrastructure.Repositories.MRS;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -192,6 +197,9 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IPreventiveSchedulerQuery, PreventiveSchedulerQueryRepository>();
             services.AddScoped<IItemQueryRepository, ItemQueryRepository>();
             services.AddScoped<IStockLedgerQueryRepository, StockLedgerQueryRepository>();
+            services.AddScoped<IMainStoreStockQueryRepository, MainStoreStockQueryRepository>();
+            services.AddScoped<IMRSQueryRepository, MRSQueryRepository>();
+            services.AddScoped<IMRSCommandRepository, MRSCommandRepository>();
 
             // Miscellaneous services
 
