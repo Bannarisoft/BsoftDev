@@ -7,16 +7,19 @@ using Dapper;
 using Core.Application.Entity.Queries.GetEntityLastCode;
 using Microsoft.Data.SqlClient;
 using UserManagement.Infrastructure.Migrations;
+using Core.Application.Common.Interfaces;
 
 namespace UserManagement.Infrastructure.Repositories.Entities
 {
     public class EntityQueryRepository : IEntityQueryRepository
     {
-        private readonly IDbConnection _dbConnection;        
+        private readonly IDbConnection _dbConnection; 
+        private readonly IIPAddressService _ipAddressService;       
 
-        public EntityQueryRepository(IDbConnection dbConnection)
+        public EntityQueryRepository(IDbConnection dbConnection,IIPAddressService ipAddressService)
         {
              _dbConnection = dbConnection;
+             _ipAddressService = ipAddressService;
         }
 
         public async Task<string> GenerateEntityCodeAsync()
@@ -82,15 +85,16 @@ namespace UserManagement.Infrastructure.Repositories.Entities
         public async Task<List<Entity>> GetByEntityNameAsync(string searchPattern)
         {
             searchPattern = searchPattern ?? string.Empty; // Prevent null issues
-
+            var enityId = _ipAddressService.GetEntityId();
             const string query = @"
              SELECT Id, EntityName 
             FROM AppData.Entity
             WHERE IsDeleted = 0 
-            AND EntityName LIKE @SearchPattern";  
+            AND EntityName LIKE @SearchPattern AND Id=@EntityId ";  
             var parameters = new 
             { 
-            SearchPattern = $"%{searchPattern}%" 
+            SearchPattern = $"%{searchPattern}%" ,
+            EntityId = enityId
             };
 
             var entitiesGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.Entity>(query, parameters);
@@ -130,6 +134,22 @@ namespace UserManagement.Infrastructure.Repositories.Entities
                     
                        return UserExists.HasValue || AdminSecurityExists.HasValue || CompanyExists.HasValue;
             }
+              public async Task<List<Entity>> GetByEntityName_SuperAdmin(string searchPattern)
+             {
+                 searchPattern = searchPattern ?? string.Empty; 
+                 const string query = @"
+                  SELECT Id, EntityName 
+                 FROM AppData.Entity
+                 WHERE IsDeleted = 0 
+                 AND EntityName LIKE @SearchPattern AND Id=@EntityId ";  
+                 var parameters = new 
+                 { 
+                 SearchPattern = $"%{searchPattern}%" 
+                 };
+
+                 var entitiesGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.Entity>(query, parameters);
+                 return entitiesGroups.ToList();  
+             }
 
         
 

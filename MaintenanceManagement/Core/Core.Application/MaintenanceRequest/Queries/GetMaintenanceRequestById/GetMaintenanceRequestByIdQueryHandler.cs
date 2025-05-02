@@ -16,9 +16,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequestById
          private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-
-
-           public GetMaintenanceRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator)
+        public GetMaintenanceRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator)
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
@@ -28,6 +26,8 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequestById
          public async Task<ApiResponseDTO<GetMaintenanceRequestDto>> Handle(GetMaintenanceRequestByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _maintenanceRequestQueryRepository.GetByIdAsync(request.Id);
+            var maintenanceRequest = _mapper.Map<GetMaintenanceRequestDto>(result);
+
             if (result is null)
             {
                 return new ApiResponseDTO<GetMaintenanceRequestDto>
@@ -38,7 +38,16 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequestById
                 };
             }
 
-            var maintenanceRequest = _mapper.Map<GetMaintenanceRequestDto>(result);
+           
+
+            // var departments = await _departmentService.GetAllDepartmentAsync();
+            // var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            // if (departmentLookup.TryGetValue(maintenanceRequest.DepartmentId, out string departmentName) && departmentName != null)
+            // {
+            //     maintenanceRequest.DepartmentName = departmentName;
+            // }
+
 
             // Domain Event
             var domainEvent = new AuditLogsDomainEvent(

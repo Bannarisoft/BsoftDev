@@ -54,6 +54,7 @@ using MaintenanceManagement.Infrastructure.Data.Configurations;
 using Core.Application.Common.Interfaces.IStcokLedger;
 using MaintenanceManagement.Infrastructure.Repositories.StockLedger;
 using Core.Application.Common.Interfaces.IMainStoreStock;
+using MaintenanceManagement.Infrastructure.Repositories;
 using Core.Application.MainStoreStock.Queries.GetMainStoreStock;
 using MaintenanceManagement.Infrastructure.Repositories.MainStoreStock;
 using Core.Application.Common.Interfaces.IMRS;
@@ -66,8 +67,16 @@ namespace MaintenanceManagement.Infrastructure
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
         {
 
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection");
+
+              var connectionString = configuration.GetConnectionString("DefaultConnection")
+                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
+                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
+                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
+            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
+                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
+                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
+                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");    
+            
 
 
             if (string.IsNullOrWhiteSpace(connectionString))
@@ -207,8 +216,10 @@ namespace MaintenanceManagement.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
-            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
 
+            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();                     
+            services.AddScoped<ILogQueryService, LogQueryService>();   
+            
             // AutoMapper profiles
             services.AddAutoMapper(
             typeof(MachineGroupProfile),

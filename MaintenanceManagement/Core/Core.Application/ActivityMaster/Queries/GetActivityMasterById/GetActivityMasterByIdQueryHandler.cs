@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IActivityMaster;
-using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Domain.Events;
 using MediatR;
 
@@ -17,12 +13,17 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
+        private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
 
-         public GetActivityMasterByIdQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator)
+        
+
+         public GetActivityMasterByIdQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
         {
             _activityMasterQueryRepository = activityMasterQueryRepository;
             _mapper =mapper;
             _mediator = mediator;
+            _departmentGrpcClient = departmentGrpcClient;
+
         } 
 
          public async Task<ApiResponseDTO<GetActivityMasterByIdDto>> Handle(GetActivityMasterByIdQuery request, CancellationToken cancellationToken)
@@ -40,6 +41,18 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
             }
             
             var machineGroup = _mapper.Map<GetActivityMasterByIdDto>(result);
+
+             // 🔥 Fetch departments using gRPC
+            var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            var activityMasterDictionary = new Dictionary<int, GetActivityMasterByIdDto>();
+
+           // ✅ No foreach needed
+                    if (departmentLookup.TryGetValue(machineGroup.DepartmentId, out var departmentName) && departmentName != null)
+                    {
+                        machineGroup.Department = departmentName;
+                    }
 
             // Domain Event
             var domainEvent = new AuditLogsDomainEvent(

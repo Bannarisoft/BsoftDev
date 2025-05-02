@@ -9,7 +9,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
     {
         public string ItemId { get; set; }
         public int RequiredQty { get; set; }
-        public int? SourceId { get; set; }
+        // public int? SourceId { get; set; }
         public string? OldCategoryDescription { get; set; }
         public string? OldGroupName{ get; set; }
     }

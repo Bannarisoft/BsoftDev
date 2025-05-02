@@ -84,6 +84,16 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 )
                 .IsRequired();
 
+                  builder.Property(b => b.UnitId)
+                .HasColumnName("UnitId")
+                .HasColumnType("int")
+                .IsRequired();
+
+                builder.Property(b => b.CompanyId)
+                .HasColumnName("CompanyId")
+                .HasColumnType("int")
+                .IsRequired();
+
                  builder.Property(cf => cf.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")

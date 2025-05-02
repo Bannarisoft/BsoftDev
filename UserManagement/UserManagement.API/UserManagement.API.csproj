@@ -7,6 +7,13 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.30.2" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.71.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="MassTransit" Version="8.0.0" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
@@ -20,15 +27,24 @@
     </PackageReference>
     <PackageReference Include="RabbitMQ.Client" Version="6.7.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
-    <PackageReference Include="Dapper" Version="2.1.44" />    
+    <PackageReference Include="Dapper" Version="2.1.44" /> 
+    <PackageReference Include="Shared.Contracts" Version="1.0.1" />
+    <PackageReference Include="Shared.Infrastructure" Version="1.0.1" />   
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.Application\Core.Application.csproj" />
     <ProjectReference Include="..\UserManagement.Infrastructure\UserManagement.Infrastructure.csproj" />
+
  <None Update="web.config">
     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   </None>
         
+  </ItemGroup>
+    <!-- Correct placement of Protobuf item -->
+  <ItemGroup>
+    <Protobuf Include="..\..\Shared\Contracts\Protos\department.proto" Link="Protos\department.proto" GrpcServices="Server" />
+    <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" Link="Protos\session.proto" GrpcServices="Server" />
+
   </ItemGroup>
 
 </Project>

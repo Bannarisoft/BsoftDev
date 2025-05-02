@@ -9,6 +9,6 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetCheckListByActivit
 {
     public class GetActivityCheckListByActivityIdQuery : IRequest<ApiResponseDTO<List<GetActivityCheckListByActivityIdDto>>>
     {
-        public int Id { get; set; }
+        public List<int>? Ids { get; set; }
     }
 }

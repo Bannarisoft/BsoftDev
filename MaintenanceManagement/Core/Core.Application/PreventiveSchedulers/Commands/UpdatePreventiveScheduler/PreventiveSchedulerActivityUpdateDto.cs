@@ -7,9 +7,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
 {
     public class PreventiveSchedulerActivityUpdateDto
     {
-        public int PreventiveSchedulerHdrId { get; set; }
+        public int PreventiveSchedulerHeaderId { get; set; }
         public int ActivityId { get; set; }
-        public decimal EstimatedTimeHrs { get; set; }
-        public string? Description { get; set; }
     }
 }

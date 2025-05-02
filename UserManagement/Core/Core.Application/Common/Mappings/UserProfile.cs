@@ -7,9 +7,11 @@ using Core.Application.Users.Commands.DeleteUser;
 using Core.Domain.Entities;
 using static Core.Domain.Enums.Common.Enums;
 using Core.Application.Users.Queries.GetUserAutoComplete;
+using Core.Application.Common.Interfaces;
 
 public class UserProfile : Profile
 {
+    private readonly IIPAddressService _ipAddressService;
     public UserProfile()
     {
         CreateMap<CreateUserCommand, User>()
@@ -22,7 +24,8 @@ public class UserProfile : Profile
         .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
         .ForMember(dest => dest.IsFirstTimeUser, opt => opt.MapFrom(src => FirstTimeUserStatus.Yes))
         .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
-        .ForMember(dest => dest.UserType, opt => opt.MapFrom(src => 1));
+        .ForMember(dest => dest.UserType, opt => opt.MapFrom(src => 1))
+        .ForMember(dest => dest.Entity, opt => opt.MapFrom(src => _ipAddressService.GetEntityId()));
 
         CreateMap<UserCompanyDTO, UserCompany>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())

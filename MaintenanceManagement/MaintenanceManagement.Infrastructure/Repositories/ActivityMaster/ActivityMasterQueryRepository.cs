@@ -148,6 +148,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
 
                     return result > 0;
                 }
+                public async Task<bool> FKColumnExistValidation(int activityId)
+            {
+                var sql = "SELECT COUNT(1) FROM Maintenance.ActivityMaster WHERE Id = @Id AND IsDeleted = 0 AND IsActive = 1";
+                  var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = activityId });
+                  return count > 0;
+            }  
         
     }
 }

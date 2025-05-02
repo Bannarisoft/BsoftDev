@@ -13,13 +13,13 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
       
        public int RequestTypeId  { get; set; }       
        public int MaintenanceTypeId  { get; set; }     
-       public int MachineId { get; set; } 
-       public int CompanyId { get; set; }
-       public int  UnitId { get; set; }           
+       public int MachineId { get; set; }               
        public int DepartmentId { get; set; }
        public int? SourceId { get; set; }
        public int? VendorId  { get; set; }
+       public string? VendorName { get; set; } = null;
        public string? OldVendorId  { get; set; }
+       public string? OldVendorName { get; set; } = null;
        public int?  ServiceTypeId { get; set; }
        public int?  ServiceLocationId { get; set; }
        public int? ModeOfDispatchId { get; set; }
@@ -28,8 +28,6 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
        public decimal? EstimatedServiceCost { get; set; }
        public decimal? EstimatedSpareCost { get; set; }
        public string? Remarks { get; set; }
-       public int RequestStatusId { get; set; }
-
 
         
     }

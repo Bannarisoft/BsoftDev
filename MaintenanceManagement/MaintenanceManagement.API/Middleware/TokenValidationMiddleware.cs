@@ -1,14 +1,14 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
-using Contracts.Interfaces.IUser;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace MaintenanceManagement.API.Middleware
-{   
+{
     public class TokenValidationMiddleware
     {
         private readonly RequestDelegate _next;
@@ -22,10 +22,10 @@ namespace MaintenanceManagement.API.Middleware
             _timeZoneService = timeZoneService;
         }
 
-        public async Task Invoke(HttpContext context, IJwtTokenHelper jwtTokenHelper, IUserSessionService sessionService)
+        public async Task Invoke(HttpContext context, IJwtTokenHelper jwtTokenHelper, IUserSessionGrpcClient sessionService)
         {
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
-            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);             
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
             var endpoint = context.GetEndpoint();
             if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
             {
@@ -55,7 +55,7 @@ namespace MaintenanceManagement.API.Middleware
                 }
 
                 // Check session in the database
-                var session = await sessionService.GetSessionByJwtIdAsync(jti,token);
+                var session = await sessionService.GetSessionByJwtIdAsync(jti, token);
                 if (session is null || session.IsActive is 0 || session.ExpiresAt <= currentTime)
                 {
                     await WriteErrorResponse(context, StatusCodes.Status401Unauthorized, "Session is invalid or expired.");
@@ -69,7 +69,7 @@ namespace MaintenanceManagement.API.Middleware
                 // Update session's last activity
                 session.LastActivity = currentTime;
                 // await sessionService.UpdateSessionAsync(session);
-                await sessionService.UpdateSessionAsync(jti, currentTime,token);
+                await sessionService.UpdateSessionAsync(jti, currentTime, token);
 
                 // Set the User principal
                 context.User = principal;

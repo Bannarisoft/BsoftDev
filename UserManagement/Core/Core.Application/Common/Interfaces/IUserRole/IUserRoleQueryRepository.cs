@@ -17,6 +17,7 @@ namespace Core.Application.Common.Interfaces.IUserRole
         Task<List<UserRole>> GetRolesAsync(string searchTerm); 
         Task<bool> SoftDeleteValidation(int Id); 
         Task<bool> FKColumnExistValidation(int Id);
+        Task<List<UserRole>> GetRoles_SuperAdmin(string searchTerm); 
         
         
          

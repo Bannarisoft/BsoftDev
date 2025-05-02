@@ -8,15 +8,18 @@ using Core.Application.Divisions.Queries.GetDivisions;
 using Core.Application.Common;
 using System.Data;
 using Dapper;
+using Core.Application.Common.Interfaces;
 
 namespace UserManagement.Infrastructure.Repositories.Divisions
 {
     public class DivisionQueryRepository : IDivisionQueryRepository
     {
         private readonly IDbConnection _dbConnection;        
-        public DivisionQueryRepository(IDbConnection dbConnection)
+        private readonly IIPAddressService _ipAddressService; 
+        public DivisionQueryRepository(IDbConnection dbConnection,IIPAddressService ipAddressService)
         {
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
         }
          public async Task<(List<Division>,int)> GetAllDivisionAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
@@ -82,27 +85,25 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
             return await _dbConnection.QueryFirstOrDefaultAsync<Division>(query, new { id });
         }
       
-        public async Task<List<Division>>  GetDivision(string searchPattern, List<UserCompany> userCompanies)
+        public async Task<List<Division>>  GetDivision(string searchPattern)
         {
-            var CompanyId = new List<int>();
-            foreach (var userCompany in userCompanies)
-            {
-                CompanyId.Add(userCompany.CompanyId);
-            }
-            if (CompanyId is null || !CompanyId.Any())
-                return new List<Division>();
+            var CompanyId = _ipAddressService.GetCompanyId();
+            var userId = _ipAddressService.GetUserId();
 
             var query = $@"
-        SELECT Id, Name 
-        FROM AppData.Division 
-        WHERE IsDeleted = 0 
-        AND Name LIKE @SearchPattern
-        AND CompanyId IN ({string.Join(",", CompanyId)})";
+        SELECT D.Id, D.Name 
+        FROM AppData.Division D
+        INNER JOIN [AppSecurity].[UserDivision] UD ON UD.DivisionId=D.Id AND UD.IsActive=1
+        WHERE D.IsDeleted = 0 
+        AND D.Name LIKE @SearchPattern
+        AND D.CompanyId=@CompanyId AND UD.UserId=@UserId";
                 
             
             var parameters = new 
               { 
-                  SearchPattern = $"%{searchPattern ?? string.Empty}%"
+                  SearchPattern = $"%{searchPattern ?? string.Empty}%",
+                  CompanyId =CompanyId,
+                  UserId =userId
               };
 
             var divisions = await _dbConnection.QueryAsync<Division>(query, parameters);
@@ -128,5 +129,26 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
                 var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = Id });
                 return count > 0;
           }
+            public async Task<List<Division>>  GetDivision_SuperAdmin(string searchPattern)
+            {
+                var CompanyId = _ipAddressService.GetCompanyId();
+
+                var query = $@"
+                 SELECT Id, Name 
+                 FROM AppData.Division 
+                 WHERE IsDeleted = 0 
+                 AND Name LIKE @SearchPattern
+                 AND CompanyId=@CompanyId";
+
+
+                var parameters = new 
+                  { 
+                      SearchPattern = $"%{searchPattern ?? string.Empty}%",
+                      CompanyId =CompanyId
+                  };
+
+                var divisions = await _dbConnection.QueryAsync<Division>(query, parameters);
+                return divisions.ToList();
+            }
     }
 }

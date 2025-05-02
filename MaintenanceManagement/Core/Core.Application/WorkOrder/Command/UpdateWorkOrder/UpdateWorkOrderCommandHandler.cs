@@ -1,8 +1,13 @@
 using AutoMapper;
+using Contracts.Events.Maintenance;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IWorkOrder;
+using Core.Domain.Common;
 using Core.Domain.Events;
+using MassTransit;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
 {
@@ -12,13 +17,20 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
         private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;         
+        private readonly IEventPublisher _eventPublisher;
+        private readonly ILogger<UpdateWorkOrderCommandHandler> _logger;        
+        private readonly ILogQueryService _logQueryService;
 
-        public UpdateWorkOrderCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper,IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator)
-        {
+        public UpdateWorkOrderCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper,IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IEventPublisher eventPublisher, ILogger<UpdateWorkOrderCommandHandler> logger, ILogQueryService logQueryService) 
+               {
             _workOrderRepository = workOrderRepository;
             _mapper = mapper;
             _workOrderQueryRepository = workOrderQueryRepository;
-            _mediator = mediator;            
+            _mediator = mediator;         
+            _eventPublisher = eventPublisher;
+            _logger = logger;         
+            _logQueryService = logQueryService ?? throw new ArgumentNullException(nameof(logQueryService));     
+           
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(UpdateWorkOrderCommand request, CancellationToken cancellationToken)
@@ -38,6 +50,50 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
             await _mediator.Publish(domainEvent, cancellationToken);
             if(updateResult)
             {
+               
+                var miscMaster = await _workOrderRepository.GetMiscMasterByCodeAsync(MiscEnumEntity.MaintenanceStatusUpdate.Code);
+                // Check if the code matches
+              
+                //var closedStatusId = miscMaster.Id;                
+                if (updatedEntity.StatusId == miscMaster.Id  && updatedEntity.PreventiveScheduleId.HasValue)                
+                {
+                    var correlationId = Guid.NewGuid(); // ✅ Always create new correlationId
+                    var @event = new WorkOrderClosedEvent
+                    {
+                        CorrelationId = correlationId,
+                        WorkOrderId = updatedEntity.Id,
+                        PreventiveSchedulerDetailId = updatedEntity.PreventiveScheduleId.Value
+                    };
+                    // Save and publish event (RabbitMQ/Saga)
+                    await _eventPublisher.SaveEventAsync(@event);
+                    await _eventPublisher.PublishPendingEventsAsync();
+                  // 🧾 Check MongoDB for rollback failure
+
+                var connectionError = await _logQueryService.GetLatestConnectionFailureAsync();
+                if (!string.IsNullOrEmpty(connectionError))
+                {
+                    return new ApiResponseDTO<bool>
+                    {
+                        IsSuccess = false,
+                        Message = $"Message broker connection error: {connectionError}"
+                    };
+                }
+                await Task.Delay(1000); 
+                var rollbackError = await _logQueryService.GetLatestRollbackErrorAsync(correlationId);
+                if (!string.IsNullOrEmpty(rollbackError))
+                {
+                    return new ApiResponseDTO<bool>
+                    {
+                        IsSuccess = false,
+                        Message = rollbackError
+                    };
+                }
+                        
+                    _logger.LogInformation("✅ WorkOrderClosedEvent published. CorrelationId: {CorrelationId}, WorkOrderId: {WorkOrderId}",
+                        correlationId, updatedEntity.Id);
+                }
+                
+                
                 string tempFilePath = request.WorkOrder.Image;
                 if (tempFilePath != null){
                     string baseDirectory = await _workOrderQueryRepository.GetBaseDirectoryAsync();
@@ -69,7 +125,7 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
                 return new ApiResponseDTO<bool>
                 {
                     IsSuccess = true,
-                    Message = "WorkOrder updated successfully.",                        
+                    Message = "WorkOrder updated. Scheduling in progress..."                     
                 };
             }
             return new ApiResponseDTO<bool>

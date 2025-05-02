@@ -12,5 +12,6 @@ namespace Core.Application.SwitchProfile.Commands.SwitchProfileByUnit
         public int UnitId { get; set; }
         public int CompanyId { get; set; }
         public int DivisionId { get; set; }
+        public string? OldUnitId { get; set; }
     }
 }

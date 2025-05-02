@@ -8,7 +8,7 @@ namespace Core.Application.Common.Interfaces.IShiftMasterDetail
 {
     public interface IShiftMasterDetailQuery
     {
-         Task<(List<Core.Domain.Entities.ShiftMaster>,int)> GetAllShiftMasterDetailAsync(int PageNumber, int PageSize, string? SearchTerm);
+         Task<(IEnumerable<dynamic>,int)> GetAllShiftMasterDetailAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<ShiftMasterDetail> GetByIdAsync(int ShiftMasterId);
         Task<List<ShiftMasterDetail>> GetShiftMasterDetail(string searchPattern);
         Task<bool> SoftDeleteValidation(int Id); 

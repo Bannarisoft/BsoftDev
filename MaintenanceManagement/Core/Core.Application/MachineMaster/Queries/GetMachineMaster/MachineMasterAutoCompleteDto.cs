@@ -10,4 +10,4 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMaster
          public int Id { get; set; }
          public string? MachineName { get; set; }
     }
-    }
+}

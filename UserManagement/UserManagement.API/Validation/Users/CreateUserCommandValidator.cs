@@ -12,6 +12,7 @@ using Core.Application.Common.Interfaces.IDivision;
 using Core.Application.Common.Interfaces.IDepartment;
 using Core.Application.Common.Interfaces.IUserRole;
 using Core.Application.Common.Interfaces.IUnit;
+using Core.Application.Common.Interfaces;
 
 namespace UserManagement.API.Validation.Users
 {
@@ -24,8 +25,9 @@ namespace UserManagement.API.Validation.Users
         private readonly IDepartmentQueryRepository _departmentQueryRepository;
         private readonly IUserRoleQueryRepository _userRoleQueryRepository;
         private readonly IUnitQueryRepository _unitQueryRepository;
+        private readonly IIPAddressService _ipAddressService; 
 
-        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userRepository, ICompanyQueryRepository companyQueryRepository, IDivisionQueryRepository divisionQueryRepository, IDepartmentQueryRepository departmentQueryRepository, IUserRoleQueryRepository userRoleQueryRepository, IUnitQueryRepository unitQueryRepository)
+        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userRepository, ICompanyQueryRepository companyQueryRepository, IDivisionQueryRepository divisionQueryRepository, IDepartmentQueryRepository departmentQueryRepository, IUserRoleQueryRepository userRoleQueryRepository, IUnitQueryRepository unitQueryRepository,IIPAddressService ipAddressService)
         {
            var MaxLen = maxLengthProvider.GetMaxLength<User>("FirstName") ?? 25;
 
@@ -36,6 +38,7 @@ namespace UserManagement.API.Validation.Users
             _departmentQueryRepository = departmentQueryRepository;
             _userRoleQueryRepository = userRoleQueryRepository;
             _unitQueryRepository = unitQueryRepository;
+            _ipAddressService = ipAddressService;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -47,40 +50,60 @@ namespace UserManagement.API.Validation.Users
                 {
                     case "NotEmpty":
                         RuleFor(x => x.FirstName)
+                             .NotNull()
+                             .WithMessage($"{nameof(CreateUserCommand.FirstName)} {rule.Error}")
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateUserCommand.FirstName)} {rule.Error}");
 
                         RuleFor(x => x.LastName)
+                            .NotNull()
+                            .WithMessage($"{nameof(CreateUserCommand.LastName)} {rule.Error}")
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateUserCommand.LastName)} {rule.Error}");
 
                         RuleFor(x => x.UserName)
+                        .NotNull()
+                             .WithMessage($"{nameof(CreateUserCommand.UserName)} {rule.Error}")
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateUserCommand.UserName)} {rule.Error}");
 
+                        RuleFor(x => x.UserGroupId)
+                             .NotNull()
+                             .WithMessage($"{nameof(CreateUserCommand.UserGroupId)} {rule.Error}")
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateUserCommand.UserGroupId)} {rule.Error}");
+
                         RuleFor(x => x.UserCompanies)
+                        .Cascade(CascadeMode.Stop)
                         .NotNull()
                         .WithMessage($"{rule.Error}")
                         .Must(x => x.Count > 0)
-                        .WithMessage($"{rule.Error}");
+                        .WithMessage($"{rule.Error}")
+                        .When(x => _ipAddressService.GetGroupcode() == "USER");
 
                         RuleFor(x => x.userUnits)
+                        .Cascade(CascadeMode.Stop)
                         .NotNull()
                         .WithMessage($"{rule.Error}")
                         .Must(x => x.Count > 0)
-                        .WithMessage($"{rule.Error}");
+                        .WithMessage($"{rule.Error}")
+                        .When(x => _ipAddressService.GetGroupcode() == "USER");
 
                         RuleFor(x => x.userDivisions)
+                        .Cascade(CascadeMode.Stop)
                         .NotNull()
                         .WithMessage($"{rule.Error}")
                         .Must(x => x.Count > 0)
-                        .WithMessage($"{rule.Error}");
+                        .WithMessage($"{rule.Error}")
+                        .When(x => _ipAddressService.GetGroupcode() == "USER");
 
                          RuleFor(x => x.userDepartments)
+                         .Cascade(CascadeMode.Stop)
                          .NotNull()
                         .WithMessage($"{rule.Error}")
                         .Must(x => x.Count > 0)
-                        .WithMessage($"{rule.Error}");
+                        .WithMessage($"{rule.Error}")
+                        .When(x => _ipAddressService.GetGroupcode() == "USER");
 
                         RuleFor(x => x.userRoleAllocations)
                          .NotNull()
@@ -155,21 +178,25 @@ namespace UserManagement.API.Validation.Users
                                  companyRule.MustAsync(async (company, cancellation) => 
                                      await _companyQueryRepository.FKColumnExistValidation(company.CompanyId))
                                      .WithMessage($"{rule.Error}");  
-                             });
+                             })
+                             .When(x => _ipAddressService.GetGroupcode() == "USER");
+                             
                      RuleFor(x => x.userDivisions)
                              .ForEach(divisionRule =>
                              {
                                  divisionRule.MustAsync(async (division, cancellation) => 
                                      await _divisionQueryRepository.FKColumnExistValidation(division.DivisionId))
                                      .WithMessage($"{rule.Error}");  
-                             });
+                             })
+                             .When(x => _ipAddressService.GetGroupcode() == "USER");
                         RuleFor(x => x.userUnits)
                              .ForEach(unitRule =>
                              {
                                  unitRule.MustAsync(async (unit, cancellation) => 
                                      await _unitQueryRepository.FKColumnExistValidation(unit.UnitId))
                                      .WithMessage($"{rule.Error}");  
-                             });
+                             })
+                             .When(x => _ipAddressService.GetGroupcode() == "USER");
                         RuleFor(x => x.userRoleAllocations)
                              .ForEach(RoleRule =>
                              {
@@ -184,7 +211,8 @@ namespace UserManagement.API.Validation.Users
                                  departmentRule.MustAsync(async (department, cancellation) => 
                                      await _departmentQueryRepository.FKColumnExistValidation(department.DepartmentId))
                                      .WithMessage($"{rule.Error}");  
-                             });
+                             })
+                             .When(x => _ipAddressService.GetGroupcode() == "USER");
                              
                         break; 
 

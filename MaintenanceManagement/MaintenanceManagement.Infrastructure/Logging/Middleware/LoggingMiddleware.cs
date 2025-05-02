@@ -68,7 +68,7 @@ namespace MaintenanceManagement.Infrastructure.Logging.Middleware
                 case KeyNotFoundException keyNotFoundException:
                     statusCode = StatusCodes.Status404NotFound; // Use 404 for resource not found
                     title = "The requested resource could not be found.";
-                    detail = exception.Message;
+                    detail =keyNotFoundException.Message;
                     _logger.LogError(keyNotFoundException, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
                         statusCode, title, context.Request.Path);
                     break;
@@ -92,7 +92,7 @@ namespace MaintenanceManagement.Infrastructure.Logging.Middleware
                 case NullReferenceException nullReferenceException:
                     statusCode = StatusCodes.Status500InternalServerError;
                     title = "A null reference occurred.";
-                    detail = exception.InnerException.Message;
+                    detail = nullReferenceException.InnerException?.Message ?? nullReferenceException.Message;
                     _logger.LogError(nullReferenceException, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
                         statusCode, title, context.Request.Path);
                     break;
@@ -100,7 +100,7 @@ namespace MaintenanceManagement.Infrastructure.Logging.Middleware
                 default:
                     statusCode = StatusCodes.Status500InternalServerError;
                     title = "An unexpected error occurred.";
-                    detail = exception.InnerException.Message;
+                    detail = exception.InnerException?.Message ?? exception.Message;
                     _logger.LogError(exception, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
                         statusCode, title, context.Request.Path);
                     break;

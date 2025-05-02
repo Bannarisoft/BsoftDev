@@ -33,6 +33,20 @@ namespace Core.Application.Units.Queries.GetUnitAutoComplete
 
         public async Task<ApiResponseDTO<List<UnitAutoCompleteDTO>>> Handle(GetUnitAutoCompleteQuery request, CancellationToken cancellationToken)
         {     
+            var groupcode = _ipAddressService.GetGroupcode();
+
+            if(groupcode == "SUPER_ADMIN" || groupcode == "ADMIN")
+                {
+                    var Adminresult = await _unitRepository.GetUnit_SuperAdmin(request.SearchPattern);
+                    var AdminunitDto = _mapper.Map<List<UnitAutoCompleteDTO>>(Adminresult);
+
+                    return new ApiResponseDTO<List<UnitAutoCompleteDTO>>
+                   {
+                       IsSuccess = true,
+                       Message = "Success",
+                       Data = AdminunitDto
+                   }; 
+                }
            _logger.LogInformation($"Search pattern started: {request.SearchPattern}");
 
             var userId = _ipAddressService.GetUserId();

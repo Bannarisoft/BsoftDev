@@ -37,9 +37,13 @@ namespace UserManagement.API.Validation.UserLogin
                 {
                     case "NotEmpty":
                         RuleFor(x => x.Username)
+                            .NotNull()
+                             .WithMessage($"{nameof(UserLoginCommand.Username)} {rule.Error}")
                             .NotEmpty()
                             .WithMessage($"{nameof(UserLoginCommand.Username)} {rule.Error}");
                          RuleFor(x => x.Password)
+                             .NotNull()
+                             .WithMessage($"{nameof(UserLoginCommand.Password)} {rule.Error}")
                             .NotEmpty()
                             .WithMessage($"{nameof(UserLoginCommand.Password)} {rule.Error}");
                         break;

@@ -19,18 +19,35 @@ namespace Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch
           private readonly IMediator _mediator; 
 
           private readonly ILogger<GetDepartmentAutoCompleteSearchQueryHandler> _logger;
-        public GetDepartmentAutoCompleteSearchQueryHandler(IDepartmentQueryRepository divisionRepository,IMapper mapper, IMediator mediator, ILogger<GetDepartmentAutoCompleteSearchQueryHandler> logger)
+          private readonly IIPAddressService _ipAddressService;
+        public GetDepartmentAutoCompleteSearchQueryHandler(IDepartmentQueryRepository divisionRepository,IMapper mapper, IMediator mediator, ILogger<GetDepartmentAutoCompleteSearchQueryHandler> logger,IIPAddressService ipAddressService)
         {
              _mapper =mapper;
 
             _departmentRepository = divisionRepository;    
             _mediator = mediator;        
             _logger = logger;
+            _ipAddressService = ipAddressService;
         }
 
 
         public async Task<ApiResponseDTO<List<DepartmentAutocompleteDto>>> Handle(GetDepartmentAutoCompleteSearchQuery request, CancellationToken cancellationToken)
         { 
+
+            var groupcode = _ipAddressService.GetGroupcode();
+
+            if(groupcode == "SUPER_ADMIN" || groupcode == "ADMIN")
+                {
+                    var Adminresult = await _departmentRepository.GetDepartment_SuperAdmin(request.SearchPattern);
+                    var AdmindeptDto = _mapper.Map<List<DepartmentAutocompleteDto>>(Adminresult);
+
+                    return new ApiResponseDTO<List<DepartmentAutocompleteDto>>
+                   {
+                       IsSuccess = true,
+                       Message = "Success",
+                       Data = AdmindeptDto
+                   }; 
+                }
 
             _logger.LogInformation($"Handling GetDepartmentAutoCompleteSearchQuery with search pattern: {request.SearchPattern}" );
               

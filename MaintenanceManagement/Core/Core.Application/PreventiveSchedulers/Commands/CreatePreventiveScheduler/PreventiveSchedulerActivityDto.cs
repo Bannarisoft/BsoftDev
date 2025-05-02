@@ -8,7 +8,5 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
     public class PreventiveSchedulerActivityDto
     {
         public int ActivityId { get; set; }
-        public decimal EstimatedTimeHrs { get; set; }
-        public string? Description { get; set; }
     }
 }

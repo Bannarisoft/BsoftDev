@@ -15,6 +15,7 @@ namespace Core.Application.Location.Queries.GetLocations
         public int SortOrder { get; set; }
         public int UnitId { get; set; }
         public int DepartmentId { get; set; }
+        public string? DepartmentName { get; set; }
         public Status IsActive { get; set; }
     }
 }

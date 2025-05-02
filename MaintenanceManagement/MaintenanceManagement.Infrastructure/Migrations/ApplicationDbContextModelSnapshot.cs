@@ -672,6 +672,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("OldVendorId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OldVendorName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
@@ -699,6 +702,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<int?>("VendorId")
                         .HasColumnType("int");
+
+                    b.Property<string>("VendorName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -911,14 +917,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ActivityId");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("varchar(250)")
-                        .HasColumnName("Description");
-
-                    b.Property<decimal>("EstimatedTimeHrs")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("EstimatedTimeHrs");
-
                     b.Property<int>("PreventiveSchedulerHeaderId")
                         .HasColumnType("int")
                         .HasColumnName("PreventiveSchedulerHeaderId");
@@ -1018,6 +1016,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int")
+                        .HasColumnName("CompanyId");
+
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
@@ -1103,6 +1105,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ScheduleId");
 
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("FrequencyTypeId");
@@ -1149,10 +1155,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<int>("RequiredQty")
                         .HasColumnType("int")
                         .HasColumnName("RequiredQty");
-
-                    b.Property<int?>("SourceId")
-                        .HasColumnType("int")
-                        .HasColumnName("SourceId");
 
                     b.HasKey("Id");
 
@@ -1664,6 +1666,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("EndTime")
                         .HasColumnType("DateTimeOffset")
                         .HasColumnName("EndTime");
+
+                    b.Property<bool?>("ISCompleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("StartTime")
                         .HasColumnType("DateTimeOffset")

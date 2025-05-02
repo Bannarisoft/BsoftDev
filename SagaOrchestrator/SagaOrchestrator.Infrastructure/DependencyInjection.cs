@@ -1,13 +1,15 @@
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SagaOrchestrator.Application;
+using SagaOrchestrator.Application.Orchestration;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IAssets;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IMaintenance;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
+using SagaOrchestrator.Application.Orchestration.Models;
 using SagaOrchestrator.Application.Orchestration.Services.AssetServices;
 using SagaOrchestrator.Application.Orchestration.Services.MaintenanceServices;
 using SagaOrchestrator.Application.Orchestration.Services.UserServices;
+using SagaOrchestrator.Application.StateMachines;
 using SagaOrchestrator.Infrastructure.Consumers;
 using SagaOrchestrator.Infrastructure.Services.AssetServices;
 using SagaOrchestrator.Infrastructure.Services.MaintenanceServices;
@@ -45,38 +47,32 @@ namespace SagaOrchestrator.Infrastructure
             services.AddScoped<AssetSagaService>();
             services.AddScoped<DepartmentSagaService>();
 
-            // Configure MassTransit with RabbitMQ
+            // Configure MassTransit with RabbitMQ         
             services.AddMassTransit(x =>
             {
-                x.AddSagaStateMachine<UserAssetStateMachine, UserAssetState>()
-                .MongoDbRepository(r =>
-                      {
-                          r.Connection = "mongodb://192.168.1.126:27017";
-                          r.DatabaseName = "saga_orchestrator_db";
-                      });
+                // Register Saga
+                x.AddSagaStateMachine<WorkOrderSchedulerStateMachine, WorkOrderSchedulerState>()
+                    .InMemoryRepository(); // You can replace with MongoDbRepository or EF if needed
 
+                // Register Event Consumers (for other workflows if any)
+                x.AddConsumer<UserCreatedEventConsumer>();
+                x.AddConsumer<AssetCreatedEventConsumer>();
+                x.AddConsumer<SagaCompletedEventConsumer>();
+                x.AddConsumer<DeleteUserCommandConsumer>();                
 
-                  x.AddConsumer<UserCreatedEventConsumer>();
-                  x.AddConsumer<AssetCreatedEventConsumer>();
-                  x.AddConsumer<SagaCompletedEventConsumer>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
-
                     cfg.Host("localhost", "/", h =>
                     {
                         h.Username("guest");
                         h.Password("guest");
                     });
-                    // Automatically configure endpoints for sagas and consumers
-                    cfg.ConfigureEndpoints(context);
-
+                   cfg.ConfigureEndpoints(context);
                 });
             });
 
 
-            // Register IPublishEndpoint from MassTransit
-            // services.AddScoped<IPublishEndpoint>(provider => provider.GetRequiredService<IBus>());
-
+           
             return services;
         }
     }

@@ -5,6 +5,7 @@ using Core.Application.Common.Interfaces.IUnit;
 using System.Data;
 using Dapper;
 using Core.Application.Units.Queries.GetUnits;
+using Core.Application.Common.Interfaces;
 
 namespace UserManagement.Infrastructure.Repositories.Units
 {
@@ -12,11 +13,12 @@ namespace UserManagement.Infrastructure.Repositories.Units
     {
         private readonly IDbConnection _dbConnection;  
 
-         
+         private readonly IIPAddressService _ipAddressService;
 
-        public UnitQueryRepository(IDbConnection dbConnection)
+        public UnitQueryRepository(IDbConnection dbConnection,IIPAddressService ipAddressService)
         {
           _dbConnection = dbConnection;
+          _ipAddressService =ipAddressService;
         }
 
         public async Task<(List<Unit>, int)> GetAllUnitsAsync(int PageNumber, int PageSize, string? SearchTerm)
@@ -148,6 +150,25 @@ namespace UserManagement.Infrastructure.Repositories.Units
                 var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = Id });
                 return count > 0;
           }
+            public async Task<List<Unit>> GetUnit_SuperAdmin(string searchPattern)
+             {
+                var companyId = _ipAddressService.GetCompanyId();
+                  const string query = @"
+                     SELECT 
+                     U.Id, 
+                     U.UnitName,
+                     U.DivisionId
+                 FROM AppData.Unit U
+                 WHERE IsDeleted = 0 AND UnitName like @SearchPattern AND U.CompanyId=@CompanyId";
+                     
+                   var result = await _dbConnection.QueryAsync<Unit>(query, new 
+                 { 
+                     SearchPattern = $"%{searchPattern}%",
+                     CompanyId =companyId
+                 
+                  });
+                 return result.ToList();
+             }
   
 
                   

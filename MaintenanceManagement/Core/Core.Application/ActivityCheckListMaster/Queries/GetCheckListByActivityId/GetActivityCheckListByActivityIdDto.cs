@@ -7,7 +7,7 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetCheckListByActivit
 {
     public class GetActivityCheckListByActivityIdDto
     {
-        public  int Id { get; set;}
+       // public  int Id { get; set;}
         public int ChecklistId { get; set; }
         public int ActivityID { get; set; }
         public string? ActivityName { get; set; }

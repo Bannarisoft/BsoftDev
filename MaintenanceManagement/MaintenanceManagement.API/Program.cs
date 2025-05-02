@@ -2,17 +2,17 @@ using Core.Application;
 using MaintenanceManagement.Infrastructure;
 using MaintenanceManagement.API.Configurations;
 using MaintenanceManagement.API.Validation.Common;
-using MassTransit;
 using MaintenanceManagement.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load Serilog configuration from appsettings.json
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ;
 builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile("settings/serilogsetting.json", optional: false, reloadOnChange: true)
-    .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
-    .AddEnvironmentVariables();
+
+.AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+.AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true)
+.AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
+.AddEnvironmentVariables();
 
 // Configure Serilog
 builder.Host.ConfigureSerilog();
@@ -32,7 +32,7 @@ builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
-
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
@@ -49,8 +49,8 @@ app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
 app.UseCors();// Enable CORS
 app.UseAuthentication();
-//app.UseMiddleware<TokenValidationMiddleware>();
-//app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
+app.UseMiddleware<TokenValidationMiddleware>();
+app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
