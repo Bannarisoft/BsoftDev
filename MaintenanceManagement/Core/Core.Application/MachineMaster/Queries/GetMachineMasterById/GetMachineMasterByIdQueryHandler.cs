@@ -13,16 +13,14 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMasterById
         
         private readonly IMachineMasterQueryRepository _imachineMasterQueryRepository;        
         private readonly IMapper _mapper;
-        private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
+        private readonly IMediator _mediator;        
 
 
-        public GetMachineMasterByIdQueryHandler(IMachineMasterQueryRepository imachineMasterQueryRepository, IMapper mapper, IMediator mediator , IDepartmentGrpcClient departmentGrpcClient)
+        public GetMachineMasterByIdQueryHandler(IMachineMasterQueryRepository imachineMasterQueryRepository, IMapper mapper, IMediator mediator)
         {
             _imachineMasterQueryRepository = imachineMasterQueryRepository;            
             _mapper = mapper;
-            _mediator = mediator;
-            _departmentGrpcClient = departmentGrpcClient;
+            _mediator = mediator;            
         }
 
         public async Task<ApiResponseDTO<MachineMasterDto>> Handle(GetMachineMasterByIdQuery request, CancellationToken cancellationToken)
@@ -35,17 +33,17 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMasterById
             }
             // Map a single entity
             var machineMaster = _mapper.Map<MachineMasterDto>(result);
-            var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
-                var dept = departments.FirstOrDefault(d => d.DepartmentId == machineMaster.DepartmentId);
-                if (dept != null)
-                {
-                    machineMaster.DepartmentName = dept.DepartmentName;
-                }
-                else
-                {
-                    // Optional: handle missing department
-                    machineMaster.DepartmentName = "Unknown";
-                }
+            //var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
+                // var dept = departments.FirstOrDefault(d => d.DepartmentId == machineMaster.DepartmentId);
+                // if (dept != null)
+                // {
+                //     machineMaster.DepartmentName = dept.DepartmentName;
+                // }
+                // else
+                // {
+                //     // Optional: handle missing department
+                //     machineMaster.DepartmentName = "Unknown";
+                // }
           //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetById",
