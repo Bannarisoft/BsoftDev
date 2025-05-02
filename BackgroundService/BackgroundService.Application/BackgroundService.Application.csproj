@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BackgroundService.Domain\BackgroundService.Domain.csproj" />
     <ProjectReference Include="..\..\UserManagement\Core\Core.Application\Core.Application.csproj" />
+    <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -37,7 +38,7 @@
     <PackageReference Include="IdentityModel" Version="7.0.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Hangfire" Version="1.8.17" />
-    <PackageReference Include="Shared.Contracts" Version="1.0.0" />
+    <!-- <PackageReference Include="Shared.Contracts" Version="1.0.0" /> -->
   </ItemGroup>
 
 </Project>
