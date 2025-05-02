@@ -27,7 +27,7 @@ namespace FAM.Infrastructure.Repositories.SubLocation
                 Description,
                 LocationId,
                 UnitId,
-                DepartmentId
+                DepartmentId,
                 IsActive
             FROM FixedAsset.SubLocation 
             WHERE 

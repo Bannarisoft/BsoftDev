@@ -38,38 +38,6 @@ builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
-// Configure MassTransit with RabbitMQ
-// builder.Services.AddMassTransit(x =>
-// {
-//     x.UsingRabbitMq((context, cfg) =>
-//     {
-//         cfg.Host("localhost", "/", h =>
-//         {
-//             h.Username("guest");
-//             h.Password("guest");
-//         });
-//     });
-// });
-
-// builder.Services.AddMassTransit(cfg =>
-// {
-//     cfg.AddConsumer<FixedAssetConsumer>();
-
-//     cfg.UsingRabbitMq((context, config) =>
-//     {
-//         config.Host("rabbitmq://localhost", h =>
-//         {
-//             h.Username("guest");
-//             h.Password("guest");
-//         });
-
-//         config.ReceiveEndpoint("user-created-queue", e =>
-//         {
-//             e.ConfigureConsumer<FixedAssetConsumer>(context);
-//         });
-//     });
-// });
-
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {

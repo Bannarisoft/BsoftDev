@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Domain.Events;
 using MediatR;
@@ -16,14 +12,15 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMaster
         private readonly IMachineMasterQueryRepository _imachineMasterQueryRepository;        
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
-        private readonly IDepartmentService _departmentService;
+        private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
 
-         public GetMachineMasterQueryHandler(IMachineMasterQueryRepository imachineMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentService departmentService)
+         public GetMachineMasterQueryHandler(IMachineMasterQueryRepository imachineMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
         {
             _imachineMasterQueryRepository = imachineMasterQueryRepository;            
             _mapper = mapper;
             _mediator = mediator;  
-            _departmentService = departmentService; 
+            _departmentGrpcClient = departmentGrpcClient;
+
         }
 
         public async Task<ApiResponseDTO<List<MachineMasterDto>>> Handle(GetMachineMasterQuery request, CancellationToken cancellationToken)
@@ -31,8 +28,8 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMaster
            var (MachineMaster, totalCount) = await _imachineMasterQueryRepository.GetAllMachineAsync(request.PageNumber, request.PageSize, request.SearchTerm);
                var machineMastersgroup = _mapper.Map<List<MachineMasterDto>>(MachineMaster);
 
-               
-               var departments = await _departmentService.GetAllDepartmentAsync();
+                // 🔥 Fetch departments using gRPC
+               var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
                 var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
                 // 4. Enrich each DTO, unwrapping the nullable DepartmentId and setting DepartmentName

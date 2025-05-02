@@ -2,7 +2,6 @@ using Core.Application;
 using MaintenanceManagement.Infrastructure;
 using MaintenanceManagement.API.Configurations;
 using MaintenanceManagement.API.Validation.Common;
-using MassTransit;
 using MaintenanceManagement.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);

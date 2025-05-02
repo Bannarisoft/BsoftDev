@@ -29,7 +29,7 @@ namespace FAM.Infrastructure.Repositories.Locations
                 Description,
                 SortOrder,
                 UnitId,
-                DepartmentId
+                DepartmentId,
                 IsActive
             FROM FixedAsset.Location 
             WHERE 

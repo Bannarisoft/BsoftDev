@@ -8,6 +8,7 @@
 
   <!-- NuGet Packages -->
   <ItemGroup>
+
  <PackageReference Include="MassTransit" Version="8.0.0" />
     <PackageReference Include="MassTransit.MongoDb" Version="8.0.0" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
@@ -16,7 +17,7 @@
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
-   <!--  <PackageReference Include="Shared.Contracts" Version="1.0.2" /> -->
+    <PackageReference Include="Shared.Contracts" Version="1.0.1" />
 
 
   </ItemGroup>
@@ -25,7 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SagaOrchestrator.Application\SagaOrchestrator.Application.csproj" />
     <ProjectReference Include="..\SagaOrchestrator.Infrastructure\SagaOrchestrator.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />    
   </ItemGroup>
 
 </Project>
