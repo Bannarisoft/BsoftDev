@@ -1,24 +1,30 @@
 using System.Data;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Domain.Common;
-using Core.Domain.Entities;
 using Core.Domain.Entities.AssetMaster;
 using Dapper;
+using FAM.Infrastructure.Repositories.Common;
 using Newtonsoft.Json;
 
 namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 {
-    public class AssetMasterGeneralQueryRepository : IAssetMasterGeneralQueryRepository
+    public class AssetMasterGeneralQueryRepository : BaseQueryRepository,IAssetMasterGeneralQueryRepository
     {
-        private readonly IDbConnection _dbConnection;
-        public AssetMasterGeneralQueryRepository(IDbConnection dbConnection)
+        private readonly IDbConnection _dbConnection;        
+        public AssetMasterGeneralQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
+            : base(ipAddressService) 
         {
-            _dbConnection = dbConnection;
+            _dbConnection = dbConnection;            
         }     
         public async Task<(List<AssetMasterGeneralDTO>, int)> GetAllAssetAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+            //var companyId = _ipAddressService.GetCompanyId();
+            //var unitId = _ipAddressService.GetUnitId();
             var parameters = new DynamicParameters();
+            parameters.Add("@CompanyId", CompanyId);
+            parameters.Add("@UnitId", UnitId);
             parameters.Add("@PageNumber", PageNumber);
             parameters.Add("@PageSize", PageSize);
             parameters.Add("@SearchTerm", string.IsNullOrEmpty(SearchTerm) ? null : SearchTerm);
@@ -57,9 +63,17 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             INNER JOIN FixedAsset.MiscMaster MM on MM.Id =AM.WorkingStatus
             LEFT JOIN FixedAsset.MiscMaster M on M.Id =AM.AssetType
             LEFT JOIN FixedAsset.AssetMaster AM1 on AM1.Id =AM.AssetParentId
-            WHERE (AM.AssetName LIKE @SearchPattern OR AM.AssetCode LIKE @SearchPattern) 
+            WHERE AM.CompanyId = @CompanyId AND AM.UnitId = @UnitId AND  (AM.AssetName LIKE @SearchPattern OR AM.AssetCode LIKE @SearchPattern) 
             AND  AM.IsDeleted=0 and AM.IsActive=1 ORDER BY AM.ID DESC";            
-            var result = await _dbConnection.QueryAsync<AssetMasterGeneralDTO>(query, new { SearchPattern = $"%{searchPattern}%" });
+            //var result = await _dbConnection.QueryAsync<AssetMasterGeneralDTO>(query, new { SearchPattern = $"%{searchPattern}%" });
+             var result = await _dbConnection.QueryAsync<AssetMasterGeneralDTO>(
+                query,
+                new
+                {
+                    CompanyId,
+                    UnitId,
+                    SearchPattern = $"%{searchPattern}%"
+                });
             return result.ToList();
         }
 
@@ -84,9 +98,17 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             INNER JOIN FixedAsset.MiscMaster MM ON MM.Id = AM.WorkingStatus
             LEFT JOIN FixedAsset.MiscMaster M ON M.Id = AM.AssetType
             LEFT JOIN FixedAsset.AssetMaster AM1 ON AM1.Id = AM.AssetParentId
-            WHERE AM.Id = @assetId AND AM.IsDeleted = 0";
+            WHERE AM.CompanyId = @CompanyId AND AM.UnitId = @UnitId AND   AM.Id = @assetId AND AM.IsDeleted = 0";
 
-            var assetMaster = await _dbConnection.QueryFirstOrDefaultAsync<AssetMasterGeneralDTO>(query, new { assetId });
+            //var assetMaster = await _dbConnection.<AssetMasterGeneralDTO>(query, new { assetId });
+             var assetMaster = await _dbConnection.QueryFirstOrDefaultAsync<AssetMasterGeneralDTO>(
+            query,
+            new
+            {
+                CompanyId,
+                UnitId,
+                assetId = $"%{assetId}%"
+            });
 
             if (assetMaster is null)
             {
@@ -160,11 +182,11 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             return locationExists.HasValue || purchaseExists.HasValue || warrantyExists.HasValue  || specExists.HasValue  || amcExists.HasValue || insuranceExists.HasValue || additionalCostExists.HasValue || depreciationExists.HasValue ; 
         }
 
-        public async Task<string?> GetLatestAssetCode(int companyId, int unitId, int assetGroupId, int assetCategoryId, int DepartmentId, int LocationId)
+        public async Task<string?> GetLatestAssetCode( int assetGroupId, int assetCategoryId, int DepartmentId, int LocationId)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", companyId);
-            parameters.Add("@UnitId", unitId);
+            parameters.Add("@CompanyId", CompanyId);
+            parameters.Add("@UnitId", UnitId);
             parameters.Add("@GroupId", assetGroupId);
             parameters.Add("@CategoryId", assetCategoryId);
             parameters.Add("@DeptId", DepartmentId);
@@ -242,7 +264,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'
                 LEFT JOIN Bannari.AppData.Unit UN on UN.Id=AM.UnitId
                 LEFT JOIN Bannari.AppData.Company C on C.Id=AM.CompanyId
-                WHERE AM.Id = @AssetId;
+                WHERE  AM.CompanyId = @CompanyId AND AM.UnitId = @UnitId AND   AM.Id = @AssetId;
 
                 -- Second Query: AssetLocation (One-to-One)
                 SELECT U.UnitName,D.DeptName,L.LocationName,SL.SubLocationName,U.OldUnitId,AL.CustodianId,AL.UserId,AL.DepartmentId,AL.LocationId,AL.SubLocationId
@@ -308,17 +330,27 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 WHERE AssetId=@AssetId
                 ";
 
-            using var multi = await _dbConnection.QueryMultipleAsync(sqlQuery, new { AssetId = assetId });
+            //using var multi = await _dbConnection.QueryMultipleAsync(sqlQuery, new { AssetId = assetId });
 
-            var assetResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
-            var locationResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
-            var purchaseDetails = await multi.ReadAsync<dynamic>();
-            var SpecDetails = await multi.ReadAsync<dynamic>();
-            var WarrantyDetails = await multi.ReadAsync<dynamic>();
-            var AMCDetails = await multi.ReadAsync<dynamic>();
-            var DisposalResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
-            var InsuranceDetails = await multi.ReadAsync<dynamic>();
-            var AdditionalCost = await multi.ReadAsync<dynamic>();
+            using var multi = await _dbConnection.QueryMultipleAsync(
+                sqlQuery,
+                new
+                {
+                    CompanyId,
+                    UnitId,
+                    AssetId = assetId
+                });            
+
+
+            var assetResult     = (await multi.ReadAsync<dynamic>()).FirstOrDefault();
+            var locationResult  = (await multi.ReadAsync<dynamic>()).FirstOrDefault();
+            var purchaseDetails = (await multi.ReadAsync<dynamic>()).ToList();
+            var specDetails     = (await multi.ReadAsync<dynamic>()).ToList();
+            var warrantyDetails = (await multi.ReadAsync<dynamic>()).ToList();
+            var amcDetails      = (await multi.ReadAsync<dynamic>()).ToList();
+            var disposalResult  = (await multi.ReadAsync<dynamic>()).FirstOrDefault();
+            var insuranceDetails = (await multi.ReadAsync<dynamic>()).ToList();
+            var additionalCost   = (await multi.ReadAsync<dynamic>()).ToList();
 
        
             if (locationResult != null && !string.IsNullOrEmpty(locationResult.OldUnitId))
@@ -362,7 +394,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 }
             }
 
-            return (assetResult, locationResult, purchaseDetails, SpecDetails, WarrantyDetails, AMCDetails, DisposalResult, InsuranceDetails,AdditionalCost);
+            return (assetResult, locationResult, purchaseDetails, specDetails, warrantyDetails, amcDetails, disposalResult, insuranceDetails,additionalCost);
        
         }
 
@@ -382,7 +414,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'
                 LEFT JOIN Bannari.AppData.Unit UN on UN.Id=AM.UnitId
                 LEFT JOIN Bannari.AppData.Company C on C.Id=AM.CompanyId
-                WHERE AM.Id = @AssetId;
+                WHERE AM.CompanyId = @CompanyId AND AM.UnitId = @UnitId AND AM.Id = @AssetId;
 
                 -- Second Query: AssetLocation (One-to-One)
                 SELECT U.UnitName,D.DeptName,L.LocationName,SL.SubLocationName,U.OldUnitId,AL.CustodianId,AL.UserId,AL.DepartmentId,AL.LocationId,AL.SubLocationId
@@ -410,12 +442,24 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 WHERE AssetId=@AssetId
                 ";
 
-            using var multi = await _dbConnection.QueryMultipleAsync(sqlQuery, new { AssetId = assetId });
+            //using var multi = await _dbConnection.QueryMultipleAsync(sqlQuery, new { AssetId = assetId });
 
-            var assetResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
-            var locationResult = await multi.ReadFirstOrDefaultAsync<dynamic>();
-            var purchaseDetails = await multi.ReadAsync<dynamic>();          
-            var AdditionalCost = await multi.ReadAsync<dynamic>();
+            using var multi = await _dbConnection.QueryMultipleAsync(
+                sqlQuery,
+                new
+                {
+                    CompanyId,
+                    UnitId,
+                   AssetId = assetId
+                });       
+
+
+
+            var assetResult     = (await multi.ReadAsync<dynamic>()).FirstOrDefault();
+            var locationResult  = (await multi.ReadAsync<dynamic>()).FirstOrDefault();
+            var purchaseDetails = (await multi.ReadAsync<dynamic>()).ToList();
+            var additionalCost   = (await multi.ReadAsync<dynamic>()).ToList();
+
 
        
             if (locationResult != null && !string.IsNullOrEmpty(locationResult.OldUnitId))
@@ -459,7 +503,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 }
             }
 
-            return (assetResult, locationResult, purchaseDetails, AdditionalCost);
+            return (assetResult, locationResult, purchaseDetails, additionalCost);
        
         }
     }

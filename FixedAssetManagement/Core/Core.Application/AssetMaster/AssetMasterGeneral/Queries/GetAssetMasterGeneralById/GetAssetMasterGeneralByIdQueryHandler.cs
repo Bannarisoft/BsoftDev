@@ -22,8 +22,13 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public async Task<ApiResponseDTO<AssetMasterDTO>> Handle(GetAssetMasterGeneralByIdQuery request, CancellationToken cancellationToken)
         {
           //  var assetMaster = await _assetMasterRepository.GetByIdAsync(request.Id);
-          var (assetResult, locationResult, purchaseDetails, spec, warranty, amc, disposal, insurance,additionalCost) = await _assetMasterRepository.GetAssetMasterByIdAsync(request.Id);
-          var asset = _mapper.Map<AssetMasterDTO>(assetResult);
+           var (assetResult, locationResult, purchaseDetails, spec, warranty, amc, disposal, insurance,additionalCost) = await _assetMasterRepository.GetAssetMasterByIdAsync(request.Id);
+           var asset = _mapper.Map<AssetMasterDTO>(assetResult);
+            if (assetResult == null)
+            {
+                
+                return null;                  
+            }
 
             if (assetResult?.AssetName != null)
              {

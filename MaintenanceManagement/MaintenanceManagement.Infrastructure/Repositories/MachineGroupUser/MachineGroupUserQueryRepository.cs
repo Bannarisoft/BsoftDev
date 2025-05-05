@@ -72,7 +72,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroupUser
 
         public async Task<MachineGroupUserDto> GetByIdAsync(int id)
         {
-            const string query = @"SELECT MT.Id,MT.MachineGroupId,MT.DepartmentId,MT.UserId,MG.GroupName,D.DeptName,U.UserName,MT.IsActive,MT.CreatedBy,MT.CreatedDate,MT.CreatedByName,MT.CreatedIP,MT.ModifiedBy,MT.ModifiedDate,MT.ModifiedByName,MT.ModifiedIP
+            const string query = @"SELECT MT.Id,MT.MachineGroupId,MT.DepartmentId,MT.UserId,MG.GroupName,D.DeptName,U.UserName,MT.IsActive,MT.CreatedBy,MT.CreatedDate,MT.CreatedByName,MT.CreatedIP,MT.ModifiedBy,MT.ModifiedDate,MT.ModifiedByName,MT.ModifiedIP,MT.IsDeleted
             FROM [Maintenance].[MachineGroupUser]  MT 
             INNER JOIN [Maintenance].[MachineGroup] MG ON MT.MachineGroupId = MG.Id
             INNER JOIN Bannari.AppData.Department D ON D.Id = MT.DepartmentId 
@@ -84,7 +84,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroupUser
         public async Task<List<MachineGroupUserAutoCompleteDto>> GetMachineGroupUserByName(string searchPattern)
         {
             const string query = @"
-            SELECT MT.Id, MT.MachineGroupId,GroupName,UserName,DeptName
+            SELECT MT.Id, MT.MachineGroupId,GroupName,UserName,DeptName,MT.IsActive,MT.IsDeleted
             FROM [Maintenance].[MachineGroupUser]  MT 
             INNER JOIN [Maintenance].[MachineGroup] MG ON MT.MachineGroupId = MG.Id
             INNER JOIN Bannari.AppData.Department D ON D.Id = MT.DepartmentId 

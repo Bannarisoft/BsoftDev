@@ -151,6 +151,29 @@ namespace FAM.Infrastructure.Services
             if (userAgent.Contains("Opera") || userAgent.Contains("OPR")) return "Opera";
             return "Unknown Browser";
         }
+          public int GetCompanyId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("CompanyId")?.Value;
+    
+            if (int.TryParse(claim, out int companyId))
+                return companyId;    
+            return claim != null ? Convert.ToInt32(claim) : 0;
+        }
+        public string GetGroupCode()
+        {
+            var GroupCode = _httpContextAccessor.HttpContext?.User?.FindFirst("GroupCode")?.Value;    
+            return GroupCode ?? string.Empty;
+        }
+        public int GetEntityId()
+        {
+            var EntityId = _httpContextAccessor.HttpContext?.User?.FindFirst("EntityId")?.Value;    
+            return EntityId != null ? Convert.ToInt32(EntityId) : 0;
+        }
+        public int GetUnitId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("UnitId")?.Value;    
+            return claim != null ? Convert.ToInt32(claim) : 0;
+        }
     }    
 }
 
