@@ -115,10 +115,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                     string baseDirectory =await GetBaseDirectoryItemAsync();
 
                     var (companyName, unitName) = await GetCompanyUnitAsync(workOrder.CompanyId, workOrder.UnitId);
+                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);       
 
-                    string companyFolder = Path.Combine(baseDirectory, companyName.Trim());
-                    string unitFolder = Path.Combine(companyFolder,unitName.Trim());
-                    string filePath = Path.Combine(unitFolder, tempItemFilePath);                
+                    //string companyFolder = Path.Combine(uploadPath, companyName.Trim());
+                    //EnsureDirectoryExists(companyFolder);              
+                    //string unitFolder = Path.Combine(companyFolder,unitName.Trim());
+                    //EnsureDirectoryExists(companyFolder); 
+                    string filePath = Path.Combine(uploadPath, tempItemFilePath);  
+                    EnsureDirectoryExists(Path.GetDirectoryName(filePath));      
 
                     if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
                     {
@@ -130,7 +134,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                         {
                             File.Move(filePath, newFilePath);
                             //assetEntity.AssetImage = newFileName;
-                            await UpdateWOItemImageAsync(item.Id, newFileName);
+                            await UpdateWOItemImageAsync(item.Id, newFilePath);
                         }
                         catch (Exception ex)
                         {
@@ -168,6 +172,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             }               
 
             return result> 0;
+        }
+         private void EnsureDirectoryExists(string path)
+        {
+            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
         }
         public async Task<string> GetBaseDirectoryItemAsync()
         {
