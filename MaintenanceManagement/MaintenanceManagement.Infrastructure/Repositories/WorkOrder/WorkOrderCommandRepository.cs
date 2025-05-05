@@ -194,10 +194,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             ";
             using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { CompanyId = companyId, UnitId = unitId });
 
-            var companyName = await multiQuery.ReadFirstOrDefaultAsync<string>();
-            var unitName = await multiQuery.ReadFirstOrDefaultAsync<string>();
+            var companyName = (await multiQuery.ReadFirstOrDefaultAsync<string>())?.Trim();
+            var unitName = (await multiQuery.ReadFirstOrDefaultAsync<string>())?.Trim();
 
-            return (companyName ?? "Unknown Company", unitName ?? "Unknown Unit");
+            return (companyName, unitName);
         }    
         public async Task<bool> RemoveWOImageReferenceAsync(int workOrderId)
         {

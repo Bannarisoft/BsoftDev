@@ -23,7 +23,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
   
         public async Task<ApiResponseDTO<List<Dictionary<string, List<GetWorkOrderDto>>>>> Handle(GetWorkOrderQuery request, CancellationToken cancellationToken)
         {
-           var (workOrder, totalCount) = await _workOrderRepository.GetAllWOAsync(request.fromDate,request.toDate, request.requestType, request.PageNumber, request.PageSize, request.SearchTerm);            
+           var (workOrder, totalCount) = await _workOrderRepository.GetAllWOAsync(request.fromDate,request.toDate, request.requestTypeId, request.PageNumber, request.PageSize, request.SearchTerm);            
            var mappedWorkOrders = _mapper.Map<List<GetWorkOrderDto>>(workOrder);
             var groupedWorkOrders = mappedWorkOrders
             .GroupBy(w => w.MaintenanceType ?? "Unknown")
@@ -48,8 +48,8 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
                 Message = "Success",
                 Data = groupedWorkOrders,
                 TotalCount = totalCount,
-                PageNumber = request.PageNumber,
-                PageSize = request.PageSize
+                PageNumber = request.PageNumber??0,
+                PageSize = request.PageSize??0
             };     
         }
     }

@@ -7,6 +7,7 @@ using Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder;
 using Core.Application.WorkOrder.Command.UploadFileWorOrder.Item;
 using Core.Application.WorkOrder.Queries.GetRequestType;
+using Core.Application.WorkOrder.Queries.GetWorkOderDropdown;
 using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrderById;
 using Core.Application.WorkOrder.Queries.GetWorkOrderRootCause;
@@ -440,8 +441,8 @@ namespace MaintenanceManagement.API.Controllers
             });
         }
          [HttpGet]
-        public async Task<IActionResult> GetByAllAsync( [FromQuery] string? fromDate,[FromQuery] string? toDate,[FromQuery] int requestTypeId
-        , [FromQuery] int pageNumber,[FromQuery] int pageSize,[FromQuery] string? searchTerm)
+        public async Task<IActionResult> GetByAllAsync( [FromQuery] string? fromDate,[FromQuery] string? toDate,[FromQuery] int? requestTypeId
+        , [FromQuery] int? pageNumber,[FromQuery] int? pageSize,[FromQuery] string? searchTerm)
         {            
             DateTimeOffset? parsedStartDate = null;
             DateTimeOffset? parsedEndDate = null;
@@ -471,7 +472,7 @@ namespace MaintenanceManagement.API.Controllers
                 {                   
                     fromDate=parsedStartDate,
                     toDate=parsedEndDate,
-                    requestType=requestTypeId,
+                    requestTypeId=requestTypeId,
                     PageNumber = pageNumber, 
                     PageSize = pageSize, 
                     SearchTerm = searchTerm                  
@@ -481,6 +482,25 @@ namespace MaintenanceManagement.API.Controllers
                 StatusCode = StatusCodes.Status200OK, 
                 message = workOrder.Message,
                 data = workOrder.Data.ToList()               
+            });
+        }
+        [HttpGet("GetWorkOrderDropdown")]
+        public async Task<IActionResult> GetWorkOrderAsync()
+        {
+            var result = await Mediator.Send(new GetWorkOderDropdownQuery());
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = "No Workorder found."
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = "Workorder fetched successfully.",
+                data = result.Data
             });
         }
     }
