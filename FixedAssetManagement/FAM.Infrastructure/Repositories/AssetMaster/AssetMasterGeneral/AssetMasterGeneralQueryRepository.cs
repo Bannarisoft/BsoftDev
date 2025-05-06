@@ -506,5 +506,23 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             return (assetResult, locationResult, purchaseDetails, additionalCost);
        
         }
+        public async Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId,int unitId)
+        {
+            const string query = @"
+                SELECT CompanyName 
+                FROM Bannari.AppData.Company 
+                WHERE Id = @CompanyId;
+
+                SELECT UnitName  
+                FROM Bannari.AppData.Unit 
+                WHERE Id = @UnitId;
+            ";
+            using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { CompanyId = companyId, UnitId = unitId });
+
+            var companyName = (await multiQuery.ReadFirstOrDefaultAsync<string>())?.Trim();
+            var unitName = (await multiQuery.ReadFirstOrDefaultAsync<string>())?.Trim();
+
+            return (companyName, unitName);
+        }  
     }
 }

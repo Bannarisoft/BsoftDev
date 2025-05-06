@@ -38,10 +38,9 @@ namespace Core.Application.WorkOrder.Command.DeleteFileWorkOrder
                 _logger.LogError("Base directory path not found in database.");
                 return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Base directory not configured." };                
             }
-            string companyFolder = Path.Combine(baseDirectory, companyName);
-            string unitFolder = Path.Combine(companyFolder, unitName);
-            
-            string filePath = Path.Combine(unitFolder, request.Image??string.Empty);
+             string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);       
+
+            string filePath = Path.Combine(uploadPath, request.Image??string.Empty);
 
             var result = await _fileUploadService.DeleteFileAsync(filePath);
 

@@ -12,6 +12,6 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty
         Task<AssetWarrantyDTO?> GetByAssetCodeAsync(string  assetCode);
         Task<bool> UpdateAssetWarrantyImageAsync(int assetId, string imageName);
          Task<AssetWarrantyDTO?> GetByAssetWarrantyAsync(string? assetCode);
-        Task<bool> RemoveAssetWarrantyAsync(int assetId);
+        Task<bool> RemoveAssetWarrantyAsync(string assetPath);
     }
 }
