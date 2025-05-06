@@ -134,7 +134,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                         {
                             File.Move(filePath, newFilePath);
                             //assetEntity.AssetImage = newFileName;
-                            await UpdateWOItemImageAsync(item.Id, newFilePath);
+                            await UpdateWOItemImageAsync(item.Id, newFileName);
                         }
                         catch (Exception ex)
                         {
