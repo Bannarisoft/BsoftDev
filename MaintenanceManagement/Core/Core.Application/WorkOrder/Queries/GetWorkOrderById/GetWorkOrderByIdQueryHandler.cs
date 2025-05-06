@@ -44,7 +44,27 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
             if (woItem != null)
             {
                 asset.WOItem  = _mapper.Map<List<GetWorkOrderItemByIdDto>>(woItem);
-             
+               /* // 🔹 Path construction
+                //string baseDirectory = "ItemImages"; // or fetch from DB
+                 string baseDirectory =await _workOrderRepository.GetBaseDirectoryItemAsync();
+                var companyId = _ipAddressService.GetCompanyId();
+                var unitId = _ipAddressService.GetUnitId();
+                var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(companyId, unitId);
+                string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory);
+
+                foreach (var item in asset.WOItem)
+                {
+                    if (!string.IsNullOrEmpty(item.Image))
+                    {
+                        string imagePath = Path.Combine(uploadPath, companyName, unitName, item.Image);
+
+                        if (File.Exists(imagePath))
+                        {
+                            byte[] imageBytes = await File.ReadAllBytesAsync(imagePath);
+                            item.ImageBase64 = Convert.ToBase64String(imageBytes);
+                        }
+                    }
+                } */
             }
             if (woTechnician != null)
             {

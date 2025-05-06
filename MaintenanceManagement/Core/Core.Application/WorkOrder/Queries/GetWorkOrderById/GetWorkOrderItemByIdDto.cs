@@ -12,5 +12,6 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
         public int? ScarpQty { get; set; }
         public int? ToSubStoreQty { get; set; }
         public string? Image { get; set; }
+     //   public string? ImageBase64 { get; set; }
     }
 }

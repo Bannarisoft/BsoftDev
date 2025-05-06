@@ -27,8 +27,8 @@ namespace Core.Application.WorkOrder.Command.DeleteFileWorkOrder.Item
 
         public async Task<ApiResponseDTO<bool>> Handle(DeleteFileItemCommand request, CancellationToken cancellationToken)
         { 
-            var companyId = _ipAddressService.GetCompanyId();
-            var unitId = _ipAddressService.GetUnitId();
+            var companyId =1;// _ipAddressService.GetCompanyId();
+            var unitId = 53;//_ipAddressService.GetUnitId();
             var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(companyId, unitId);
 
             string baseDirectory = await _workOrderRepository.GetBaseDirectoryItemAsync();
@@ -36,10 +36,9 @@ namespace Core.Application.WorkOrder.Command.DeleteFileWorkOrder.Item
             {                
                 return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Base directory not configured." };                
             }
-            string companyFolder = Path.Combine(baseDirectory, companyName);
-            string unitFolder = Path.Combine(companyFolder, unitName);
-            
-            string filePath = Path.Combine(unitFolder, request.Image??string.Empty);
+            string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);       
+
+            string filePath = Path.Combine(uploadPath, request.Image??string.Empty);
 
             var result = await _fileUploadService.DeleteFileAsync(filePath);
 
