@@ -54,6 +54,34 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
                 await _mediator.Publish(domainEvent, cancellationToken);
                 if(updateResult)
                 {
+                    string tempFilePath = request.AssetMaster.AssetImage;
+                    if (tempFilePath != null){
+                        string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
+
+                        var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(request.AssetMaster.CompanyId, request.AssetMaster.UnitId);
+                        string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);     
+                        string filePath = Path.Combine(uploadPath, tempFilePath);  
+                        EnsureDirectoryExists(Path.GetDirectoryName(filePath));           
+
+                        if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+                        {
+                            string directory = Path.GetDirectoryName(filePath) ?? string.Empty;
+                            string newFileName = $"{request.AssetMaster.AssetCode}{Path.GetExtension(tempFilePath)}";
+                            string newFilePath = Path.Combine(directory, newFileName);
+
+                            try
+                            {
+                                File.Move(filePath, newFilePath);
+                                //assetEntity.AssetImage = newFileName;
+                                await _assetMasterGeneralRepository.UpdateAssetImageAsync(request.AssetMaster.Id, newFileName);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Failed to rename file: {ex.Message}");
+                            }
+                        }
+                    }       
+                    
                     return new ApiResponseDTO<bool>
                     {
                         IsSuccess = true,
@@ -64,8 +92,14 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
                 {
                     IsSuccess = false,
                     Message = "AssetMaster not updated."
-                };                
-          
+                };                          
         }
+         private void EnsureDirectoryExists(string path)
+        {
+            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+        }    
     }
 }

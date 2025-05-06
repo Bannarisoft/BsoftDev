@@ -135,5 +135,18 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty
             var warrantyExists = await multi.ReadFirstOrDefaultAsync<int?>();          
             return warrantyExists.HasValue ;
         }
+        public async Task<string> GetBaseDirectoryAsync()
+        {
+            const string query = @"
+            SELECT M.Description            
+            FROM FixedAsset.MiscMaster M
+            INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeId
+            WHERE (MiscTypeCode = @MiscTypeCode) 
+            AND  M.IsDeleted=0 and M.IsActive=1
+            ORDER BY M.ID DESC";    
+            var parameters = new { MiscTypeCode = MiscEnumEntity.AssetWarrantyImage.MiscCode };        
+            var result = await _dbConnection.QueryAsync<string>(query,parameters);
+            return result.FirstOrDefault();    
+        }
     }
 }

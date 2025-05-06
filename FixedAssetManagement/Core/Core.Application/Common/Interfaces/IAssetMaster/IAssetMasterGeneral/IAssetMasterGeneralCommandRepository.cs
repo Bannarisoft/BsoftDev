@@ -12,7 +12,7 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
         Task<bool>  DeleteAsync(int assetId,AssetMasterGenerals assetMasterGeneral);        
         Task<AssetMasterGenerals?> GetByAssetCodeAsync(string assetCode);
         Task<bool> UpdateAssetImageAsync(int assetId, string imageName);
-        Task<AssetMasterGeneralDTO?> GetByAssetImageAsync(string assetCode);
-        Task<bool> RemoveAssetImageReferenceAsync(int assetId);        
+        Task<AssetMasterGeneralDTO?> GetByAssetImageAsync(string imageName);
+        Task<bool> RemoveAssetImageReferenceAsync(string assetId);          
     }
 }

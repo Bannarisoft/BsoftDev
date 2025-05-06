@@ -6,7 +6,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
     public class DeleteFileAssetMasterGeneralCommand : IRequest<ApiResponseDTO<bool>>
     {
         public string? assetPath { get; set; }
-        public string? CompanyName { get; set; }  
-        public string? UnitName { get; set; } 
+        // public string? CompanyName { get; set; }  
+        // public string? UnitName { get; set; } 
     }
 }
