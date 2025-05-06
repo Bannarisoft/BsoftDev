@@ -137,11 +137,11 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                           }); 
 
                     break;
-                    case "DateValidation":
-                     RuleFor(x => x.EffectiveDate)
-                                .Must(BeAValidDate)
-                                .WithMessage($"{rule.Error}"); 
-                    break;
+                //     case "DateValidation":
+                //      RuleFor(x => x.EffectiveDate)
+                //                 .Must(BeAValidDate)
+                //                 .WithMessage($"{rule.Error}"); 
+                //     break;
                     case "PastDateValidation":
                      RuleFor(x => x.EffectiveDate)
                                 .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
