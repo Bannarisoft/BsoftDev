@@ -27,8 +27,8 @@ namespace Core.Application.WorkOrder.Command.DeleteFileWorkOrder.Item
 
         public async Task<ApiResponseDTO<bool>> Handle(DeleteFileItemCommand request, CancellationToken cancellationToken)
         { 
-            var companyId =1;// _ipAddressService.GetCompanyId();
-            var unitId = 53;//_ipAddressService.GetUnitId();
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
             var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(companyId, unitId);
 
             string baseDirectory = await _workOrderRepository.GetBaseDirectoryItemAsync();
