@@ -41,27 +41,15 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder.Item
             var unitId = _ipAddressService.GetUnitId();
             var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(companyId, unitId);
 
-          /*   // 🔹 Construct the required file path
-             string companyFolder = Path.Combine(baseDirectory,companyName);
-            EnsureDirectoryExists(companyFolder);
-
-            string unitFolder = Path.Combine(companyFolder,unitName);
-            EnsureDirectoryExists(unitFolder); 
- */
-        string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);        
-        //string companyFolder = Path.Combine(uploadPath,companyName);
-        EnsureDirectoryExists(uploadPath);
-
-        //string ~ = Path.Combine(companyFolder,unitName);
-        //EnsureDirectoryExists(unitFolder); 
-        
-
-        string fileExtension = Path.GetExtension(request.File.FileName);            
-        string dummyFileName = $"TEMP_{Guid.NewGuid()}{fileExtension}";            
-        string filePath = Path.Combine(uploadPath, dummyFileName);
-
             try
-            {
+            {                
+                string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);        
+                EnsureDirectoryExists(uploadPath);                
+
+                string fileExtension = Path.GetExtension(request.File.FileName);            
+                string dummyFileName = $"TEMP_{Guid.NewGuid()}{fileExtension}";            
+                string filePath = Path.Combine(uploadPath, dummyFileName);
+                
                 EnsureDirectoryExists(Path.GetDirectoryName(filePath));
 
                 // Save the file

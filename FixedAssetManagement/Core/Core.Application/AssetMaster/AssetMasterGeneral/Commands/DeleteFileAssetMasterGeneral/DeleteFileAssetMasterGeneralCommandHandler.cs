@@ -11,19 +11,25 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
         private readonly IFileUploadService _fileUploadService;        
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly ILogger<DeleteFileAssetMasterGeneralCommandHandler> _logger;
+        private readonly IIPAddressService _ipAddressService;
+        private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
 
         public DeleteFileAssetMasterGeneralCommandHandler(
             IFileUploadService fileUploadService,            
             IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository,
-            ILogger<DeleteFileAssetMasterGeneralCommandHandler> logger)
+            ILogger<DeleteFileAssetMasterGeneralCommandHandler> logger, IIPAddressService ipAddressService,IAssetMasterGeneralCommandRepository assetMasterGeneralRepository)
         {
             _fileUploadService = fileUploadService;            
             _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
-            _logger = logger;
+            _logger = logger;  _ipAddressService = ipAddressService;_assetMasterGeneralRepository=assetMasterGeneralRepository;
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(DeleteFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         { 
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
+            var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(companyId, unitId);
+            
             string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
             if (string.IsNullOrWhiteSpace(baseDirectory))
             {
@@ -31,14 +37,13 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
                 return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Base directory not configured." };                
             }
             
-            string companyFolder = Path.Combine(baseDirectory, request.CompanyName ?? string.Empty);
-            string unitFolder = Path.Combine(companyFolder, request.UnitName ?? string.Empty);
-            
-            string filePath = Path.Combine(unitFolder, request.assetPath??string.Empty);
+            string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);       
 
-            //var correctedAssetPath = request.assetPath?.Replace("\\", "\\\\") ?? string.Empty;         
+            string filePath = Path.Combine(uploadPath, request.assetPath??string.Empty);
 
             var result = await _fileUploadService.DeleteFileAsync(filePath);
+
+            await _assetMasterGeneralRepository.RemoveAssetImageReferenceAsync(request.assetPath);
             if (result)
             {
                 return new ApiResponseDTO<bool> { IsSuccess = true, Message = "File deleted successfully" };

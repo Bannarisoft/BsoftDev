@@ -12,52 +12,45 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.DeleteFileAssetWar
         private readonly IFileUploadService _fileUploadService;
         private readonly IAssetWarrantyCommandRepository _assetWarrantyRepository;
         private readonly ILogger<DeleteFileAssetWarrantyCommandHandler> _logger;
+        private readonly IIPAddressService _ipAddressService;
+        private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralRepository;
+        private readonly IAssetWarrantyQueryRepository _assetWarrantQueryRepository;
 
         public DeleteFileAssetWarrantyCommandHandler(
             IFileUploadService fileUploadService,
             IAssetWarrantyCommandRepository assetWarrantyRepository,
-            ILogger<DeleteFileAssetWarrantyCommandHandler> logger)
+            ILogger<DeleteFileAssetWarrantyCommandHandler> logger, IIPAddressService ipAddressService,IAssetMasterGeneralQueryRepository assetMasterGeneralRepository,IAssetWarrantyQueryRepository assetWarrantQueryRepository)
         {
             _fileUploadService = fileUploadService;
             _assetWarrantyRepository = assetWarrantyRepository;
-            _logger = logger;
+            _logger = logger; _ipAddressService = ipAddressService;_assetMasterGeneralRepository=assetMasterGeneralRepository;_assetWarrantQueryRepository=assetWarrantQueryRepository;
         }
 
        public async Task<ApiResponseDTO<bool>> Handle(DeleteFileAssetWarrantyCommand request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(request.AssetCode))
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
+            var (companyName, unitName) = await _assetMasterGeneralRepository.GetCompanyUnitAsync(companyId, unitId);
+            
+            string baseDirectory = await _assetWarrantQueryRepository.GetBaseDirectoryAsync();
+            if (string.IsNullOrWhiteSpace(baseDirectory))
             {
-                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Asset code is required." };
+                _logger.LogError("Base directory path not found in database.");
+                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Base directory not configured." };                
             }
+            
+            string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);       
 
-            _logger.LogInformation("Deleting asset warranty file for AssetCode: {AssetCode}", request.AssetCode);
+            string filePath = Path.Combine(uploadPath, request.assetPath??string.Empty);
 
-            // 🔹 Fetch Asset Warranty based on AssetCode
-            var existingAsset = await _assetWarrantyRepository.GetByAssetWarrantyAsync(request.AssetCode);
-            if (existingAsset == null || string.IsNullOrEmpty(existingAsset.Document))
+            var result = await _fileUploadService.DeleteFileAsync(filePath);
+
+            await _assetWarrantyRepository.RemoveAssetWarrantyAsync(request.assetPath);
+              if (result)
             {
-                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Asset warranty file not found." };
+                return new ApiResponseDTO<bool> { IsSuccess = true, Message = "File deleted successfully" };
             }
-
-            string filePath = existingAsset.Document.Replace(@"\", "/");  // Normalize path
-            _logger.LogInformation("File to be deleted: {FilePath}", filePath);
-
-            // 🔹 Delete the file from storage
-            var deleteResult = await _fileUploadService.DeleteFileAsync(filePath);
-            if (!deleteResult)
-            {
-                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "File deletion failed." };
-            }
-
-            // 🔹 Remove the file reference from the database
-            bool updateSuccess = await _assetWarrantyRepository.RemoveAssetWarrantyAsync(existingAsset.Id);
-            if (!updateSuccess)
-            {
-                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Failed to update asset warranty record." };
-            }
-
-            _logger.LogInformation("Successfully deleted asset warranty file for AssetCode: {AssetCode}", request.AssetCode);
-            return new ApiResponseDTO<bool> { IsSuccess = true, Message = "File deleted successfully." };
+            return new ApiResponseDTO<bool> { IsSuccess = false, Message = "File deletion failed" };
         }
 
     }

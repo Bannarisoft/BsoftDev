@@ -8,8 +8,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
     public class UploadFileAssetMasterGeneralCommand : IRequest<ApiResponseDTO<AssetMasterImageDto>>
     {
         public IFormFile? File { get; set; }
-        public string? CompanyName { get; set; }  
-        public string? UnitName { get; set; }  
+        // public string? CompanyName { get; set; }  
+        // public string? UnitName { get; set; }  
       /*   public string? AssetCode { get; set; }   */
     }
 }

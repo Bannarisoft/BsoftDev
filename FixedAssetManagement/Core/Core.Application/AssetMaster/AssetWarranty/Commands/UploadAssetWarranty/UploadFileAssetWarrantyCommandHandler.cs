@@ -2,6 +2,7 @@ using AutoMapper;
 using Core.Application.AssetMaster.AssetWarranty.Queries.GetAssetWarranty;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -19,20 +20,26 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.UploadAssetWarrant
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
         private readonly IAssetWarrantyCommandRepository _assetWarrantyRepository;
+        private readonly IAssetWarrantyQueryRepository _assetWarrantyQueryRepository;
         private readonly ILogger<UploadFileAssetWarrantyCommandHandler> _logger;
+        private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
+        private readonly IIPAddressService _ipAddressService;
 
         public UploadFileAssetWarrantyCommandHandler(
             IFileUploadService fileUploadService,
             IMediator mediator,
             IMapper mapper,
             IAssetWarrantyCommandRepository assetWarrantyRepository,
-            ILogger<UploadFileAssetWarrantyCommandHandler> logger)
+            ILogger<UploadFileAssetWarrantyCommandHandler> logger,IAssetWarrantyQueryRepository assetWarrantyQueryRepository, IIPAddressService ipAddressService, IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository)
         {
             _fileUploadService = fileUploadService;
             _mediator = mediator;
             _mapper = mapper;
             _assetWarrantyRepository = assetWarrantyRepository;
             _logger = logger;
+            _assetWarrantyQueryRepository=assetWarrantyQueryRepository;
+            _ipAddressService = ipAddressService;
+            _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
         }
 
         public async Task<ApiResponseDTO<AssetWarrantyDTO>> Handle(UploadFileAssetWarrantyCommand request, CancellationToken cancellationToken)
@@ -57,20 +64,19 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.UploadAssetWarrant
             try
             {
                 // 🔹 Define Base Directory
-                string baseDirectory = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "AssetWarranty");
+                string baseDirectory = await _assetWarrantyQueryRepository.GetBaseDirectoryAsync();
                 //string baseDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AssetWarranty");
                 EnsureDirectoryExists(baseDirectory);
 
-                // 🔹 Construct file path
-                string companyFolder = Path.Combine(baseDirectory, request.CompanyName ?? string.Empty);
-                EnsureDirectoryExists(companyFolder);
-
-                string unitFolder = Path.Combine(companyFolder, request.UnitName ?? string.Empty);
-                EnsureDirectoryExists(unitFolder);
+                var companyId =_ipAddressService.GetCompanyId();
+                var unitId = _ipAddressService.GetUnitId();
+                var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(companyId, unitId);
+                string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);                
+                EnsureDirectoryExists(uploadPath);
 
                 string fileExtension = Path.GetExtension(request.File.FileName);
-                string fileName = $"{request.AssetCode}{fileExtension}"; // ✅ Example: HomeTextile-COMP-MOU-1.png
-                string filePath = Path.Combine(unitFolder, fileName);
+                string fileName = $"{"WARRANTY_"}{request.AssetCode}{fileExtension}"; // ✅ Example: HomeTextile-COMP-MOU-1.png
+                string filePath = Path.Combine(uploadPath, fileName);
 
                 EnsureDirectoryExists(Path.GetDirectoryName(filePath));
 

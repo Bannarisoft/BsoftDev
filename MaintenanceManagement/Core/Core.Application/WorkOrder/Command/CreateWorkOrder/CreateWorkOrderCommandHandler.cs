@@ -58,15 +58,11 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
                 string tempFilePath = request.WorkOrderDto.Image;
                 if (tempFilePath != null){
                     string baseDirectory = await _workOrderQueryRepository.GetBaseDirectoryAsync();
-
                     var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(companyId, unitId);
-
-                    string companyFolder = Path.Combine(baseDirectory, companyName.Trim());
-                    string unitFolder = Path.Combine(companyFolder,unitName.Trim());
-                    string filePath = Path.Combine(unitFolder, tempFilePath);
-
-            
-
+                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);                      
+                    string filePath = Path.Combine(uploadPath, tempFilePath);
+                    EnsureDirectoryExists(Path.GetDirectoryName(filePath)); 
+                       
                     if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
                     {
                         string directory = Path.GetDirectoryName(filePath) ?? string.Empty;
@@ -97,6 +93,13 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
                 IsSuccess = false,
                 Message = "Work Order not created."
             };
+        }   
+        private void EnsureDirectoryExists(string path)
+        {
+            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
         }         
     }
 }
