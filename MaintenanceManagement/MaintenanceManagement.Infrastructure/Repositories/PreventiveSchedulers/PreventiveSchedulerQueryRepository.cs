@@ -271,7 +271,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
              {
                  var query = @"SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] PSH
                  INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
-                 [Maintenance].[WorkOrder] W ON W.PreventiveScheduleId =PSD.Id
+                INNER JOIN [Maintenance].[WorkOrder] W ON W.PreventiveScheduleId =PSD.Id
                   WHERE PSH.Id = @Id AND PSH.IsDeleted = 0";
 
                      var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
@@ -297,7 +297,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 {
                        var query = $@"
                             SELECT  
-                                PSD.Id,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
+                                PS.Id,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
                             FROM [Maintenance].[PreventiveSchedulerHeader] PS
                             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
                             INNER JOIN [Maintenance].[MachineMaster] M ON M.Id =PSD.MachineId
