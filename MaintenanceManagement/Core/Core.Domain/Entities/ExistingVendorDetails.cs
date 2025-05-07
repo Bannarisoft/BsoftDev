@@ -11,5 +11,7 @@ namespace Core.Domain.Entities
         public string? VendorName { get; set; }
         public string? VendorEmail { get; set; }
         public string? VendorPhone { get; set; }
+
+       
     }
 }

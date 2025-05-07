@@ -6,6 +6,7 @@ using Core.Application.MiscMaster.Command.UpdateMiscMaster;
 using MaintenanceManagement.API.Validation.Common;
 using FluentValidation;
 using Core.Application.Common.Interfaces.IMiscMaster;
+using MongoDB.Driver;
 
 namespace MaintenanceManagement.API.Validation.MiscMaster
 {
@@ -61,7 +62,7 @@ namespace MaintenanceManagement.API.Validation.MiscMaster
                         RuleFor(x => x)
                             .MustAsync(async (command, cancellation) =>
                             {
-                                return !await _miscMasterQuery.AlreadyExistsAsync(command.Code, command.MiscTypeId);
+                                return !await _miscMasterQuery.AlreadyExistsAsync(command.Code, command.MiscTypeId,command.Id);
                             })
                             .WithMessage($"{rule.Error}")
                             .WithName("Misc Code");

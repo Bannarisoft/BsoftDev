@@ -8,7 +8,9 @@ using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using Core.Application.MaintenanceRequest.Queries.GetExistingVendorDetails;
 using Core.Application.MaintenanceRequest.Queries.GetExternalRequestById;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest;
+using Core.Application.MaintenanceRequest.Queries.RequestReport;
 using Core.Domain.Common;
+using Core.Domain.Entities;
 using Dapper;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
@@ -48,6 +50,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             A.VendorId,
                             A.OldVendorId,
                             A.Remarks,
+
+                            A.CreatedByName,
+                            A.CreatedDate,
+                            A.CreatedBy,
+                            A.CreatedIP,
+                            A.ModifiedByName,
+                            A.ModifiedDate,
+                            A.ModifiedBy,
+                            A.ModifiedIP,
                             B.Id AS RequestTypeId,
                             B.Code AS RequestType,
                             C.Id AS MaintenanceTypeId,
@@ -76,7 +87,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id 
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
 
-                        WHERE A.IsDeleted = 0 AND A.RequestStatusId <> 33  AND  B.Code = @MiscCode
+                        WHERE A.IsDeleted = 0   AND  B.Code = @MiscCode  AND J.Code <> @MaintenanceStatusUpdate
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search OR F.Code LIKE @Search or G.Code LIKE @Search OR H.Code LIKE @Search  OR E.MachineName LIKE @Search OR I.Code LIKE @Search  or J.Code LIKE @Search) ")}}
                         ORDER BY A.Id DESC
                         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -128,6 +139,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             A.VendorId,
                             A.OldVendorId,
                             A.Remarks,
+                            A.EstimatedServiceCost,
+                            A.EstimatedSpareCost,
+                             A.CreatedByName,
+                            A.CreatedDate,
+                            A.CreatedBy,
+                            A.CreatedIP,
+                             A.ModifiedByName,
+                            A.ModifiedDate,
+                            A.ModifiedBy,
+                            A.ModifiedIP,
                             B.Id AS RequestTypeId,
                             B.Code AS RequestType,
                             C.Id AS MaintenanceTypeId,
@@ -156,7 +177,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id 
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
 
-                        WHERE A.RequestStatusId <> 33  AND  B.Code = @MiscCode
+                        WHERE  B.Code = @MiscCode  AND C.Code <> @MaintenanceStatusUpdate
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search OR F.Code LIKE @Search or G.Code LIKE @Search OR H.Code LIKE @Search  OR E.MachineName LIKE @Search OR I.Code LIKE @Search  or J.Code LIKE @Search) ")}}
                         ORDER BY A.Id DESC
                         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -183,7 +204,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
 
 
           
-                                public async Task<dynamic?> GetByIdAsync(int id)
+                public async Task<dynamic?> GetByIdAsync(int id)
                 {
                     var query = @"
                         SELECT 
@@ -193,6 +214,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             A.VendorId,
                             A.OldVendorId,
                             A.Remarks,
+                            A.EstimatedServiceCost,
+                            A.EstimatedSpareCost,
+                            A.CreatedByName,
+                            A.CreatedDate,
+                            A.CreatedBy,
+                            A.CreatedIP,
+                            A.ModifiedByName,
+                            A.ModifiedDate,
+                            A.ModifiedBy,
+                            A.ModifiedIP,
                             B.Id AS RequestTypeId,
                             B.Code AS RequestType,
                             C.Id AS MaintenanceTypeId,
@@ -221,10 +252,21 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
 
-                        WHERE A.IsDeleted = 0 AND A.Id = @Id;
+                        WHERE A.IsDeleted = 0 AND A.Id = @Id 
+                        AND B.Code = @MiscCode ;
                     ";
 
-                    var result = await _dbConnection.QueryFirstOrDefaultAsync<dynamic>(query, new { Id = id });
+                   // var result = await _dbConnection.QueryFirstOrDefaultAsync<dynamic>(query, new { Id = id });
+                    
+                     var parameters = new
+                    {
+                        Id = id,
+                        MiscCode = MiscEnumEntity.MaintenanceRequestTypeInternal.Code,
+                         MiscStatusCode = MiscEnumEntity.MaintenanceStatusUpdate.Code
+                        
+                    };
+
+                     var result = await _dbConnection.QueryFirstOrDefaultAsync<dynamic>(query, parameters);
 
                     return result;
                 }
@@ -241,6 +283,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             A.Remarks,
                             A.CompanyId,
                             A.UnitId,
+                             A.EstimatedServiceCost,
+                            A.EstimatedSpareCost,
+                             A.CreatedByName,
+                            A.CreatedDate,
+                            A.CreatedBy,
+                            A.CreatedIP,
+                             A.ModifiedByName,
+                            A.ModifiedDate,
+                            A.ModifiedBy,
+                            A.ModifiedIP,
                             B.Id AS RequestTypeId,
                             B.Code AS RequestType,
                             C.Id AS MaintenanceTypeId,
@@ -267,19 +319,23 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster H ON A.ModeOfDispatchId = H.Id
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
-                        WHERE A.IsDeleted = 0 AND A.Id IN @Ids;
+                        WHERE A.IsDeleted = 0 AND A.Id IN @Ids 
+                        AND B.Code = @MiscCode AND J.Code <> @MiscStatusCode;
                     ";
+                //    var result = await _dbConnection.QueryAsync<GetExternalRequestByIdDto>(query, new { Ids = ids });
+                 var parameters = new
+                    {
+                        Ids = ids,
+                        MiscCode = MiscEnumEntity.MaintenanceRequestTypeExternal.Code,
+                        MiscStatusCode = MiscEnumEntity.MaintenanceStatusUpdate.Code
+                       
+                    };
 
-                    var result = await _dbConnection.QueryAsync<GetExternalRequestByIdDto>(query, new { Ids = ids });
-
+                  //   var result = await _dbConnection.QueryFirstOrDefaultAsync<dynamic>(query, parameters);
+                   var result = await _dbConnection.QueryAsync<GetExternalRequestByIdDto>(query, parameters);
                     return result.ToList(); // always return a list (empty if nothing found)
-                }
-
-
-       
-       
-    
-
+                }  
+         
 
                  public async Task<List<Core.Domain.Entities.ExistingVendorDetails>> GetVendorDetails(string OldUnitId, string? VendorCode)
             {
@@ -514,6 +570,53 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
                         return result.ToList();
                     } 
+
+                    public async Task<List<RequestReportDto>> GetMaintenanceStatusDescAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? getRequestType, int? requestStatus)
+                    {
+                        var query = @"
+                        SELECT 
+                            a.Id AS RequestId,
+                            a.UnitId,
+                            a.CreatedDate AS RequestDate,
+                            a.CreatedBy,
+                            d.FirstName AS Created,
+                            a.DepartmentId,
+                            a.MachineId,
+                            a.MaintenanceTypeId,
+                            b.Id AS WorkOrderId,
+                            b.StatusId,
+                            a.ModifiedDate,
+                            DATEDIFF(MINUTE, a.CreatedDate, a.ModifiedDate) AS RequestMinutesDifference,
+                            RIGHT('0' + CAST(DATEDIFF(MINUTE, a.CreatedDate, a.ModifiedDate) / 60 AS VARCHAR), 2) + ':' +
+                            RIGHT('0' + CAST(DATEDIFF(MINUTE, a.CreatedDate, a.ModifiedDate) % 60 AS VARCHAR), 2) AS DownTime,
+                            RIGHT('0' + CAST(SUM(DATEDIFF(SECOND, c.StartTime, c.EndTime)) / 3600 AS VARCHAR), 2) + ':' +
+                            RIGHT('0' + CAST((SUM(DATEDIFF(SECOND, c.StartTime, c.EndTime) % 3600) / 60) AS VARCHAR), 2) AS TimeTakenToRepair
+                        FROM Maintenance.MaintenanceRequest a
+                        INNER JOIN Maintenance.WorkOrder b ON a.Id = b.RequestId
+                        LEFT JOIN Maintenance.WorkOrderSchedule c ON c.WorkOrderId = b.Id
+                        LEFT JOIN BANNARI.AppSecurity.Users d ON a.CreatedBy = d.UserId
+                        WHERE a.CreatedDate >= @RequestFromDate
+                            AND a.CreatedDate <= @RequestToDate
+                            AND (@GetRequestType ='' OR a.RequestTypeId = @GetRequestType)
+                            AND (@RequestStatus ='' OR a.RequestStatusId = @RequestStatus)
+                        GROUP BY 
+                            a.Id, a.UnitId, a.CreatedDate, a.CreatedBy, a.DepartmentId,
+                            a.MachineId, a.MaintenanceTypeId,
+                            b.Id, b.StatusId, a.ModifiedDate, d.UserId, d.FirstName
+                        ORDER BY a.Id";
+
+                        var parameters = new
+                        {
+                            RequestFromDate = requestFromDate?.Date,
+                            RequestToDate = requestToDate?.Date.AddDays(1).AddTicks(-1), // To include full day
+                            GetRequestType = getRequestType,
+                            RequestStatus = requestStatus
+                        };
+                        
+                        var result = await _dbConnection.QueryAsync<RequestReportDto>(query, parameters);
+                        return result.ToList();
+                    }
+
                              
                          
 
