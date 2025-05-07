@@ -30,7 +30,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
         public async Task<ApiResponseDTO<AssetMasterDto>> Handle(CreateAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         {
             // Get latest AssetCode
-            var latestAssetCode = await _assetMasterGeneralQueryRepository.GetLatestAssetCode(request.AssetMaster.CompanyId, request.AssetMaster.UnitId, request.AssetMaster.AssetGroupId, request.AssetMaster.AssetCategoryId, request.AssetMaster.AssetLocation.DepartmentId, request.AssetMaster.AssetLocation.LocationId);
+            var latestAssetCode = await _assetMasterGeneralQueryRepository.GetLatestAssetCode( request.AssetMaster.AssetGroupId, request.AssetMaster.AssetCategoryId, request.AssetMaster.AssetLocation.DepartmentId, request.AssetMaster.AssetLocation.LocationId);
             var assetCode = latestAssetCode;
             var assetEntity = _mapper.Map<AssetMasterGenerals>(request.AssetMaster);
             assetEntity.AssetCode = assetCode;
@@ -71,13 +71,10 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
                 string tempFilePath = request.AssetMaster.AssetImage;
                 if (tempFilePath != null){
                     string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
-                    string companyFolder = Path.Combine(baseDirectory, request.AssetMaster.CompanyName?.Trim() ?? string.Empty);
-            
-
-                    string unitFolder = Path.Combine(companyFolder, request.AssetMaster.UnitName?.Trim() ?? string.Empty);
-                    string filePath = Path.Combine(unitFolder, tempFilePath);
-
-            
+                    var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(request.AssetMaster.CompanyId ,request.AssetMaster.UnitId);
+                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);   
+                    string filePath = Path.Combine(uploadPath, tempFilePath);
+                    EnsureDirectoryExists(Path.GetDirectoryName(filePath));             
 
                     if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
                     {
@@ -110,5 +107,12 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
                 Message = "AssetMasterGeneral not created."
             };
         }
+          private void EnsureDirectoryExists(string path)
+        {
+            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+        }     
     }
 }

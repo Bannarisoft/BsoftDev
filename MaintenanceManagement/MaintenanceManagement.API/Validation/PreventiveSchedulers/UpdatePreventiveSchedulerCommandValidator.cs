@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IActivityMaster;
@@ -141,11 +142,11 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                           }); 
 
                     break;
-                    case "DateValidation":
-                     RuleFor(x => x.EffectiveDate)
-                                .Must(BeAValidDate)
-                                .WithMessage($"{rule.Error}"); 
-                    break;
+                //     case "DateValidation":
+                //      RuleFor(x => x.EffectiveDate)
+                //                 .Must(BeAValidDate)
+                //                 .WithMessage($"{rule.Error}"); 
+                //     break;
                     case "PastDateValidation":
                      RuleFor(x => x.EffectiveDate)
                                 .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
@@ -160,7 +161,7 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                   case "WorkOrderValidate":
                      RuleFor(x => x.Id )
                            .MustAsync(async (Id, cancellation) => 
-                        await _preventiveSchedulerQuery.UpdateValidation(Id))
+                        !await _preventiveSchedulerQuery.UpdateValidation(Id))
                             .WithMessage($"{rule.Error}");
                             break;  
                   case "AlreadyExists":
@@ -181,10 +182,6 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                 }
             }
         }
-         private bool BeAValidDate(DateOnly date)
-        {
-        
-            return date >= DateOnly.FromDateTime(DateTime.Today);
-        }
+         
     }
 }

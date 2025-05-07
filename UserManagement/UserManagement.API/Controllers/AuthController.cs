@@ -13,6 +13,7 @@ using Core.Application.Common.Interfaces.IUser;
 using Infrastructure;
 using Core.Application.Common.Interfaces;
 using Core.Application.UserLogin.Commands.DeactivateUserSession;
+using Core.Application.UserLogin.Commands.UnlockUser;
 
 namespace UserManagement.API.Controllers
 {
@@ -183,7 +184,18 @@ namespace UserManagement.API.Controllers
                 Message = $"All sessions for user {command.Username} have been deactivated."
             });
         }
-        
+         [HttpPost("unlock")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UnlockUser([FromBody] UnlockUserCommand command)
+        {
+            var UserSession = await _mediator.Send(command);          
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = $"All sessions for user {command.userName} have been deactivated."
+            });
+        }
     }
 }
 

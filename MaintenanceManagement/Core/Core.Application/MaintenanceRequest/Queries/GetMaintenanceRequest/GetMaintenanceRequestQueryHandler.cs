@@ -12,18 +12,18 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
         private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
+
 
         public GetMaintenanceRequestQueryHandler(
             IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository,
             IMapper mapper,
-            IMediator mediator,
-            IDepartmentGrpcClient departmentGrpcClient)
+            IMediator mediator)
+            
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentGrpcClient = departmentGrpcClient;
+            
 
         }
 

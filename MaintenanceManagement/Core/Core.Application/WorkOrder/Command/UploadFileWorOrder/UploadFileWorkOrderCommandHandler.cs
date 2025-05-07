@@ -44,16 +44,12 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
             var unitId = _ipAddressService.GetUnitId();
             var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(companyId, unitId);
 
-            // 🔹 Construct the required file path
-             string companyFolder = Path.Combine(baseDirectory,companyName);
-            EnsureDirectoryExists(companyFolder);
-
-            string unitFolder = Path.Combine(companyFolder,unitName);
-            EnsureDirectoryExists(unitFolder); 
+            string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);                
+            EnsureDirectoryExists(uploadPath);
 
             string fileExtension = Path.GetExtension(request.File.FileName);            
             string dummyFileName = $"TEMP_{Guid.NewGuid()}{fileExtension}";            
-            string filePath = Path.Combine(unitFolder, dummyFileName);
+            string filePath = Path.Combine(uploadPath, dummyFileName);
 
             try
             {

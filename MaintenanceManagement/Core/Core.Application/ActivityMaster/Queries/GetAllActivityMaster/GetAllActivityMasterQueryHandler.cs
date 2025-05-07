@@ -12,15 +12,15 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-          private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
+          
 
 
-        public GetAllActivityMasterQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator , IDepartmentGrpcClient departmentGrpcClient)
+        public GetAllActivityMasterQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator)
         {
             _activityMasterQueryRepository = activityMasterQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentGrpcClient = departmentGrpcClient;
+         
         }
          public async Task<ApiResponseDTO<List<GetAllActivityMasterDto>>> Handle(GetAllActivityMasterQuery request, CancellationToken cancellationToken)
         {
@@ -31,22 +31,22 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
             var activityList = _mapper.Map<List<GetAllActivityMasterDto>>(activities);
 
 
-             var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
-            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+            // var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
+            // var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            var activityMasterDictionary = new Dictionary<int, GetAllActivityMasterDto>();
+            // var activityMasterDictionary = new Dictionary<int, GetAllActivityMasterDto>();
 
-                 foreach (var data in activityList)
-            {
+            //      foreach (var data in activityList)
+            // {
               
-                    if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName )&& departmentName != null)
-                    {
-                        data.Department = departmentName;
-                    }
+            //         if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName )&& departmentName != null)
+            //         {
+            //             data.Department = departmentName;
+            //         }
 
-                    activityMasterDictionary[data.DepartmentId] = data;
+            //         activityMasterDictionary[data.DepartmentId] = data;
                 
-            }
+            // }
 
             // Publish domain event for auditing
             var domainEvent = new AuditLogsDomainEvent(

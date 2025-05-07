@@ -42,7 +42,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MainStoreStock
             var result = await _dbConnection.QueryAsync<MainStoreItemStockDto>(
                 procedureName,
                 parameters,
-                commandType: CommandType.StoredProcedure
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 120 // in seconds
             );
 
             return result.FirstOrDefault(); // Get single or null
@@ -72,7 +73,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MainStoreStock
             var itemcodes = await _dbConnection.QueryAsync<MainStoresStockDto>(
                 procedureName,
                 parameters,
-                commandType: CommandType.StoredProcedure
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 120 // in seconds
             );
 
             return itemcodes.ToList();
@@ -102,7 +104,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MainStoreStock
             var itemcodes = await _dbConnection.QueryAsync<MainStoresStockItemsDto>(
                 procedureName,
                 parameters,
-                commandType: CommandType.StoredProcedure
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 120 // in seconds
             );
 
             return itemcodes.ToList();

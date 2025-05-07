@@ -5,6 +5,6 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.DeleteFileAssetWar
 {
     public class DeleteFileAssetWarrantyCommand : IRequest<ApiResponseDTO<bool>>
     {
-        public string? AssetCode { get; set; }
+        public string? assetPath { get; set; }
     }
 }

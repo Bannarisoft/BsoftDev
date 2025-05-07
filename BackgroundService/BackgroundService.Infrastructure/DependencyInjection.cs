@@ -1,9 +1,12 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using BackgroundService.Infrastructure.Configurations;
-using System.Reflection;
 using Core.Application.Common.Interfaces;
 using BackgroundService.Infrastructure.Services;
+using Shared.Infrastructure.HttpClientPolly;
+using BackgroundService.Application.Interfaces;
+using Hangfire;
+using Hangfire.SqlServer;
 
 
 namespace BackgroundService.Infrastructure
@@ -12,6 +15,35 @@ namespace BackgroundService.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
+           var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
+                                              .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
+                                              .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
+                                              .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");  
+            
+            if (string.IsNullOrWhiteSpace(HangfireConnectionString))
+            {
+                throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
+            }
+
+              // Register Hangfire services
+            services.AddHangfire(config =>
+            {
+                config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                      .UseSimpleAssemblyNameTypeSerializer()
+                      .UseDefaultTypeSerializer()
+                      .UseSqlServerStorage(HangfireConnectionString, new SqlServerStorageOptions
+                      {
+                          CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                          SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                          QueuePollInterval = TimeSpan.Zero,
+                          UseRecommendedIsolationLevel = true,
+                          UsePageLocksOnDequeue = true,
+                          DisableGlobalLocks = true
+                      });
+            });
+
+            // Add the Hangfire server
+            services.AddHangfireServer();
            // ✅ Correctly bind EmailSettings
             var emailSettings = new EmailSettings();
             configuration.GetSection("EmailSettings").Bind(emailSettings);
@@ -21,13 +53,21 @@ namespace BackgroundService.Infrastructure
             configuration.GetSection("SmsSettings").Bind(smsSettings);
             services.AddSingleton(smsSettings); 
 
-          services.AddHttpClient();  
-           //services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
-            //services.Configure<SmsSettings>(configuration.GetSection("SmsSettings"));
+             services.AddHttpClient("UserManagementClient", client =>
+            {
+                //client.BaseAddress = new Uri("http://localhost:5174"); 
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:UserManagement"]);
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
-          services.AddScoped<IEmailService, RealEmailService>();
-          services.AddScoped<ISmsService, RealSmsService>();
-        return services;
+            services.AddHttpClient(); 
+            services.AddScoped<IEmailService, RealEmailService>();
+            services.AddScoped<ISmsService, RealSmsService>();
+            services.AddScoped<IUserUnlockService, UserUnlockService>(); 
+            services.AddScoped<UserUnlockService>();              
+            services.AddTransient<IVerificationCodeCleanupService, VerificationCodeCleanupService>();         
+            return services;
     }
     }
 }
