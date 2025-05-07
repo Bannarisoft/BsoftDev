@@ -38,12 +38,12 @@ builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
 builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
-builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
+//builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
 // Register gRPC
-builder.Services.AddGrpc();
+//builder.Services.AddGrpc();
 
 var app = builder.Build();
 // builder.Services.AddScoped<SessionGrpcService>();
@@ -70,7 +70,7 @@ app.UseMiddleware<TokenValidationMiddleware>();
 
 app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
-app.MapGrpcService<DepartmentGrpcService>();
+//app.MapGrpcService<DepartmentGrpcService>();
 app.MapControllers();
-app.ConfigureHangfireDashboard();
+//app.ConfigureHangfireDashboard();
 app.Run();

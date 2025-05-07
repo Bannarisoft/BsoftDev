@@ -179,8 +179,8 @@ namespace UserManagement.Infrastructure
                     services.AddScoped<IBackgroundServiceClient, BackgroundServiceClient>();
             services.AddHttpClient("BackgroundServiceClient", client =>
             {
-                //client.BaseAddress = new Uri(configuration["HttpClientSettings:BackgroundService"]);
-                client.BaseAddress = new Uri("http://localhost:5011"); 
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:BackgroundService"]);
+                //client.BaseAddress = new Uri("http://localhost:5011"); 
             })
             .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());    
