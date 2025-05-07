@@ -3,10 +3,8 @@ using UserManagement.Infrastructure;
 using UserManagement.API.Validation.Common;
 using UserManagement.API.Middleware;
 using UserManagement.API.Configurations;
-using Core.Domain.Entities;
-using MassTransit;
 using UserManagement.Infrastructure.PollyResilience;
-using UserManagement.API.GrpcServices;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +41,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
 // Register gRPC
-builder.Services.AddGrpc();
+//builder.Services.AddGrpc();
 
 var app = builder.Build();
 // builder.Services.AddScoped<SessionGrpcService>();
@@ -70,7 +68,7 @@ app.UseMiddleware<TokenValidationMiddleware>();
 
 app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
-app.MapGrpcService<DepartmentGrpcService>();
+//app.MapGrpcService<DepartmentGrpcService>();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
 app.Run();

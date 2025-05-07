@@ -112,9 +112,10 @@ namespace UserManagement.Infrastructure.Repositories
                   if (existingUser != null)
                     {
                         existingUser.IsLocked = 1;
+                        _applicationDbContext.User.Update(existingUser);
+                        return await _applicationDbContext.SaveChangesAsync() > 0;
                     }
-             _applicationDbContext.User.Update(existingUser);
-            return await _applicationDbContext.SaveChangesAsync() >0;
+              return false;
         }
 
         public async Task<int> SetAdminPassword(int userId, User user)

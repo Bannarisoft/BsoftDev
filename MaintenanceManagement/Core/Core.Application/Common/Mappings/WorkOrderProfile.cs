@@ -51,7 +51,8 @@ namespace Core.Application.Common.Mappings
                     x.RequestType,
                     x.Status,
                     x.MaintenanceType,
-                    x.RequestId
+                    x.RequestId,
+                    x.MachineName
                 })
                 .Select(g => new GetWorkOrderDto
                 {
@@ -64,6 +65,7 @@ namespace Core.Application.Common.Mappings
                     Status = g.Key.Status,
                     MaintenanceType = g.Key.MaintenanceType,
                     RequestId = g.Key.RequestId,
+                    MachineName = g.Key.MachineName,
                     Schedules = g
                         .Where(s => s.ScheduleStartTime.HasValue || s.ScheduleEndTime.HasValue)
                         .Select(s => new ScheduleDto
