@@ -45,7 +45,6 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMaster
                         }
                     }
                 }
-
              //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetMachineMasterQuery",

@@ -20,9 +20,9 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
        public string? DepartmentName { get; set; }
        public int SourceId { get; set; }
        public int? VendorId  { get; set; }
-       public string? VendorName  { get; set; } = null;
-       public string? OldVendorId  { get; set; }
-       public string?   OldVendorName  { get; set; }
+       public string? VendorNameNew  { get; set; } = null;
+       public string? VendorCode  { get; set; }
+       public string?   VendorName  { get; set; }
        public int?  ServiceTypeId { get; set; }
        public string? ServiceType { get; set; }
        public int?  ServiceLocationId { get; set; }
@@ -37,6 +37,17 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
        public string? Remarks { get; set; }
        public int RequestStatusId { get; set; }
        public string? RequestStatus { get; set; }
+       public string? CreatedByName { get; set; }
+       public DateTimeOffset CreatedDate { get; set; }
+       public int  CreatedBy { get; set; }
+       public string?  CreatedIP { get; set; }
+       public string? ModifiedByName { get; set; }
+       public DateTimeOffset? ModifiedDate { get; set;}
+       public int? ModifiedBy { get; set;}
+       public string? ModifiedIP { get; set;}
+
+       
+      
        
        
     }

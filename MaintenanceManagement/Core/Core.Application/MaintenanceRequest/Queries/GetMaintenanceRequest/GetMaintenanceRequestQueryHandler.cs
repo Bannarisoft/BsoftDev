@@ -33,23 +33,23 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
             var maintenanceRequestList = _mapper.Map<List<GetMaintenanceRequestDto>>(maintenanceRequests);
 
             // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentsAsync(); // ✅ Clean call
-            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+            // var departments = await _departmentGrpcClient.GetAllDepartmentsAsync(); // ✅ Clean call
+            // var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            var maintenanceRequestDictionary = new Dictionary<int, GetMaintenanceRequestDto>();
+            // var maintenanceRequestDictionary = new Dictionary<int, GetMaintenanceRequestDto>();
             
-            // 🔥 Map department names to MaintenanceRequest
-            foreach (var data in maintenanceRequestList)
-            {
+            // // 🔥 Map department names to MaintenanceRequest
+            // foreach (var data in maintenanceRequestList)
+            // {
               
-                    if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName )&& departmentName != null)
-                    {
-                        data.DepartmentName = departmentName;
-                    }
+            //         if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName )&& departmentName != null)
+            //         {
+            //             data.DepartmentName = departmentName;
+            //         }
 
-                    maintenanceRequestDictionary[data.DepartmentId] = data;
+            //         maintenanceRequestDictionary[data.DepartmentId] = data;
                 
-            }
+            // }
 
             // Domain Event Logging
             var domainEvent = new AuditLogsDomainEvent(
