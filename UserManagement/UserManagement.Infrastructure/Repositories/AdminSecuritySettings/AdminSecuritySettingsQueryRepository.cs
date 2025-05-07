@@ -7,6 +7,7 @@ using System.Data;
 using Dapper;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
 using System.Security.Permissions;
+using Core.Application.Common.Interfaces;
 
 
 namespace UserManagement.Infrastructure.Repositories.AdminSecuritySettings
@@ -14,14 +15,17 @@ namespace UserManagement.Infrastructure.Repositories.AdminSecuritySettings
     public class AdminSecuritySettingsQueryRepository  :IAdminSecuritySettingsQueryRepository
     {
         private readonly IDbConnection _dbConnection; 
+        private readonly IIPAddressService _ipAddressService;
 
-        public  AdminSecuritySettingsQueryRepository(IDbConnection dbConnection)
+        public  AdminSecuritySettingsQueryRepository(IDbConnection dbConnection,IIPAddressService iPAddressService)
     {
          _dbConnection = dbConnection;
+         _ipAddressService = iPAddressService;
     }
    
             public async Task<(List<Core.Domain.Entities.AdminSecuritySettings>, int)> GetAllAdminSecuritySettingsAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+            var entityId = _ipAddressService.GetEntityId();
             var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
@@ -52,7 +56,7 @@ namespace UserManagement.Infrastructure.Repositories.AdminSecuritySettings
                     ModifiedIP,
                     IsDeleted
                 FROM AppSecurity.AdminSecuritySettings
-                WHERE IsDeleted = 0
+                WHERE IsDeleted = 0 AND EntityId=@EntityId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Id LIKE @Search)")}}
                 ORDER BY Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -64,7 +68,8 @@ namespace UserManagement.Infrastructure.Repositories.AdminSecuritySettings
             {
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize
+                PageSize,
+                EntityId =entityId
             };
 
             var securitySettings = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -77,9 +82,9 @@ namespace UserManagement.Infrastructure.Repositories.AdminSecuritySettings
 
         public async Task<Core.Domain.Entities.AdminSecuritySettings> GetAdminSecuritySettingsByIdAsync(int id)
         {
-            
-            const string query = @"SELECT * FROM AppSecurity.AdminSecuritySettings WHERE Id = @Id AND IsDeleted = 0 ORDER BY ID DESC";
-                var adminsettings = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.AdminSecuritySettings>(query, new { id });
+            var entityId = _ipAddressService.GetEntityId();
+            const string query = @"SELECT * FROM AppSecurity.AdminSecuritySettings WHERE Id = @Id AND IsDeleted = 0 AND EntityId=@EntityId ORDER BY ID DESC";
+                var adminsettings = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.AdminSecuritySettings>(query, new { Id=id,EntityId=entityId });
                 
                 if (adminsettings == null)
                 {
