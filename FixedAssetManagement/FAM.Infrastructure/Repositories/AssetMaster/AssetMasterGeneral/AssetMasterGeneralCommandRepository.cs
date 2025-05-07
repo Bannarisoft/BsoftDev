@@ -128,17 +128,16 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             .FirstOrDefaultAsync();
         }
 
-        public async Task<bool> RemoveAssetImageReferenceAsync(int assetId)
+        public async Task<bool> RemoveAssetImageReferenceAsync(string imageName)
         {
-            var asset = await _applicationDbContext.AssetMasterGenerals.FindAsync(assetId);
+            var asset = await _applicationDbContext.AssetMasterGenerals.FirstOrDefaultAsync(x => x.AssetImage == imageName);
             if (asset == null)
             {
                 return false;  // Asset not found
             }
-
             asset.AssetImage = null;
             await _applicationDbContext.SaveChangesAsync();
             return true;
-        }    
+        }        
     }
 }

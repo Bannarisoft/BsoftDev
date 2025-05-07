@@ -1,5 +1,4 @@
 using AutoMapper;
-using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using Core.Domain.Events;
@@ -13,16 +12,16 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
+        //private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
 
         
 
-         public GetActivityMasterByIdQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
+         public GetActivityMasterByIdQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator)
         {
             _activityMasterQueryRepository = activityMasterQueryRepository;
             _mapper =mapper;
             _mediator = mediator;
-            _departmentGrpcClient = departmentGrpcClient;
+           // _departmentGrpcClient = departmentGrpcClient;
 
         } 
 
@@ -43,16 +42,16 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
             var machineGroup = _mapper.Map<GetActivityMasterByIdDto>(result);
 
              // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
-            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+            //var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
+            //var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            var activityMasterDictionary = new Dictionary<int, GetActivityMasterByIdDto>();
+        //     var activityMasterDictionary = new Dictionary<int, GetActivityMasterByIdDto>();
 
-           // ✅ No foreach needed
-                    if (departmentLookup.TryGetValue(machineGroup.DepartmentId, out var departmentName) && departmentName != null)
-                    {
-                        machineGroup.Department = departmentName;
-                    }
+        //    // ✅ No foreach needed
+        //             if (departmentLookup.TryGetValue(machineGroup.DepartmentId, out var departmentName) && departmentName != null)
+        //             {
+        //                 machineGroup.Department = departmentName;
+        //             }
 
             // Domain Event
             var domainEvent = new AuditLogsDomainEvent(

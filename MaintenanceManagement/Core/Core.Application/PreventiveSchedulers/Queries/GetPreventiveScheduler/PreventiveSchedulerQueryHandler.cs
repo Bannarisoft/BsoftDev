@@ -12,13 +12,12 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
-        public PreventiveSchedulerQueryHandler(IPreventiveSchedulerQuery preventiveSchedulerQuery, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
+        
+        public PreventiveSchedulerQueryHandler(IPreventiveSchedulerQuery preventiveSchedulerQuery, IMapper mapper, IMediator mediator)
         {
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _mapper = mapper;
-            _mediator = mediator;
-            _departmentGrpcClient = departmentGrpcClient;
+            _mediator = mediator;            
         }
         public async Task<ApiResponseDTO<List<GetPreventiveSchedulerDto>>> Handle(GetPreventiveSchedulerQuery request, CancellationToken cancellationToken)
         {
@@ -27,24 +26,24 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
 
             // var departments = await _departmentService.GetAllUserDepartmentAsync();
             // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentsAsync(); // ✅ Clean call
+            // var departments = await _departmentGrpcClient.GetAllDepartmentsAsync(); // ✅ Clean call
 
-            // var departments = departmentResponse.Departments.ToList();
-            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+            // // var departments = departmentResponse.Departments.ToList();
+            // var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            var PreventiveSchedulerDictionary = new Dictionary<int, GetPreventiveSchedulerDto>();
-            // 🔥 Map department names to preventiveScheduler
-            foreach (var data in preventiveSchedulerList)
-            {
+            // var PreventiveSchedulerDictionary = new Dictionary<int, GetPreventiveSchedulerDto>();
+            // // 🔥 Map department names to preventiveScheduler
+            // foreach (var data in preventiveSchedulerList)
+            // {
 
-                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-                {
-                    data.DepartmentName = departmentName;
-                }
+            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+            //     {
+            //         data.DepartmentName = departmentName;
+            //     }
 
-                PreventiveSchedulerDictionary[data.DepartmentId] = data;
+            //     PreventiveSchedulerDictionary[data.DepartmentId] = data;
 
-            }
+            // }
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetPreventiveScheduler",
                 actionCode: "",

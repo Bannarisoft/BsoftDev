@@ -27,7 +27,7 @@ builder.Services.AddSwaggerDocumentation();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
-builder.Services.AddHttpClients(builder.Configuration);
+// builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
 builder.Services.AddHttpContextAccessor();
@@ -50,9 +50,10 @@ app.UseRouting(); // Enable routing
 app.UseCors();// Enable CORS
 app.UseAuthentication();
 //app.UseMiddleware<TokenValidationMiddleware>();
-app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
-//app.UseAuthorization();
+//app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
+app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
 
 app.Run();
+

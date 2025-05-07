@@ -142,7 +142,7 @@
     },
     {
         "rule": "WorkOrderValidate",      
-        "error": "{PropertyName} Work order has already been generated. You cannot update this schedule. Please inactivate the existing scheduler and create a new one."
+        "error": "Work order has already been generated. You cannot update this schedule. Please inactivate the existing scheduler and create a new one."
     },
     {
         "rule": "PreventiveDelete",      

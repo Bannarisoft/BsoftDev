@@ -17,7 +17,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _ipAddressService = ipAddressService;
         }
 
-        public async Task<(List<WorkOrderWithScheduleDto>, int)> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,int requestType, int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<WorkOrderWithScheduleDto>, int)> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,int? requestTypeId, int? PageNumber, int? PageSize, string? SearchTerm)
         {
             var companyId = _ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
@@ -26,7 +26,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             parameters.Add("@UnitId", unitId);
             parameters.Add("@FromDate", fromDate);
             parameters.Add("@ToDate", toDate);
-            parameters.Add("@RequestType", requestType);
+            parameters.Add("@RequestType", requestTypeId);
             parameters.Add("@PageNumber", PageNumber );
             parameters.Add("@PageSize", PageSize );
             parameters.Add("@SearchTerm", SearchTerm);
@@ -144,6 +144,28 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             return (workOrderResult, activity, item, technician, checkList, schedule);
         }
 
+        public async Task<List<Core.Domain.Entities.WorkOrderMaster.WorkOrder>> GetWorkOrderAsync()
+        {
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
+            var excludedStatusCode = MiscEnumEntity.MaintenanceStatusUpdate.Code;
+            const string query = @"
+                SELECT WO.Id, WO.WorkOrderDocNo
+                FROM Maintenance.WorkOrder WO     
+                INNER JOIN Maintenance.MiscMaster MM ON MM.ID = WO.StatusId   
+                WHERE WO.CompanyId = @CompanyId 
+                AND WO.UnitId = @UnitId  
+                AND MM.Code <> @ExcludedStatusCode
+                ORDER BY WO.Id";
+
+            var parameters = new 
+            { 
+                CompanyId = companyId, 
+                UnitId = unitId, 
+                ExcludedStatusCode = excludedStatusCode 
+            };
+        var result = await _dbConnection.QueryAsync<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(query, parameters);
+        return result.ToList();        }
     } 
 }
    

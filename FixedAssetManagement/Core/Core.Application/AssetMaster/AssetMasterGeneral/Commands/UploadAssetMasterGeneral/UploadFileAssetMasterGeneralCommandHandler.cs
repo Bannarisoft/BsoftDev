@@ -16,6 +16,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
         private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly ILogger<UploadFileAssetMasterGeneralCommandHandler> _logger;
+        private readonly IIPAddressService _ipAddressService;
 
         public UploadFileAssetMasterGeneralCommandHandler(
             IFileUploadService fileUploadService,
@@ -23,7 +24,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             IMapper mapper,
             IAssetMasterGeneralCommandRepository assetMasterGeneralRepository,
             IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository,
-            ILogger<UploadFileAssetMasterGeneralCommandHandler> logger)
+            ILogger<UploadFileAssetMasterGeneralCommandHandler> logger, IIPAddressService ipAddressService)
         {
             _fileUploadService = fileUploadService;
             _mediator = mediator;
@@ -31,6 +32,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             _assetMasterGeneralRepository = assetMasterGeneralRepository;
             _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
             _logger = logger;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<ApiResponseDTO<AssetMasterImageDto>> Handle(UploadFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
@@ -39,24 +41,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             {
                 return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = false, Message = "No file uploaded" };
             }
-             /*       // Get latest AssetCode
-            
-            if (string.IsNullOrWhiteSpace(request.AssetCode))
-            {
-                return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "AssetCode is required for file naming." };
-            }
-
-            // 🔹 Check if asset exists using repository
-            var existingAsset = await _assetMasterGeneralRepository.GetByAssetCodeAsync(request.AssetCode);
-            if (existingAsset == null)
-            {
-                return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "Asset not found." };
-            } */
-            
-            /*       // 🔹 Define Base Directory as "D:\AssetImages"
-            string baseDirectory = @"D:\BSOFTImages\Asset\AssetImage";
-            EnsureDirectoryExists(baseDirectory);
-            */
 
              // 🔹 Fetch Base Directory from Database
             string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
@@ -66,17 +50,16 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
                 return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = false, Message = "Base directory not configured." };
             }
             
-            // 🔹 Construct the required file path
-            string companyFolder = Path.Combine(baseDirectory, request.CompanyName?.Trim() ?? string.Empty);
-            EnsureDirectoryExists(companyFolder);
+            var companyId =_ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
+            var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(companyId, unitId);
+            
+            string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);                
+            EnsureDirectoryExists(uploadPath);
 
-            string unitFolder = Path.Combine(companyFolder, request.UnitName?.Trim() ?? string.Empty);
-            EnsureDirectoryExists(unitFolder);
-
-            string fileExtension = Path.GetExtension(request.File.FileName);
-            //string fileName = $"{request.AssetCode}{fileExtension}";
+            string fileExtension = Path.GetExtension(request.File.FileName);            
             string dummyFileName = $"TEMP_{Guid.NewGuid()}{fileExtension}";
-            string filePath = Path.Combine(unitFolder, dummyFileName);
+            string filePath = Path.Combine(uploadPath, dummyFileName);
 
             try
             {
@@ -93,22 +76,12 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
 
                 // ✅ Ensure the correct format before saving in DB
                 string formattedPath = dummyFileName;
-                
 
-  /*               // ✅ Update AssetImage field using repository
-                bool updateSuccess = await _assetMasterGeneralRepository.UpdateAssetImageAsync(existingAsset.Id, formattedPath);
-                if (!updateSuccess)
-                {
-                    return new ApiResponseDTO<AssetMasterGeneralDTO> { IsSuccess = false, Message = "Failed to update asset image." };
-                }
- */
                 var response = new AssetMasterImageDto
                 {
                     AssetImage = formattedPath,  // ✅ Correctly formatted file path
                     AssetImageBase64 = base64Image  // ✅ Convert to Base64
                 };
-
-
                 return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = true, Data = response };
             }
             catch (Exception ex)

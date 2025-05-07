@@ -8,8 +8,8 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.UploadAssetWarrant
     public class UploadFileAssetWarrantyCommand : IRequest<ApiResponseDTO<AssetWarrantyDTO>>
     {
         public IFormFile? File { get; set; }
-        public string? CompanyName { get; set; }  
-        public string? UnitName { get; set; }  
+        // public string? CompanyName { get; set; }  
+        // public string? UnitName { get; set; }  
         public string? AssetCode { get; set; }  
     }
 }

@@ -11,5 +11,6 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty
         Task<List<Core.Domain.Entities.MiscMaster>> GetWarrantyTypeAsync();    
         Task<List<Core.Domain.Entities.MiscMaster>> GetWarrantyClaimStatusAsync();  
         Task<bool> SoftDeleteValidation(int Id);   
+        Task<string> GetBaseDirectoryAsync();
     }
 }

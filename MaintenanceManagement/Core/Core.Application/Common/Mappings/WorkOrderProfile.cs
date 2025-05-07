@@ -2,6 +2,7 @@
 using AutoMapper;
 using Core.Application.WorkOrder.Command.CreateWorkOrder;
 using Core.Application.WorkOrder.Command.UpdateWorkOrder;
+using Core.Application.WorkOrder.Queries.GetWorkOderDropdown;
 using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Entities.WorkOrderMaster;
 
@@ -24,13 +25,13 @@ namespace Core.Application.Common.Mappings
             CreateMap<WorkOrderItemUpdateDto, WorkOrderItem>().ReverseMap();
             CreateMap<WorkOrderTechnicianUpdateDto, WorkOrderTechnician>().ReverseMap();
             CreateMap<WorkOrderCheckListUpdateDto, WorkOrderCheckList>().ReverseMap();
-            
-            CreateMap<WorkOrderCombineDto,Core.Domain.Entities.WorkOrderMaster.WorkOrder>();
+                        
+            CreateMap<Core.Domain.Entities.WorkOrderMaster.WorkOrder, GetWorkOderDropdownDto>();
 
             CreateMap<WorkOrderItemDto, WorkOrderItem>().ReverseMap();
             CreateMap<WorkOrderCheckListDto, WorkOrderCheckList>().ReverseMap();
             CreateMap<WorkOrderActivityDto, WorkOrderActivity>().ReverseMap();
-            
+            CreateMap<GetWorkOderDropdownDto, Core.Domain.Entities.WorkOrderMaster.WorkOrder>();
          
               // Use AfterMap to group schedules
             CreateMap<List<WorkOrderWithScheduleDto>, List<GetWorkOrderDto>>()

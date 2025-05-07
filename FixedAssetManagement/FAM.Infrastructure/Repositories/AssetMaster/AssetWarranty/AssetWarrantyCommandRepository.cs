@@ -111,9 +111,9 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty
                 .FirstOrDefaultAsync();
         }
 
-      public async Task<bool> RemoveAssetWarrantyAsync(int assetId)
+      public async Task<bool> RemoveAssetWarrantyAsync(string imageName)
         {
-            var asset = await _applicationDbContext.AssetWarranties.FindAsync(assetId);
+            var asset = await _applicationDbContext.AssetWarranties.FirstOrDefaultAsync(x => x.Document == imageName);            
             if (asset == null)
             {
                 return false;  // Asset not found
