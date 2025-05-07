@@ -36,6 +36,7 @@
     <ProjectReference Include="..\UserManagement.Infrastructure\UserManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj"/>
     <ProjectReference Include="..\..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj"/>
+    <ProjectReference Include="..\..\BackgroundService\BackgroundService.Infrastructure\BackgroundService.Infrastructure.csproj" />
  <None Update="web.config">
     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   </None>
