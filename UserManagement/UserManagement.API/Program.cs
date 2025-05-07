@@ -43,7 +43,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
 // Register gRPC
-builder.Services.AddGrpc();
+// builder.Services.AddGrpc();
 
 var app = builder.Build();
 // builder.Services.AddScoped<SessionGrpcService>();
