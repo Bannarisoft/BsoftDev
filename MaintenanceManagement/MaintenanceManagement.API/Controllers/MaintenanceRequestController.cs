@@ -24,6 +24,8 @@ using Core.Application.MaintenanceRequest.Queries.GetMaintenanceServiceType;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceServiceLocation;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceSparesType;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceDipatchMode;
+using Core.Application.Common.Interfaces.IMaintenanceRequest;
+using Core.Application.MaintenanceRequest.Queries.RequestReport;
 
 namespace MaintenanceManagement.API.Controllers
 {
@@ -38,14 +40,17 @@ namespace MaintenanceManagement.API.Controllers
          private readonly IValidator<UpdateMaintenanceRequestCommand> _updateMaintenanceRequestCommandValidator;
          private readonly IMaintenanceCategoryQueryRepository _maintenanceCategoryQueryRepository;
 
+         private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
+
             
-        public MaintenanceRequestController(ISender mediator,ILogger<MaintenanceRequestController> logger,IValidator<CreateMaintenanceRequestCommand> createmaintenancecommandvalidator,IValidator<UpdateMaintenanceRequestCommand> updatemaintenancerequestcommandvalidator,IMaintenanceCategoryQueryRepository maintenanceCategoryQueryRepository)
+        public MaintenanceRequestController(ISender mediator,ILogger<MaintenanceRequestController> logger,IValidator<CreateMaintenanceRequestCommand> createmaintenancecommandvalidator,IValidator<UpdateMaintenanceRequestCommand> updatemaintenancerequestcommandvalidator,IMaintenanceCategoryQueryRepository maintenanceCategoryQueryRepository ,IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository)
         : base(mediator)
         {
             _logger = logger;
             _createmaintenancecommandvalidator = createmaintenancecommandvalidator;
             _updateMaintenanceRequestCommandValidator = updatemaintenancerequestcommandvalidator;
             _maintenanceCategoryQueryRepository = maintenanceCategoryQueryRepository;
+            _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
            
         }
 
@@ -368,6 +373,40 @@ namespace MaintenanceManagement.API.Controllers
                         data = result.Data
                     });
                 }
+
+               [HttpGet("RequestReport")]
+            public async Task<IActionResult> GetMaintenanceStatusDescAsync(
+                [FromQuery] DateTimeOffset? requestFromDate,
+                [FromQuery] DateTimeOffset? requestToDate,
+                [FromQuery] int getRequestType,
+                [FromQuery] int requestStatus)
+            {
+                var query = new RequestReportQuery
+                {
+                    RequestFromDate = requestFromDate,
+                    RequestToDate = requestToDate,
+                    GetRequestType = getRequestType,
+                    RequestStatus = requestStatus
+                };
+
+                var result = await Mediator.Send(query);
+
+                if (result == null || result.Data == null || result.Data.Count == 0)
+                {
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = result?.Message ?? "No maintenance requests found."
+                    });
+                }
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = result.Message,
+                    Data = result.Data
+                });
+            }
 
       
         

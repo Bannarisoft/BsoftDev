@@ -1,20 +1,20 @@
-using Contracts.Interfaces.External.IUser;
+/* using Contracts.Interfaces.External.IUser;
 using FAM.Infrastructure.GrpcClients;
 using GrpcServices.Maintenance;
 using GrpcServices.UserManagement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Infrastructure.HttpClientPolly;
-
+ */
 namespace FAM.Infrastructure
 {
     public static class HttpClientInjection
     {
-        public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
-        {
+       // public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
+        //{
 
             // Register gRPC Client
-            var userManagementUrl = configuration["GrpcSettings:UserManagementUrl"];
+        /*     var userManagementUrl = configuration["GrpcSettings:UserManagementUrl"];
             services.AddGrpcClient<DepartmentService.DepartmentServiceClient>(o =>
             {
                 o.Address = new Uri(userManagementUrl); // 👈 UserManagement HTTPS URL
@@ -62,6 +62,6 @@ namespace FAM.Infrastructure
 
             return services;
         }
-
+ */
     }
 }

@@ -42,10 +42,10 @@
         
   </ItemGroup>
     <!-- Correct placement of Protobuf item -->
-  <ItemGroup>
+ <!--  <ItemGroup>
     <Protobuf Include="..\..\Shared\Contracts\Protos\department.proto" Link="Protos\department.proto" GrpcServices="Server" />
     <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" Link="Protos\session.proto" GrpcServices="Server" />
 
-  </ItemGroup>
+  </ItemGroup> -->
 
 </Project>

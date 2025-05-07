@@ -1,13 +1,13 @@
-using Core.Application.Common.Interfaces.IUserSession;
+/* using Core.Application.Common.Interfaces.IUserSession;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using GrpcServices.UserManagement;
-
+ */
 namespace UserManagement.API.GrpcServices
 {
-    public class SessionGrpcService : SessionService.SessionServiceBase
+    public class SessionGrpcService //: SessionService.SessionServiceBase
     {
-        private readonly IUserSessionRepository _userSessionRepository;
+/*         private readonly IUserSessionRepository _userSessionRepository;
 
         public SessionGrpcService(IUserSessionRepository userSessionRepository)
         {
@@ -43,6 +43,6 @@ namespace UserManagement.API.GrpcServices
             await _userSessionRepository.UpdateSessionAsync(session);
 
             return new Empty();
-        }
+        } */
     }
 }

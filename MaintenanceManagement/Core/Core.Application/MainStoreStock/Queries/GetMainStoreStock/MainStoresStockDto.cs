@@ -8,13 +8,9 @@ namespace Core.Application.MainStoreStock.Queries.GetMainStoreStock
     public class MainStoresStockDto
     {
         public string? ItemCode { get; set; }
-
         public string? ItemName { get; set; }
-
-        public decimal StockQty { get; set; }
-
         public string? Uom { get; set; }
-
+        public decimal StockQty { get; set; }
         public decimal StockValue { get; set; }
     }
 }
