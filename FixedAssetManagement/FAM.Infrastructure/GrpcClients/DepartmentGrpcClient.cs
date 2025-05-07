@@ -1,14 +1,14 @@
-using Grpc.Core;
+/* using Grpc.Core;
 using GrpcServices.Maintenance;
 using Contracts.Interfaces.External.IUser;
 using Google.Protobuf.WellKnownTypes;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http; */
 
 namespace FAM.Infrastructure.GrpcClients
 {
-    public class DepartmentGrpcClient : IDepartmentGrpcClient
+    public class DepartmentGrpcClient //: IDepartmentGrpcClient
     {
-        private readonly DepartmentService.DepartmentServiceClient _client;
+       /*  private readonly DepartmentService.DepartmentServiceClient _client;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public DepartmentGrpcClient(DepartmentService.DepartmentServiceClient client, IHttpContextAccessor httpContextAccessor)
@@ -50,6 +50,6 @@ namespace FAM.Infrastructure.GrpcClients
                 }).ToList();
 
             return departments;
-        }
+        } */
     }
 }

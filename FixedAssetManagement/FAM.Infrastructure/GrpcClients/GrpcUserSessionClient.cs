@@ -1,14 +1,14 @@
-using Grpc.Core;
+/* using Grpc.Core;
 using Contracts.Dtos.Users;
 using Contracts.Interfaces.External.IUser;
 using Google.Protobuf.WellKnownTypes;
-using GrpcServices.UserManagement;
+using GrpcServices.UserManagement; */
 
 namespace FAM.Infrastructure.GrpcClients
 {
-    public class GrpcUserSessionClient : IUserSessionGrpcClient
+    public class GrpcUserSessionClient //: IUserSessionGrpcClient
     {
-        private readonly SessionService.SessionServiceClient _client;
+       /*  private readonly SessionService.SessionServiceClient _client;
 
         public GrpcUserSessionClient(SessionService.SessionServiceClient client)
         {
@@ -55,6 +55,6 @@ namespace FAM.Infrastructure.GrpcClients
 
             await _client.UpdateSessionAsync(request, callOptions); // ✅ Attach metadata!
             return true;
-        }
+        } */
     }
 }
