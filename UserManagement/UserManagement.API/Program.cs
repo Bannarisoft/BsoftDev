@@ -55,7 +55,7 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseDeveloperExceptionPage();
+// app.UseDeveloperExceptionPage();
 //}
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
@@ -65,8 +65,8 @@ app.UseMiddleware<TokenValidationMiddleware>();
 
 app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
-app.MapGrpcService<SessionGrpcService>();
-app.MapGrpcService<DepartmentGrpcService>();
+// app.MapGrpcService<SessionGrpcService>();
+// app.MapGrpcService<DepartmentGrpcService>();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
 app.Run();

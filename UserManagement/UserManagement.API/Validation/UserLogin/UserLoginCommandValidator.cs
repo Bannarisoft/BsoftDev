@@ -9,6 +9,7 @@ using FluentValidation;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Application.Common.Interfaces.IUserSession;
 using Core.Application.Common.Interfaces.ICompanySettings;
+using Core.Application.Common.Interfaces;
 
 namespace UserManagement.API.Validation.UserLogin
 {
@@ -18,7 +19,8 @@ namespace UserManagement.API.Validation.UserLogin
         private readonly IUserQueryRepository _userQueryRepository;
         private readonly ICompanyQuerySettings _companyQuerySettings;
         private readonly IUserSessionRepository _userSessionRepository;
-        public UserLoginCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userQueryRepository, ICompanyQuerySettings companyQuerySettings,IUserSessionRepository userSessionRepository)
+        private readonly IIPAddressService _ipAddressService;
+        public UserLoginCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userQueryRepository, ICompanyQuerySettings companyQuerySettings,IUserSessionRepository userSessionRepository,IIPAddressService iPAddressService)
         {
             // CascadeMode = CascadeMode.Stop;
             var MaxLen = maxLengthProvider.GetMaxLength<User>("UserName") ?? 25;
@@ -26,6 +28,7 @@ namespace UserManagement.API.Validation.UserLogin
             _companyQuerySettings = companyQuerySettings;
             _userQueryRepository = userQueryRepository;
             _userSessionRepository = userSessionRepository;
+            _ipAddressService = iPAddressService;
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -65,6 +68,7 @@ namespace UserManagement.API.Validation.UserLogin
                         await _companyQuerySettings.BeforeLoginNotFoundValidation(Username))             
                            .WithName("User Name")
                             .WithMessage("User Admin Settings not found")
+                            .When(x => _ipAddressService.GetGroupcode() =="USER")
                             .MustAsync(async (Username, cancellation) => 
                         await _userQueryRepository.ValidateUserRolesAsync(Username))
                             .WithMessage("User does not have any role assigned to it. Contact your admin.");
