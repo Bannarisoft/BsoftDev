@@ -12,14 +12,14 @@ namespace Core.Application.Location.Queries.GetLocations
         private readonly ILocationQueryRepository _locationQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
+        //private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
 
-        public GetLocationHandlerQuery(ILocationQueryRepository locationQueryRepository, IMediator mediator, IMapper mapper, IDepartmentGrpcClient departmentGrpcClient)
+        public GetLocationHandlerQuery(ILocationQueryRepository locationQueryRepository, IMediator mediator, IMapper mapper)
         {
             _locationQueryRepository = locationQueryRepository;
             _mediator = mediator;
             _mapper = mapper;
-            _departmentGrpcClient = departmentGrpcClient;
+            
 
         }
         public async Task<ApiResponseDTO<List<LocationDto>>> Handle(GetLocationQuery request, CancellationToken cancellationToken)
@@ -27,7 +27,7 @@ namespace Core.Application.Location.Queries.GetLocations
             var (locations, totalCount) = await _locationQueryRepository.GetAllLocationAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var locationList = _mapper.Map<List<LocationDto>>(locations);
 
-            // 🔥 Fetch departments using gRPC
+           /*  // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
@@ -38,7 +38,7 @@ namespace Core.Application.Location.Queries.GetLocations
                 {
                     location.DepartmentName = departmentName;
                 }
-            }
+            } */
 
 
             //Domain Event
