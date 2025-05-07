@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IStcokLedger;
 using Core.Application.StockLedger.Queries.GetCurrentStock;
 using Core.Application.StockLedger.Queries.GetCurrentStockItemsById;
+using Core.Application.StockLedger.Queries.GetStockLegerReport;
 using Dapper;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
@@ -99,6 +100,22 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
             var stocklist = await _dbConnection.QueryFirstOrDefaultAsync<CurrentStockDto>(query, parameters);
 
             return stocklist;
+        }
+
+        public async Task<List<StockLedgerReportDto>> GetSubStoresStockLedger(string OldUnitcode, DateTime FromDate, DateTime ToDate, string? Itemcode)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@FromDate", FromDate);
+            parameters.Add("@ToDate", ToDate);
+            parameters.Add("@ItemCode", Itemcode);
+            parameters.Add("@OldUnitCode", OldUnitcode);
+
+            var result = await _dbConnection.QueryAsync<StockLedgerReportDto>(
+                "GetSubStoreStockLedgerSummary",
+                parameters,
+                commandType: CommandType.StoredProcedure);
+
+            return result.ToList();
         }
     }
 }
