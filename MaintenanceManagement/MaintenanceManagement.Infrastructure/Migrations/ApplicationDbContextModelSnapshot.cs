@@ -672,9 +672,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("OldVendorId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OldVendorName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
@@ -702,9 +699,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<int?>("VendorId")
                         .HasColumnType("int");
-
-                    b.Property<string>("VendorName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
