@@ -159,14 +159,16 @@ namespace Core.Application.UserLogin.Commands.UserLogin
                     // Lock the user
                     userInfo.IsLocked = true; 
                     userInfo.UnlockTime = currentTime.AddMinutes(companySettings.AutoReleaseTime);
-                    _userRepository.lockUser(username);
-                    // Schedule Hangfire job to unlock user
-                    await _backgroundServiceClient.UserUnlock(username, companySettings.AutoReleaseTime);
-                    //BackgroundJob.Schedule<IUserCommandRepository>(service =>service.UnlockUser(username), TimeSpan.FromMinutes(companySettings.AutoReleaseTime));
-
-                    _logger.LogWarning("User {Username} is locked due to too many invalid login attempts.", username);
-
-                    
+                    var locked = await _userRepository.lockUser(username);
+                    if (locked)
+                    {
+                        // Schedule Hangfire job to unlock user
+                        await _backgroundServiceClient.UserUnlock(username, companySettings.AutoReleaseTime);
+                        //BackgroundJob.Schedule<IUserCommandRepository>(service =>service.UnlockUser(username), TimeSpan.FromMinutes(companySettings.AutoReleaseTime));
+                        _logger.LogWarning("User {Username} is locked due to too many invalid login attempts.", username);
+                        return (0, companySettings.AutoReleaseTime);
+                    }
+                     _logger.LogError("Failed to lock user {Username}.", username);    
                     return (0,companySettings.AutoReleaseTime);
                 }
                  return (0,0);

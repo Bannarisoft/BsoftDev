@@ -3,10 +3,8 @@ using UserManagement.Infrastructure;
 using UserManagement.API.Validation.Common;
 using UserManagement.API.Middleware;
 using UserManagement.API.Configurations;
-using Core.Domain.Entities;
-using MassTransit;
 using UserManagement.Infrastructure.PollyResilience;
-using UserManagement.API.GrpcServices;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

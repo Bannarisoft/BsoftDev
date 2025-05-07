@@ -16,13 +16,10 @@ namespace BackgroundService.Infrastructure.Services
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<bool> UnlockUser(string userName)
+        public async Task UnlockUser(string userName)
         {
             var client = _httpClientFactory.CreateClient("UserManagementClient");
-
-            var response = await client.PostAsJsonAsync("/api/Auth/unlock", new { UserName = userName });
-
-            return response.IsSuccessStatusCode;
+            await client.PostAsJsonAsync("/api/auth/unlock", new { Username = userName });
         }
     }
 }
