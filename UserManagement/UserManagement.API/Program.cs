@@ -43,7 +43,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
 // Register gRPC
-//builder.Services.AddGrpc();
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 // builder.Services.AddScoped<SessionGrpcService>();
@@ -60,7 +60,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseSwagger();
 app.UseSwaggerUI();
-//app.UseDeveloperExceptionPage();
+app.UseDeveloperExceptionPage();
 //}
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
@@ -70,8 +70,7 @@ app.UseMiddleware<TokenValidationMiddleware>();
 
 app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
-//app.MapGrpcService<SessionGrpcService>();
-//app.MapGrpcService<DepartmentGrpcService>();
+app.MapGrpcService<DepartmentGrpcService>();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
 app.Run();
