@@ -1,5 +1,6 @@
 using System.Data;
 using Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAssetTransferIssueApproval;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetTransferIssueApproval;
 using Dapper;
 
@@ -8,10 +9,12 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
     public class AssetTransferIssueQueryRepository : IAssetTransferIssueApprovalQueryRepository
     {
         private readonly IDbConnection _dbConnection;
+        private readonly IIPAddressService _ipAddressService;  
 
-        public AssetTransferIssueQueryRepository(IDbConnection dbConnection)
+        public AssetTransferIssueQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
         }
 
     public async Task<(List<AssetTransferIssueApprovalDto>, int)> GetAllPendingAssetTransferAsync(
@@ -21,6 +24,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
     DateTimeOffset? FromDate, 
     DateTimeOffset? ToDate)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
@@ -30,7 +34,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
                 INNER JOIN [Bannari].AppData.Unit e ON a.ToUnitId = e.Id
                 INNER JOIN [Bannari].AppData.Department f ON a.FromDepartmentId = f.Id
                 INNER JOIN [Bannari].AppData.Department g ON a.ToDepartmentId = g.Id
-                WHERE a.Status = 'Pending'
+                WHERE a.Status = 'Pending' and a.FromUnitId = @UnitId
                 {{(string.IsNullOrEmpty(TransferType) ? "" : "AND a.TransferType LIKE @Search")}}
                 {{(FromDate.HasValue ? "AND CAST(a.DocDate AS DATE) >= CAST(@FromDate AS DATE)" : "")}}
                 {{(ToDate.HasValue ? "AND CAST(a.DocDate AS DATE) <= CAST(@ToDate AS DATE)" : "")}};
@@ -54,7 +58,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
                 INNER JOIN [Bannari].AppData.Unit e ON a.ToUnitId = e.Id
                 INNER JOIN [Bannari].AppData.Department f ON a.FromDepartmentId = f.Id
                 INNER JOIN [Bannari].AppData.Department g ON a.ToDepartmentId = g.Id
-                WHERE a.Status = 'Pending'
+                WHERE a.Status = 'Pending' and a.FromUnitId = @UnitId
                 {{(string.IsNullOrEmpty(TransferType) ? "" : "AND a.TransferType LIKE @Search")}}
                 {{(FromDate.HasValue ? "AND CAST(a.DocDate AS DATE) >= CAST(@FromDate AS DATE)" : "")}}
                 {{(ToDate.HasValue ? "AND CAST(a.DocDate AS DATE) <= CAST(@ToDate AS DATE)" : "")}}
@@ -70,7 +74,8 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
                 FromDate,
                 ToDate,
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize
+                PageSize,
+                UnitId
             };
 
             var assetTransferIssue = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -82,6 +87,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
 
     public async Task<List<Core.Domain.Entities.AssetMaster.AssetTransferIssueApproval>> GetByAssetTransferIdAsync(int Id)
     {
+         var UnitId = _ipAddressService.GetUnitId();
             const string query = @"
             SELECT 
                 a.Id,
@@ -93,9 +99,9 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
             FROM FixedAsset.AssetTransferIssueHdr a 
             INNER JOIN FixedAsset.AssetTransferIssueDtl b ON a.Id = b.AssetTransferId
             INNER JOIN FixedAsset.AssetMaster c ON b.AssetId = c.Id
-            WHERE a.Status = 'Pending' AND a.Id = @Id";
+            WHERE a.Status = 'Pending' AND a.Id = @Id AND a.FromUnitId = @UnitId";
 
-        var assetTransfers = await _dbConnection.QueryAsync<Core.Domain.Entities.AssetMaster.AssetTransferIssueApproval>(query, new { Id });
+        var assetTransfers = await _dbConnection.QueryAsync<Core.Domain.Entities.AssetMaster.AssetTransferIssueApproval>(query, new { Id, UnitId });
 
         return assetTransfers.ToList(); // Ensure it returns a List
     }

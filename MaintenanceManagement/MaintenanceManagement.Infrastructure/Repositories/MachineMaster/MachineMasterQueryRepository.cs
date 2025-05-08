@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Dapper;
 
@@ -11,17 +12,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
     public class MachineMasterQueryRepository : IMachineMasterQueryRepository
     {
          private readonly IDbConnection _dbConnection; 
-         public MachineMasterQueryRepository(IDbConnection dbConnection)
+         private readonly IIPAddressService _ipAddressService;  
+         public MachineMasterQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
         }
         public async Task<(List<Core.Domain.Entities.MachineMaster>, int)> GetAllMachineAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             var query = $$"""
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
              FROM Maintenance.MachineMaster
-             WHERE IsDeleted = 0
+             WHERE IsDeleted = 0 AND UnitId = @UnitId
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MachineCode LIKE @Search OR MachineName LIKE @Search)")}};
 
                 SELECT 
@@ -41,7 +45,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                 IsActive
             FROM Maintenance.MachineMaster 
             WHERE 
-            IsDeleted = 0
+            IsDeleted = 0 AND UnitId = @UnitId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MachineCode LIKE @Search OR MachineName LIKE @Search )")}}
                 ORDER BY Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -54,7 +58,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                        {
                            Search = $"%{SearchTerm}%",
                            Offset = (PageNumber - 1) * PageSize,
-                           PageSize
+                           PageSize,
+                           UnitId
                        };
 
              var maintenanceCategory = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -65,27 +70,30 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
 
         public async Task<Core.Domain.Entities.MachineMaster?> GetByIdAsync(int Id)
         {
+             var UnitId = _ipAddressService.GetUnitId();
              const string query = @"
                     SELECT * 
                     FROM Maintenance.MachineMaster 
-                    WHERE Id = @Id AND IsDeleted = 0";
+                    WHERE Id = @Id AND IsDeleted = 0 AND UnitId = @UnitId";
 
-                    var machineMaster = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineMaster>(query, new { Id });
+                    var machineMaster = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineMaster>(query, new { Id, });
                     return machineMaster;
         }
 
         public async Task<List<Core.Domain.Entities.MachineMaster>> GetMachineAsync(string searchPattern)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             searchPattern = searchPattern ?? string.Empty; // Prevent null issues
 
             const string query = @"
              SELECT Id, MachineName 
             FROM Maintenance.MachineMaster 
-            WHERE IsDeleted = 0 
+            WHERE IsDeleted = 0 AND UnitId = @UnitId
             AND MachineName LIKE @SearchPattern";  
             var parameters = new 
             { 
-            SearchPattern = $"%{searchPattern}%" 
+            SearchPattern = $"%{searchPattern}%" ,
+            UnitId
             };
 
             var machineMasters = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
@@ -94,12 +102,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
 
         public async Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroupAsync(int MachineGroupId)
         {
+            var UnitId = _ipAddressService.GetUnitId();
              const string query = @"
                     SELECT Id 
                     FROM Maintenance.MachineMaster 
-                    WHERE MachineGroupId = @MachineGroupId AND IsDeleted = 0";
+                    WHERE MachineGroupId = @MachineGroupId AND IsDeleted = 0 AND UnitId = @UnitId";
 
-                    var machineMaster = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, new { MachineGroupId });
+                    var machineMaster = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, new { MachineGroupId, UnitId });
                     return machineMaster.ToList();
         }
         // public async Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroup(int MachineGroupId)
