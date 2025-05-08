@@ -39,7 +39,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                         aclm.Id AS ChecklistId,
                         aclm.ActivityID,
                         am.ActivityName,
-                        aclm.ActivityChecklist,
+                        aclm.ActivityChecklist AS Description,
                         aclm.IsActive,
                         aclm.IsDeleted,
                         aclm.CreatedBy,
@@ -82,7 +82,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                     aclm.Id AS ChecklistId,
                     aclm.ActivityID,
                     am.ActivityName,
-                    aclm.ActivityChecklist,
+                    aclm.ActivityChecklist  AS Description,
                     aclm.IsActive,
                     aclm.IsDeleted,
                     aclm.CreatedBy,
@@ -127,10 +127,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
              }
                 var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
                 return count > 0;
-        } 
-
-
-           // public async Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdAsync(int id)
+        }            
 
            public async Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdsAsync(List<int> ids)
             {
@@ -143,7 +140,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                         aclm.Id AS ChecklistId,
                         aclm.ActivityID,
                         am.ActivityName,
-                        aclm.ActivityChecklist,
+                        aclm.ActivityChecklist  AS Description,
                         aclm.IsActive,
                         aclm.IsDeleted,
                         aclm.CreatedBy,

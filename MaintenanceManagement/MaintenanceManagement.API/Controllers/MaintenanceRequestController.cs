@@ -56,14 +56,16 @@ namespace MaintenanceManagement.API.Controllers
 
 
          [HttpGet("InternalRequest")]         
-         public async Task<IActionResult> GetAllMaintenanceRequestAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+         public async Task<IActionResult> GetAllMaintenanceRequestAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null, [FromQuery] DateTimeOffset FromDate = default, [FromQuery] DateTimeOffset ToDate = default)
         {
             var maintenancerequest = await Mediator.Send(
             new GetMaintenanceRequestQuery
             {
                 PageNumber = PageNumber, 
                 PageSize = PageSize, 
-                SearchTerm = SearchTerm
+                SearchTerm = SearchTerm,
+                FromDate = FromDate,
+                ToDate = ToDate
             });
            
 
@@ -77,14 +79,16 @@ namespace MaintenanceManagement.API.Controllers
             });
         }
          [HttpGet("ExternalRequest")] 
-        public async Task<IActionResult> GetAllMaintenanceExternalRequestAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        public async Task<IActionResult> GetAllMaintenanceExternalRequestAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null , [FromQuery] DateTimeOffset FromDate = default, [FromQuery] DateTimeOffset ToDate = default)
         {
             var maintenanceexternalrequest = await Mediator.Send(
             new GetMaintenanceExternalRequestQuery
             {
                 PageNumber = PageNumber, 
                 PageSize = PageSize, 
-                SearchTerm = SearchTerm
+                SearchTerm = SearchTerm,
+                FromDate = FromDate,
+                ToDate = ToDate
             });
            
 
@@ -263,7 +267,7 @@ namespace MaintenanceManagement.API.Controllers
                     return NotFound(new
                     {
                         StatusCode = StatusCodes.Status404NotFound,
-                        Message =  $" Maintenance Request with ID {id} Status is Closed or In Progress."
+                        Message =  $" Cannot proceed: The Work Order linked to Maintenance Request ID {id} is still in 'Open' status.."
                         
                     });
 
@@ -375,7 +379,7 @@ namespace MaintenanceManagement.API.Controllers
                 }
 
                [HttpGet("RequestReport")]
-            public async Task<IActionResult> GetMaintenanceStatusDescAsync(
+            public async Task<IActionResult> MaintenanceReportAsync(
                 [FromQuery] DateTimeOffset? requestFromDate,
                 [FromQuery] DateTimeOffset? requestToDate,
                 [FromQuery] int getRequestType,
@@ -385,7 +389,7 @@ namespace MaintenanceManagement.API.Controllers
                 {
                     RequestFromDate = requestFromDate,
                     RequestToDate = requestToDate,
-                    GetRequestType = getRequestType,
+                    RequestType = getRequestType,
                     RequestStatus = requestStatus
                 };
 

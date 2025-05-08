@@ -138,7 +138,7 @@
     },
     {
         "rule": "WOclosedStatusCheck",      
-        "error": "{PropertyName} Work Order  has been   InProgress or closed."
+        "error": "{PropertyName} Work Order  is in open status."
     },
     {
         "rule": "WorkOrderValidate",      
