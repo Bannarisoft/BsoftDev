@@ -23,6 +23,7 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
         }
          public async Task<(List<Division>,int)> GetAllDivisionAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+            var CompanyId = _ipAddressService.GetCompanyId();
                  var query = $$"""
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
@@ -38,7 +39,7 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
                 IsActive
             FROM AppData.Division 
             WHERE 
-            IsDeleted = 0
+            IsDeleted = 0 AND CompanyId=@CompanyId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShortName LIKE @Search OR Name LIKE @Search )")}}
                 ORDER BY Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -51,7 +52,8 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
                        {
                            Search = $"%{SearchTerm}%",
                            Offset = (PageNumber - 1) * PageSize,
-                           PageSize
+                           PageSize,
+                           CompanyId
                        };
 
                var division = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -61,12 +63,13 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
         }   
         public async Task<Division?> GetByDivisionnameAsync(string name, int? id = null)
         {
+            var CompanyId = _ipAddressService.GetCompanyId();
               var query = """
                  SELECT * FROM AppData.Division 
-                 WHERE Name = @Name AND IsDeleted = 0
+                 WHERE Name = @Name AND IsDeleted = 0 AND CompanyId=@CompanyId
                  """;
 
-             var parameters = new DynamicParameters(new { Name = name });
+             var parameters = new DynamicParameters(new { Name = name,CompanyId=CompanyId });
 
              if (id is not null)
              {
@@ -80,9 +83,9 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
          public async Task<Division> GetByIdAsync(int id)
         {
             
-
-             const string query = "SELECT * FROM AppData.Division WHERE Id = @Id AND IsDeleted = 0";
-            return await _dbConnection.QueryFirstOrDefaultAsync<Division>(query, new { id });
+                var CompanyId = _ipAddressService.GetCompanyId();
+             const string query = "SELECT * FROM AppData.Division WHERE Id = @Id AND IsDeleted = 0 AND CompanyId=@CompanyId";
+            return await _dbConnection.QueryFirstOrDefaultAsync<Division>(query, new { id,CompanyId });
         }
       
         public async Task<List<Division>>  GetDivision(string searchPattern)

@@ -174,6 +174,15 @@ namespace UserManagement.Infrastructure.Repositories
         
               return EntityId != null ? Convert.ToInt32(EntityId) : 0;
           }
+            public int? GetUnitId()
+          {
+              var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("UnitId")?.Value;
+        
+              if (int.TryParse(claim, out int unitId))
+                  return unitId;
+        
+              return null;
+          }
       
     }    
 }

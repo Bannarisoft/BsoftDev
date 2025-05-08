@@ -32,7 +32,7 @@ builder.Services.AddSwaggerDocumentation();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
-// builder.Services.AddHttpClients(builder.Configuration);
+//builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
 builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
@@ -59,4 +59,5 @@ app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
 app.Run();
+
 

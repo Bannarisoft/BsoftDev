@@ -26,7 +26,7 @@ namespace Core.Application.MaintenanceRequest.Command.UpdateMaintenanceRequestCo
        public int? SparesTypeId { get; set; }
        public decimal? EstimatedServiceCost { get; set; }
        public decimal? EstimatedSpareCost { get; set; }
-      // public string? Remarks { get; set; }
+       public string? Remarks { get; set; }
        public int RequestStatusId { get; set; }
         
     }

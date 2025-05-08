@@ -69,7 +69,7 @@ namespace UserManagement.Infrastructure.Repositories
 
           public async Task<User> CreateAsync(User user)
             {
-                user.EntityId = _ipAddressService.GetEntityId();
+                // user.EntityId = _ipAddressService.GetEntityId();
                 //    var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);   
                 //   return await policyWrap.ExecuteAsync(async () =>
                 //   {       
@@ -112,9 +112,10 @@ namespace UserManagement.Infrastructure.Repositories
                   if (existingUser != null)
                     {
                         existingUser.IsLocked = 1;
+                        _applicationDbContext.User.Update(existingUser);
+                        return await _applicationDbContext.SaveChangesAsync() > 0;
                     }
-             _applicationDbContext.User.Update(existingUser);
-            return await _applicationDbContext.SaveChangesAsync() >0;
+              return false;
         }
 
         public async Task<int> SetAdminPassword(int userId, User user)

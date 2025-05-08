@@ -34,7 +34,7 @@ namespace Core.Domain.Entities
        public MiscMaster? SpareType { get; set; }         
        public decimal? EstimatedServiceCost { get; set;} = null!;
        public decimal? EstimatedSpareCost { get; set;}
-    //   public string? RequestId { get; set;}
+    
        public string? Remarks { get; set; } 
        public int?  RequestStatusId { get; set; }  
        public MiscMaster? RequestStatus { get; set; }    

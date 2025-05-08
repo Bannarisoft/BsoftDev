@@ -24,6 +24,7 @@ namespace UserManagement.Infrastructure.Repositories.Companies
 
          public async Task<(List<Company>,int)> GetAllCompaniesAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+            var entityId = _ipAddressService.GetEntityId();
             var query = $$"""
             DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
@@ -45,7 +46,7 @@ namespace UserManagement.Infrastructure.Repositories.Companies
             C.EntityId, 
             C.IsActive
              FROM AppData.Company C
-              WHERE C.IsDeleted = 0
+              WHERE C.IsDeleted = 0 AND EntityId=@EntityId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (C.CompanyName LIKE @Search OR C.LegalName LIKE @Search)")}}
               ORDER BY C.Id DESC
               OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -58,7 +59,8 @@ namespace UserManagement.Infrastructure.Repositories.Companies
                        {
                            Search = $"%{SearchTerm}%",
                            Offset = (PageNumber - 1) * PageSize,
-                           PageSize
+                           PageSize,
+                           EntityId=entityId
                        };
               var company = await _dbConnection.QueryMultipleAsync(query, parameters);
              var companies = (await company.ReadAsync<Company>()).ToList();

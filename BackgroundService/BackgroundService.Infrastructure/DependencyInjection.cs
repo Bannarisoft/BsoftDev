@@ -7,6 +7,7 @@ using Shared.Infrastructure.HttpClientPolly;
 using BackgroundService.Application.Interfaces;
 using Hangfire;
 using Hangfire.SqlServer;
+using BackgroundService.Infrastructure.Jobs;
 
 
 namespace BackgroundService.Infrastructure
@@ -57,6 +58,13 @@ namespace BackgroundService.Infrastructure
             {
                 //client.BaseAddress = new Uri("http://localhost:5174"); 
                 client.BaseAddress = new Uri(configuration["HttpClientSettings:UserManagement"]);
+                // var userServiceUrl = configuration["HttpClientSettings:UserManagement"];
+                // if (string.IsNullOrWhiteSpace(userServiceUrl))
+                // {
+                //     throw new ArgumentNullException("UserServiceUrl is missing in configuration.");
+                // }
+
+                //client.BaseAddress = new Uri(userServiceUrl);
             })
             .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
@@ -64,9 +72,10 @@ namespace BackgroundService.Infrastructure
             services.AddHttpClient(); 
             services.AddScoped<IEmailService, RealEmailService>();
             services.AddScoped<ISmsService, RealSmsService>();
-            services.AddScoped<IUserUnlockService, UserUnlockService>(); 
-            services.AddScoped<UserUnlockService>();              
-            services.AddTransient<IVerificationCodeCleanupService, VerificationCodeCleanupService>();         
+            services.AddScoped<IUserUnlockService, UserUnlockService>();                         
+            services.AddTransient<IVerificationCodeCleanupService, VerificationCodeCleanupService>();                           
+            services.AddScoped<IUserUnlockBackgroundJob, UserUnlockBackgroundJob>();
+            
             return services;
     }
     }

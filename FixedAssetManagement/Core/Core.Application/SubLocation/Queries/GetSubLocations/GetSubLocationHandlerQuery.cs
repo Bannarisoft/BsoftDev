@@ -12,23 +12,22 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
         private readonly ISubLocationQueryRepository _sublocationQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
+        //private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
         
 
-        public GetSubLocationHandlerQuery(ISubLocationQueryRepository sublocationQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
+        public GetSubLocationHandlerQuery(ISubLocationQueryRepository sublocationQueryRepository, IMapper mapper, IMediator mediator)
         {
             _sublocationQueryRepository = sublocationQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentGrpcClient = departmentGrpcClient;
-
+        
         }
         public async Task<ApiResponseDTO<List<SubLocationDto>>> Handle(GetSubLocationQuery request, CancellationToken cancellationToken)
         {
             var (sublocations, totalCount) = await _sublocationQueryRepository.GetAllSubLocationAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var sublocationList = _mapper.Map<List<SubLocationDto>>(sublocations);
 
-            // 🔥 Fetch departments using gRPC
+         /*    // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
@@ -40,7 +39,7 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
                     sublocation.DepartmentName = departmentName;
                 }
             }
-
+ */
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetSubLocations",
