@@ -158,6 +158,10 @@
     {
         "rule": "PasswordValidation",      
         "error": "Password is incorrect."
+    },
+    {
+        "rule": "IsFirstime",      
+        "error": "First time user cannot be update the password."
     }
      
     

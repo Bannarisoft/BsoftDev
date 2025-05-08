@@ -363,6 +363,14 @@ namespace UserManagement.Infrastructure.Repositories.Users
                 var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { UserName = UserName });
                 return count > 0;
           }
+                 public async Task<bool> IsFirstimeUserValidation(string UserName )
+          {
+              var query = "SELECT COUNT(1) FROM [AppSecurity].[Users] WHERE UserName = @UserName AND IsDeleted = 0 AND IsFirstTimeUser = 0";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { UserName = UserName });
+                return count > 0;
+          }
+
           
              
           
