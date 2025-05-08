@@ -72,7 +72,7 @@ namespace Core.Application.Common.Mappings
                         {
                             Start = s.ScheduleStartTime,
                             End = s.ScheduleEndTime,
-                            ISCompleted=(byte)(s.ISCompleted ?? 0)
+                            IsCompleted=(byte)(s.IsCompleted ?? 0)
                         })
                         .ToList()
                 })

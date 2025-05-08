@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Core.Application.WorkOrder.Queries.GetWorkOrder
 {
     public class WorkOrderWithScheduleDto
@@ -18,7 +13,8 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
         public int RequestId { get; set; }
         public DateTimeOffset? ScheduleStartTime { get; set; }
         public DateTimeOffset? ScheduleEndTime { get; set; }
-        public byte? ISCompleted { get; set; }
+        public byte? IsCompleted { get; set; }
         public int MaintenanceTypeId { get; set; }
+        public string? MachineName { get; set; }
     }
 }
