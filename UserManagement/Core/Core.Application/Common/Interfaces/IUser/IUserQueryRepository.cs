@@ -23,6 +23,7 @@ namespace Core.Application.Common.Interfaces.IUser
         Task<bool> ValidateUserRolesAsync(string username);
         Task<User> GetByUsernameAsync(string username);
         Task<bool> UserLockedAsync(string UserName );
+        Task<bool> IsFirstimeUserValidation(string UserName );
   
     }
 
