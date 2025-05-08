@@ -332,13 +332,13 @@ namespace UserManagement.Infrastructure.Repositories.Users
         }
           public async Task<User> GetByUsernameAsync(string username)
         {
-           var UnitId = _ipAddressService.GetUnitId();
+        //    var UnitId = _ipAddressService.GetUnitId();
              var query = """
                  SELECT U.Id,U.FirstName,U.LastName,U.UserName,U.UserType,U.Mobile,U.EmailId,U.UserId,U.IsFirstTimeUser,U.EntityId,U.PasswordHash,UG.GroupCode 
                  FROM AppSecurity.Users U
                  LEFT JOIN AppSecurity.UserGroup UG ON UG.Id = U.UserGroupId 
                  INNER JOIN AppSecurity.UserUnit uu ON uu.UserId = U.UserId AND uu.IsActive = 1
-                 WHERE U.UserName = @Username AND U.IsDeleted = 0 AND uu.UnitId=@UnitId
+                 WHERE U.UserName = @Username AND U.IsDeleted = 0 
                  """;
 
 
