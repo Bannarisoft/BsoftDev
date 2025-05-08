@@ -11,6 +11,7 @@ using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetDtlToTrans
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByDeptId;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetTransferType;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
 using Core.Domain.Common;
 using Core.Domain.Entities.AssetMaster;
@@ -21,18 +22,21 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
     public class AssetTransferQueryRepository : IAssetTransferQueryRepository
     {
         private readonly IDbConnection _dbConnection;
+        private  readonly IIPAddressService _iPAddressService;
+        
 
-         public AssetTransferQueryRepository(IDbConnection dbConnection)
+         public AssetTransferQueryRepository(IDbConnection dbConnection, IIPAddressService iPAddressService)
         {
             _dbConnection = dbConnection;
+            _iPAddressService = iPAddressService;
         }
         
 
 
          public async Task<(List<AssetTransferDto>, int)> GetAllAsync(int PageNumber, int PageSize ,string? SearchTerm, DateTimeOffset? FromDate , DateTimeOffset? ToDate )        
-        {
-
-           
+        { 
+                var CompanyId = _iPAddressService.GetCompanyId();
+                var UnitId = _iPAddressService.GetUnitId();           
                         var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
@@ -42,7 +46,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                 INNER JOIN Bannari.AppData.Department FromDept ON A.FromDepartmentId = FromDept.Id
                 INNER JOIN Bannari.AppData.Department ToDept ON A.ToDepartmentId = ToDept.Id
                 INNER JOIN FixedAsset.MiscMaster Misc ON A.TransferType = Misc.Id
-                WHERE 1 = 1 
+                WHERE 1 = 1 AND A.FromUnitId = @UnitId
                 {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
                 {{(ToDate.HasValue ? "AND A.DocDate <= @ToDate" : "")}}
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search)") }};
@@ -85,7 +89,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                 INNER JOIN Bannari.AppData.Department FromDept ON A.FromDepartmentId = FromDept.Id
                 INNER JOIN Bannari.AppData.Department ToDept ON A.ToDepartmentId = ToDept.Id
                 INNER JOIN FixedAsset.MiscMaster Misc ON A.TransferType = Misc.Id
-                WHERE 1 = 1          
+                WHERE 1 = 1      AND A.FromUnitId = @UnitId    
                 {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
                 {{(ToDate.HasValue ? "AND A.DocDate < @ToDate" : "")}}
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search)") }}        
@@ -99,6 +103,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
 
             var parameters = new
             {  
+                UnitId,
                 FromDate,
                 ToDate  = ToDate?.Date.AddDays(1),
                 Search = $"%{SearchTerm}%",
@@ -116,16 +121,18 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
    }
       public async Task<AssetTransferJsonDto> GetAssetTransferByIdAsync(int assetTransferId)
     {
+        var CompanyId = _iPAddressService.GetCompanyId();
+        var UnitId = _iPAddressService.GetUnitId();
         const string query = @"
             SELECT Id as AssetTransferId , DocDate, TransferType, FromUnitId, ToUnitId, FromDepartmentId, ToDepartmentId, 
                    FromCustodianId, ToCustodianId, Status, FromCustodianName, ToCustodianName
             FROM FixedAsset.AssetTransferIssueHdr
-            WHERE Id = @AssetTransferId AND Status = 'Pending'
+            WHERE Id = @AssetTransferId AND Status = 'Pending'  AND FromUnitId = @UnitId
             FOR JSON PATH, INCLUDE_NULL_VALUES;
 
             SELECT AssetId, AssetValue 
             FROM FixedAsset.AssetTransferIssueDtl
-            WHERE AssetTransferId = @AssetTransferId
+            WHERE AssetTransferId = @AssetTransferId  
             FOR JSON PATH, INCLUDE_NULL_VALUES;
         ";
 
@@ -158,28 +165,34 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
     }
     
     public async Task<List<GetCategoryByDeptIdDto>> GetCategoriesByDepartmentAsync(int departmentId)
-    {         
+    {        
+        var CompanyId = _iPAddressService.GetCompanyId();
+           var UnitId = _iPAddressService.GetUnitId();    
             const string query = @"SELECT DISTINCT 
             A.Id AS CategoryID,  A.CategoryName  FROM FixedAsset.AssetCategories A 
             INNER JOIN FixedAsset.AssetMaster   B   ON A.Id = B.AssetCategoryId 
             INNER JOIN FixedAsset.AssetLocation C   ON B.Id = C.AssetId 
-            WHERE C.DepartmentId = @departmentId";                          
+            WHERE C.DepartmentId = @departmentId AND A.CompanyId = @CompanyId AND A.UnitId = @UnitId";                          
             var result = await _dbConnection.QueryAsync<GetCategoryByDeptIdDto>(query, new { departmentId });         
             return result.ToList();      
     }   
 
     public async Task<List<GetAssetMasterDto>> GetAssetsByCategoryAsync(int assetCategoryId , int assetDepartmentId)
     {         
-           // const string query = @"SELECT Id as AssetId, AssetName FROM FixedAsset.AssetMaster WHERE AssetCategoryId = @assetCategoryId";    
+           // const string query = @"SELECT Id as AssetId, AssetName FROM FixedAsset.AssetMaster WHERE AssetCategoryId = @assetCategoryId"; 
+           var CompanyId = _iPAddressService.GetCompanyId();
+           var UnitId = _iPAddressService.GetUnitId();   
             const string query = @"	SELECT  A.Id AS AssetId,A.AssetName,A.AssetCategoryId FROM FixedAsset.AssetMaster A 
                                     INNER JOIN FixedAsset.AssetLocation B  ON A.Id = B.AssetId  
-                                    WHERE      A.AssetCategoryId = @assetCategoryId   AND B.DepartmentId =  @assetDepartmentId";                      
+                                    WHERE      A.AssetCategoryId = @assetCategoryId   AND B.DepartmentId =  @assetDepartmentId  AND A.CompanyId = @CompanyId AND A.UnitId = @UnitId";                      
             var result = await _dbConnection.QueryAsync<GetAssetMasterDto>(query, new { assetCategoryId, assetDepartmentId });         
             return result.ToList();      
     }   
     
      public async Task<GetAssetDetailsToTransferHdrDto>  GetAssetDetailsToTransferByIdAsync(int assetId)
     {
+                    var CompanyId = _iPAddressService.GetCompanyId();
+                    var UnitId = _iPAddressService.GetUnitId();   
                     const string query = @"
                     -- Get Asset Master Details
                     SELECT 
@@ -193,7 +206,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                     INNER JOIN Bannari.AppData.Department F ON B.DepartmentId = F.Id
                     INNER JOIN Bannari.AppData.Unit G ON A.UnitId = G.Id
                     INNER JOIN FixedAsset.AssetCategories H ON A.AssetCategoryId = H.Id
-                    WHERE A.Id = @AssetId  
+                    WHERE A.Id = @AssetId   AND A.CompanyId = @CompanyId AND A.UnitId = @UnitId
                     FOR JSON PATH, INCLUDE_NULL_VALUES;
 
                     -- Get Asset Transfer Issue Details
@@ -208,7 +221,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                 INNER JOIN [FixedAsset].[SubLocation] SL ON SL.Id=AL.SubLocationId
                 LEFT JOIN [Bannari].[AppData].[Unit] U ON AL.UnitId = U.Id
                 LEFT JOIN [Bannari].[AppData].[Department] D ON AL.DepartmentId=D.Id                
-                WHERE AL.AssetId =@AssetId  
+                WHERE AL.AssetId =@AssetId     
 
 
                 ";
@@ -294,10 +307,11 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                 }
                 public async Task<bool> IsAssetPendingOrApprovedAsync(int assetId)
                 {
+                       var UnitId = _iPAddressService.GetUnitId();   
                     const string query = @"
                         SELECT 1 FROM FixedAsset.AssetTransferIssueHdr A
                         INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
-                        WHERE B.AssetId = @assetId 
+                        WHERE B.AssetId = @assetId  AND A.UnitId = @UnitId
                         AND (A.Status = 'Pending' OR (A.Status = 'Approved' AND A.AckStatus <> 1))";
 
                     var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { assetId });
@@ -306,22 +320,25 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
 
                public async Task<List<GetAllTransferDtlDto>> GetAssetTransferByIDAsync(int assetTransferId)
                 {         
+                    var CompanyId = _iPAddressService.GetCompanyId();
+                    var UnitId = _iPAddressService.GetUnitId();
                         const string query = @"SELECT  A.Id,A.AssetTransferId,A.AssetId,B.AssetCode,B.AssetName,A.AssetValue  FROM FixedAsset.AssetTransferIssueDtl A 
-			                                 INNER JOIN  FixedAsset.AssetMaster B on  A.AssetId=B.ID WHERE AssetTransferId = @assetTransferId";                          
+			                                 INNER JOIN  FixedAsset.AssetMaster B on  A.AssetId=B.ID WHERE AssetTransferId = @assetTransferId AND A.CompanyId = @CompanyId AND A.UnitId = @UnitId"; ;                          
                         var result = await _dbConnection.QueryAsync<GetAllTransferDtlDto>(query, new { assetTransferId });         
                         return result.ToList();      
                 }                                
                
 
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetTransferTypeAsync()
-        {
+        { 
+             
             const string query = @"
                     SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder, M.IsActive
                     ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
                     FROM FixedAsset.MiscMaster M
                     INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeId
                     WHERE (MiscTypeCode = @MiscTypeCode)
-                    AND M.IsDeleted=0 and M.IsActive=1
+                    AND M.IsDeleted=0 and M.IsActive=1 
                     ORDER BY M.ID DESC";
                     var parameters = new { MiscTypeCode = MiscEnumEntity.AssetTransferType.MiscCode};
                     var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);

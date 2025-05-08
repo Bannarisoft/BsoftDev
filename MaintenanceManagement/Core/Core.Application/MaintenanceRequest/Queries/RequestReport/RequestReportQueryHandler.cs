@@ -23,10 +23,10 @@ namespace Core.Application.MaintenanceRequest.Queries.RequestReport
 
           public async Task<ApiResponseDTO<List<RequestReportDto>>> Handle(RequestReportQuery request, CancellationToken cancellationToken)
         {
-                    var requestReportEntities = await _maintenanceRequestQueryRepository.GetMaintenanceStatusDescAsync(
+                    var requestReportEntities = await _maintenanceRequestQueryRepository.MaintenanceReportAsync(
                     request.RequestFromDate,
                     request.RequestToDate,
-                    request.GetRequestType,
+                    request.RequestType,
                     request.RequestStatus);
 
                 var requestReportDtos = _mapper.Map<List<RequestReportDto>>(requestReportEntities);

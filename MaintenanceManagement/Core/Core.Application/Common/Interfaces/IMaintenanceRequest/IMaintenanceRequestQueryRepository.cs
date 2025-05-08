@@ -13,8 +13,8 @@ namespace Core.Application.Common.Interfaces.IMaintenanceRequest
     public interface IMaintenanceRequestQueryRepository
     {
 
-          Task<(IEnumerable<dynamic> MaintenanceRequestList, int)> GetAllMaintenanceRequestAsync(int PageNumber, int PageSize, string? SearchTerm);
-          Task<(IEnumerable<dynamic> MaintenanceRequestList, int)> GetAllMaintenanceExternalRequestAsync(int PageNumber, int PageSize, string? SearchTerm);
+          Task<(IEnumerable<dynamic> MaintenanceRequestList, int)> GetAllMaintenanceRequestAsync(int PageNumber, int PageSize, string? SearchTerm,DateTimeOffset? FromDate,  DateTimeOffset? ToDate);
+          Task<(IEnumerable<dynamic> MaintenanceRequestList, int)> GetAllMaintenanceExternalRequestAsync(int PageNumber, int PageSize, string? SearchTerm ,DateTimeOffset? FromDate,  DateTimeOffset? ToDate);
         // Task<Core.Domain.Entities.MaintenanceRequest?> GetByIdAsync(int Id);
          Task<dynamic?> GetByIdAsync(int id);
          Task<List<GetExternalRequestByIdDto>> GetExternalRequestByIdAsync(List<int> ids);
@@ -26,6 +26,7 @@ namespace Core.Application.Common.Interfaces.IMaintenanceRequest
 
            Task<bool> GetWOclosedAsync(int id);
           Task<bool> GetWOclosedOrInProgressAsync(int id);
+          
           Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceStatusDescAsync();  
 
           Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceServiceDescAsync(); 
@@ -33,8 +34,9 @@ namespace Core.Application.Common.Interfaces.IMaintenanceRequest
           Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceSpareTypeDescAsync();
          Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceDispatchModeDescAsync();
 
-          Task<List<RequestReportDto>> GetMaintenanceStatusDescAsync( DateTimeOffset? RequestFromDate, DateTimeOffset? RequestToDate , int? GetRequestType , int?  RequestStatus);  
-          
+          //Task<List<RequestReportDto>> GetMaintenanceStatusDescAsync( DateTimeOffset? RequestFromDate, DateTimeOffset? RequestToDate , int? GetRequestType , int?  RequestStatus);  
+          Task<List<RequestReportDto>> MaintenanceReportAsync( DateTimeOffset? requestFromDate,DateTimeOffset? requestToDate, int? RequestType,int? requestType
+    );          
            
           
 

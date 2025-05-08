@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using Core.Application.MaintenanceRequest.Queries.GetExistingVendorDetails;
@@ -12,6 +13,7 @@ using Core.Application.MaintenanceRequest.Queries.RequestReport;
 using Core.Domain.Common;
 using Core.Domain.Entities;
 using Dapper;
+using MaintenanceManagement.Infrastructure.Services;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
 {
@@ -19,13 +21,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
     {
                 private readonly IDbConnection _dbConnection; 
 
-                public MaintenanceRequestQueryRepository(IDbConnection dbConnection)
+                private readonly IIPAddressService _iPAddressService;
+
+                public MaintenanceRequestQueryRepository(IDbConnection dbConnection , IIPAddressService iPAddressService)
                 {
                     _dbConnection = dbConnection;
+                    _iPAddressService = iPAddressService;
                 }
 
-                public async Task<(IEnumerable<dynamic> MaintenanceRequestList, int)> GetAllMaintenanceRequestAsync(int PageNumber, int PageSize, string? SearchTerm)
+                public async Task<(IEnumerable<dynamic> MaintenanceRequestList, int)> GetAllMaintenanceRequestAsync(int PageNumber, int PageSize, string? SearchTerm, DateTimeOffset? FromDate,    DateTimeOffset? ToDate   ) 
                 {
+                    var UnitId= _iPAddressService.GetUnitId();
                                         var query = $$"""
                         DECLARE @TotalCount INT;
 
@@ -41,6 +47,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                          LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
 
                         WHERE A.IsDeleted = 0
+                        AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
+                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate) AND A.UnitId = @UnitId
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search  OR F.Code LIKE @Search OR G.Code LIKE @Search OR E.MachineName LIKE @Search OR H.Code LIKE @Search OR I.Code LIKE @Search OR J.Code LIKE @Search ) ")}};
                                             
                         SELECT 
@@ -88,6 +96,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
 
                         WHERE A.IsDeleted = 0   AND  B.Code = @MiscCode  AND J.Code <> @MaintenanceStatusUpdate
+                        AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
+                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate)
+                        AND A.UnitId = @UnitId
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search OR F.Code LIKE @Search or G.Code LIKE @Search OR H.Code LIKE @Search  OR E.MachineName LIKE @Search OR I.Code LIKE @Search  or J.Code LIKE @Search) ")}}
                         ORDER BY A.Id DESC
                         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -101,7 +112,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         MaintenanceStatusUpdate = MiscEnumEntity.MaintenanceStatusUpdate.Code,
                         Search = $"%{SearchTerm}%",
                         Offset = (PageNumber - 1) * PageSize,
-                        PageSize
+                        PageSize,
+                        FromDate = FromDate?.Date,
+                        ToDate = ToDate?.Date.AddDays(1).AddTicks(-1),
+                        UnitId
+
+                        
                     };
 
                          using var multi = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -113,8 +129,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                 }
 
                 // External Request
-                 public async Task<(IEnumerable<dynamic> MaintenanceRequestList, int)> GetAllMaintenanceExternalRequestAsync(int PageNumber, int PageSize, string? SearchTerm)
+                 public async Task<(IEnumerable<dynamic> MaintenanceRequestList, int)> GetAllMaintenanceExternalRequestAsync(int PageNumber, int PageSize, string? SearchTerm ,DateTimeOffset? FromDate,  DateTimeOffset? ToDate)
                 {
+
+                      var UnitId= _iPAddressService.GetUnitId();
                                         var query = $$"""
                         DECLARE @TotalCount INT;
 
@@ -129,7 +147,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                          LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id 
                          LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
 
-                        WHERE A.IsDeleted = 0
+                        WHERE A.IsDeleted = 0 AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
+                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate)  AND A.UnitId = @UnitId
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search  OR F.Code LIKE @Search OR G.Code LIKE @Search OR E.MachineName LIKE @Search OR H.Code LIKE @Search OR I.Code LIKE @Search OR J.Code LIKE @Search ) ")}};
                                             
                         SELECT 
@@ -177,7 +196,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id 
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
 
-                        WHERE  B.Code = @MiscCode  AND C.Code <> @MaintenanceStatusUpdate
+                        WHERE  B.Code = @MiscCode  AND C.Code <> @MaintenanceStatusUpdate 
+                        AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
+                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate) AND A.UnitId = @UnitId
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search OR F.Code LIKE @Search or G.Code LIKE @Search OR H.Code LIKE @Search  OR E.MachineName LIKE @Search OR I.Code LIKE @Search  or J.Code LIKE @Search) ")}}
                         ORDER BY A.Id DESC
                         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -191,7 +212,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         MaintenanceStatusUpdate = MiscEnumEntity.MaintenanceStatusUpdate.Code,
                         Search = $"%{SearchTerm}%",
                         Offset = (PageNumber - 1) * PageSize,
-                        PageSize
+                        PageSize,
+                        FromDate = FromDate?.Date,
+                        ToDate = ToDate?.Date.AddDays(1).AddTicks(-1),
+                        UnitId
                     };
 
                          using var multi = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -206,6 +230,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
           
                 public async Task<dynamic?> GetByIdAsync(int id)
                 {
+
+                    var UnitId= _iPAddressService.GetUnitId();
                     var query = @"
                         SELECT 
                             A.Id,
@@ -253,7 +279,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
 
                         WHERE A.IsDeleted = 0 AND A.Id = @Id 
-                        AND B.Code = @MiscCode ;
+                        AND B.Code = @MiscCode AND A.UnitId = @UnitId;
                     ";
 
                    // var result = await _dbConnection.QueryFirstOrDefaultAsync<dynamic>(query, new { Id = id });
@@ -262,7 +288,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                     {
                         Id = id,
                         MiscCode = MiscEnumEntity.MaintenanceRequestTypeInternal.Code,
-                         MiscStatusCode = MiscEnumEntity.MaintenanceStatusUpdate.Code
+                         MiscStatusCode = MiscEnumEntity.MaintenanceStatusUpdate.Code,
+                        UnitId
                         
                     };
 
@@ -273,6 +300,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
 
                 public async Task<List<GetExternalRequestByIdDto>> GetExternalRequestByIdAsync(List<int> ids)
                 {
+                    var UnitId= _iPAddressService.GetUnitId();
                     var query = @"
                         SELECT 
                             A.Id,
@@ -320,14 +348,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
                         WHERE A.IsDeleted = 0 AND A.Id IN @Ids 
-                        AND B.Code = @MiscCode AND J.Code <> @MiscStatusCode;
+                        AND B.Code = @MiscCode AND J.Code <> @MiscStatusCode AND A.UnitId = @UnitId;
                     ";
                 //    var result = await _dbConnection.QueryAsync<GetExternalRequestByIdDto>(query, new { Ids = ids });
                  var parameters = new
                     {
                         Ids = ids,
                         MiscCode = MiscEnumEntity.MaintenanceRequestTypeExternal.Code,
-                        MiscStatusCode = MiscEnumEntity.MaintenanceStatusUpdate.Code
+                        MiscStatusCode = MiscEnumEntity.MaintenanceStatusUpdate.Code,
+                        UnitId
                        
                     };
 
@@ -484,15 +513,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                     FROM Maintenance.WorkOrder WO
                     INNER JOIN Maintenance.MiscMaster M ON M.Id = WO.StatusId
                     INNER JOIN Maintenance.MiscTypeMaster T ON T.Id = M.MiscTypeId
-                    WHERE WO.RequestId = @RequestId
-                    AND (M.Code = @MiscCodeClosed OR M.Code = @MiscCodeInProgress)
+                    WHERE WO.RequestId = @RequestId And M.Code <> @MiscCode                   
                     AND T.MiscTypeCode = @MiscTypeCode";
                    var parameters = new
                     {
                         RequestId = Id,
                         MiscTypeCode = MiscEnumEntity.WOStatus.MiscCode,
-                        MiscCodeClosed = MiscEnumEntity.MaintenanceStatusUpdate.Code ,
-                        MiscCodeInProgress = MiscEnumEntity.GetStatusId.Status
+                        MiscCode= MiscEnumEntity.StatusOpen.Code ,
+                       // MiscCodeInProgress = MiscEnumEntity.GetStatusId.Status
 
 
                     };
@@ -571,45 +599,77 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         return result.ToList();
                     } 
 
-                    public async Task<List<RequestReportDto>> GetMaintenanceStatusDescAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? getRequestType, int? requestStatus)
+                    public async Task<List<RequestReportDto>> MaintenanceReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? RequestType, int? requestStatus )
                     {
                         var query = @"
                         SELECT 
                             a.Id AS RequestId,
                             a.UnitId,
-                            a.CreatedDate AS RequestDate,
+                            a.CreatedDate AS RequestCreatedDate,
                             a.CreatedBy,
-                            d.FirstName AS Created,
+                            d.FirstName AS RequestCreatedName,
                             a.DepartmentId,
+							G.DeptName as Department,
                             a.MachineId,
+							E.MachineName,
                             a.MaintenanceTypeId,
+							F.Code as MaintenanceType,
                             b.Id AS WorkOrderId,
                             b.StatusId,
+							H.Code as RequestStatus,
                             a.ModifiedDate,
+							A.OldVendorId,
+							A.OldVendorName,
+							A.ModeOfDispatchId,
+                            L.Code as ModeOfDispatch,
+							A.ExpectedDispatchDate,
+							A.EstimatedSpareCost,
+							A.EstimatedServiceCost,
+							A.ServiceLocationId,
+							I.Code AS ServiceLocation,
+							A.ServiceTypeId,
+							J.code AS ServiceType,
+							A.SparesTypeId,
+							K.Code  AS SparesType,
+                            A.ModeOfDispatchId,
+                            L.Code AS DispatchMode,
                             DATEDIFF(MINUTE, a.CreatedDate, a.ModifiedDate) AS RequestMinutesDifference,
                             RIGHT('0' + CAST(DATEDIFF(MINUTE, a.CreatedDate, a.ModifiedDate) / 60 AS VARCHAR), 2) + ':' +
                             RIGHT('0' + CAST(DATEDIFF(MINUTE, a.CreatedDate, a.ModifiedDate) % 60 AS VARCHAR), 2) AS DownTime,
                             RIGHT('0' + CAST(SUM(DATEDIFF(SECOND, c.StartTime, c.EndTime)) / 3600 AS VARCHAR), 2) + ':' +
                             RIGHT('0' + CAST((SUM(DATEDIFF(SECOND, c.StartTime, c.EndTime) % 3600) / 60) AS VARCHAR), 2) AS TimeTakenToRepair
-                        FROM Maintenance.MaintenanceRequest a
-                        INNER JOIN Maintenance.WorkOrder b ON a.Id = b.RequestId
-                        LEFT JOIN Maintenance.WorkOrderSchedule c ON c.WorkOrderId = b.Id
-                        LEFT JOIN BANNARI.AppSecurity.Users d ON a.CreatedBy = d.UserId
-                        WHERE a.CreatedDate >= @RequestFromDate
-                            AND a.CreatedDate <= @RequestToDate
-                            AND (@GetRequestType ='' OR a.RequestTypeId = @GetRequestType)
-                            AND (@RequestStatus ='' OR a.RequestStatusId = @RequestStatus)
+                          FROM Maintenance.MaintenanceRequest a
+                               LEFT JOIN Maintenance.WorkOrder b ON a.Id = b.RequestId
+                                LEFT JOIN Maintenance.WorkOrderSchedule c ON c.WorkOrderId = b.Id
+                                LEFT JOIN BANNARI.AppSecurity.Users d ON a.CreatedBy = d.UserId                        
+                                LEFT JOIN  Maintenance.MachineMaster E  ON A.MachineId=E.Id 
+                                LEFT JOIN  Maintenance.MiscMaster F  ON A.MaintenanceTypeId=F.Id 
+                                LEFT JOIN  Bannari.AppData.Department G  ON A.DepartmentId=G.Id
+                                LEFT JOIN  Maintenance.MiscMaster H  ON A.RequestStatusId=H.Id
+                                LEFT JOIN  Maintenance.MiscMaster I  ON A.ServiceLocationId=I.Id
+                                LEFT JOIN  Maintenance.MiscMaster J  ON A.ServiceTypeId=J.Id
+                                LEFT JOIN  Maintenance.MiscMaster K  ON A.SparesTypeId=K.Id
+                                LEFT JOIN  Maintenance.MiscMaster L  ON A.ModeOfDispatchId=L.Id
+                            WHERE a.CreatedDate >= @RequestFromDate
+                                AND a.CreatedDate <= @RequestToDate
+                                AND (@RequestType IS NULL OR a.RequestTypeId = @RequestType)
+                                AND (@RequestStatus IS NULL OR a.RequestStatusId = @RequestStatus)
+                                AND (@RequestType IS NULL OR a.RequestTypeId = @RequestType)                      
                         GROUP BY 
-                            a.Id, a.UnitId, a.CreatedDate, a.CreatedBy, a.DepartmentId,
-                            a.MachineId, a.MaintenanceTypeId,
-                            b.Id, b.StatusId, a.ModifiedDate, d.UserId, d.FirstName
+                              a.Id, a.UnitId, a.CreatedDate, a.CreatedBy, a.DepartmentId,
+                                a.MachineId, a.MaintenanceTypeId, b.Id, b.StatusId, a.ModifiedDate,
+                                d.FirstName, G.DeptName, E.MachineName, F.Code, H.Code,
+                                a.OldVendorId, a.OldVendorName, a.ModeOfDispatchId, a.ExpectedDispatchDate,
+                                a.EstimatedSpareCost, a.EstimatedServiceCost,
+                                a.ServiceLocationId, I.Code, a.ServiceTypeId, J.Code,
+                                a.SparesTypeId, K.Code,L.Code
                         ORDER BY a.Id";
 
                         var parameters = new
                         {
                             RequestFromDate = requestFromDate?.Date,
                             RequestToDate = requestToDate?.Date.AddDays(1).AddTicks(-1), // To include full day
-                            GetRequestType = getRequestType,
+                            RequestType = RequestType,
                             RequestStatus = requestStatus
                         };
                         
