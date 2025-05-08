@@ -9,6 +9,7 @@ using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptD
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetailsById;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptPending;
 using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRecieptDtlPending;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetTransferReceipt;
 using Dapper;
 
@@ -17,14 +18,17 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
     public class AssetTransferReceiptQueryRepository : IAssetTransferReceiptQueryRepository
     {
         private readonly IDbConnection _dbConnection;
+        private readonly IIPAddressService _ipAddressService;  
 
-        public AssetTransferReceiptQueryRepository(IDbConnection dbConnection)
+        public AssetTransferReceiptQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
         }
 
          public async Task<(List<AssetReceiptDetailsDto>, int)> GetAllAssetReceiptDetails(int PageNumber, int PageSize, string? Receiptno, DateTimeOffset? FromDate, DateTimeOffset? ToDate)
         {
+            var UnitId = _ipAddressService.GetUnitId();
              var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
@@ -35,6 +39,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 INNER JOIN [Bannari].AppData.Unit E ON B.ToUnitId = E.Id
                 INNER JOIN [Bannari].AppData.Department F ON B.FromDepartmentId = F.Id
                 INNER JOIN [Bannari].AppData.Department G ON B.ToDepartmentId = G.Id
+                WHERE B.ToUnitId = @UnitId
                 {{(string.IsNullOrEmpty(Receiptno) ? "" : "AND A.Id LIKE @Search")}}
                 {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
                 {{(ToDate.HasValue ? "AND A.DocDate <= @ToDate" : "")}};
@@ -64,6 +69,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 INNER JOIN [Bannari].AppData.Unit E ON B.ToUnitId = E.Id
                 INNER JOIN [Bannari].AppData.Department F ON B.FromDepartmentId = F.Id
                 INNER JOIN [Bannari].AppData.Department G ON B.ToDepartmentId = G.Id
+                WHERE B.ToUnitId = @UnitId
                 {{(string.IsNullOrEmpty(Receiptno) ? "" : "AND A.Id LIKE @Search")}}
                 {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
                 {{(ToDate.HasValue ? "AND A.DocDate <= @ToDate" : "")}}
@@ -79,7 +85,8 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 FromDate,
                 ToDate,
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize
+                PageSize,
+                UnitId
             };
 
             var assetTransferreceipt = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -90,6 +97,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
         }
          public async Task<List<AssetReceiptDetailsByIdDto>> GetByAssetReceiptId(int AssetReceiptId)
         {
+            
              const string query = @"
             SELECT 
             b.AssetReceiptId,
@@ -117,6 +125,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
         public async Task<(List<AssetTransferReceiptPendingDto>, int)> GetAllPendingAssetTransferAsync(
             int PageNumber, int PageSize, int? AssetTransferId, string? TransferType, DateTimeOffset? FromDate, DateTimeOffset? ToDate)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(DISTINCT A.Id)
@@ -130,7 +139,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
                 LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
                 LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
-                WHERE A.Status = 'Approved' 
+                WHERE A.Status = 'Approved' AND A.ToUnitId = @UnitId 
                 AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL) -- Consider pending receipts only
                 {{(AssetTransferId.HasValue ? "AND A.Id = @AssetTransferId" : "")}}
                 {{(string.IsNullOrEmpty(TransferType) ? "" : "AND A.TransferType LIKE @Search")}}
@@ -161,7 +170,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
                 LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
                 LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
-                WHERE A.Status = 'Approved' 
+                WHERE A.Status = 'Approved' AND A.ToUnitId = @UnitId
                 AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL)
                 {{(AssetTransferId.HasValue ? "AND A.Id = @AssetTransferId" : "")}}
                 {{(string.IsNullOrEmpty(TransferType) ? "" : "AND A.TransferType LIKE @Search")}}
@@ -180,7 +189,8 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 FromDate,
                 ToDate,
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize
+                PageSize,
+                UnitId
             };
 
             var assetTransferIssue = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -235,12 +245,13 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
 
         public async Task<AssetTransferDto?> GetByAssetTransferId(int assetTransferId)
         {
+            var UnitId = _ipAddressService.GetUnitId();
              const string query = @"
                 SELECT ToUnitId, ToDepartmentId, ToCustodianId
                 FROM FixedAsset.AssetTransferIssueHdr
-                WHERE Id = @AssetTransferId";
+                WHERE Id = @AssetTransferId AND ToUnitId = @UnitId";
 
-                var parameters = new { AssetTransferId = assetTransferId };
+                var parameters = new { AssetTransferId = assetTransferId, UnitId };
 
                 var assetTransfer = await _dbConnection.QueryFirstOrDefaultAsync<AssetTransferDto>(query, parameters);
 
@@ -249,8 +260,9 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
 
         public async Task<AssetTrasnferReceiptHdrPendingDto?> GetAssetTransferByIdAsync(int assetTransferId)
         {
+            var UnitId = _ipAddressService.GetUnitId();
              const string query = @"
-            SELECT 
+                    SELECT 
                     Distinct(A.Id) AS AssetTransferId,
                     A.DocDate,
                     C.Description AS TransferType,
@@ -273,7 +285,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
                 LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
                 LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
-                WHERE A.Status = 'Approved' 
+                WHERE A.Status = 'Approved' AND A.ToUnitId = @UnitId 
                 AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL)
                 AND A.Id = @assetTransferId
                 FOR JSON PATH, INCLUDE_NULL_VALUES;
@@ -292,13 +304,13 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 INNER JOIN [Bannari].AppData.Department G ON A.ToDepartmentId = G.Id
                 LEFT JOIN FixedAsset.AssetTransferReceiptHdr RH ON A.Id = RH.AssetTransferId
                 LEFT JOIN FixedAsset.AssetTransferReceiptDtl RD ON RH.Id = RD.AssetReceiptId AND B.AssetId = RD.AssetId
-                WHERE A.Status = 'Approved' 
+                WHERE A.Status = 'Approved'  AND A.ToUnitId = @UnitId
                 AND (RD.AckStatus = 0 OR RD.AckStatus IS NULL)
         		AND A.Id=@assetTransferId
                 FOR JSON PATH, INCLUDE_NULL_VALUES;
                 ";
 
-        using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { assetTransferId });
+        using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { assetTransferId, UnitId });
 
         string headerJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
         string detailsJson = await multiQuery.ReadFirstOrDefaultAsync<string>();

@@ -12,9 +12,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
     public class ShiftMasterDetailQueryRepository : IShiftMasterDetailQuery
     {
         private readonly IDbConnection _dbConnection;
-        public ShiftMasterDetailQueryRepository(IDbConnection dbConnection)
+        private readonly IIPAddressService _ipAddressService;  
+        public ShiftMasterDetailQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
         }
         public async Task<bool> AlreadyExistsAsync(int ShiftMasterId)
         {
@@ -34,12 +36,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
 
         public async Task<(IEnumerable<dynamic>, int)> GetAllShiftMasterDetailAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+            var UnitId = _ipAddressService.GetUnitId();
               var query = $$"""
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
                FROM [Maintenance].[ShiftMaster] SM
             INNER JOIN [Maintenance].[ShiftMasterDetails] SMD ON SMD.ShiftMasterId=SM.Id
-              WHERE SMD.IsDeleted = 0
+              WHERE SMD.IsDeleted = 0 AND SMD.UnitId = @UnitId
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SM.ShiftName LIKE @Search OR SM.ShiftCode LIKE @Search)")}};
 
                 SELECT 
@@ -54,7 +57,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
             FROM [Maintenance].[ShiftMaster] SM
             INNER JOIN [Maintenance].[ShiftMasterDetails] SMD ON SMD.ShiftMasterId=SM.Id
             WHERE 
-            SMD.IsDeleted = 0
+            SMD.IsDeleted = 0 AND SMD.UnitId = @UnitId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SM.ShiftName LIKE @Search OR SM.ShiftCode LIKE @Search )")}}
                 ORDER BY SMD.Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -67,7 +70,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
                        {
                            Search = $"%{SearchTerm}%",
                            Offset = (PageNumber - 1) * PageSize,
-                           PageSize
+                           PageSize,
+                           UnitId
                        };
 
              var shiftmaster = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -79,8 +83,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
 
         public async Task<ShiftMasterDetail> GetByIdAsync(int ShiftMasterId)
         {
-            const string query = "SELECT * FROM [Maintenance].[ShiftMasterDetails]  WHERE ShiftMasterId = @ShiftMasterId AND IsDeleted = 0";
-            return await _dbConnection.QueryFirstOrDefaultAsync<ShiftMasterDetail>(query, new { ShiftMasterId =ShiftMasterId });
+            var UnitId = _ipAddressService.GetUnitId();
+            const string query = "SELECT * FROM [Maintenance].[ShiftMasterDetails]  WHERE ShiftMasterId = @ShiftMasterId AND IsDeleted = 0 AND UnitId = @UnitId";
+            return await _dbConnection.QueryFirstOrDefaultAsync<ShiftMasterDetail>(query, new { ShiftMasterId =ShiftMasterId, UnitId = UnitId });
         }
 
         public Task<List<ShiftMasterDetail>> GetShiftMasterDetail(string searchPattern)
