@@ -11,7 +11,28 @@ namespace Core.Application.MaintenanceRequest.Queries.RequestReport
     {
          public DateTimeOffset? RequestFromDate { get; set; }
         public DateTimeOffset? RequestToDate { get; set; }
-        public int GetRequestType { get; set; }
-        public int RequestStatus { get; set; }
+        public int RequestType { get; set; }
+        public int RequestStatus { get; set; }        
+        
+        public int? SparesTypeId { get; set; }
+            public string? SparesType { get; set; } = string.Empty;
+        public int? ServiceTypeId { get; set; }
+          public string? ServiceType { get; set; }  
+        public int? ServiceLocationId { get; set; }
+        public string? ServiceLocation { get; set; }
+        public string? OldVendorName { get; set; }
+        public int? MaintenanceTypeId { get; set; }
+        public int? DepartmentId { get; set; }
+        public int? MachineId { get; set; }
+
+        public decimal? EstimatedSpareCost { get; set; }
+        public decimal? EstimatedServiceCost { get; set; }        
+        
+        
+            
+    
+
+
+
     }
 }
