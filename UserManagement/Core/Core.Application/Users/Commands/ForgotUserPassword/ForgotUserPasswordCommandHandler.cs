@@ -53,8 +53,13 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
             // Generate verification code
             string verificationCode = await _changePasswordService.GenerateVerificationCode(6);
             int expiryMinutes = await _notificationsQueryRepository.GetResetCodeExpiryMinutes();
-            // var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
-            // var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId); 
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId); 
+             ForgotPasswordCache.CodeStorage[request.UserName] = new VerificationCodeDetails
+            {
+                Code = verificationCode,
+                ExpiryTime = currentTime.AddMinutes(expiryMinutes)
+            };
 
             await _backgroundServiceClient.ScheduleVerificationCodeCleanupAsync(request.UserName, expiryMinutes);
 

@@ -6,19 +6,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IAdminSecuritySettings;
+using Core.Application.Common.Interfaces;
 
 namespace UserManagement.Infrastructure.Repositories.AdminSecuritySettings
 {
     public class AdminSecuritySettingsCommandRepository  : IAdminSecuritySettingsCommandRepository 
     {
         private readonly ApplicationDbContext _applicationDbContext;
+        private readonly IIPAddressService _ipAddressService;
 
-         public  AdminSecuritySettingsCommandRepository(ApplicationDbContext applicationDbContext)
+         public  AdminSecuritySettingsCommandRepository(ApplicationDbContext applicationDbContext,IIPAddressService iPAddressService)
     {
         _applicationDbContext=applicationDbContext;
+        _ipAddressService=iPAddressService;
     } 
      public async Task<Core.Domain.Entities.AdminSecuritySettings> CreateAsync(Core.Domain.Entities.AdminSecuritySettings adminSecuritySettings)
-    {
+    {       
+            var entityId = _ipAddressService.GetEntityId();
+            adminSecuritySettings.EntityId = entityId;
             await _applicationDbContext.AdminSecuritySettings.AddAsync(adminSecuritySettings);
             await _applicationDbContext.SaveChangesAsync();
             return adminSecuritySettings;

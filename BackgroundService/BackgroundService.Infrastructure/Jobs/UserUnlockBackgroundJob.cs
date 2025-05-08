@@ -1,11 +1,10 @@
-
 using BackgroundService.Application.Interfaces;
 
 namespace BackgroundService.Infrastructure.Jobs
 {
-    public class UserUnlockBackgroundJob
+    public class UserUnlockBackgroundJob : IUserUnlockBackgroundJob
     {
-         private readonly IUserUnlockService _userUnlockService;
+        private readonly IUserUnlockService _userUnlockService;
 
         public UserUnlockBackgroundJob(IUserUnlockService userUnlockService)
         {

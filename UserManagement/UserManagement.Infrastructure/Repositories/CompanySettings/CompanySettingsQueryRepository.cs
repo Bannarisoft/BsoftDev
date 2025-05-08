@@ -40,47 +40,52 @@ namespace UserManagement.Infrastructure.Repositories.CompanySettings
                 var count = await _dbConnection.ExecuteScalarAsync<int>(sql, parameters);
                 return count > 0;
           }
-           public async Task<Core.Domain.Entities.CompanySettings> BeforeLoginGetUserCompanySettings(string Username)
+           public async Task<dynamic> BeforeLoginGetUserCompanySettings(string Username)
           {
-              var sql = @"Declare @CompanyId int 
+              var sql = @"Declare @CompanyId int,@EntityId int 
               SET @CompanyId = (SELECT TOP 1 UC.CompanyId FROM [AppSecurity].[Users] U
               INNER JOIN [AppSecurity].[UserCompany] UC ON UC.UserId = U.UserId  WHERE U.Username = @Username AND U.IsDeleted = 0 AND UC.IsActive = 1)
 
-              SELECT * FROM [AppData].[CompanySetting] WHERE CompanyId = @CompanyId AND IsDeleted = 0";
+              SET @EntityId =( SELECT TOP 1 EntityId FROM [AppData].[Company] WHERE Id=@CompanyId)
+
+                          IF EXISTS (
+                SELECT 1
+                FROM [AppData].[CompanySetting]
+                WHERE CompanyId = @CompanyId AND IsDeleted = 0
+            )
+            BEGIN
+                SELECT *
+                FROM [AppData].[CompanySetting]
+                WHERE CompanyId = @CompanyId AND IsDeleted = 0
+            END
+            ELSE
+            BEGIN
+                SELECT Id,PasswordHistoryCount AS PasswordHistoryCount,SessionTimeoutMinutes AS SessionTimeout,MaxFailedLoginAttempts AS FailedLoginAttempts,
+                AccountAutoUnlockMinutes AS AutoReleaseTime,PasswordExpiryDays AS PasswordExpiryDays,PasswordExpiryAlertDays AS PasswordExpiryAlert,
+                IsTwoFactorAuthenticationEnabled AS TwoFactorAuth,MaxConcurrentLogins AS MaxConcurrentLogins,PasswordResetCodeExpiryMinutes AS ForgotPasswordCodeExpiry,IsCaptchaEnabledOnLogin AS CaptchaOnLogin
+                FROM [AppSecurity].[AdminSecuritySettings]
+                WHERE IsDeleted = 0 AND EntityId=@EntityId
+            END";
              
-                var companySettings = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.CompanySettings>(sql, new { Username = Username });
+                var companySettings = await _dbConnection.QueryFirstOrDefaultAsync<dynamic>(sql, new { Username = Username });
                 return companySettings;
           }
             public async Task<bool> BeforeLoginNotFoundValidation(string Username)
           {
             
-                 var sql = @"Declare @EntityId int,@GroupCode nvarchar(50),@CompanyId int  
-
-                 SET @GroupCode = (SELECT TOP 1 UG.GroupCode FROM [AppSecurity].[Users] U
-                 INNER JOIN [AppSecurity].[UserGroup] UG ON UG.Id = U.UserGroupId
-                 WHERE U.Username = @Username AND U.IsDeleted = 0 )
-
-               IF @GroupCode = 'ENT_ADM_USR' OR @GroupCode = 'ENT_ADM'
-               BEGIN
-                 SET @EntityId = (SELECT TOP 1 U.EntityId FROM [AppSecurity].[Users] U
-                    WHERE U.Username = @Username AND U.IsDeleted = 0 )
+            var entityId =_ipAddressService.GetEntityId();
+            
+                 var sql = @"
 
                  SELECT COUNT(1)  FROM [AppSecurity].[AdminSecuritySettings] WHERE EntityId = @EntityId AND IsDeleted = 0
-               END
-               ELSE IF @GroupCode = 'COMP_ADM_USR' OR @GroupCode = 'COMP_ADM'
-               BEGIN
-
-                SET @CompanyId = (SELECT TOP 1 UC.CompanyId FROM [AppSecurity].[Users] U
-                INNER JOIN [AppSecurity].[UserCompany] UC ON UC.UserId = U.UserId  WHERE U.Username = @Username AND U.IsDeleted = 0 AND UC.IsActive = 1)
-
-                SELECT COUNT(1)  FROM [AppData].[CompanySetting] WHERE CompanyId = @CompanyId AND IsDeleted = 0   
-               END
+               
+               
                ";
                 
             
             
              
-            var companySettings = await _dbConnection.QueryFirstOrDefaultAsync<int>(sql, new { Username = Username });
+            var companySettings = await _dbConnection.QueryFirstOrDefaultAsync<int>(sql, new { EntityId = entityId });
             return companySettings > 0;
           }
         

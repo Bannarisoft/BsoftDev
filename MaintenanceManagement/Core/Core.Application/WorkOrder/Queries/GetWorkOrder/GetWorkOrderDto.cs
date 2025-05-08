@@ -5,7 +5,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
     {
         public DateTimeOffset? Start { get; set; }
         public DateTimeOffset? End { get; set; }
-        public byte ISCompleted { get; set; } 
+        public byte IsCompleted { get; set; } 
     }
     public class GetWorkOrderDto
     {
@@ -18,6 +18,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
         public string? Status { get; set; }   
         public string? MaintenanceType { get; set; }  
         public int RequestId { get; set; }
+        public string? MachineName { get; set; }
         public List<ScheduleDto> Schedules { get; set; } = new();
     }
 }

@@ -13,6 +13,7 @@ namespace Core.Application.Common.Interfaces
         int? GetCompanyId();
         string GetGroupcode();
         int GetEntityId();
+        int? GetUnitId();
                
     }
 }

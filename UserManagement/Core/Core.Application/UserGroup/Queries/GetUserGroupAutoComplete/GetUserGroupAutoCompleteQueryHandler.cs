@@ -36,7 +36,7 @@ namespace Core.Application.UserGroup.Queries.GetUserGroupAutoComplete
                 return new ApiResponseDTO<List<UserGroupAutoCompleteDto>>
                 {
                     IsSuccess = false,
-                    Message = "No countries found matching the search pattern."
+                    Message = "No user group found matching the search pattern."
                 };
             }
             // Publish a domain event
