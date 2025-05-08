@@ -141,7 +141,7 @@ namespace UserManagement.Infrastructure.Repositories.Entities
                   SELECT Id, EntityName 
                  FROM AppData.Entity
                  WHERE IsDeleted = 0 
-                 AND EntityName LIKE @SearchPattern AND Id=@EntityId ";  
+                 AND EntityName LIKE @SearchPattern ";  
                  var parameters = new 
                  { 
                  SearchPattern = $"%{searchPattern}%" 
