@@ -9,6 +9,7 @@ using Polly.Timeout;
 using Serilog;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Core.Domain.Common;
+using Core.Application.Common.Interfaces;
 
 namespace UserManagement.Infrastructure.Repositories.Users
 {
@@ -16,27 +17,31 @@ namespace UserManagement.Infrastructure.Repositories.Users
     {
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IDbConnection _dbConnection;
+        private readonly IIPAddressService _ipAddressService;
         // private readonly IAsyncPolicy _retryPolicy;
         // private readonly IAsyncPolicy _circuitBreakerPolicy;
         // private readonly IAsyncPolicy _timeoutPolicy;
         // private readonly IAsyncPolicy _fallbackPolicy;
 
-        public UserQueryRepository(ApplicationDbContext applicationDbContext,IDbConnection dbConnection)
+        public UserQueryRepository(ApplicationDbContext applicationDbContext,IDbConnection dbConnection,IIPAddressService ipAddressService)
         {
             _applicationDbContext = applicationDbContext;
 
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
        
         }
         public async Task<(List<User>,int)> GetAllUsersAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-
+            
+            var UnitId = _ipAddressService.GetUnitId();
                      var query = $$"""
 
                      DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
-               FROM AppSecurity.Users 
-              WHERE IsDeleted = 0
+               FROM AppSecurity.Users ur
+               INNER JOIN [AppSecurity].[UserUnit] UU ON UU.UserId=ur.UserId AND UU.IsActive=1
+              WHERE IsDeleted = 0 AND UU.UnitId=@UnitId
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (FirstName LIKE @Search OR LastName LIKE @Search OR UserName LIKE @Search)")}};
 
                 SELECT DISTINCT ur.Id,
@@ -53,7 +58,8 @@ namespace UserManagement.Infrastructure.Repositories.Users
                                 ur.IsDeleted,UG.Id AS UserGroupId
                 FROM AppSecurity.Users ur
                 left join AppSecurity.UserGroup UG on UG.Id=ur.UserGroupId and UG.IsActive=1
-                WHERE ur.IsDeleted = 0
+                INNER JOIN [AppSecurity].[UserUnit] UU ON UU.UserId=ur.UserId AND UU.IsActive=1
+                WHERE ur.IsDeleted = 0  AND UU.UnitId=@UnitId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ur.FirstName LIKE @Search OR ur.LastName LIKE @Search OR ur.UserName LIKE @Search)")}}
                 ORDER BY ur.UserId desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -65,7 +71,8 @@ namespace UserManagement.Infrastructure.Repositories.Users
                        {
                            Search = $"%{SearchTerm}%",
                            Offset = (PageNumber - 1) * PageSize,
-                           PageSize
+                           PageSize,
+                           UnitId
                        };
                     // var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
 
@@ -84,6 +91,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
 
      public async Task<User?> GetByIdAsync(int userId)
 {
+    var UnitId = _ipAddressService.GetUnitId();
     const string query = @"
         SELECT ur.Id,
                ur.UserId,
@@ -110,7 +118,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
         LEFT JOIN AppSecurity.UserDivision ud ON ud.UserId = ur.UserId AND ud.IsActive = 1
         LEFT JOIN AppSecurity.UserGroup UG ON UG.Id = ur.UserGroupId AND UG.IsActive = 1
         LEFT JOIN AppSecurity.UserDepartment udd ON udd.UserId = ur.UserId AND udd.IsActive = 1
-        WHERE ur.IsDeleted = 0 AND ur.UserId = @UserId";
+        WHERE ur.IsDeleted = 0 AND ur.UserId = @UserId AND uu.UnitId=@UnitId";
 
     var userDictionary = new Dictionary<int, User>();
 
@@ -166,7 +174,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
 
             return existingUser;
         },
-        new { userId },
+        new { userId,UnitId },
         splitOn: "UserRoleId,CompanyId,UnitId,DivisionId,DepartmentId,UserGroupId" // ✅ Added UserGroupId here
     );
 
@@ -177,13 +185,17 @@ namespace UserManagement.Infrastructure.Repositories.Users
 
         public async Task<User?> GetByUsernameAsync(string? username, int? id = null)
         {
+            var UnitId = _ipAddressService.GetUnitId();
            
              var query = """
-                 SELECT * FROM AppSecurity.Users 
-                 WHERE UserName = @Username AND IsDeleted = 0
+                 SELECT u.Id,u.FirstName,u.LastName,u.UserName,u.IsActive,u.PasswordHash,u.UserType,u.Mobile,u.EmailId,u.CreatedBy,
+                 u.CreatedByName,u.CreatedAt,u.CreatedIP,u.ModifiedBy,u.ModifiedByName,u.ModifiedAt,u.ModifiedIP,u.UserId,u.IsFirstTimeUser,u.IsDeleted,
+                 u.EntityId,u.UserGroupId,u.IsLocked FROM AppSecurity.Users u
+                 INNER JOIN AppSecurity.UserUnit uu ON uu.UserId = u.UserId AND uu.IsActive = 1
+                 WHERE UserName = @Username AND IsDeleted = 0 AND uu.UnitId=@UnitId
                  """;
 
-             var parameters = new DynamicParameters(new { Username = username });
+             var parameters = new DynamicParameters(new { Username = username,UnitId });
 
              if (id is not null)
              {
@@ -201,13 +213,15 @@ namespace UserManagement.Infrastructure.Repositories.Users
         }
         public async Task<List<User>> GetUser(string searchPattern)
         {
+            var UnitId = _ipAddressService.GetUnitId();
              const string query = @"
-                SELECT UserId, UserName 
-                FROM AppSecurity.Users
-                WHERE IsDeleted = 0 AND UserName LIKE @SearchPattern";
+                SELECT u.UserId, u.UserName 
+                FROM AppSecurity.Users u
+                INNER JOIN AppSecurity.UserUnit uu ON uu.UserId = u.UserId AND uu.IsActive = 1
+                WHERE IsDeleted = 0 AND UserName LIKE @SearchPattern AND uu.UnitId=@UnitId" ;
                 
             
-            var users = await _dbConnection.QueryAsync<User>(query, new { SearchPattern = $"%{searchPattern}%" });
+            var users = await _dbConnection.QueryAsync<User>(query, new { SearchPattern = $"%{searchPattern}%",UnitId });
             
             
             //    var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
@@ -220,12 +234,14 @@ namespace UserManagement.Infrastructure.Repositories.Users
         }
         public async Task<List<string>> GetUserRolesAsync(int userId)
         {
+            var UnitId = _ipAddressService.GetUnitId();
                 const string query = @"
                 SELECT ur.RoleName
                 FROM AppSecurity.UserRole ur
                 INNER JOIN AppSecurity.UserRoleAllocation ura ON   ur.Id = ura.UserRoleId
                 INNER JOIN AppSecurity.Users u ON u.UserId = ura.UserId
-                WHERE u.UserId = @UserId and u.IsDeleted = 0";
+                INNER JOIN AppSecurity.UserUnit uu ON uu.UserId = u.UserId AND uu.IsActive = 1
+                WHERE u.UserId = @UserId and u.IsDeleted = 0 AND uu.UnitId=@UnitId";
                 // const string query = @"
                 // SELECT 'Admin' as RoleName FROM AppSecurity.Users u 
                 // WHERE u.UserId = @UserId";
@@ -234,7 +250,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
                 // var policyWrap = Policy.WrapAsync( _retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
                 // return await policyWrap.ExecuteAsync(async () =>
                 // {
-                return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId })).ToList();
+                return (await _dbConnection.QueryAsync<string>(query, new { UserId = userId,UnitId })).ToList();
                 // });
 
         }
@@ -316,11 +332,13 @@ namespace UserManagement.Infrastructure.Repositories.Users
         }
           public async Task<User> GetByUsernameAsync(string username)
         {
-           
+           var UnitId = _ipAddressService.GetUnitId();
              var query = """
-                 SELECT U.Id,U.FirstName,U.LastName,U.UserName,U.UserType,U.Mobile,U.EmailId,U.UserId,U.IsFirstTimeUser,U.EntityId,U.PasswordHash,UG.GroupCode FROM AppSecurity.Users U
+                 SELECT U.Id,U.FirstName,U.LastName,U.UserName,U.UserType,U.Mobile,U.EmailId,U.UserId,U.IsFirstTimeUser,U.EntityId,U.PasswordHash,UG.GroupCode 
+                 FROM AppSecurity.Users U
                  LEFT JOIN AppSecurity.UserGroup UG ON UG.Id = U.UserGroupId 
-                 WHERE U.UserName = @Username AND U.IsDeleted = 0
+                 INNER JOIN AppSecurity.UserUnit uu ON uu.UserId = U.UserId AND uu.IsActive = 1
+                 WHERE U.UserName = @Username AND U.IsDeleted = 0 AND uu.UnitId=@UnitId
                  """;
 
 
