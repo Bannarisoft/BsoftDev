@@ -1,26 +1,29 @@
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IDepreciationDetail;
 using Core.Domain.Common;
 using Core.Domain.Entities;
 using FAM.Infrastructure.Data;
+using FAM.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace FAM.Infrastructure.Repositories.DepreciationDetail
 {
-    public class DepreciationDetailCommandRepository : IDepreciationDetailCommandRepository
+    public class DepreciationDetailCommandRepository : BaseQueryRepository,IDepreciationDetailCommandRepository
     {
         private readonly ApplicationDbContext _applicationDbContext;
 
-        public DepreciationDetailCommandRepository(ApplicationDbContext applicationDbContext)
+        public DepreciationDetailCommandRepository(ApplicationDbContext applicationDbContext,IIPAddressService ipAddressService)
+        : base(ipAddressService) 
         {
             _applicationDbContext = applicationDbContext;
         }
 
         
-        public async Task<int> DeleteAsync(int companyId, int unitId, int finYearId, int depreciationType,int depreciationPeriod)
+        public async Task<int> DeleteAsync( int finYearId, int depreciationType,int depreciationPeriod)
         {
             var depreciationDetails = await _applicationDbContext.DepreciationDetails
-                .Where(d => d.CompanyId == companyId &&
-                                           (unitId == 0 || d.UnitId == unitId) &&
+                .Where(d => d.CompanyId == CompanyId &&
+                                           (UnitId == 0 || d.UnitId == UnitId) &&
                                           d.Finyear == finYearId &&
                                           d.DepreciationPeriod == depreciationPeriod && d.DepreciationType==depreciationType ).ToListAsync();        
             if (depreciationDetails != null)
@@ -31,11 +34,11 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             return 0;
         }
 
-        public async Task<int> UpdateAsync(int companyId, int unitId, int finYearId, int depreciationType, int depreciationPeriod)
+        public async Task<int> UpdateAsync(int finYearId, int depreciationType, int depreciationPeriod)
         {
             var depreciationDetails = await _applicationDbContext.DepreciationDetails
-                .Where(d => d.CompanyId == companyId &&
-                                           (unitId == 0 || d.UnitId == unitId) &&
+                .Where(d => d.CompanyId == CompanyId &&
+                                           (UnitId == 0 || d.UnitId == UnitId) &&
                                           d.Finyear == finYearId &&
                                           d.DepreciationPeriod == depreciationPeriod && d.DepreciationType==depreciationType ).ToListAsync();        
             if (depreciationDetails != null)

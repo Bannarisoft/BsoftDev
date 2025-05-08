@@ -240,8 +240,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 var status  = await _applicationDbContext.MiscMaster
                 .FirstOrDefaultAsync(mm => mm.Code == MiscEnumEntity.GetStatusId.Status);
 
+
+                workOrder.StatusId =status.Id; // Start work
+                _applicationDbContext.WorkOrder.Update(workOrder);
+                await _applicationDbContext.SaveChangesAsync();
+
                 var maintenanceRequest = await _applicationDbContext.MaintenanceRequest
                     .FirstOrDefaultAsync(mr => mr.Id == workOrder.RequestId);
+
                 if (maintenanceRequest != null)
                 {
                     maintenanceRequest.RequestStatusId =status.Id; // Start work
