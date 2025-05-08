@@ -71,6 +71,11 @@ namespace UserManagement.API.Validation.Users
                             !await IsNewPasswordSameAsOldPassword(command.UserName, password))
                         .WithMessage($"{rule.Error}");
                         break;
+                          case "IsFirstime":
+                         RuleFor(x => x.UserName)
+                         .MustAsync(async (UserName, cancellation) => await _userQueryRepository.IsFirstimeUserValidation(UserName))
+                        .WithMessage($"{rule.Error}");
+                        break;
                          default:
                        
                         break;
