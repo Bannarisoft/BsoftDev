@@ -25,7 +25,7 @@ public class UserProfile : Profile
         .ForMember(dest => dest.IsFirstTimeUser, opt => opt.MapFrom(src => FirstTimeUserStatus.Yes))
         .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
         .ForMember(dest => dest.UserType, opt => opt.MapFrom(src => 1))
-        .ForMember(dest => dest.Entity, opt => opt.MapFrom(src => _ipAddressService.GetEntityId()));
+        .ForMember(dest => dest.EntityId, opt => opt.MapFrom(src => _ipAddressService.GetEntityId()));
 
         CreateMap<UserCompanyDTO, UserCompany>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
