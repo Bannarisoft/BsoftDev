@@ -91,7 +91,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
 
      public async Task<User?> GetByIdAsync(int userId)
 {
-    var UnitId = _ipAddressService.GetUnitId();
+    // var UnitId = _ipAddressService.GetUnitId();
     const string query = @"
         SELECT ur.Id,
                ur.UserId,
@@ -118,7 +118,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
         LEFT JOIN AppSecurity.UserDivision ud ON ud.UserId = ur.UserId AND ud.IsActive = 1
         LEFT JOIN AppSecurity.UserGroup UG ON UG.Id = ur.UserGroupId AND UG.IsActive = 1
         LEFT JOIN AppSecurity.UserDepartment udd ON udd.UserId = ur.UserId AND udd.IsActive = 1
-        WHERE ur.IsDeleted = 0 AND ur.UserId = @UserId AND uu.UnitId=@UnitId";
+        WHERE ur.IsDeleted = 0 AND ur.UserId = @UserId";
 
     var userDictionary = new Dictionary<int, User>();
 
@@ -174,7 +174,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
 
             return existingUser;
         },
-        new { userId,UnitId },
+        new { userId },
         splitOn: "UserRoleId,CompanyId,UnitId,DivisionId,DepartmentId,UserGroupId" // ✅ Added UserGroupId here
     );
 
