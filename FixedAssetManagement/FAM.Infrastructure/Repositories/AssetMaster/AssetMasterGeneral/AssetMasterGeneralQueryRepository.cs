@@ -105,7 +105,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             {
                 CompanyId,
                 UnitId,
-                assetId = $"%{assetId}%"
+                assetId = assetId
             });
 
             if (assetMaster is null)
