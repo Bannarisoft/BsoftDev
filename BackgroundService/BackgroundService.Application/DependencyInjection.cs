@@ -1,4 +1,5 @@
 using System.Reflection;
+using BackgroundService.Application.DelyedJobs;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Application
@@ -12,7 +13,7 @@ namespace BackgroundService.Application
             // Use a specific AddAutoMapper overload
             services.AddAutoMapper(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
             
-
+        services.AddScoped<UserUnlockservice>();
             // Add MediatR
             // services.AddMediatR(cfg =>
             // {
