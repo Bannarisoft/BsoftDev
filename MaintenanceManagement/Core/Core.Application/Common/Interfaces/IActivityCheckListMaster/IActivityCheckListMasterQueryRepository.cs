@@ -18,7 +18,10 @@ namespace Core.Application.Common.Interfaces.IActivityCheckListMaster
             Task<bool> AlreadyExistsCheckListAsync(string activityChecklist , int activityId,int? id = null);
 
            // Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdAsync( int  Id) ;
-            Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdsAsync(List<int> ids);
+        //    Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdsAsync(List<int> ids);
+
+        Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdsAsync(List<int> ids, int? workOrderId = null);
+
                                                               
 
              
