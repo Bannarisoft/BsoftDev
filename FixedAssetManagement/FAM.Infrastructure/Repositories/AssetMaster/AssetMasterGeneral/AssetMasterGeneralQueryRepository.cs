@@ -530,5 +530,6 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 
             return (companyName, unitName);
         }  
+        
     }
 }

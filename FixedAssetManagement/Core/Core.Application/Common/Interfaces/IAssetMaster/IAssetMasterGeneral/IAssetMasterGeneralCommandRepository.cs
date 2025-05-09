@@ -14,7 +14,6 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
         Task<bool> UpdateAssetImageAsync(int assetId, string imageName);
         Task<AssetMasterGeneralDTO?> GetByAssetImageAsync(string imageName);
         Task<bool> RemoveAssetImageReferenceAsync(string assetId);
-        Task<bool> RemoveAssetWarrantyAsync(string assetPath);
-        Task<string> GetBaseDirectoryAsync();          
+        Task<bool> RemoveAssetWarrantyAsync(string assetPath);              
     }
 }

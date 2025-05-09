@@ -16,5 +16,6 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
         public byte? IsCompleted { get; set; }
         public int MaintenanceTypeId { get; set; }
         public string? MachineName { get; set; }
+        public string? ScheduleStatus { get; set; }
     }
 }
