@@ -33,8 +33,19 @@ namespace UserManagement.Infrastructure.Repositories.Users
         }
         public async Task<(List<User>,int)> GetAllUsersAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-            
+            var groupCode = _ipAddressService.GetGroupcode();
+           
             var UnitId = _ipAddressService.GetUnitId();
+            var CompanyId = _ipAddressService.GetCompanyId();
+            var EntityId = _ipAddressService.GetEntityId();
+
+                   string filterCondition = groupCode switch
+                   {
+                       "SUPER_ADMIN" => "", 
+                       "ADMIN" => "AND ur.EntityId = @EntityId",
+                       "USER" => "AND UU.UnitId = @UnitId",
+                       _ => throw new UnauthorizedAccessException("Invalid user group")
+                   };
                      var query = $$"""
 
                      DECLARE @TotalCount INT;
@@ -42,7 +53,8 @@ namespace UserManagement.Infrastructure.Repositories.Users
                FROM AppSecurity.Users ur
                INNER JOIN [AppSecurity].[UserUnit] UU ON UU.UserId=ur.UserId AND UU.IsActive=1
               WHERE IsDeleted = 0 AND UU.UnitId=@UnitId
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (FirstName LIKE @Search OR LastName LIKE @Search OR UserName LIKE @Search)")}};
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (FirstName LIKE @Search OR LastName LIKE @Search OR UserName LIKE @Search)")}}
+            {{filterCondition}};
 
                 SELECT DISTINCT ur.Id,
                                 ur.UserId,
@@ -59,8 +71,9 @@ namespace UserManagement.Infrastructure.Repositories.Users
                 FROM AppSecurity.Users ur
                 left join AppSecurity.UserGroup UG on UG.Id=ur.UserGroupId and UG.IsActive=1
                 INNER JOIN [AppSecurity].[UserUnit] UU ON UU.UserId=ur.UserId AND UU.IsActive=1
-                WHERE ur.IsDeleted = 0  AND UU.UnitId=@UnitId
+                WHERE ur.IsDeleted = 0  
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ur.FirstName LIKE @Search OR ur.LastName LIKE @Search OR ur.UserName LIKE @Search)")}}
+                {{filterCondition}}
                 ORDER BY ur.UserId desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
@@ -72,7 +85,8 @@ namespace UserManagement.Infrastructure.Repositories.Users
                            Search = $"%{SearchTerm}%",
                            Offset = (PageNumber - 1) * PageSize,
                            PageSize,
-                           UnitId
+                           UnitId,
+                           EntityId
                        };
                     // var policyWrap = Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy, _timeoutPolicy);
 
