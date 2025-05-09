@@ -106,7 +106,7 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
                             break;
                     case "Email":
                           RuleFor(x => x.VendorEmail)
-                            .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
+                            .EmailAddress() 
                             .When(x => !string.IsNullOrEmpty(x.VendorEmail))
                             .WithMessage($"{nameof(VendorEmail)} {rule.Error}");
                              break;

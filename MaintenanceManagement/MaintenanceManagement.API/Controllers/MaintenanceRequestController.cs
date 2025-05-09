@@ -382,14 +382,14 @@ namespace MaintenanceManagement.API.Controllers
             public async Task<IActionResult> MaintenanceReportAsync(
                 [FromQuery] DateTimeOffset? requestFromDate,
                 [FromQuery] DateTimeOffset? requestToDate,
-                [FromQuery] int getRequestType,
+                [FromQuery] int RequestType,
                 [FromQuery] int requestStatus)
             {
                 var query = new RequestReportQuery
                 {
                     RequestFromDate = requestFromDate,
                     RequestToDate = requestToDate,
-                    RequestType = getRequestType,
+                    RequestType = RequestType,
                     RequestStatus = requestStatus
                 };
 
