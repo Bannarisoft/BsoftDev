@@ -44,10 +44,10 @@
     <PackageReference Include="Shared.Infrastructure" Version="1.0.0" /> -->
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- <ItemGroup>
   <Protobuf Include="..\..\Shared\Contracts\Protos\department.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" GrpcServices="Client" />
-</ItemGroup>
+</ItemGroup> -->
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

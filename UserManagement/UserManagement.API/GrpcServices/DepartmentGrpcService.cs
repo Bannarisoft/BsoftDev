@@ -6,8 +6,8 @@ using GrpcServices.Maintenance;
 using Microsoft.AspNetCore.Authorization; */
 
 //[Authorize]
-public class DepartmentGrpcService //: DepartmentService.DepartmentServiceBase
-{
+// public class DepartmentGrpcService //: DepartmentService.DepartmentServiceBase
+// {
    /*  private readonly IDepartmentQueryRepository _departmentRepository;
 
     public DepartmentGrpcService(IDepartmentQueryRepository departmentRepository)
@@ -29,4 +29,4 @@ public class DepartmentGrpcService //: DepartmentService.DepartmentServiceBase
 
         return response;
     } */
-}
+// }
