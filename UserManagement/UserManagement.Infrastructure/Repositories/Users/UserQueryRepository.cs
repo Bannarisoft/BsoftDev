@@ -70,7 +70,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
                                 ur.IsDeleted,UG.Id AS UserGroupId
                 FROM AppSecurity.Users ur
                 left join AppSecurity.UserGroup UG on UG.Id=ur.UserGroupId and UG.IsActive=1
-                INNER JOIN [AppSecurity].[UserUnit] UU ON UU.UserId=ur.UserId AND UU.IsActive=1
+                LEFT JOIN [AppSecurity].[UserUnit] UU ON UU.UserId=ur.UserId AND UU.IsActive=1
                 WHERE ur.IsDeleted = 0  
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ur.FirstName LIKE @Search OR ur.LastName LIKE @Search OR ur.UserName LIKE @Search)")}}
                 {{filterCondition}}
