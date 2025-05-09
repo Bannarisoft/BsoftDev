@@ -40,9 +40,7 @@ namespace Core.Application.Location.Queries.GetLocations
                 {
                     data.DepartmentName = departmentName;
                 }
-
                 LocationDictionary[data.DepartmentId] = data;
-
             }
 
             /*  // 🔥 Fetch departments using gRPC
