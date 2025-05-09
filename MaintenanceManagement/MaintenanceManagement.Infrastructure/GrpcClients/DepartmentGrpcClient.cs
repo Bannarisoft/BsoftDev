@@ -1,10 +1,10 @@
 // using Grpc.Core;
 // using GrpcServices.Maintenance;
-using Microsoft.AspNetCore.Http;
+// using Microsoft.AspNetCore.Http;
 // using Contracts.Interfaces.External.IUser;
 
-namespace MaintenanceManagement.Infrastructure.GrpcClients
-{
+// namespace MaintenanceManagement.Infrastructure.GrpcClients
+// {
     // public class DepartmentGrpcClient : IDepartmentGrpcClient
     // {
     //     private readonly DepartmentService.DepartmentServiceClient _client;
@@ -52,4 +52,4 @@ namespace MaintenanceManagement.Infrastructure.GrpcClients
     //         return departments;
     //     }
     // }
-}
+// }

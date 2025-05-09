@@ -22,7 +22,7 @@ namespace MaintenanceManagement.API.Middleware
             _timeZoneService = timeZoneService;
         }
 
-        public async Task Invoke(HttpContext context, IJwtTokenHelper jwtTokenHelper, IUserSessionGrpcClient sessionService)
+        public async Task Invoke(HttpContext context, IJwtTokenHelper jwtTokenHelper, IUserSessionService sessionService)
         {
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
             var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
