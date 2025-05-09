@@ -6,8 +6,8 @@
 // using Microsoft.Extensions.DependencyInjection;
 // using Shared.Infrastructure.HttpClientPolly;
 
-namespace MaintenanceManagement.Infrastructure
-{
+// namespace MaintenanceManagement.Infrastructure
+// {
     // public static class HttpClientInjection
     // {
     //     public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
@@ -73,4 +73,4 @@ namespace MaintenanceManagement.Infrastructure
     //         return services;
     //     }
     // }
-}
+// }
