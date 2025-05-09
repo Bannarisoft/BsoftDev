@@ -104,7 +104,7 @@ namespace FAM.API.Validation.Manufacture
                           break;
                     case "Email":
                         RuleFor(x => x.Email)
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                        .EmailAddress()
                         .WithMessage($"{nameof(UpdateManufactureCommand.Email)} {rule.Error}");
                         break;
                     default:                        

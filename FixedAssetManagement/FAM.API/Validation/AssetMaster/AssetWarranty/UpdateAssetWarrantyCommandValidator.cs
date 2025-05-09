@@ -106,10 +106,10 @@ namespace FAM.API.Validation.AssetMaster.AssetWaranty
                           break;
                     case "Email":
                         RuleFor(x => x.Email)
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                        .EmailAddress()
                         .WithMessage($"{nameof(UpdateAssetWarrantyCommand.Email)} {rule.Error}");
                          RuleFor(x => x.ServiceEmail)
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                        .EmailAddress()
                         .WithMessage($"{nameof(UpdateAssetWarrantyCommand.ServiceEmail)} {rule.Error}");
                         break;
                     default:                        
