@@ -35,13 +35,22 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .IsRequired(false)
                 .HasColumnType("DateTimeOffset");    
 
-             builder.Property(c => c.ISCompleted)                
+             builder.Property(c => c.IsCompleted)                
                 .HasColumnType("bit")
                 .HasConversion(
                     v => v == 1, 
                     v => v ? (byte)1 : (byte)0 
                 )
                 .IsRequired(false);
+                
+            builder.Property(t => t.StatusId)
+                .HasColumnName("StatusId")
+                .HasColumnType("int")
+                .IsRequired();
+            builder.HasOne(amg => amg.MiscStatus)
+                .WithMany(am => am.WorkOrderScheduleStatus)
+                .HasForeignKey(amg => amg.StatusId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
