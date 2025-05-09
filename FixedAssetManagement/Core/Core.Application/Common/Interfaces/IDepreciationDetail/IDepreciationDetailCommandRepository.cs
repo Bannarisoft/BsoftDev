@@ -6,8 +6,8 @@ namespace Core.Application.Common.Interfaces.IDepreciationDetail
 {
     public interface IDepreciationDetailCommandRepository
     {        
-        Task<int> DeleteAsync(int companyId, int unitId, int finYearId, int depreciationType,int depreciationPeriod);      
-        Task<int> UpdateAsync(int companyId, int unitId, int finYearId, int depreciationType,int depreciationPeriod);   
+        Task<int> DeleteAsync( int finYearId, int depreciationType,int depreciationPeriod);      
+        Task<int> UpdateAsync(int finYearId, int depreciationType,int depreciationPeriod);   
         
     }
 }

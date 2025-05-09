@@ -8,5 +8,6 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset? EndTime { get; set; }   
         public byte? IsCompleted { get; set; }  
+        public int StatusId { get; set; }  
     }
 }

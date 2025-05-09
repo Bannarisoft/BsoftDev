@@ -4,26 +4,24 @@ using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Common;
 using Dapper;
+using MaintenanceManagement.Infrastructure.Repositories.Common;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
-    public class WorkOrderQueryRepository : IWorkOrderQueryRepository
+    public class WorkOrderQueryRepository :BaseQueryRepository, IWorkOrderQueryRepository
     {
-        private readonly IDbConnection _dbConnection;
-        private readonly IIPAddressService _ipAddressService;
+        private readonly IDbConnection _dbConnection;        
         public WorkOrderQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
+        : base(ipAddressService) 
         {
-            _dbConnection = dbConnection;
-            _ipAddressService = ipAddressService;
+            _dbConnection = dbConnection;            
         }
 
         public async Task<(List<WorkOrderWithScheduleDto>, int)> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,int? requestTypeId, int? PageNumber, int? PageSize, string? SearchTerm)
-        {
-            var companyId = _ipAddressService.GetCompanyId();
-            var unitId = _ipAddressService.GetUnitId();
+        {         
             var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", companyId);
-            parameters.Add("@UnitId", unitId);
+            parameters.Add("@CompanyId", CompanyId);
+            parameters.Add("@UnitId", UnitId);
             parameters.Add("@FromDate", fromDate);
             parameters.Add("@ToDate", toDate);
             parameters.Add("@RequestType", requestTypeId);
@@ -53,8 +51,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             ";
              var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
             return result;               
-        }    
-       
+        }          
       
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetWORootCauseDescAsync()
         {
@@ -125,11 +122,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
         public async Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity, IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician, IEnumerable<dynamic> checkList, IEnumerable<dynamic> schedule)> GetWorkOrderByIdAsync(int workOrderId)         
         {
-            var companyId = _ipAddressService.GetCompanyId();
-            var unitId = _ipAddressService.GetUnitId();
             var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", companyId);
-            parameters.Add("@UnitId", unitId);
+            parameters.Add("@CompanyId", CompanyId);
+            parameters.Add("@UnitId", UnitId);
             parameters.Add("@WorkOrderId", workOrderId);
 
             using var multi = await _dbConnection.QueryMultipleAsync("dbo.Usp_GetWorkOrderById", parameters, commandType: CommandType.StoredProcedure);
@@ -146,8 +141,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
         public async Task<List<Core.Domain.Entities.WorkOrderMaster.WorkOrder>> GetWorkOrderAsync()
         {
-            var companyId = _ipAddressService.GetCompanyId();
-            var unitId = _ipAddressService.GetUnitId();
             var excludedStatusCode = MiscEnumEntity.MaintenanceStatusUpdate.Code;
             const string query = @"
                 SELECT WO.Id, WO.WorkOrderDocNo
@@ -160,8 +153,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
             var parameters = new 
             { 
-                CompanyId = companyId, 
-                UnitId = unitId, 
+                CompanyId, 
+                UnitId, 
                 ExcludedStatusCode = excludedStatusCode 
             };
         var result = await _dbConnection.QueryAsync<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(query, parameters);

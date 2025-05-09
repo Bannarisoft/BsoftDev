@@ -20,8 +20,6 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         }     
         public async Task<(List<AssetMasterGeneralDTO>, int)> GetAllAssetAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-            //var companyId = _ipAddressService.GetCompanyId();
-            //var unitId = _ipAddressService.GetUnitId();
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", CompanyId);
             parameters.Add("@UnitId", UnitId);
@@ -159,17 +157,26 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         public async Task<bool> GetAssetChildDetails(int assetId)
         {
             const string query = @"
-                    SELECT 1 FROM [FixedAsset].[AssetLocation] WHERE AssetId = @Id ;
-                    SELECT 1 FROM [FixedAsset].[AssetPurchaseDetails] WHERE AssetId = @Id ;
-                    SELECT 1 FROM [FixedAsset].[AssetWarranty] WHERE AssetId = @Id AND IsDeleted = 0;
-                    SELECT 1 FROM [FixedAsset].[AssetSpecifications] WHERE AssetId = @Id AND IsDeleted = 0;
-                    SELECT 1 FROM [FixedAsset].[AssetAmc] WHERE AssetId = @Id AND IsDeleted = 0;
-                    SELECT 1 FROM [FixedAsset].[AssetInsurance] WHERE AssetId = @Id AND IsDeleted = 0;
-                    SELECT 1 FROM [FixedAsset].[AssetAdditionalCost] WHERE AssetId = @Id ;
-                    SELECT 1 FROM [FixedAsset].[AssetDisposal] WHERE AssetId = @Id AND IsDeleted = 0;
-                    SELECT 1 FROM [FixedAsset].[DepreciationDetail] WHERE AssetId = @Id ";
-            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = assetId });
-                    
+                SELECT 1 FROM [FixedAsset].[AssetLocation] WHERE unit_id=@UnitId AND AssetId = @Id ;
+                SELECT 1 FROM [FixedAsset].[AssetPurchaseDetails] WHERE AssetId = @Id ;
+                SELECT 1 FROM [FixedAsset].[AssetWarranty] WHERE AssetId = @Id AND IsDeleted = 0;
+                SELECT 1 FROM [FixedAsset].[AssetSpecifications] WHERE AssetId = @Id AND IsDeleted = 0;
+                SELECT 1 FROM [FixedAsset].[AssetAmc] WHERE AssetId = @Id AND IsDeleted = 0;
+                SELECT 1 FROM [FixedAsset].[AssetInsurance] WHERE AssetId = @Id AND IsDeleted = 0;
+                SELECT 1 FROM [FixedAsset].[AssetAdditionalCost] WHERE AssetId = @Id ;
+                SELECT 1 FROM [FixedAsset].[AssetDisposal] WHERE AssetId = @Id AND IsDeleted = 0;
+                SELECT 1 FROM [FixedAsset].[DepreciationDetail] WHERE companyId=@CompanyId AND unit_id=@UnitId AND  AssetId = @Id ";
+
+            //using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = assetId });        
+            using var multi = await _dbConnection.QueryMultipleAsync(
+                query,
+                new
+                {
+                    UnitId,
+                    Id = assetId,
+                    CompanyId                    
+                });            
+
             var locationExists = await multi.ReadFirstOrDefaultAsync<int?>();  
             var purchaseExists = await multi.ReadFirstOrDefaultAsync<int?>();
             var warrantyExists = await multi.ReadFirstOrDefaultAsync<int?>();
@@ -273,8 +280,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 INNER JOIN [FixedAsset].[SubLocation] SL ON SL.Id=AL.SubLocationId
                 LEFT JOIN [Bannari].[AppData].[Unit] U ON AL.UnitId = U.Id
                 LEFT JOIN [Bannari].[AppData].[Department] D ON AL.DepartmentId=D.Id                
-                WHERE AL.AssetId = @AssetId;
-                
+                WHERE AL.UnitId = @UnitId AND AL.AssetId = @AssetId;                
 
                 -- Third Query: AssetPurchaseDetails (One-to-Many)
                 SELECT distinct AP.Id,AP.VendorCode, AP.VendorName,U.UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
@@ -284,7 +290,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 FROM [FixedAsset].[AssetPurchaseDetails] AP
                 LEFT JOIN [Bannari].[AppData].[Unit] U ON AP.OldUnitId = U.OldUnitId
                 INNER JOIN [FixedAsset].[AssetSource] ASource ON ASource.Id=AP.AssetSourceId
-                WHERE AP.AssetId = @AssetId;
+                WHERE U.UnitId = @UnitId AND AP.AssetId = @AssetId;
 
                 SELECT A.Id,SM.SpecificationName,A.SpecificationValue,A.SpecificationId,SM.IsDefault FROM  [FixedAsset].[AssetSpecifications] A
                 INNER JOIN [FixedAsset].[SpecificationMaster] SM ON SM.Id=A.SpecificationId
@@ -423,7 +429,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 INNER JOIN [FixedAsset].[SubLocation] SL ON SL.Id=AL.SubLocationId
                 LEFT JOIN [Bannari].[AppData].[Unit] U ON AL.UnitId = U.Id
                 LEFT JOIN [Bannari].[AppData].[Department] D ON AL.DepartmentId=D.Id                
-                WHERE AL.AssetId = @AssetId;
+                WHERE AL.UnitId = @UnitId AND  AL.AssetId = @AssetId;
                 
 
                 -- Third Query: AssetPurchaseDetails (One-to-Many)
@@ -434,7 +440,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 FROM [FixedAsset].[AssetPurchaseDetails] AP
                 LEFT JOIN [Bannari].[AppData].[Unit] U ON AP.OldUnitId = U.OldUnitId
                 INNER JOIN [FixedAsset].[AssetSource] ASource ON ASource.Id=AP.AssetSourceId
-                WHERE AP.AssetId = @AssetId;             
+                WHERE U.UnitId = @UnitId AND AP.AssetId = @AssetId;             
 
                 SELECT AC.Id,AssetSourceId,Amount,JournalNo,CostType,MM.Code CostTypeDesc
                 FROM [FixedAsset].[AssetAdditionalCost]AC
@@ -524,5 +530,6 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 
             return (companyName, unitName);
         }  
+        
     }
 }
