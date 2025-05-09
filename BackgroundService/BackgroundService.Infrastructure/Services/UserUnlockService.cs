@@ -19,7 +19,7 @@ namespace BackgroundService.Infrastructure.Services
         public async Task UnlockUser(string userName)
         {
             var client = _httpClientFactory.CreateClient("UserManagementClient");
-            await client.PostAsJsonAsync("/api/auth/unlock", new { Username = userName });
+            await client.PostAsJsonAsync("api/auth/unlock", new { Username = userName });
         }
     }
 }
