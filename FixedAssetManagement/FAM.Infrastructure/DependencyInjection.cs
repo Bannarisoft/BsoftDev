@@ -87,12 +87,12 @@ namespace FAM.Infrastructure
                                                 .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
                                                 .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
                                                 .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
-                                                
+
             var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
                                                 .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
                                                 .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
-                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");            
-            
+                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
+
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
@@ -174,6 +174,7 @@ namespace FAM.Infrastructure
 
             // Register IDateTime
             services.AddHttpContextAccessor();
+            services.AddTransient<AuthTokenHandler>();
 
             // Register repositories
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
@@ -232,7 +233,7 @@ namespace FAM.Infrastructure
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddTransient<IFileUploadService, FileUploadRepository>();
-            services.AddSingleton<ITimeZoneService, TimeZoneService>();            
+            services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
 
             // AutoMapper profiles

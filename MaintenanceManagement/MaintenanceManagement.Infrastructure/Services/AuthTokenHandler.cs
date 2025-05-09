@@ -11,10 +11,10 @@ namespace MaintenanceManagement.Infrastructure.Services
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AuthTokenHandler(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
+        public AuthTokenHandler(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
 
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {

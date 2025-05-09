@@ -40,9 +40,7 @@ namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
             }
  */
             // Call CreateAsync and get the status message and code
-            var (creationMessage, statusCode) = await _depreciationDetailQueryRepository.CreateAsync(
-                request.companyId,
-                request.unitId,
+            var (creationMessage, statusCode) = await _depreciationDetailQueryRepository.CreateAsync(               
                 request.finYearId,
                 request.depreciationType,
                 request.depreciationPeriod

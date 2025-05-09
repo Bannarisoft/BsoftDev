@@ -23,9 +23,9 @@ namespace MaintenanceManagement.Infrastructure
                 .Build();
 
           var connectionString = configuration.GetConnectionString("DefaultConnection")
-                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
-                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
-                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
+                                                .Replace("{SERVER}","192.168.1.126")
+                                                .Replace("{USER_ID}","Developer")
+                                                .Replace("{ENC_PASSWORD}", "Dev@#$456");
 
 
             optionsBuilder.UseSqlServer(connectionString);

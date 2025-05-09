@@ -672,6 +672,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("OldVendorId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OldVendorName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
@@ -699,6 +702,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<int?>("VendorId")
                         .HasColumnType("int");
+
+                    b.Property<string>("VendorName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1661,18 +1667,24 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("DateTimeOffset")
                         .HasColumnName("EndTime");
 
-                    b.Property<bool?>("ISCompleted")
+                    b.Property<bool?>("IsCompleted")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("StartTime")
                         .HasColumnType("DateTimeOffset")
                         .HasColumnName("StartTime");
 
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("StatusId");
+
                     b.Property<int>("WorkOrderId")
                         .HasColumnType("int")
                         .HasColumnName("WorkOrderId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StatusId");
 
                     b.HasIndex("WorkOrderId");
 
@@ -2068,11 +2080,19 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule", b =>
                 {
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscStatus")
+                        .WithMany("WorkOrderScheduleStatus")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Core.Domain.Entities.WorkOrderMaster.WorkOrder", "WOSchedule")
                         .WithMany("WorkOrderSchedules")
                         .HasForeignKey("WorkOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MiscStatus");
 
                     b.Navigation("WOSchedule");
                 });
@@ -2167,6 +2187,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("WorkOrderItemStoreType");
 
                     b.Navigation("WorkOrderRootCause");
+
+                    b.Navigation("WorkOrderScheduleStatus");
 
                     b.Navigation("WorkOrderStatus");
 

@@ -6,27 +6,28 @@ using Core.Application.DepreciationDetail.Queries.GetDepreciationDetail;
 using Core.Domain.Common;
 using Dapper;
 using FAM.Infrastructure.Data;
+using FAM.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace FAM.Infrastructure.Repositories.DepreciationDetail
 {
-    public class DepreciationDetailQueryRepository : IDepreciationDetailQueryRepository
+    public class DepreciationDetailQueryRepository : BaseQueryRepository, IDepreciationDetailQueryRepository
     {
         private readonly IDbConnection _dbConnection;
         private readonly ApplicationDbContext _applicationDbContext;
-        private readonly IIPAddressService _ipAddressService;
+        
         public DepreciationDetailQueryRepository(IDbConnection dbConnection,ApplicationDbContext applicationDbContext,IIPAddressService ipAddressService)
+        : base(ipAddressService) 
         {
             _dbConnection = dbConnection;
-            _applicationDbContext = applicationDbContext;
-            _ipAddressService = ipAddressService;
+            _applicationDbContext = applicationDbContext;        
         }
     
-        public async Task<(List<DepreciationDto>, int)> CalculateDepreciationAsync(int companyId,int unitId,int finYearId, DateTimeOffset? startDate, DateTimeOffset? endDate,int depreciationType, int PageNumber, int PageSize, string? SearchTerm,int depreciationPeriod)
+        public async Task<(List<DepreciationDto>, int)> CalculateDepreciationAsync(int finYearId, DateTimeOffset? startDate, DateTimeOffset? endDate,int depreciationType, int PageNumber, int PageSize, string? SearchTerm,int depreciationPeriod)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", companyId);
-            parameters.Add("@UnitId", unitId);
+            parameters.Add("@CompanyId", CompanyId);
+            parameters.Add("@UnitId", UnitId);
             parameters.Add("@Finyear", finYearId);
             parameters.Add("@StartDate", startDate);
             parameters.Add("@EndDate", endDate);
@@ -48,15 +49,15 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             return (depreciationList, totalCount);   
         }
 
-        public async Task<(string message, int statusCode)>  CreateAsync(int companyId, int unitId, int finYearId,  int depreciationType,int depreciationPeriod)
+        public async Task<(string message, int statusCode)>  CreateAsync( int finYearId,  int depreciationType,int depreciationPeriod)
         {
             int userId = _ipAddressService.GetUserId();
             string username = _ipAddressService.GetUserName();
             string ipAddress = _ipAddressService.GetSystemIPAddress();
 
             var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", companyId);
-            parameters.Add("@UnitId", unitId);
+            parameters.Add("@CompanyId", CompanyId);
+            parameters.Add("@UnitId", UnitId);
             parameters.Add("@Finyear", finYearId);
             parameters.Add("@StartDate", null);
             parameters.Add("@EndDate", null);
@@ -93,32 +94,32 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             return ("Unknown error", -1);
         } 
 
-        public async Task<bool> ExistDataAsync(int companyId, int unitId, int finYearId, int depreciationType,int depreciationPeriod)
+        public async Task<bool> ExistDataAsync( int finYearId, int depreciationType,int depreciationPeriod)
         {
             return await _applicationDbContext.DepreciationDetails
-                .Where(d => d.CompanyId == companyId &&
+                .Where(d => d.CompanyId == CompanyId &&
                             d.Finyear == finYearId &&
                             d.DepreciationPeriod == depreciationPeriod &&
                             d.DepreciationType == depreciationType &&                                                    
-                            (unitId == 0 || d.UnitId == unitId)) 
+                            (UnitId == 0 || d.UnitId == UnitId)) 
                 .AnyAsync();
         }
-        public async Task<bool> ExistDataLockedAsync(int companyId, int unitId, int finYearId, int depreciationType,int depreciationPeriod)
+        public async Task<bool> ExistDataLockedAsync( int finYearId, int depreciationType,int depreciationPeriod)
         {
             return await _applicationDbContext.DepreciationDetails
-                .Where(d => d.CompanyId == companyId &&
+                .Where(d => d.CompanyId == CompanyId &&
                             d.Finyear == finYearId &&
                             d.DepreciationPeriod == depreciationPeriod &&
                             d.DepreciationType == depreciationType &&  d.IsLocked ==1 &&                                             
-                            (unitId == 0 || d.UnitId == unitId)) 
+                            (UnitId == 0 || d.UnitId == UnitId)) 
                 .AnyAsync();
         }
 
-        public async Task<List<DepreciationAbstractDto>> GetDepreciationAbstractAsync(int companyId, int unitId, int finYearId, DateTimeOffset? startDate,DateTimeOffset? endDate,int depreciationPeriod, int depreciationType)
+        public async Task<List<DepreciationAbstractDto>> GetDepreciationAbstractAsync(int finYearId, DateTimeOffset? startDate,DateTimeOffset? endDate,int depreciationPeriod, int depreciationType)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", companyId);
-            parameters.Add("@UnitId", unitId);
+            parameters.Add("@CompanyId", CompanyId);
+            parameters.Add("@UnitId", UnitId);
             parameters.Add("@Finyear", finYearId);
             parameters.Add("@StartDate", startDate);
             parameters.Add("@EndDate", endDate);
