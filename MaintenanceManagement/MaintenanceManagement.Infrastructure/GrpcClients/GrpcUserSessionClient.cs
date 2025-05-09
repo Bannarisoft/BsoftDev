@@ -4,8 +4,8 @@
 // using GrpcServices.UserManagement;
 // using Google.Protobuf.WellKnownTypes;
 
-namespace MaintenanceManagement.Infrastructure.GrpcClients
-{
+// namespace MaintenanceManagement.Infrastructure.GrpcClients
+// {
     // public class GrpcUserSessionClient : IUserSessionGrpcClient
     // {
     //     private readonly SessionService.SessionServiceClient _client;
@@ -57,4 +57,4 @@ namespace MaintenanceManagement.Infrastructure.GrpcClients
     //         return true;
     //     }
     // }
-}
+// }

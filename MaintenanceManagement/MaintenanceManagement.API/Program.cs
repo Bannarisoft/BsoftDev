@@ -6,7 +6,7 @@ using MaintenanceManagement.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ;
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 builder.Configuration
 
 .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
@@ -27,7 +27,7 @@ builder.Services.AddSwaggerDocumentation();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
-// builder.Services.AddHttpClients(builder.Configuration);
+builder.Services.AddHttpClientsFactory(builder.Configuration);
 builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
 builder.Services.AddHttpContextAccessor();
@@ -49,8 +49,8 @@ app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
 app.UseCors();// Enable CORS
 app.UseAuthentication();
-//app.UseMiddleware<TokenValidationMiddleware>();
-//app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
+app.UseMiddleware<TokenValidationMiddleware>();
+app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();

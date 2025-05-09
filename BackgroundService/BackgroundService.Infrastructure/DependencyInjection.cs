@@ -57,7 +57,7 @@ namespace BackgroundService.Infrastructure
              services.AddHttpClient("UserManagementClient", client =>
             {
                 //client.BaseAddress = new Uri("http://localhost:5174"); 
-                client.BaseAddress = new Uri(configuration["HttpClientSettings:UserManagement"]);
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:UserManagementService"]);
                 // var userServiceUrl = configuration["HttpClientSettings:UserManagement"];
                 // if (string.IsNullOrWhiteSpace(userServiceUrl))
                 // {

@@ -13,6 +13,7 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
         Task<AssetMasterGenerals?> GetByAssetCodeAsync(string assetCode);
         Task<bool> UpdateAssetImageAsync(int assetId, string imageName);
         Task<AssetMasterGeneralDTO?> GetByAssetImageAsync(string imageName);
-        Task<bool> RemoveAssetImageReferenceAsync(string assetId);          
+        Task<bool> RemoveAssetImageReferenceAsync(string assetId);
+        Task<bool> RemoveAssetWarrantyAsync(string assetPath);              
     }
 }

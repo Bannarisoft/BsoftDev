@@ -4,10 +4,10 @@ using Contracts.Interfaces.External.IUser;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Http; */
 
-namespace FAM.Infrastructure.GrpcClients
-{
-    public class DepartmentGrpcClient //: IDepartmentGrpcClient
-    {
+// namespace FAM.Infrastructure.GrpcClients
+// {
+//     public class DepartmentGrpcClient //: IDepartmentGrpcClient
+//     {
        /*  private readonly DepartmentService.DepartmentServiceClient _client;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -51,5 +51,5 @@ namespace FAM.Infrastructure.GrpcClients
 
             return departments;
         } */
-    }
-}
+//     }
+// }

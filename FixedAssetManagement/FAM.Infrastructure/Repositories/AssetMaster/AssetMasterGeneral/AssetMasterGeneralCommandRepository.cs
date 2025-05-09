@@ -138,6 +138,18 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             asset.AssetImage = null;
             await _applicationDbContext.SaveChangesAsync();
             return true;
-        }        
+        }
+
+        public async Task<bool> RemoveAssetWarrantyAsync(string assetPath)
+        {
+           var asset = await _applicationDbContext.AssetWarranties.FirstOrDefaultAsync(x => x.Document == assetPath);
+            if (asset == null)
+            {
+                return false;  // Asset not found
+            }
+            asset.Document = null;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }

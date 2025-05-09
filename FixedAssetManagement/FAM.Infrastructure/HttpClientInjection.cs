@@ -6,10 +6,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Infrastructure.HttpClientPolly;
  */
-namespace FAM.Infrastructure
-{
-    public static class HttpClientInjection
-    {
+// namespace FAM.Infrastructure
+// {
+//     public static class HttpClientInjection
+//     {
        // public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
         //{
 
@@ -63,5 +63,5 @@ namespace FAM.Infrastructure
             return services;
         }
  */
-    }
-}
+//     }
+// }
