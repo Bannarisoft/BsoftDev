@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IShiftMasterDetail;
 using Core.Domain.Entities;
 using Dapper;
