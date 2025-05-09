@@ -267,7 +267,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             if (existingWO != null)
             {
                 existingWO.EndTime = workOrderSchedule.EndTime;
-                existingWO.ISCompleted=workOrderSchedule.ISCompleted;
+                existingWO.IsCompleted=workOrderSchedule.IsCompleted;
+                existingWO.StatusId=workOrderSchedule.StatusId;
                 _applicationDbContext.WorkOrderSchedule.Update(existingWO);
                 return await _applicationDbContext.SaveChangesAsync() > 0;
             }
