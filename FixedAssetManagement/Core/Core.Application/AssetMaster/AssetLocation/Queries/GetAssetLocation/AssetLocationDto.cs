@@ -12,9 +12,6 @@ namespace Core.Application.AssetLocation.Queries.GetAssetLocation
         public int UnitId { get; set; } 
         public int DepartmentId { get; set; }
         public int LocationId { get; set; }
-        public int SubLocationId { get; set; } 
-
-
-        
+        public int SubLocationId { get; set; }         
     }
 }
