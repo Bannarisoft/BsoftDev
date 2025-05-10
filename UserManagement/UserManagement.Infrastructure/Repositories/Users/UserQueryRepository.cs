@@ -119,6 +119,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
                ur.EmailId,
                ur.IsFirstTimeUser,
                ur.IsDeleted,
+               ur.EntityId,
                ura.UserRoleId,
                uc.CompanyId,
                uu.UnitId,

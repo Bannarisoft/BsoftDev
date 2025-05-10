@@ -73,7 +73,7 @@ namespace UserManagement.API.Validation.Entity
                         break; 
                     case "Email":
                         RuleFor(x => x.Email) 
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
+                        .EmailAddress() 
                         .WithMessage($"{nameof(CreateEntityCommand.Email)} {rule.Error}"); 
                         break;
                     // case "AlphabeticOnly":

@@ -30,7 +30,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                     DECLARE @TotalCount INT;
                     SELECT @TotalCount = COUNT(DISTINCT aclm.Id)
                     FROM Maintenance.Maintenance.ActivityCheckListMaster aclm
-                    INNER JOIN Maintenance.Maintenance.ActivityMaster am 
+                    INNER JOIN Maintenance.ActivityMaster am 
                         ON aclm.ActivityID = am.Id
                     WHERE aclm.IsDeleted = 0
                     {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (am.ActivityName LIKE @Search OR aclm.ActivityChecklist LIKE @Search)")}};
@@ -39,7 +39,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                         aclm.Id AS ChecklistId,
                         aclm.ActivityID,
                         am.ActivityName,
-                        aclm.ActivityChecklist,
+                        aclm.ActivityChecklist ,
                         aclm.IsActive,
                         aclm.IsDeleted,
                         aclm.CreatedBy,
@@ -50,8 +50,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                         aclm.ModifiedDate,
                         aclm.ModifiedByName,
                         aclm.ModifiedIP
-                    FROM Maintenance.Maintenance.ActivityCheckListMaster aclm
-                    INNER JOIN Maintenance.Maintenance.ActivityMaster am 
+                    FROM Maintenance.ActivityCheckListMaster aclm
+                    INNER JOIN Maintenance.ActivityMaster am 
                         ON aclm.ActivityID = am.Id
                     WHERE aclm.IsDeleted = 0
                     {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (am.ActivityName LIKE @Search OR aclm.ActivityChecklist LIKE @Search)")}}
@@ -93,8 +93,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                     aclm.ModifiedDate,
                     aclm.ModifiedByName,
                     aclm.ModifiedIP
-                FROM Maintenance.Maintenance.ActivityCheckListMaster aclm
-                INNER JOIN Maintenance.Maintenance.ActivityMaster am 
+                FROM Maintenance.ActivityCheckListMaster aclm
+                INNER JOIN Maintenance.ActivityMaster am 
                     ON aclm.ActivityID = am.Id
                 WHERE aclm.Id = @id AND aclm.IsDeleted = 0";
                                 
@@ -128,19 +128,19 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                 var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
                 return count > 0;
         }            
-
-           public async Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdsAsync(List<int> ids)
+            public async Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdsAsync(List<int> ids, int? workOrderId = null)
             {
-                 if (ids == null || !ids.Any())
+                if (ids == null || !ids.Any())
                 {
                     return new List<GetActivityCheckListByActivityIdDto>();
                 }
+
                 const string query = @"
                     SELECT 
                         aclm.Id AS ChecklistId,
                         aclm.ActivityID,
                         am.ActivityName,
-                        aclm.ActivityChecklist ,
+                        aclm.ActivityChecklist,
                         aclm.IsActive,
                         aclm.IsDeleted,
                         aclm.CreatedBy,
@@ -151,14 +151,58 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                         aclm.ModifiedDate,
                         aclm.ModifiedByName,
                         aclm.ModifiedIP
-                    FROM Maintenance.Maintenance.ActivityCheckListMaster aclm
-                    INNER JOIN Maintenance.Maintenance.ActivityMaster am 
-                        ON aclm.ActivityID = am.Id
-                    WHERE aclm.ActivityID IN  @ids AND aclm.IsDeleted = 0";
+                    FROM Maintenance.ActivityCheckListMaster aclm
+                    INNER JOIN Maintenance.ActivityMaster am ON aclm.ActivityID = am.Id
+                    LEFT JOIN Maintenance.WorkOrderCheckList WOC 
+                        ON WOC.CheckListId = aclm.Id 
+                        AND (@WorkOrderId IS NULL OR WOC.WorkOrderId = @WorkOrderId)
+                    WHERE aclm.ActivityID IN @Ids
+                        AND aclm.IsDeleted = 0
+                    GROUP BY 
+                        aclm.Id, aclm.ActivityID, am.ActivityName, aclm.ActivityChecklist, aclm.IsActive, 
+                        aclm.IsDeleted, aclm.CreatedBy, aclm.CreatedDate, aclm.CreatedByName, aclm.CreatedIP,
+                        aclm.ModifiedBy, aclm.ModifiedDate, aclm.ModifiedByName, aclm.ModifiedIP";
 
-                var result = await _dbConnection.QueryAsync<GetActivityCheckListByActivityIdDto>(query, new { ids });
+                var parameters = new
+                {
+                    Ids = ids,
+                    WorkOrderId = workOrderId
+                };
+
+                var result = await _dbConnection.QueryAsync<GetActivityCheckListByActivityIdDto>(query, parameters);
                 return result.ToList();
             }
+
+        //    public async Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdsAsync(List<int> ids)
+        //     {
+        //          if (ids == null || !ids.Any())
+        //         {
+        //             return new List<GetActivityCheckListByActivityIdDto>();
+        //         }
+        //         const string query = @"
+        //             SELECT 
+        //                 aclm.Id AS ChecklistId,
+        //                 aclm.ActivityID,
+        //                 am.ActivityName,
+        //                 aclm.ActivityChecklist  ,
+        //                 aclm.IsActive,
+        //                 aclm.IsDeleted,
+        //                 aclm.CreatedBy,
+        //                 aclm.CreatedDate,
+        //                 aclm.CreatedByName,
+        //                 aclm.CreatedIP,
+        //                 aclm.ModifiedBy,
+        //                 aclm.ModifiedDate,
+        //                 aclm.ModifiedByName,
+        //                 aclm.ModifiedIP
+        //             FROM Maintenance.ActivityCheckListMaster aclm
+        //             INNER JOIN Maintenance.ActivityMaster am 
+        //                 ON aclm.ActivityID = am.Id
+        //             WHERE aclm.ActivityID IN  @ids AND aclm.IsDeleted = 0";
+
+        //         var result = await _dbConnection.QueryAsync<GetActivityCheckListByActivityIdDto>(query, new { ids });
+        //         return result.ToList();
+        //     }
 
 
         
