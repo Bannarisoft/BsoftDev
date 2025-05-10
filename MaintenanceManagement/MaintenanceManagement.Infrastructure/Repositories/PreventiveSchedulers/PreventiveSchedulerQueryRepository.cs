@@ -314,6 +314,51 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                         return preventiveSchedulers;
                 }
+                public async Task<PreventiveSchedulerHeader> GetWorkOrderScheduleDetailById(int Id)
+           {
+               var query = $@"
+                    SELECT  
+						 PSH.Id,
+						PSH.CompanyId,
+                       PSH.UnitId,
+                       PSH.MaintenanceCategoryId,
+                       PSD.Id,
+                       PSA.ActivityId,
+                       PSI.OldItemId
+					   FROM [Maintenance].[PreventiveSchedulerDetail] PSD
+				   INNER JOIN [Maintenance].[PreventiveSchedulerHeader] PSH ON PSD.PreventiveSchedulerHeaderId=PSH.Id
+				   INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId=PSD.PreventiveSchedulerHeaderId
+				   LEFT JOIN [Maintenance].[PreventiveSchedulerItems] PSI ON PSI.PreventiveSchedulerHeaderId=PSD.PreventiveSchedulerHeaderId
+				   WHERE PSD.Id =@Id AND PSD.IsDeleted = 0  AND PSH.IsDeleted = 0
+               ";
+
+                   var PreventiveSchedulerDictionary = new Dictionary<int, PreventiveSchedulerHeader>();
+
+              var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader,PreventiveSchedulerActivity,PreventiveSchedulerItems, PreventiveSchedulerHeader>(
+              query,
+              (preventiveScheduler, preventiveSchedulerActivity, preventiveSchedulerItems) =>
+              {
+                  if (!PreventiveSchedulerDictionary.TryGetValue(preventiveScheduler.Id, out var existingPreventiveScheduler))
+                  {
+                      existingPreventiveScheduler = preventiveScheduler;
+                      existingPreventiveScheduler.PreventiveSchedulerActivities = new List<PreventiveSchedulerActivity>();
+                      existingPreventiveScheduler.PreventiveSchedulerItems = new List<PreventiveSchedulerItems>();
+                      PreventiveSchedulerDictionary[preventiveScheduler.Id] = existingPreventiveScheduler;
+                  }
+
+                      existingPreventiveScheduler.PreventiveSchedulerActivities!.Add(preventiveSchedulerActivity);
+
+                      existingPreventiveScheduler.PreventiveSchedulerItems!.Add(preventiveSchedulerItems);
+
+
+                  return existingPreventiveScheduler;
+              },
+              new { Id },
+              splitOn: "Id,ActivityId,OldItemId" 
+              );
+
+            return PreventiveSchedulerResponse.FirstOrDefault()!;
+           }
              
 
     }
