@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Application.Common.Interfaces.IWorkOrder;
@@ -19,13 +20,15 @@ namespace Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder
         private readonly IMediator _mediator;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IWorkOrderCommandRepository _workOrderRepository;
-        public ScheduleWorkOrderCommandHandler( IPreventiveSchedulerQuery preventiveSchedulerQuery,IMapper mapper, IMediator mediator,IMiscMasterQueryRepository miscMasterQueryRepository ,IWorkOrderCommandRepository workOrderRepository)
+        private readonly IIPAddressService _ipAddressService;
+        public ScheduleWorkOrderCommandHandler( IPreventiveSchedulerQuery preventiveSchedulerQuery,IMapper mapper, IMediator mediator,IMiscMasterQueryRepository miscMasterQueryRepository ,IWorkOrderCommandRepository workOrderRepository,IIPAddressService iPAddressService)
         {
             _preventiveSchedulerQuery=preventiveSchedulerQuery;
             _mapper=mapper;
             _mediator=mediator;
             _miscMasterQueryRepository=miscMasterQueryRepository;
             _workOrderRepository=workOrderRepository;
+            _ipAddressService = iPAddressService;
         }
         public async Task<ApiResponseDTO<bool>> Handle(ScheduleWorkOrderCommand request, CancellationToken cancellationToken)
         {
@@ -39,7 +42,11 @@ namespace Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder
                             opt.Items["StatusId"] = miscdetail.Id;
                             opt.Items["PreventiveSchedulerDetailId"] = scheduledetail.PreventiveSchedulerDetails?.FirstOrDefault()?.Id;   
                         });
-
+                        workOrderRequest.CreatedByName="System";
+                        workOrderRequest.CreatedBy=1;
+                        workOrderRequest.CreatedDate=DateTime.Now;
+                        workOrderRequest.CreatedIP="192.168";
+                        
                         var response = await _workOrderRepository.CreateAsync(workOrderRequest,scheduledetail.MaintenanceCategoryId, cancellationToken);
                         if (response.Id == 0)
                         {

@@ -334,17 +334,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                    var PreventiveSchedulerDictionary = new Dictionary<int, PreventiveSchedulerHeader>();
 
-              var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader,PreventiveSchedulerActivity,PreventiveSchedulerItems, PreventiveSchedulerHeader>(
+              var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader,PreventiveSchedulerDetail,PreventiveSchedulerActivity,PreventiveSchedulerItems, PreventiveSchedulerHeader>(
               query,
-              (preventiveScheduler, preventiveSchedulerActivity, preventiveSchedulerItems) =>
+              (preventiveScheduler, preventiveSchedulerDetail,preventiveSchedulerActivity, preventiveSchedulerItems) =>
               {
                   if (!PreventiveSchedulerDictionary.TryGetValue(preventiveScheduler.Id, out var existingPreventiveScheduler))
                   {
                       existingPreventiveScheduler = preventiveScheduler;
+                      existingPreventiveScheduler.PreventiveSchedulerDetails = new List<PreventiveSchedulerDetail>();
                       existingPreventiveScheduler.PreventiveSchedulerActivities = new List<PreventiveSchedulerActivity>();
                       existingPreventiveScheduler.PreventiveSchedulerItems = new List<PreventiveSchedulerItems>();
                       PreventiveSchedulerDictionary[preventiveScheduler.Id] = existingPreventiveScheduler;
                   }
+
+                  existingPreventiveScheduler.PreventiveSchedulerDetails!.Add(preventiveSchedulerDetail);
 
                       existingPreventiveScheduler.PreventiveSchedulerActivities!.Add(preventiveSchedulerActivity);
 
