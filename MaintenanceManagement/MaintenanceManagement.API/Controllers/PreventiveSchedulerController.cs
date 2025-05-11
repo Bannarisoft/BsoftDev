@@ -6,6 +6,7 @@ using Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventive;
 using Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.DeletePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive;
+using Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder;
 using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Queries.GetDetailSchedulerByDate;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler;
@@ -13,6 +14,7 @@ using Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerById;
 using Core.Application.PreventiveSchedulers.Queries.GetSchedulerByDate;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MaintenanceManagement.API.Controllers
@@ -265,6 +267,18 @@ namespace MaintenanceManagement.API.Controllers
         }
           [HttpPost("SchedulerDetailByDate")]
         public async Task<IActionResult> GetSchedulerDetail(GetDetailSchedulerByDateQuery command)
+        {
+           var response =  await Mediator.Send(command);
+           
+            return Ok( new 
+            { 
+                StatusCode=StatusCodes.Status200OK, 
+                data = response.Data
+            });
+        }
+         [HttpPost("HangfireSchedule")]
+         [AllowAnonymous]
+        public async Task<IActionResult> HangfireSchedule(ScheduleWorkOrderCommand command)
         {
            var response =  await Mediator.Send(command);
            

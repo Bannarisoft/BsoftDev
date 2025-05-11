@@ -17,14 +17,14 @@ namespace Core.Application.Common.Mappings
 {
     public class PreventiveSchedulerProfile : Profile
     {
-        private readonly IIPAddressService _ipAddressService;
+        
         public PreventiveSchedulerProfile()
         {
             CreateMap<CreatePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
             .ForMember(dest => dest.PreventiveSchedulerActivities, opt => opt.MapFrom(src => src.Activity))
             .ForMember(dest => dest.PreventiveSchedulerItems, opt => opt.MapFrom(src => src.Items))
-            .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => _ipAddressService.GetCompanyId()))
-            .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => _ipAddressService.GetUnitId()))
+            .ForMember(dest => dest.CompanyId, opt => opt.Ignore())
+            .ForMember(dest => dest.UnitId, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
