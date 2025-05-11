@@ -38,7 +38,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         public async Task<string?> GetLatestWorkOrderDocNo(int TypeId)
         {
             var companyId = _ipAddressService.GetCompanyId();
-            var unitId = _ipAddressService.GetUnitId();
+            var unitId = _ipAddressService.GetUnitId();           
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", companyId);
             parameters.Add("@UnitId", unitId);
@@ -52,6 +52,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         }
         public async Task<bool> UpdateAsync(int workOrderId,Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder)
         {
+             var oldUnitId = _ipAddressService.GetOldUnitId();
              var existingWorkOrder = await _applicationDbContext.WorkOrder
                    .Include(cf => cf.WorkOrderItems)
                    .Include(cf => cf.WorkOrderActivities)                   
@@ -95,16 +96,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             int docSerialNumber = 1;
             foreach (var item in workOrder.WorkOrderItems ?? [])
             {
-                if ((item.UsedQty > 0) || (item.ToSubStoreQty > 0))
+                if ((item.UsedQty > 0) || (item.ToSubStoreQty > 0) || (item.ScarpQty > 0))
                 {
                     var parameters = new DynamicParameters();
-                    parameters.Add("@OldUnitCode", "01");                                        
+                    parameters.Add("@OldUnitCode", oldUnitId);                                        
                     parameters.Add("@DocNo", workOrder.Id);
                     parameters.Add("@DocSNo", docSerialNumber);                    
                     parameters.Add("@ItemCode", item.OldItemCode);
                     parameters.Add("@ItemName", item.ItemName);                    
                     parameters.Add("@UsedQty", item.UsedQty);                    
-                    parameters.Add("@SubStoreQty", item.ToSubStoreQty);                                       
+                    parameters.Add("@SubStoreQty", item.ToSubStoreQty);
+                    parameters.Add("@ScrapQty", item.ScarpQty);
 
                     await _dbConnection.ExecuteAsync(
                         "usp_InsertStockLedger",  // your stored procedure name
