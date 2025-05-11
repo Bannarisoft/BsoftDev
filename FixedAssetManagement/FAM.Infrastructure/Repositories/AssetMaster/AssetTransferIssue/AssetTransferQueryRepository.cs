@@ -136,7 +136,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
             FOR JSON PATH, INCLUDE_NULL_VALUES;
         ";
 
-        using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { assetTransferId });
+        using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { AssetTransferId=assetTransferId,UnitId });
 
         string headerJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
         string detailsJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
@@ -173,7 +173,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
             INNER JOIN FixedAsset.AssetMaster   B   ON A.Id = B.AssetCategoryId 
             INNER JOIN FixedAsset.AssetLocation C   ON B.Id = C.AssetId 
             WHERE C.DepartmentId = @departmentId AND A.CompanyId = @CompanyId AND A.UnitId = @UnitId";                          
-            var result = await _dbConnection.QueryAsync<GetCategoryByDeptIdDto>(query, new { departmentId });         
+            var result = await _dbConnection.QueryAsync<GetCategoryByDeptIdDto>(query, new { departmentId,CompanyId,UnitId });         
             return result.ToList();      
     }   
 
@@ -185,7 +185,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
             const string query = @"	SELECT  A.Id AS AssetId,A.AssetName,A.AssetCategoryId FROM FixedAsset.AssetMaster A 
                                     INNER JOIN FixedAsset.AssetLocation B  ON A.Id = B.AssetId  
                                     WHERE      A.AssetCategoryId = @assetCategoryId   AND B.DepartmentId =  @assetDepartmentId  AND A.CompanyId = @CompanyId AND A.UnitId = @UnitId";                      
-            var result = await _dbConnection.QueryAsync<GetAssetMasterDto>(query, new { assetCategoryId, assetDepartmentId });         
+            var result = await _dbConnection.QueryAsync<GetAssetMasterDto>(query, new { assetCategoryId, assetDepartmentId,CompanyId,UnitId });         
             return result.ToList();      
     }   
     
@@ -226,7 +226,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
 
                 ";
 
-                using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { AssetId = assetId });
+                using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { AssetId = assetId,CompanyId,UnitId });
 
                 string assetJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
                 string transferJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
@@ -314,7 +314,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                         WHERE B.AssetId = @assetId  AND A.UnitId = @UnitId
                         AND (A.Status = 'Pending' OR (A.Status = 'Approved' AND A.AckStatus <> 1))";
 
-                    var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { assetId });
+                    var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { assetId,UnitId });
                     return result.HasValue; // If record exists, return true (restricted)
                 }
 
@@ -324,7 +324,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                     var UnitId = _iPAddressService.GetUnitId();
                         const string query = @"SELECT  A.Id,A.AssetTransferId,A.AssetId,B.AssetCode,B.AssetName,A.AssetValue  FROM FixedAsset.AssetTransferIssueDtl A 
 			                                 INNER JOIN  FixedAsset.AssetMaster B on  A.AssetId=B.ID WHERE AssetTransferId = @assetTransferId AND A.CompanyId = @CompanyId AND A.UnitId = @UnitId"; ;                          
-                        var result = await _dbConnection.QueryAsync<GetAllTransferDtlDto>(query, new { assetTransferId });         
+                        var result = await _dbConnection.QueryAsync<GetAllTransferDtlDto>(query, new { assetTransferId,CompanyId,UnitId });         
                         return result.ToList();      
                 }                                
                
