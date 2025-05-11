@@ -499,3 +499,6 @@ MaintenanceManagement.Infrastructure/Migrations/Archive/
 /MaintenanceManagement/Core/Core.Domain/bin
 /MaintenanceManagement/Core/Core.Application/obj
 /MaintenanceManagement/Core/Core.Application/bin
+**/appsettings.Development.json
+**/appsettings.QA.json
+**/launchSettings.json
