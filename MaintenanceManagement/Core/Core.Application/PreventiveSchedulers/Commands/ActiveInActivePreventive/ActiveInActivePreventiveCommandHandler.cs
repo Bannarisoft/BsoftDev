@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.IBackgroundService;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
@@ -24,7 +25,8 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IWorkOrderCommandRepository _workOrderRepository;
         private readonly IMapper _mapper;
-        public ActiveInActivePreventiveCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMediator mediator, IPreventiveSchedulerQuery preventiveSchedulerQuery, IMachineMasterQueryRepository machineMasterQueryRepository, IMiscMasterQueryRepository miscMasterQueryRepository,IWorkOrderCommandRepository workOrderRepository,IMapper mapper)
+        private readonly IBackgroundServiceClient  _backgroundServiceClient;
+        public ActiveInActivePreventiveCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMediator mediator, IPreventiveSchedulerQuery preventiveSchedulerQuery, IMachineMasterQueryRepository machineMasterQueryRepository, IMiscMasterQueryRepository miscMasterQueryRepository,IWorkOrderCommandRepository workOrderRepository,IMapper mapper,IBackgroundServiceClient backgroundServiceClient)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mediator = mediator;
@@ -32,6 +34,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
             _machineMasterQueryRepository = machineMasterQueryRepository;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _mapper =mapper;
+            _backgroundServiceClient = backgroundServiceClient;
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(ActiveInActivePreventiveCommand request, CancellationToken cancellationToken)
@@ -69,17 +72,14 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
                           var delay = reminderDate - DateTime.Now;
 
                          string newJobId;
+                         var delayInMinutes = (int)delay.TotalMinutes;
                         if (delay.TotalSeconds > 0)
                         {
-                             newJobId =  BackgroundJob.Schedule(() => 
-                            _workOrderRepository.CreateAsync(workOrderRequest,Scheduledetail.MaintenanceCategoryId, cancellationToken),
-                             delay);
+                             newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(detailsResponse.Id,delayInMinutes);
                         }
                         else
                         {
-                               newJobId =  BackgroundJob.Schedule(() => 
-                            _workOrderRepository.CreateAsync(workOrderRequest,Scheduledetail.MaintenanceCategoryId, cancellationToken),
-                             TimeSpan.FromMinutes(15));
+                               newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(detailsResponse.Id,5);
                         }
                   
                          await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id,newJobId);
