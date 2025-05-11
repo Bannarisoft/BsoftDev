@@ -506,7 +506,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                 } 
 
 
-                 public async Task<bool> GetWOclosedOrInProgressAsync(int Id)
+                 public async Task<bool> GetWOclosedOrInProgressAsync(int id)
                 {                      
                                 var query = @"
                     SELECT COUNT(1)
@@ -517,7 +517,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                     AND T.MiscTypeCode = @MiscTypeCode";
                    var parameters = new
                     {
-                        RequestId = Id,
+                        RequestId = id,
                         MiscTypeCode = MiscEnumEntity.WOStatus.MiscCode,
                         MiscCode= MiscEnumEntity.StatusOpen.Code ,
                        // MiscCodeInProgress = MiscEnumEntity.GetStatusId.Status
