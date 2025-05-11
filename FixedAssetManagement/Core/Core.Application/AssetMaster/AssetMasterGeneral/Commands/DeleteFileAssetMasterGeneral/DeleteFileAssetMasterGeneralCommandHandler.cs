@@ -9,6 +9,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
     public class DeleteFileAssetMasterGeneralCommandHandler : IRequestHandler<DeleteFileAssetMasterGeneralCommand, ApiResponseDTO<bool>>
     {
         private readonly IFileUploadService _fileUploadService;        
+        
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly ILogger<DeleteFileAssetMasterGeneralCommandHandler> _logger;
         private readonly IIPAddressService _ipAddressService;
