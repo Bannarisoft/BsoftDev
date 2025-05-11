@@ -172,7 +172,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
             A.Id AS CategoryID,  A.CategoryName  FROM FixedAsset.AssetCategories A 
             INNER JOIN FixedAsset.AssetMaster   B   ON A.Id = B.AssetCategoryId 
             INNER JOIN FixedAsset.AssetLocation C   ON B.Id = C.AssetId 
-            WHERE C.DepartmentId = @departmentId AND A.CompanyId = @CompanyId AND A.UnitId = @UnitId";                          
+            WHERE C.DepartmentId = @departmentId AND B.CompanyId = @CompanyId AND B.UnitId = @UnitId";                          
             var result = await _dbConnection.QueryAsync<GetCategoryByDeptIdDto>(query, new { departmentId,CompanyId,UnitId });         
             return result.ToList();      
     }   
@@ -311,10 +311,10 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                     const string query = @"
                         SELECT 1 FROM FixedAsset.AssetTransferIssueHdr A
                         INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
-                        WHERE B.AssetId = @assetId  AND A.UnitId = @UnitId
+                        WHERE B.AssetId = @assetId  
                         AND (A.Status = 'Pending' OR (A.Status = 'Approved' AND A.AckStatus <> 1))";
 
-                    var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { assetId,UnitId });
+                    var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { assetId });
                     return result.HasValue; // If record exists, return true (restricted)
                 }
 
@@ -323,7 +323,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                     var CompanyId = _iPAddressService.GetCompanyId();
                     var UnitId = _iPAddressService.GetUnitId();
                         const string query = @"SELECT  A.Id,A.AssetTransferId,A.AssetId,B.AssetCode,B.AssetName,A.AssetValue  FROM FixedAsset.AssetTransferIssueDtl A 
-			                                 INNER JOIN  FixedAsset.AssetMaster B on  A.AssetId=B.ID WHERE AssetTransferId = @assetTransferId AND A.CompanyId = @CompanyId AND A.UnitId = @UnitId"; ;                          
+			                                 INNER JOIN  FixedAsset.AssetMaster B on  A.AssetId=B.ID WHERE AssetTransferId = @assetTransferId AND B.CompanyId = @CompanyId AND B.UnitId = @UnitId";                           
                         var result = await _dbConnection.QueryAsync<GetAllTransferDtlDto>(query, new { assetTransferId,CompanyId,UnitId });         
                         return result.ToList();      
                 }                                
