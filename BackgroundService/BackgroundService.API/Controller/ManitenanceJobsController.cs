@@ -22,7 +22,7 @@ namespace BackgroundService.API.Controller
             ); */
           string newJobId = BackgroundJob.Schedule<UserUnlockservice>(
                  job => job.ScheduleworkOrderExecute(command.PreventiveScheduleId),
-                TimeSpan.FromMinutes(1)
+                TimeSpan.FromMinutes(command.DelayInMinutes)
             );
             return Ok(new { Message = "Work order scheduled", JobId = newJobId });   
         }
