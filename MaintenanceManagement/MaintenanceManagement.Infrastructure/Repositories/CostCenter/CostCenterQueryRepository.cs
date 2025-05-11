@@ -73,7 +73,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.CostCenter
             const string query = @"
                     SELECT * 
                     FROM Maintenance.CostCenter 
-                    WHERE Id = @Id AND IsDeleted = 0 AND UnitId = @UnitId"; ;
+                    WHERE Id = @Id AND IsDeleted = 0 AND UnitId = @UnitId"; 
 
                     var costCenter = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.CostCenter>(query, new { Id, UnitId });
                     return costCenter;
