@@ -75,17 +75,18 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _applicationDbContext.WorkOrderTechnician.RemoveRange(
                 _applicationDbContext.WorkOrderTechnician.Where(x => x.WorkOrderId == workOrderId));
         
-            var createdBy = existingWorkOrder.CreatedBy;
+ /*            var createdBy = existingWorkOrder.CreatedBy;
             var createdByName = existingWorkOrder.CreatedByName;
             var createdIP  = existingWorkOrder.CreatedIP ;
-            var createdDate  = existingWorkOrder.CreatedDate ;
+            var createdDate  = existingWorkOrder.CreatedDate  */;
 
                 // Update scalar fields
-            _applicationDbContext.Entry(existingWorkOrder).CurrentValues.SetValues(workOrder);
-            existingWorkOrder.CreatedBy = createdBy;
+            //_applicationDbContext.Entry(existingWorkOrder).CurrentValues.SetValues(workOrder);
+  /*           existingWorkOrder.CreatedBy = createdBy;
             existingWorkOrder.CreatedByName = createdByName;
             existingWorkOrder.CreatedIP = createdIP;           
-            existingWorkOrder.CreatedDate = createdDate;     
+            existingWorkOrder.CreatedDate = createdDate;     */ 
+            _applicationDbContext.WorkOrder.Update(existingWorkOrder);
 
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderActivities ?? []);
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderItems ?? []);

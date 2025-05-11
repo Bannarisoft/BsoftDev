@@ -14,7 +14,7 @@ namespace Core.Application.Common.Interfaces
         string GetGroupCode();
         int GetEntityId();
         int GetUnitId();
-        int GetOldUnitId();
+        string GetOldUnitId();
                
     }
 }
