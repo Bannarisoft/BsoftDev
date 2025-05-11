@@ -76,7 +76,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                     FROM Maintenance.MachineMaster 
                     WHERE Id = @Id AND IsDeleted = 0 AND UnitId = @UnitId";
 
-                    var machineMaster = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineMaster>(query, new { Id, });
+                    var machineMaster = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineMaster>(query, new { Id,UnitId });
                     return machineMaster;
         }
 
