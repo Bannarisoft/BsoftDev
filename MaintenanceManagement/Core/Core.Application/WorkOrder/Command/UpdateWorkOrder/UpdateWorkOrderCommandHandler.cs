@@ -125,7 +125,7 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
                 return new ApiResponseDTO<bool>
                 {
                     IsSuccess = true,
-                    Message = "WorkOrder updated. Scheduling in progress..."                     
+                    Message = "WorkOrder updated."                     
                 };
             }
             return new ApiResponseDTO<bool>

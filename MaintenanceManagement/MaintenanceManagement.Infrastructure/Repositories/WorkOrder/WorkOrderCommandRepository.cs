@@ -77,12 +77,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             var createdBy = existingWorkOrder.CreatedBy;
             var createdByName = existingWorkOrder.CreatedByName;
             var createdIP  = existingWorkOrder.CreatedIP ;
+            var createdDate  = existingWorkOrder.CreatedDate ;
 
                 // Update scalar fields
             _applicationDbContext.Entry(existingWorkOrder).CurrentValues.SetValues(workOrder);
             existingWorkOrder.CreatedBy = createdBy;
             existingWorkOrder.CreatedByName = createdByName;
             existingWorkOrder.CreatedIP = createdIP;           
+            existingWorkOrder.CreatedDate = createdDate;     
 
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderActivities ?? []);
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderItems ?? []);
