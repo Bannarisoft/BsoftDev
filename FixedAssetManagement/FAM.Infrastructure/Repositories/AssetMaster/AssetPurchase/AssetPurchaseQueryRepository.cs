@@ -103,7 +103,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
             var grnList = await _dbConnection.QueryAsync<AssetGrnItem>(
             "dbo.GetGRNByItemDivision", 
             parameters, 
-            commandType: CommandType.StoredProcedure
+            commandType: CommandType.StoredProcedure,commandTimeout: 120
         );
 
         if (!grnList.Any())
@@ -170,7 +170,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
             var grnList = await _dbConnection.QueryAsync<AssetGrnDetails>(
             "dbo.GetPurchaseDetailsKalsofte", 
             parameters, 
-            commandType: CommandType.StoredProcedure
+            commandType: CommandType.StoredProcedure,commandTimeout: 120
         );
         if (!grnList.Any())
         {
@@ -219,7 +219,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
             var grnList = await _dbConnection.QueryAsync<AssetGrn>(
             "dbo.GetGRNByDivision", 
             parameters, 
-            commandType: CommandType.StoredProcedure
+            commandType: CommandType.StoredProcedure,commandTimeout: 120
         );
 
         if (!grnList.Any())

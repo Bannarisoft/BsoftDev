@@ -8,6 +8,6 @@ namespace Core.Application.Common.Interfaces.External.IUnit
 {
     public class IUnitService
     {
-      //Task<List<DepartmentDto>> GetAllDepartmentAsync();
+    //  Task<List<UnitDto>> GetAllDepartmentAsync();
     }
 }

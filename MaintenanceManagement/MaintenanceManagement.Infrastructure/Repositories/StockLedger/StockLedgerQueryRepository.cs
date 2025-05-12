@@ -35,6 +35,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
                     Maintenance.StockLedger
                 WHERE
                     Oldunitcode = @OldUnitcode 
+                    AND TransactionType not in('SRP')
                 GROUP BY 
                     ItemCode, ItemName, Oldunitcode,Uom
                 HAVING
@@ -60,7 +61,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
                 FROM 
                     Maintenance.StockLedger
                 WHERE
-                    Oldunitcode = @OldUnitcode 
+                    Oldunitcode = @OldUnitcode
+                    AND TransactionType not in('SRP') 
                 GROUP BY 
                     ItemCode, ItemName, Oldunitcode
                 HAVING
@@ -89,7 +91,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
                     Maintenance.StockLedger
                 WHERE
                     Oldunitcode = @OldUnitcode AND
-                    ItemCode = @Itemcode
+                    ItemCode = @Itemcode AND
+                    TransactionType not in('SRP')
                 GROUP BY 
                     ItemCode, ItemName, Oldunitcode,Uom
                 HAVING
