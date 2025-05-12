@@ -348,7 +348,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
                         INNER JOIN Maintenance.MiscTypeMaster K ON J.MiscTypeId = K.Id
-                        WHERE  A.Id IN @Ids  AND C.Code = @MiscType
+                        WHERE  A.Id IN @Ids  
                         AND B.Code = @MiscCode AND J.Code <> @MiscStatusCode AND A.UnitId = @UnitId AND K.MiscTypeCode =@MiscType ;
                     ";
                 //    var result = await _dbConnection.QueryAsync<GetExternalRequestByIdDto>(query, new { Ids = ids });
