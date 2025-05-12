@@ -39,6 +39,6 @@ namespace UserManagement.Infrastructure.Services
             var response = await client.PostAsJsonAsync("/api/userhangfirejobs/user-verification-code-removal", removeCodeCommand);
             response.EnsureSuccessStatusCode();
         }      
-    }    
+    }   
 
 }

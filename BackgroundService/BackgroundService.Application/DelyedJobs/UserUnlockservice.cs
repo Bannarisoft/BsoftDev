@@ -10,19 +10,25 @@ namespace BackgroundService.Application.DelyedJobs
     {
         private readonly IUserUnlockService _userUnlockService;
         private readonly IMaintenance _maintenance;
-        public UserUnlockservice(IUserUnlockService userUnlockService,IMaintenance maintenance)
+        private readonly IVerificationCodeCleanupService _verificationCleanupService;
+        public UserUnlockservice(IUserUnlockService userUnlockService,IMaintenance maintenance,IVerificationCodeCleanupService verificationCleanupService)
         {
             _userUnlockService = userUnlockService;
             _maintenance = maintenance;
+            _verificationCleanupService=verificationCleanupService;
         }
         
-         public async Task Execute(string userName)
+        public async Task Execute(string userName)
         {
             await _userUnlockService.UnlockUser(userName);
         }
-          public async Task ScheduleworkOrderExecute(int PreventiveScheduleId)
+        public async Task ScheduleworkOrderExecute(int PreventiveScheduleId)
         {
             await _maintenance.SchedulerWorkOrderExecute(PreventiveScheduleId);
+        }
+        public async Task VerificationCleanup(string userName,int delayMinutes)
+        {
+            await _verificationCleanupService.RemoveVerificationCode(userName,delayMinutes);
         }
     }
 }
