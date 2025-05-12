@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.ICostCenter;
 using Core.Application.CostCenter.Queries.GetCostCenter;
 using Core.Domain.Events;
@@ -17,12 +18,14 @@ namespace Core.Application.CostCenter.Queries.GetCostCenterById
         private readonly ICostCenterQueryRepository _iCostCenterQueryRepository;        
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
+        private readonly IDepartmentService _departmentService;
 
-        public GetCostCenterByIdQueryHandler(ICostCenterQueryRepository iCostCenterQueryRepository, IMapper mapper, IMediator mediator)
+        public GetCostCenterByIdQueryHandler(ICostCenterQueryRepository iCostCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentService departmentService)
         {
             _iCostCenterQueryRepository = iCostCenterQueryRepository;            
             _mapper = mapper;
             _mediator = mediator;
+            _departmentService = departmentService;
         }
 
         public async Task<ApiResponseDTO<CostCenterDto>> Handle(GetCostCenterByIdQuery request, CancellationToken cancellationToken)
@@ -35,6 +38,17 @@ namespace Core.Application.CostCenter.Queries.GetCostCenterById
             }
             // Map a single entity
             var costCenter = _mapper.Map<CostCenterDto>(result);
+             // 🔥 Fetch departments using HttpClientFactory
+            // 🔥 Fetch departments
+            var departments = await _departmentService.GetAllDepartmentAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            // 🔥 Map department name to cost center
+            if (departmentLookup.TryGetValue(costCenter.DepartmentId, out var departmentName) && departmentName != null)
+            {
+                costCenter.DepartmentName = departmentName;
+            }
+
 
           //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
