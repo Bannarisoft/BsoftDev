@@ -259,8 +259,10 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         {
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
-                SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,
-                MM.Description+'\'+C.CompanyName+'\'+trim(UN.unitname) +'\'+AM.AssetImage AssetImage,AM.AssetCategoryId,AM.AssetSubCategoryId,
+                SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName ParentName,AM.AssetGroupId ,
+                --MM.Description+'\'+C.CompanyName+'\'+trim(UN.unitname) +'\'+AM.AssetImage AssetImage,
+                 MM.Description+''+MM1.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName)+'/'+  AM.AssetImage AssetImage ,  
+                AM.AssetCategoryId,AM.AssetSubCategoryId,
                 AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
@@ -269,6 +271,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 INNER JOIN [FixedAsset].[AssetSubCategories] ASUBC ON AM.AssetSubCategoryId = ASUBC.Id
                 LEFT JOIN [FixedAsset].[AssetMaster] AssetParent ON AM.AssetParentId = AssetParent.Id
                 LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'
+                LEFT JOIN FixedAsset.MiscTypeMaster MM1 on MM1.MiscTypeCode ='ASSETIMAGE'
                 LEFT JOIN Bannari.AppData.Unit UN on UN.Id=AM.UnitId
                 LEFT JOIN Bannari.AppData.Company C on C.Id=AM.CompanyId
                 WHERE  AM.CompanyId = @CompanyId AND AM.UnitId = @UnitId AND   AM.Id = @AssetId;
@@ -290,7 +293,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 FROM [FixedAsset].[AssetPurchaseDetails] AP
                 LEFT JOIN [Bannari].[AppData].[Unit] U ON AP.OldUnitId = U.OldUnitId
                 INNER JOIN [FixedAsset].[AssetSource] ASource ON ASource.Id=AP.AssetSourceId
-                WHERE U.UnitId = @UnitId AND AP.AssetId = @AssetId;
+                WHERE U.Id = @UnitId AND AP.AssetId = @AssetId;
 
                 SELECT A.Id,SM.SpecificationName,A.SpecificationValue,A.SpecificationId,SM.IsDefault FROM  [FixedAsset].[AssetSpecifications] A
                 INNER JOIN [FixedAsset].[SpecificationMaster] SM ON SM.Id=A.SpecificationId
@@ -440,7 +443,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 FROM [FixedAsset].[AssetPurchaseDetails] AP
                 LEFT JOIN [Bannari].[AppData].[Unit] U ON AP.OldUnitId = U.OldUnitId
                 INNER JOIN [FixedAsset].[AssetSource] ASource ON ASource.Id=AP.AssetSourceId
-                WHERE U.UnitId = @UnitId AND AP.AssetId = @AssetId;             
+                WHERE U.Id = @UnitId AND AP.AssetId = @AssetId;             
 
                 SELECT AC.Id,AssetSourceId,Amount,JournalNo,CostType,MM.Code CostTypeDesc
                 FROM [FixedAsset].[AssetAdditionalCost]AC

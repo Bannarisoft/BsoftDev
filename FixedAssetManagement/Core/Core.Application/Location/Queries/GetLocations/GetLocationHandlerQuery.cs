@@ -38,9 +38,11 @@ namespace Core.Application.Location.Queries.GetLocations
 
                 if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
                 {
+                    
                     data.DepartmentName = departmentName;
                 }
                 LocationDictionary[data.DepartmentId] = data;
+                
             }
 
             /*  // 🔥 Fetch departments using gRPC

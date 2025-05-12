@@ -26,11 +26,11 @@ builder.Services.AddInfrastructureServices(configuration);
 var app = builder.Build();
 
 // Enable Swagger in Development
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.UseHttpsRedirection();
 app.UseCors();
