@@ -57,7 +57,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             A.VendorId,
                             A.OldVendorId,
                             A.Remarks,
-
                             A.CreatedByName,
                             A.CreatedDate,
                             A.CreatedBy,
@@ -92,7 +91,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster G ON A.ServiceLocationId = G.Id  
                         LEFT JOIN Maintenance.MiscMaster H ON A.ModeOfDispatchId = H.Id 
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id 
-                        LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
+                        LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
+                          
                        
 
                         WHERE A.IsDeleted = 0   AND  B.Code = @MiscCode  AND J.Code <> @MaintenanceStatusUpdate
