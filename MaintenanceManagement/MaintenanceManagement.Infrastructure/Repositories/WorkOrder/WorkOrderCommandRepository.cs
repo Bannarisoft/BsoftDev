@@ -86,6 +86,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             existingWorkOrder.CreatedByName = createdByName;
             existingWorkOrder.CreatedIP = createdIP;           
             existingWorkOrder.CreatedDate = createdDate;     */ 
+
+            existingWorkOrder.DowntimeStart = workOrder.DowntimeStart;
+            existingWorkOrder.DowntimeEnd = workOrder.DowntimeEnd;
+            existingWorkOrder.Image = workOrder.Image;
+            existingWorkOrder.Remarks = workOrder.Remarks;            
+            existingWorkOrder.StatusId = workOrder.StatusId;            
+
             _applicationDbContext.WorkOrder.Update(existingWorkOrder);
 
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderActivities ?? []);
