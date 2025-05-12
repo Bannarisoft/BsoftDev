@@ -17,9 +17,13 @@ namespace BackgroundService.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult ScheduleVerificationCodeRemoval([FromBody] ScheduleRemoveCodeCommand command)
         {
-            BackgroundJob.Schedule<IVerificationCodeCleanupService>(
+           /*  BackgroundJob.Schedule<IVerificationCodeCleanupService>(
                 service => service.RemoveVerificationCode(command.UserName, command.DelayInMinutes),
                 TimeSpan.FromMinutes(command.DelayInMinutes)
+            ); */
+             BackgroundJob.Schedule<UserUnlockservice>(
+                 job => job.VerificationCleanup(command.UserName,command.DelayInMinutes),
+                TimeSpan.FromMinutes(1)
             );
 
             return Ok("Verification code removal scheduled successfully.");
