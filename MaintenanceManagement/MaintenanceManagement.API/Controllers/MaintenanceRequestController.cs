@@ -194,17 +194,42 @@ namespace MaintenanceManagement.API.Controllers
                     errors = ""
                 });
         }   
+            // [HttpPost("create-WO-from-external-request/by-ids")]
+            // public async Task<ActionResult> CreateFromExternalRequest(CreateExternalRequestWorkOrderCommand command)
+            // {
+            //     var response = await Mediator.Send(command);
+             
+            //     if (!response.IsSuccess)
+            //     {
+            //         return BadRequest(response);
+            //     }    
+            //     return Ok(response);
+            // }
             [HttpPost("create-WO-from-external-request/by-ids")]
             public async Task<ActionResult> CreateFromExternalRequest(CreateExternalRequestWorkOrderCommand command)
             {
                 var response = await Mediator.Send(command);
-             
+
                 if (!response.IsSuccess)
                 {
-                    return BadRequest(response);
-                }    
-                return Ok(response);
+                    return BadRequest(new
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        message = response.Message,
+                        errors = "",
+                        data = response.Data // Optional: can be null or empty list
+                    });
+                }
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status201Created,
+                    message = response.Message,
+                    errors = "",
+                    data = response.Data
+                });
             }
+
         [HttpPut]
         public async Task<IActionResult> Update(UpdateMaintenanceRequestCommand command)
         {
