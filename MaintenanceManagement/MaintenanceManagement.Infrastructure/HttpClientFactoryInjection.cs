@@ -39,6 +39,15 @@ namespace MaintenanceManagement.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
             services.AddScoped<IUserSessionService, UserSessionService>();
 
+              services.AddHttpClient("BackgroundServiceClient", client =>
+            {
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:BackgroundService"]);
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            })
+            // .AddHttpMessageHandler<AuthTokenHandler>()
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
             return services;
         }
     }

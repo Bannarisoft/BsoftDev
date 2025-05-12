@@ -491,3 +491,6 @@ $RECYCLE.BIN/
 /FixedAssetManagement/FAM.API/bin
 /FixedAssetManagement/FAM.Infrastructure/obj
 /FixedAssetManagement/FAM.Infrastructure/bin
+**/appsettings.Development.json
+**/appsettings.QA.json
+**/launchSettings.json

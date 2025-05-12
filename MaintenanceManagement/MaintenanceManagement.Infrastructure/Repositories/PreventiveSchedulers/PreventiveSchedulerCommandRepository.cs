@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Domain.Entities;
@@ -19,16 +20,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IMapper _mapper;
-        public PreventiveSchedulerCommandRepository(ApplicationDbContext applicationDbContext, IPreventiveSchedulerQuery preventiveSchedulerQuery, IMiscMasterQueryRepository miscMasterQueryRepository, IMapper mapper)
+        private readonly IIPAddressService _ipAddressService;
+        public PreventiveSchedulerCommandRepository(ApplicationDbContext applicationDbContext, IPreventiveSchedulerQuery preventiveSchedulerQuery, IMiscMasterQueryRepository miscMasterQueryRepository, IMapper mapper,IIPAddressService ipAddressService)
         {
             _applicationDbContext = applicationDbContext;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _mapper = mapper;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<int> CreateAsync(PreventiveSchedulerHeader preventiveSchedulerHdr)
         {
+            preventiveSchedulerHdr.CompanyId = _ipAddressService.GetCompanyId();
+            preventiveSchedulerHdr.UnitId = _ipAddressService.GetUnitId();
             _applicationDbContext.Entry(preventiveSchedulerHdr);
             await _applicationDbContext.PreventiveSchedulerHdr.AddAsync(preventiveSchedulerHdr);
             await _applicationDbContext.SaveChangesAsync();

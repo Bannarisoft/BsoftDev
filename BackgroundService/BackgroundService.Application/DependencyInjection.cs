@@ -14,6 +14,7 @@ namespace BackgroundService.Application
             services.AddAutoMapper(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
             
         services.AddScoped<UserUnlockservice>();
+        services.AddScoped<PreventiveScheduleService>();
             // Add MediatR
             // services.AddMediatR(cfg =>
             // {

@@ -63,15 +63,15 @@ namespace UserManagement.API.Validation.UserLogin
                            .MustAsync(async (Username, cancellation) => 
                         await _userQueryRepository.AlreadyExistsAsync(Username))             
                            .WithName("User Name")
-                            .WithMessage($"{rule.Error}")
-                            .MustAsync(async (Username, cancellation) => 
-                        await _companyQuerySettings.BeforeLoginNotFoundValidation(Username))             
-                           .WithName("User Name")
-                            .WithMessage("User Admin Settings not found")
-                            .When(x => _ipAddressService.GetGroupcode() =="USER")
-                            .MustAsync(async (Username, cancellation) => 
-                        await _userQueryRepository.ValidateUserRolesAsync(Username))
-                            .WithMessage("User does not have any role assigned to it. Contact your admin.");
+                            .WithMessage($"{rule.Error}");
+                        //     .MustAsync(async (Username, cancellation) => 
+                        // await _companyQuerySettings.BeforeLoginNotFoundValidation(Username))             
+                        //    .WithName("User Name")
+                        //     .WithMessage("User Admin Settings not found")
+                        //     .When(x => _ipAddressService.GetGroupcode() =="USER")
+                        //     .MustAsync(async (Username, cancellation) => 
+                        // await _userQueryRepository.ValidateUserRolesAsync(Username))
+                        //     .WithMessage("User does not have any role assigned to it. Contact your admin.");
                             
                            
                             break;
