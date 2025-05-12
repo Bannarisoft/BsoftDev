@@ -444,7 +444,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 FROM [FixedAsset].[AssetPurchaseDetails] AP
                 LEFT JOIN [Bannari].[AppData].[Unit] U ON AP.OldUnitId = U.OldUnitId
                 INNER JOIN [FixedAsset].[AssetSource] ASource ON ASource.Id=AP.AssetSourceId
-                WHERE U.UnitId = @UnitId AND AP.AssetId = @AssetId;             
+                WHERE U.Id = @UnitId AND AP.AssetId = @AssetId;             
 
                 SELECT AC.Id,AssetSourceId,Amount,JournalNo,CostType,MM.Code CostTypeDesc
                 FROM [FixedAsset].[AssetAdditionalCost]AC
