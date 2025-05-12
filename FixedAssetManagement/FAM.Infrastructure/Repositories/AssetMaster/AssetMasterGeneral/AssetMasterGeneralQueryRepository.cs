@@ -261,7 +261,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 -- First Query: AssetMaster (One-to-One)
                 SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName ParentName,AM.AssetGroupId ,
                 --MM.Description+'\'+C.CompanyName+'\'+trim(UN.unitname) +'\'+AM.AssetImage AssetImage,
-                 MM.Description+''+MM1.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName)+'/'+  AM.AssetImage AssetImage ,  
+                case when (isnull(AM.AssetImage,'') <> '') then MM.Description+''+MM1.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetImage  else 
+                '' end AssetImage ,  
                 AM.AssetCategoryId,AM.AssetSubCategoryId,
                 AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName
                 FROM [FixedAsset].[AssetMaster] AM

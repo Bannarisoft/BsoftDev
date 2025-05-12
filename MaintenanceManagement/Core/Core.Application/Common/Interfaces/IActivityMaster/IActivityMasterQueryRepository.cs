@@ -28,6 +28,8 @@ namespace Core.Application.Common.Interfaces.IActivityMaster
 
             Task<bool> GetByActivityNameAsync(string activityname);
             Task<bool> FKColumnExistValidation(int activityId);
+
+            Task<List<Core.Domain.Entities.MiscMaster>> GetActivityTypeAsync();
         
     }
 }

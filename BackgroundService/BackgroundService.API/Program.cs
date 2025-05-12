@@ -1,10 +1,11 @@
 using BackgroundService.Infrastructure;
 using BackgroundService.Application;
 using BackgroundService.API.Configurations;
+using BackgroundService.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ;
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
 builder.Configuration
 .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
@@ -13,6 +14,7 @@ builder.Configuration
 
 // Add services
 builder.Services.AddControllers();
+builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -31,6 +33,7 @@ var app = builder.Build();
 //}
 
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();

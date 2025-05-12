@@ -139,13 +139,15 @@ namespace MaintenanceManagement.API.Controllers
 
                 if (!parsedIds.Any())
                 {
-                    return BadRequest(new ApiResponseDTO<List<GetExternalRequestByIdDto>>
-                    {
+                     return BadRequest(new
+                      {
+                         StatusCode = StatusCodes.Status400BadRequest,
                         IsSuccess = false,
                         Message = "No valid IDs found.",
                         Data = new List<GetExternalRequestByIdDto>()
                     });
                 }
+                
 
                 var query = new GetExternalRequestsByIdsQuery
                 {
@@ -154,7 +156,15 @@ namespace MaintenanceManagement.API.Controllers
 
                 var result = await Mediator.Send(query);
 
-                return Ok(result);
+               // return Ok(result);
+
+                 return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    message = "External requests retrieved successfully.",
+                    errors = "",
+                    data = result.Data
+                });
             }
 
         [HttpPost("create")]

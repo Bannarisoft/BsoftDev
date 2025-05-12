@@ -99,5 +99,11 @@ namespace Core.Domain.Common
         {
             public const string Code = "RequestType";
         }
+
+         public static class GetActivityType
+        {
+            public const string MiscCode = "ActivityType";
+        }
+
     }
 }

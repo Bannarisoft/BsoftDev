@@ -27,14 +27,14 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
 
           public  async Task<ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>>> Handle(GetMiscMasterAutoCompleteQuery request, CancellationToken cancellationToken)
         {
-            var miscTypeMasters  = await _miscMasterQueryRepository.GetMiscMaster(request.SearchPattern);
+            var miscTypeMasters  = await _miscMasterQueryRepository.GetMiscMaster( request.MiscTypeCode,request.MiscTypeName);
 
-                    if (miscTypeMasters == null || !miscTypeMasters.Any())
+                    if (miscTypeMasters == null )
             {
                 return new ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>>
                 {
                     IsSuccess = false,
-                    Message = $"No Misc Type Masters found matching '{request.SearchPattern}'.",
+                    Message = $"No Misc Type Masters found for TypeCode '{request.MiscTypeCode}' and TypeName '{request.MiscTypeName}'.",
                     Data = new List<GetMiscMasterAutoCompleteDto>()
                 };
             }
@@ -45,8 +45,8 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
                     actionDetail: "GetAll",
                     actionCode: "",        
                     actionName: "", 
-                    details: $"Division details was fetched.",
-                    module:"Division"
+                    details: $"Misc Type details was fetched.",
+                    module:"MiscType"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
             return new ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = division }; 

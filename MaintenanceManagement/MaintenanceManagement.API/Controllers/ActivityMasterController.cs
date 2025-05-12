@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Application.ActivityCheckListMaster.Command.UpdateActivityCheckListMaster;
 using Core.Application.ActivityMaster.Command.CreateActivityMaster;
 using Core.Application.ActivityMaster.Command.UpdateActivityMster;
+using Core.Application.ActivityMaster.Queries.GetActivityType;
 using Core.Application.ActivityMaster.Queries.GetAllActivityMaster;
 using Core.Application.ActivityMaster.Queries.GetMachineGroupById;
 using Core.Application.Common.HttpResponse;
@@ -168,6 +169,28 @@ namespace MaintenanceManagement.API.Controllers
                     errors = "" 
                 });
           }
+
+
+              [HttpGet("GetActivityType")]
+                public async Task<IActionResult> GetActivityTypeAsync()
+                {
+                    var result = await Mediator.Send(new GetActivityTypeQuery());
+                    if (result == null || result.Data == null || result.Data.Count == 0)
+                    {
+                        return NotFound(new
+                        {
+                            StatusCode = StatusCodes.Status404NotFound,
+                            message = "No ActivityType  found."
+                        });
+                    }
+                    return Ok(new
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        message = "ActivityType  fetched successfully.",
+                        data = result.Data
+                    });
+                }
+
 
 
 
