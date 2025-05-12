@@ -14,6 +14,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? GroupName { get; set; }
         public string? CategoryName { get; set; }
         public string? SubCategoryName { get; set; }
+        public string? ParentName { get; set; }        
         public string? AssetGroupId { get; set; }
         public string? AssetImage { get; set; }            
         public int AssetCategoryId { get; set; }        

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IBackgroundService;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Application.Common.Interfaces.IWorkOrder;
@@ -27,7 +28,8 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
         private readonly IWorkOrderCommandRepository _workOrderRepository;
         private readonly IIPAddressService _ipAddressService;
         private readonly ITimeZoneService _timeZoneService;
-        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderCommandRepository workOrderRepository, IIPAddressService ipAddressService, ITimeZoneService timeZoneService)
+        private readonly IBackgroundServiceClient  _backgroundServiceClient;
+        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderCommandRepository workOrderRepository, IIPAddressService ipAddressService, ITimeZoneService timeZoneService,IBackgroundServiceClient backgroundServiceClient)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
@@ -37,6 +39,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
             _workOrderRepository = workOrderRepository;
             _ipAddressService = ipAddressService;
             _timeZoneService = timeZoneService;
+            _backgroundServiceClient = backgroundServiceClient;
         }
         public async Task<ApiResponseDTO<bool>> Handle(UpdatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
         {
@@ -100,19 +103,22 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
                        var delay = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
 
                          string newJobId;
+                         var delayInMinutes = (int)delay.TotalMinutes;
                         if (delay.TotalSeconds > 0)
                         {
                             
-                            newJobId =  BackgroundJob.Schedule(() => 
-                            _workOrderRepository.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId, cancellationToken),
-                             delay);
+                            // newJobId =  BackgroundJob.Schedule(() => 
+                            // _workOrderRepository.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId, cancellationToken),
+                            //  delay);
+                            newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(detail.Id,delayInMinutes);
                         }
                         else
                         {
                             
-                            newJobId =  BackgroundJob.Schedule(() => 
-                            _workOrderRepository.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId, cancellationToken),
-                             TimeSpan.FromMinutes(15));
+                            // newJobId =  BackgroundJob.Schedule(() => 
+                            // _workOrderRepository.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId, cancellationToken),
+                            //  TimeSpan.FromMinutes(15));
+                            newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(detail.Id,5);
                         }
                         await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id,newJobId);
                 }

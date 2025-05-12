@@ -1,3 +1,4 @@
+using BackgroundService.Application.DelyedJobs;
 using BackgroundService.Application.Interfaces;
 using BackgroundService.Infrastructure.Jobs;
 using BackgroundService.Infrastructure.Services;
@@ -31,9 +32,9 @@ namespace BackgroundService.API.Controllers
                job => job.Execute(command.UserName),
                 TimeSpan.FromMinutes(command.DelayInMinutes)
             ); */
-            BackgroundJob.Schedule<UserUnlockBackgroundJob>(
+            BackgroundJob.Schedule<UserUnlockservice>(
                  job => job.Execute(command.UserName),
-                TimeSpan.FromMinutes(command.DelayInMinutes)
+                TimeSpan.FromMinutes(1)
             );
             return Ok("User unlock scheduled successfully.");   
         }

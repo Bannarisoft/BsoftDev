@@ -150,7 +150,7 @@ namespace UserManagement.API.Validation.Unit
                      break;
                      case "Email":
                         RuleFor(x => x.UnitContactsDto.Email) 
-                            .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
+                            .EmailAddress() 
                             .WithMessage($"{nameof(UnitContactsDto.Email)} {rule.Error}");
                      break;
                      case "PinCode":

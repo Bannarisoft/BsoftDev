@@ -175,7 +175,11 @@ namespace MaintenanceManagement.Infrastructure.Services
             return claim != null ? Convert.ToInt32(claim) : 0;
         }
 
-        
+        public string GetOldUnitId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("OldUnitId")?.Value;    
+            return claim  ?? string.Empty;
+        }
     }    
 }
 

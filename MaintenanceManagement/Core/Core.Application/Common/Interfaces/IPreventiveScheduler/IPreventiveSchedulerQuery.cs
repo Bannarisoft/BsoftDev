@@ -21,5 +21,6 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<bool> UpdateValidation(int id);
         Task<IEnumerable<dynamic>> GetAbstractSchedulerByDate();
         Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate);
+        Task<PreventiveSchedulerHeader> GetWorkOrderScheduleDetailById(int Id);
     }
 }

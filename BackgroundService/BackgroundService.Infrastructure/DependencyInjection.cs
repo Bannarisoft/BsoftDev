@@ -57,7 +57,7 @@ namespace BackgroundService.Infrastructure
              services.AddHttpClient("UserManagementClient", client =>
             {
                 //client.BaseAddress = new Uri("http://localhost:5174"); 
-                client.BaseAddress = new Uri(configuration["HttpClientSettings:UserManagement"]);
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:UserManagementService"]);
                 // var userServiceUrl = configuration["HttpClientSettings:UserManagement"];
                 // if (string.IsNullOrWhiteSpace(userServiceUrl))
                 // {
@@ -66,6 +66,17 @@ namespace BackgroundService.Infrastructure
 
                 //client.BaseAddress = new Uri(userServiceUrl);
             })
+            
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+             services.AddHttpClient("MaintenanceClient", client =>
+            {
+                //client.BaseAddress = new Uri("http://localhost:5174"); 
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:MaintenanceManagementService"]);
+                
+            })
+            
             .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
@@ -75,6 +86,7 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<IUserUnlockService, UserUnlockService>();                         
             services.AddTransient<IVerificationCodeCleanupService, VerificationCodeCleanupService>();                           
             services.AddScoped<IUserUnlockBackgroundJob, UserUnlockBackgroundJob>();
+            services.AddScoped<IMaintenance, MaintenanceService>();
             
             return services;
     }

@@ -25,7 +25,7 @@ namespace FAM.API.Middleware
         public async Task Invoke(HttpContext context, IJwtTokenHelper jwtTokenHelper, IUserSessionService sessionService)
         {
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
-            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);             
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
             var endpoint = context.GetEndpoint();
             if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
             {
@@ -55,7 +55,7 @@ namespace FAM.API.Middleware
                 }
 
                 // Check session in the database
-                var session = await sessionService.GetSessionByJwtIdAsync(jti,token);
+                var session = await sessionService.GetSessionByJwtIdAsync(jti, token);
                 if (session is null || session.IsActive is 0 || session.ExpiresAt <= currentTime)
                 {
                     await WriteErrorResponse(context, StatusCodes.Status401Unauthorized, "Session is invalid or expired.");

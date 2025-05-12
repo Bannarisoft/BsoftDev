@@ -499,3 +499,6 @@ UserManagement.Infrastructure/Migrations/Archive/
 /UserManagement/Core/Core.Domain/bin
 /UserManagement/Core/Core.Application/obj
 /UserManagement/Core/Core.Application/bin
+**/appsettings.Development.json
+**/appsettings.QA.json
+**/launchSettings.json
