@@ -66,6 +66,7 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
                     // Save and publish event (RabbitMQ/Saga)
                     await _eventPublisher.SaveEventAsync(@event);
                     await _eventPublisher.PublishPendingEventsAsync();
+                    
          /*          // 🧾 Check MongoDB for rollback failure
 
                 var connectionError = await _logQueryService.GetLatestConnectionFailureAsync();
