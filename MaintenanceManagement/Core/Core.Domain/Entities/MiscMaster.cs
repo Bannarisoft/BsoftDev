@@ -33,6 +33,10 @@ namespace Core.Domain.Entities
         public ICollection<MaintenanceRequest>? ModeOfDispatchType { get; set; }
         public ICollection<PreventiveSchedulerHeader>? MaintenanceCategory { get; set; }
         public ICollection<WorkOrderSchedule>? WorkOrderScheduleStatus  {get; set;}  
+
+        public ICollection<ActivityMaster>? ActivityType { get; set; }
+
+
         
 
 

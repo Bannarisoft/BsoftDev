@@ -9,6 +9,7 @@ using Core.Application.ActivityMaster.Queries.GetAllActivityMaster;
 using Core.Application.ActivityMaster.Queries.GetMachineGroupById;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using Core.Application.MachineGroup.Queries.GetMachineGroupById;
+using Core.Domain.Common;
 using Dapper;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
@@ -154,6 +155,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
                   var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = activityId });
                   return count > 0;
             }  
+
+             public async Task<List<Core.Domain.Entities.MiscMaster>> GetActivityTypeAsync()
+                    {
+                    const string query = @"
+                        SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder            
+                        FROM Maintenance.MiscMaster M
+                        INNER JOIN Maintenance.MiscTypeMaster T on T.ID=M.MiscTypeId
+                        WHERE (MiscTypeCode = @MiscTypeCode) 
+                        AND  M.IsDeleted=0 and M.IsActive=1
+                        ORDER BY SortOrder DESC";    
+                        var parameters = new { MiscTypeCode = MiscEnumEntity.GetActivityType.MiscCode };        
+                        var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+                        return result.ToList();
+                    } 
         
     }
 }

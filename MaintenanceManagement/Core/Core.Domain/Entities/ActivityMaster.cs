@@ -16,11 +16,12 @@ namespace Core.Domain.Entities
      // public int MachineGroupId { get; set; }
       public int EstimatedDuration { get; set; }
       public int ActivityType { get; set; } 
+      public MiscMaster? ActivityTypes { get; set; } 
       public ICollection<ActivityMachineGroup>? ActivityMachineGroups { get; set; } // ✅ Many-to-Many Relation 
-       public ICollection<WorkOrderActivity>? workOrderActivities { get; set; } 
+      public ICollection<WorkOrderActivity>? workOrderActivities { get; set; } 
 
-       public ICollection<ActivityCheckListMaster>? ActivityCheckLists { get; set; } // ✅ One-to-Many Relation
-       public ICollection<PreventiveSchedulerActivity>? PreventiveSchedulerActivities { get; set; }
+      public ICollection<ActivityCheckListMaster>? ActivityCheckLists { get; set; } // ✅ One-to-Many Relation
+      public ICollection<PreventiveSchedulerActivity>? PreventiveSchedulerActivities { get; set; }
 
 
     }

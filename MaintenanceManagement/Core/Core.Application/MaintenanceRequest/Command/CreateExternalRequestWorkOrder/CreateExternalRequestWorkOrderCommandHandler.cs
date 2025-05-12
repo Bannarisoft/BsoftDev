@@ -39,7 +39,15 @@ namespace Core.Application.MaintenanceRequest.Command.CreateExternalRequestWorkO
             {
                
                 var externalRequests = await _maintenanceRequestQueryRepository.GetExternalRequestByIdAsync(request.Ids);
-
+                if (externalRequests == null || !externalRequests.Any())
+                    {
+                        return new ApiResponseDTO<List<int>>
+                        {
+                            IsSuccess = false,
+                            Message = "No external requests found for the given IDs.",
+                            Data = new List<int>() // Optional: return empty list
+                        };
+                    }
                 // Fetch the Misc Open Status once
                 var statusList = await _maintenanceRequestQueryRepository.GetMaintenanceOpenstatusAsync();
                 var openStatus = statusList.FirstOrDefault();
