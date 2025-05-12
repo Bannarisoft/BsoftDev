@@ -72,6 +72,7 @@ using Core.Application.Common;
 using Core.Application.Common.Interfaces.ICustomField;
 using UserManagement.Infrastructure.Repositories.CustomFields;
 using Shared.Infrastructure.HttpClientPolly;
+using Polly;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
@@ -181,9 +182,14 @@ namespace UserManagement.Infrastructure
             {
                 client.BaseAddress = new Uri(configuration["HttpClientSettings:BackgroundService"]);
                 //client.BaseAddress = new Uri("http://localhost:5011"); 
-            })
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());    
+            })  
+            .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.CircuitBreakerAsync(
+                    handledEventsAllowedBeforeBreaking: 3,
+                    durationOfBreak: TimeSpan.FromSeconds(30)))
+            .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.WaitAndRetryAsync(3, retryAttempt =>
+                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));  
             
 
             // services.AddDistributedMemoryCache();
