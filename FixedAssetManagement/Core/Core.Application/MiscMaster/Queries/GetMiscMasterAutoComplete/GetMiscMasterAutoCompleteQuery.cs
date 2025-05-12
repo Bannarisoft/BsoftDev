@@ -11,7 +11,9 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
     public class GetMiscMasterAutoCompleteQuery  :  IRequest<ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>>>
     {
 
-          public string? SearchPattern { get; set; }
+
+          public string? MiscTypeCode { get; set; }
+         public string? MiscTypeName { get; set; }
         
     }
 }

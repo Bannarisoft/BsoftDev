@@ -66,22 +66,24 @@ namespace FAM.Infrastructure.Repositories.MiscMaster
             return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MiscMaster>(query, new { id });
         } 
 
-        public async Task<List<Core.Domain.Entities.MiscMaster>>  GetMiscMaster(string searchPattern)
-        {
-            
-
-            const string query = @"SELECT Id,Code   FROM FixedAsset.MiscMaster
-                WHERE IsDeleted = 0 AND Code LIKE @SearchPattern ";
+        public async Task<List<Core.Domain.Entities.MiscMaster>>  GetMiscMaster(string miscTypeCode,string miscTypeName)
+        {                                                    
+             const string query = @"SELECT M.Id,M.Code ,M.Description  FROM FixedAsset.MiscMaster M
+            INNER JOIN [FixedAsset].[MiscTypeMaster] MT ON MT.Id = M.MiscTypeId
+                WHERE M.IsDeleted = 0 AND MT.MiscTypeCode= @MiscTypeCode AND M.Code LIKE @SearchPattern ";
                 
             
             var parameters = new 
               { 
-                  SearchPattern = $"%{searchPattern ?? string.Empty}%", 
+                  SearchPattern = $"%{miscTypeName ?? string.Empty}%",
+                  MiscTypeCode = miscTypeCode 
              
               };
 
             var miscmaster = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query, parameters);
             return miscmaster.ToList();
+
+            
         }
 
         public async Task<Core.Domain.Entities.MiscMaster?> GetByMiscMasterCodeAsync(string name, int miscTypeId, int? id = null)

@@ -347,8 +347,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster H ON A.ModeOfDispatchId = H.Id
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
-                        WHERE A.IsDeleted = 0 AND A.Id IN @Ids 
-                        AND B.Code = @MiscCode AND J.Code <> @MiscStatusCode AND A.UnitId = @UnitId;
+                        INNER JOIN Maintenance.MiscTypeMaster K ON J.MiscTypeId = K.Id
+                        WHERE  A.Id IN @Ids  AND C.Code = @MiscType
+                        AND B.Code = @MiscCode AND J.Code <> @MiscStatusCode AND A.UnitId = @UnitId AND K.MiscTypeCode =@MiscType ;
                     ";
                 //    var result = await _dbConnection.QueryAsync<GetExternalRequestByIdDto>(query, new { Ids = ids });
                  var parameters = new
@@ -356,6 +357,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         Ids = ids,
                         MiscCode = MiscEnumEntity.MaintenanceRequestTypeExternal.Code,
                         MiscStatusCode = MiscEnumEntity.MaintenanceStatusUpdate.Code,
+                        MiscType= MiscEnumEntity.WOStatus.MiscCode,
                         UnitId
                        
                     };

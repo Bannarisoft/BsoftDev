@@ -66,11 +66,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
             return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MiscMaster>(query, new { id });
         } 
 
+
         public async Task<List<Core.Domain.Entities.MiscMaster>>  GetMiscMaster(string searchPattern,string miscTypeCode)
         {
             
 
-            const string query = @"SELECT M.Id,M.Code   FROM Maintenance.MiscMaster M
+            const string query = @"SELECT M.Id,M.Code ,M.Description  FROM Maintenance.MiscMaster M
             INNER JOIN [Maintenance].[MiscTypeMaster] MT ON MT.Id = M.MiscTypeId
                 WHERE M.IsDeleted = 0 AND MT.MiscTypeCode= @MiscTypeCode AND M.Code LIKE @SearchPattern ";
                 
@@ -154,7 +155,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
         {
             
 
-            const string query = @"SELECT M.Id,M.Code  FROM Maintenance.MiscMaster AS M
+            const string query = @"SELECT M.Id,M.Code ,M.Description  FROM Maintenance.MiscMaster AS M
                                 INNER JOIN Maintenance.MiscTypeMaster AS MT 
                                 ON MT.Id = M.MiscTypeId
                                 WHERE M.IsDeleted = 0 AND MT.IsDeleted = 0 AND MT.MiscTypeCode= @MiscTypeCode AND M.Code=@MiscTypeName ";

@@ -54,11 +54,12 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnName("ActivityType")
                 .HasColumnType("int")
                 .IsRequired();
+            
                 // MachineGroup → ActivityMaster (One-to-Many Relationship)
-            // builder.HasOne(am => am.MachineGroup)  // One MachineGroup per ActivityMaster
-            // .WithMany(mg => mg.ActivityMasters) // One MachineGroup has many ActivityMasters
-            // .HasForeignKey(am => am.MachineGroupId) // Foreign key in ActivityMaster
-            // .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete   
+            builder.HasOne(am => am.ActivityTypes)  // One MachineGroup per ActivityMaster
+            .WithMany(mg => mg.ActivityType) // One MachineGroup has many ActivityMasters
+            .HasForeignKey(am => am.ActivityType) // Foreign key in ActivityMaster
+            .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete   
 
 
                
