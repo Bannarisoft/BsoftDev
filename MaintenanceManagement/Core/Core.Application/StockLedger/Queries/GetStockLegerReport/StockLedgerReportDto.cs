@@ -23,6 +23,11 @@ namespace Core.Application.StockLedger.Queries.GetStockLegerReport
     public decimal ReturnQty { get; set; }
     public decimal ReturnValue { get; set; }
 
+    public decimal ScrapReceiptQty { get; set; }
+    public decimal ScrapReceiptValue { get; set; }
+
+    public decimal ScrapIssueQty { get; set; }
+    public decimal ScrapIssueValue { get; set; }
     public decimal ClosingQty { get; set; }
     public decimal ClosingValue { get; set; }
     }

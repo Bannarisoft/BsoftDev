@@ -13,6 +13,7 @@ namespace Core.Application.CostCenter.Queries.GetCostCenter
         public string? CostCenterName { get; set; }
         public int UnitId { get; set; }
         public int DepartmentId { get; set; }
+        public string? DepartmentName { get; set; }
         public DateTimeOffset EffectiveDate { get; set; }
         public string? ResponsiblePerson { get; set; }
         public decimal? BudgetAllocated { get; set; }
