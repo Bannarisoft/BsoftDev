@@ -12,7 +12,9 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
         public string? WorkCenterCode { get; set; }
         public string? WorkCenterName { get; set; }
         public int UnitId { get; set; }
+        public string? UnitName { get; set; }
         public int DepartmentId { get; set; }
+        public string? DepartmentName { get; set; }
         public Status IsActive { get; set; }
     }
 }

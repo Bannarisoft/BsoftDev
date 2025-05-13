@@ -5,7 +5,9 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.Interfaces.External.IDepartment;
+using Core.Application.Common.Interfaces.External.IUnit;
 using MaintenanceManagement.Infrastructure.HttpClients.Departments;
+using MaintenanceManagement.Infrastructure.HttpClients.Units;
 using MaintenanceManagement.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +29,18 @@ namespace MaintenanceManagement.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
             services.AddScoped<IDepartmentService, DepartmentService>();
+
+
+             // UnitClient
+            services.AddHttpClient("UnitClient", client =>
+            {
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:UnitService"]);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            })
+             .AddHttpMessageHandler<AuthTokenHandler>()
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+            services.AddScoped<IUnitService, UnitService>();
 
             // UserSessionClient
             services.AddHttpClient("UserSessionClient", client =>

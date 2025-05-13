@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IDepartment;
+using Core.Application.Common.Interfaces.External.IUnit;
 using Core.Application.Common.Interfaces.ICostCenter;
 using Core.Application.CostCenter.Queries.GetCostCenter;
 using Core.Domain.Events;
@@ -19,13 +20,16 @@ namespace Core.Application.CostCenter.Queries.GetCostCenterById
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IDepartmentService _departmentService;
+        private readonly IUnitService _unitService;
 
-        public GetCostCenterByIdQueryHandler(ICostCenterQueryRepository iCostCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentService departmentService)
+
+        public GetCostCenterByIdQueryHandler(ICostCenterQueryRepository iCostCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentService departmentService, IUnitService unitService)
         {
             _iCostCenterQueryRepository = iCostCenterQueryRepository;            
             _mapper = mapper;
             _mediator = mediator;
             _departmentService = departmentService;
+            _unitService = unitService;
         }
 
         public async Task<ApiResponseDTO<CostCenterDto>> Handle(GetCostCenterByIdQuery request, CancellationToken cancellationToken)
@@ -38,17 +42,19 @@ namespace Core.Application.CostCenter.Queries.GetCostCenterById
             }
             // Map a single entity
             var costCenter = _mapper.Map<CostCenterDto>(result);
-             // 🔥 Fetch departments using HttpClientFactory
-            // 🔥 Fetch departments
-            var departments = await _departmentService.GetAllDepartmentAsync();
-            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+          
+          
+             var departments = await _departmentService.GetAllDepartmentAsync();
+             var units = await _unitService.GetUnitAutoCompleteAsync();
+             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
-            // 🔥 Map department name to cost center
-            if (departmentLookup.TryGetValue(costCenter.DepartmentId, out var departmentName) && departmentName != null)
+           if ((departmentLookup.TryGetValue(costCenter.DepartmentId, out var departmentName) && departmentName != null) |
+                (unitLookup.TryGetValue(costCenter.UnitId, out var unitName) && unitName != null))
             {
                 costCenter.DepartmentName = departmentName;
+                costCenter.UnitName = unitName;
             }
-
 
           //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(

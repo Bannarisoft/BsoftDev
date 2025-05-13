@@ -6,8 +6,8 @@ using Contracts.Dtos.Maintenance;
 
 namespace Core.Application.Common.Interfaces.External.IUnit
 {
-    public class IUnitService
+    public interface IUnitService
     {
-    //  Task<List<UnitDto>> GetAllDepartmentAsync();
+        Task<List<UnitDto>> GetUnitAutoCompleteAsync();
     }
 }
