@@ -1,28 +1,30 @@
 {
-
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "SagaOrchestrator.API",
-        "type": "coreclr",
-        "request": "launch",
-        "preLaunchTask": "build",
-        "program": "${workspaceFolder}/SagaOrchestrator.API/bin/Debug/net8.0/SagaOrchestrator.API.dll",
-        "args": [],
-        "cwd": "${workspaceFolder}/SagaOrchestrator.API",
-        "stopAtEntry": false,
-        "serverReadyAction": {
-          "action": "openExternally",
-          "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-        },
-        "env": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
-        },
-        "sourceFileMap": {
-          "/Views": "${workspaceFolder}/SagaOrchestrator.API/Views"
-        }
-
-  
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "SagaOrchestrator.API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/SagaOrchestrator.API/bin/Debug/net8.0/SagaOrchestrator.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/SagaOrchestrator.API",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/SagaOrchestrator.API/Views"
+      }
+    },
+    {
+      "name": "C#: Launch Startup Project",
+      "type": "dotnet",
+      "request": "launch"
     },
     {
       "name": "C#: Launch Startup Project",
