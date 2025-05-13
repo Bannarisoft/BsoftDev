@@ -113,11 +113,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
   
         public async Task<bool> UpdateStatusAsync(int id)
         {
-
-            // Step 1: Get the maintenance status from MiscMaster (e.g., "Closed")
-            var WOstatusclosed = await _maintenanceRequestQueryRepository.GetWOclosedOrInProgressAsync(id );
-           if (!WOstatusclosed)
-                return false;
+            
+            var WOstatusOpen = await _maintenanceRequestQueryRepository.GetWOclosedOrInProgressAsync(id );
+           if (WOstatusOpen)
+           return false;
 
             var statusList = await _maintenanceRequestQueryRepository.GetMaintenancestatusAsync();
             var status = statusList.FirstOrDefault();
