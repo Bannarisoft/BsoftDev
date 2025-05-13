@@ -55,7 +55,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             A.DepartmentId,
                             A.SourceId,
                             A.VendorId,
+                            A.VendorName,
                             A.OldVendorId,
+                            A.OldVendorName,
                             A.Remarks,
                             A.CreatedByName,
                             A.CreatedDate,
@@ -159,7 +161,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             A.DepartmentId,
                             A.SourceId,
                             A.VendorId,
+                            A.VendorName,
                             A.OldVendorId,
+                            A.OldVendorName,
                             A.Remarks,
                             A.EstimatedServiceCost,
                             A.EstimatedSpareCost,
@@ -244,7 +248,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             A.DepartmentId,
                             A.SourceId,
                             A.VendorId,
+                            A.VendorName,
                             A.OldVendorId,
+                            A.OldVendorName,
                             A.Remarks,
                             A.EstimatedServiceCost,
                             A.EstimatedSpareCost,
@@ -313,7 +319,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             A.DepartmentId,
                             A.SourceId,
                             A.VendorId,
+                            A.VendorName,
                             A.OldVendorId,
+                            A.OldVendorName,
                             A.Remarks,
                             A.CompanyId,
                             A.UnitId,
@@ -518,18 +526,21 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                 {                      
                                 var query = @"
                     SELECT COUNT(1)
-                    FROM Maintenance.WorkOrder WO
-                    INNER JOIN Maintenance.MiscMaster M ON M.Id = WO.StatusId
-                    INNER JOIN Maintenance.MiscTypeMaster T ON T.Id = M.MiscTypeId
-                    WHERE WO.RequestId = @RequestId And M.Code <> @MiscCode                   
-                    AND T.MiscTypeCode = @MiscTypeCode";
+                    FROM   Maintenance.MaintenanceRequest R  
+                    left JOIN Maintenance.WorkOrder WO  ON R.Id=WO.RequestId   
+					left JOIN Maintenance.MiscMaster M ON M.Id = WO.StatusId
+                    left JOIN Maintenance.MiscTypeMaster T ON T.Id = M.MiscTypeId
+                    INNER JOIN Maintenance.MiscMaster MN ON MN.Id = R.RequestTypeId
+					 INNER JOIN Maintenance.MiscMaster MJ ON MJ.Id = R.MaintenanceTypeId
+                    WHERE R.Id = @RequestId AND M.Code = @MiscCode AND MJ.Code  = @Maintenancetype   AND MN.Code = @MiscCodeexternal                  
+                    AND T.MiscTypeCode = @MiscTypeCode ";
                    var parameters = new
                     {
                         RequestId = id,
                         MiscTypeCode = MiscEnumEntity.WOStatus.MiscCode,
                         MiscCode= MiscEnumEntity.StatusOpen.Code ,
-                       // MiscCodeInProgress = MiscEnumEntity.GetStatusId.Status
-
+                       MiscCodeexternal = MiscEnumEntity.MaintenanceRequestTypeInternal.Code,
+                       Maintenancetype =MiscEnumEntity.MaintenanceType.Code
 
                     };
                     
