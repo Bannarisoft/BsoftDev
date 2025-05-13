@@ -86,7 +86,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
                     ItemName,
                     SUM(ReceivedQty) - SUM(IssueQty) AS StockQty,
                     Uom,
-                    SUM(ReceivedValue) - SUM(IssueValue) AS StockValue
+                    SUM(ReceivedValue) - SUM(IssueValue) AS StockValue,
+                    ((SUM(ReceivedValue) - SUM(IssueValue)) / (SUM(ReceivedQty) - SUM(IssueQty))) AS Rate
                 FROM 
                     Maintenance.StockLedger
                 WHERE

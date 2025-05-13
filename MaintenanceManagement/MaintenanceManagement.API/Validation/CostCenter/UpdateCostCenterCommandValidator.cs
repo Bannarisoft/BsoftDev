@@ -46,8 +46,10 @@ namespace MaintenanceManagement.API.Validation.CostCenter
                         RuleFor(x => x.EffectiveDate)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateCostCenterCommand.EffectiveDate)} {rule.Error}")
-                            .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Document Date cannot be in the future.")
-                            .GreaterThanOrEqualTo(DateTime.UtcNow.AddYears(-1)).WithMessage("Document Date cannot be older than 1 year.");
+                            .Must(date => date.Date <= DateTime.UtcNow.Date)
+                            .WithMessage("Document Date cannot be in the future.")
+                            .Must(date => date.Date >= DateTime.UtcNow.AddYears(-1).Date)
+                            .WithMessage("Document Date cannot be older than 1 year.");
                         RuleFor(x => x.ResponsiblePerson)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateCostCenterCommand.ResponsiblePerson)} {rule.Error}");

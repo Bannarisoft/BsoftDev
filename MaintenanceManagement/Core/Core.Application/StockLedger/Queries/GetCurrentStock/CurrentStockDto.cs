@@ -14,12 +14,10 @@ namespace Core.Application.StockLedger.Queries.GetCurrentStock
         public string? ItemCode { get; set; }
 
         public string? ItemName { get; set; }
-
-        public decimal StockQty { get; set; }
-
         public string? Uom { get; set; }
-
+        public decimal StockQty { get; set; }
         public decimal StockValue { get; set; }
+        public decimal Rate { get; set; }
 
     }
 }
