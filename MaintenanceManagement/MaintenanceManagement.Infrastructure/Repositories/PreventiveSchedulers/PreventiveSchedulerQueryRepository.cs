@@ -371,7 +371,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 var UnitId =_ipAddressService.GetUnitId();
                  var query = @"SELECT COUNT(1) FROM [Maintenance].[MachineGroup] MG
                  INNER JOIN [Maintenance].[MachineMaster] MM ON MM.MachineGroupId=MG.Id
-                  WHERE MG.Id = @Id AND MG.IsDeleted = 0";
+                  WHERE MG.Id = @Id AND MG.IsDeleted = 0 AND MM.Unitid=@UnitId";
 
                      var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id,UnitId });
                      return count > 0;
