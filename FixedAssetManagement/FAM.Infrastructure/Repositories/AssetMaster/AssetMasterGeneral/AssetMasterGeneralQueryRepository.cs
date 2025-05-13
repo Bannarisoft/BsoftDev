@@ -413,15 +413,19 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
            var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
                 SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,
-                MM.Description+'\'+C.CompanyName+'\'+trim(UN.unitname) +'\'+AM.AssetImage AssetImage,AM.AssetCategoryId,AM.AssetSubCategoryId,
+                --MM.Description+'\'+C.CompanyName+'\'+trim(UN.unitname) +'\'+AM.AssetImage AssetImage,
+                 case when (isnull(AM.AssetImage,'') <> '') then MM.Description+''+MM1.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetImage  else 
+                '' end AssetImage ,  
+                AM.AssetCategoryId,AM.AssetSubCategoryId,
                 AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
                 INNER JOIN [FixedAsset].[AssetGroup] AG ON AM.AssetGroupId = AG.Id
                 INNER JOIN [FixedAsset].[AssetCategories] AC ON AM.AssetCategoryId = AC.Id
                 INNER JOIN [FixedAsset].[AssetSubCategories] ASUBC ON AM.AssetSubCategoryId = ASUBC.Id
-                LEFT JOIN [FixedAsset].[AssetMaster] AssetParent ON AM.AssetParentId = AssetParent.Id
+                LEFT JOIN [FixedAsset].[AssetMaster] AssetParent ON AM.AssetParentId = AssetParent.Id                
                 LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'
+                LEFT JOIN FixedAsset.MiscTypeMaster MM1 on MM1.MiscTypeCode ='ASSETIMAGE'
                 LEFT JOIN Bannari.AppData.Unit UN on UN.Id=AM.UnitId
                 LEFT JOIN Bannari.AppData.Company C on C.Id=AM.CompanyId
                 WHERE AM.CompanyId = @CompanyId AND AM.UnitId = @UnitId AND AM.Id = @AssetId;
