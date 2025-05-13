@@ -47,6 +47,15 @@ namespace FAM.API.Validation.MiscMaster
                             .MaximumLength(DescriptionMaxLength)
                             .WithMessage($"{nameof(CreateMiscMasterCommand.Description)} {rule.Error}");
                         break;
+                        //  case "AlreadyExists":
+                        // RuleFor(x => x)
+                        //     .MustAsync(async (command, cancellation) =>
+                        //     {
+                        //         return !await _miscMasterQuery.AlreadyExistsAsync(command.Code, command.MiscTypeId);
+                        //     })
+                        //     .WithMessage($"{rule.Error}")
+                        //     .WithName("Misc Code");
+                        // break; 
                 }
 
             }

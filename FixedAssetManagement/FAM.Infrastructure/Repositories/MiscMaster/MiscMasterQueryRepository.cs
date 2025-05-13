@@ -90,7 +90,7 @@ namespace FAM.Infrastructure.Repositories.MiscMaster
         {
               var query = """
                  SELECT * FROM FixedAsset.MiscMaster
-                 WHERE Code = @Name AND MiscTypeId = @MiscTypeId AND IsDeleted = 0
+                 WHERE Code = @Name AND MiscTypeId = @MiscTypeId       AND IsDeleted = 0
                  """;
 
              var parameters = new DynamicParameters(new { Name = name , MiscTypeId = miscTypeId });
