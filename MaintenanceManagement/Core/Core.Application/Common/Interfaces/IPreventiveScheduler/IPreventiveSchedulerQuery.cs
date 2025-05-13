@@ -22,5 +22,6 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<IEnumerable<dynamic>> GetAbstractSchedulerByDate();
         Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate);
         Task<PreventiveSchedulerHeader> GetWorkOrderScheduleDetailById(int Id);
+        Task<bool> MachingroupValidation(int id);
     }
 }

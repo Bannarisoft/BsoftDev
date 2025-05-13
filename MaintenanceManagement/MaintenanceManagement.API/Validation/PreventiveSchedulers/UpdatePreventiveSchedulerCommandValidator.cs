@@ -177,6 +177,12 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                          .WithMessage($"{rule.Error}");  
                          
                             break;  
+                            case "MachineGroupValidation":
+                                RuleFor(x => x.MachineGroupId)
+                                  .MustAsync(async (MachineGroupId, cancellation) => 
+                                 !await _preventiveSchedulerQuery.MachingroupValidation(MachineGroupId))
+                                .WithMessage($"{rule.Error}"); 
+                                break;
                     default:                        
                         break;   
                 }
