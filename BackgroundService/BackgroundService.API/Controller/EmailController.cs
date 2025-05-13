@@ -22,9 +22,9 @@ namespace BackgroundService.API.Controller
         {
             var result = await _mediator.Send(command);
             if (result)
-                return Ok(new { Message = "Email sent successfully" });
+                return Ok(new { StatusCode = StatusCodes.Status200OK,Message = "Email sent successfully" });
 
-            return BadRequest(new { Message = "Email sending failed" });
+            return BadRequest(new {StatusCode=StatusCodes.Status400BadRequest,  Message = "Email sending failed" });
         }
     }
 

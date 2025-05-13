@@ -44,11 +44,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster G ON A.ServiceLocationId = G.Id  
                         LEFT JOIN Maintenance.MiscMaster H ON A.ModeOfDispatchId = H.Id  
                          LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id 
-                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
-
+                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id                          
                         WHERE A.IsDeleted = 0
                         AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
-                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate) AND A.UnitId = @UnitId
+                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate) AND A.UnitId = @UnitId                       
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search  OR F.Code LIKE @Search OR G.Code LIKE @Search OR E.MachineName LIKE @Search OR H.Code LIKE @Search OR I.Code LIKE @Search OR J.Code LIKE @Search ) ")}};
                                             
                         SELECT 
@@ -58,7 +57,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             A.VendorId,
                             A.OldVendorId,
                             A.Remarks,
-
                             A.CreatedByName,
                             A.CreatedDate,
                             A.CreatedBy,
@@ -93,12 +91,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster G ON A.ServiceLocationId = G.Id  
                         LEFT JOIN Maintenance.MiscMaster H ON A.ModeOfDispatchId = H.Id 
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id 
-                        LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
+                        LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
+                          
+                       
 
                         WHERE A.IsDeleted = 0   AND  B.Code = @MiscCode  AND J.Code <> @MaintenanceStatusUpdate
                         AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
                         AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate)
                         AND A.UnitId = @UnitId
+                       
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search OR F.Code LIKE @Search or G.Code LIKE @Search OR H.Code LIKE @Search  OR E.MachineName LIKE @Search OR I.Code LIKE @Search  or J.Code LIKE @Search) ")}}
                         ORDER BY A.Id DESC
                         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -146,9 +147,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster H ON A.ModeOfDispatchId = H.Id  
                          LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id 
                          LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
+                         LEFT JOIN Maintenance.WorkOrder K ON A.Id = K.RequestId
 
                         WHERE A.IsDeleted = 0 AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
                         AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate)  AND A.UnitId = @UnitId
+                         AND K.RequestId IS NOT NULL
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search  OR F.Code LIKE @Search OR G.Code LIKE @Search OR E.MachineName LIKE @Search OR H.Code LIKE @Search OR I.Code LIKE @Search OR J.Code LIKE @Search ) ")}};
                                             
                         SELECT 
@@ -195,10 +198,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster H ON A.ModeOfDispatchId = H.Id 
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id 
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
+                        LEFT JOIN Maintenance.WorkOrder K ON A.Id = K.RequestId
 
                         WHERE  B.Code = @MiscCode  AND C.Code <> @MaintenanceStatusUpdate 
                         AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
-                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate) AND A.UnitId = @UnitId
+                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate) AND A.UnitId = @UnitId 
+                        AND A.Id NOT IN (SELECT RequestId FROM Maintenance.WorkOrder WHERE RequestId IS NOT NULL)
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search OR F.Code LIKE @Search or G.Code LIKE @Search OR H.Code LIKE @Search  OR E.MachineName LIKE @Search OR I.Code LIKE @Search  or J.Code LIKE @Search) ")}}
                         ORDER BY A.Id DESC
                         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -210,6 +215,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                        //  MiscTypeCode = MiscEnumEntity.MaintenanceRequestType.MiscCode,
                         MiscCode = MiscEnumEntity.MaintenanceRequestTypeExternal.Code,
                         MaintenanceStatusUpdate = MiscEnumEntity.MaintenanceStatusUpdate.Code,
+                        MiscType= MiscEnumEntity.WOStatus.MiscCode,
                         Search = $"%{SearchTerm}%",
                         Offset = (PageNumber - 1) * PageSize,
                         PageSize,
@@ -279,7 +285,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
 
                         WHERE A.IsDeleted = 0 AND A.Id = @Id 
-                        AND B.Code = @MiscCode AND A.UnitId = @UnitId;
+                        AND B.Code = @MiscCode AND A.UnitId = @UnitId;  
                     ";
 
                    // var result = await _dbConnection.QueryFirstOrDefaultAsync<dynamic>(query, new { Id = id });
@@ -348,7 +354,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
                         INNER JOIN Maintenance.MiscTypeMaster K ON J.MiscTypeId = K.Id
-                        WHERE  A.Id IN @Ids  AND C.Code = @MiscType
+                        WHERE  A.Id IN @Ids  
                         AND B.Code = @MiscCode AND J.Code <> @MiscStatusCode AND A.UnitId = @UnitId AND K.MiscTypeCode =@MiscType ;
                     ";
                 //    var result = await _dbConnection.QueryAsync<GetExternalRequestByIdDto>(query, new { Ids = ids });

@@ -8,6 +8,7 @@ using BackgroundService.Application.Interfaces;
 using Hangfire;
 using Hangfire.SqlServer;
 using BackgroundService.Infrastructure.Jobs;
+using Polly;
 
 
 namespace BackgroundService.Infrastructure
@@ -67,8 +68,13 @@ namespace BackgroundService.Infrastructure
                 //client.BaseAddress = new Uri(userServiceUrl);
             })
             
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+               .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.CircuitBreakerAsync(
+                    handledEventsAllowedBeforeBreaking: 3,
+                    durationOfBreak: TimeSpan.FromSeconds(30)))
+            .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.WaitAndRetryAsync(3, retryAttempt =>
+                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));  
 
              services.AddHttpClient("MaintenanceClient", client =>
             {
@@ -77,8 +83,13 @@ namespace BackgroundService.Infrastructure
                 
             })
             
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+               .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.CircuitBreakerAsync(
+                    handledEventsAllowedBeforeBreaking: 3,
+                    durationOfBreak: TimeSpan.FromSeconds(30)))
+            .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.WaitAndRetryAsync(3, retryAttempt =>
+                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));  
 
             services.AddHttpClient(); 
             services.AddScoped<IEmailService, RealEmailService>();
