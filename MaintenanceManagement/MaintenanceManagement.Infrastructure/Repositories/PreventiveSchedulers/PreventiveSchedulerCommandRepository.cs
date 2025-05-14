@@ -176,15 +176,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                   var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(lastMaintenanceDate.Value.DateTime, headerInfo.FrequencyInterval, miscdetail.Code ?? "", headerInfo.ReminderWorkOrderDays);
                   var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(lastMaintenanceDate.Value.DateTime, headerInfo.FrequencyInterval, miscdetail.Code ?? "", headerInfo.ReminderMaterialReqDays);
 
-                  var details = _mapper.Map<PreventiveSchedulerDetail>(existingPreventiveScheduler);
+                //   var details = _mapper.Map<PreventiveSchedulerDetail>(existingPreventiveScheduler);
                    // 🔥 Set new dates
-                    details.Id = 0;
-                    details.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
-                    details.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
-                    details.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
+                    existingPreventiveScheduler.Id = 0;
+                    existingPreventiveScheduler.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
+                    existingPreventiveScheduler.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
+                    existingPreventiveScheduler.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
                      
 
-                    await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(details);
+                    await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(existingPreventiveScheduler);
                     await _applicationDbContext.SaveChangesAsync(); 
                     return true;
             }

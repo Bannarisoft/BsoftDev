@@ -424,7 +424,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 INNER JOIN [FixedAsset].[AssetCategories] AC ON AM.AssetCategoryId = AC.Id
                 INNER JOIN [FixedAsset].[AssetSubCategories] ASUBC ON AM.AssetSubCategoryId = ASUBC.Id
                 LEFT JOIN [FixedAsset].[AssetMaster] AssetParent ON AM.AssetParentId = AssetParent.Id                
-                   LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'
+                   LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'               
                 LEFT JOIN FixedAsset.MiscTypeMaster MM1 on MM1.MiscTypeCode ='ASSETIMAGE'
                 LEFT JOIN Bannari.AppData.Unit UN on UN.Id=AM.UnitId
                 LEFT JOIN Bannari.AppData.Company C on C.Id=AM.CompanyId

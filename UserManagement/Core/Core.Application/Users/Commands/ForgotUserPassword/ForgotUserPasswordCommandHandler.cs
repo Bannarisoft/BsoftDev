@@ -62,6 +62,9 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
             };
 
             await _backgroundServiceClient.ScheduleVerificationCodeCleanupAsync(request.UserName, expiryMinutes);
+            string provider = user.EmailId.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase)
+                ? "Gmail"
+                : "Zimbra";
 
             //Email
             var emailCommand = new SendEmailCommand
@@ -69,7 +72,7 @@ namespace Core.Application.Users.Commands.ForgotUserPassword
                 ToEmail = user.EmailId,
                 Subject = "Forgot Password",
                 HtmlContent = $"Dear {request.UserName}, We received a request to reset your password. Use the verification code below to proceed:Code:{verificationCode}, This code is valid for {expiryMinutes} minutes.",
-                Provider = "Gmail"
+                Provider =provider
             };
             var emailsent=await _emailService.SendEmailAsync(emailCommand);
 
