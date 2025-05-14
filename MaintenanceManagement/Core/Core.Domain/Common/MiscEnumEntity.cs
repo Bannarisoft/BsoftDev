@@ -105,5 +105,11 @@ namespace Core.Domain.Common
             public const string MiscCode = "ActivityType";
         }
 
+          public static class MaintenanceType
+        {
+            public const string Code = "BRK";
+        }
+
+
     }
 }

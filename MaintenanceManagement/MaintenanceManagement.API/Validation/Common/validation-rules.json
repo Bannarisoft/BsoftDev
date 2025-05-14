@@ -147,6 +147,10 @@
     {
         "rule": "PreventiveDelete",      
         "error": "{PropertyName} Work order has already been generated. You cannot Delete this schedule. Please inactivate the existing scheduler and create a new one."
+    },
+    {
+        "rule": "MachineGroupValidation",      
+        "error": "No Machines found for this group."
     }
     
 ]

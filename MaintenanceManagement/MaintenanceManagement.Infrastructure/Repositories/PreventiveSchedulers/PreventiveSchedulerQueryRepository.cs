@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Domain.Entities;
 using Dapper;
@@ -13,9 +14,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
     public class PreventiveSchedulerQueryRepository : IPreventiveSchedulerQuery
     {
         private readonly IDbConnection _dbConnection;
-        public PreventiveSchedulerQueryRepository(IDbConnection dbConnection)
+        private readonly IIPAddressService _ipAddressService;
+        public PreventiveSchedulerQueryRepository(IDbConnection dbConnection,IIPAddressService iPAddressService)
         {
             _dbConnection = dbConnection;
+            _ipAddressService = iPAddressService;
         }
         public async Task<bool> AlreadyExistsAsync(int activityId,int machinegroupId,int? id = null)
         {
@@ -54,12 +57,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
                 FROM [Maintenance].[PreventiveSchedulerHeader] PS
-                INNER JOIN [Maintenance].[MaintenanceCategory] MC ON MC.Id = PS.MaintenanceCategoryId
+                INNER JOIN [Maintenance].[MachineGroup] MG ON PS.MachineGroupId = MG.Id
+                INNER JOIN [Maintenance].[MiscMaster] MC ON MC.Id = PS.MaintenanceCategoryId
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
                 WHERE PS.IsDeleted = 0
-                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MC.CategoryName LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")};
+                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")};
 
                 SELECT  
                     PS.Id,
@@ -83,7 +87,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     MG.Id AS MachineGroupId,
                     MG.GroupName AS MachineGroup,
                     MC.Id AS CategoryId,
-                    MC.CategoryName ,
+                    MC.Code AS CategoryName ,
                     Schedule.Id AS ScheduleId,
                     Schedule.Code AS Schedule,
                     FrequencyType.Id AS FrequencyTypeId,
@@ -92,12 +96,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     FrequencyUnit.Code AS FrequencyUnit
                 FROM [Maintenance].[PreventiveSchedulerHeader] PS
                 INNER JOIN [Maintenance].[MachineGroup] MG ON PS.MachineGroupId = MG.Id
-                INNER JOIN [Maintenance].[MaintenanceCategory] MC ON MC.Id = PS.MaintenanceCategoryId
+                INNER JOIN [Maintenance].[MiscMaster] MC ON MC.Id = PS.MaintenanceCategoryId
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
                 WHERE PS.IsDeleted = 0
-                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.CategoryName LIKE @Search OR Schedule.Code LIKE @Search OR DueType.Code LIKE @Search OR Frequency.Code LIKE @Search)")}
+                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")}
                 ORDER BY PS.Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
@@ -362,6 +366,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             return PreventiveSchedulerResponse.FirstOrDefault()!;
            }
+            public async Task<bool> MachingroupValidation(int id)
+             {
+                var UnitId =_ipAddressService.GetUnitId();
+                 var query = @"SELECT COUNT(1) FROM [Maintenance].[MachineGroup] MG
+                 INNER JOIN [Maintenance].[MachineMaster] MM ON MM.MachineGroupId=MG.Id
+                  WHERE MG.Id = @Id AND MG.IsDeleted = 0 AND MM.Unitid=@UnitId";
+
+                     var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id,UnitId });
+                     return count > 0;
+             }
              
 
     }
