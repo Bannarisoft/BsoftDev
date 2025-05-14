@@ -16,8 +16,6 @@ namespace BackgroundService.Application.Email
         {
             //return await _emailService.SendEmailAsync(request.ToEmail!, request.Subject!, request.HtmlContent!, request.Provider ?? "Gmail");
             return await _emailService.SendEmailAsync(request);
-        } 
-        
-   
+        }   
     }
 }

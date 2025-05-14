@@ -31,6 +31,8 @@ namespace BackgroundService.Infrastructure.Services
                     Port = provider.Port,
                     Credentials = new NetworkCredential(provider.UserName, provider.Password),
                     EnableSsl = provider.EnableSsl,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false
                 };
 
                 var mail = new MailMessage

@@ -17,7 +17,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _dbConnection = dbConnection;            
         }
 
-        public async Task<(List<WorkOrderWithScheduleDto>, int)> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,int? requestTypeId, int? PageNumber, int? PageSize, string? SearchTerm)
+        public async Task<List<WorkOrderWithScheduleDto>> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,int? requestTypeId, int? departmentId)
         {         
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", CompanyId);
@@ -25,20 +25,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             parameters.Add("@FromDate", fromDate);
             parameters.Add("@ToDate", toDate);
             parameters.Add("@RequestType", requestTypeId);
-            parameters.Add("@PageNumber", PageNumber );
-            parameters.Add("@PageSize", PageSize );
-            parameters.Add("@SearchTerm", SearchTerm);
+            parameters.Add("@DepartmentId", departmentId );
 
             List<WorkOrderWithScheduleDto> workOrderList;
             int totalCount;
 
             using (var multiResult = await _dbConnection.QueryMultipleAsync(
-                "dbo.GetWorkOrder", parameters, commandType: CommandType.StoredProcedure))
+                "dbo.Usp_GetWorkOrder", parameters, commandType: CommandType.StoredProcedure))
             {
-                workOrderList = (await multiResult.ReadAsync<WorkOrderWithScheduleDto>()).ToList();
-                totalCount = await multiResult.ReadFirstOrDefaultAsync<int>();
+                workOrderList = (await multiResult.ReadAsync<WorkOrderWithScheduleDto>()).ToList();                
             }
-            return (workOrderList, totalCount);
+            return (workOrderList);
         }
 
         public async Task<string> GetBaseDirectoryAsync()

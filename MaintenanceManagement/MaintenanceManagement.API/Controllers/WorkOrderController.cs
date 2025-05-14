@@ -442,7 +442,7 @@ namespace MaintenanceManagement.API.Controllers
         }
          [HttpGet]
         public async Task<IActionResult> GetByAllAsync( [FromQuery] string? fromDate,[FromQuery] string? toDate,[FromQuery] int? requestTypeId
-        , [FromQuery] int? pageNumber,[FromQuery] int? pageSize,[FromQuery] string? searchTerm)
+        , [FromQuery] int? departmentId)
         {            
             DateTimeOffset? parsedStartDate = null;
             DateTimeOffset? parsedEndDate = null;
@@ -473,9 +473,7 @@ namespace MaintenanceManagement.API.Controllers
                     fromDate=parsedStartDate,
                     toDate=parsedEndDate,
                     requestTypeId=requestTypeId,
-                    PageNumber = pageNumber, 
-                    PageSize = pageSize, 
-                    SearchTerm = searchTerm                  
+                    departmentId = departmentId,                                   
                 });
             return Ok(new 
             { 
