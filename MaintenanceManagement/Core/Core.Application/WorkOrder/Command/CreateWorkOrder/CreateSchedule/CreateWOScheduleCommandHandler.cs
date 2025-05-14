@@ -28,7 +28,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder.CreateSchedule
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
             var systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById(systemTimeZoneId);
 
-            request.WOSchedule.StartTime = TimeZoneInfo.ConvertTime(request.WOSchedule.StartTime.Value , systemTimeZone);
+            request.WOSchedule.StartTime = TimeZoneInfo.ConvertTime(request.WOSchedule.StartTime , systemTimeZone);
             if (request.WOSchedule.EndTime != null)
             {
                 request.WOSchedule.EndTime = TimeZoneInfo.ConvertTime(request.WOSchedule.EndTime.Value, systemTimeZone);
