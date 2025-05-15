@@ -17,8 +17,8 @@ namespace Core.Application.Reports.AssetReport
         public string? Department { get; set; }   
         public string? Location { get; set; }   
         public string? SubLocation { get; set; }   
-        public string? Custodian { get; set; }   
-        public string? User { get; set; }   
+        public string? CustodianName { get; set; }   
+        public string? UserName { get; set; }   
         public string? ParentAssetName { get; set; }   
         public string? DepreciationGroup { get; set; }   
         public string? GRNNumber { get; set; }   
