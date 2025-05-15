@@ -33,13 +33,15 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder.UpdateSchedule
                     Message = "Schedule data is missing."
                 };
             }   
-            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
-            var systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById(systemTimeZoneId);
+            //var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            //var systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById(systemTimeZoneId);
 
-            request.WOSchedule.StartTime = TimeZoneInfo.ConvertTime(request.WOSchedule.StartTime, systemTimeZone);
+            //request.WOSchedule.StartTime = TimeZoneInfo.ConvertTime(request.WOSchedule.StartTime, systemTimeZone);
+            request.WOSchedule.StartTime =request.WOSchedule.StartTime;
             if (request.WOSchedule.EndTime != null)
             {
-                request.WOSchedule.EndTime = TimeZoneInfo.ConvertTime(request.WOSchedule.EndTime.Value, systemTimeZone);
+                //request.WOSchedule.EndTime = TimeZoneInfo.ConvertTime(request.WOSchedule.EndTime.Value, systemTimeZone);
+                request.WOSchedule.EndTime =request.WOSchedule.EndTime.Value;
             }          
 
             var updatedWOEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule>(request.WOSchedule);                   
