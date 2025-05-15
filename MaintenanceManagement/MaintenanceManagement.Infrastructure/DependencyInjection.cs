@@ -60,6 +60,8 @@ using MaintenanceManagement.Infrastructure.Repositories.MainStoreStock;
 using Core.Application.Common.Interfaces.IMRS;
 using MaintenanceManagement.Infrastructure.Repositories.MRS;
 using Core.Application.Common.Interfaces.IBackgroundService;
+using MaintenanceManagement.Infrastructure.Repositories.Reports;
+using Core.Application.Common.Interfaces.IReports;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -211,6 +213,9 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMRSQueryRepository, MRSQueryRepository>();
             services.AddScoped<IMRSCommandRepository, MRSCommandRepository>();
             services.AddScoped<IBackgroundServiceClient, BackgroundServiceClient>();  
+            services.AddScoped<IReportRepository, ReportsRepository>();  
+
+            
             // Miscellaneous services
 
             services.AddScoped<IIPAddressService, IPAddressService>();

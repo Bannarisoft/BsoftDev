@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.External.IUnit;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
+using Core.Application.Common.Interfaces.IReports;
 using MediatR;
 
 namespace Core.Application.Reports.MaintenanceRequestReport
@@ -14,12 +11,12 @@ namespace Core.Application.Reports.MaintenanceRequestReport
     public class RequestReportQueryHandler : IRequestHandler<RequestReportQuery, ApiResponseDTO<List<RequestReportDto>>>
     {
         
-        private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
+        private readonly IReportRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
          private readonly IDepartmentService _departmentService;
         private readonly IUnitService _unitService;
 
-        public RequestReportQueryHandler( IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IUnitService unitService, IDepartmentService departmentService )
+        public RequestReportQueryHandler( IReportRepository maintenanceRequestQueryRepository, IMapper mapper, IUnitService unitService, IDepartmentService departmentService )
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
