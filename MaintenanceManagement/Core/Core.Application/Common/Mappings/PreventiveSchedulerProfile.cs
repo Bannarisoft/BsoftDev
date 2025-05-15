@@ -78,7 +78,15 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.WorkOrderItems, opt => opt.MapFrom(src => src.PreventiveSchedulerItems))
             .ForMember(dest => dest.DowntimeStart, opt => opt.Ignore())
             .ForMember(dest => dest.DowntimeEnd, opt => opt.Ignore())
-            .ForMember(dest => dest.RootCauseId, opt => opt.Ignore());
+            .ForMember(dest => dest.RootCauseId, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedByName, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedIP, opt => opt.Ignore())
+            .ForMember(dest => dest.ModifiedBy, opt => opt.Ignore())
+            .ForMember(dest => dest.ModifiedDate, opt => opt.Ignore())
+            .ForMember(dest => dest.ModifiedByName, opt => opt.Ignore())
+            .ForMember(dest => dest.ModifiedIP, opt => opt.Ignore());
 
             CreateMap<PreventiveSchedulerActivity, WorkOrderActivity>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())

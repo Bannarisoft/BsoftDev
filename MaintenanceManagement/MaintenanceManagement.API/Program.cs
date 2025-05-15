@@ -3,6 +3,7 @@ using MaintenanceManagement.Infrastructure;
 using MaintenanceManagement.API.Configurations;
 using MaintenanceManagement.API.Validation.Common;
 using MaintenanceManagement.API.Middleware;
+using Core.Application.Common.RealTimeNotificationHub;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,7 @@ app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.Loggin
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
-
+app.MapHub<PreventiveScheduleHub>("/preventiveschedulehub");
 app.Run();
 
 
