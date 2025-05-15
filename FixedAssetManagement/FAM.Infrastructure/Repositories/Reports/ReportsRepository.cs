@@ -30,6 +30,7 @@ namespace FAM.Infrastructure.Repositories.Reports
                 parameters, 
                 commandType: CommandType.StoredProcedure,
                 commandTimeout: 120);
+                
             return result.ToList(); 
         }
     }

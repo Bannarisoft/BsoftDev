@@ -2,6 +2,7 @@ using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IReports;
 using Core.Application.Reports.MaintenanceRequestReport;
+using Core.Application.Reports.WorkOrderReport;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Repositories.Common;
 
@@ -97,6 +98,24 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             
             var result = await _dbConnection.QueryAsync<RequestReportDto>(query, parameters);
             return result.ToList();
+        }
+
+        public async Task<List<WorkOrderReportDto>> WorkOrderReportAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate, int? RequestTypeId)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@CompanyId", CompanyId);
+            parameters.Add("@UnitId", UnitId);
+            parameters.Add("@FromDate", fromDate);
+            parameters.Add("@Todate", toDate);
+            parameters.Add("@RequestType", RequestTypeId);         
+          
+            var result = await _dbConnection.QueryAsync<WorkOrderReportDto>(
+                "dbo.Rpt_WorkOrderReport", 
+                parameters, 
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 120);
+                
+            return result.ToList(); 
         }
     }
 }
