@@ -11,8 +11,8 @@ namespace Core.Application.Reports.MaintenanceRequestReport
     {
          public DateTimeOffset? RequestFromDate { get; set; }
         public DateTimeOffset? RequestToDate { get; set; }
-        public int RequestType { get; set; }
-        public int RequestStatus { get; set; }        
+        public int? RequestType { get; set; }
+        public int? RequestStatus { get; set; }        
         
         public int? SparesTypeId { get; set; }
             public string? SparesType { get; set; } = string.Empty;
