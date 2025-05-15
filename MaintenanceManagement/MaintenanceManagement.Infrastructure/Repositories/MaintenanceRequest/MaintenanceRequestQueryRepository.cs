@@ -618,12 +618,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         return result.ToList();
                     } 
 
-                    public async Task<List<RequestReportDto>> MaintenanceReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? RequestType, int? requestStatus )
+                    public async Task<List<RequestReportDto>> MaintenanceReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? RequestType, int? requestStatus ,int? departmentId )
                     {
+
                         var query = @"
                         SELECT 
                             a.Id AS RequestId,
                             a.UnitId,
+                            A.RequestTypeId,
+                            M.Code AS RequestType,
                             a.CreatedDate AS RequestCreatedDate,
                             a.CreatedBy,
                             d.FirstName AS RequestCreatedName,
@@ -657,7 +660,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             RIGHT('0' + CAST(DATEDIFF(MINUTE, a.CreatedDate, a.ModifiedDate) % 60 AS VARCHAR), 2) AS DownTime,
                             RIGHT('0' + CAST(SUM(DATEDIFF(SECOND, c.StartTime, c.EndTime)) / 3600 AS VARCHAR), 2) + ':' +
                             RIGHT('0' + CAST((SUM(DATEDIFF(SECOND, c.StartTime, c.EndTime) % 3600) / 60) AS VARCHAR), 2) AS TimeTakenToRepair
-                          FROM Maintenance.MaintenanceRequest a
+                        FROM Maintenance.MaintenanceRequest a
                                LEFT JOIN Maintenance.WorkOrder b ON a.Id = b.RequestId
                                 LEFT JOIN Maintenance.WorkOrderSchedule c ON c.WorkOrderId = b.Id
                                 LEFT JOIN BANNARI.AppSecurity.Users d ON a.CreatedBy = d.UserId                        
@@ -669,11 +672,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                                 LEFT JOIN  Maintenance.MiscMaster J  ON A.ServiceTypeId=J.Id
                                 LEFT JOIN  Maintenance.MiscMaster K  ON A.SparesTypeId=K.Id
                                 LEFT JOIN  Maintenance.MiscMaster L  ON A.ModeOfDispatchId=L.Id
-                            WHERE a.CreatedDate >= @RequestFromDate
+                                LEFT JOIN  Maintenance.MiscMaster M  ON A.RequestTypeId=M.Id
+                        WHERE a.CreatedDate >= @RequestFromDate
                                 AND a.CreatedDate <= @RequestToDate
-                                AND (@RequestType IS NULL OR a.RequestTypeId = @RequestType)
-                                AND (@RequestStatus IS NULL OR a.RequestStatusId = @RequestStatus)
-                                AND (@RequestType IS NULL OR a.RequestTypeId = @RequestType)                      
+                                AND (@RequestType IS NULL OR  @RequestType ='' OR a.RequestTypeId = @RequestType)
+                                AND (@RequestStatus IS NULL OR  @RequestStatus ='' OR a.RequestStatusId = @RequestStatus)
+                                AND (@DepartmentId IS NULL OR   @DepartmentId ='' OR a.DepartmentId = @DepartmentId)                                                
                         GROUP BY 
                               a.Id, a.UnitId, a.CreatedDate, a.CreatedBy, a.DepartmentId,
                                 a.MachineId, a.MaintenanceTypeId, b.Id, b.StatusId, a.ModifiedDate,
@@ -681,7 +685,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                                 a.OldVendorId, a.OldVendorName, a.ModeOfDispatchId, a.ExpectedDispatchDate,
                                 a.EstimatedSpareCost, a.EstimatedServiceCost,
                                 a.ServiceLocationId, I.Code, a.ServiceTypeId, J.Code,
-                                a.SparesTypeId, K.Code,L.Code
+                                a.SparesTypeId, K.Code,L.Code,M.Code,A.RequestTypeId
                         ORDER BY a.Id";
 
                         var parameters = new
@@ -689,12 +693,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             RequestFromDate = requestFromDate?.Date,
                             RequestToDate = requestToDate?.Date.AddDays(1).AddTicks(-1), // To include full day
                             RequestType = RequestType,
-                            RequestStatus = requestStatus
+                            RequestStatus = requestStatus,
+                            DepartmentId = departmentId
                         };
                         
                         var result = await _dbConnection.QueryAsync<RequestReportDto>(query, parameters);
                         return result.ToList();
                     }
+
+
 
                              
                          
