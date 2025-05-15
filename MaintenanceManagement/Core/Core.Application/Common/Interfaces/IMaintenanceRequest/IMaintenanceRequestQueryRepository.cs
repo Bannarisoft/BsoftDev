@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.MaintenanceRequest.Queries.GetExistingVendorDetails;
 using Core.Application.MaintenanceRequest.Queries.GetExternalRequestById;
-using Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest;
-using Core.Application.MaintenanceRequest.Queries.RequestReport;
-using Core.Application.WorkOrder.Queries.GetRequestType;
+using Core.Application.Reports.MaintenanceRequestReport;
+
 
 namespace Core.Application.Common.Interfaces.IMaintenanceRequest
 {
