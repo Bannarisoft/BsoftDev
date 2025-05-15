@@ -9,7 +9,7 @@ using Core.Application.Common.Interfaces.External.IUnit;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using MediatR;
 
-namespace Core.Application.MaintenanceRequest.Queries.RequestReport
+namespace Core.Application.Reports.MaintenanceRequestReport
 {
     public class RequestReportQueryHandler : IRequestHandler<RequestReportQuery, ApiResponseDTO<List<RequestReportDto>>>
     {

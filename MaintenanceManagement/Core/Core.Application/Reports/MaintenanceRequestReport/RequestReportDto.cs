@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Core.Application.MaintenanceRequest.Queries.RequestReport
+namespace Core.Application.Reports.MaintenanceRequestReport
 {
     public class RequestReportDto
     {

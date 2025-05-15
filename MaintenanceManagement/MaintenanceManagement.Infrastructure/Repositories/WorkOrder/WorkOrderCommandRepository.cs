@@ -80,6 +80,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             var createdIP  = existingWorkOrder.CreatedIP ;
             var createdDate  = existingWorkOrder.CreatedDate  */;
 
+
                 // Update scalar fields
             //_applicationDbContext.Entry(existingWorkOrder).CurrentValues.SetValues(workOrder);
   /*           existingWorkOrder.CreatedBy = createdBy;
@@ -92,6 +93,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             existingWorkOrder.Image = workOrder.Image;
             existingWorkOrder.Remarks = workOrder.Remarks;            
             existingWorkOrder.StatusId = workOrder.StatusId;            
+            existingWorkOrder.RootCauseId = workOrder.RootCauseId;   
 
             _applicationDbContext.WorkOrder.Update(existingWorkOrder);
 
@@ -115,6 +117,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                     parameters.Add("@UsedQty", item.UsedQty);                    
                     parameters.Add("@SubStoreQty", item.ToSubStoreQty);
                     parameters.Add("@ScrapQty", item.ScarpQty);
+                    parameters.Add("@Rate", item.Rate);
 
                     await _dbConnection.ExecuteAsync(
                         "usp_InsertStockLedger",  // your stored procedure name
@@ -142,7 +145,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                         string newFileName = $"{workOrder.WorkOrderDocNo}-{docSerialNumber}{Path.GetExtension(tempItemFilePath)}";
                         string newFilePath = Path.Combine(directory, newFileName);
 
-                        try
+                        try 
                         {
                             File.Move(filePath, newFilePath);
                             //assetEntity.AssetImage = newFileName;

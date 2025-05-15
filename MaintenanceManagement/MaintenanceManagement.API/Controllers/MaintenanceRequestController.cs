@@ -25,7 +25,7 @@ using Core.Application.MaintenanceRequest.Queries.GetMaintenanceServiceLocation;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceSparesType;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceDipatchMode;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
-using Core.Application.MaintenanceRequest.Queries.RequestReport;
+using Core.Application.Reports.MaintenanceRequestReport;
 
 namespace MaintenanceManagement.API.Controllers
 {

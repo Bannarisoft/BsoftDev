@@ -9,7 +9,7 @@ using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using Core.Application.MaintenanceRequest.Queries.GetExistingVendorDetails;
 using Core.Application.MaintenanceRequest.Queries.GetExternalRequestById;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest;
-using Core.Application.MaintenanceRequest.Queries.RequestReport;
+using Core.Application.Reports.MaintenanceRequestReport;
 using Core.Domain.Common;
 using Core.Domain.Entities;
 using Dapper;

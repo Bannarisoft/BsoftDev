@@ -18,26 +18,28 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder.CreateSchedule
         public CreateWOScheduleCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper, IMediator mediator, ITimeZoneService timeZoneService)
         {
             _workOrderRepository = workOrderRepository;
-            _mapper = mapper;            
+            _mapper = mapper;
             _mediator = mediator;
             _timeZoneService = timeZoneService; 
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(CreateWOScheduleCommand request, CancellationToken cancellationToken)
         {   
-            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
-            var systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById(systemTimeZoneId);
+            //var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            //var systemTimeZone = TimeZoneInfo.FindSystemTimeZoneById(systemTimeZoneId);
 
-            request.WOSchedule.StartTime = TimeZoneInfo.ConvertTime(request.WOSchedule.StartTime , systemTimeZone);
+            //request.WOSchedule.StartTime = TimeZoneInfo.ConvertTime(request.WOSchedule.StartTime , systemTimeZone);
+            request.WOSchedule.StartTime=request.WOSchedule.StartTime;
             if (request.WOSchedule.EndTime != null)
             {
-                request.WOSchedule.EndTime = TimeZoneInfo.ConvertTime(request.WOSchedule.EndTime.Value, systemTimeZone);
+                //request.WOSchedule.EndTime = TimeZoneInfo.ConvertTime(request.WOSchedule.EndTime.Value, systemTimeZone);
+                request.WOSchedule.EndTime = request.WOSchedule.EndTime.Value;
             }            
       
             var createWOEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule>(request.WOSchedule);                   
             var updateResult = await _workOrderRepository.CreateScheduleAsync(createWOEntity.WorkOrderId, createWOEntity);            
         
-            //Domain Event
+            //Domain Event 
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
                 actionCode: request.WOSchedule.WorkOrderId.ToString(),
