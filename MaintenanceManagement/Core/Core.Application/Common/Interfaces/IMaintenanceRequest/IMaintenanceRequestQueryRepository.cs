@@ -29,7 +29,7 @@ namespace Core.Application.Common.Interfaces.IMaintenanceRequest
          Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceDispatchModeDescAsync();
 
           //Task<List<RequestReportDto>> GetMaintenanceStatusDescAsync( DateTimeOffset? RequestFromDate, DateTimeOffset? RequestToDate , int? GetRequestType , int?  RequestStatus);  
-          Task<List<RequestReportDto>> MaintenanceReportAsync( DateTimeOffset? requestFromDate,DateTimeOffset? requestToDate, int? RequestType,int? requestType ,int? departmentId);
+          
 
           
 

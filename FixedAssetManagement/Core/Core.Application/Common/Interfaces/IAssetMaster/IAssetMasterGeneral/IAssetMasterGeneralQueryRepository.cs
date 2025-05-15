@@ -1,4 +1,5 @@
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
+using Core.Application.Reports.AssetReport;
 using Core.Domain.Entities;
 
 namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
@@ -17,6 +18,6 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
         Task<List<Core.Domain.Entities.MiscMaster>> GetAssetPattern();
         Task<(dynamic AssetResult, dynamic LocationResult, IEnumerable<dynamic> PurchaseDetails, IEnumerable<dynamic> Spec, IEnumerable<dynamic> Warranty,IEnumerable<dynamic> Amc,dynamic Disposal, IEnumerable<dynamic> Insurance , IEnumerable<dynamic> AdditionalCost)> GetAssetMasterByIdAsync(int assetId);
         Task<(dynamic AssetResult, dynamic LocationResult, IEnumerable<dynamic> PurchaseDetails,  IEnumerable<dynamic> AdditionalCost)> GetAssetMasterSplitByIdAsync(int assetId);
-        Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId,int unitId);      
+        Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId,int unitId);              
     }
 }
