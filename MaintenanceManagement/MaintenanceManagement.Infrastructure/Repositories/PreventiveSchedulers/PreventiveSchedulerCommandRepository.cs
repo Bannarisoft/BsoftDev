@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.Interfaces;
+using Core.Application.Common.Interfaces.IBackgroundService;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Domain.Entities;
@@ -21,13 +22,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IIPAddressService _ipAddressService;
-        public PreventiveSchedulerCommandRepository(ApplicationDbContext applicationDbContext, IPreventiveSchedulerQuery preventiveSchedulerQuery, IMiscMasterQueryRepository miscMasterQueryRepository, IMapper mapper,IIPAddressService ipAddressService)
+        private readonly IBackgroundServiceClient  _backgroundServiceClient;
+        // private readonly IPreventiveSchedulerCommand _preventiveSchedulerCommand;
+        public PreventiveSchedulerCommandRepository(ApplicationDbContext applicationDbContext, IPreventiveSchedulerQuery preventiveSchedulerQuery, IMiscMasterQueryRepository miscMasterQueryRepository, IMapper mapper,IIPAddressService ipAddressService,IBackgroundServiceClient backgroundServiceClient)
         {
             _applicationDbContext = applicationDbContext;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _mapper = mapper;
             _ipAddressService = ipAddressService;
+            _backgroundServiceClient = backgroundServiceClient;
+            // _preventiveSchedulerCommand = preventiveSchedulerCommand;
         }
 
         public async Task<int> CreateAsync(PreventiveSchedulerHeader preventiveSchedulerHdr)
@@ -183,9 +188,24 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     existingPreventiveScheduler.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
                     existingPreventiveScheduler.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
                      
+                    
 
                     await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(existingPreventiveScheduler);
-                    await _applicationDbContext.SaveChangesAsync(); 
+                    await _applicationDbContext.SaveChangesAsync();
+                    var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
+                    string newJobId;
+                         var delayInMinutes = (int)delay.TotalMinutes; 
+
+                          if (delay.TotalSeconds > 0)
+                        {
+                            newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id,delayInMinutes);
+                        }
+                        else
+                        {
+                            
+                            newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id,5);
+                        }
+                        // await _preventiveSchedulerCommand.UpdateDetailAsync(existingPreventiveScheduler.Id,newJobId);
                     return true;
             }
 
