@@ -29,8 +29,7 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
             _mediator = mediator;         
             _eventPublisher = eventPublisher;
             _logger = logger;         
-            _logQueryService = logQueryService ?? throw new ArgumentNullException(nameof(logQueryService));     
-           
+            _logQueryService = logQueryService ?? throw new ArgumentNullException(nameof(logQueryService));  
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(UpdateWorkOrderCommand request, CancellationToken cancellationToken)

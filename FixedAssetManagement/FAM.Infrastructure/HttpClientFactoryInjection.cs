@@ -17,7 +17,7 @@ namespace FAM.Infrastructure
             services.AddHttpClient("DepartmentClient", client =>
             {
                 //client.BaseAddress = new Uri(configuration["HttpClientSettings:DepartmentService"]);
-                client.BaseAddress = new Uri("http://192.168.1.130:81");
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:DepartmentService"]);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             })
              .AddHttpMessageHandler<AuthTokenHandler>()
@@ -29,7 +29,7 @@ namespace FAM.Infrastructure
             services.AddHttpClient("UserSessionClient", client =>
             {
                 //client.BaseAddress = new Uri(configuration["HttpClientSettings:UserSessionService"]);
-                client.BaseAddress = new Uri("http://192.168.1.130:81");
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:UserSessionService"]);
                 client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             })
             // .AddHttpMessageHandler<AuthTokenHandler>()
