@@ -418,14 +418,17 @@ namespace MaintenanceManagement.API.Controllers
                 [FromQuery] DateTimeOffset? requestFromDate,
                 [FromQuery] DateTimeOffset? requestToDate,
                 [FromQuery] int RequestType,
-                [FromQuery] int requestStatus)
+                [FromQuery] int requestStatus,
+                [FromQuery] int departmentId
+              )
             {
                 var query = new RequestReportQuery
                 {
                     RequestFromDate = requestFromDate,
                     RequestToDate = requestToDate,
                     RequestType = RequestType,
-                    RequestStatus = requestStatus
+                    RequestStatus = requestStatus,
+                    DepartmentId = departmentId
                 };
 
                 var result = await Mediator.Send(query);

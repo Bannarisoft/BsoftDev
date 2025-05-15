@@ -9,10 +9,11 @@ namespace Core.Application.MaintenanceRequest.Queries.RequestReport
     {
         public int RequestId { get; set; } 
         public int  UnitId { get; set; }
+        public string? UnitName { get; set; }
         public DateTimeOffset RequestDate { get; set; }
         public string? CreatedBy { get; set; }
         public string? RequestCreatedName  { get; set; }
-        public int? DepartmentId { get; set; }
+        public int DepartmentId { get; set; }
         public string? Department { get; set; }
         public int? MachineId { get; set; }
         public string? MachineName { get; set; }
