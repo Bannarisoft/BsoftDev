@@ -72,6 +72,8 @@ using FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer;
 using Core.Application.Common.Interfaces.IExcelImport;
 using FAM.Infrastructure.Repositories.ExcelImport;
 using FAM.Infrastructure.Helpers;
+using Core.Application.Common.Interfaces.IReports;
+using FAM.Infrastructure.Repositories.Reports;
 
 namespace FAM.Infrastructure
 {
@@ -228,6 +230,7 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetTransferReceiptCommandRepository, AssetTransferReceiptCommandRepository>();
             services.AddScoped<IExcelImportCommandRepository, ExcelImportCommandRepository>();
             services.AddScoped<IExcelImportQueryRepository, ExcelImportCommandQueryRepository>();
+            services.AddScoped<IReportRepository, ReportsRepository>();
 
 
             // Miscellaneous services
