@@ -19,36 +19,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
             _dbConnection = dbConnection;
         }
 
-        public async Task<List<CurrentStockDto>> GetStockDetails(string OldUnitcode)
-        {
-             OldUnitcode = OldUnitcode ?? string.Empty; // Prevent null issues
-
-            const string query = @"
-                SELECT 
-                    Oldunitcode as OldUnitId,
-                    ItemCode,
-                    ItemName,
-					Uom,
-                    SUM(ReceivedQty) - SUM(IssueQty) AS StockQty,
-                    SUM(ReceivedValue) - SUM(IssueValue) AS StockValue
-                FROM 
-                    Maintenance.StockLedger
-                WHERE
-                    Oldunitcode = @OldUnitcode 
-                    AND TransactionType not in('SRP')
-                GROUP BY 
-                    ItemCode, ItemName, Oldunitcode,Uom
-                HAVING
-                    SUM(ReceivedQty) - SUM(IssueQty) > 0";
-
-            var parameters = new 
-            { 
-                OldUnitcode // match exactly, no wildcards
-            };
-
-            var itemcodes = await _dbConnection.QueryAsync<CurrentStockDto>(query, parameters);
-            return itemcodes.ToList();
-        }
 
         public async Task<List<StockItemCodeDto>> GetStockItemCodes(string OldUnitcode)
         {
@@ -106,20 +76,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
             return stocklist;
         }
 
-        public async Task<List<StockLedgerReportDto>> GetSubStoresStockLedger(string OldUnitcode, DateTime FromDate, DateTime ToDate, string? Itemcode)
-        {
-            var parameters = new DynamicParameters();
-            parameters.Add("@FromDate", FromDate);
-            parameters.Add("@ToDate", ToDate);
-            parameters.Add("@ItemCode", Itemcode);
-            parameters.Add("@OldUnitCode", OldUnitcode);
-
-            var result = await _dbConnection.QueryAsync<StockLedgerReportDto>(
-                "GetSubStoreStockLedgerSummary",
-                parameters,
-                commandType: CommandType.StoredProcedure);
-
-            return result.ToList();
-        }
+       
     }
 }

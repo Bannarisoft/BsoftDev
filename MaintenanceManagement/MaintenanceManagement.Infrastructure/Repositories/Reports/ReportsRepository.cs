@@ -1,23 +1,26 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IReports;
+using Core.Application.Reports.GetStockLegerReport;
 using Core.Application.Reports.MaintenanceRequestReport;
+using Core.Application.Reports.WorkOrderItemConsuption;
 using Core.Application.Reports.WorkOrderReport;
+using Core.Application.StockLedger.Queries.GetCurrentStock;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Repositories.Common;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.Reports
 {
-    public class ReportsRepository : BaseQueryRepository,IReportRepository
+    public class ReportsRepository : BaseQueryRepository, IReportRepository
     {
-        private readonly IDbConnection _dbConnection;        
+        private readonly IDbConnection _dbConnection;
         public ReportsRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
-            : base(ipAddressService) 
+            : base(ipAddressService)
         {
-            _dbConnection = dbConnection;            
+            _dbConnection = dbConnection;
         }
 
-        public async Task<List<RequestReportDto>> MaintenanceReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? RequestType, int? requestStatus ,int? departmentId )
+        public async Task<List<RequestReportDto>> MaintenanceReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? RequestType, int? requestStatus, int? departmentId)
         {
 
             var query = @"
@@ -95,7 +98,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 RequestStatus = requestStatus,
                 DepartmentId = departmentId
             };
-            
+
             var result = await _dbConnection.QueryAsync<RequestReportDto>(query, parameters);
             return result.ToList();
         }
@@ -107,15 +110,80 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             parameters.Add("@UnitId", UnitId);
             parameters.Add("@FromDate", fromDate);
             parameters.Add("@Todate", toDate);
-            parameters.Add("@RequestType", RequestTypeId);         
-          
+            parameters.Add("@RequestType", RequestTypeId);
+
             var result = await _dbConnection.QueryAsync<WorkOrderReportDto>(
-                "dbo.Rpt_WorkOrderReport", 
-                parameters, 
+                "dbo.Rpt_WorkOrderReport",
+                parameters,
                 commandType: CommandType.StoredProcedure,
                 commandTimeout: 120);
-                
-            return result.ToList(); 
+
+            return result.ToList();
+        }
+
+        public async Task<List<WorkOrderIssueDto>> GetItemConsumptionAsync(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate, int maintenanceTypeId)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@FromDate", IssueFromDate);
+            parameters.Add("@ToDate", IssueToDate);
+            parameters.Add("@UnitId", UnitId);
+            parameters.Add("@MaintenanceTypeId", maintenanceTypeId);
+
+            var result = await _dbConnection.QueryAsync<WorkOrderIssueDto>(
+                "GetItemConsumptionDetails",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return result.ToList();
+        }
+
+        public async Task<List<StockLedgerReportDto>> GetSubStoresStockLedger(string OldUnitcode, DateTime FromDate, DateTime ToDate, string? Itemcode)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@FromDate", FromDate);
+            parameters.Add("@ToDate", ToDate);
+            parameters.Add("@ItemCode", Itemcode);
+            parameters.Add("@OldUnitCode", OldUnitcode);
+
+            var result = await _dbConnection.QueryAsync<StockLedgerReportDto>(
+                "GetSubStoreStockLedgerSummary",
+                parameters,
+                commandType: CommandType.StoredProcedure);
+
+            return result.ToList();
+        }
+        
+         public async Task<List<CurrentStockDto>> GetStockDetails(string OldUnitcode)
+        {
+             OldUnitcode = OldUnitcode ?? string.Empty; // Prevent null issues
+
+            const string query = @"
+                SELECT 
+                    Oldunitcode as OldUnitId,
+                    ItemCode,
+                    ItemName,
+					Uom,
+                    SUM(ReceivedQty) - SUM(IssueQty) AS StockQty,
+                    SUM(ReceivedValue) - SUM(IssueValue) AS StockValue,
+                    ((SUM(ReceivedValue) - SUM(IssueValue)) / (SUM(ReceivedQty) - SUM(IssueQty))) AS Rate
+                FROM 
+                    Maintenance.StockLedger
+                WHERE
+                    Oldunitcode = @OldUnitcode 
+                    AND TransactionType not in('SRP')
+                GROUP BY 
+                    ItemCode, ItemName, Oldunitcode,Uom
+                HAVING
+                    SUM(ReceivedQty) - SUM(IssueQty) > 0";
+
+            var parameters = new 
+            { 
+                OldUnitcode // match exactly, no wildcards
+            };
+
+            var itemcodes = await _dbConnection.QueryAsync<CurrentStockDto>(query, parameters);
+            return itemcodes.ToList();
         }
     }
 }

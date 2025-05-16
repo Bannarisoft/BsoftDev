@@ -504,51 +504,6 @@ namespace MaintenanceManagement.API.Controllers
             });
         }
 
-        [HttpGet("ItemConsumption")]
-        public async Task<IActionResult> GetAllItemConsuption(
-            [FromQuery] string? fromDate,
-            [FromQuery] string? toDate,
-            [FromQuery] int? maintenanceTypeId)
-        {
-            DateTimeOffset? parsedFromDate = null;
-            DateTimeOffset? parsedToDate = null;
-
-            if (!string.IsNullOrWhiteSpace(fromDate))
-            {
-                if (!DateTimeOffset.TryParse(fromDate, out var fromParsed))
-                {
-                    return BadRequest(new { message = "Invalid fromDate format. Use yyyy-MM-dd." });
-                }
-                parsedFromDate = fromParsed;
-            }
-
-            if (!string.IsNullOrWhiteSpace(toDate))
-            {
-                if (!DateTimeOffset.TryParse(toDate, out var toParsed))
-                {
-                    return BadRequest(new { message = "Invalid toDate format. Use yyyy-MM-dd." });
-                }
-                parsedToDate = toParsed;
-            }
-
-            if (maintenanceTypeId is null or <= 0)
-            {
-                return BadRequest(new { message = "Invalid Maintenance Type Id" });
-            }
-
-            var workOrder = await Mediator.Send(new WorkOrderIssueQuery
-            {
-                IssueFrom = parsedFromDate,
-                IssueTo = parsedToDate,
-                MaintenanceTypeId = maintenanceTypeId.Value
-            });
-
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status200OK,
-                message = workOrder.Message,
-                data = workOrder.Data?.ToList()
-            });
-        }
+        
     }
 }

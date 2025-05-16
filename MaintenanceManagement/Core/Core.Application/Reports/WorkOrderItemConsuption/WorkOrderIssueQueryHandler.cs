@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IUnit;
+using Core.Application.Common.Interfaces.IReports;
 using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Domain.Events;
 using MediatR;
@@ -13,12 +14,12 @@ namespace Core.Application.Reports.WorkOrderItemConsuption
 {
     public class WorkOrderIssueQueryHandler : IRequestHandler<WorkOrderIssueQuery, ApiResponseDTO<List<WorkOrderIssueDto>>>
     {
-        private readonly IWorkOrderQueryRepository _repository;
+        private readonly IReportRepository _repository;
         private readonly IMapper _mapper;
         private readonly IUnitService _unitService;
          private readonly IMediator _mediator;
 
-        public WorkOrderIssueQueryHandler(IWorkOrderQueryRepository repository, IMapper mapper, IUnitService unitService, IMediator mediator)
+        public WorkOrderIssueQueryHandler(IReportRepository repository, IMapper mapper, IUnitService unitService, IMediator mediator)
         {
             _repository = repository;
             _mapper = mapper;
