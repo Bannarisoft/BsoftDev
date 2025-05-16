@@ -158,22 +158,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         var result = await _dbConnection.QueryAsync<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(query, parameters);
         return result.ToList();        }
 
-        public async Task<List<WorkOrderIssueDto>> GetItemConsumptionAsync(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate, int maintenanceTypeId)
-        {
-            var parameters = new DynamicParameters();
-                parameters.Add("@FromDate", IssueFromDate);
-                parameters.Add("@ToDate", IssueToDate);
-                parameters.Add("@UnitId", UnitId);
-                parameters.Add("@MaintenanceTypeId", maintenanceTypeId);
-
-                var result = await _dbConnection.QueryAsync<WorkOrderIssueDto>(
-                    "GetItemConsumptionDetails",
-                    parameters,
-                    commandType: CommandType.StoredProcedure
-                );
-
-                return result.ToList();
-        }
+       
     } 
 }
    

@@ -6,7 +6,7 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.StockLedger.Queries.GetCurrentStock;
 using MediatR;
 
-namespace Core.Application.StockLedger.Queries.GetCurrentAllStockItems
+namespace Core.Application.Reports.GetCurrentAllStockItems
 {
     public class GetCurrentAllStockItemsQuery : IRequest<ApiResponseDTO<List<CurrentStockDto>>>
     {

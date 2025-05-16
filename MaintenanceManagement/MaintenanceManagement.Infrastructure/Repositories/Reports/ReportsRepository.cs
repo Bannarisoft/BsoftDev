@@ -1,8 +1,11 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IReports;
+using Core.Application.Reports.GetStockLegerReport;
 using Core.Application.Reports.MaintenanceRequestReport;
+using Core.Application.Reports.WorkOrderItemConsuption;
 using Core.Application.Reports.WorkOrderReport;
+using Core.Application.StockLedger.Queries.GetCurrentStock;
 using Core.Application.Reports.WorkOderCheckListReport;
 using Core.Application.WorkOrder.Command.CreateWorkOrder;
 using Dapper;
@@ -10,17 +13,22 @@ using MaintenanceManagement.Infrastructure.Repositories.Common;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.Reports
 {
-    public class ReportsRepository : BaseQueryRepository,IReportRepository
+
+    public class ReportsRepository : BaseQueryRepository, IReportRepository
     {
-        private readonly IDbConnection _dbConnection;        
+
+        private readonly IDbConnection _dbConnection;
         public ReportsRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
-            : base(ipAddressService) 
+
+            : base(ipAddressService)
         {
-            _dbConnection = dbConnection;            
+
+            _dbConnection = dbConnection;
         }
 
+
         public async Task<List<RequestReportDto>> MaintenanceReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? requestType, int? requestStatus, int? departmentId)
-        {
+         {
             var parameters = new DynamicParameters();
 
             if (requestFromDate.HasValue)
@@ -63,6 +71,71 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 commandTimeout: 120);
                 
             return result.ToList(); 
+        }
+
+        public async Task<List<WorkOrderIssueDto>> GetItemConsumptionAsync(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate, int maintenanceTypeId)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@FromDate", IssueFromDate);
+            parameters.Add("@ToDate", IssueToDate);
+            parameters.Add("@UnitId", UnitId);
+            parameters.Add("@MaintenanceTypeId", maintenanceTypeId);
+
+            var result = await _dbConnection.QueryAsync<WorkOrderIssueDto>(
+                "GetItemConsumptionDetails",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return result.ToList();
+        }
+
+        public async Task<List<StockLedgerReportDto>> GetSubStoresStockLedger(string OldUnitcode, DateTime FromDate, DateTime ToDate, string? Itemcode)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@FromDate", FromDate);
+            parameters.Add("@ToDate", ToDate);
+            parameters.Add("@ItemCode", Itemcode);
+            parameters.Add("@OldUnitCode", OldUnitcode);
+
+            var result = await _dbConnection.QueryAsync<StockLedgerReportDto>(
+                "GetSubStoreStockLedgerSummary",
+                parameters,
+                commandType: CommandType.StoredProcedure);
+
+            return result.ToList();
+        }
+        
+         public async Task<List<CurrentStockDto>> GetStockDetails(string OldUnitcode)
+        {
+             OldUnitcode = OldUnitcode ?? string.Empty; // Prevent null issues
+
+            const string query = @"
+                SELECT 
+                    Oldunitcode as OldUnitId,
+                    ItemCode,
+                    ItemName,
+					Uom,
+                    SUM(ReceivedQty) - SUM(IssueQty) AS StockQty,
+                    SUM(ReceivedValue) - SUM(IssueValue) AS StockValue,
+                    ((SUM(ReceivedValue) - SUM(IssueValue)) / (SUM(ReceivedQty) - SUM(IssueQty))) AS Rate
+                FROM 
+                    Maintenance.StockLedger
+                WHERE
+                    Oldunitcode = @OldUnitcode 
+                    AND TransactionType not in('SRP')
+                GROUP BY 
+                    ItemCode, ItemName, Oldunitcode,Uom
+                HAVING
+                    SUM(ReceivedQty) - SUM(IssueQty) > 0";
+
+            var parameters = new 
+            { 
+                OldUnitcode // match exactly, no wildcards
+            };
+
+            var itemcodes = await _dbConnection.QueryAsync<CurrentStockDto>(query, parameters);
+            return itemcodes.ToList();
         }
 		 public async Task<List<WorkOderCheckListReportDto>> GetWorkOrderChecklistReportAsync(
                          DateTimeOffset? fromDate,

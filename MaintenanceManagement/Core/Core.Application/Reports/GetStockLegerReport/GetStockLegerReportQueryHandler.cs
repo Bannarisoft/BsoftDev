@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.IReports;
 using Core.Application.Common.Interfaces.IStcokLedger;
+using Core.Application.Reports.GetStockLegerReport;
 using Core.Domain.Events;
 using MediatR;
 
@@ -12,11 +14,11 @@ namespace Core.Application.StockLedger.Queries.GetStockLegerReport
 {
     public class GetStockLegerReportQueryHandler : IRequestHandler<GetStockLegerReportQuery,ApiResponseDTO<List<StockLedgerReportDto>>>
     {
-        private readonly IStockLedgerQueryRepository _stockLedgerQueryRepository;        
+        private readonly IReportRepository _stockLedgerQueryRepository;        
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         
-        public GetStockLegerReportQueryHandler(IStockLedgerQueryRepository stockLedgerQueryRepository, IMapper mapper, IMediator mediator)
+        public GetStockLegerReportQueryHandler(IReportRepository stockLedgerQueryRepository, IMapper mapper, IMediator mediator)
         {
             _stockLedgerQueryRepository = stockLedgerQueryRepository;            
             _mapper = mapper;

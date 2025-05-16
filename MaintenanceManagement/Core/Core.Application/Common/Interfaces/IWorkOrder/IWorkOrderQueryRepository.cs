@@ -17,7 +17,7 @@ namespace Core.Application.Common.Interfaces.IWorkOrder
         Task<string> GetBaseDirectoryAsync();
         Task<(dynamic WorkOrderResult, IEnumerable<dynamic> Activity, IEnumerable<dynamic> Item, IEnumerable<dynamic> Technician, IEnumerable<dynamic> checkList, IEnumerable<dynamic> schedule)> GetWorkOrderByIdAsync(int workOrderId);
         Task<List<WorkOrderWithScheduleDto>> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate, int? requestType, int? departmentId);   
-        Task<List<WorkOrderIssueDto>> GetItemConsumptionAsync(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate,int maintenanceTypeId);
+        
                  
     }
 }
