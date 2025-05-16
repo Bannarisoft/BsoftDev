@@ -1,3 +1,4 @@
+using Core.Application.Reports.WorkOrderItemConsuption;
 using Core.Application.WorkOrder.Command.CreateWorkOrder;
 using Core.Application.WorkOrder.Command.CreateWorkOrder.CreateSchedule;
 using Core.Application.WorkOrder.Command.DeleteFileWorkOrder;
@@ -27,30 +28,30 @@ namespace MaintenanceManagement.API.Controllers
     {
         private readonly IValidator<CreateWorkOrderCommand> _createWorkOrderCommandValidator;
         private readonly IValidator<UpdateWorkOrderCommand> _updateWorkOrderCommandValidator;
-        private readonly IValidator<UpdateWOScheduleCommand> _updateWoScheduleCommandValidator;        
-        private readonly IValidator<CreateWOScheduleCommand> _createWoScheduleCommandValidator;  
-        private readonly IValidator<UploadFileWorkOrderCommand> _uploadFileCommandValidator;        
-        private readonly IValidator<UploadFileItemCommand> _uploadItemCommandValidator;     
+        private readonly IValidator<UpdateWOScheduleCommand> _updateWoScheduleCommandValidator;
+        private readonly IValidator<CreateWOScheduleCommand> _createWoScheduleCommandValidator;
+        private readonly IValidator<UploadFileWorkOrderCommand> _uploadFileCommandValidator;
+        private readonly IValidator<UploadFileItemCommand> _uploadItemCommandValidator;
 
-        public WorkOrderController( ISender mediator, 
-            IValidator<CreateWorkOrderCommand> createWorkOrderCommandValidator, 
-            IValidator<UpdateWorkOrderCommand> updateWorkOrderCommandValidator ,
-            IValidator<UpdateWOScheduleCommand> updateWoScheduleCommandValidator ,
-            IValidator<CreateWOScheduleCommand> createWoScheduleCommandValidator ,
+        public WorkOrderController(ISender mediator,
+            IValidator<CreateWorkOrderCommand> createWorkOrderCommandValidator,
+            IValidator<UpdateWorkOrderCommand> updateWorkOrderCommandValidator,
+            IValidator<UpdateWOScheduleCommand> updateWoScheduleCommandValidator,
+            IValidator<CreateWOScheduleCommand> createWoScheduleCommandValidator,
             IValidator<UploadFileWorkOrderCommand> uploadFileCommandValidator,
             IValidator<UploadFileItemCommand> uploadItemCommandValidator
-            ) 
+            )
             : base(mediator)
 
         {
             _createWorkOrderCommandValidator = createWorkOrderCommandValidator;
             _updateWorkOrderCommandValidator = updateWorkOrderCommandValidator;
-            _updateWoScheduleCommandValidator=updateWoScheduleCommandValidator;
-            _createWoScheduleCommandValidator=createWoScheduleCommandValidator;
+            _updateWoScheduleCommandValidator = updateWoScheduleCommandValidator;
+            _createWoScheduleCommandValidator = createWoScheduleCommandValidator;
             _uploadFileCommandValidator = uploadFileCommandValidator;
             _uploadItemCommandValidator = uploadItemCommandValidator;
         }
-       [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateWorkOrderCommand command)
         {
             var validationResult = await _createWorkOrderCommandValidator.ValidateAsync(command);
@@ -63,7 +64,7 @@ namespace MaintenanceManagement.API.Controllers
                     message = "Validation failed",
                     errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
                 });
-            }            
+            }
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
@@ -124,7 +125,7 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> CreateScheduleAsync(CreateWOScheduleCommand command)
         {
             var validationResult = await _createWoScheduleCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)            
+            if (!validationResult.IsValid)
             {
                 return BadRequest(new
                 {
@@ -151,11 +152,11 @@ namespace MaintenanceManagement.API.Controllers
                 message = result.Message
             });
         }
-          [HttpPut("schedule/Update")]
+        [HttpPut("schedule/Update")]
         public async Task<IActionResult> UpdateScheduleAsync(UpdateWOScheduleCommand command)
         {
             var validationResult = await _updateWoScheduleCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)            
+            if (!validationResult.IsValid)
             {
                 return BadRequest(new
                 {
@@ -222,9 +223,9 @@ namespace MaintenanceManagement.API.Controllers
         {
             if (deleteFileCommand == null || string.IsNullOrWhiteSpace(deleteFileCommand.Image))
             {
-                return BadRequest(new 
-                { 
-                    StatusCode = StatusCodes.Status400BadRequest, 
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
                     message = "Invalid request. 'ImagePath' cannot be null or empty.",
                     errors = ""
                 });
@@ -288,9 +289,9 @@ namespace MaintenanceManagement.API.Controllers
         {
             if (deleteFileCommand == null || string.IsNullOrWhiteSpace(deleteFileCommand.Image))
             {
-                return BadRequest(new 
-                { 
-                    StatusCode = StatusCodes.Status400BadRequest, 
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
                     message = "Invalid request. 'ImagePath' cannot be null or empty.",
                     errors = ""
                 });
@@ -352,7 +353,7 @@ namespace MaintenanceManagement.API.Controllers
                 message = "WorkOrder Status fetched successfully.",
                 data = result.Data
             });
-        }        
+        }
         [HttpGet("Source")]
         public async Task<IActionResult> GetWorkOrderSource()
         {
@@ -440,10 +441,10 @@ namespace MaintenanceManagement.API.Controllers
 
             });
         }
-         [HttpGet]
-        public async Task<IActionResult> GetByAllAsync( [FromQuery] string? fromDate,[FromQuery] string? toDate,[FromQuery] int? requestTypeId
-        , [FromQuery] int? departmentId)
-        {            
+        [HttpGet]
+        public async Task<IActionResult> GetByAllAsync([FromQuery] string? fromDate, [FromQuery] string? toDate, [FromQuery] int? requestTypeId
+       , [FromQuery] int? departmentId)
+        {
             DateTimeOffset? parsedStartDate = null;
             DateTimeOffset? parsedEndDate = null;
 
@@ -463,23 +464,24 @@ namespace MaintenanceManagement.API.Controllers
                     return BadRequest(new { message = "Invalid toDate format. Use yyyy-MM-dd." });
                 }
                 parsedEndDate = parsedDate;
-            } 
-            if (requestTypeId <= 0){
-               return BadRequest(new { message = "Invalid Request Id" }); 
             }
-             var workOrder = await Mediator.Send(
-                new GetWorkOrderQuery
-                {                   
-                    fromDate=parsedStartDate,
-                    toDate=parsedEndDate,
-                    requestTypeId=requestTypeId,
-                    departmentId = departmentId,                                   
-                });
-            return Ok(new 
-            { 
-                StatusCode = StatusCodes.Status200OK, 
+            if (requestTypeId <= 0)
+            {
+                return BadRequest(new { message = "Invalid Request Id" });
+            }
+            var workOrder = await Mediator.Send(
+               new GetWorkOrderQuery
+               {
+                   fromDate = parsedStartDate,
+                   toDate = parsedEndDate,
+                   requestTypeId = requestTypeId,
+                   departmentId = departmentId,
+               });
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
                 message = workOrder.Message,
-                data = workOrder.Data.ToList()               
+                data = workOrder.Data.ToList()
             });
         }
         [HttpGet("GetWorkOrderDropdown")]
@@ -499,6 +501,53 @@ namespace MaintenanceManagement.API.Controllers
                 StatusCode = StatusCodes.Status200OK,
                 message = "Workorder fetched successfully.",
                 data = result.Data
+            });
+        }
+
+        [HttpGet("ItemConsumption")]
+        public async Task<IActionResult> GetAllItemConsuption(
+            [FromQuery] string? fromDate,
+            [FromQuery] string? toDate,
+            [FromQuery] int? maintenanceTypeId)
+        {
+            DateTimeOffset? parsedFromDate = null;
+            DateTimeOffset? parsedToDate = null;
+
+            if (!string.IsNullOrWhiteSpace(fromDate))
+            {
+                if (!DateTimeOffset.TryParse(fromDate, out var fromParsed))
+                {
+                    return BadRequest(new { message = "Invalid fromDate format. Use yyyy-MM-dd." });
+                }
+                parsedFromDate = fromParsed;
+            }
+
+            if (!string.IsNullOrWhiteSpace(toDate))
+            {
+                if (!DateTimeOffset.TryParse(toDate, out var toParsed))
+                {
+                    return BadRequest(new { message = "Invalid toDate format. Use yyyy-MM-dd." });
+                }
+                parsedToDate = toParsed;
+            }
+
+            if (maintenanceTypeId is null or <= 0)
+            {
+                return BadRequest(new { message = "Invalid Maintenance Type Id" });
+            }
+
+            var workOrder = await Mediator.Send(new WorkOrderIssueQuery
+            {
+                IssueFrom = parsedFromDate,
+                IssueTo = parsedToDate,
+                MaintenanceTypeId = maintenanceTypeId.Value
+            });
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = workOrder.Message,
+                data = workOrder.Data?.ToList()
             });
         }
     }

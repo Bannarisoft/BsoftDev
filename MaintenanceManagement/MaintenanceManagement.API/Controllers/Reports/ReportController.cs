@@ -1,4 +1,5 @@
 using Core.Application.Reports.MaintenanceRequestReport;
+using Core.Application.Reports.WorkOrderReport;
 using Core.Application.Reports.WorkOderCheckListReport;
 using MaintenanceManagement.API.Controllers;
 using MediatR;
@@ -8,15 +9,65 @@ namespace MaintenanceManagement.API.Controllers.Reports
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ReportController : ApiControllerBase
+    public class ReportController  : ApiControllerBase
     {
-
-        public ReportController(ISender mediator)
+        
+        public ReportController(ISender mediator) 
         : base(mediator)
         {
-
+            
         }
-        [HttpGet("RequestReport")]
+       
+
+        [HttpGet("WorkOrderReport")]
+        public async Task<IActionResult> WorkOrderReportAsync([FromQuery] string? fromDate, [FromQuery] string? toDate, [FromQuery] int requestTypeId )
+        {
+            DateTimeOffset? parsedFromDate = null;
+            DateTimeOffset? parsedToDate = null;
+
+            if (!string.IsNullOrWhiteSpace(fromDate))  // Allow null or empty values
+            {
+                if (!DateTimeOffset.TryParse(fromDate, out var parsedDate))
+                {
+                    return BadRequest(new { message = "Invalid fromDate format. Use yyyy-MM-dd." });
+                }
+                parsedFromDate = parsedDate;
+            }
+
+            if (!string.IsNullOrWhiteSpace(toDate))  // Allow null or empty values
+            {
+                if (!DateTimeOffset.TryParse(toDate, out var parsedDate))
+                {
+                    return BadRequest(new { message = "Invalid toDate format. Use yyyy-MM-dd." });
+                }
+                parsedToDate = parsedDate;
+            } 
+
+            var query = new WorkOrderReportQuery
+            {
+                FromDate = parsedFromDate,
+                ToDate = parsedToDate   ,
+                RequestTypeId = requestTypeId             
+            };
+            var result = await Mediator.Send(query);
+
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = result?.Message ?? "No Work Order Report found."
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = result.Message,
+                Data = result.Data
+            });
+        }
+[HttpGet("RequestReport")]
         public async Task<IActionResult> MaintenanceReportAsync(
             [FromQuery] DateTimeOffset? requestFromDate,
             [FromQuery] DateTimeOffset? requestToDate,
@@ -90,6 +141,5 @@ namespace MaintenanceManagement.API.Controllers.Reports
                     Data = result?.Data ?? new List<WorkOderCheckListReportDto>()
                 });
             }
-
     }
 }
