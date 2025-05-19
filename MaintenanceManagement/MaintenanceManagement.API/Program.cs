@@ -3,6 +3,7 @@ using MaintenanceManagement.Infrastructure;
 using MaintenanceManagement.API.Configurations;
 using MaintenanceManagement.API.Validation.Common;
 using MaintenanceManagement.API.Middleware;
+using Core.Application.Common.RealTimeNotificationHub;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
@@ -70,7 +71,8 @@ app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.Loggin
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
-
+app.UseWebSockets();
+app.MapHub<PreventiveScheduleHub>("/preventiveschedulehub");
 app.Run();
 
 
