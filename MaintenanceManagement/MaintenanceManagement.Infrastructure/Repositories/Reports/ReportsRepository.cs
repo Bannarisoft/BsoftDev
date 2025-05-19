@@ -10,6 +10,7 @@ using Core.Application.Reports.WorkOderCheckListReport;
 using Core.Application.WorkOrder.Command.CreateWorkOrder;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Repositories.Common;
+using Core.Application.Reports.MRS;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.Reports
 {
@@ -172,6 +173,20 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
 
                     return result.ToList();
                 }
+
+        public async Task<List<MRSReportDto>> GetMRSReports(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate, string OldUnitCode)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@FromDate", IssueFromDate);
+            parameters.Add("@ToDate", IssueToDate);
+            parameters.Add("@OldUnitId", OldUnitCode);
+            var result = await _dbConnection.QueryAsync<MRSReportDto>(
+                "GetMRSReport",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+            return result.ToList();
+        }
     }
 }
    
