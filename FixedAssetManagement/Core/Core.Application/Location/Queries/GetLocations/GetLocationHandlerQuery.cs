@@ -1,4 +1,5 @@
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.ILocation;
@@ -12,14 +13,14 @@ namespace Core.Application.Location.Queries.GetLocations
         private readonly ILocationQueryRepository _locationQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentService _departmentService;
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;
 
-        public GetLocationHandlerQuery(ILocationQueryRepository locationQueryRepository, IMediator mediator, IMapper mapper, IDepartmentService departmentService)
+        public GetLocationHandlerQuery(ILocationQueryRepository locationQueryRepository, IMediator mediator, IMapper mapper, IDepartmentGrpcClient departmentService)
         {
             _locationQueryRepository = locationQueryRepository;
             _mediator = mediator;
             _mapper = mapper;
-            _departmentService = departmentService;
+            _departmentGrpcClient = departmentService;
 
         }
         public async Task<ApiResponseDTO<List<LocationDto>>> Handle(GetLocationQuery request, CancellationToken cancellationToken)
@@ -28,7 +29,7 @@ namespace Core.Application.Location.Queries.GetLocations
             var locationList = _mapper.Map<List<LocationDto>>(locations);
 
             // 🔥 Fetch departments using HttpClientFactory
-            var departments = await _departmentService.GetAllDepartmentAsync();
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var LocationDictionary = new Dictionary<int, LocationDto>();
 
