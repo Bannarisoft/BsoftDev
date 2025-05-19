@@ -6,6 +6,7 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IUnit;
 using Core.Application.Common.Interfaces.IReports;
+using Core.Domain.Events;
 using MediatR;
 
 namespace Core.Application.Reports.MRS
@@ -15,11 +16,48 @@ namespace Core.Application.Reports.MRS
         private readonly IReportRepository _repository;
         private readonly IMapper _mapper;
         private readonly IUnitService _unitService;
-         private readonly IMediator _mediator;
+        private readonly IMediator _mediator;
 
-        public Task<ApiResponseDTO<List<MRSReportDto>>> Handle(MRSReportQuery request, CancellationToken cancellationToken)
+        public MRSReportQueryHandler(IReportRepository repository, IMapper mapper, IUnitService unitService, IMediator mediator)
         {
-            throw new NotImplementedException();
+            _repository = repository;
+            _mapper = mapper;
+            _unitService = unitService;
+            _mediator = mediator;
+        }
+
+
+        public async Task<ApiResponseDTO<List<MRSReportDto>>> Handle(MRSReportQuery request, CancellationToken cancellationToken)
+        {
+            var fromDate = request.FromDate ?? throw new ArgumentNullException(nameof(request.FromDate));
+            var toDate = request.ToDate ?? throw new ArgumentNullException(nameof(request.ToDate));
+
+            // Fetch MRS report data from repository
+            var mrsReports = await _repository.GetMRSReports(fromDate, toDate, request.OldUnitCode);
+
+            // Map to DTOs
+            var mrsReportDtos = _mapper.Map<List<MRSReportDto>>(mrsReports);
+
+        
+            // Log audit
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "GetMRSReport",
+                actionCode: "Get",
+                actionName: mrsReports.Count.ToString(),
+                details: "MRS report list fetched.",
+                module: "MRS"
+            );
+
+            await _mediator.Publish(domainEvent, cancellationToken);
+
+            // Return API response
+            return new ApiResponseDTO<List<MRSReportDto>>
+            {
+                IsSuccess = true,
+                Message = "Success",
+                Data = mrsReportDtos,
+                TotalCount = mrsReportDtos.Count
+            };
         }
     }
 }

@@ -7,6 +7,7 @@ using Core.Application.Reports.WorkOderCheckListReport;
 using MaintenanceManagement.API.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Core.Application.Reports.MRS;
 
 namespace MaintenanceManagement.API.Controllers.Reports
 {
@@ -23,7 +24,7 @@ namespace MaintenanceManagement.API.Controllers.Reports
 
         }
 
-       
+
 
 
         [HttpGet("WorkOrderReport")]
@@ -168,7 +169,7 @@ namespace MaintenanceManagement.API.Controllers.Reports
                 return Ok(new
                 {
                     statusCode = StatusCodes.Status200OK,
-                    data = result,
+                    data = result.Data?.ToList(),
                     message = "Success"
                 });
             }
@@ -195,29 +196,29 @@ namespace MaintenanceManagement.API.Controllers.Reports
 
             if (result.IsSuccess)
             {
-                return Ok(new 
-                { 
-                    StatusCode = StatusCodes.Status200OK, 
-                    data = result.Data, 
-                    message = result.Message 
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    data = result.Data,
+                    message = result.Message
                 });
             }
 
-            return NotFound(new 
-            { 
-                StatusCode = StatusCodes.Status404NotFound, 
-                message = result.Message 
+            return NotFound(new
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                message = result.Message
             });
         }
 
-[HttpGet("RequestReport")]
+        [HttpGet("RequestReport")]
         public async Task<IActionResult> MaintenanceReportAsync(
-            [FromQuery] DateTimeOffset? requestFromDate,
-            [FromQuery] DateTimeOffset? requestToDate,
-            [FromQuery] int? RequestType,
-            [FromQuery] int? requestStatus,
-            [FromQuery] int? departmentId
-            )
+                    [FromQuery] DateTimeOffset? requestFromDate,
+                    [FromQuery] DateTimeOffset? requestToDate,
+                    [FromQuery] int? RequestType,
+                    [FromQuery] int? requestStatus,
+                    [FromQuery] int? departmentId
+                    )
         {
             var query = new RequestReportQuery
             {
@@ -243,46 +244,93 @@ namespace MaintenanceManagement.API.Controllers.Reports
             {
                 StatusCode = StatusCodes.Status200OK,
                 Message = result.Message,
-                Data = result?.Data ??  new List<RequestReportDto>()
+                Data = result?.Data ?? new List<RequestReportDto>()
             });
         }
-        
+
         [HttpGet("WorkOrderChecklistReport")]
-            public async Task<IActionResult> WorkOrderChecklistReportAsync(
+        public async Task<IActionResult> WorkOrderChecklistReportAsync(
                 [FromQuery] DateTimeOffset? WorkOrderFromDate,
                 [FromQuery] DateTimeOffset? WorkOrderToDate,
                 [FromQuery] int? MachineGroupId,
                 [FromQuery] int? machineId,
                 [FromQuery] int? ActivityId
                 )
+        {
+            var query = new WorkOderCheckListReportQuery
             {
-                var query = new WorkOderCheckListReportQuery
-                {
-                    WorkOrderFromDate = WorkOrderFromDate,
-                    WorkOrderToDate = WorkOrderToDate,
-                    MachineGroupId = MachineGroupId,
-                    MachineId = machineId,
-                    ActivityId = ActivityId
-                };
+                WorkOrderFromDate = WorkOrderFromDate,
+                WorkOrderToDate = WorkOrderToDate,
+                MachineGroupId = MachineGroupId,
+                MachineId = machineId,
+                ActivityId = ActivityId
+            };
 
-                var result = await Mediator.Send(query);
+            var result = await Mediator.Send(query);
 
-                if (result == null || result.Data == null || result.Data.Count == 0)
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
                 {
-                    return NotFound(new
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = result?.Message ?? "No Work Order Checklist records found."
-                    });
-                }
-
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = result.Message,
-                    //Data = result.Data
-                    Data = result?.Data ?? new List<WorkOderCheckListReportDto>()
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = result?.Message ?? "No Work Order Checklist records found."
                 });
             }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = result.Message,
+                //Data = result.Data
+                Data = result?.Data ?? new List<WorkOderCheckListReportDto>()
+            });
+        }
+            
+         [HttpGet("MRSReport")]
+        public async Task<IActionResult> GetMRSReport(
+            [FromQuery] string? fromDate,
+            [FromQuery] string? toDate,
+            [FromQuery] string? OldUnitCode)
+        {
+            DateTimeOffset? parsedFromDate = null;
+            DateTimeOffset? parsedToDate = null;
+
+            if (!string.IsNullOrWhiteSpace(fromDate))
+            {
+                if (!DateTimeOffset.TryParse(fromDate, out var fromParsed))
+                {
+                    return BadRequest(new { message = "Invalid fromDate format. Use yyyy-MM-dd." });
+                }
+                parsedFromDate = fromParsed;
+            }
+
+            if (!string.IsNullOrWhiteSpace(toDate))
+            {
+                if (!DateTimeOffset.TryParse(toDate, out var toParsed))
+                {
+                    return BadRequest(new { message = "Invalid toDate format. Use yyyy-MM-dd." });
+                }
+                parsedToDate = toParsed;
+            }
+
+            if (OldUnitCode is null)
+            {
+                return BadRequest(new { message = "Invalid OldUnitCode" });
+            }
+
+            var workOrder = await Mediator.Send(new MRSReportQuery
+            {
+                FromDate = parsedFromDate,
+                ToDate = parsedToDate,
+                OldUnitCode = OldUnitCode
+            });
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = workOrder.Message,
+                data = workOrder.Data?.ToList()
+            });
+        }
     }
 }
