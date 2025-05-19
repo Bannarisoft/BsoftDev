@@ -3,6 +3,8 @@ using MaintenanceManagement.Infrastructure;
 using MaintenanceManagement.API.Configurations;
 using MaintenanceManagement.API.Validation.Common;
 using MaintenanceManagement.API.Middleware;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,19 @@ builder.Configuration
 .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true)
 .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
 .AddEnvironmentVariables();
+
+// builder.WebHost.ConfigureKestrel(options =>
+// {
+//     options.ListenAnyIP(5293, listenOptions =>
+//     {
+//         listenOptions.Protocols = HttpProtocols.Http1;
+//     });
+//     options.ListenAnyIP(7243, listenOptions =>
+//     {
+//         listenOptions.Protocols = HttpProtocols.Http2;
+//     });
+// });
+
 
 // Configure Serilog
 builder.Host.ConfigureSerilog();
@@ -27,6 +42,7 @@ builder.Services.AddSwaggerDocumentation();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
+builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddHttpClientsFactory(builder.Configuration);
 builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);

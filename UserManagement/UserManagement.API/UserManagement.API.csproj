@@ -7,13 +7,13 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-    <!-- <PackageReference Include="Google.Protobuf" Version="3.30.2" />
+    <PackageReference Include="Google.Protobuf" Version="3.30.2" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
     <PackageReference Include="Grpc.Tools" Version="2.71.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
-    </PackageReference> -->
+    </PackageReference> 
     <PackageReference Include="MassTransit" Version="8.0.0" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
@@ -43,10 +43,9 @@
         
   </ItemGroup>
     <!-- Correct placement of Protobuf item -->
- <!--  <ItemGroup>
-    <Protobuf Include="..\..\Shared\Contracts\Protos\department.proto" Link="Protos\department.proto" GrpcServices="Server" />
-    <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" Link="Protos\session.proto" GrpcServices="Server" />
-
-  </ItemGroup> -->
+  <ItemGroup>
+    <Protobuf Include="..\..\Shared\Contracts\Protos\department.proto" GrpcServices="Server" />
+    <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" GrpcServices="Server" />
+  </ItemGroup> 
 
 </Project>
