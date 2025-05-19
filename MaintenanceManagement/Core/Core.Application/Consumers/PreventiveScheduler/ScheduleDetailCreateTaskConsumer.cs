@@ -42,7 +42,7 @@ namespace Core.Application.Consumers.PreventiveScheduler
               try
             {
                 CancellationToken cancellationToken = context.CancellationToken;
-                var machineMaster = await _machineMasterQueryRepository.GetMachineByGroupAsync(context.Message.MachineGroupId);
+                var machineMaster = await _machineMasterQueryRepository.GetMachineByGroupSagaAsync(context.Message.MachineGroupId,context.Message.UnitId);
                 
                 var details = _mapper.Map<List<PreventiveSchedulerDetail>>(machineMaster);
                 var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(context.Message.FrequencyUnitId);
