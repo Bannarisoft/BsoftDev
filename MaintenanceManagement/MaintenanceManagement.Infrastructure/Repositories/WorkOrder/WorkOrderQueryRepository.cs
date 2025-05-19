@@ -1,6 +1,7 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IWorkOrder;
+using Core.Application.Reports.WorkOrderItemConsuption;
 using Core.Application.WorkOrder.Queries.GetWorkOrder;
 using Core.Domain.Common;
 using Dapper;
@@ -156,6 +157,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             };
         var result = await _dbConnection.QueryAsync<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(query, parameters);
         return result.ToList();        }
+
+       
     } 
 }
    

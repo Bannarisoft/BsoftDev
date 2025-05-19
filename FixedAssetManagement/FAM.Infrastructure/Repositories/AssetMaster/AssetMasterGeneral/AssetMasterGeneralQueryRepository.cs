@@ -2,6 +2,7 @@ using System.Data;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
+using Core.Application.Reports.AssetReport;
 using Core.Domain.Common;
 using Core.Domain.Entities.AssetMaster;
 using Dapper;
@@ -537,7 +538,6 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             var unitName = (await multiQuery.ReadFirstOrDefaultAsync<string>())?.Trim();
 
             return (companyName, unitName);
-        }  
-        
+        }       
     }
 }

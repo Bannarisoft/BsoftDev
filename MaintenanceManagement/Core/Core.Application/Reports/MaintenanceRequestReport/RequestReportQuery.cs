@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
 using MediatR;
 
-namespace Core.Application.MaintenanceRequest.Queries.RequestReport
+namespace Core.Application.Reports.MaintenanceRequestReport
 {
     public class RequestReportQuery : IRequest<ApiResponseDTO<List<RequestReportDto>>> 
     {
          public DateTimeOffset? RequestFromDate { get; set; }
         public DateTimeOffset? RequestToDate { get; set; }
-        public int RequestType { get; set; }
-        public int RequestStatus { get; set; }        
+        public int? RequestType { get; set; }
+        public int? RequestStatus { get; set; }        
         
         public int? SparesTypeId { get; set; }
             public string? SparesType { get; set; } = string.Empty;

@@ -25,7 +25,7 @@ using Core.Application.MaintenanceRequest.Queries.GetMaintenanceServiceLocation;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceSparesType;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceDipatchMode;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
-using Core.Application.MaintenanceRequest.Queries.RequestReport;
+using Core.Application.Reports.MaintenanceRequestReport;
 
 namespace MaintenanceManagement.API.Controllers
 {
@@ -413,39 +413,7 @@ namespace MaintenanceManagement.API.Controllers
                     });
                 }
 
-               [HttpGet("RequestReport")]
-            public async Task<IActionResult> MaintenanceReportAsync(
-                [FromQuery] DateTimeOffset? requestFromDate,
-                [FromQuery] DateTimeOffset? requestToDate,
-                [FromQuery] int RequestType,
-                [FromQuery] int requestStatus)
-            {
-                var query = new RequestReportQuery
-                {
-                    RequestFromDate = requestFromDate,
-                    RequestToDate = requestToDate,
-                    RequestType = RequestType,
-                    RequestStatus = requestStatus
-                };
-
-                var result = await Mediator.Send(query);
-
-                if (result == null || result.Data == null || result.Data.Count == 0)
-                {
-                    return NotFound(new
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = result?.Message ?? "No maintenance requests found."
-                    });
-                }
-
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = result.Message,
-                    Data = result.Data
-                });
-            }
+             
 
       
         

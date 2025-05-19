@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Application.MaintenanceRequest.Queries.GetExistingVendorDetails;
 using Core.Application.MaintenanceRequest.Queries.GetExternalRequestById;
-using Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest;
-using Core.Application.MaintenanceRequest.Queries.RequestReport;
-using Core.Application.WorkOrder.Queries.GetRequestType;
+using Core.Application.Reports.MaintenanceRequestReport;
+
 
 namespace Core.Application.Common.Interfaces.IMaintenanceRequest
 {
@@ -35,9 +29,8 @@ namespace Core.Application.Common.Interfaces.IMaintenanceRequest
          Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceDispatchModeDescAsync();
 
           //Task<List<RequestReportDto>> GetMaintenanceStatusDescAsync( DateTimeOffset? RequestFromDate, DateTimeOffset? RequestToDate , int? GetRequestType , int?  RequestStatus);  
-          Task<List<RequestReportDto>> MaintenanceReportAsync( DateTimeOffset? requestFromDate,DateTimeOffset? requestToDate, int? RequestType,int? requestType
-    );          
-           
+          
+
           
 
           

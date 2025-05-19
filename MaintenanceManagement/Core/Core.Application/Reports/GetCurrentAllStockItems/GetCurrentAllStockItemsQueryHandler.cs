@@ -4,20 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces.IReports;
 using Core.Application.Common.Interfaces.IStcokLedger;
 using Core.Application.StockLedger.Queries.GetCurrentStock;
 using Core.Domain.Events;
 using MediatR;
 
-namespace Core.Application.StockLedger.Queries.GetCurrentAllStockItems
+namespace Core.Application.Reports.GetCurrentAllStockItems
 {
     public class GetCurrentAllStockItemsQueryHandler : IRequestHandler<GetCurrentAllStockItemsQuery,ApiResponseDTO<List<CurrentStockDto>>>
     {
-        private readonly IStockLedgerQueryRepository _stockLedgerQueryRepository;        
+        private readonly IReportRepository _stockLedgerQueryRepository;        
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
 
-        public GetCurrentAllStockItemsQueryHandler(IStockLedgerQueryRepository stockLedgerQueryRepository, IMapper mapper, IMediator mediator)
+        public GetCurrentAllStockItemsQueryHandler(IReportRepository stockLedgerQueryRepository, IMapper mapper, IMediator mediator)
         {
             _stockLedgerQueryRepository = stockLedgerQueryRepository;            
             _mapper = mapper;

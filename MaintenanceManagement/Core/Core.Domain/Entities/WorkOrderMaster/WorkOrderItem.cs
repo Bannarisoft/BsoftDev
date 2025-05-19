@@ -18,5 +18,6 @@ namespace Core.Domain.Entities.WorkOrderMaster
         public int? ScarpQty { get; set; }
         public int? ToSubStoreQty { get; set; }
         public string? Image { get; set; }
+        public decimal? Rate { get; set; }
     }
 }

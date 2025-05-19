@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.Common.HttpResponse;
 using MediatR;
 
-namespace Core.Application.StockLedger.Queries.GetStockLegerReport
+namespace Core.Application.Reports.GetStockLegerReport
 {
     public class GetStockLegerReportQuery : IRequest<ApiResponseDTO<List<StockLedgerReportDto>>>
     {
