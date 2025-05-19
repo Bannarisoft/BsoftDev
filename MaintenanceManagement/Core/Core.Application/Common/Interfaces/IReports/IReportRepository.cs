@@ -19,5 +19,6 @@ namespace Core.Application.Common.Interfaces.IReports
         Task<List<CurrentStockDto>> GetStockDetails(string OldUnitcode);
         Task<List<WorkOderCheckListReportDto>> GetWorkOrderChecklistReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? machineGroupId, int? machineId, int? activityId);
         Task<List<MRSReportDto>> GetMRSReports(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate, string OldUnitCode);
+        Task<IEnumerable<dynamic>> ScheduleReportAsync(string MachineGroup,string MaintenanceCategory,string Activity,string ActivityType);
     }
 }
