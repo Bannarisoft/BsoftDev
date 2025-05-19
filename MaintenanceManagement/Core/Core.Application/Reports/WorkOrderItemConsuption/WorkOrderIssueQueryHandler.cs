@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IUnit;
 using Core.Application.Common.Interfaces.IReports;
@@ -16,14 +17,14 @@ namespace Core.Application.Reports.WorkOrderItemConsuption
     {
         private readonly IReportRepository _repository;
         private readonly IMapper _mapper;
-        private readonly IUnitService _unitService;
+        private readonly IUnitGrpcClient _unitGrpcClient;
          private readonly IMediator _mediator;
 
-        public WorkOrderIssueQueryHandler(IReportRepository repository, IMapper mapper, IUnitService unitService, IMediator mediator)
+        public WorkOrderIssueQueryHandler(IReportRepository repository, IMapper mapper, IUnitGrpcClient unitGrpcClient, IMediator mediator)
         {
             _repository = repository;
             _mapper = mapper;
-            _unitService = unitService;
+            _unitGrpcClient = unitGrpcClient;
             _mediator = mediator;
         }
 
@@ -39,7 +40,7 @@ namespace Core.Application.Reports.WorkOrderItemConsuption
                     );
 
                     var workOrderDtos = _mapper.Map<List<WorkOrderIssueDto>>(workOrders);
-                     var units = await _unitService.GetUnitAutoCompleteAsync();
+                     var units = await _unitGrpcClient.GetUnitAutoCompleteAsync();
                     var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
                     foreach (var dto in workOrderDtos)
                     {

@@ -14,20 +14,20 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
 
-        private readonly IDepartmentService _departmentService;
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;
 
 
         public GetMaintenanceRequestQueryHandler(
             IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository,
             IMapper mapper,
             IMediator mediator ,
-            IDepartmentService departmentService)
+            IDepartmentGrpcClient departmentService)
             
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentService = departmentService;
+            _departmentGrpcClient = departmentService;
             
 
         }
@@ -38,7 +38,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
             var maintenanceRequestList = _mapper.Map<List<GetMaintenanceRequestDto>>(maintenanceRequests);
 
         
-            var departments = await _departmentService.GetAllDepartmentAsync(); // ✅ Clean call
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync(); // ✅ Clean call
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
             var maintenanceRequestDictionary = new Dictionary<int, GetMaintenanceRequestDto>();

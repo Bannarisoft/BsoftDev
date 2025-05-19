@@ -1,4 +1,5 @@
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.ISubLocation;
@@ -12,15 +13,15 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
         private readonly ISubLocationQueryRepository _sublocationQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentService _departmentService;
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;
 
 
-        public GetSubLocationHandlerQuery(ISubLocationQueryRepository sublocationQueryRepository, IMapper mapper, IMediator mediator, IDepartmentService departmentService)
+        public GetSubLocationHandlerQuery(ISubLocationQueryRepository sublocationQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService)
         {
             _sublocationQueryRepository = sublocationQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentService = departmentService;
+            _departmentGrpcClient = departmentService;
 
         }
         public async Task<ApiResponseDTO<List<SubLocationDto>>> Handle(GetSubLocationQuery request, CancellationToken cancellationToken)
@@ -29,7 +30,7 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             var sublocationList = _mapper.Map<List<SubLocationDto>>(sublocations);
 
             // 🔥 Fetch departments using HttpClientFactory
-            var departments = await _departmentService.GetAllDepartmentAsync();
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var subLocationDictionary = new Dictionary<int, SubLocationDto>();
 

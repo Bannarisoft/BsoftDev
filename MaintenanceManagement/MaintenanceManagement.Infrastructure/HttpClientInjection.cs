@@ -56,6 +56,15 @@ namespace MaintenanceManagement.Infrastructure
             // .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<IUserSessionGrpcClient, GrpcUserSessionClient>();
+            
+               // ✅ Register Session gRPC Client
+            services.AddGrpcClient<UnitService.UnitServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
+            .AddGrpcPolicies();            
+            services.AddScoped<IUnitGrpcClient, UnitGrpcClient>();
 
             return services;
         }

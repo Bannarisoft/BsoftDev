@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.External.IUnit;
@@ -17,19 +18,16 @@ namespace Core.Application.CostCenter.Queries.GetCostCenter
         private readonly ICostCenterQueryRepository _iCostCenterQueryRepository;        
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentService _departmentService;
-        private readonly IUnitService _unitService;
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        private readonly IUnitGrpcClient _unitGrpcClient;
 
-
-
-
-        public GetCostCenterQueryHandler(ICostCenterQueryRepository iCostCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentService departmentService, IUnitService unitService)
+        public GetCostCenterQueryHandler(ICostCenterQueryRepository iCostCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService, IUnitGrpcClient unitGrpcClient)
         {
             _iCostCenterQueryRepository = iCostCenterQueryRepository;            
             _mapper = mapper;
             _mediator = mediator;
-            _departmentService = departmentService;
-            _unitService = unitService;
+            _departmentGrpcClient = departmentService;
+            _unitGrpcClient = unitGrpcClient;
         }
 
         // public async Task<ApiResponseDTO<List<CostCenterDto>>> Handle(GetCostCenterQuery request, CancellationToken cancellationToken)
@@ -98,8 +96,8 @@ namespace Core.Application.CostCenter.Queries.GetCostCenter
             var costCenterDtos = _mapper.Map<List<CostCenterDto>>(costCenters);
 
             // 🔥 Fetch lookups
-            var departments = await _departmentService.GetAllDepartmentAsync();
-            var units = await _unitService.GetUnitAutoCompleteAsync();
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            var units = await _unitGrpcClient.GetUnitAutoCompleteAsync();
 
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
