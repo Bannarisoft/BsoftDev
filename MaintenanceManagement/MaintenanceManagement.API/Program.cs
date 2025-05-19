@@ -55,6 +55,7 @@ app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.Loggin
 app.UseAuthorization();
 app.MapControllers();
 app.ConfigureHangfireDashboard();
+app.UseWebSockets();
 app.MapHub<PreventiveScheduleHub>("/preventiveschedulehub");
 app.Run();
 
