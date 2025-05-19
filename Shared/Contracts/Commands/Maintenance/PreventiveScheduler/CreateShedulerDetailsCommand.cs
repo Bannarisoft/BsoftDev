@@ -9,13 +9,14 @@ namespace Contracts.Commands.Maintenance.PreventiveScheduler
     public class CreateShedulerDetailsCommand : CorrelatedBy<Guid>
     {
         public Guid CorrelationId { get; set; }
-         public int PreventiveSchedulerHeaderId { get; set; }
-         public int MaintenanceCategoryId { get; set; }
-         public int MachineGroupId { get; set; }
-         public int FrequencyUnitId { get; set; }
-         public DateOnly EffectiveDate { get; set; }
-         public int FrequencyInterval { get; set; }
-         public int ReminderWorkOrderDays { get; set; }
-         public int ReminderMaterialReqDays { get; set; }
+        public int PreventiveSchedulerHeaderId { get; set; }
+        public int MaintenanceCategoryId { get; set; }
+        public int MachineGroupId { get; set; }
+        public int FrequencyUnitId { get; set; }
+        public DateOnly EffectiveDate { get; set; }
+        public int FrequencyInterval { get; set; }
+        public int ReminderWorkOrderDays { get; set; }
+        public int ReminderMaterialReqDays { get; set; }
+         public int UnitId { get; set; }
     }
 }

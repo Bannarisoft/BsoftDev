@@ -46,6 +46,7 @@ namespace SagaOrchestrator.Application.StateMachines
                         context.Instance.FrequencyInterval = context.Data.FrequencyInterval;
                         context.Instance.ReminderWorkOrderDays = context.Data.ReminderWorkOrderDays;
                         context.Instance.ReminderMaterialReqDays = context.Data.ReminderMaterialReqDays;
+                        context.Instance.UnitId = context.Data.UnitId;
                     })
                     .Send(new Uri("queue:schedule-detail-task-queue"), context => new CreateShedulerDetailsCommand
                     {

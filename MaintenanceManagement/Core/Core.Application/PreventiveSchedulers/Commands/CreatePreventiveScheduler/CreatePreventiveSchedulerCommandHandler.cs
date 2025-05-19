@@ -26,14 +26,16 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IEventPublisher _eventPublisher;
+        private readonly IIPAddressService _ipAddressService;
 
         public CreatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator,
-         IEventPublisher eventPublisher)
+         IEventPublisher eventPublisher, IIPAddressService iPAddressService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
             _mediator = mediator;
             _eventPublisher = eventPublisher;
+            _ipAddressService = iPAddressService;
 
         }
         public async Task<ApiResponseDTO<int>> Handle(CreatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
@@ -42,23 +44,25 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
             var preventiveScheduler  = _mapper.Map<PreventiveSchedulerHeader>(request);
 
                 var response = await _preventiveSchedulerCommand.CreateAsync(preventiveScheduler);
-                 if(response >0 || response != null)
+            var UnitId = _ipAddressService.GetUnitId();
+                 if (response > 0 || response != null)
+            {
+                var correlationId = Guid.NewGuid();
+                var @event = new PreventiveSchedulerHeaderCreationEvent
                 {
-                    var correlationId = Guid.NewGuid();
-                    var @event = new PreventiveSchedulerHeaderCreationEvent
-                    {
-                        CorrelationId = correlationId,
-                        PreventiveSchedulerHeaderId = response,
-                        MachineGroupId = preventiveScheduler.MachineGroupId,
-                        FrequencyUnitId = preventiveScheduler.FrequencyUnitId,
-                        EffectiveDate = preventiveScheduler.EffectiveDate,
-                        FrequencyInterval = preventiveScheduler.FrequencyInterval,
-                        ReminderWorkOrderDays = preventiveScheduler.ReminderWorkOrderDays,
-                    };
-                    // Save and publish event (RabbitMQ/Saga)
-                    await _eventPublisher.SaveEventAsync(@event);
-                    await _eventPublisher.PublishPendingEventsAsync();
-                }
+                    CorrelationId = correlationId,
+                    PreventiveSchedulerHeaderId = response,
+                    MachineGroupId = preventiveScheduler.MachineGroupId,
+                    FrequencyUnitId = preventiveScheduler.FrequencyUnitId,
+                    EffectiveDate = preventiveScheduler.EffectiveDate,
+                    FrequencyInterval = preventiveScheduler.FrequencyInterval,
+                    ReminderWorkOrderDays = preventiveScheduler.ReminderWorkOrderDays,
+                    UnitId =UnitId
+                };
+                // Save and publish event (RabbitMQ/Saga)
+                await _eventPublisher.SaveEventAsync(@event);
+                await _eventPublisher.PublishPendingEventsAsync();
+            }
                 
             //    var machineMaster = await _machineMasterQueryRepository.GetMachineByGroupAsync(request.MachineGroupId);
                 

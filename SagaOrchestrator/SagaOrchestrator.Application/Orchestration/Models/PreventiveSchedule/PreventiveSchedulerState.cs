@@ -20,5 +20,6 @@ namespace SagaOrchestrator.Application.Orchestration.Models.PreventiveSchedule
         public int ReminderMaterialReqDays { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? FailureReason { get; set; }
+        public int UnitId { get; set; }
     }
 }

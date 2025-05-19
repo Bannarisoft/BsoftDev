@@ -9,8 +9,10 @@ using Core.Application.Common.Interfaces.IBackgroundService;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Application.Common.Interfaces.IWorkOrder;
+using Core.Application.Common.RealTimeNotificationHub;
 using Hangfire;
 using MassTransit;
+using Microsoft.AspNetCore.SignalR;
 using static Core.Domain.Common.MiscEnumEntity;
 
 namespace Core.Application.Consumers.PreventiveScheduler
@@ -21,17 +23,17 @@ namespace Core.Application.Consumers.PreventiveScheduler
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IMapper _mapper;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
-        private readonly IWorkOrderCommandRepository _workOrderRepository;
         private readonly IBackgroundServiceClient  _backgroundServiceClient;
+        private readonly IHubContext<PreventiveScheduleHub> _hubContext;
         public ScheduleWorkOrderTaskConsumer(IPreventiveSchedulerCommand preventiveSchedulerCommand, IPreventiveSchedulerQuery preventiveSchedulerQuery,
-        IMiscMasterQueryRepository miscMasterQueryRepository, IWorkOrderCommandRepository workOrderRepository, IMapper mapper, IBackgroundServiceClient backgroundServiceClient)
+        IMiscMasterQueryRepository miscMasterQueryRepository,  IMapper mapper, IBackgroundServiceClient backgroundServiceClient, IHubContext<PreventiveScheduleHub> hubContext)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _miscMasterQueryRepository = miscMasterQueryRepository;
-            _workOrderRepository = workOrderRepository;
             _mapper = mapper;
             _backgroundServiceClient = backgroundServiceClient;
+            _hubContext = hubContext;
         }
 
         public async Task Consume(ConsumeContext<SheduleWorkOrderCommand> context)
@@ -65,21 +67,34 @@ namespace Core.Application.Consumers.PreventiveScheduler
                           detail.HangfireJobId = newJobId;
                         await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id,newJobId);
                      }
-
+                var headerId = context.Message.PreventiveSchedulerHeaderId;
                      if(getMachineWiseDetail.Count > 0)
                      {
+                        
+                       await _hubContext.Clients.All.SendAsync("ReceiveMessage", 
+                       $"Preventive Schedule created successfully: {headerId}");
+
                          await context.Publish(new ScheduleWorkOrderCreationEvent
-                         {
-                             CorrelationId = context.Message.CorrelationId
-                         });
+                    {
+                        CorrelationId = context.Message.CorrelationId
+                    });
                      }
-                       await context.Publish(new ScheduleWorkOrderFailedEvent
-                         {
-                             CorrelationId = context.Message.CorrelationId
-                         });
+                     
+                 
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", 
+                $"Preventive Schedule creation failed: {headerId}");
+
+                await context.Publish(new ScheduleWorkOrderFailedEvent
+                {
+                    CorrelationId = context.Message.CorrelationId
+                });
              }
             catch (Exception ex)
             {
+                var headerId = context.Message.PreventiveSchedulerHeaderId;
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", 
+                $"Preventive Schedule creation failed: {headerId}");
+
                 await context.RespondAsync(new ScheduleWorkOrderFailedEvent
                 {
                     CorrelationId = context.Message.CorrelationId,
