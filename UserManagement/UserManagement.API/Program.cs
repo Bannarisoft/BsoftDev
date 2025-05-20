@@ -65,15 +65,23 @@ app.UseDeveloperExceptionPage();
 //}
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
-app.UseCors();// Enable CORS
+app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 
 app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
-app.MapGrpcService<DepartmentGrpcService>();
-app.MapGrpcService<SessionGrpcService>();
-app.MapGrpcService<UnitGrpcService>();
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGrpcService<DepartmentGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<SessionGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<UnitGrpcService>().EnableGrpcWeb();
+    endpoints.MapControllers();
+});
+// app.MapGrpcService<DepartmentGrpcService>();
+// app.MapGrpcService<SessionGrpcService>();
+// app.MapGrpcService<UnitGrpcService>();
+// app.MapControllers();
 //app.ConfigureHangfireDashboard();
 app.Run();
