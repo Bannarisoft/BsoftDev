@@ -9,10 +9,7 @@ namespace Core.Application.Reports.ScheduleReport
 {
     public class ScheduleReportQuery : IRequest<ApiResponseDTO<List<ScheduleReportDto>>>
     {
-        public string? MachineDepartment { get; set; }
-        public string? MachineGroup { get; set; }
-        public string? MaintenanceCategory { get; set; }
-        public string? Activity { get; set; }
-        public string? ActivityType { get; set; }
+        public DateTime? FromDueDate { get; set; }
+        public DateTime? ToDueDate { get; set; }
     }
 }

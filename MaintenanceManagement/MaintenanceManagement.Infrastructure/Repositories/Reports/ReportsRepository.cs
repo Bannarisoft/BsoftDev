@@ -188,7 +188,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             return result.ToList();
         }
 
-        public async Task<IEnumerable<dynamic>> ScheduleReportAsync( string MachineGroup, string MaintenanceCategory, string Activity, string ActivityType)
+        public async Task<IEnumerable<dynamic>> ScheduleReportAsync(DateTime? FromDueDate, DateTime? ToDueDate)
         {
             var query = $$"""
 
@@ -201,11 +201,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 Inner Join [Maintenance].[MiscMaster] MISC ON MISC.Id=PSH.MaintenanceCategoryId
                 Inner Join [Maintenance].[ActivityMaster] A ON A.Id=PSA.ActivityId
                 Inner Join [Maintenance].[MiscMaster] ActivityType ON ActivityType.Id=A.ActivityType
-                WHERE PSH.IsDeleted=0 AND PSD.IsActive=0
-                {{(string.IsNullOrEmpty(MachineGroup) ? "" : "AND (MG.GroupName LIKE @MachineGroup  )")}}
-                {{(string.IsNullOrEmpty(MaintenanceCategory) ? "" : "AND (MISC.description LIKE @Description  )")}}
-                {{(string.IsNullOrEmpty(Activity) ? "" : "AND (A.ActivityName LIKE @ActivityName  )")}}
-                {{(string.IsNullOrEmpty(ActivityType) ? "" : "AND (ActivityType.Code LIKE @ActivityType  )")}}
+                WHERE PSH.IsDeleted=0 AND PSD.IsActive=1
+                {{(FromDueDate.HasValue ? "AND PSD.ActualWorkOrderDate >= @FromDueDate" : "")}}
+                {{(ToDueDate.HasValue ? "AND PSD.ActualWorkOrderDate <= @ToDueDate" : "")}}
                 group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate,PSD.LastMaintenanceActivityDate 
                 
                 ORDER BY PSH.Id desc
@@ -213,10 +211,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             
               var parameters = new
                        {
-                           MachineGroup = $"%{MachineGroup}%",
-                           Description = $"%{MaintenanceCategory}%",
-                           ActivityName = $"%{Activity}%",
-                           ActivityType = $"%{ActivityType}%"
+                           FromDueDate = FromDueDate,
+                           ToDueDate  = ToDueDate ,
                        };
 
              var schedule = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -225,8 +221,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             return schedulelist;
         }
 
-        public async Task<IEnumerable<dynamic>> MaterialPlanningReportAsync(DateTime? FromDueDate, DateTime? ToDueDate, string MaintenanceCategory,
-        string MachineName, string Activity, string MaterialCode)
+        public async Task<IEnumerable<dynamic>> MaterialPlanningReportAsync(DateTime? FromDueDate, DateTime? ToDueDate)
         {
                    var query = $$"""
            SELECT 
@@ -293,13 +288,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                ON SQ.ItemCode = PSI.OldItemId 
                AND PSI.OldCategoryDescription = SQ.CategoryDescription 
                AND PSI.OldGroupName = SQ.GroupName
-           WHERE PSH.IsDeleted = 0 AND PSD.IsActive=0
+           WHERE PSH.IsDeleted = 0 AND PSD.IsActive=1
            {{(FromDueDate.HasValue ? "AND PSD.ActualWorkOrderDate >= @FromDueDate" : "")}}
             {{(ToDueDate.HasValue ? "AND PSD.ActualWorkOrderDate <= @ToDueDate" : "")}}
-            {{(string.IsNullOrEmpty(MaintenanceCategory) ? "" : "AND (MISC.Description LIKE @Description  )")}}
-            {{(string.IsNullOrEmpty(MachineName) ? "" : "AND (MM.MachineName LIKE @MachineName  )")}}
-            {{(string.IsNullOrEmpty(Activity) ? "" : "AND (A.ActivityName LIKE @ActivityName  )")}}
-            {{(string.IsNullOrEmpty(MaterialCode) ? "" : "AND (PSI.OldItemId LIKE @MaterialCode  )")}}
            GROUP BY 
                PSH.Id, 
                MM.MachineName, 
@@ -320,11 +311,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
               var parameters = new
                        {
                            FromDueDate = FromDueDate,
-                           ToDueDate  = ToDueDate ,
-                           Description = MaintenanceCategory,
-                           MachineName = $"%{MachineName}%",
-                           ActivityName = $"%{Activity}%",
-                           MaterialCode = $"%{MaterialCode}%"
+                           ToDueDate  = ToDueDate 
                        };
 
              var schedule = await _dbConnection.QueryMultipleAsync(query, parameters);

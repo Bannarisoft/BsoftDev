@@ -337,20 +337,14 @@ namespace MaintenanceManagement.API.Controllers.Reports
 
         [HttpGet("SchedulerReport")]
         public async Task<IActionResult> SchedulerReportAsync(
-               [FromQuery] string? MachineDepartment,
-               [FromQuery] string? MachineGroup,
-               [FromQuery] string? MaintenanceCategory,
-               [FromQuery] string? Activity,
-               [FromQuery] string? ActivityType
+               [FromQuery] DateTime? FromDueDate,
+                [FromQuery] DateTime? ToDueDate
                )
         {
             var query = new ScheduleReportQuery
             {
-                MachineDepartment = MachineDepartment,
-                MachineGroup = MachineGroup,
-                MaintenanceCategory = MaintenanceCategory,
-                Activity = Activity,
-                ActivityType = ActivityType
+                FromDueDate = FromDueDate,
+                ToDueDate = ToDueDate
             };
 
             var result = await Mediator.Send(query);
@@ -374,21 +368,13 @@ namespace MaintenanceManagement.API.Controllers.Reports
            [HttpGet("MaterialPlanningReport")]
         public async Task<IActionResult> MaterialPlanningReportAsync(
                 [FromQuery] DateTime? FromDueDate,
-                [FromQuery] DateTime? ToDueDate,
-                [FromQuery] string? MaintenanceCategory,
-                [FromQuery] string? MachineName,
-                [FromQuery] string? Activity,
-                [FromQuery] string? MaterialCode
+                [FromQuery] DateTime? ToDueDate
                 )
         {
             var query = new MaterialPlanningReportQuery
             {
                 FromDueDate = FromDueDate,
-                ToDueDate = ToDueDate,
-                MaintenanceCategory = MaintenanceCategory,
-                MachineName = MachineName,
-                Activity = Activity,
-                MaterialCode = MaterialCode
+                ToDueDate = ToDueDate
             };
 
             var result = await Mediator.Send(query);

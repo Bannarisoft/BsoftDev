@@ -20,8 +20,7 @@ namespace Core.Application.Reports.MaterialPlanningReport
         }
         public async Task<ApiResponseDTO<List<MaterialPlanningReportDto>>> Handle(MaterialPlanningReportQuery request, CancellationToken cancellationToken)
         {
-            var reportEntities = await _reportQueryRepository.MaterialPlanningReportAsync(request.FromDueDate, request.ToDueDate, request.MaintenanceCategory,
-            request.MachineName, request.Activity, request.MaterialCode);
+            var reportEntities = await _reportQueryRepository.MaterialPlanningReportAsync(request.FromDueDate, request.ToDueDate);
 
             var MaterialPlanningList = _mapper.Map<List<MaterialPlanningReportDto>>(reportEntities);
             
