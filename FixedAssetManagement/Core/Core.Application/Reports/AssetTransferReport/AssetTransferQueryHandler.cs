@@ -36,6 +36,32 @@ namespace Core.Application.Reports.AssetTransferReport
 
             // Map to DTOs
             var assetTransfersReportDtos = _mapper.Map<List<AssetTransferDetailsDto>>(assetTransfersReports);
+                // 🔥 Fetch departments using HttpClientFactory
+            var departments = await _departmentService.GetAllDepartmentAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+            var assetTransferDictionary = new Dictionary<int, AssetTransferDetailsDto>();
+
+            // 🔥 Map department names to AssetTransferData
+            foreach (var data in assetTransfersReportDtos)
+            {
+                if (departmentLookup.TryGetValue(data.FromDepartmentId, out var departmentName) && departmentName != null)
+                {
+                    data.FromDepartmentName = departmentName;
+                }
+                    assetTransferDictionary[data.FromDepartmentId] = data;
+
+            }
+              // 🔥 Map department names to AssetTransferData
+            foreach (var data in assetTransfersReportDtos)
+            {
+                if (departmentLookup.TryGetValue(data.ToDepartmentId, out var departmentName) && departmentName != null)
+                {
+                    data.ToDepartmentName = departmentName;
+                }
+                    assetTransferDictionary[data.ToDepartmentId] = data;
+
+            }
+
 
         
             // Log audit

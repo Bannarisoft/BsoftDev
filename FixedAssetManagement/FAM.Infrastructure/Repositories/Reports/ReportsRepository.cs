@@ -38,16 +38,17 @@ namespace FAM.Infrastructure.Repositories.Reports
 
         public async Task<List<AssetTransferDetailsDto>> AssetTransferReportAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate)
         {
-                    var sql = @"
+            var sql = @"
                 SELECT * FROM vw_AssetTransferStatus
                 WHERE (@FromDate IS NULL OR DocDate >= @FromDate)
-                AND (@ToDate IS NULL OR DocDate <= @ToDate) AND FromUnitId = @UnitId";
+                AND (@ToDate IS NULL OR DocDate <= @ToDate)
+                AND FromUnitId = @UnitId";
 
             var parameters = new
             {
                 FromDate = fromDate,
                 ToDate = toDate,
-                FromUnit = UnitId
+                UnitId = UnitId // <-- FIXED: must match the SQL parameter name
             };
 
             var result = await _dbConnection.QueryAsync<AssetTransferDetailsDto>(sql, parameters);
