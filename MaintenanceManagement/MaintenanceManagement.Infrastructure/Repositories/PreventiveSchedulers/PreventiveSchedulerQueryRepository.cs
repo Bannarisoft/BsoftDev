@@ -376,6 +376,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                      var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id,UnitId });
                      return count > 0;
              }
+               public async Task<bool> ExistWorkOrderBySchedulerDetailId(int id)
+             {
+                
+                 var query = @"SELECT COUNT(1) FROM [Maintenance].[WorkOrder]
+                  WHERE PreventiveScheduleId = @Id ";
+
+                     var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+                     return count > 0;
+             }
              
 
     }

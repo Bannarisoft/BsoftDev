@@ -193,7 +193,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             var query = $$"""
 
                 Select PSH.DepartmentId,MG.GroupName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
-                Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate from [Maintenance].[PreventiveSchedulerHeader] PSH
+                Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,PSD.LastMaintenanceActivityDate from [Maintenance].[PreventiveSchedulerHeader] PSH
                 Inner Join [Maintenance].[MachineGroup] MG ON PSH.MachineGroupId=MG.Id
                 Inner Join [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
                 Inner Join [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId=PSH.Id
@@ -201,12 +201,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 Inner Join [Maintenance].[MiscMaster] MISC ON MISC.Id=PSH.MaintenanceCategoryId
                 Inner Join [Maintenance].[ActivityMaster] A ON A.Id=PSA.ActivityId
                 Inner Join [Maintenance].[MiscMaster] ActivityType ON ActivityType.Id=A.ActivityType
-                WHERE PSH.IsDeleted=0
+                WHERE PSH.IsDeleted=0 AND PSD.IsActive=0
                 {{(string.IsNullOrEmpty(MachineGroup) ? "" : "AND (MG.GroupName LIKE @MachineGroup  )")}}
                 {{(string.IsNullOrEmpty(MaintenanceCategory) ? "" : "AND (MISC.description LIKE @Description  )")}}
                 {{(string.IsNullOrEmpty(Activity) ? "" : "AND (A.ActivityName LIKE @ActivityName  )")}}
                 {{(string.IsNullOrEmpty(ActivityType) ? "" : "AND (ActivityType.Code LIKE @ActivityType  )")}}
-                group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate 
+                group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate,PSD.LastMaintenanceActivityDate 
                 
                 ORDER BY PSH.Id desc
             """;
@@ -293,7 +293,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                ON SQ.ItemCode = PSI.OldItemId 
                AND PSI.OldCategoryDescription = SQ.CategoryDescription 
                AND PSI.OldGroupName = SQ.GroupName
-           WHERE PSH.IsDeleted = 0
+           WHERE PSH.IsDeleted = 0 AND PSD.IsActive=0
            {{(FromDueDate.HasValue ? "AND PSD.ActualWorkOrderDate >= @FromDueDate" : "")}}
             {{(ToDueDate.HasValue ? "AND PSD.ActualWorkOrderDate <= @ToDueDate" : "")}}
             {{(string.IsNullOrEmpty(MaintenanceCategory) ? "" : "AND (MISC.Description LIKE @Description  )")}}
