@@ -80,72 +80,76 @@ using Core.Application.CustomFields.Commands.CreateCustomField;
 using UserManagement.API.Validation.CustomFields;
 using Core.Application.CustomFields.Commands.UpdateCustomField;
 using Core.Application.CustomFields.Commands.DeleteCustomField;
+using Core.Application.DepartmentGroup.Command.CreateDepartmentGroup;
+using UserManagement.API.Validation.DepartmentGroup;
 namespace UserManagement.API.Validation.Common
 {
     public class ValidationService
     {
-       public void AddValidationServices(IServiceCollection services)
-    {
-        services.AddScoped<MaxLengthProvider>();
-        services.AddScoped<IValidator<CreateCountryCommand>, CreateCountryCommandValidator>();
-        services.AddScoped<IValidator<UpdateCountryCommand>, UpdateCountryCommandValidator>();
-        services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
-        services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserCommandValidator>();
-        services.AddScoped<IValidator<CreateRoleEntitlementCommand>, CreateRoleEntitlementCommandValidator>();
-        services.AddScoped<IValidator<UpdateRoleEntitlementCommand>, UpdateRoleEntitlementCommandValidator>();
-        services.AddScoped<IValidator<CreateModuleCommand>, CreateModuleCommandValidator>();
-        services.AddScoped<IValidator<UpdateModuleCommand>, UpdateModuleCommandValidator>();
-        services.AddScoped<IValidator<CreateEntityCommand>, CreateEntityCommandValidator>();
-        services.AddScoped<IValidator<UpdateEntityCommand>, UpdateEntityCommandValidator>();
-        services.AddScoped<IValidator<CreateUnitCommand>, CreateUnitCommandValidator>();
-        services.AddScoped<IValidator<UpdateUnitCommand>, UpdateUnitCommandValidator>();
-        services.AddScoped<IValidator<CreateCompanyCommand>, CreateCompanyCommandValidator>();
-        services.AddScoped<IValidator<UpdateCompanyCommand>, UpdateCompanyCommandValidator>();
-        services.AddScoped<IValidator<CreateDepartmentCommand>, CreateDepartmentCommandValidator>();
-        services.AddScoped<IValidator<UpdateDepartmentCommand>, UpdateDepartmentCommandValidator>();
-        services.AddScoped<IValidator<CreateDivisionCommand>, CreateDivisionCommandValidator>();
-        services.AddScoped<IValidator<UpdateDivisionCommand>, UpdateDivisionCommandValidator>();
-        services.AddScoped<IValidator<CreateStateCommand>, CreateStateCommandValidator>();
-        services.AddScoped<IValidator<UpdateStateCommand>, UpdateStateCommandValidator>();
-        services.AddScoped<IValidator<CreateCityCommand>, CreateCityCommandValidator>();
-        services.AddScoped<IValidator<UpdateCityCommand>, UpdateCityCommandValidator>();
-        services.AddScoped<IValidator<CreateRoleCommand>, CreateRoleCommandValidator>();
-        services.AddScoped<IValidator<UpdateRoleCommand>, UpdateRoleCommandValidator>();
-        services.AddScoped<IValidator<FirstTimeUserPasswordCommand>,PasswordChangeCommandValidator>();
-        services.AddScoped<IValidator<ChangeUserPasswordCommand>,ExistingUserPasswordChangeCommandValidator>();
- 		services.AddScoped<IValidator<CreatePasswordComplexityRuleCommand>, CreatePasswordComplexityRuleCommandValidator>();
-        services.AddScoped<IValidator<UserLoginCommand>,UserLoginCommandValidator>();
-        services.AddScoped<IValidator<UpdatePasswordComplexityRuleCommand>, UpdatePasswordComplexityRuleCommandValidator>();
-        services.AddScoped<IValidator<CreateAdminSecuritySettingsCommand>, CreateAdminSecuritySettingsCommandValidator>(); 
-        services.AddScoped<IValidator<UpdateAdminSecuritySettingsCommand> ,UpdateAdminSecuritySettingsCommandValidator>();  
-        services.AddScoped<IValidator<FirstTimeUserPasswordCommand>,PasswordChangeCommandValidator>();
-        services.AddScoped<IValidator<CreateCompanySettingsCommand>, CreateCompanySettingsCommandValidator>();
-        services.AddScoped<IValidator<CreateFinancialYearCommand>, CreateFinancialYearCommandValidator>();
-        services.AddScoped<IValidator<UpdateFinancialYearCommand>, UpdateFinancialYearCommandValidator>();
-        services.AddScoped<IValidator<UpdateCompanySettingsCommand>, UpdateCompanySettingsCommandValidator>();
-        services.AddScoped<IValidator<CreateCurrencyCommand>, CreateCurrencyCommandValidator>();
-        services.AddScoped<IValidator<CreateLanguageCommand>, CreateLanguageCommandValidator>();
-        services.AddScoped<IValidator<UpdateCurrencyCommand>, UpdateCurrencyCommandValidator>();
-        services.AddScoped<IValidator<UpdateLanguageCommand>, UpdateLanguageCommandValidator>();
-        services.AddScoped<IValidator<UploadFileCompanyCommand>, UploadCompanyCommandValidator>();
-        services.AddScoped<IValidator<ResetPasswordCommand>, SetAdminPasswordCommandValidator>();
-        services.AddScoped<IValidator<DeleteEntityCommand>, DeleteEntityCommandValidator>();
-        services.AddScoped<IValidator<DeleteStateCommand>, DeleteStateCommandValidator>();
-        services.AddScoped<IValidator<DeleteCompanyCommand>, DeleteCompanyCommandValidator>();
-        services.AddScoped<IValidator<DeleteModuleCommand>, DeleteModuleCommandValidator>();
-        services.AddScoped<IValidator<DeleteRoleCommand>, DeleteRoleCommandValidator>();
-        services.AddScoped<IValidator<DeleteCountryCommand>, DeleteCountryCommandValidator>();
+        public void AddValidationServices(IServiceCollection services)
+        {
+            services.AddScoped<MaxLengthProvider>();
+            services.AddScoped<IValidator<CreateCountryCommand>, CreateCountryCommandValidator>();
+            services.AddScoped<IValidator<UpdateCountryCommand>, UpdateCountryCommandValidator>();
+            services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
+            services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserCommandValidator>();
+            services.AddScoped<IValidator<CreateRoleEntitlementCommand>, CreateRoleEntitlementCommandValidator>();
+            services.AddScoped<IValidator<UpdateRoleEntitlementCommand>, UpdateRoleEntitlementCommandValidator>();
+            services.AddScoped<IValidator<CreateModuleCommand>, CreateModuleCommandValidator>();
+            services.AddScoped<IValidator<UpdateModuleCommand>, UpdateModuleCommandValidator>();
+            services.AddScoped<IValidator<CreateEntityCommand>, CreateEntityCommandValidator>();
+            services.AddScoped<IValidator<UpdateEntityCommand>, UpdateEntityCommandValidator>();
+            services.AddScoped<IValidator<CreateUnitCommand>, CreateUnitCommandValidator>();
+            services.AddScoped<IValidator<UpdateUnitCommand>, UpdateUnitCommandValidator>();
+            services.AddScoped<IValidator<CreateCompanyCommand>, CreateCompanyCommandValidator>();
+            services.AddScoped<IValidator<UpdateCompanyCommand>, UpdateCompanyCommandValidator>();
+            services.AddScoped<IValidator<CreateDepartmentCommand>, CreateDepartmentCommandValidator>();
+            services.AddScoped<IValidator<UpdateDepartmentCommand>, UpdateDepartmentCommandValidator>();
+            services.AddScoped<IValidator<CreateDivisionCommand>, CreateDivisionCommandValidator>();
+            services.AddScoped<IValidator<UpdateDivisionCommand>, UpdateDivisionCommandValidator>();
+            services.AddScoped<IValidator<CreateStateCommand>, CreateStateCommandValidator>();
+            services.AddScoped<IValidator<UpdateStateCommand>, UpdateStateCommandValidator>();
+            services.AddScoped<IValidator<CreateCityCommand>, CreateCityCommandValidator>();
+            services.AddScoped<IValidator<UpdateCityCommand>, UpdateCityCommandValidator>();
+            services.AddScoped<IValidator<CreateRoleCommand>, CreateRoleCommandValidator>();
+            services.AddScoped<IValidator<UpdateRoleCommand>, UpdateRoleCommandValidator>();
+            services.AddScoped<IValidator<FirstTimeUserPasswordCommand>, PasswordChangeCommandValidator>();
+            services.AddScoped<IValidator<ChangeUserPasswordCommand>, ExistingUserPasswordChangeCommandValidator>();
+            services.AddScoped<IValidator<CreatePasswordComplexityRuleCommand>, CreatePasswordComplexityRuleCommandValidator>();
+            services.AddScoped<IValidator<UserLoginCommand>, UserLoginCommandValidator>();
+            services.AddScoped<IValidator<UpdatePasswordComplexityRuleCommand>, UpdatePasswordComplexityRuleCommandValidator>();
+            services.AddScoped<IValidator<CreateAdminSecuritySettingsCommand>, CreateAdminSecuritySettingsCommandValidator>();
+            services.AddScoped<IValidator<UpdateAdminSecuritySettingsCommand>, UpdateAdminSecuritySettingsCommandValidator>();
+            services.AddScoped<IValidator<FirstTimeUserPasswordCommand>, PasswordChangeCommandValidator>();
+            services.AddScoped<IValidator<CreateCompanySettingsCommand>, CreateCompanySettingsCommandValidator>();
+            services.AddScoped<IValidator<CreateFinancialYearCommand>, CreateFinancialYearCommandValidator>();
+            services.AddScoped<IValidator<UpdateFinancialYearCommand>, UpdateFinancialYearCommandValidator>();
+            services.AddScoped<IValidator<UpdateCompanySettingsCommand>, UpdateCompanySettingsCommandValidator>();
+            services.AddScoped<IValidator<CreateCurrencyCommand>, CreateCurrencyCommandValidator>();
+            services.AddScoped<IValidator<CreateLanguageCommand>, CreateLanguageCommandValidator>();
+            services.AddScoped<IValidator<UpdateCurrencyCommand>, UpdateCurrencyCommandValidator>();
+            services.AddScoped<IValidator<UpdateLanguageCommand>, UpdateLanguageCommandValidator>();
+            services.AddScoped<IValidator<UploadFileCompanyCommand>, UploadCompanyCommandValidator>();
+            services.AddScoped<IValidator<ResetPasswordCommand>, SetAdminPasswordCommandValidator>();
+            services.AddScoped<IValidator<DeleteEntityCommand>, DeleteEntityCommandValidator>();
+            services.AddScoped<IValidator<DeleteStateCommand>, DeleteStateCommandValidator>();
+            services.AddScoped<IValidator<DeleteCompanyCommand>, DeleteCompanyCommandValidator>();
+            services.AddScoped<IValidator<DeleteModuleCommand>, DeleteModuleCommandValidator>();
+            services.AddScoped<IValidator<DeleteRoleCommand>, DeleteRoleCommandValidator>();
+            services.AddScoped<IValidator<DeleteCountryCommand>, DeleteCountryCommandValidator>();
 
-        services.AddScoped<IValidator<DeleteDivisionCommand>, DeleteDivisionCommandValidator>();        
-        services.AddScoped<IValidator<CreateUserGroupCommand>, CreateUserGroupCommandValidator>();
-        services.AddScoped<IValidator<UpdateUserGroupCommand>, UpdateUserGroupCommandValidator>();
-        services.AddScoped<IValidator<DeleteUserGroupCommand>, DeleteUserGroupCommandValidator>();
-        services.AddScoped<IValidator<ForgotUserPasswordCommand>, ForgotPasswordCommandValidator>();
-        services.AddScoped<IValidator<ResetUserPasswordCommand>, ResetUserPasswordCommandValidator>();
-        services.AddScoped<IValidator<DeactivateUserSessionCommand>, DeactivateUserSessionCommandValidator>();
-        services.AddScoped<IValidator<CreateCustomFieldCommand>, CreateCustomFieldCommandValidator>();
-        services.AddScoped<IValidator<UpdateCustomFieldCommand>, UpdateCustomFieldCommandValidator>();
-        services.AddScoped<IValidator<DeleteCustomFieldCommand>, DeleteCustomFieldCommandValidator>();
+            services.AddScoped<IValidator<DeleteDivisionCommand>, DeleteDivisionCommandValidator>();
+            services.AddScoped<IValidator<CreateUserGroupCommand>, CreateUserGroupCommandValidator>();
+            services.AddScoped<IValidator<UpdateUserGroupCommand>, UpdateUserGroupCommandValidator>();
+            services.AddScoped<IValidator<DeleteUserGroupCommand>, DeleteUserGroupCommandValidator>();
+            services.AddScoped<IValidator<ForgotUserPasswordCommand>, ForgotPasswordCommandValidator>();
+            services.AddScoped<IValidator<ResetUserPasswordCommand>, ResetUserPasswordCommandValidator>();
+            services.AddScoped<IValidator<DeactivateUserSessionCommand>, DeactivateUserSessionCommandValidator>();
+            services.AddScoped<IValidator<CreateCustomFieldCommand>, CreateCustomFieldCommandValidator>();
+            services.AddScoped<IValidator<UpdateCustomFieldCommand>, UpdateCustomFieldCommandValidator>();
+            services.AddScoped<IValidator<DeleteCustomFieldCommand>, DeleteCustomFieldCommandValidator>();
+            services.AddScoped<IValidator<CreateDepartmentGroupCommand>, CreateDepartmentGroupCommandValidator>();
+           
          }  
     }
 }

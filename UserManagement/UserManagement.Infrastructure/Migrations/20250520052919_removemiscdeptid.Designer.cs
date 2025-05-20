@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserManagement.Infrastructure.Data;
 
 #nullable disable
 
-namespace UserManagement.Infrastructure.Migrations
+namespace BSOFT.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250520052919_removemiscdeptid")]
+    partial class removemiscdeptid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -802,10 +805,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("DepartmentGroupId")
-                        .HasColumnType("int")
-                        .HasColumnName("DepartmentGroupId");
-
                     b.Property<string>("DeptName")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -837,8 +836,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("ShortName");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DepartmentGroupId");
 
                     b.ToTable("Department", "AppData");
                 });
@@ -2563,17 +2560,6 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("Unit");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Department", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.DepartmentGroup", "DepartmentGroup")
-                        .WithMany("Departments")
-                        .HasForeignKey("DepartmentGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("DepartmentGroup");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.Division", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Company", "Company")
@@ -2934,11 +2920,6 @@ namespace UserManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.Department", b =>
                 {
                     b.Navigation("userDepartments");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.DepartmentGroup", b =>
-                {
-                    b.Navigation("Departments");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Division", b =>
