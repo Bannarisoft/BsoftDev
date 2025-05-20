@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Contracts.Interfaces.External.IUser;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using GrpcServices.UserManagement;
 using Microsoft.AspNetCore.Http;
 
-namespace MaintenanceManagement.Infrastructure.GrpcClients
+namespace FAM.Infrastructure.GrpcClients
 {
     public class UnitGrpcClient : IUnitGrpcClient
     {

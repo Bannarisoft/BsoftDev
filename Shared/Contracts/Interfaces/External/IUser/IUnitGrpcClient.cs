@@ -8,6 +8,6 @@ namespace Contracts.Interfaces.External.IUser
 {
     public interface IUnitGrpcClient
     {
-        Task<List<UnitDto>> GetUnitAutoCompleteAsync();
+        Task<List<UnitDto>> GetAllUnitAsync();
     }
 }

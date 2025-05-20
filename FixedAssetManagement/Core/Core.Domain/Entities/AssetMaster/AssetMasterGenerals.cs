@@ -34,6 +34,7 @@ namespace Core.Domain.Entities
         public string? AssetImage { get; set; }
         public byte ISDepreciated { get; set; }
         public byte IsTangible { get; set; }    
+        public string? AssetDocument { get; set; }
         public ICollection<AssetPurchaseDetails>? AssetPurchase { get; set; }     
 		public ICollection<AssetSpecifications>? AssetSpecification { get; set; }
 		public ICollection<AssetWarranties>? AssetWarranty { get; set; }
@@ -42,9 +43,7 @@ namespace Core.Domain.Entities
  		public ICollection<AssetAmc>? AssetAmc { get; set; }    
 		public  ICollection<AssetInsurance>? AssetInsurance { get; set; }
         public AssetDisposal? AssetDisposalMaster { get; set; } 
-
 		public ICollection<DepreciationDetails>? DepreciationDetails { get; set; }
-
         public ICollection<AssetTransferIssueDtl>? AssetTransferIssueMaster { get; set; } 
         public ICollection<AssetTransferReceiptDtl>? AssetTransferReceiptMaster { get; set; }
 

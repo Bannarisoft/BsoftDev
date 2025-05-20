@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.GrpcClients;
 using MaintenanceManagement.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Infrastructure.HttpClientPolly;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -23,18 +24,18 @@ namespace MaintenanceManagement.Infrastructure
                 options.Address = new Uri(userManagementUrl);
             })
             .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
-            .AddGrpcPolicies();
-            // .ConfigurePrimaryHttpMessageHandler(() =>
-            // {
-            //     return new HttpClientHandler
-            //     {
-            //         // ❗ Use only in development to ignore SSL validation
-            //         // In production, use a valid certificate
-            //         ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-            //     };
-            // })
-            // .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
-            // .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+            // .AddGrpcPolicies();
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                return new HttpClientHandler
+                {
+                    // ❗ Use only in development to ignore SSL validation
+                    // In production, use a valid certificate
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<IDepartmentGrpcClient, DepartmentGrpcClient>();
 
@@ -44,27 +45,33 @@ namespace MaintenanceManagement.Infrastructure
                 options.Address = new Uri(userManagementUrl);
             })
             .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
-            .AddGrpcPolicies();
-            // .ConfigurePrimaryHttpMessageHandler(() =>
-            // {
-            //     return new HttpClientHandler
-            //     {
-            //         ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-            //     };
-            // })
-            // .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
-            // .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+            // .AddGrpcPolicies();
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                return new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<IUserSessionGrpcClient, GrpcUserSessionClient>();
-            
-               // ✅ Register Session gRPC Client
+
+            // ✅ Register Unit gRPC Client
             services.AddGrpcClient<UnitService.UnitServiceClient>(options =>
             {
                 options.Address = new Uri(userManagementUrl);
             })
-            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
-            .AddGrpcPolicies();            
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
             services.AddScoped<IUnitGrpcClient, UnitGrpcClient>();
+
 
             return services;
         }

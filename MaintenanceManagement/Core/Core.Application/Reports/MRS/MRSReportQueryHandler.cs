@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.External.IUnit;
 using Core.Application.Common.Interfaces.IReports;
 using Core.Domain.Events;
 using MediatR;
@@ -15,14 +14,14 @@ namespace Core.Application.Reports.MRS
     {
         private readonly IReportRepository _repository;
         private readonly IMapper _mapper;
-        private readonly IUnitService _unitService;
+        // private readonly IUnitService _unitService;
         private readonly IMediator _mediator;
 
-        public MRSReportQueryHandler(IReportRepository repository, IMapper mapper, IUnitService unitService, IMediator mediator)
+        public MRSReportQueryHandler(IReportRepository repository, IMapper mapper, IMediator mediator)
         {
             _repository = repository;
             _mapper = mapper;
-            _unitService = unitService;
+            // _unitService = unitService;
             _mediator = mediator;
         }
 
