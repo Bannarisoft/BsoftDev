@@ -1,67 +1,51 @@
-/* using Contracts.Interfaces.External.IUser;
+
+using Contracts.Interfaces.External.IUser;
 using FAM.Infrastructure.GrpcClients;
-using GrpcServices.Maintenance;
 using GrpcServices.UserManagement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Infrastructure.HttpClientPolly;
- */
-// namespace FAM.Infrastructure
-// {
-//     public static class HttpClientInjection
-//     {
-       // public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
-        //{
 
-            // Register gRPC Client
-        /*     var userManagementUrl = configuration["GrpcSettings:UserManagementUrl"];
-            services.AddGrpcClient<DepartmentService.DepartmentServiceClient>(o =>
+namespace FAM.Infrastructure
+ {
+     public static class HttpClientInjection
+    {
+        private static readonly HttpClientHandler GrpcHttpHandler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        };
+        public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
+        {
+            var userManagementUrl = configuration["GrpcSettings:UserManagementUrl"];
+
+            // ✅ Register Department gRPC Client
+            services.AddGrpcClient<DepartmentService.DepartmentServiceClient>(options =>
             {
-                o.Address = new Uri(userManagementUrl); // 👈 UserManagement HTTPS URL
+                options.Address = new Uri(userManagementUrl);
             })
-            .ConfigurePrimaryHttpMessageHandler(() =>
-            {
-                // Optional: Customize the HTTP handler if needed
-                return new HttpClientHandler
-                {
-                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true // For localhost dev certificate
-                };
-            })
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())            // 👈 Retry Policy
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());  // 👈 Circuit Breaker Policy
+            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
+            .AddGrpcPolicies();        
+
             services.AddScoped<IDepartmentGrpcClient, DepartmentGrpcClient>();
-
-            services.AddGrpcClient<SessionService.SessionServiceClient>(o =>
+            // ✅ Register Session gRPC Client
+            services.AddGrpcClient<SessionService.SessionServiceClient>(options =>
             {
-                o.Address = new Uri(userManagementUrl); // ➔ UserManagement HTTPS URL
+                options.Address = new Uri(userManagementUrl);
             })
-             .ConfigurePrimaryHttpMessageHandler(() =>
-            {
-                // Optional: Customize the HTTP handler if needed
-                return new HttpClientHandler
-                {
-                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true // For localhost dev certificate
-                };
-            })
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())            // 👈 Retry Policy
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());  // 👈 Circuit Breaker Policy
+            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
+            .AddGrpcPolicies();
+         
             services.AddScoped<IUserSessionGrpcClient, GrpcUserSessionClient>();
-
-            // Named HttpClient with Polly policies
-            // UserSessionClient
-            // services.AddHttpClient("UserSessionClient", client =>
-            // {
-            //     client.BaseAddress = new Uri(configuration["HttpClientSettings:UserSessionService"]);
-            //     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-            // })
-
-            // .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
-            // .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
-            // // Manual registration of service that uses IHttpClientFactory
-            // services.AddScoped<IUserSessionService, UserSessionService>();
+            
+               // ✅ Register Session gRPC Client
+            services.AddGrpcClient<UnitService.UnitServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
+            .AddGrpcPolicies();            
+            services.AddScoped<IUnitGrpcClient, UnitGrpcClient>();
 
             return services;
         }
- */
-//     }
-// }
+    }
+}

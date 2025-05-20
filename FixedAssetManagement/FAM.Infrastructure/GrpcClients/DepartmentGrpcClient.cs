@@ -1,14 +1,17 @@
-/* using Grpc.Core;
-using GrpcServices.Maintenance;
+
+
+
 using Contracts.Interfaces.External.IUser;
 using Google.Protobuf.WellKnownTypes;
-using Microsoft.AspNetCore.Http; */
+using Grpc.Core;
+using GrpcServices.UserManagement;
+using Microsoft.AspNetCore.Http;
 
-// namespace FAM.Infrastructure.GrpcClients
-// {
-//     public class DepartmentGrpcClient //: IDepartmentGrpcClient
-//     {
-       /*  private readonly DepartmentService.DepartmentServiceClient _client;
+namespace FAM.Infrastructure.GrpcClients
+ {
+    public class DepartmentGrpcClient : IDepartmentGrpcClient
+    {
+        private readonly DepartmentService.DepartmentServiceClient _client;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public DepartmentGrpcClient(DepartmentService.DepartmentServiceClient client, IHttpContextAccessor httpContextAccessor)
@@ -17,7 +20,7 @@ using Microsoft.AspNetCore.Http; */
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<List<Contracts.Dtos.Maintenance.DepartmentDto>> GetAllDepartmentsAsync()
+        public async Task<List<Contracts.Dtos.Maintenance.DepartmentDto>> GetAllDepartmentAsync()
         {
             // ✅ Get token from current HTTP Context
             var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
@@ -26,20 +29,22 @@ using Microsoft.AspNetCore.Http; */
             {
                 throw new Exception("No Authorization token found in the current context.");
             }
-            // Ensure it has "Bearer " prefix
+            //  ✅ Ensure it has "Bearer " prefix
             if (!token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
+                
                 token = $"Bearer {token}";
             }
+
             var metadata = new Metadata
             {
                 { "Authorization", token }
             };
 
-            // ✅ Attach Authorization header
+            //  ✅ Attach Authorization header
             var callOptions = new CallOptions(metadata);
 
-            var response = await _client.GetAllDepartmentsAsync(new Empty(), callOptions);
+            var response = await _client.GetAllDepartmentAsync(new Empty(), callOptions);
 
             var departments = response.Departments
                 .Select(proto => new Contracts.Dtos.Maintenance.DepartmentDto
@@ -50,6 +55,6 @@ using Microsoft.AspNetCore.Http; */
                 }).ToList();
 
             return departments;
-        } */
-//     }
-// }
+        }   
+     }
+ }
