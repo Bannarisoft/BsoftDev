@@ -30,66 +30,6 @@ namespace Core.Application.CostCenter.Queries.GetCostCenter
             _unitGrpcClient = unitGrpcClient;
         }
 
-        // public async Task<ApiResponseDTO<List<CostCenterDto>>> Handle(GetCostCenterQuery request, CancellationToken cancellationToken)
-        // {
-        //       var (CostCenter, totalCount) = await _iCostCenterQueryRepository.GetAllCostCenterGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
-        //        var costCentersgrouplist = _mapper.Map<List<CostCenterDto>>(CostCenter);
-        //      // 🔥 Fetch departments using HttpClientFactory
-        //      var departments = await _departmentService.GetAllDepartmentAsync();
-        //      var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-        //      var costCentersgrouplistDictionary = new Dictionary<int, CostCenterDto>();
-
-        //       // 🔥 Map department names to CostCenter
-        //     foreach (var data in costCentersgrouplist)
-        //     {
-
-        //         if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-        //         {
-        //             data.DepartmentName = departmentName;
-        //         }
-
-        //         costCentersgrouplistDictionary[data.DepartmentId] = data;
-
-        //     }
-
-        //       // 🔥 Fetch UnitId using HttpClientFactory
-
-        //     var units= await _unitService.GetUnitAutoCompleteAsync();
-        //     var unitLookup = units.ToDictionary(d => d.UnitId, d => d.UnitName);
-        //     var costCentersunitDictionary = new Dictionary<int, CostCenterDto>();
-        //       // 🔥 Map Unit names to CostCenter
-        //     foreach (var data in costCentersgrouplist)
-        //     {
-
-        //         if (unitLookup.TryGetValue(data.UnitId, out var UnitName) && UnitName != null)
-        //         {
-        //             data.UnitName = UnitName;
-        //         }
-
-        //         costCentersunitDictionary[data.UnitId] = data;
-
-        //     }
-          
-        //      //Domain Event
-        //         var domainEvent = new AuditLogsDomainEvent(
-        //             actionDetail: "GetCostCenter",
-        //             actionCode: "Get",        
-        //             actionName: CostCenter.Count().ToString(),
-        //             details: $"CostCenter details was fetched.",
-        //             module:"CostCenter"
-        //         );
-        //         await _mediator.Publish(domainEvent, cancellationToken);
-        //     return new ApiResponseDTO<List<CostCenterDto>> 
-        //     { 
-        //         IsSuccess = true, 
-        //         Message = "Success", 
-        //         Data = costCentersgrouplist ,
-        //         TotalCount = totalCount,
-        //         PageNumber = request.PageNumber,
-        //         PageSize = request.PageSize
-        //         };
-        // }
-
         public async Task<ApiResponseDTO<List<CostCenterDto>>> Handle(GetCostCenterQuery request, CancellationToken cancellationToken)
         {
             var (costCenters, totalCount) = await _iCostCenterQueryRepository.GetAllCostCenterGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
