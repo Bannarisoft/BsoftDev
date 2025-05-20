@@ -4,10 +4,11 @@ using FAM.Infrastructure.GrpcClients;
 using GrpcServices.UserManagement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Infrastructure.HttpClientPolly;
 
 namespace FAM.Infrastructure
- {
-     public static class HttpClientInjection
+{
+    public static class HttpClientInjection
     {
         private static readonly HttpClientHandler GrpcHttpHandler = new HttpClientHandler
         {
@@ -23,7 +24,8 @@ namespace FAM.Infrastructure
                 options.Address = new Uri(userManagementUrl);
             })
             .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
-            .AddGrpcPolicies();        
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<IDepartmentGrpcClient, DepartmentGrpcClient>();
             // ✅ Register Session gRPC Client
@@ -32,17 +34,19 @@ namespace FAM.Infrastructure
                 options.Address = new Uri(userManagementUrl);
             })
             .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
-            .AddGrpcPolicies();
-         
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
             services.AddScoped<IUserSessionGrpcClient, GrpcUserSessionClient>();
-            
-               // ✅ Register Session gRPC Client
+
+            // ✅ Register Session gRPC Client
             services.AddGrpcClient<UnitService.UnitServiceClient>(options =>
             {
                 options.Address = new Uri(userManagementUrl);
             })
             .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
-            .AddGrpcPolicies();            
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
             services.AddScoped<IUnitGrpcClient, UnitGrpcClient>();
 
             return services;

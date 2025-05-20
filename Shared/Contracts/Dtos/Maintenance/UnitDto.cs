@@ -10,10 +10,9 @@ namespace Contracts.Dtos.Maintenance
     public class UnitDto
     {
         [JsonPropertyName("id")]
-        public int UnitId { get; set; }        
-        public string? UnitName { get; set; }
-        public string? ShortName { get; set; }
-        public string? UnitHeadName { get; set; }
-        public string? OldUnitId { get; set; }
+        public int UnitId { get; set; }
+        public string UnitName { get; set; }
+        public string ShortName { get; set; }
+        public string UnitHeadName { get; set; }
     }
 }

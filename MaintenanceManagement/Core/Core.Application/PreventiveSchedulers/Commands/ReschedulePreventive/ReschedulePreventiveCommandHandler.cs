@@ -28,14 +28,15 @@ namespace Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive
         public async Task<ApiResponseDTO<bool>> Handle(ReshedulePreventiveCommand request, CancellationToken cancellationToken)
         {
             var result = await _preventiveSchedulerQuery.ExistWorkOrderBySchedulerDetailId(request.PreventiveScheduleDetailId);
-            // if (result == true)
-            // {
-                var DetailResult = await _preventiveSchedulerCommand.UpdateRescheduleDate(request.PreventiveScheduleDetailId, request.RescheduleDate);
-            // }
-            // else
-            // { 
-
-            // }
+            bool  DetailResult;
+            if (result == true)
+            {
+                 DetailResult = await _preventiveSchedulerCommand.UpdateRescheduleDate(request.PreventiveScheduleDetailId, request.RescheduleDate);
+            }
+            else
+            {
+                 DetailResult = await _preventiveSchedulerCommand.AddReScheduleDetailAsync(request.PreventiveScheduleDetailId, request.RescheduleDate);
+            }
 
             if (DetailResult)
             {

@@ -1,7 +1,6 @@
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.ISubLocation;
 using Core.Domain.Events;
 using MediatR;
@@ -29,7 +28,7 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             var (sublocations, totalCount) = await _sublocationQueryRepository.GetAllSubLocationAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var sublocationList = _mapper.Map<List<SubLocationDto>>(sublocations);
 
-            // 🔥 Fetch departments using HttpClientFactory
+            // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var subLocationDictionary = new Dictionary<int, SubLocationDto>();
@@ -46,20 +45,6 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
                 subLocationDictionary[data.DepartmentId] = data;
 
             }
-
-            /*    // 🔥 Fetch departments using gRPC
-               var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
-               var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-
-               // 🔥 Map department names to sublocations
-               foreach (var sublocation in sublocationList)
-               {
-                   if (departmentLookup.TryGetValue(sublocation.DepartmentId, out var departmentName) && departmentName != null)
-                   {
-                       sublocation.DepartmentName = departmentName;
-                   }
-               }
-    */
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetSubLocations",

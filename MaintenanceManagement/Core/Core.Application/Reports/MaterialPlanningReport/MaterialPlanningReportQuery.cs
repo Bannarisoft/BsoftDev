@@ -11,9 +11,5 @@ namespace Core.Application.Reports.MaterialPlanningReport
     {
         public DateTime? FromDueDate { get; set; }
         public DateTime? ToDueDate { get; set; }
-        public string MaintenanceCategory { get; set; }
-        public string MachineName { get; set; }
-        public string Activity { get; set; }
-        public string MaterialCode { get; set; }
     }
 }

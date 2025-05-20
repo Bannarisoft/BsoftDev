@@ -12,7 +12,7 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
         public string? ActivityName { get; set;}
         public string? Description { get; set; }
         public int DepartmentId { get; set; }
-        public string? Department { get; set; }        
+        public string? DepartmentName { get; set; }        
         public int EstimatedDuration { get; set; }
         public int ActivityType { get; set; }
         public string? ActivityTypeDescription { get; set; }        

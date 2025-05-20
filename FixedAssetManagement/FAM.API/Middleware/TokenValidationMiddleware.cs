@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace FAM.API.Middleware
-{   
+{
     public class TokenValidationMiddleware
     {
         private readonly RequestDelegate _next;
@@ -22,7 +22,7 @@ namespace FAM.API.Middleware
             _timeZoneService = timeZoneService;
         }
 
-        public async Task Invoke(HttpContext context, IJwtTokenHelper jwtTokenHelper, IUserSessionService sessionService)
+        public async Task Invoke(HttpContext context, IJwtTokenHelper jwtTokenHelper, IUserSessionGrpcClient sessionService)
         {
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
             var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
