@@ -113,6 +113,17 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             await _applicationDbContext.SaveChangesAsync();
             return true;
         }
+        public async Task<bool> UpdateAssetDocumentAsync(int assetId, string imageName)
+        {
+            var asset = await _applicationDbContext.AssetMasterGenerals.FindAsync(assetId);
+            if (asset == null)
+            {
+                return false;  
+            }
+            asset.AssetDocument = imageName;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
         public async Task<AssetMasterGeneralDTO?> GetByAssetImageAsync(string assetCode)
         {
            /*  return await _applicationDbContext.AssetMasterGenerals
@@ -136,6 +147,18 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 return false;  // Asset not found
             }
             asset.AssetImage = null;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RemoveAssetDocumentReferenceAsync(string imageName)
+        {
+            var asset = await _applicationDbContext.AssetMasterGenerals.FirstOrDefaultAsync(x => x.AssetDocument == imageName);
+            if (asset == null)
+            {
+                return false;  // Asset not found
+            }
+            asset.AssetDocument = null;
             await _applicationDbContext.SaveChangesAsync();
             return true;
         }

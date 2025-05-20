@@ -538,6 +538,20 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             var unitName = (await multiQuery.ReadFirstOrDefaultAsync<string>())?.Trim();
 
             return (companyName, unitName);
-        }       
+        }
+
+        public async Task<string> GetDocumentDirectoryAsync()
+        {
+            const string query = @"
+            SELECT M.Description            
+            FROM FixedAsset.MiscMaster M
+            INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeId
+            WHERE (MiscTypeCode = @MiscTypeCode) 
+            AND  M.IsDeleted=0 and M.IsActive=1
+            ORDER BY M.ID DESC";    
+            var parameters = new { MiscTypeCode = MiscEnumEntity.AssetDocumentImage.MiscCode };        
+            var result = await _dbConnection.QueryAsync<string>(query,parameters);
+            return result.FirstOrDefault();  
+        }
     }
 }

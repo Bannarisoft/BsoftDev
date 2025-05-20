@@ -140,6 +140,10 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 .HasColumnName("AssetImage")
                 .HasColumnType("nvarchar(255)");
 
+                builder.Property(ca => ca.AssetDocument)
+                .HasColumnName("AssetDocument")
+                .HasColumnType("nvarchar(255)");
+                
                 builder.Property(b => b.IsActive)                
                 .HasColumnType("bit")
                 .HasConversion(statusConverter)
