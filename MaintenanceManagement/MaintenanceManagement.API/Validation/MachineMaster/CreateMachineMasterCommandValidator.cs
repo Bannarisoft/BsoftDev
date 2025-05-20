@@ -56,6 +56,9 @@ namespace MaintenanceManagement.API.Validation.MachineMaster
                         RuleFor(x => x.AssetId)
                              .NotEmpty()
                             .WithMessage($"{nameof(CreateMachineMasterCommand.AssetId)} {rule.Error} {0}"); 
+                         RuleFor(x => x.LineNo)
+                             .NotEmpty()
+                            .WithMessage($"{nameof(CreateMachineMasterCommand.LineNo)} {rule.Error} {0}"); 
                         RuleFor(x => x.InstallationDate)
                              .NotEmpty()
                             .WithMessage($"{nameof(CreateMachineMasterCommand.InstallationDate)} {rule.Error} {0}"); 
@@ -83,6 +86,9 @@ namespace MaintenanceManagement.API.Validation.MachineMaster
                         RuleFor(x => x.AssetId)
                             .GreaterThanOrEqualTo(1)
                             .WithMessage($"{nameof(CreateMachineMasterCommand.AssetId)} {rule.Error} {0}"); 
+                        RuleFor(x => x.LineNo)
+                            .GreaterThanOrEqualTo(1)
+                            .WithMessage($"{nameof(CreateMachineMasterCommand.LineNo)} {rule.Error} {0}"); 
                         break;
                     case "MaxLength":
                         RuleFor(x => x.MachineCode)

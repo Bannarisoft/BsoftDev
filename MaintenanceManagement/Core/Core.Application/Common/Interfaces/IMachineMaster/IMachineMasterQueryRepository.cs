@@ -8,9 +8,11 @@ namespace Core.Application.Common.Interfaces.IMachineMaster
     public interface IMachineMasterQueryRepository
     {
         Task<Core.Domain.Entities.MachineMaster?> GetByIdAsync(int Id);
-        Task<(List<Core.Domain.Entities.MachineMaster>,int)> GetAllMachineAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<(List<Core.Domain.Entities.MachineMaster>, int)> GetAllMachineAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<List<Core.Domain.Entities.MachineMaster>> GetMachineAsync(string searchPattern);
         Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroupAsync(int MachineGroupId);
         // Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroup(int MachineGroupId);
+        Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroupSagaAsync(int MachineGroupId, int UnitId);
+        Task<List<Core.Domain.Entities.MiscMaster>> GetMachineLineNoAsync(); 
     }
 }

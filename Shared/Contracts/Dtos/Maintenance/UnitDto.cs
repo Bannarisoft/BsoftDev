@@ -11,8 +11,8 @@ namespace Contracts.Dtos.Maintenance
     {
         [JsonPropertyName("id")]
         public int UnitId { get; set; }
-        [JsonPropertyName("unitName")]
-        public string? UnitName { get; set; }
-        public string? ShortName { get; set; }
+        public string UnitName { get; set; }
+        public string ShortName { get; set; }
+        public string UnitHeadName { get; set; }
     }
 }
