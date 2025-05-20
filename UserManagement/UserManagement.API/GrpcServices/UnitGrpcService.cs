@@ -15,7 +15,7 @@ public class UnitGrpcService : UnitService.UnitServiceBase
         _unitRepository = unitRepository;
     }
 
-    public override async Task<UnitListResponse> GetAllUnit(Empty request, ServerCallContext context)
+     public override async Task<UnitListResponse> GetAllUnit(Empty request, ServerCallContext context)
     {
         var (units, _) = await _unitRepository.GetAllUnitsAsync(1, 100, null);
 

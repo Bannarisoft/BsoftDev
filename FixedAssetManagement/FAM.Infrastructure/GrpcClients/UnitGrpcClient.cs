@@ -1,10 +1,11 @@
- using Grpc.Core;
-using Microsoft.AspNetCore.Http;
- using Contracts.Interfaces.External.IUser;
-using GrpcServices.UserManagement;
-using Google.Protobuf.WellKnownTypes;
 
-namespace MaintenanceManagement.Infrastructure.GrpcClients
+using Contracts.Interfaces.External.IUser;
+using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
+using GrpcServices.UserManagement;
+using Microsoft.AspNetCore.Http;
+
+namespace FAM.Infrastructure.GrpcClients
 {
     public class UnitGrpcClient : IUnitGrpcClient
         {

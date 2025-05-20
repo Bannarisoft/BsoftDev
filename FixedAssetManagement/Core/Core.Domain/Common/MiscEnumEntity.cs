@@ -72,7 +72,10 @@ namespace Core.Domain.Common
         {
         public const string MiscCode = "ASSETWARRANTYIMAGE";
         }
-
+        public static class  AssetDocumentImage
+        {
+        public const string MiscCode = "ASSETDocument";
+        }
         
 
     }
