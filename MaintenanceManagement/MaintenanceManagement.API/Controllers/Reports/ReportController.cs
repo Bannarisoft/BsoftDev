@@ -9,6 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Core.Application.Reports.MRS;
 using Core.Application.Reports.ScheduleReport;
+using Core.Application.Reports.MaterialPlanningReport;
 
 namespace MaintenanceManagement.API.Controllers.Reports
 {
@@ -333,15 +334,15 @@ namespace MaintenanceManagement.API.Controllers.Reports
                 data = workOrder.Data?.ToList()
             });
         }
-        
-         [HttpGet("SchedulerReport")]
+
+        [HttpGet("SchedulerReport")]
         public async Task<IActionResult> SchedulerReportAsync(
-                [FromQuery] string? MachineDepartment,
-                [FromQuery] string? MachineGroup,
-                [FromQuery] string? MaintenanceCategory,
-                [FromQuery] string? Activity,
-                [FromQuery] string? ActivityType
-                )
+               [FromQuery] string? MachineDepartment,
+               [FromQuery] string? MachineGroup,
+               [FromQuery] string? MaintenanceCategory,
+               [FromQuery] string? Activity,
+               [FromQuery] string? ActivityType
+               )
         {
             var query = new ScheduleReportQuery
             {
@@ -360,6 +361,44 @@ namespace MaintenanceManagement.API.Controllers.Reports
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                     Message = result?.Message ?? "No Scheduler records found."
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = result.Message,
+                Data = result?.Data
+            });
+        }
+           [HttpGet("MaterialPlanningReport")]
+        public async Task<IActionResult> MaterialPlanningReportAsync(
+                [FromQuery] DateTime? FromDueDate,
+                [FromQuery] DateTime? ToDueDate,
+                [FromQuery] string? MaintenanceCategory,
+                [FromQuery] string? MachineName,
+                [FromQuery] string? Activity,
+                [FromQuery] string? MaterialCode
+                )
+        {
+            var query = new MaterialPlanningReportQuery
+            {
+                FromDueDate = FromDueDate,
+                ToDueDate = ToDueDate,
+                MaintenanceCategory = MaintenanceCategory,
+                MachineName = MachineName,
+                Activity = Activity,
+                MaterialCode = MaterialCode
+            };
+
+            var result = await Mediator.Send(query);
+
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = result?.Message ?? "No Material Planning Report records found."
                 });
             }
 
