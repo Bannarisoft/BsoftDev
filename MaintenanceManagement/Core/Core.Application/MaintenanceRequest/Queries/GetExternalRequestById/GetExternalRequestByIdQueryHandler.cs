@@ -24,57 +24,53 @@ namespace Core.Application.MaintenanceRequest.Queries.GetExternalRequestById
             _mediator = mediator;
             _departmentGrpcClient = departmentService;
         }
+        public async Task<ApiResponseDTO<List<GetExternalRequestByIdDto>>> Handle(GetExternalRequestsByIdsQuery request, CancellationToken cancellationToken)
+        {
 
-      
-
-                    public async Task<ApiResponseDTO<List<GetExternalRequestByIdDto>>> Handle(GetExternalRequestsByIdsQuery request, CancellationToken cancellationToken)
+            if (request.Ids == null || !request.Ids.Any())
             {
-
-
-                if (request.Ids == null || !request.Ids.Any())
-                {
-                    return new ApiResponseDTO<List<GetExternalRequestByIdDto>>
-                    {
-                        IsSuccess = false,
-                        Message = "No IDs provided.",
-                        Data = new List<GetExternalRequestByIdDto>()
-                    };
-                }
-
-                var externalRequests = await _maintenanceRequestQueryRepository.GetExternalRequestByIdAsync(request.Ids);
-
-                     // Fetch departments and build lookup
-                    var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-                    var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-
-                    // Assign department names to each external request
-                    foreach (var requestDto in externalRequests)
-                    {
-                        if (requestDto.DepartmentId != 0 && departmentLookup.TryGetValue(requestDto.DepartmentId, out var deptName))
-                        {
-                            requestDto.DepartmentName = deptName;
-                        }
-                    }
-
-
-                if (!externalRequests.Any())
-                {
-                    return new ApiResponseDTO<List<GetExternalRequestByIdDto>>
-                    {
-                        IsSuccess = false,
-                        Message = "No external requests found for the provided IDs.",
-                        Data = new List<GetExternalRequestByIdDto>()
-                    };
-                }
-
                 return new ApiResponseDTO<List<GetExternalRequestByIdDto>>
                 {
-                    IsSuccess = true,
-                    Message = "External requests fetched successfully.",
-                    Data = externalRequests
+                    IsSuccess = false,
+                    Message = "No IDs provided.",
+                    Data = new List<GetExternalRequestByIdDto>()
                 };
             }
 
-        
+            var externalRequests = await _maintenanceRequestQueryRepository.GetExternalRequestByIdAsync(request.Ids);
+
+            // 🔥 Fetch departments using gRPC
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            // 🔥 Map department names to each external request
+            foreach (var requestDto in externalRequests)
+            {
+                if (requestDto.DepartmentId != 0 && departmentLookup.TryGetValue(requestDto.DepartmentId, out var deptName))
+                {
+                    requestDto.DepartmentName = deptName;
+                }
+            }
+
+
+            if (!externalRequests.Any())
+            {
+                return new ApiResponseDTO<List<GetExternalRequestByIdDto>>
+                {
+                    IsSuccess = false,
+                    Message = "No external requests found for the provided IDs.",
+                    Data = new List<GetExternalRequestByIdDto>()
+                };
+            }
+
+            return new ApiResponseDTO<List<GetExternalRequestByIdDto>>
+            {
+                IsSuccess = true,
+                Message = "External requests fetched successfully.",
+                Data = externalRequests
+            };
+        }
+
+
     }
 }

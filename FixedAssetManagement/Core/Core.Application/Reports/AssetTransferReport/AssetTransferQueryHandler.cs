@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IReports;
 using Core.Domain.Events;
@@ -14,15 +15,15 @@ namespace Core.Application.Reports.AssetTransferReport
     {
         private readonly IReportRepository _repository;
         private readonly IMapper _mapper;
-        private readonly IDepartmentService _departmentService;
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;
         private readonly IMediator _mediator;
 
-        public AssetTransferQueryHandler(IReportRepository repository, IMapper mapper, IDepartmentService departmentService, IMediator mediator)
+        public AssetTransferQueryHandler(IReportRepository repository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
         {
             _repository = repository;
             _mapper = mapper;
-            _departmentService = departmentService;
             _mediator = mediator;
+            _departmentGrpcClient = departmentGrpcClient;
         }
 
         public async Task<ApiResponseDTO<List<AssetTransferDetailsDto>>> Handle(AssetTransferQuery request, CancellationToken cancellationToken)
@@ -36,7 +37,7 @@ namespace Core.Application.Reports.AssetTransferReport
             // Map to DTOs
             var assetTransfersReportDtos = _mapper.Map<List<AssetTransferDetailsDto>>(assetTransfersReports);
                 // 🔥 Fetch departments using HttpClientFactory
-            var departments = await _departmentService.GetAllDepartmentAsync();
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var assetTransferDictionary = new Dictionary<int, AssetTransferDetailsDto>();
 
@@ -50,19 +51,7 @@ namespace Core.Application.Reports.AssetTransferReport
                     assetTransferDictionary[data.FromDepartmentId] = data;
 
             }
-              // 🔥 Map department names to AssetTransferData
-            foreach (var data in assetTransfersReportDtos)
-            {
-                if (departmentLookup.TryGetValue(data.ToDepartmentId, out var departmentName) && departmentName != null)
-                {
-                    data.ToDepartmentName = departmentName;
-                }
-                    assetTransferDictionary[data.ToDepartmentId] = data;
 
-            }
-
-
-        
             // Log audit
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetAssetTransferReport",

@@ -11,33 +11,33 @@ using MediatR;
 
 namespace Core.Application.WorkCenter.Queries.GetWorkCenter
 {
-    public class GetWorkCenterQueryHandler : IRequestHandler<GetWorkCenterQuery,ApiResponseDTO<List<WorkCenterDto>>>
+    public class GetWorkCenterQueryHandler : IRequestHandler<GetWorkCenterQuery, ApiResponseDTO<List<WorkCenterDto>>>
     {
-        private readonly IWorkCenterQueryRepository _iWorkCenterQueryRepository;        
+        private readonly IWorkCenterQueryRepository _iWorkCenterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        // private readonly IUnitGrpcClient _unitGrpcClient;
+        private readonly IUnitGrpcClient _unitGrpcClient;
 
-        public GetWorkCenterQueryHandler(IWorkCenterQueryRepository iWorkCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService)
+        public GetWorkCenterQueryHandler(IWorkCenterQueryRepository iWorkCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService, IUnitGrpcClient unitGrpcClient)
         {
-            _iWorkCenterQueryRepository = iWorkCenterQueryRepository;            
+            _iWorkCenterQueryRepository = iWorkCenterQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
             _departmentGrpcClient = departmentService;
-            // _unitGrpcClient = unitGrpcClient;
+            _unitGrpcClient = unitGrpcClient;
         }
 
         public async Task<ApiResponseDTO<List<WorkCenterDto>>> Handle(GetWorkCenterQuery request, CancellationToken cancellationToken)
         {
-             var (WorkCenter, totalCount) = await _iWorkCenterQueryRepository.GetAllWorkCenterGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
-             var workCentersgrouplist = _mapper.Map<List<WorkCenterDto>>(WorkCenter);
-               // 🔥 Fetch lookups
+            var (WorkCenter, totalCount) = await _iWorkCenterQueryRepository.GetAllWorkCenterGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+            var workCentersgrouplist = _mapper.Map<List<WorkCenterDto>>(WorkCenter);
+            // 🔥 Fetch lookups
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-            // var units = await _unitGrpcClient.GetUnitAutoCompleteAsync();
+            var units = await _unitGrpcClient.GetAllUnitAsync();
 
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-            // var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
             // 🔁 Set DepartmentName and UnitName in one loop
             foreach (var dto in workCentersgrouplist)
@@ -45,28 +45,28 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
                 if (departmentLookup.TryGetValue(dto.DepartmentId, out var deptName))
                     dto.DepartmentName = deptName;
 
-                // if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
-                //     dto.UnitName = unitName;
+                if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
+                    dto.UnitName = unitName;
             }
 
-             //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetWorkCenter",
-                    actionCode: "Get",        
-                    actionName: WorkCenter.Count().ToString(),
-                    details: $"WorkCenter details was fetched.",
-                    module:"WorkCenter"
-                );
-                await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<WorkCenterDto>> 
-            { 
-                IsSuccess = true, 
-                Message = "Success", 
-                Data = workCentersgrouplist ,
+            //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "GetWorkCenter",
+                actionCode: "Get",
+                actionName: WorkCenter.Count().ToString(),
+                details: $"WorkCenter details was fetched.",
+                module: "WorkCenter"
+            );
+            await _mediator.Publish(domainEvent, cancellationToken);
+            return new ApiResponseDTO<List<WorkCenterDto>>
+            {
+                IsSuccess = true,
+                Message = "Success",
+                Data = workCentersgrouplist,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
-                };
+            };
         }
 
     }
