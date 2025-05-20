@@ -59,39 +59,46 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             return await _applicationDbContext.MachineMaster
                 .AnyAsync(cc => cc.MachineName == name && cc.Id != excludeId);
         }
+        public async Task<bool> IsCodeDuplicateAsync(string? code, int excludeId)
+        {
+            return await _applicationDbContext.MachineMaster
+            .AnyAsync(cc => cc.MachineCode == code && cc.Id != excludeId);
+        }
 
         public async Task<int> UpdateAsync(int Id, Core.Domain.Entities.MachineMaster machineMaster)
         {
-           var existingmachinemaster = await _applicationDbContext.MachineMaster.FirstOrDefaultAsync(u => u.Id == Id);
+            var existingmachinemaster = await _applicationDbContext.MachineMaster.FirstOrDefaultAsync(u => u.Id == Id);
 
-        // If the MaintenanceType does not exist
-        if (existingmachinemaster is null)
-        {
-            return -1; //indicate failure
-        }
+            // If the MaintenanceType does not exist
+            if (existingmachinemaster is null)
+            {
+                return -1; //indicate failure
+            }
 
-        // Update the existing MaintenanceType properties
-        existingmachinemaster.MachineName = machineMaster.MachineName;
-        existingmachinemaster.MachineGroupId = machineMaster.MachineGroupId;
-        existingmachinemaster.UnitId = machineMaster.UnitId;
-        existingmachinemaster.DepartmentId = machineMaster.DepartmentId;
-        existingmachinemaster.ProductionCapacity = machineMaster.ProductionCapacity;
-        existingmachinemaster.UomId = machineMaster.UomId;
-        existingmachinemaster.ShiftMasterId = machineMaster.ShiftMasterId;
-        existingmachinemaster.CostCenterId = machineMaster.CostCenterId;
-        existingmachinemaster.WorkCenterId = machineMaster.WorkCenterId;
-        existingmachinemaster.InstallationDate = machineMaster.InstallationDate;
-        existingmachinemaster.AssetId = machineMaster.AssetId;
-        existingmachinemaster.IsActive=machineMaster.IsActive;
+            // Update the existing MaintenanceType properties
+            existingmachinemaster.MachineCode = machineMaster.MachineCode;
+            existingmachinemaster.MachineName = machineMaster.MachineName;
+            existingmachinemaster.MachineGroupId = machineMaster.MachineGroupId;
+            existingmachinemaster.UnitId = machineMaster.UnitId;
+            existingmachinemaster.DepartmentId = machineMaster.DepartmentId;
+            existingmachinemaster.ProductionCapacity = machineMaster.ProductionCapacity;
+            existingmachinemaster.UomId = machineMaster.UomId;
+            existingmachinemaster.ShiftMasterId = machineMaster.ShiftMasterId;
+            existingmachinemaster.CostCenterId = machineMaster.CostCenterId;
+            existingmachinemaster.WorkCenterId = machineMaster.WorkCenterId;
+            existingmachinemaster.InstallationDate = machineMaster.InstallationDate;
+            existingmachinemaster.AssetId = machineMaster.AssetId;
+            existingmachinemaster.LineNo = machineMaster.LineNo;
+            existingmachinemaster.IsActive = machineMaster.IsActive;
 
 
-        // Mark the entity as modified
-        _applicationDbContext.MachineMaster.Update(existingmachinemaster);
+            // Mark the entity as modified
+            _applicationDbContext.MachineMaster.Update(existingmachinemaster);
 
-        // Save changes to the database
-        await _applicationDbContext.SaveChangesAsync();
+            // Save changes to the database
+            await _applicationDbContext.SaveChangesAsync();
 
-        return 1; // Indicate success
+            return 1; // Indicate success
         }
     }
 }

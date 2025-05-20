@@ -54,6 +54,9 @@ namespace MaintenanceManagement.API.Validation.MachineMaster
                         RuleFor(x => x.AssetId)
                              .NotEmpty()
                             .WithMessage($"{nameof(UpdateMachineMasterCommand.AssetId)} {rule.Error} {0}"); 
+                        RuleFor(x => x.LineNo)
+                             .NotEmpty()
+                            .WithMessage($"{nameof(UpdateMachineMasterCommand.LineNo)} {rule.Error} {0}"); 
                         RuleFor(x => x.InstallationDate)
                              .NotEmpty()
                             .WithMessage($"{nameof(UpdateMachineMasterCommand.InstallationDate)} {rule.Error} {0}"); 
@@ -80,6 +83,9 @@ namespace MaintenanceManagement.API.Validation.MachineMaster
                         RuleFor(x => x.AssetId)
                             .GreaterThanOrEqualTo(1)
                             .WithMessage($"{nameof(UpdateMachineMasterCommand.AssetId)} {rule.Error} {0}"); 
+                          RuleFor(x => x.LineNo)
+                            .GreaterThanOrEqualTo(1)
+                            .WithMessage($"{nameof(UpdateMachineMasterCommand.AssetId)} {rule.Error} {0}"); 
                         break;
                     case "MaxLength":
                          RuleFor(x => x.MachineName)
@@ -96,6 +102,12 @@ namespace MaintenanceManagement.API.Validation.MachineMaster
                             .MustAsync(async (x, MachineName, cancellation) => 
                                 !await _iMachineMasterCommandRepository.IsNameDuplicateAsync(MachineName, x.Id))
                             .WithName("MachineName")
+                            .WithMessage($"{rule.Error}");
+                            
+                        RuleFor(x => x.MachineCode)
+                            .MustAsync(async (x, machineCode, cancellation) =>
+                                !await _iMachineMasterCommandRepository.IsCodeDuplicateAsync(machineCode, x.Id))
+                            .WithName("MachineCode")
                             .WithMessage($"{rule.Error}");
                         break;
                       case "RecordNotFound":
