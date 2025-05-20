@@ -56,6 +56,10 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnName("RescheduleReason")
                 .HasColumnType("nvarchar(max)");
 
+            builder.Property(t => t.LastMaintenanceActivityDate)
+                .HasColumnName("LastMaintenanceActivityDate")
+                .HasColumnType("date");
+
                    builder.Property(cf => cf.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
