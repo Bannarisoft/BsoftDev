@@ -44,7 +44,7 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
 builder.Services.AddHttpClients(builder.Configuration);
-builder.Services.AddHttpClientsFactory(builder.Configuration);
+// builder.Services.AddHttpClientsFactory(builder.Configuration);
 builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
 builder.Services.AddHttpContextAccessor();
@@ -64,7 +64,8 @@ app.UseDeveloperExceptionPage();
 //}
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
-app.UseCors();// Enable CORS
+app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();

@@ -4,7 +4,6 @@ using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Domain.Events;
 using MediatR;
 using Contracts.Interfaces.External.IUser;
-using Core.Application.Common.Interfaces.External.IDepartment;
 
 namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
 {

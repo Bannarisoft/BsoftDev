@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.External.IDepartment;
-using Core.Application.Common.Interfaces.External.IUnit;
 using Core.Application.Common.Interfaces.IReports;
 using MediatR;
 
@@ -18,13 +16,12 @@ namespace Core.Application.Reports.WorkOderCheckListReport
         private readonly IReportRepository _workOrderCheckListQueryRepository;
         private readonly IMapper _mapper;
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        private readonly IUnitGrpcClient _unitGrpcClient;
+        // private readonly IUnitGrpcClient _unitGrpcClient;
 
-        public WorkOderCheckListReportQueryHandler(IReportRepository workOrderCheckListQueryRepository, IMapper mapper, IUnitGrpcClient unitGrpcClient, IDepartmentGrpcClient departmentService)
+        public WorkOderCheckListReportQueryHandler(IReportRepository workOrderCheckListQueryRepository, IMapper mapper,  IDepartmentGrpcClient departmentService)
         {
             _workOrderCheckListQueryRepository = workOrderCheckListQueryRepository;
             _mapper = mapper;
-            _unitGrpcClient = unitGrpcClient;
             _departmentGrpcClient = departmentService;
         }
         
@@ -44,9 +41,9 @@ namespace Core.Application.Reports.WorkOderCheckListReport
 
             // Step 3: Fetch department and unit data
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-            var units = await _unitGrpcClient.GetUnitAutoCompleteAsync();
+            // var units = await _unitGrpcClient.GetUnitAutoCompleteAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+            // var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
            
             // Step 4: Assign DepartmentName and UnitName to each DTO
             foreach (var dto in requestReportDtos)
@@ -55,10 +52,10 @@ namespace Core.Application.Reports.WorkOderCheckListReport
                 // {
                 //     dto.Department = departmentName;
                 // }
-                if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
-                {
-                    dto.UnitName = unitName;
-                }
+                // if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
+                // {
+                //     dto.UnitName = unitName;
+                // }
             }
             return new ApiResponseDTO<List<WorkOderCheckListReportDto>>
             {

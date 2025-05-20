@@ -1,6 +1,5 @@
 using System.Net.Http.Headers;
 using Contracts.Interfaces.External.IUser;
-using Core.Application.Common.Interfaces.External.IDepartment;
 using FAM.Infrastructure.HttpClients.Departments;
 using FAM.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;

@@ -1,7 +1,6 @@
 using System.Net.Http.Json;
 using Contracts.Dtos.Maintenance;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.External.IDepartment;
 
 
 namespace FAM.Infrastructure.HttpClients.Departments

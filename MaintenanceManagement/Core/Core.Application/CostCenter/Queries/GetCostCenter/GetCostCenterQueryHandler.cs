@@ -5,25 +5,24 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.External.IDepartment;
-using Core.Application.Common.Interfaces.External.IUnit;
 using Core.Application.Common.Interfaces.ICostCenter;
 using Core.Domain.Events;
 using MediatR;
 
 namespace Core.Application.CostCenter.Queries.GetCostCenter
 {
-    public class GetCostCenterQueryHandler : IRequestHandler<GetCostCenterQuery,ApiResponseDTO<List<CostCenterDto>>>
+    public class GetCostCenterQueryHandler : IRequestHandler<GetCostCenterQuery, ApiResponseDTO<List<CostCenterDto>>>
     {
-        private readonly ICostCenterQueryRepository _iCostCenterQueryRepository;        
+        private readonly ICostCenterQueryRepository _iCostCenterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        private readonly IUnitGrpcClient _unitGrpcClient;
+        private readonly IUnitGrpcClient _unitGrpcClient; // 👈 gRPC Inject here
+
 
         public GetCostCenterQueryHandler(ICostCenterQueryRepository iCostCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService, IUnitGrpcClient unitGrpcClient)
         {
-            _iCostCenterQueryRepository = iCostCenterQueryRepository;            
+            _iCostCenterQueryRepository = iCostCenterQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
             _departmentGrpcClient = departmentService;
@@ -37,7 +36,7 @@ namespace Core.Application.CostCenter.Queries.GetCostCenter
 
             // 🔥 Fetch lookups
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-            var units = await _unitGrpcClient.GetUnitAutoCompleteAsync();
+            var units = await _unitGrpcClient.GetAllUnitAsync();
 
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
@@ -74,7 +73,7 @@ namespace Core.Application.CostCenter.Queries.GetCostCenter
             };
         }
 
-        
+
 
     }
 }

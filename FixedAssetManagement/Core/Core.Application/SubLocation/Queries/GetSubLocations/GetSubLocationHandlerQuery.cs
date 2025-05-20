@@ -1,7 +1,6 @@
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.ISubLocation;
 using Core.Domain.Events;
 using MediatR;

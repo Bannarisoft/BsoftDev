@@ -7,9 +7,10 @@ namespace MaintenanceManagement.API.Configurations
         {
             services.AddCors(options =>
             {
-                options.AddDefaultPolicy(policy =>
+                options.AddPolicy("AllowAll", builder =>
                 {
-                    policy.AllowAnyOrigin()
+                    builder
+                        .AllowAnyOrigin() // In production: replace with .WithOrigins("https://your-frontend.com")
                         .AllowAnyMethod()
                         .AllowAnyHeader();
                 });
