@@ -12,23 +12,23 @@ using MediatR;
 
 namespace Core.Application.CostCenter.Queries.GetCostCenterById
 {
-    public class GetCostCenterByIdQueryHandler : IRequestHandler<GetCostCenterByIdQuery,ApiResponseDTO<CostCenterDto>>
+    public class GetCostCenterByIdQueryHandler : IRequestHandler<GetCostCenterByIdQuery, ApiResponseDTO<CostCenterDto>>
     {
-        
-        private readonly ICostCenterQueryRepository _iCostCenterQueryRepository;        
+
+        private readonly ICostCenterQueryRepository _iCostCenterQueryRepository;
         private readonly IMapper _mapper;
-        private readonly IMediator _mediator;        
+        private readonly IMediator _mediator;
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        // private readonly IUnitGrpcClient _unitGrpcClient;
+        private readonly IUnitGrpcClient _unitGrpcClient;
 
 
-        public GetCostCenterByIdQueryHandler(ICostCenterQueryRepository iCostCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService)
+        public GetCostCenterByIdQueryHandler(ICostCenterQueryRepository iCostCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService, IUnitGrpcClient unitGrpcClient)
         {
-            _iCostCenterQueryRepository = iCostCenterQueryRepository;            
+            _iCostCenterQueryRepository = iCostCenterQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
             _departmentGrpcClient = departmentService;
-            // _unitGrpcClient = unitGrpcClient;
+            _unitGrpcClient = unitGrpcClient;
         }
 
         public async Task<ApiResponseDTO<CostCenterDto>> Handle(GetCostCenterByIdQuery request, CancellationToken cancellationToken)
@@ -37,34 +37,34 @@ namespace Core.Application.CostCenter.Queries.GetCostCenterById
             // Check if the entity exists
             if (result is null)
             {
-                return new ApiResponseDTO<CostCenterDto> { IsSuccess = false, Message =$"CostCenter ID {request.Id} not found." };
+                return new ApiResponseDTO<CostCenterDto> { IsSuccess = false, Message = $"CostCenter ID {request.Id} not found." };
             }
             // Map a single entity
             var costCenter = _mapper.Map<CostCenterDto>(result);
-          
-          
-             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-            //  var units = await _unitGrpcClient.GetUnitAutoCompleteAsync();
-             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-            //  var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
-        //    if ((departmentLookup.TryGetValue(costCenter.DepartmentId, out var departmentName) && departmentName != null) |
-        //         (unitLookup.TryGetValue(costCenter.UnitId, out var unitName) && unitName != null))
-        //     {
-        //         costCenter.DepartmentName = departmentName;
-        //         costCenter.UnitName = unitName;
-        //     }
 
-          //Domain Event
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetById",
-                    actionCode: "GetCostCenterByIdQuery",        
-                    actionName: costCenter.Id.ToString(),
-                    details: $"CostCenter details {costCenter.Id} was fetched.",
-                    module:"CostCenter"
-                );
-                await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<CostCenterDto> { IsSuccess = true, Message = "Success", Data = costCenter };
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            var units = await _unitGrpcClient.GetAllUnitAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+            if ((departmentLookup.TryGetValue(costCenter.DepartmentId, out var departmentName) && departmentName != null) |
+                 (unitLookup.TryGetValue(costCenter.UnitId, out var unitName) && unitName != null))
+            {
+                costCenter.DepartmentName = departmentName;
+                costCenter.UnitName = unitName;
+            }
+
+            //Domain Event
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "GetById",
+                actionCode: "GetCostCenterByIdQuery",
+                actionName: costCenter.Id.ToString(),
+                details: $"CostCenter details {costCenter.Id} was fetched.",
+                module: "CostCenter"
+            );
+            await _mediator.Publish(domainEvent, cancellationToken);
+            return new ApiResponseDTO<CostCenterDto> { IsSuccess = true, Message = "Success", Data = costCenter };
         }
 
     }
