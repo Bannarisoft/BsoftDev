@@ -8,6 +8,7 @@ using MaintenanceManagement.API.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Core.Application.Reports.MRS;
+using Core.Application.Reports.ScheduleReport;
 
 namespace MaintenanceManagement.API.Controllers.Reports
 {
@@ -285,12 +286,12 @@ namespace MaintenanceManagement.API.Controllers.Reports
                 Data = result?.Data ?? new List<WorkOderCheckListReportDto>()
             });
         }
-            
-         [HttpGet("MRSReport")]
+
+        [HttpGet("MRSReport")]
         public async Task<IActionResult> GetMRSReport(
-            [FromQuery] string? fromDate,
-            [FromQuery] string? toDate,
-            [FromQuery] string? OldUnitCode)
+           [FromQuery] string? fromDate,
+           [FromQuery] string? toDate,
+           [FromQuery] string? OldUnitCode)
         {
             DateTimeOffset? parsedFromDate = null;
             DateTimeOffset? parsedToDate = null;
@@ -330,6 +331,43 @@ namespace MaintenanceManagement.API.Controllers.Reports
                 StatusCode = StatusCodes.Status200OK,
                 message = workOrder.Message,
                 data = workOrder.Data?.ToList()
+            });
+        }
+        
+         [HttpGet("SchedulerReport")]
+        public async Task<IActionResult> SchedulerReportAsync(
+                [FromQuery] string? MachineDepartment,
+                [FromQuery] string? MachineGroup,
+                [FromQuery] string? MaintenanceCategory,
+                [FromQuery] string? Activity,
+                [FromQuery] string? ActivityType
+                )
+        {
+            var query = new ScheduleReportQuery
+            {
+                MachineDepartment = MachineDepartment,
+                MachineGroup = MachineGroup,
+                MaintenanceCategory = MaintenanceCategory,
+                Activity = Activity,
+                ActivityType = ActivityType
+            };
+
+            var result = await Mediator.Send(query);
+
+            if (result == null || result.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = result?.Message ?? "No Scheduler records found."
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = result.Message,
+                Data = result?.Data
             });
         }
     }

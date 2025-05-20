@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
@@ -16,14 +17,13 @@ namespace Core.Application.MaintenanceRequest.Queries.GetExternalRequestById
         private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-
-        private readonly IDepartmentService _departmentService;
-        public GetExternalRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator, IDepartmentService departmentService)
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        public GetExternalRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService)
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentService = departmentService;
+            _departmentGrpcClient = departmentService;
         }
 
       
@@ -45,7 +45,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetExternalRequestById
                 var externalRequests = await _maintenanceRequestQueryRepository.GetExternalRequestByIdAsync(request.Ids);
 
                      // Fetch departments and build lookup
-                    var departments = await _departmentService.GetAllDepartmentAsync();
+                    var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
                     var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
                     // Assign department names to each external request

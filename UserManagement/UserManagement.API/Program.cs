@@ -73,6 +73,7 @@ app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddle
 app.UseAuthorization();
 app.MapGrpcService<DepartmentGrpcService>();
 app.MapGrpcService<SessionGrpcService>();
+app.MapGrpcService<UnitGrpcService>();
 app.MapControllers();
 //app.ConfigureHangfireDashboard();
 app.Run();

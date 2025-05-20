@@ -1,4 +1,5 @@
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.External.IUnit;
@@ -13,15 +14,15 @@ namespace Core.Application.Reports.MaintenanceRequestReport
         
         private readonly IReportRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
-         private readonly IDepartmentService _departmentService;
-        private readonly IUnitService _unitService;
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        private readonly IUnitGrpcClient _unitGrpcClient;
 
-        public RequestReportQueryHandler( IReportRepository maintenanceRequestQueryRepository, IMapper mapper, IUnitService unitService, IDepartmentService departmentService )
+        public RequestReportQueryHandler( IReportRepository maintenanceRequestQueryRepository, IMapper mapper, IUnitGrpcClient unitGrpcClient, IDepartmentGrpcClient departmentService )
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
-            _unitService = unitService;
-            _departmentService = departmentService;
+            _unitGrpcClient = unitGrpcClient;
+            _departmentGrpcClient = departmentService;
         }
 
           public async Task<ApiResponseDTO<List<RequestReportDto>>> Handle(RequestReportQuery request, CancellationToken cancellationToken)
@@ -38,8 +39,8 @@ namespace Core.Application.Reports.MaintenanceRequestReport
                 var requestReportDtos = _mapper.Map<List<RequestReportDto>>(requestReportEntities);
 
              // Step 3: Fetch department and unit data
-                        var departments = await _departmentService.GetAllDepartmentAsync();
-                        var units = await _unitService.GetUnitAutoCompleteAsync();
+                        var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+                        var units = await _unitGrpcClient.GetUnitAutoCompleteAsync();
                         var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
                         var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 

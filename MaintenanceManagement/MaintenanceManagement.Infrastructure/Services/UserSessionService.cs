@@ -25,6 +25,7 @@ namespace MaintenanceManagement.Infrastructure.Services
 
             var response = await client.GetAsync($"api/Auth/session/{jwtId}");
             if (!response.IsSuccessStatusCode)
+            
                 return null;
 
             var content = await response.Content.ReadAsStringAsync();

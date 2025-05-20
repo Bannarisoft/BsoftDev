@@ -18,23 +18,21 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceExternalRequ
 
         private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
-        private readonly IMediator _mediator;
-        private readonly IDepartmentService _departmentService;
-        // private readonly IDepartmentGrpcClient _departmentGrpcClient; // ✅ Interface, not DepartmentServiceClient
+        private readonly IMediator _mediator;        
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;
 
 
         public GetMaintenanceExternalRequestQueryHandler(
             IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository,
             IMapper mapper,
             IMediator mediator ,
-            IDepartmentService departmentService
+            IDepartmentGrpcClient departmentGrpcClient
             )
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
-            _mediator = mediator;
-            _departmentService = departmentService;
-            // _departmentGrpcClient = departmentGrpcClient;
+            _mediator = mediator;            
+            _departmentGrpcClient = departmentGrpcClient;
 
         }
 
@@ -44,7 +42,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceExternalRequ
             var maintenanceRequestList = _mapper.Map<List<GetMaintenanceExternalRequestDto>>(maintenanceExternalRequests);
 
            
-            var departments = await _departmentService.GetAllDepartmentAsync(); // ✅ Clean call
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync(); // ✅ Clean call
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
             var maintenanceRequestDictionary = new Dictionary<int, GetMaintenanceExternalRequestDto>();

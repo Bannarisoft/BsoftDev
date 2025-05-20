@@ -187,6 +187,43 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             );
             return result.ToList();
         }
+
+        public async Task<IEnumerable<dynamic>> ScheduleReportAsync( string MachineGroup, string MaintenanceCategory, string Activity, string ActivityType)
+        {
+            var query = $$"""
+
+                Select PSH.DepartmentId,MG.GroupName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
+                Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate from [Maintenance].[PreventiveSchedulerHeader] PSH
+                Inner Join [Maintenance].[MachineGroup] MG ON PSH.MachineGroupId=MG.Id
+                Inner Join [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
+                Inner Join [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId=PSH.Id
+                Inner Join [Maintenance].[MachineMaster] MM ON MM.MachineGroupId=MG.Id
+                Inner Join [Maintenance].[MiscMaster] MISC ON MISC.Id=PSH.MaintenanceCategoryId
+                Inner Join [Maintenance].[ActivityMaster] A ON A.Id=PSA.ActivityId
+                Inner Join [Maintenance].[MiscMaster] ActivityType ON ActivityType.Id=A.ActivityType
+                WHERE PSH.IsDeleted=0
+                {{(string.IsNullOrEmpty(MachineGroup) ? "" : "AND (MG.GroupName LIKE @MachineGroup  )")}}
+                {{(string.IsNullOrEmpty(MaintenanceCategory) ? "" : "AND (MISC.description LIKE @Description  )")}}
+                {{(string.IsNullOrEmpty(Activity) ? "" : "AND (A.ActivityName LIKE @ActivityName  )")}}
+                {{(string.IsNullOrEmpty(ActivityType) ? "" : "AND (ActivityType.Code LIKE @ActivityType  )")}}
+                group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate 
+                
+                ORDER BY PSH.Id desc
+            """;
+            
+              var parameters = new
+                       {
+                           MachineGroup = $"%{MachineGroup}%",
+                           Description = $"%{MaintenanceCategory}%",
+                           ActivityName = $"%{Activity}%",
+                           ActivityType = $"%{ActivityType}%"
+                       };
+
+             var schedule = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var schedulelist = await schedule.ReadAsync<dynamic>();
+
+            return schedulelist;
+        }
     }
 }
    

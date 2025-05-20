@@ -6,6 +6,7 @@ using SagaOrchestrator.Application.Orchestration.Interfaces.IAssets;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IMaintenance;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
 using SagaOrchestrator.Application.Orchestration.Models;
+using SagaOrchestrator.Application.Orchestration.Models.PreventiveSchedule;
 using SagaOrchestrator.Application.Orchestration.Services.AssetServices;
 using SagaOrchestrator.Application.Orchestration.Services.MaintenanceServices;
 using SagaOrchestrator.Application.Orchestration.Services.UserServices;
@@ -53,6 +54,8 @@ namespace SagaOrchestrator.Infrastructure
                 // Register Saga
                 x.AddSagaStateMachine<WorkOrderSchedulerStateMachine, WorkOrderSchedulerState>()
                     .InMemoryRepository(); // You can replace with MongoDbRepository or EF if needed
+                    x.AddSagaStateMachine<PreventiveSchedulerStateMachine, PreventiveSchedulerState>()
+                    .InMemoryRepository();
 
                 // Register Event Consumers (for other workflows if any)
                 x.AddConsumer<UserCreatedEventConsumer>();
