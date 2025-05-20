@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.External.IDepartment;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using MediatR;
 

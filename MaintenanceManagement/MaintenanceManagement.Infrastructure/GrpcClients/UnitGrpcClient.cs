@@ -1,60 +1,50 @@
- using Grpc.Core;
-using Microsoft.AspNetCore.Http;
- using Contracts.Interfaces.External.IUser;
-using GrpcServices.UserManagement;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Contracts.Interfaces.External.IUser;
 using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
+using GrpcServices.UserManagement;
+using Microsoft.AspNetCore.Http;
 
 namespace MaintenanceManagement.Infrastructure.GrpcClients
 {
     public class UnitGrpcClient : IUnitGrpcClient
+    {
+        private readonly UnitService.UnitServiceClient _client;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public UnitGrpcClient(UnitService.UnitServiceClient client, IHttpContextAccessor httpContextAccessor)
         {
-            private readonly UnitService.UnitServiceClient _client;
-            private readonly IHttpContextAccessor _httpContextAccessor;
+            _client = client;
+            _httpContextAccessor = httpContextAccessor; // ✅ fixed
+        }
 
-            public UnitGrpcClient(UnitService.UnitServiceClient client, IHttpContextAccessor httpContextAccessor)
+        public async Task<List<Contracts.Dtos.Maintenance.UnitDto>> GetAllUnitAsync()
+        {
+            var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
+
+            if (string.IsNullOrWhiteSpace(token))
+                throw new UnauthorizedAccessException("Authorization token not found.");
+
+            if (!token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                token = $"Bearer {token}";
+
+            var metadata = new Metadata
             {
-                _client = client;
-                _httpContextAccessor = httpContextAccessor;
-            }
+                { "Authorization", token }
+            };
 
-            public async Task<List<Contracts.Dtos.Maintenance.UnitDto>> GetUnitAutoCompleteAsync()
+            var response = await _client.GetAllUnitAsync(new Empty(), new CallOptions(metadata));
+
+            return response.Units.Select(u => new Contracts.Dtos.Maintenance.UnitDto
             {
-                // ✅ Get token from current HTTP Context
-                var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
-
-                if (string.IsNullOrEmpty(token))
-                {
-                    throw new Exception("No Authorization token found in the current context.");
-                }
-                //  ✅ Ensure it has "Bearer " prefix
-                if (!token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-                {
-                    
-                    token = $"Bearer {token}";
-                }
-
-                var metadata = new Metadata
-                {
-                    { "Authorization", token }
-                };
-
-                //  ✅ Attach Authorization header
-                var callOptions = new CallOptions(metadata);
-
-                var response = await _client.GetAllUnitAsync(new Empty(), callOptions);
-
-                var units = response.Units
-                    .Select(proto => new Contracts.Dtos.Maintenance.UnitDto
-                    {
-                        UnitId = proto.UnitId,
-                        UnitName = proto.UnitName,
-                        ShortName = proto.ShortName,
-                        UnitHeadName = proto.UnitHeadName,
-                        OldUnitId=proto.OldUnitId                                         
-                    }).ToList();
-
-                return units;
-            }
-      
+                UnitId = u.UnitId,
+                UnitName = u.UnitName,
+                ShortName = u.ShortName,
+                UnitHeadName = u.UnitHeadName
+            }).ToList();
+        }
     }
- }
+}

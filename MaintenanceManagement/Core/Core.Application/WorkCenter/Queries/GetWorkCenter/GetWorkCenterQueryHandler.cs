@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
-using Core.Application.Common.Interfaces.External.IDepartment;
-using Core.Application.Common.Interfaces.External.IUnit;
 using Core.Application.Common.Interfaces.IWorkCenter;
 using Core.Domain.Events;
 using MediatR;
@@ -19,15 +17,15 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        private readonly IUnitGrpcClient _unitGrpcClient;
+        // private readonly IUnitGrpcClient _unitGrpcClient;
 
-        public GetWorkCenterQueryHandler(IWorkCenterQueryRepository iWorkCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService, IUnitGrpcClient unitGrpcClient)
+        public GetWorkCenterQueryHandler(IWorkCenterQueryRepository iWorkCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService)
         {
             _iWorkCenterQueryRepository = iWorkCenterQueryRepository;            
             _mapper = mapper;
             _mediator = mediator;
             _departmentGrpcClient = departmentService;
-            _unitGrpcClient = unitGrpcClient;
+            // _unitGrpcClient = unitGrpcClient;
         }
 
         public async Task<ApiResponseDTO<List<WorkCenterDto>>> Handle(GetWorkCenterQuery request, CancellationToken cancellationToken)
@@ -36,10 +34,10 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
              var workCentersgrouplist = _mapper.Map<List<WorkCenterDto>>(WorkCenter);
                // 🔥 Fetch lookups
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-            var units = await _unitGrpcClient.GetUnitAutoCompleteAsync();
+            // var units = await _unitGrpcClient.GetUnitAutoCompleteAsync();
 
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+            // var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
             // 🔁 Set DepartmentName and UnitName in one loop
             foreach (var dto in workCentersgrouplist)
@@ -47,8 +45,8 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
                 if (departmentLookup.TryGetValue(dto.DepartmentId, out var deptName))
                     dto.DepartmentName = deptName;
 
-                if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
-                    dto.UnitName = unitName;
+                // if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
+                //     dto.UnitName = unitName;
             }
 
              //Domain Event

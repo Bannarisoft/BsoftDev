@@ -1,34 +1,39 @@
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IUnit;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using GrpcServices.UserManagement;
-using Microsoft.AspNetCore.Authorization;
 
-[Authorize]
-public class UnitGrpcService : UnitService.UnitServiceBase
- {
-   private readonly IUnitQueryRepository _unitRepository;
-
-    public UnitGrpcService(IUnitQueryRepository unitRepository)
+namespace UserManagement.API.GrpcServices
+{
+    public class UnitGrpcService : UnitService.UnitServiceBase
     {
-        _unitRepository = unitRepository;
-    }
-
-     public override async Task<UnitListResponse> GetAllUnit(Empty request, ServerCallContext context)
-    {
-        var (units, _) = await _unitRepository.GetAllUnitsAsync(1, 100, null);
-
-        var response = new UnitListResponse();
-        response.Units.AddRange(units.Select(d => new GrpcServices.UserManagement.UnitDto
+        private readonly IUnitQueryRepository _unitQueryRepository;
+        public UnitGrpcService(IUnitQueryRepository unitQueryRepository)
         {
-            UnitId = d.Id,
-            UnitName = d.UnitName,
-            ShortName = d.ShortName,
-            UnitHeadName = d.UnitHeadName,
-            OldUnitId = d.OldUnitId
-        }));
+            _unitQueryRepository = unitQueryRepository;
+        }
+        public override async Task<UnitListResponse> GetAllUnit(Empty request, ServerCallContext context)
+        {
+            var (units, _) = await _unitQueryRepository.GetAllUnitsAsync(1, int.MaxValue, null);
 
-        return response;
-    } 
- }
+            var response = new UnitListResponse();
+            foreach (var unit in units)
+            {
+                response.Units.Add(new UnitDto
+                {
+                    UnitId = unit.Id,
+                    UnitName = unit.UnitName,
+                    ShortName = unit.ShortName,
+                    UnitHeadName = unit.UnitHeadName
+                });
+            }
+
+            return response;
+        }
+
+    }
+}
