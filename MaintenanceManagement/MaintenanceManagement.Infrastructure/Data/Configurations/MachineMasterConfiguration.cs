@@ -140,14 +140,14 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(50)");
 
             builder.Property(s => s.LineNo)
-              .IsRequired()
+             .IsRequired()
               .HasColumnType("int");
-              
+
             // Foreign Key configuration: required one-to-many
             builder.HasOne(m => m.LineNoMachine)
             .WithMany(c => c.MachineMasterLineNo)
             .HasForeignKey(m => m.LineNo)
-            .IsRequired()
+             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
         }

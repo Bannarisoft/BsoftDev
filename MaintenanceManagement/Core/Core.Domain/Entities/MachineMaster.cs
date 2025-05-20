@@ -28,7 +28,7 @@ namespace Core.Domain.Entities
         public ICollection<PreventiveSchedulerDetail>? PreventiveSchedulerDetail { get; set; }
 
         public ICollection<MaintenanceRequest> MaintenanceRequest { get; set; } = null!;  
-        public int? LineNo { get; set; }        
+        public int LineNo { get; set; }        
         public MiscMaster LineNoMachine { get; set; } = null!;  
                     
 

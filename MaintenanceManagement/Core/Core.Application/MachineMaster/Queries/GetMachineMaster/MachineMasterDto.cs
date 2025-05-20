@@ -15,7 +15,6 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMaster
         public int UnitId { get; set; }
         public int? DepartmentId { get; set; }
         public string? DepartmentName { get; set; }
-
         public decimal? ProductionCapacity { get; set; }
         public int UomId { get; set; }
         public int ShiftMasterId { get; set; } 
@@ -23,6 +22,7 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMaster
         public int WorkCenterId { get; set; } 
         public DateTimeOffset? InstallationDate { get; set; }
         public int AssetId { get; set; }
+        public int LineNo { get; set; }
         public Status IsActive { get; set; }
     }
 }

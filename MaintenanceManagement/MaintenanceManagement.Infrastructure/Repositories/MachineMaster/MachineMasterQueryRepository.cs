@@ -43,6 +43,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                 WorkCenterId,
                 InstallationDate,
                 AssetId,
+                LineNo,
                 IsActive
             FROM Maintenance.MachineMaster 
             WHERE 
