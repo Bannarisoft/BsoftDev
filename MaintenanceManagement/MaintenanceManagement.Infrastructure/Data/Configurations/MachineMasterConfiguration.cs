@@ -16,16 +16,16 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
         public void Configure(EntityTypeBuilder<MachineMaster> builder)
         {
             var statusConverter = new ValueConverter<Status, bool>(
-                    v => v == Status.Active,                    
-                    v => v ? Status.Active : Status.Inactive    
+                    v => v == Status.Active,
+                    v => v ? Status.Active : Status.Inactive
                 );
             // ValueConverter for IsDelete (enum to bit)
-                var isDeleteConverter = new ValueConverter<IsDelete, bool>(
-                    v => v == IsDelete.Deleted,                 
-                    v => v ? IsDelete.Deleted : IsDelete.NotDeleted
-                );
+            var isDeleteConverter = new ValueConverter<IsDelete, bool>(
+                v => v == IsDelete.Deleted,
+                v => v ? IsDelete.Deleted : IsDelete.NotDeleted
+            );
             builder.ToTable("MachineMaster", "Maintenance");
-                // Primary Key
+            // Primary Key
             builder.HasKey(b => b.Id);
             builder.Property(b => b.Id)
                 .HasColumnName("Id")
@@ -35,66 +35,66 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
             builder.Property(ag => ag.MachineCode)
                 .HasColumnName("MachineCode")
                 .HasColumnType("varchar(20)")
-                .IsRequired();  
+                .IsRequired();
 
             builder.Property(ag => ag.MachineName)
                 .HasColumnName("MachineName")
                 .HasColumnType("nvarchar(200)")
-                .IsRequired(); 
-            
+                .IsRequired();
+
             builder.Property(s => s.MachineGroupId)
                 .IsRequired()
                 .HasColumnType("int");
 
-             // Foreign Key: MachineGroup (One-to-Many)
+            // Foreign Key: MachineGroup (One-to-Many)
             builder.HasOne(m => m.MachineGroup)
                .WithMany(g => g.MachineMasters)  // Assuming Machines is a ICollection<MachineMaster> in MachineGroup
                .HasForeignKey(m => m.MachineGroupId)
                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete if required
 
 
-             builder.Property(ag => ag.UnitId)
-                .HasColumnName("UnitId")
-                .HasColumnType("int")
-                .IsRequired(); 
+            builder.Property(ag => ag.UnitId)
+               .HasColumnName("UnitId")
+               .HasColumnType("int")
+               .IsRequired();
 
-             builder.Property(m => m.DepartmentId)
-                .HasColumnName("DepartmentId")
-                .HasColumnType("int")
-                .IsRequired(false)
-                .HasDefaultValue(0);
+            builder.Property(m => m.DepartmentId)
+               .HasColumnName("DepartmentId")
+               .HasColumnType("int")
+               .IsRequired(false)
+               .HasDefaultValue(0);
 
-            builder.Property(dg => dg.ProductionCapacity)                
-                .HasColumnType("decimal(18,2)")                
+            builder.Property(dg => dg.ProductionCapacity)
+                .HasColumnType("decimal(18,2)")
                 .IsRequired(false)
                 .HasDefaultValue(0.00m); // Set default value to 0.00
 
             builder.Property(ag => ag.UomId)
                 .HasColumnName("UomId")
                 .HasColumnType("int")
-                .IsRequired(); 
+                .IsRequired();
 
             builder.Property(s => s.ShiftMasterId)
                 .IsRequired()
                 .HasColumnType("int");
 
-             // Foreign Key: ShiftMaster (One-to-Many)
+            // Foreign Key: ShiftMaster (One-to-Many)
             builder.HasOne(m => m.ShiftMaster)
                .WithMany(s => s.MachineMasters)
                .HasForeignKey(m => m.ShiftMasterId)
                .OnDelete(DeleteBehavior.Restrict);
-            
+
             builder.Property(s => s.CostCenterId)
                 .IsRequired()
                 .HasColumnType("int");
 
-               // Foreign Key: CostCenter (One-to-Many)
+            // Foreign Key: CostCenter (One-to-Many)
             builder.HasOne(m => m.CostCenter)
                .WithMany(c => c.MachineMasters)
                .HasForeignKey(m => m.CostCenterId)
                .OnDelete(DeleteBehavior.Restrict);
-            
-             
+
+
             builder.Property(s => s.WorkCenterId)
                 .IsRequired()
                 .HasColumnType("int");
@@ -105,22 +105,22 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                .HasForeignKey(m => m.WorkCenterId)
                .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Property(dg => dg.InstallationDate)  
-                .HasColumnName("InstallationDate") 
-                .HasColumnType("datetimeoffset")                             
+            builder.Property(dg => dg.InstallationDate)
+                .HasColumnName("InstallationDate")
+                .HasColumnType("datetimeoffset")
                 .IsRequired();
 
             builder.Property(s => s.AssetId)
                 .IsRequired()
                 .HasColumnType("int");
-          
-        
-            builder.Property(b => b.IsActive)                
+
+
+            builder.Property(b => b.IsActive)
                 .HasColumnType("bit")
                 .HasConversion(statusConverter)
                 .IsRequired();
 
-            builder.Property(b => b.IsDeleted)                
+            builder.Property(b => b.IsDeleted)
                 .HasColumnType("bit")
                 .HasConversion(isDeleteConverter)
                 .IsRequired();
@@ -128,7 +128,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
             builder.Property(b => b.CreatedByName)
                 .IsRequired()
                 .HasColumnType("varchar(50)");
-    
+
             builder.Property(b => b.CreatedIP)
                 .IsRequired()
                 .HasColumnType("varchar(50)");
@@ -137,7 +137,18 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(50)");
 
             builder.Property(b => b.ModifiedIP)
-                .HasColumnType("varchar(50)"); 
+                .HasColumnType("varchar(50)");
+
+            builder.Property(s => s.LineNo)
+              .IsRequired()
+              .HasColumnType("int");
+              
+            // Foreign Key configuration: required one-to-many
+            builder.HasOne(m => m.LineNoMachine)
+            .WithMany(c => c.MachineMasterLineNo)
+            .HasForeignKey(m => m.LineNo)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
 
         }
     }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMachineMaster;
+using Core.Domain.Common;
 using Dapper;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
@@ -139,6 +140,21 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
 
                     var machineMaster = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, new { MachineGroupId, UnitId });
                     return machineMaster.ToList();
+        }
+
+        public async Task<List<Core.Domain.Entities.MiscMaster>> GetMachineLineNoAsync()
+        {
+            const string query = @"
+            SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder,M.IsActive
+            ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
+            FROM Maintenance.MiscMaster M
+            INNER JOIN Maintenance.MiscTypeMaster T on T.ID=M.MiscTypeId
+            WHERE (MiscTypeCode = @MiscTypeCode) 
+            AND  M.IsDeleted=0 and M.IsActive=1
+            ORDER BY M.ID DESC";    
+            var parameters = new { MiscTypeCode = MiscEnumEntity.MachineLineNo.Code };        
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+            return result.ToList();
         }
     }
 }

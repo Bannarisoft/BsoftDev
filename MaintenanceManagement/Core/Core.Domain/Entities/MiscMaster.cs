@@ -5,25 +5,25 @@ using Core.Domain.Entities.WorkOrderMaster;
 
 namespace Core.Domain.Entities
 {
-    public class MiscMaster  :BaseEntity
+    public class MiscMaster : BaseEntity
     {
-        
-         public int MiscTypeId { get; set; }  
-        public string? Code { get; set;}
-        public string? Description { get; set;}
-        public int SortOrder  { get; set;}
+
+        public int MiscTypeId { get; set; }
+        public string? Code { get; set; }
+        public string? Description { get; set; }
+        public int SortOrder { get; set; }
         public Status IsActive { get; set; }
-            
-        public MiscTypeMaster? MiscTypeMaster { get; set; } 
+
+        public MiscTypeMaster? MiscTypeMaster { get; set; }
         public ICollection<MaintenanceRequest>? RequestType { get; set; }
-        public ICollection<MaintenanceRequest>? MaintenanceType { get; set; }        
-        public ICollection<WorkOrder>? WorkOrderStatus  {get; set;}  
-        public ICollection<WorkOrder>? WorkOrderRootCause  {get; set;}                  
-        public ICollection<WorkOrderItem>? WorkOrderItemStoreType  {get; set;}   
-        public ICollection<WorkOrderTechnician>? WorkOrderTechnicianSource  {get; set;}   
+        public ICollection<MaintenanceRequest>? MaintenanceType { get; set; }
+        public ICollection<WorkOrder>? WorkOrderStatus { get; set; }
+        public ICollection<WorkOrder>? WorkOrderRootCause { get; set; }
+        public ICollection<WorkOrderItem>? WorkOrderItemStoreType { get; set; }
+        public ICollection<WorkOrderTechnician>? WorkOrderTechnicianSource { get; set; }
         public ICollection<PreventiveSchedulerHeader>? Schedule { get; set; }
         public ICollection<PreventiveSchedulerHeader>? FrequencyType { get; set; }
-        public ICollection<PreventiveSchedulerHeader>? FrequencyUnit { get; set; }      
+        public ICollection<PreventiveSchedulerHeader>? FrequencyUnit { get; set; }
         public ICollection<MaintenanceRequest>? ServiceType { get; set; }
         public ICollection<MaintenanceRequest>? ServiceLocation { get; set; }
         public ICollection<MaintenanceRequest>? SpareType { get; set; }
@@ -32,9 +32,11 @@ namespace Core.Domain.Entities
 
         public ICollection<MaintenanceRequest>? ModeOfDispatchType { get; set; }
         public ICollection<PreventiveSchedulerHeader>? MaintenanceCategory { get; set; }
-        public ICollection<WorkOrderSchedule>? WorkOrderScheduleStatus  {get; set;}  
+        public ICollection<WorkOrderSchedule>? WorkOrderScheduleStatus { get; set; }
 
         public ICollection<ActivityMaster>? ActivityType { get; set; }
+        public ICollection<MachineMaster>? MachineMasterLineNo { get; set; }
+
 
 
         
