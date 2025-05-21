@@ -174,5 +174,16 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             await _applicationDbContext.SaveChangesAsync();
             return true;
         }
+        public async Task<bool> UpdateDocumentAsync(int AssetId, string imageName)
+        {
+            var assetDocument = await _applicationDbContext.AssetMasterGenerals.FindAsync(AssetId);
+            if (assetDocument == null)
+            {
+                return false;  
+            }          
+            assetDocument.AssetDocument = imageName;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }
