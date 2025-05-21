@@ -497,6 +497,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("LineNo")
+                        .HasColumnType("int");
+
                     b.Property<string>("MachineCode")
                         .IsRequired()
                         .HasColumnType("varchar(20)")
@@ -544,6 +547,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CostCenterId");
+
+                    b.HasIndex("LineNo");
 
                     b.HasIndex("MachineGroupId");
 
@@ -1807,6 +1812,12 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "LineNoMachine")
+                        .WithMany("MachineMasterLineNo")
+                        .HasForeignKey("LineNo")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Core.Domain.Entities.MachineGroup", "MachineGroup")
                         .WithMany("MachineMasters")
                         .HasForeignKey("MachineGroupId")
@@ -1826,6 +1837,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("CostCenter");
+
+                    b.Navigation("LineNoMachine");
 
                     b.Navigation("MachineGroup");
 
@@ -2187,6 +2200,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("FrequencyType");
 
                     b.Navigation("FrequencyUnit");
+
+                    b.Navigation("MachineMasterLineNo");
 
                     b.Navigation("MaintenanceCategory");
 

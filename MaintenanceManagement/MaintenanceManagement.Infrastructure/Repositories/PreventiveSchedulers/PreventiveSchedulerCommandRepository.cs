@@ -182,8 +182,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(lastMaintenanceDate.Value.DateTime, headerInfo.FrequencyInterval, miscdetail.Code ?? "", headerInfo.ReminderMaterialReqDays);
 
                 //   var details = _mapper.Map<PreventiveSchedulerDetail>(existingPreventiveScheduler);
-                
-                  existingPreventiveScheduler.IsActive = Status.Inactive;
+
+                existingPreventiveScheduler.IsActive = Status.Inactive;
                 _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
 
                 existingPreventiveScheduler.Id = 0;
@@ -230,15 +230,63 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             }
             return false;
         }
-         public async Task<bool> DeleteDetailAsync(int id)
+        public async Task<bool> DeleteDetailAsync(int id)
         {
-             var PreventiveSchedulerToDelete = await _applicationDbContext.PreventiveSchedulerDtl.FirstOrDefaultAsync(u => u.PreventiveSchedulerHeaderId == id);
+            var PreventiveSchedulerToDelete = await _applicationDbContext.PreventiveSchedulerDtl.FirstOrDefaultAsync(u => u.PreventiveSchedulerHeaderId == id);
             if (PreventiveSchedulerToDelete != null)
             {
                 PreventiveSchedulerToDelete.IsDeleted = IsDelete.Deleted;
-                return await _applicationDbContext.SaveChangesAsync() >0;
+                return await _applicationDbContext.SaveChangesAsync() > 0;
             }
-            return false; 
+            return false;
+        }
+        public async Task<bool> AddReScheduleDetailAsync(int Id,DateOnly RescheduleDate)
+        {
+            var existingPreventiveScheduler = await _applicationDbContext.PreventiveSchedulerDtl
+            .Include(ps => ps.PreventiveScheduler)
+            .FirstOrDefaultAsync(u =>
+                u.Id == Id &&
+                u.IsActive == Status.Active &&
+                u.IsDeleted == IsDelete.NotDeleted);
+
+
+            if (existingPreventiveScheduler != null)
+            {
+               
+                var headerInfo = await _preventiveSchedulerQuery.GetByIdAsync(existingPreventiveScheduler.PreventiveSchedulerHeaderId);
+                var miscdetail = await _miscMasterQueryRepository.GetByIdAsync(headerInfo.FrequencyUnitId);
+                
+                  existingPreventiveScheduler.IsActive = Status.Inactive;
+                _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
+
+                existingPreventiveScheduler.Id = 0;
+                existingPreventiveScheduler.WorkOrderCreationStartDate = RescheduleDate;
+                existingPreventiveScheduler.ActualWorkOrderDate = RescheduleDate;
+                existingPreventiveScheduler.LastMaintenanceActivityDate = null;
+
+
+
+                await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(existingPreventiveScheduler);
+                await _applicationDbContext.SaveChangesAsync();
+                var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
+                string newJobId;
+                var delayInMinutes = (int)delay.TotalMinutes;
+
+                if (delay.TotalSeconds > 0)
+                {
+                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id, delayInMinutes);
+                }
+                else
+                {
+
+                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id, 5);
+                }
+                
+                return true;
+            }
+
+
+            return false;
         }
     }
 }

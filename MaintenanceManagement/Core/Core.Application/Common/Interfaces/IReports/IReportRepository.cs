@@ -19,7 +19,7 @@ namespace Core.Application.Common.Interfaces.IReports
         Task<List<CurrentStockDto>> GetStockDetails(string OldUnitcode);
         Task<List<WorkOderCheckListReportDto>> GetWorkOrderChecklistReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? machineGroupId, int? machineId, int? activityId);
         Task<List<MRSReportDto>> GetMRSReports(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate, string OldUnitCode);
-        Task<IEnumerable<dynamic>> ScheduleReportAsync(string MachineGroup, string MaintenanceCategory, string Activity, string ActivityType);
-        Task<IEnumerable<dynamic>> MaterialPlanningReportAsync(DateTime? FromDueDate, DateTime? ToDueDate,string MaintenanceCategory,string MachineName,string Activity,string MaterialCode);
+        Task<IEnumerable<dynamic>> ScheduleReportAsync(DateTime? FromDueDate, DateTime? ToDueDate);
+        Task<IEnumerable<dynamic>> MaterialPlanningReportAsync(DateTime? FromDueDate, DateTime? ToDueDate);
     }
 }

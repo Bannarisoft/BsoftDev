@@ -17,7 +17,8 @@ namespace Core.Application.Common.Mappings
     {
           public DepartmentProfile()
     {
-      
+  
+
         CreateMap<CreateDepartmentCommand, Department>()             
         .ForMember(dest => dest.ShortName, opt => opt.MapFrom(src => src.ShortName))
         .ForMember(dest => dest.DeptName, opt => opt.MapFrom(src => src.DeptName))

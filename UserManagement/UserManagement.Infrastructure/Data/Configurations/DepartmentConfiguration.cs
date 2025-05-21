@@ -42,6 +42,17 @@ namespace UserManagement.Infrastructure.Data.Configurations
             .HasColumnType("varchar(50)")
             .IsRequired();
 
+
+            builder.Property(u => u.DepartmentGroupId)
+                      .HasColumnName("DepartmentGroupId")
+                      .HasColumnType("int")
+                      .IsRequired();
+
+            builder.HasOne(d => d.DepartmentGroup)
+             .WithMany(g => g.Departments)
+             .HasForeignKey(d => d.DepartmentGroupId)            
+            .OnDelete(DeleteBehavior.Restrict);
+
                 builder.Property(u => u.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.ActivityMaster.Command.UpdateActivityMster
 {
@@ -13,9 +14,10 @@ namespace Core.Application.ActivityMaster.Command.UpdateActivityMster
         public int DepartmentId { get; set; }
         public int EstimatedDuration { get; set; }
         public int ActivityType { get; set; }
+        public Status  IsActive { get; set; }
     
 
-        public List<UpdateActivityMachineGroupDto>? UpdateActivityMachineGroup  { get; set; }
+        public List<UpdateActivityMachineGroupDto>? UpdateActivityMachineGroup { get; set; }
         
     }
 }

@@ -57,7 +57,8 @@ namespace SagaOrchestrator.Application.StateMachines
                         EffectiveDate = context.Data.EffectiveDate,
                         FrequencyInterval = context.Data.FrequencyInterval,
                         ReminderWorkOrderDays = context.Data.ReminderWorkOrderDays,
-                        ReminderMaterialReqDays = context.Data.ReminderMaterialReqDays
+                        ReminderMaterialReqDays = context.Data.ReminderMaterialReqDays,
+                        UnitId = context.Data.UnitId
                     })
                     .TransitionTo(CreatingPreventiveSchedulerDetail)
 

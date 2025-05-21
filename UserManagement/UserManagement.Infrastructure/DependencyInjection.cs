@@ -73,6 +73,8 @@ using Core.Application.Common.Interfaces.ICustomField;
 using UserManagement.Infrastructure.Repositories.CustomFields;
 using Shared.Infrastructure.HttpClientPolly;
 using Polly;
+using Core.Application.Common.Interfaces.IDepartmentGroup;
+using UserManagement.Infrastructure.Repositories.DepartmentGroup;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
@@ -268,6 +270,8 @@ namespace UserManagement.Infrastructure
             services.AddHttpClient();                                
             services.AddScoped<IEmailService, EmailSenderService>();
             services.AddScoped<ISmsService, SmsSenderService>();
+            services.AddScoped<IDepartmentGroupCommandRepository, DepartmentGroupCommandRepository>();
+            services.AddScoped<IDepartmentGroupQueryRepository, DepartmentGroupQueryRepository>();
 
 
             // AutoMapper profiles
@@ -283,7 +287,8 @@ namespace UserManagement.Infrastructure
                 typeof(FinancialYearProfile),
                 typeof(CurrencyProfile),
                 typeof(UnitsProfile),
-                typeof(CompanySettingsProfile)
+                typeof(CompanySettingsProfile),
+                typeof(DepartmentGroupProfile)
             );
 
             return services;

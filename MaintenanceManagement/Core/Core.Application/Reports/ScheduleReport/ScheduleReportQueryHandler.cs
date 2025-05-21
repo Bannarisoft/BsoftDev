@@ -22,7 +22,7 @@ namespace Core.Application.Reports.ScheduleReport
         }
         public async Task<ApiResponseDTO<List<ScheduleReportDto>>> Handle(ScheduleReportQuery request, CancellationToken cancellationToken)
         {
-            var reportEntities = await _reportQueryRepository.ScheduleReportAsync(request.MachineGroup, request.MaintenanceCategory, request.Activity, request.ActivityType);
+            var reportEntities = await _reportQueryRepository.ScheduleReportAsync(request.FromDueDate, request.ToDueDate);
 
             var preventiveSchedulerList = _mapper.Map<List<ScheduleReportDto>>(reportEntities);
 
@@ -43,17 +43,7 @@ namespace Core.Application.Reports.ScheduleReport
 
             }
 
-            var filteredList = preventiveSchedulerList
-            .Where(d => !string.IsNullOrWhiteSpace(d.Department))
-            .ToList();
-
-
-                    if (!string.IsNullOrWhiteSpace(request.MachineDepartment))
-                    {
-                        filteredList = filteredList
-                            .Where(d => string.Equals(d.Department, request.MachineDepartment, StringComparison.OrdinalIgnoreCase))
-                            .ToList();
-                    }
+            
                
                 return new ApiResponseDTO<List<ScheduleReportDto>>
                 {
