@@ -18,7 +18,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
         private readonly IMediator _mediator;
         private readonly IEventPublisher _eventPublisher;  // Use IEventPublisher instead of IPublishEndpoint
 
-        public CreateAssetMasterGeneralCommandHandler(IMapper mapper, IAssetMasterGeneralCommandRepository assetMasterGeneralRepository, IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository, IMediator mediator, IEventPublisher eventPublisher)
+        public CreateAssetMasterGeneralCommandHandler(IMapper mapper,IAssetMasterGeneralCommandRepository  assetMasterGeneralRepository, IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository, IMediator mediator, IEventPublisher eventPublisher)
         {
             _mapper = mapper;
             _assetMasterGeneralRepository = assetMasterGeneralRepository;
