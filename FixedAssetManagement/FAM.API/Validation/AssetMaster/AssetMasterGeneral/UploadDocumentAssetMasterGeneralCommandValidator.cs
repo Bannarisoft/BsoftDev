@@ -26,7 +26,7 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                             .NotEmpty()
                             .WithMessage($"{nameof(UploadDocumentAssetMasterGeneralCommand.File)} {rule.Error}");
                         break;
-                    case "FileValidation":
+                    case "FilePDFValidation":
                         RuleFor(x => x.File)
                             .Must(file => file != null && IsValidFileType(file, rule.allowedExtensions))
                             .WithMessage($"{nameof(UploadFileAssetMasterGeneralCommand.File)} {rule.Error}")
