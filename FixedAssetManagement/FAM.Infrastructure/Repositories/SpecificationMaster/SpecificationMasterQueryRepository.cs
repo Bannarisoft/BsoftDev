@@ -1,6 +1,7 @@
 
 using System.Data;
 using Core.Application.Common.Interfaces.ISpecificationMaster;
+using Core.Application.SpecificationMaster.Queries.GetSpecificationMaster;
 using Core.Domain.Entities;
 using Dapper;
 
@@ -13,7 +14,7 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
         {
             _dbConnection = dbConnection;
         }
-        public async Task<(List<SpecificationMasters>, int)> GetAllSpecificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<SpecificationMasterDTO>, int)> GetAllSpecificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
              var query = $$"""
                 DECLARE @TotalCount INT;
@@ -40,7 +41,7 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
                        };
 
             var specificationMaster = await _dbConnection.QueryMultipleAsync(query, parameters);
-            var specificationMasterList = (await specificationMaster.ReadAsync<SpecificationMasters>()).ToList();
+            var specificationMasterList = (await specificationMaster.ReadAsync<SpecificationMasterDTO>()).ToList();
             int totalCount = (await specificationMaster.ReadFirstAsync<int>());             
             return (specificationMasterList, totalCount);             
         }
