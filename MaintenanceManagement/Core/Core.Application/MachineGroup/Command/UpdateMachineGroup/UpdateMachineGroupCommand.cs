@@ -13,7 +13,8 @@ namespace Core.Application.MachineGroup.Command.UpdateMachineGroup
         public int Id { get; set; }
         public string? GroupName { get; set; }  
         public int Manufacturer  { get; set;}
-        public byte  IsActive { get; set; }
+        public int DepartmentId { get; set; }
+        public byte IsActive { get; set; }
         
     }
 }

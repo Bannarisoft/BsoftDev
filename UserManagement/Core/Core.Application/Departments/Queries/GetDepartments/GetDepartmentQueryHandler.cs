@@ -29,41 +29,85 @@ namespace Core.Application.Departments.Queries.GetDepartments
             _logger = logger;
 
         }
-
-
-        public async Task<ApiResponseDTO<List<GetDepartmentDto>>> Handle(GetDepartmentQuery request ,CancellationToken cancellationToken )
-        {
-             _logger.LogInformation("Fetching Department Request started: {request}", request);
-           
-            var (department,totalCount) = await _departmentRepository.GetAllDepartmentAsync(request.PageNumber, request.PageSize, request.SearchTerm);
-            
-             if (department is null || !department.Any())
+        public async Task<ApiResponseDTO<List<GetDepartmentDto>>> Handle(GetDepartmentQuery request, CancellationToken cancellationToken)
             {
-               _logger.LogWarning("No department records found in the database. Total count: {Count}", department?.Count ?? 0);
+                _logger.LogInformation("Fetching Department Request started. Page: {Page}, Size: {Size}, Search: {Search}", 
+                    request.PageNumber, request.PageSize, request.SearchTerm);
 
-                  return new ApiResponseDTO<List<GetDepartmentDto>> { IsSuccess = false, Message = "No Record Found" };
-            }
+                var (departmentDynamicList, totalCount) = await _departmentRepository
+                    .GetAllDepartmentAsync(request.PageNumber, request.PageSize, request.SearchTerm);
 
-             var departmentList = _mapper.Map<List<GetDepartmentDto>>(department);
-             var domainEvent = new AuditLogsDomainEvent(
+                if (departmentDynamicList is null || !departmentDynamicList.Any())
+                {
+                    _logger.LogWarning("No department records found in the database.");
+
+                    return new ApiResponseDTO<List<GetDepartmentDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "No Record Found"
+                    };
+                }
+
+                // ✅ Map from dynamic to DTO
+                var departmentList = _mapper.Map<List<GetDepartmentDto>>(departmentDynamicList);
+
+                var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetAll",
-                    actionCode: "",        
+                    actionCode: "",
                     actionName: "",
-                    details: $"Department details was fetched.",
-                    module:"Department"
+                    details: $"Fetched {departmentList.Count} department records.",
+                    module: "Department"
                 );
 
-                  await _mediator.Publish(domainEvent, cancellationToken);
-              
-            _logger.LogInformation("Department {department} Listed successfully.", departmentList.Count);
-            return new ApiResponseDTO<List<GetDepartmentDto>> { IsSuccess = true,
-            Message = "Success",
-            Data = departmentList ,
-            TotalCount = totalCount,
-            PageNumber = request.PageNumber,
-            PageSize = request.PageSize};  
+                await _mediator.Publish(domainEvent, cancellationToken);
+
+                _logger.LogInformation("Fetched {Count} departments successfully.", departmentList.Count);
+
+                return new ApiResponseDTO<List<GetDepartmentDto>>
+                {
+                    IsSuccess = true,
+                    Message = "Success",
+                    Data = departmentList,
+                    TotalCount = totalCount,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
+                };
+            }
+
+
+        // public async Task<ApiResponseDTO<List<GetDepartmentDto>>> Handle(GetDepartmentQuery request ,CancellationToken cancellationToken )
+        // {
+        //      _logger.LogInformation("Fetching Department Request started: {request}", request);
            
-        }
+        //     var (department,totalCount) = await _departmentRepository.GetAllDepartmentAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+            
+        //      if (department is null || !department.Any())
+        //     {
+             
+
+        //           return new ApiResponseDTO<List<GetDepartmentDto>> { IsSuccess = false, Message = "No Record Found" };
+        //     }
+
+        //      var departmentList = _mapper.Map<List<GetDepartmentDto>>(department);
+        //      var domainEvent = new AuditLogsDomainEvent(
+        //             actionDetail: "GetAll",
+        //             actionCode: "",        
+        //             actionName: "",
+        //             details: $"Department details was fetched.",
+        //             module:"Department"
+        //         );
+
+        //           await _mediator.Publish(domainEvent, cancellationToken);
+              
+        //     _logger.LogInformation("Department {department} Listed successfully.", departmentList.Count);
+        //     return new ApiResponseDTO<List<GetDepartmentDto>> { IsSuccess = true,
+        //     Message = "Success",
+        //     Data = departmentList ,
+        //     TotalCount = totalCount,
+        //     PageNumber = request.PageNumber,
+        //     PageSize = request.PageSize};  
+           
+        // }
 
       
     }

@@ -19,7 +19,8 @@ namespace Core.Application.Departments.Commands.UpdateDepartment
         public string? ShortName { get; set; }
         public string? DeptName { get; set; }
         public int CompanyId { get; set; }
-        public Status  IsActive { get; set; }
+        public int DepartmentGroupId { get; set; }
+        public Status IsActive { get; set; }
              
     }
 }

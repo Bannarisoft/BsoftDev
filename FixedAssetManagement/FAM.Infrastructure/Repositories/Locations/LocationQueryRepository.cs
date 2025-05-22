@@ -30,7 +30,9 @@ namespace FAM.Infrastructure.Repositories.Locations
                 SortOrder,
                 UnitId,
                 DepartmentId,
-                IsActive
+                IsActive,
+                CreatedDate,
+                CreatedByName
             FROM FixedAsset.Location 
             WHERE 
             IsDeleted = 0

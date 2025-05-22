@@ -4,12 +4,13 @@ using UserManagement.API.Validation.Common;
 using UserManagement.API.Middleware;
 using UserManagement.API.Configurations;
 using UserManagement.Infrastructure.PollyResilience;
+using UserManagement.API.GrpcServices;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ;
-
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
 builder.Configuration
 
@@ -36,12 +37,14 @@ builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
 builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
-//builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
+builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
+
+
 // Register gRPC
-//builder.Services.AddGrpc();
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 // builder.Services.AddScoped<SessionGrpcService>();
@@ -62,13 +65,23 @@ app.UseDeveloperExceptionPage();
 //}
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
-app.UseCors();// Enable CORS
+app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 
 app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
-//app.MapGrpcService<DepartmentGrpcService>();
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGrpcService<DepartmentGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<SessionGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<UnitGrpcService>().EnableGrpcWeb();
+    endpoints.MapControllers();
+});
+// app.MapGrpcService<DepartmentGrpcService>();
+// app.MapGrpcService<SessionGrpcService>();
+// app.MapGrpcService<UnitGrpcService>();
+// app.MapControllers();
 //app.ConfigureHangfireDashboard();
 app.Run();

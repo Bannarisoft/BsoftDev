@@ -20,8 +20,9 @@ namespace Core.Domain.Entities
         public DateOnly? ActualWorkOrderDate { get; set; }
         public DateOnly MaterialReqStartDays { get; set; }
         public string? RescheduleReason { get; set; }
-        public ICollection<WorkOrder>? workOrdersSchedule  {get; set;}   
+        public ICollection<WorkOrder>? workOrdersSchedule { get; set; }
         public string? HangfireJobId { get; set; }
+        public DateOnly? LastMaintenanceActivityDate { get; set; }
         
     }
 }

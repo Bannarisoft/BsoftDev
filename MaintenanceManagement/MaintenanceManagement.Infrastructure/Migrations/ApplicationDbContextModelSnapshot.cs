@@ -362,6 +362,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
+
                     b.Property<string>("GroupName")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -481,12 +485,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int?>("DepartmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0)
-                        .HasColumnName("DepartmentId");
-
                     b.Property<DateTimeOffset>("InstallationDate")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("InstallationDate");
@@ -496,6 +494,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<int>("LineNo")
+                        .HasColumnType("int");
 
                     b.Property<string>("MachineCode")
                         .IsRequired()
@@ -544,6 +545,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CostCenterId");
+
+                    b.HasIndex("LineNo");
 
                     b.HasIndex("MachineGroupId");
 
@@ -968,6 +971,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
+
+                    b.Property<DateOnly?>("LastMaintenanceActivityDate")
+                        .HasColumnType("date")
+                        .HasColumnName("LastMaintenanceActivityDate");
 
                     b.Property<int>("MachineId")
                         .HasColumnType("int")
@@ -1627,6 +1634,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("OldItemCode");
 
+                    b.Property<decimal?>("Rate")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int?>("ScarpQty")
                         .HasColumnType("int")
                         .HasColumnName("ScarpQty");
@@ -1800,6 +1810,12 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "LineNoMachine")
+                        .WithMany("MachineMasterLineNo")
+                        .HasForeignKey("LineNo")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Core.Domain.Entities.MachineGroup", "MachineGroup")
                         .WithMany("MachineMasters")
                         .HasForeignKey("MachineGroupId")
@@ -1819,6 +1835,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("CostCenter");
+
+                    b.Navigation("LineNoMachine");
 
                     b.Navigation("MachineGroup");
 
@@ -2180,6 +2198,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("FrequencyType");
 
                     b.Navigation("FrequencyUnit");
+
+                    b.Navigation("MachineMasterLineNo");
 
                     b.Navigation("MaintenanceCategory");
 

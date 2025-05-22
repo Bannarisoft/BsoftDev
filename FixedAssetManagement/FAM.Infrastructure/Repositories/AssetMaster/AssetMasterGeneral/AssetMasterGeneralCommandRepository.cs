@@ -113,6 +113,17 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             await _applicationDbContext.SaveChangesAsync();
             return true;
         }
+        public async Task<bool> UpdateAssetDocumentAsync(int assetId, string imageName)
+        {
+            var asset = await _applicationDbContext.AssetMasterGenerals.FindAsync(assetId);
+            if (asset == null)
+            {
+                return false;  
+            }
+            asset.AssetDocument = imageName;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
         public async Task<AssetMasterGeneralDTO?> GetByAssetImageAsync(string assetCode)
         {
            /*  return await _applicationDbContext.AssetMasterGenerals
@@ -140,6 +151,18 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             return true;
         }
 
+        public async Task<bool> RemoveAssetDocumentReferenceAsync(string imageName)
+        {
+            var asset = await _applicationDbContext.AssetMasterGenerals.FirstOrDefaultAsync(x => x.AssetDocument == imageName);
+            if (asset == null)
+            {
+                return false;  // Asset not found
+            }
+            asset.AssetDocument = null;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> RemoveAssetWarrantyAsync(string assetPath)
         {
            var asset = await _applicationDbContext.AssetWarranties.FirstOrDefaultAsync(x => x.Document == assetPath);
@@ -148,6 +171,17 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 return false;  // Asset not found
             }
             asset.Document = null;
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> UpdateDocumentAsync(int AssetId, string imageName)
+        {
+            var assetDocument = await _applicationDbContext.AssetMasterGenerals.FindAsync(AssetId);
+            if (assetDocument == null)
+            {
+                return false;  
+            }          
+            assetDocument.AssetDocument = imageName;
             await _applicationDbContext.SaveChangesAsync();
             return true;
         }

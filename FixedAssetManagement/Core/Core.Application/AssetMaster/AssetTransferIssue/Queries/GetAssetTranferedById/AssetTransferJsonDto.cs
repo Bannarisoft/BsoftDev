@@ -19,10 +19,11 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransf
      public string? Status { get; set; }
     public string? FromCustodianName { get; set; }
     public string? ToCustodianName { get; set; }
-    public string? ModifiedIP { get; set; }
-    public int ModifiedBy { get; set; }
-    public string? ModifiedByName { get; set; }
-    public DateTimeOffset ModifiedDate { get; set; }
+    public string? GatePassNo { get; set; }
+    // public string? ModifiedIP { get; set; }
+    // public int? ModifiedBy { get; set; }
+    // public string? ModifiedByName { get; set; }
+    // public DateTimeOffset? ModifiedDate { get; set; }
     
     public List<AssetTransferDetailJsonDto>? AssetTransferDetails { get; set; }
     }

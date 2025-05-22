@@ -42,6 +42,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
                 existingRecord.DepartmentId = activityMaster.DepartmentId;
                 existingRecord.EstimatedDuration = activityMaster.EstimatedDuration;
                 existingRecord.ActivityType = activityMaster.ActivityType;
+            existingRecord.IsActive = activityMaster.IsActive;
+                
+                
 
                 _dbContext.ActivityMaster.Update(existingRecord);
 

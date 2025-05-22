@@ -9,8 +9,8 @@ namespace Core.Application.Reports.MRS
 {
     public class MRSReportQuery : IRequest<ApiResponseDTO<List<MRSReportDto>>>
     {
-        public DateTime? IssueFrom { get; set; }
-        public DateTime? IssueTo { get; set; }
+        public DateTimeOffset? FromDate { get; set; }
+        public DateTimeOffset? ToDate { get; set; }
         public string? OldUnitCode { get; set; }
     }
 }

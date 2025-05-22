@@ -31,6 +31,7 @@ namespace UserManagement.Infrastructure.Repositories.Departments
                 existingDept.ShortName = department.ShortName;
                 existingDept.DeptName = department.DeptName;
                 existingDept.CompanyId = department.CompanyId;
+                existingDept.DepartmentGroupId= department.DepartmentGroupId;
                 existingDept.IsActive = department.IsActive;                                
 
                 _applicationDbContext.Department.Update(existingDept);

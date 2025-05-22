@@ -58,7 +58,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                 B.ToCustodianId,
                 B.ToCustodianName,
                 A.Sdcno,
-                A.GatePassNo,
+                B.GatePassNo,
                 A.Remarks,
                 A.AuthorizedByName,
                 A.AuthorizedDate
@@ -159,7 +159,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                     A.ToCustodianName,
                     A.Status,
                     RH.Sdcno,
-                    RH.GatePassNo 
+                    A.GatePassNo 
                 FROM FixedAsset.AssetTransferIssueHdr A
                 INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
                 INNER JOIN FixedAsset.AssetMaster M ON B.AssetId = M.Id
@@ -273,7 +273,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                     A.FromCustodianName,
                     A.ToCustodianName,
                     RH.Sdcno,
-                    RH.GatePassNo,
+                    A.GatePassNo,
                     RH.Remarks 
                 FROM FixedAsset.AssetTransferIssueHdr A
                 INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId

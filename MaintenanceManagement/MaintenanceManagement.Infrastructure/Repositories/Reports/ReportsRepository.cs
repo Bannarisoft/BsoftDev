@@ -10,6 +10,7 @@ using Core.Application.Reports.WorkOderCheckListReport;
 using Core.Application.WorkOrder.Command.CreateWorkOrder;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Repositories.Common;
+using Core.Application.Reports.MRS;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.Reports
 {
@@ -172,6 +173,152 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
 
                     return result.ToList();
                 }
+
+        public async Task<List<MRSReportDto>> GetMRSReports(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate, string OldUnitCode)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@FromDate", IssueFromDate);
+            parameters.Add("@ToDate", IssueToDate);
+            parameters.Add("@OldUnitId", OldUnitCode);
+            var result = await _dbConnection.QueryAsync<MRSReportDto>(
+                "GetMRSReport",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+            return result.ToList();
+        }
+
+        public async Task<IEnumerable<dynamic>> ScheduleReportAsync(DateTime? FromDueDate, DateTime? ToDueDate)
+        {
+            var query = $$"""
+
+                Select PSH.DepartmentId,MG.GroupName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
+                Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,PSD.LastMaintenanceActivityDate from [Maintenance].[PreventiveSchedulerHeader] PSH
+                Inner Join [Maintenance].[MachineGroup] MG ON PSH.MachineGroupId=MG.Id
+                Inner Join [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
+                Inner Join [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId=PSH.Id
+                Inner Join [Maintenance].[MachineMaster] MM ON MM.MachineGroupId=MG.Id
+                Inner Join [Maintenance].[MiscMaster] MISC ON MISC.Id=PSH.MaintenanceCategoryId
+                Inner Join [Maintenance].[ActivityMaster] A ON A.Id=PSA.ActivityId
+                Inner Join [Maintenance].[MiscMaster] ActivityType ON ActivityType.Id=A.ActivityType
+                WHERE PSH.IsDeleted=0 AND PSD.IsActive=1
+                {{(FromDueDate.HasValue ? "AND PSD.ActualWorkOrderDate >= @FromDueDate" : "")}}
+                {{(ToDueDate.HasValue ? "AND PSD.ActualWorkOrderDate <= @ToDueDate" : "")}}
+                group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate,PSD.LastMaintenanceActivityDate 
+                
+                ORDER BY PSH.Id desc
+            """;
+            
+              var parameters = new
+                       {
+                           FromDueDate = FromDueDate,
+                           ToDueDate  = ToDueDate ,
+                       };
+
+             var schedule = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var schedulelist = await schedule.ReadAsync<dynamic>();
+
+            return schedulelist;
+        }
+
+        public async Task<IEnumerable<dynamic>> MaterialPlanningReportAsync(DateTime? FromDueDate, DateTime? ToDueDate)
+        {
+                   var query = $$"""
+           SELECT 
+               ItemCode, 
+               UOM, 
+               CategoryDescription, 
+               GroupName 
+           INTO #stock 
+           FROM [Maintenance].[SubStores] SS
+           INNER JOIN [Maintenance].[PreventiveSchedulerItems] PSI 
+               ON SS.ItemCode = PSI.OldItemId 
+               AND PSI.OldCategoryDescription = SS.CategoryDescription 
+               AND PSI.OldGroupName = SS.GroupName;
+
+           SELECT 
+               SS.ItemCode, 
+               SS.UOM, 
+               SUM(SS.Quantity) AS TotQty, 
+               SS.CategoryDescription, 
+               SS.GroupName 
+           INTO #STOCKQTY 
+           FROM [Maintenance].[SubStores] SS
+           INNER JOIN #stock S 
+               ON SS.ItemCode = S.ItemCode 
+               AND SS.CategoryDescription = S.CategoryDescription 
+               AND SS.UOM = S.UOM 
+               AND SS.GroupName = S.GroupName 
+           GROUP BY 
+               SS.ItemCode, 
+               SS.UOM, 
+               SS.CategoryDescription, 
+               SS.GroupName;
+
+           SELECT 
+               MM.MachineName,
+               MISC.Description AS MaintenanceCategory,
+               A.ActivityName,
+               ActivityType.Code AS ActivityType,
+               CAST(PSD.ActualWorkOrderDate AS VARCHAR) AS PlannedMaintenanceDate,
+               PSI.OldItemId AS MaterialCode,
+               PSI.OldCategoryDescription AS MaterialDescription,
+               SQ.UOM,
+               ISNULL(SQ.TotQty, 0) AS CurrentStock,
+               PSI.RequiredQty,
+               ISNULL(SQ.TotQty, 0) - PSI.RequiredQty AS Shortfall_Excess
+           FROM [Maintenance].[PreventiveSchedulerHeader] PSH
+           INNER JOIN [Maintenance].[MachineGroup] MG 
+               ON PSH.MachineGroupId = MG.Id
+           INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD 
+               ON PSD.PreventiveSchedulerHeaderId = PSH.Id
+           INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA 
+               ON PSA.PreventiveSchedulerHeaderId = PSH.Id
+           INNER JOIN [Maintenance].[PreventiveSchedulerItems] PSI 
+               ON PSI.PreventiveSchedulerHeaderId = PSH.Id
+           INNER JOIN [Maintenance].[MachineMaster] MM 
+               ON MM.MachineGroupId = MG.Id
+           INNER JOIN [Maintenance].[MiscMaster] MISC 
+               ON MISC.Id = PSH.MaintenanceCategoryId
+           INNER JOIN [Maintenance].[ActivityMaster] A 
+               ON A.Id = PSA.ActivityId
+           INNER JOIN [Maintenance].[MiscMaster] ActivityType 
+               ON ActivityType.Id = A.ActivityType
+           LEFT JOIN #STOCKQTY SQ 
+               ON SQ.ItemCode = PSI.OldItemId 
+               AND PSI.OldCategoryDescription = SQ.CategoryDescription 
+               AND PSI.OldGroupName = SQ.GroupName
+           WHERE PSH.IsDeleted = 0 AND PSD.IsActive=1
+           {{(FromDueDate.HasValue ? "AND PSD.ActualWorkOrderDate >= @FromDueDate" : "")}}
+            {{(ToDueDate.HasValue ? "AND PSD.ActualWorkOrderDate <= @ToDueDate" : "")}}
+           GROUP BY 
+               PSH.Id, 
+               MM.MachineName, 
+               MG.GroupName, 
+               MISC.Description,
+               A.ActivityName, 
+               ActivityType.Code, 
+               PSD.ActualWorkOrderDate,
+               PSI.OldItemId, 
+               PSI.OldCategoryDescription,
+               SQ.UOM, 
+               SQ.TotQty, 
+               PSI.RequiredQty
+           ORDER BY PSH.Id DESC;
+        """;
+
+            
+              var parameters = new
+                       {
+                           FromDueDate = FromDueDate,
+                           ToDueDate  = ToDueDate 
+                       };
+
+             var schedule = await _dbConnection.QueryMultipleAsync(query, parameters);
+             var schedulelist = await schedule.ReadAsync<dynamic>();
+
+            return schedulelist;
+        }
     }
 }
    
