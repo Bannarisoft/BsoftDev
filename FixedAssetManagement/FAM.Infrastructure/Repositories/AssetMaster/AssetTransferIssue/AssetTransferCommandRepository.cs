@@ -65,6 +65,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransfer
                    existingRecord.ToCustodianId = assetTransferIssueHdr.ToCustodianId;
                    existingRecord.FromCustodianName = assetTransferIssueHdr.FromCustodianName;
                    existingRecord.ToCustodianName = assetTransferIssueHdr.ToCustodianName;
+                   existingRecord.GatePassNo=assetTransferIssueHdr.GatePassNo;
                    existingRecord.Status = assetTransferIssueHdr.Status;
                    existingRecord.ModifiedBy = assetTransferIssueHdr.ModifiedBy;
                    existingRecord.ModifiedDate = assetTransferIssueHdr.ModifiedDate;

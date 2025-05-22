@@ -32,7 +32,9 @@ namespace FAM.Infrastructure.Repositories.AssetSubCategories
                 Description,
                 AssetCategoriesId,
                 SortOrder,
-                IsActive
+                IsActive,
+                CreatedDate,
+                CreatedByName
             FROM FixedAsset.AssetSubCategories 
             WHERE 
             IsDeleted = 0

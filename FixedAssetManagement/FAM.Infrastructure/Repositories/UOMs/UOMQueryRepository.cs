@@ -30,7 +30,9 @@ namespace FAM.Infrastructure.Repositories.UOMs
                 UOMName,
                 SortOrder,
                 UOMTypeId,
-                IsActive
+                IsActive,
+                CreatedDate,
+                CreatedByName
             FROM FixedAsset.UOM 
             WHERE 
             IsDeleted = 0

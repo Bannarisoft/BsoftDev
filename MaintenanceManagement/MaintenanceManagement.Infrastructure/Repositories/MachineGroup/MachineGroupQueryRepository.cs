@@ -23,7 +23,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
         {            
             const string query = @"
                 SELECT 
-                    Id,  GroupName,  Manufacturer, IsActive, IsDeleted,CreatedBy, CreatedDate, CreatedByName,CreatedIP
+                    Id,  GroupName,DepartmentId,Manufacturer, IsActive, IsDeleted,CreatedBy, CreatedDate, CreatedByName,CreatedIP
                 FROM Maintenance.MachineGroup          
                 WHERE Id = @id AND IsDeleted = 0";
                                 
@@ -69,7 +69,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
                 WHERE M.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (M.GroupName LIKE @Search)")}}; 
 
-                SELECT M.Id, M.GroupName, M.Manufacturer, M.IsActive, M.IsDeleted, 
+                SELECT M.Id, M.GroupName, M.Manufacturer,M.DepartmentId,M.IsActive, M.IsDeleted, 
                     M.CreatedBy, M.CreatedDate, M.CreatedByName, M.CreatedIP, 
                     M.ModifiedBy, M.ModifiedDate, M.ModifiedByName, M.ModifiedIP
                 FROM [Maintenance].[MachineGroup] M

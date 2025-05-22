@@ -28,7 +28,7 @@ namespace FAM.Infrastructure.Repositories.Manufacture
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR ManufactureName LIKE @Search)")}};
 
                 SELECT M.Id,M.Code,ManufactureName,ManufactureType,M.CountryId,M.StateId,CityId,AddressLine1,AddressLine2,PinCode,PersonName,PhoneNumber,Email,  M.IsActive
-                ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
+                ,M.CreatedBy,M.CreatedDate as CreatedAt,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
                 ,C.CountryName,S.StateName,CS.CityName,MM.description ManufactureTypeDescription
                 FROM FixedAsset.Manufacture M
                 INNER JOIN FixedAsset.MiscMaster MM on MM.Id =M.ManufactureType

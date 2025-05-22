@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Application.MachineMaster.Command.CreateMachineMaster;
 using Core.Application.MachineMaster.Command.DeleteMachineMaster;
 using Core.Application.MachineMaster.Command.UpdateMachineMaster;
+using Core.Application.MachineMaster.Queries.GetMachineDepartmentbyId;
 using Core.Application.MachineMaster.Queries.GetMachineLineNo;
 using Core.Application.MachineMaster.Queries.GetMachineMaster;
 using Core.Application.MachineMaster.Queries.GetMachineMasterAutoComplete;
@@ -196,7 +197,7 @@ namespace MaintenanceManagement.API.Controllers
             });
 
         }
-            
+
         [HttpGet("MachineLineNo")]
         public async Task<IActionResult> GetMachineLineNo()
         {
@@ -216,6 +217,21 @@ namespace MaintenanceManagement.API.Controllers
                 message = "MachineLineNo fetched successfully.",
                 data = result.Data
             });
+        }
+        
+        
+        [HttpGet("MachineGroup/{MachineGroupId}")]
+        [ActionName(nameof(GetMachineDepartmentByIdAsync))]
+        public async Task<IActionResult> GetMachineDepartmentByIdAsync(int MachineGroupId)
+        {
+            var machine = await Mediator.Send(new GetMachineDepartmentbyIdQuery() { MachineGroupId = MachineGroupId });
+
+            if (machine.IsSuccess)
+            {
+
+                return Ok(new { StatusCode = StatusCodes.Status200OK, data = machine.Data, message = machine.Message });
+            }
+            return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = machine.Message });
         }
 
 

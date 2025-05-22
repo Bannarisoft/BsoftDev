@@ -7,7 +7,8 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMaster
 {
     public class MachineMasterAutoCompleteDto
     {
-         public int Id { get; set; }
-         public string? MachineName { get; set; }
+        public int Id { get; set; }
+        public string? MachineName { get; set; }
+        public string? MachineCode { get; set; }
     }
 }

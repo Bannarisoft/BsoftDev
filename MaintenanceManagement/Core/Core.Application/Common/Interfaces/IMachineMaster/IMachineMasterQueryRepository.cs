@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.MachineMaster.Queries.GetMachineDepartmentbyId;
 
 namespace Core.Application.Common.Interfaces.IMachineMaster
 {
@@ -14,5 +15,6 @@ namespace Core.Application.Common.Interfaces.IMachineMaster
         // Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroup(int MachineGroupId);
         Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroupSagaAsync(int MachineGroupId, int UnitId);
         Task<List<Core.Domain.Entities.MiscMaster>> GetMachineLineNoAsync(); 
+        Task<MachineDepartmentGroupDto?> GetMachineDepartment(int MachineGroupId);
     }
 }
