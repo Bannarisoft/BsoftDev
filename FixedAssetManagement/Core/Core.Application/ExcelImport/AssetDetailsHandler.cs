@@ -1,6 +1,7 @@
 using Core.Application.Common.Interfaces.IExcelImport;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using OfficeOpenXml;
+using Core.Application.Common.Interfaces;
 
 namespace Core.Application.ExcelImport
 {
@@ -8,11 +9,13 @@ namespace Core.Application.ExcelImport
     {
         private readonly IExcelImportCommandRepository _assetRepository;
         private readonly IExcelImportQueryRepository _assetQueryRepository;
+        private readonly IIPAddressService _ipAddressService;
 
-        public AssetDetailsHandler(IExcelImportCommandRepository assetRepository, IExcelImportQueryRepository assetQueryRepository)
+        public AssetDetailsHandler(IExcelImportCommandRepository assetRepository, IExcelImportQueryRepository assetQueryRepository, IIPAddressService ipAddressService)
         {
             _assetRepository = assetRepository;
             _assetQueryRepository = assetQueryRepository;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task ProcessAssetDetailsAsync(ImportAssetCommand request, ExcelWorksheet worksheet, int row, AssetMasterDto assetDto)
@@ -21,7 +24,11 @@ namespace Core.Application.ExcelImport
             string assetParent = worksheet.Cells[row, 10].Value?.ToString() ?? string.Empty;
             assetDto.AssetParentId = string.IsNullOrEmpty(assetParent) ? null : await _assetRepository.GetAssetIdByNameAsync(assetParent);
 
-            // Extract Unit Details
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
+            assetDto.UnitId= unitId;
+            assetDto.CompanyId = companyId;
+           /*  // Extract Unit Details
             int unitId = request.ImportDto.UnitId;
             
             var unitDetails = await _assetQueryRepository.GetUnitByNameAsync(unitId);
@@ -40,17 +47,21 @@ namespace Core.Application.ExcelImport
                 throw new Exception($"Invalid Company ID '{companyId}' at Excel Row {row}");
             }
             assetDto.CompanyName = companyName;
-            assetDto.CompanyId = request.ImportDto.CompanyId;
+            assetDto.CompanyId = request.ImportDto.CompanyId; */
             // Extract Location Details
             int? locationId = await _assetRepository.GetAssetLocationIdByNameAsync(worksheet.Cells[row, 13].Value?.ToString() ?? "");
             int? subLocationId = await _assetRepository.GetAssetSubLocationIdByNameAsync(worksheet.Cells[row, 14].Value?.ToString() ?? "");
             int custodianId = int.TryParse(worksheet.Cells[row, 15].Value?.ToString(), out int parsedCustodianId) ? parsedCustodianId : 0;
+            string assetDeptName = worksheet.Cells[row, 12].Value?.ToString() ?? string.Empty;
+            int? assetDeptId = await _assetQueryRepository.GetAssetDeptIdByNameAsync(assetDeptName);
 
             assetDto.AssetLocation = new AssetLocationCombineDto
             {
+                UnitId = unitId,
                 LocationId = locationId ?? 1,
                 SubLocationId = subLocationId ?? 2,
-                CustodianId = custodianId
+                CustodianId = custodianId,
+                DepartmentId = assetDeptId ?? 1
             };
         }
     }
