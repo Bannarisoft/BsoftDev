@@ -802,6 +802,10 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
+                    b.Property<int>("DepartmentGroupId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentGroupId");
+
                     b.Property<string>("DeptName")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -834,7 +838,69 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DepartmentGroupId");
+
                     b.ToTable("Department", "AppData");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.DepartmentGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("CreatedBy");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DepartmentGroupCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(15)")
+                        .HasColumnName("DepartmentGroupCode");
+
+                    b.Property<string>("DepartmentGroupName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("DepartmentGroupName");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("ModifiedDate");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("ModifiedBy");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DepartmentGroup", "AppData");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Division", b =>
@@ -2497,6 +2563,17 @@ namespace UserManagement.Infrastructure.Migrations
                     b.Navigation("Unit");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Department", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.DepartmentGroup", "DepartmentGroup")
+                        .WithMany("Departments")
+                        .HasForeignKey("DepartmentGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DepartmentGroup");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Division", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Company", "Company")
@@ -2857,6 +2934,11 @@ namespace UserManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.Department", b =>
                 {
                     b.Navigation("userDepartments");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.DepartmentGroup", b =>
+                {
+                    b.Navigation("Departments");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Division", b =>

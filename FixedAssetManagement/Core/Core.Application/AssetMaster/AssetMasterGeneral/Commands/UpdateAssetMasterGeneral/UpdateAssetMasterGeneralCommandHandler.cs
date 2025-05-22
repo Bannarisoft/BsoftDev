@@ -57,8 +57,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
                     string tempFilePath = request.AssetMaster.AssetImage;
                     string tempDocumentPath = request.AssetMaster.AssetDocument;
                     if (tempFilePath != null){
+                        
                         string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
-
                         var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(request.AssetMaster.CompanyId, request.AssetMaster.UnitId);
                         string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);     
                         string filePath = Path.Combine(uploadPath, tempFilePath);  
@@ -85,7 +85,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
                     //Document
                     if (tempDocumentPath != null){
                         string baseDirectory = await _assetMasterGeneralQueryRepository.GetDocumentDirectoryAsync();
-
                         var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(request.AssetMaster.CompanyId, request.AssetMaster.UnitId);
                         string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);     
                         string filePath = Path.Combine(uploadPath, tempFilePath);  
@@ -96,7 +95,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
                             string directory = Path.GetDirectoryName(filePath) ?? string.Empty;
                             string newFileName = $"{request.AssetMaster.AssetCode}{Path.GetExtension(tempFilePath)}";
                             string newFilePath = Path.Combine(directory, newFileName);
-
                             try
                             {
                                 File.Move(filePath, newFilePath);

@@ -64,6 +64,8 @@ namespace UserManagement.Infrastructure.Data
         public DbSet<CustomFieldOptionalValue> CustomFieldOptionalValue { get; set; }
         public DbSet<CustomFieldUnit> CustomFieldUnit { get; set; }
         public DbSet<CustomFieldMenu> CustomFieldMenu { get; set; }
+        
+        public DbSet<DepartmentGroup> DepartmentGroup { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -79,22 +81,22 @@ namespace UserManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UnitConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyAddressConfiguration());
-			modelBuilder.ApplyConfiguration(new StateConfiguration());       
-            modelBuilder.ApplyConfiguration(new CityConfiguration());  
+            modelBuilder.ApplyConfiguration(new StateConfiguration());
+            modelBuilder.ApplyConfiguration(new CityConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyContactConfiguration());
             modelBuilder.ApplyConfiguration(new EntityConfigurations());
             modelBuilder.ApplyConfiguration(new DivisionConfiguration());
-			modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
+            modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleAllocationConfigurations());
             modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
-     
-			modelBuilder.ApplyConfiguration(new PwdComplexityRuleConfiguration());
+
+            modelBuilder.ApplyConfiguration(new PwdComplexityRuleConfiguration());
             modelBuilder.ApplyConfiguration(new AdminSecuritySettingsConfiguration());
 
-            
+
             modelBuilder.ApplyConfiguration(new PasswordLogConfiguration());
- modelBuilder.ApplyConfiguration(new FinancialYearConfiguration());
+            modelBuilder.ApplyConfiguration(new FinancialYearConfiguration());
             modelBuilder.ApplyConfiguration(new CurrencyConfiguration());
             modelBuilder.ApplyConfiguration(new TimeZonesConfiguration());
             modelBuilder.ApplyConfiguration(new UserCompanyConfiguration());
@@ -114,8 +116,9 @@ namespace UserManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new CustomFieldOptionalValueConfiguration());
             modelBuilder.ApplyConfiguration(new CustomFieldUnitConfiguration());
             modelBuilder.ApplyConfiguration(new CustomFieldMenuConfiguration());
-            
-               
+            modelBuilder.ApplyConfiguration(new DepartmentGroupConfiguration());
+
+
             base.OnModelCreating(modelBuilder);
         }
          public override int SaveChanges()

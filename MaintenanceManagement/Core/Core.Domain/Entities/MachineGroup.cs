@@ -6,6 +6,7 @@ namespace Core.Domain.Entities
 
     {
         public string?  GroupName { get; set; }
+
         public int Manufacturer { get; set;} 
         public int DepartmentId { get; set; }      
          public ICollection<ActivityMachineGroup>? ActivityMachineGroups { get; set; }   

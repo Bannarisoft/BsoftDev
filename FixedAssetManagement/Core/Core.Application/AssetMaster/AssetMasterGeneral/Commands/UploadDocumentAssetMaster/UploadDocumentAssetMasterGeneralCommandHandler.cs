@@ -1,5 +1,3 @@
-using AutoMapper;
-using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
@@ -9,7 +7,8 @@ using Microsoft.Extensions.Logging;
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadDocumentAssetMaster
 {
     public class UploadDocumentAssetMasterGeneralCommandHandler : IRequestHandler<UploadDocumentAssetMasterGeneralCommand, ApiResponseDTO<AssetMasterDocumentDto>>
-    {        private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
+    {        
+        private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly ILogger<UploadDocumentAssetMasterGeneralCommandHandler> _logger;
         private readonly IIPAddressService _ipAddressService;
 

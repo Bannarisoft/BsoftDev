@@ -9,7 +9,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteDocumen
     public class DeleteDocumentAssetMasterGeneralCommandHandler : IRequestHandler<DeleteDocumentAssetMasterGeneralCommand, ApiResponseDTO<bool>>
     {
         private readonly IFileUploadService _fileUploadService;        
-        
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly ILogger<DeleteDocumentAssetMasterGeneralCommandHandler> _logger;
         private readonly IIPAddressService _ipAddressService;
@@ -44,7 +43,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteDocumen
 
             var result = await _fileUploadService.DeleteFileAsync(filePath);
 
-            await _assetMasterGeneralRepository.RemoveAssetImageReferenceAsync(request.assetPath);
+            await _assetMasterGeneralRepository.RemoveAssetDocumentReferenceAsync(request.assetPath);
+
             if (result)
             {
                 return new ApiResponseDTO<bool> { IsSuccess = true, Message = "File deleted successfully" };

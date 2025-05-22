@@ -29,7 +29,12 @@ namespace FAM.Infrastructure
                 .Build();
 
           
-            var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
+            //var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
+            
+          var connectionString = configuration.GetConnectionString("DefaultConnection")
+                                                .Replace("{SERVER}","192.168.1.126")
+                                                .Replace("{USER_ID}","Developer")
+                                                .Replace("{ENC_PASSWORD}", "Dev@#$456");
 
             optionsBuilder.UseSqlServer(connectionString);
 

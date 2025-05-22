@@ -260,12 +260,13 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         {
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
-                SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName ParentName,AM.AssetGroupId ,
-                --MM.Description+'\'+C.CompanyName+'\'+trim(UN.unitname) +'\'+AM.AssetImage AssetImage,
+                SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName ParentName,AM.AssetGroupId ,                
                 case when (isnull(AM.AssetImage,'') <> '') then MM.Description+''+MM1.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetImage  else 
                 '' end AssetImage ,  
                 AM.AssetCategoryId,AM.AssetSubCategoryId,
-                AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName
+                AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName,
+                case when (isnull(AM.AssetDocument,'') <> '') then MM.Description+''+MM1.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetDocument  else 
+                '' end AssetDocument ,  AM.AssetDocument AssetDocumentName
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
                 INNER JOIN [FixedAsset].[AssetGroup] AG ON AM.AssetGroupId = AG.Id
@@ -413,12 +414,13 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         {
            var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
-                SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,
-                --MM.Description+'\'+C.CompanyName+'\'+trim(UN.unitname) +'\'+AM.AssetImage AssetImage,
-                  case when (isnull(AM.AssetImage,'') <> '') then MM.Description+''+MM1.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetImage  else 
+                SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,                
+                case when (isnull(AM.AssetImage,'') <> '') then MM.Description+''+MM1.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetImage  else 
                 '' end AssetImage ,  
                 AM.AssetCategoryId,AM.AssetSubCategoryId,
-                AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName
+                AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName,
+                case when (isnull(AM.AssetDocument,'') <> '') then MM.Description+''+MM2.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetDocument  else 
+                '' end AssetDocument ,  AM.AssetDocument AssetDocumentName
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
                 INNER JOIN [FixedAsset].[AssetGroup] AG ON AM.AssetGroupId = AG.Id
@@ -427,6 +429,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 LEFT JOIN [FixedAsset].[AssetMaster] AssetParent ON AM.AssetParentId = AssetParent.Id                
                    LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'               
                 LEFT JOIN FixedAsset.MiscTypeMaster MM1 on MM1.MiscTypeCode ='ASSETIMAGE'
+                LEFT JOIN FixedAsset.MiscTypeMaster MM2 on MM2.MiscTypeCode ='ASSETDocument'
                 LEFT JOIN Bannari.AppData.Unit UN on UN.Id=AM.UnitId
                 LEFT JOIN Bannari.AppData.Company C on C.Id=AM.CompanyId
                 WHERE AM.CompanyId = @CompanyId AND AM.UnitId = @UnitId AND AM.Id = @AssetId;
@@ -543,12 +546,11 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         public async Task<string> GetDocumentDirectoryAsync()
         {
             const string query = @"
-            SELECT M.Description            
-            FROM FixedAsset.MiscMaster M
-            INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeId
+            SELECT Description            
+            FROM FixedAsset.MiscTypeMaster             
             WHERE (MiscTypeCode = @MiscTypeCode) 
-            AND  M.IsDeleted=0 and M.IsActive=1
-            ORDER BY M.ID DESC";    
+            AND  IsDeleted=0 and IsActive=1
+            ORDER BY ID DESC";    
             var parameters = new { MiscTypeCode = MiscEnumEntity.AssetDocumentImage.MiscCode };        
             var result = await _dbConnection.QueryAsync<string>(query,parameters);
             return result.FirstOrDefault();  
