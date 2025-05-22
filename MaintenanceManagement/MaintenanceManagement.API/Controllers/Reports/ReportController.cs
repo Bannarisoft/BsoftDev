@@ -203,80 +203,139 @@ namespace MaintenanceManagement.API.Controllers.Reports
             });
         }
 
-        [HttpGet("RequestReport")]
-        public async Task<IActionResult> MaintenanceReportAsync(
-                    [FromQuery] DateTimeOffset? requestFromDate,
-                    [FromQuery] DateTimeOffset? requestToDate,
-                    [FromQuery] int? RequestType,
-                    [FromQuery] int? requestStatus,
-                    [FromQuery] int? departmentId
-                    )
-        {
-            var query = new RequestReportQuery
-            {
-                RequestFromDate = requestFromDate,
-                RequestToDate = requestToDate,
-                RequestType = RequestType,
-                RequestStatus = requestStatus,
-                DepartmentId = departmentId
-            };
+        // [HttpGet("RequestReport")]
+        // public async Task<IActionResult> MaintenanceReportAsync(
+        //             [FromQuery] DateTimeOffset? requestFromDate,
+        //             [FromQuery] DateTimeOffset? requestToDate,
+        //             [FromQuery] int? RequestType,
+        //             [FromQuery] int? requestStatus,
+        //             [FromQuery] int? departmentId
+        //             )
+        // {
+        //     var query = new RequestReportQuery
+        //     {
+        //         RequestFromDate = requestFromDate,
+        //         RequestToDate = requestToDate,
+        //         RequestType = RequestType,
+        //         RequestStatus = requestStatus,
+        //         DepartmentId = departmentId
+        //     };
 
-            var result = await Mediator.Send(query);
+        //     var result = await Mediator.Send(query);
 
-            if (result == null || result.Data == null || result.Data.Count == 0)
+        //     if (result == null || result.Data == null || result.Data.Count == 0)
+        //     {
+        //         return NotFound(new
+        //         {
+        //             StatusCode = StatusCodes.Status404NotFound,
+        //             Message = result?.Message ?? "No maintenance requests found."
+
+        //         });
+        //     }
+
+        //     return Ok(new
+        //     {
+        //         StatusCode = StatusCodes.Status200OK,
+        //         Message = result.Message,
+        //         Data = result?.Data?.ToList()
+        //     });
+        // }
+                [HttpGet("RequestReport")]
+            public async Task<IActionResult> MaintenanceReportAsync(
+                [FromQuery] DateTimeOffset? requestFromDate,
+                [FromQuery] DateTimeOffset? requestToDate,
+                [FromQuery] int? RequestType,
+                [FromQuery] int? requestStatus,
+                [FromQuery] int? departmentId)
             {
-                return NotFound(new
+                var query = new RequestReportQuery
                 {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = result?.Message ?? "No maintenance requests found."
+                    RequestFromDate = requestFromDate,
+                    RequestToDate = requestToDate,
+                    RequestType = RequestType,
+                    RequestStatus = requestStatus,
+                    DepartmentId = departmentId
+                };
+
+                var result = await Mediator.Send(query);
+
+                // Always return 200 OK, even if IsSuccess is false
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = result.Message,
+                    Data = result.Data ?? new List<RequestReportDto>()
+                   
                 });
             }
-
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status200OK,
-                Message = result.Message,
-                Data = result?.Data ?? new List<RequestReportDto>()
-            });
-        }
-
-        [HttpGet("WorkOrderChecklistReport")]
-        public async Task<IActionResult> WorkOrderChecklistReportAsync(
+            [HttpGet("WorkOrderChecklistReport")]
+            public async Task<IActionResult> WorkOrderChecklistReportAsync(
                 [FromQuery] DateTimeOffset? WorkOrderFromDate,
                 [FromQuery] DateTimeOffset? WorkOrderToDate,
                 [FromQuery] int? MachineGroupId,
                 [FromQuery] int? machineId,
-                [FromQuery] int? ActivityId
-                )
-        {
-            var query = new WorkOderCheckListReportQuery
+                [FromQuery] int? ActivityId)
             {
-                WorkOrderFromDate = WorkOrderFromDate,
-                WorkOrderToDate = WorkOrderToDate,
-                MachineGroupId = MachineGroupId,
-                MachineId = machineId,
-                ActivityId = ActivityId
-            };
-
-            var result = await Mediator.Send(query);
-
-            if (result == null || result.Data == null || result.Data.Count == 0)
-            {
-                return NotFound(new
+                var query = new WorkOderCheckListReportQuery
                 {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = result?.Message ?? "No Work Order Checklist records found."
+                    WorkOrderFromDate = WorkOrderFromDate,
+                    WorkOrderToDate = WorkOrderToDate,
+                    MachineGroupId = MachineGroupId,
+                    MachineId = machineId,
+                    ActivityId = ActivityId
+                };
+
+                var result = await Mediator.Send(query);
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = result?.Message ?? "No Work Order Checklist records found.",
+                    Data = result?.Data ?? new List<WorkOderCheckListReportDto>()
+                    
                 });
             }
 
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status200OK,
-                Message = result.Message,
-                //Data = result.Data
-                Data = result?.Data ?? new List<WorkOderCheckListReportDto>()
-            });
-        }
+
+
+        // [HttpGet("WorkOrderChecklistReport")]
+        // public async Task<IActionResult> WorkOrderChecklistReportAsync(
+        //         [FromQuery] DateTimeOffset? WorkOrderFromDate,
+        //         [FromQuery] DateTimeOffset? WorkOrderToDate,
+        //         [FromQuery] int? MachineGroupId,
+        //         [FromQuery] int? machineId,
+        //         [FromQuery] int? ActivityId
+        //         )
+        // {
+        //     var query = new WorkOderCheckListReportQuery
+        //     {
+        //         WorkOrderFromDate = WorkOrderFromDate,
+        //         WorkOrderToDate = WorkOrderToDate,
+        //         MachineGroupId = MachineGroupId,
+        //         MachineId = machineId,
+        //         ActivityId = ActivityId
+        //     };
+
+        //     var result = await Mediator.Send(query);
+
+        //     if (result == null || result.Data == null || result.Data.Count == 0)
+        //     {
+        //         return NotFound(new
+        //         {
+        //             StatusCode = StatusCodes.Status404NotFound,
+        //             Message = result?.Message ?? "No Work Order Checklist records found."
+        //         });
+        //     }
+
+        //     return Ok(new
+        //     {
+        //         StatusCode = StatusCodes.Status200OK,
+        //         Message = result.Message,
+        //         //Data = result.Data
+        //        // Data = result?.Data?.ToList()
+        //         Data = result?.Data?.ToList()
+        //     });
+        // }
 
         [HttpGet("MRSReport")]
         public async Task<IActionResult> GetMRSReport(

@@ -31,7 +31,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
                     M.CreatedBy, M.CreatedDate, M.CreatedByName, M.CreatedIP, M.ModifiedBy, M.ModifiedDate, 
                     M.ModifiedByName, M.ModifiedIP
                 FROM Maintenance.MiscMaster M
-                WHERE M.IsDeleted = 0 AND M.IsActive = 1
+                WHERE M.IsDeleted = 0 
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (M.Code LIKE @Search)")}}
                 ORDER BY M.Id DESC 
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -62,7 +62,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
             public async Task<Core.Domain.Entities.MiscMaster> GetByIdAsync(int id)
         {            
            const string query = @" SELECT Id,MiscTypeId,Code,Description,SortOrder,IsActive  FROM Maintenance.MiscMaster          
-             WHERE Id = @id AND IsDeleted = 0 AND IsActive = 1";                          
+             WHERE Id = @id AND IsDeleted = 0 ";                          
             return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MiscMaster>(query, new { id });
         } 
 
@@ -73,7 +73,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
 
             const string query = @"SELECT M.Id,M.Code ,M.Description  FROM Maintenance.MiscMaster M
             INNER JOIN [Maintenance].[MiscTypeMaster] MT ON MT.Id = M.MiscTypeId
-                WHERE M.IsDeleted = 0 AND M.IsActive = 1 AND MT.MiscTypeCode= @MiscTypeCode AND M.Code LIKE @SearchPattern  ";
+                WHERE M.IsDeleted = 0  AND MT.MiscTypeCode= @MiscTypeCode AND M.Code LIKE @SearchPattern  ";
                 
             
             var parameters = new 
@@ -91,7 +91,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
         {
               var query = """
                  SELECT * FROM Maintenance.MiscMaster
-                 WHERE Code = @Name AND IsDeleted = 0 AND IsActive = 1
+                 WHERE Code = @Name AND IsDeleted = 0 
                  """;
 
              var parameters = new DynamicParameters(new { Name = name });
@@ -107,7 +107,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
 
                public async Task<int> GetMaxSortOrderAsync()
        {
-           var query = "SELECT ISNULL(MAX(SortOrder), 0) FROM Maintenance.MiscMaster WHERE IsDeleted = 0 AND IsActive = 1";
+           var query = "SELECT ISNULL(MAX(SortOrder), 0) FROM Maintenance.MiscMaster WHERE IsDeleted = 0 ";
            return await _dbConnection.QueryFirstOrDefaultAsync<int>(query);
        }
         
@@ -118,7 +118,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
                         WHERE Code = @Code 
                             AND MiscTypeId = @MiscTypeId  
                             AND IsDeleted = 0 
-                            AND IsActive = 1";
+                            ";
 
             var parameters = new DynamicParameters(new 
             { 
@@ -139,7 +139,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
 
            public async Task<bool> NotFoundAsync(int id)
         {
-             var query = "SELECT COUNT(1) FROM Maintenance.MiscMaster WHERE Id = @Id AND IsDeleted = 0 AND IsActive = 1";
+             var query = "SELECT COUNT(1) FROM Maintenance.MiscMaster WHERE Id = @Id AND IsDeleted = 0";
              
                 var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
                 return count > 0;
@@ -147,7 +147,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MiscMaster
 
            public async Task<bool> FKColumnValidation(int MiscMasterId)
         {
-            var query = "SELECT COUNT(1) FROM Maintenance.MiscMaster WHERE Id = @Id AND IsDeleted = 0   AND IsActive = 1";
+            var query = "SELECT COUNT(1) FROM Maintenance.MiscMaster WHERE Id = @Id AND IsDeleted = 0   ";
              
                 var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = MiscMasterId });
                 return count > 0;

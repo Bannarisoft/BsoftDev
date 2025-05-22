@@ -12,6 +12,7 @@ using System.Data.Common;
 using UserManagement.Infrastructure.Data;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Core.Application.Departments.Queries.GetDepartmentByDepartmentGroupId;
 
 namespace UserManagement.API.Controllers
 {
@@ -62,7 +63,10 @@ namespace UserManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data = departments.Data
+                data = departments.Data,
+                TotalCount = departments.TotalCount,
+                PageNumber = departments.PageNumber,
+                PageSize = departments.PageSize
             });
     }
 
@@ -90,13 +94,13 @@ namespace UserManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Data = department.Data
+                Data = department.Data,
+                Message = department.Message
             });
          
         }
 
-           [HttpGet("by-name/")]
-
+        [HttpGet("by-name/")]
         public async Task<IActionResult> GetAllDepartmentAutoCompleteSearchAsync([FromQuery] string? name)
         {
             _logger.LogInformation($"Starting GetAllDepartmentAutoCompleteSearchAsync with search pattern: {name} ");
@@ -121,11 +125,41 @@ namespace UserManagement.API.Controllers
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "No matching departments found."
                     });
-
-
-
             
         }
+
+        [HttpGet("by-department-group/{departmentGroupId}")]
+            public async Task<IActionResult> GetDepartmentsByDepartmentGroupId(int departmentGroupId)
+            {
+                if (departmentGroupId <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Invalid Department Group ID."
+                    });
+                }
+
+                var result = await Mediator.Send(new GetDepartmentsByDepartmentGroupIdQuery
+                {
+                    DepartmentGroupId = departmentGroupId
+                });
+
+                var dataList = result.Data ?? new List<DepartmentWithGroupDto>();
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = dataList.Any()
+                                ? "Departments retrieved successfully."
+                                : "No departments found for this group.",
+                    Data = dataList,
+                    Count = dataList.Count,
+                    IsSuccess = result.IsSuccess
+                });
+            }
+
+
 
         [HttpPost]        
         public async Task<IActionResult>CreateAsync([FromBody] CreateDepartmentCommand command)
