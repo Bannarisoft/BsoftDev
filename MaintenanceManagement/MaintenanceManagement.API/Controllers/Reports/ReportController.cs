@@ -52,7 +52,6 @@ namespace MaintenanceManagement.API.Controllers.Reports
                     return BadRequest(new { message = "Invalid toDate format. Use yyyy-MM-dd." });
                 }
                 parsedToDate = parsedDate;
-
             }
 
             var query = new WorkOrderReportQuery
@@ -64,20 +63,11 @@ namespace MaintenanceManagement.API.Controllers.Reports
             };
             var result = await Mediator.Send(query);
 
-            if (result == null || result.Data == null || result.Data.Count == 0)
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = result?.Message ?? "No Work Order Report found."
-                });
-            }
-
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = result.Message,
-                Data = result.Data
+                Message = result?.Message ?? "No Asset Report found.",
+                Data = result?.Data ?? new List<WorkOrderReportDto>()
             });
         }
 
@@ -349,20 +339,13 @@ namespace MaintenanceManagement.API.Controllers.Reports
 
             var result = await Mediator.Send(query);
 
-            if (result == null || result.Data == null || result.Data.Count == 0)
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = result?.Message ?? "No Scheduler records found."
-                });
-            }
-
+         
+  
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = result.Message,
-                Data = result?.Data
+                Message = result?.Message,
+                Data = result?.Data ?? new List<ScheduleReportDto>()
             });
         }
            [HttpGet("MaterialPlanningReport")]
@@ -379,20 +362,12 @@ namespace MaintenanceManagement.API.Controllers.Reports
 
             var result = await Mediator.Send(query);
 
-            if (result == null || result.Data == null || result.Data.Count == 0)
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = result?.Message ?? "No Material Planning Report records found."
-                });
-            }
-
+          
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = result.Message,
-                Data = result?.Data
+                Message = result.Message,                
+                Data = result?.Data ?? new List<MaterialPlanningReportDto>()
             });
         }
     }
