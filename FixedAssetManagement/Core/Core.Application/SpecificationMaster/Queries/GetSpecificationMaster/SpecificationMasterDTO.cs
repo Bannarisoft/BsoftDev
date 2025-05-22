@@ -12,7 +12,7 @@ namespace Core.Application.SpecificationMaster.Queries.GetSpecificationMaster
         public byte ISDefault { get; set; }        
         public Status IsActive { get; set; }
         public int CreatedBy { get; set; }
-        public DateTimeOffset?  CreatedAt { get; set; }
+        public DateTimeOffset?  CreatedDate { get; set; }
         public string? CreatedByName { get; set; }
         public string? CreatedIP { get; set; }
         public int? ModifiedBy { get; set; }

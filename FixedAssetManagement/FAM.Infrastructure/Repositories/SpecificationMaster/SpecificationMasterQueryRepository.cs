@@ -22,11 +22,13 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
                 WHERE IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SpecificationName LIKE @Search)")}};
 
-                SELECT Id,SpecificationName,AssetGroupId,ISDefault,  IsActive
-                ,CreatedBy,CreatedDate as CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
-                FROM FixedAsset.SpecificationMaster  WHERE IsDeleted = 0
+                SELECT SM.Id,SpecificationName,AssetGroupId,ISDefault,  SM.IsActive
+                ,SM.CreatedBy,SM.CreatedDate,SM.CreatedByName,SM.CreatedIP,SM.ModifiedBy,SM.ModifiedDate,SM.ModifiedByName,SM.ModifiedIP,AG.GroupName
+                FROM FixedAsset.SpecificationMaster  SM
+                inner join FixedAsset.AssetGroup AG on AG.Id=SM.AssetGroupId
+                WHERE SM.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SpecificationName LIKE @Search )")}}
-                ORDER BY Id DESC
+                ORDER BY SM.Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
                 SELECT @TotalCount AS TotalCount;
                 """;
