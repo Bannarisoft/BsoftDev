@@ -23,11 +23,11 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             _applicationDbContext = applicationDbContext;        
         }
     
-        public async Task<(List<DepreciationDto>, int)> CalculateDepreciationAsync(int finYearId, DateTimeOffset? startDate, DateTimeOffset? endDate,int depreciationType, int PageNumber, int PageSize, string? SearchTerm,int depreciationPeriod)
+        public async Task<(List<DepreciationDto>, int)> CalculateDepreciationAsync(int companyId, int unitId, int finYearId, DateTimeOffset? startDate, DateTimeOffset? endDate,int depreciationType, int PageNumber, int PageSize, string? SearchTerm,int depreciationPeriod)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", CompanyId);
-            parameters.Add("@UnitId", UnitId);
+            parameters.Add("@CompanyId", companyId);
+            parameters.Add("@UnitId", unitId);
             parameters.Add("@Finyear", finYearId);
             parameters.Add("@StartDate", startDate);
             parameters.Add("@EndDate", endDate);
@@ -115,11 +115,11 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
                 .AnyAsync();
         }
 
-        public async Task<List<DepreciationAbstractDto>> GetDepreciationAbstractAsync(int finYearId, DateTimeOffset? startDate,DateTimeOffset? endDate,int depreciationPeriod, int depreciationType)
+        public async Task<List<DepreciationAbstractDto>> GetDepreciationAbstractAsync (int companyId, int unitId, int finYearId, DateTimeOffset? startDate,DateTimeOffset? endDate,int depreciationPeriod, int depreciationType)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", CompanyId);
-            parameters.Add("@UnitId", UnitId);
+            parameters.Add("@CompanyId", companyId);
+            parameters.Add("@UnitId", unitId);
             parameters.Add("@Finyear", finYearId);
             parameters.Add("@StartDate", startDate);
             parameters.Add("@EndDate", endDate);

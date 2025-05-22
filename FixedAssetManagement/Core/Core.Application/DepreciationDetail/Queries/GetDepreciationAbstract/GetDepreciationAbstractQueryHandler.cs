@@ -25,7 +25,7 @@ namespace Core.Application.DepreciationDetail.Queries.GetDepreciationAbstract
         }        
         public async Task<ApiResponseDTO<List<DepreciationAbstractDto>>> Handle(GetDepreciationAbstractQuery request, CancellationToken cancellationToken)
         {
-            var depreciationAbstract = await _depreciationDetailRepository.GetDepreciationAbstractAsync(request.finYearId, request.startDate,request.endDate, request.depreciationPeriod,request.depreciationType);
+            var depreciationAbstract = await _depreciationDetailRepository.GetDepreciationAbstractAsync(request.companyId,request.unitId, request.finYearId, request.startDate,request.endDate, request.depreciationPeriod,request.depreciationType);
             var depreciationAbstractList = _mapper.Map<List<DepreciationAbstractDto>>(depreciationAbstract);
 
             //Domain Event

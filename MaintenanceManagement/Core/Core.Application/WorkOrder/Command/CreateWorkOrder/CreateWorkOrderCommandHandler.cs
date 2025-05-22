@@ -1,6 +1,7 @@
 
 
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IWorkOrder;
@@ -16,22 +17,35 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
         private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
         private readonly IMediator _mediator;
         private readonly IIPAddressService _ipAddressService;
+        private readonly IUnitGrpcClient _unitGrpcClient; 
 
-        public CreateWorkOrderCommandHandler(IMapper mapper, IWorkOrderCommandRepository workOrderRepository, IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IIPAddressService ipAddressService)
+        public CreateWorkOrderCommandHandler(IMapper mapper, IWorkOrderCommandRepository workOrderRepository, IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IIPAddressService ipAddressService, IUnitGrpcClient unitGrpcClient)
         {
             _mapper = mapper;
             _workOrderRepository = workOrderRepository;
             _workOrderQueryRepository = workOrderQueryRepository;
             _mediator = mediator;     
             _ipAddressService = ipAddressService;    
+            _unitGrpcClient = unitGrpcClient;
         }
 
         public async Task<ApiResponseDTO<WorkOrderCombineDto>> Handle(CreateWorkOrderCommand request, CancellationToken cancellationToken)
-        {
+        {            
+            var woEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrderDto);               
+
             var companyId = _ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
+
+            var units = await _unitGrpcClient.GetAllUnitAsync();
+            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+            if (unitLookup.TryGetValue(unitId, out var unitNameGrpc))
+            {
+                var unitNamegRPC= unitNameGrpc;
+            }
             //var latestWoCode = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(request.WorkOrderDto.RequestTypeId);            
-            var woEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrderDto);   
+            
+            
             //woEntity.WorkOrderDocNo = latestWoCode;         
             woEntity.CompanyId = companyId; 
             woEntity.UnitId = unitId; 
@@ -40,8 +54,8 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
             woEntity.CreatedByName=     _ipAddressService.GetUserName();   
             woEntity.CreatedBy=      int.Parse(_ipAddressService.GetCurrentUserId());
             woEntity.CreatedIP=     _ipAddressService.GetSystemIPAddress();
+            
             var result = await _workOrderRepository.CreateAsync(woEntity,request.WorkOrderDto.RequestTypeId, cancellationToken);
-
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
@@ -59,6 +73,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
                 if (tempFilePath != null){
                     string baseDirectory = await _workOrderQueryRepository.GetBaseDirectoryAsync();
                     var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(companyId, unitId);
+
                     string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);                      
                     string filePath = Path.Combine(uploadPath, tempFilePath);
                     EnsureDirectoryExists(Path.GetDirectoryName(filePath)); 
