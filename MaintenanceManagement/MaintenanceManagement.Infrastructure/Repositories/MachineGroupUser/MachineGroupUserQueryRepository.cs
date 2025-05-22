@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IMachineGroupUser;
 using Core.Application.MachineGroupUser.Queries.GetMachineGroupUser;
 using Core.Application.MachineGroupUser.Queries.GetMachineGroupUserAutoComplete;
@@ -17,11 +13,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroupUser
         {
             _dbConnection = dbConnection;
         }
-      public async Task<bool> AlreadyExistsAsync(int machineGroupId, int? id = null)
+      public async Task<bool> AlreadyExistsAsync(int machineGroupId,int departmentId,int userId,  int? id = null)
         {
-            var query = "SELECT COUNT(1) FROM [Maintenance].[MachineGroupUser] WHERE MachineGroupId = @machineGroupId AND IsDeleted = 0";
+            var query = "SELECT COUNT(1) FROM [Maintenance].[MachineGroupUser] WHERE MachineGroupId = @machineGroupId and DepartmentId=departmentId and userId=@userId AND IsDeleted = 0";
             var parameters = new DynamicParameters();
-            parameters.Add("machineGroupId", machineGroupId); // ✔️ Correct parameter name
+            parameters.Add("machineGroupId", machineGroupId);
+            parameters.Add("departmentId", departmentId);
+            parameters.Add("userId", userId);
+            
 
             if (id is not null)
             {

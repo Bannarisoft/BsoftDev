@@ -139,24 +139,31 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
         public async Task<List<Core.Domain.Entities.WorkOrderMaster.WorkOrder>> GetWorkOrderAsync()
         {
-            var excludedStatusCode = MiscEnumEntity.MaintenanceStatusUpdate.Code;
+            //var excludedStatusCode = MiscEnumEntity.MaintenanceStatusUpdate.Code;
+            var excludedStatusCodes = new[] 
+            { 
+                MiscEnumEntity.MaintenanceStatusUpdate.Code, 
+                MiscEnumEntity.MaintenanceStatusCancelled.Code 
+            };
+
             const string query = @"
                 SELECT WO.Id, WO.WorkOrderDocNo
                 FROM Maintenance.WorkOrder WO     
                 INNER JOIN Maintenance.MiscMaster MM ON MM.ID = WO.StatusId   
                 WHERE WO.CompanyId = @CompanyId 
                 AND WO.UnitId = @UnitId  
-                AND MM.Code <> @ExcludedStatusCode
+                 AND MM.Code NOT IN @ExcludedStatusCodes
                 ORDER BY WO.Id";
 
             var parameters = new 
             { 
                 CompanyId, 
                 UnitId, 
-                ExcludedStatusCode = excludedStatusCode 
+                ExcludedStatusCode = excludedStatusCodes 
             };
-        var result = await _dbConnection.QueryAsync<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(query, parameters);
-        return result.ToList();        }
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(query, parameters);
+            return result.ToList();        
+        }
 
        
     } 

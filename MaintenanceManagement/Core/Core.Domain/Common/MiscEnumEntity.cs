@@ -43,8 +43,10 @@ namespace Core.Domain.Common
         public static class  MaintenanceStatusUpdate
         {   
             public const string Code = "Closed";
-
-
+        } 
+        public static class  MaintenanceStatusCancelled
+        {   
+            public const string Code = "Cancelled";
         } 
 
          public static class  StatusOpen

@@ -10,7 +10,7 @@ namespace Core.Application.SpecificationMaster.Commands.UpdateSpecificationMaste
         public int Id { get; set; }       
         public string? SpecificationName { get; set; }
         public int? AssetGroupId { get; set; }
-        public bool IsDefault { get; set; }               
-        public Status IsActive { get; set; }
+        public byte IsDefault { get; set; }               
+        public byte IsActive { get; set; }
     }
 }
