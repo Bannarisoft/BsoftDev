@@ -51,6 +51,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
                     a.FromCustodianName, 
                     a.ToCustodianId,
                     a.ToCustodianName, 
+                    a.GatePassNo,
                     a.Status
                     FROM FixedAsset.AssetTransferIssueHdr a
                 INNER JOIN FixedAsset.MiscMaster c ON a.TransferType = c.Id

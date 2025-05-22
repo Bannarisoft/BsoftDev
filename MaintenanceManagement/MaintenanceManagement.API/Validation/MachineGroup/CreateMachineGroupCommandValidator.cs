@@ -37,6 +37,9 @@ namespace MaintenanceManagement.API.Validation.MachineGroup
                         RuleFor(x => x.GroupName)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateMachineGroupCommand.GroupName)} {rule.Error}");
+                         RuleFor(x => x.DepartmentId)
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateMachineGroupCommand.DepartmentId)} {rule.Error}");
                         break;
                   case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values
@@ -44,6 +47,12 @@ namespace MaintenanceManagement.API.Validation.MachineGroup
                             .MaximumLength(maxLength)
                             .WithMessage($"{nameof(CreateMachineGroupCommand.GroupName)} {rule.Error}");
                             break;
+
+                    case "MinLength":
+                        RuleFor(x => x.DepartmentId)
+                            .GreaterThanOrEqualTo(1)
+                            .WithMessage($"{nameof(CreateMachineGroupCommand.DepartmentId)} {rule.Error} {0}");   
+                        break;
                             case "AlphanumericOnly": 
                         RuleFor(x => x.GroupName)
                             .Matches(new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9 ]+$")) // Allow spaces

@@ -17,5 +17,8 @@ namespace Core.Application.Location.Queries.GetLocations
         public int DepartmentId { get; set; }
         public string? DepartmentName { get; set; }
         public Status IsActive { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public string? CreatedByName { get; set; }
+
     }
 }

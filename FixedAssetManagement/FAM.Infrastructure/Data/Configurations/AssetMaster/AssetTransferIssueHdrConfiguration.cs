@@ -64,7 +64,10 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
 
             builder.Property(b => b.ToCustodianName)
                 .IsRequired()
-                .HasColumnType("nvarchar(100)");    
+                .HasColumnType("nvarchar(100)");
+
+            builder.Property(b => b.GatePassNo)
+                .HasColumnType("nvarchar(100)");   
 
             builder.Property(b => b.Status)
                 .IsRequired()

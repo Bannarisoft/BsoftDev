@@ -22,6 +22,7 @@ namespace Core.Domain.Entities.AssetMaster
         public string? ToCustodianName { get; set; }
         public string? Status { get; set; } 
         public byte AckStatus { get; set; }
+        public string? GatePassNo { get; set; }
         public int CreatedBy { get; set; }
         public DateTimeOffset? CreatedDate { get; set; }
         public string? CreatedByName { get; set; }

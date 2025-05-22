@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMachineMaster;
+using Core.Application.MachineMaster.Queries.GetMachineDepartmentbyId;
 using Core.Domain.Common;
 using Dapper;
 
@@ -35,7 +36,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                 MachineName,
                 MachineGroupId,
                 UnitId,
-                DepartmentId,
                 ProductionCapacity,
                 UomId,
                 ShiftMasterId,
@@ -43,7 +43,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                 WorkCenterId,
                 InstallationDate,
                 AssetId,
-                LineNo,
+                [LineNo],
                 IsActive
             FROM Maintenance.MachineMaster 
             WHERE 
@@ -88,10 +88,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             searchPattern = searchPattern ?? string.Empty; // Prevent null issues
 
             const string query = @"
-             SELECT Id, MachineName 
+            SELECT Id, MachineName, MachineCode 
             FROM Maintenance.MachineMaster 
-            WHERE IsDeleted = 0 AND UnitId = @UnitId
-            AND MachineName LIKE @SearchPattern";  
+            WHERE IsDeleted = 0 
+            AND UnitId = @UnitId
+            AND (MachineName LIKE @SearchPattern OR MachineCode LIKE @SearchPattern)";  
             var parameters = new 
             { 
             SearchPattern = $"%{searchPattern}%" ,
@@ -141,6 +142,18 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
 
                     var machineMaster = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, new { MachineGroupId, UnitId });
                     return machineMaster.ToList();
+        }
+
+        public async Task<MachineDepartmentGroupDto?> GetMachineDepartment(int MachineGroupId)
+        {
+           
+             const string query = @"
+                    select A.GroupName,B.DeptName as DepartmentName,C.DepartmentGroupName from Maintenance.MachineGroup A 
+			        INNER JOIN Bannari.AppData.Department B On A.DepartmentId=B.Id 
+			        INNER JOIN Bannari.AppData.DepartmentGroup C on B.DepartmentGroupId=C.Id WHERE A.Id=@MachineGroupId and B.IsDeleted=0 and C.IsDeleted=0";
+
+                    var machineMaster = await _dbConnection.QueryFirstOrDefaultAsync<MachineDepartmentGroupDto>(query, new {MachineGroupId});
+                    return machineMaster;
         }
 
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetMachineLineNoAsync()

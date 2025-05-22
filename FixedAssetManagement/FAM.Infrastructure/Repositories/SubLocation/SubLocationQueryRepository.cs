@@ -28,7 +28,9 @@ namespace FAM.Infrastructure.Repositories.SubLocation
                 LocationId,
                 UnitId,
                 DepartmentId,
-                IsActive
+                IsActive,
+                CreatedDate,
+                CreatedByName
             FROM FixedAsset.SubLocation 
             WHERE 
             IsDeleted = 0

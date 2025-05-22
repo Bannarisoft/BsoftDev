@@ -24,7 +24,7 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR DepreciationGroupName LIKE @Search)")}};
 
                 SELECT DG.Id,DG.Code,DG.BookType,DG.DepreciationGroupName,DG.AssetGroupId,DG.UsefulLife,DG.DepreciationMethod,DG.ResidualValue,DG.SortOrder,DG.IsActive
-                ,DG.CreatedBy,DG.CreatedDate,DG.CreatedByName,DG.CreatedIP,DG.ModifiedBy,DG.ModifiedDate,DG.ModifiedByName,DG.ModifiedIP
+                ,DG.CreatedBy,DG.CreatedDate as CreatedAt,DG.CreatedByName,DG.CreatedIP,DG.ModifiedBy,DG.ModifiedDate,DG.ModifiedByName,DG.ModifiedIP
                 ,MM.description BookTypeDesc,M.description DepreciationMethodDesc,AG.GroupName AssetGroupName
                 FROM FixedAsset.DepreciationGroups DG
                 INNER JOIN FixedAsset.MiscMaster MM on MM.Id =DG.BookType
