@@ -5,7 +5,6 @@ using Core.Domain.Common;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Contracts.Events.Maintenance;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -44,7 +43,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             parameters.Add("@UnitId", unitId);
             parameters.Add("@TypeId", TypeId);
             var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
-                "dbo.GetWorkOrderDocNo", 
+                "dbo.Usp_GetWorkOrderDocNo", 
                 parameters, 
                 commandType: CommandType.StoredProcedure,
                 commandTimeout: 120);
@@ -347,27 +346,26 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
         public async Task<bool> RevertWorkOrderStatusAsync(int workOrderId)
         {
-              var workOrder = await _applicationDbContext.WorkOrder.FindAsync(workOrderId);
+            var workOrder = await _applicationDbContext.WorkOrder.FindAsync(workOrderId);
 
-                if (workOrder == null)
-                {
-                    _logger.LogWarning("⚠️ Work order not found for rollback. ID: {id}", workOrderId);
-                    return false;
-                }
-                var openStatusId = await _applicationDbContext.MiscMaster
-                .Where(x => x.Code == MiscEnumEntity.StatusOpen.Code)
-                .Select(x => x.Id)
-                .FirstOrDefaultAsync();
+            if (workOrder == null)
+            {
+                _logger.LogWarning("⚠️ Work order not found for rollback. ID: {id}", workOrderId);
+                return false;
+            }
+            var openStatusId = await _applicationDbContext.MiscMaster
+            .Where(x => x.Code == MiscEnumEntity.StatusOpen.Code)
+            .Select(x => x.Id)
+            .FirstOrDefaultAsync();
 
-                workOrder.StatusId = openStatusId; // Or use a lookup
+            workOrder.StatusId = openStatusId; 
+            workOrder.ModifiedDate = DateTime.UtcNow;
 
-                workOrder.ModifiedDate = DateTime.UtcNow;
+            _applicationDbContext.WorkOrder.Update(workOrder);
+            await _applicationDbContext.SaveChangesAsync();
 
-                _applicationDbContext.WorkOrder.Update(workOrder);
-                await _applicationDbContext.SaveChangesAsync();
-
-                _logger.LogInformation("✅ Work order status reverted for ID: {id}", workOrderId);
-                return true;
-            }                      
+            _logger.LogInformation("✅ Work order status reverted for ID: {id}", workOrderId);
+            return true;
+        }                      
     }
 }

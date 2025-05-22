@@ -37,7 +37,7 @@ namespace Core.Application.SpecificationMaster.Commands.UpdateSpecificationMaste
             var oldSpecificationMaster = specificationMaster.SpecificationName;
             specificationMaster.SpecificationName = request.SpecificationName;
 
-            if (specificationMaster is null || specificationMaster.IsDeleted is BaseEntity.IsDelete.Deleted )
+            /*if (specificationMaster is null || specificationMaster.IsDeleted is BaseEntity.IsDelete.Deleted )
             {
                 return new ApiResponseDTO<SpecificationMasterDTO>
                 {
@@ -64,9 +64,9 @@ namespace Core.Application.SpecificationMaster.Commands.UpdateSpecificationMaste
                         Message = "Code Activated."
                     }; 
                 }                                     
-            }
+            } */
 
-            var specificationMasterExistsByName = await _specificationMasterRepository.ExistsByAssetGroupIdAsync(request.AssetGroupId, request.SpecificationName);
+         /*    var specificationMasterExistsByName = await _specificationMasterRepository.ExistsByAssetGroupIdAsync(request.AssetGroupId, request.SpecificationName);
             if (specificationMasterExistsByName)
             {                                   
                 return new ApiResponseDTO<SpecificationMasterDTO>
@@ -74,9 +74,9 @@ namespace Core.Application.SpecificationMaster.Commands.UpdateSpecificationMaste
                     IsSuccess = false,
                     Message = $"SpecificationName already exists and is {(BaseEntity.Status) request.IsActive}."
                 };                     
-            }
+            } */ 
             var updatedSpecificationEntity= _mapper.Map<SpecificationMasters>(request);                   
-            var updateResult = await _specificationMasterRepository.UpdateAsync(request.Id, updatedSpecificationEntity);            
+            var updateResult = await _specificationMasterRepository.UpdateAsync(updatedSpecificationEntity);            
 
             var updatedSpecificationMaster =  await _specificationMasterQueryRepository.GetByIdAsync(request.Id);    
             if (updatedSpecificationMaster != null)

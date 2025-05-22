@@ -9,7 +9,7 @@ namespace Core.Application.SpecificationMaster.Queries.GetSpecificationMaster
         public int Id { get; set; }
         public string? SpecificationName { get; set; }      
         public int? AssetGroupId { get; set; } 
-        public bool? ISDefault { get; set; }        
+        public byte ISDefault { get; set; }        
         public Status IsActive { get; set; }
         public int CreatedBy { get; set; }
         public DateTimeOffset?  CreatedAt { get; set; }
