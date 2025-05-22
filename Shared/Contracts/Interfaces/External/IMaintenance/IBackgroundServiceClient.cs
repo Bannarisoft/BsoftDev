@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Core.Application.Common.Interfaces.IBackgroundService
+namespace Contracts.Interfaces.External.IMaintenance
 {
     public interface IBackgroundServiceClient
     {
-        Task<string> ScheduleWorkOrder(int PreventiveScheduleId, int delayInMinutes);
+        Task<string> ScheduleWorkOrder(int preventiveScheduleId, int delayInMinutes);
     }
 }

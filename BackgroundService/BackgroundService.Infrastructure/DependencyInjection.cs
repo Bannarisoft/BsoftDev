@@ -43,7 +43,7 @@ namespace BackgroundService.Infrastructure
                           DisableGlobalLocks = true
                       });
             });
-
+            
             // Add the Hangfire server
             services.AddHangfireServer();
            // ✅ Correctly bind EmailSettings
