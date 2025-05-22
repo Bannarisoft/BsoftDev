@@ -22,9 +22,9 @@ namespace Core.Application.Reports.ScheduleReport
         }
         public async Task<ApiResponseDTO<List<ScheduleReportDto>>> Handle(ScheduleReportQuery request, CancellationToken cancellationToken)
         {
-            var reportEntities = await _reportQueryRepository.ScheduleReportAsync(request.FromDueDate, request.ToDueDate);
+            var reportEntities = await _reportQueryRepository.ScheduleReportAsync(request.FromDueDate, request.ToDueDate)?? new List<ScheduleReportDto>();   
 
-            var preventiveSchedulerList = _mapper.Map<List<ScheduleReportDto>>(reportEntities);
+            var preventiveSchedulerList = _mapper.Map<List<ScheduleReportDto>>(reportEntities)?? new List<ScheduleReportDto>();
 
             // var departments = await _departmentService.GetAllDepartmentAsync();
             // var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
@@ -47,11 +47,11 @@ namespace Core.Application.Reports.ScheduleReport
                
                 return new ApiResponseDTO<List<ScheduleReportDto>>
                 {
-                  IsSuccess = preventiveSchedulerList != null && preventiveSchedulerList.Any(),
-                     Message = preventiveSchedulerList != null && preventiveSchedulerList.Any()
+                  IsSuccess =preventiveSchedulerList.Any(),
+                     Message =preventiveSchedulerList.Any()
                      ? "Scheduler Report retrieved successfully."
                      : "No Scheduler Report found.",
-                     Data = preventiveSchedulerList ?? new List<ScheduleReportDto>()
+                     Data = preventiveSchedulerList
                 };
         }
     }
