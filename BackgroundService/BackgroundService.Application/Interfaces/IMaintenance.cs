@@ -7,6 +7,6 @@ namespace BackgroundService.Application.Interfaces
 {
     public interface IMaintenance
     {
-        public Task SchedulerWorkOrderExecute(int PreventiveScheduleId);
+       public Task SchedulerWorkOrderExecute(int PreventiveScheduleId);
     }
 }
