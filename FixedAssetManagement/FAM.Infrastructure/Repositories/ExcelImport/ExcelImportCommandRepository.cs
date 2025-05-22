@@ -112,6 +112,7 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
 
         public async Task<int?> GetAssetLocationIdByNameAsync(string locationName)
         {
+            locationName=locationName.Trim();
             var assetLocation = await _applicationDbContext.Locations
             .Where(a => a.LocationName == locationName  && a.IsDeleted == 0)
             .Select(a => a.Id)
@@ -121,6 +122,7 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
 
         public async Task<int?> GetAssetSubLocationIdByNameAsync(string subLocationName)
         {
+            subLocationName=subLocationName.Trim();
             var assetSubLocation= await _applicationDbContext.SubLocations
             .Where(a => a.SubLocationName == subLocationName  && a.IsDeleted == 0)
             .Select(a => a.Id)
