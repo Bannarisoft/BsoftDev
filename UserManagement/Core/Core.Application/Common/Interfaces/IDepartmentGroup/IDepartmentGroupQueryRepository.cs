@@ -15,7 +15,7 @@ namespace Core.Application.Common.Interfaces.IDepartmentGroup
         Task<List<Core.Domain.Entities.DepartmentGroup>> GetAllDepartmentGroupAsync(string SearchDeptGroupName);  
         
         
-
+       Task<Core.Domain.Entities.DepartmentGroup?> GetByDepartmentGroupNameAsync(string departmentGroupName);
         
     }
 }

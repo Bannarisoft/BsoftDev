@@ -11,71 +11,71 @@ using Core.Application.Common.Interfaces;
 
 namespace UserManagement.Infrastructure.Repositories.Departments
 {
-    public class DepartmentQueryRepository :IDepartmentQueryRepository
-    { 
-    private readonly IDbConnection _dbConnection; 
-    private readonly IIPAddressService _ipAddressService; 
+  public class DepartmentQueryRepository : IDepartmentQueryRepository
+  {
+    private readonly IDbConnection _dbConnection;
+    private readonly IIPAddressService _ipAddressService;
 
-    public  DepartmentQueryRepository(IDbConnection dbConnection,IIPAddressService ipAddressService)
+    public DepartmentQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
     {
-         _dbConnection = dbConnection;
-         _ipAddressService = ipAddressService;
+      _dbConnection = dbConnection;
+      _ipAddressService = ipAddressService;
     }
-      //     public async Task<(IEnumerable<dynamic>, int)> GetAllDepartmentAsync(int PageNumber, int PageSize, string? SearchTerm)
-      // {
-      //     var query = $$"""
-      //         DECLARE @TotalCount INT;
+    //     public async Task<(IEnumerable<dynamic>, int)> GetAllDepartmentAsync(int PageNumber, int PageSize, string? SearchTerm)
+    // {
+    //     var query = $$"""
+    //         DECLARE @TotalCount INT;
 
-      //         SELECT @TotalCount = COUNT(*)
-      //         FROM AppData.Department D
-      //         INNER JOIN AppData.DepartmentGroup DG ON DG.Id = D.DepartmentGroupId
-      //         WHERE D.IsDeleted = 0
-      //         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (D.ShortName LIKE @Search OR D.DeptName LIKE @Search OR DG.DepartmentGroupName LIKE @Search)")}};
+    //         SELECT @TotalCount = COUNT(*)
+    //         FROM AppData.Department D
+    //         INNER JOIN AppData.DepartmentGroup DG ON DG.Id = D.DepartmentGroupId
+    //         WHERE D.IsDeleted = 0
+    //         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (D.ShortName LIKE @Search OR D.DeptName LIKE @Search OR DG.DepartmentGroupName LIKE @Search)")}};
 
-      //         SELECT 
-      //             D.Id,
-      //             D.CompanyId AS CompanyId,
-      //             D.ShortName,
-      //             D.DeptName,
-      //             D.DepartmentGroupId AS DepartmentGroupId,
-      //             DG.DepartmentGroupName AS DepartmentGroupName,
-      //             D.CreatedIP,
-      //             D.IsActive,
-      //             D.CreatedBy,
-      //             D.CreatedByName,
-      //             D.CreatedAt,
-      //             D.ModifiedBy,
-      //             D.ModifiedByName,
-      //             D.ModifiedAt,
-      //             D.ModifiedIP,
-      //             D.IsDeleted
-      //         FROM AppData.Department D
-      //         INNER JOIN AppData.DepartmentGroup DG ON DG.Id = D.DepartmentGroupId
-      //         WHERE D.IsDeleted = 0
-      //         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (D.ShortName LIKE @Search OR D.DeptName LIKE @Search OR DG.DepartmentGroupName LIKE @Search)")}}
-      //         ORDER BY D.Id DESC
-      //         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+    //         SELECT 
+    //             D.Id,
+    //             D.CompanyId AS CompanyId,
+    //             D.ShortName,
+    //             D.DeptName,
+    //             D.DepartmentGroupId AS DepartmentGroupId,
+    //             DG.DepartmentGroupName AS DepartmentGroupName,
+    //             D.CreatedIP,
+    //             D.IsActive,
+    //             D.CreatedBy,
+    //             D.CreatedByName,
+    //             D.CreatedAt,
+    //             D.ModifiedBy,
+    //             D.ModifiedByName,
+    //             D.ModifiedAt,
+    //             D.ModifiedIP,
+    //             D.IsDeleted
+    //         FROM AppData.Department D
+    //         INNER JOIN AppData.DepartmentGroup DG ON DG.Id = D.DepartmentGroupId
+    //         WHERE D.IsDeleted = 0
+    //         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (D.ShortName LIKE @Search OR D.DeptName LIKE @Search OR DG.DepartmentGroupName LIKE @Search)")}}
+    //         ORDER BY D.Id DESC
+    //         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
-      //         SELECT @TotalCount AS TotalCount;
-      //     """;
+    //         SELECT @TotalCount AS TotalCount;
+    //     """;
 
-      //     var parameters = new
-      //     {
-      //         Search = $"%{SearchTerm}%",
-      //         Offset = (PageNumber - 1) * PageSize,
-      //         PageSize
-      //     };
+    //     var parameters = new
+    //     {
+    //         Search = $"%{SearchTerm}%",
+    //         Offset = (PageNumber - 1) * PageSize,
+    //         PageSize
+    //     };
 
-      //     var result = await _dbConnection.QueryMultipleAsync(query, parameters);
-      //     var departmentList = await result.ReadAsync<dynamic>();
-      //     int totalCount = await result.ReadFirstAsync<int>();
+    //     var result = await _dbConnection.QueryMultipleAsync(query, parameters);
+    //     var departmentList = await result.ReadAsync<dynamic>();
+    //     int totalCount = await result.ReadFirstAsync<int>();
 
-      //     return (departmentList, totalCount);
-      // }
+    //     return (departmentList, totalCount);
+    // }
 
-        public async Task<(List<DepartmentDto>, int)> GetAllDepartmentAsync(int PageNumber, int PageSize, string? SearchTerm)
+    public async Task<(List<DepartmentDto>, int)> GetAllDepartmentAsync(int PageNumber, int PageSize, string? SearchTerm)
     {
-        var query = $$"""
+      var query = $$"""
             DECLARE @TotalCount INT;
 
             SELECT @TotalCount = COUNT(*)
@@ -111,18 +111,18 @@ namespace UserManagement.Infrastructure.Repositories.Departments
             SELECT @TotalCount AS TotalCount;
         """;
 
-        var parameters = new
-        {
-            Search = $"%{SearchTerm}%",
-            Offset = (PageNumber - 1) * PageSize,
-            PageSize
-        };
+      var parameters = new
+      {
+        Search = $"%{SearchTerm}%",
+        Offset = (PageNumber - 1) * PageSize,
+        PageSize
+      };
 
-        var result = await _dbConnection.QueryMultipleAsync(query, parameters);
-        var departmentList = (await result.ReadAsync<DepartmentDto>()).ToList(); // map to DTO if needed
-        int totalCount = await result.ReadFirstAsync<int>();
+      var result = await _dbConnection.QueryMultipleAsync(query, parameters);
+      var departmentList = (await result.ReadAsync<DepartmentDto>()).ToList(); // map to DTO if needed
+      int totalCount = await result.ReadFirstAsync<int>();
 
-        return (departmentList, totalCount);
+      return (departmentList, totalCount);
     }
 
     //  public async Task<List<Department>>GetAllDepartmentAsync()
@@ -187,11 +187,11 @@ namespace UserManagement.Infrastructure.Repositories.Departments
 
       return department; // Returns null if not found
 
-    }   
+    }
 
-    public async Task<List<DepartmentWithGroupDto>> GetDepartmentsByDepartmentGroupIdAsync(int departmentGroupId)
+    public async Task<List<DepartmentWithGroupDto>> GetDepartmentsByDepartmentGroupIdAsync(string departmentGroupName)
     {
-        const string query = @"
+      const string query = @"
             SELECT 
                 D.Id,
                 D.CompanyId,
@@ -202,15 +202,15 @@ namespace UserManagement.Infrastructure.Repositories.Departments
                 D.IsActive
             FROM AppData.Department D           
             INNER JOIN AppData.DepartmentGroup DG ON DG.Id = D.DepartmentGroupId
-            WHERE DG.Id = @Id";
+            WHERE DG.DepartmentGroupName = @DepartmentGroupName";
 
-        var departments = await _dbConnection.QueryAsync<DepartmentWithGroupDto>(query, new { Id = departmentGroupId });
+      var departments = await _dbConnection.QueryAsync<DepartmentWithGroupDto>(query, new { DepartmentGroupName = departmentGroupName });
 
-        return departments.ToList();
+      return departments.ToList();
     }
 
 
-        public async Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync(string SearchDept)
+    public async Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync(string SearchDept)
     {
       var CompanyId = _ipAddressService.GetCompanyId();
       var userId = _ipAddressService.GetUserId();
@@ -231,29 +231,30 @@ namespace UserManagement.Infrastructure.Repositories.Departments
       var departments = await _dbConnection.QueryAsync<Department>(query, parameters);
       return departments.ToList();
     }
-            public async Task<bool> FKColumnExistValidation(int Id)
-          {
-              var sql = "SELECT COUNT(1) FROM AppData.Department WHERE Id = @Id AND IsDeleted = 0 AND IsActive = 1";
-                var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = Id });
-                return count > 0;
-          }
-          public async Task<List<Department>>  GetDepartment_SuperAdmin(string SearchDept)
-        {
-            var CompanyId = _ipAddressService.GetCompanyId();
-           const string query = @"
+    public async Task<bool> FKColumnExistValidation(int Id)
+    {
+      var sql = "SELECT COUNT(1) FROM AppData.Department WHERE Id = @Id AND IsDeleted = 0 AND IsActive = 1";
+      var count = await _dbConnection.ExecuteScalarAsync<int>(sql, new { Id = Id });
+      return count > 0;
+    }
+    public async Task<List<Department>> GetDepartment_SuperAdmin(string SearchDept)
+    {
+      var CompanyId = _ipAddressService.GetCompanyId();
+      const string query = @"
             SELECT D.Id,D.CompanyId,D.ShortName,D.DeptName,D.IsActive FROM  AppData.Department D
             WHERE (D.DeptName LIKE @SearchDept OR  D.ShortName LIKE @SearchDept) and D.IsDeleted = 0 AND D.CompanyId=@CompanyId 
             ORDER BY D.Id DESC";
 
-              var parameters = new 
-              { 
-                  SearchDept = $"%{SearchDept ?? string.Empty}%",
-                  CompanyId =CompanyId
-              };
-           
-            var departments = await _dbConnection.QueryAsync<Department>(query, parameters);
-            return departments.ToList();       
-        }
+      var parameters = new
+      {
+        SearchDept = $"%{SearchDept ?? string.Empty}%",
+        CompanyId = CompanyId
+      };
+
+      var departments = await _dbConnection.QueryAsync<Department>(query, parameters);
+      return departments.ToList();
+    }
+        
 
        
     }

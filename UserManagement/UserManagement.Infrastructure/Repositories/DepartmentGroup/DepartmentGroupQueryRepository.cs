@@ -104,7 +104,7 @@ namespace UserManagement.Infrastructure.Repositories.DepartmentGroup
             const string query = @"
                            SELECT 1 
                            FROM [AppData].[DepartmentGroup] 
-                         WHERE Id = @Id AND   IsDeleted = 0;";
+                         WHERE Id = @Id AND   IsDeleted = 0  ;";
 
             using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
 
@@ -114,8 +114,8 @@ namespace UserManagement.Infrastructure.Repositories.DepartmentGroup
         }
 
         public async Task<List<Core.Domain.Entities.DepartmentGroup>> GetAllDepartmentGroupAsync(string searchPattern)
-            {
-                const string query = @"
+        {
+            const string query = @"
                     SELECT 
                         [Id],
                         [DepartmentGroupCode],
@@ -136,13 +136,31 @@ namespace UserManagement.Infrastructure.Repositories.DepartmentGroup
                         AND IsDeleted = 0 AND IsActive = 1
                     ORDER BY Id DESC";
 
-                var result = await _dbConnection.QueryAsync<Core.Domain.Entities.DepartmentGroup>(
-                    query,
-                    new { SearchPattern = $"%{searchPattern}%" }
-                );
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.DepartmentGroup>(
+                query,
+                new { SearchPattern = $"%{searchPattern}%" }
+            );
 
-                return result.ToList();
-            }
+            return result.ToList();
+        }
+
+        
+        public async Task<Core.Domain.Entities.DepartmentGroup?> GetByDepartmentGroupNameAsync(string departmentGroupName)
+    {
+        const string query = @"
+            SELECT TOP 1 * 
+            FROM AppData.DepartmentGroup 
+            WHERE DepartmentGroupName = @DepartmentGroupName AND IsDeleted = 0";
+
+        var result = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.DepartmentGroup>(
+            query,
+            new { DepartmentGroupName = departmentGroupName }
+        );
+
+        return result;
+    }
+            
+
                   
 
        
