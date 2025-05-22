@@ -75,6 +75,7 @@ using Core.Application.SpecificationMaster.Commands.DeleteSpecificationMaster;
 using Core.Application.AssetMaster.AssetAmc.Command.CreateAssetAmc;
 using Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc;
 using FAM.API.Validation.AssetMaster.AssetAmc;
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadDocumentAssetMaster;
 
 
 namespace FAM.API.Validation.Common
@@ -143,6 +144,8 @@ namespace FAM.API.Validation.Common
         services.AddScoped<IValidator<CreateAssetTransferReceiptCommand>, CreateAssetTransferReceiptCommandValidator>();
         services.AddScoped<IValidator<CreateAssetAmcCommand>, CreateAssetAmcCommandValidator>();
         services.AddScoped<IValidator<UpdateAssetAmcCommand>, UpdateAssetAmcCommandValidator>();
+
+        services.AddScoped<IValidator<UploadDocumentAssetMasterGeneralCommand>, UploadDocumentAssetMasterGeneralCommandValidator>();
 
 
     }  

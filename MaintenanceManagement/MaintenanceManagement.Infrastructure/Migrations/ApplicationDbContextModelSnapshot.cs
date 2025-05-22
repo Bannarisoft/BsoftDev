@@ -362,6 +362,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
+
                     b.Property<string>("GroupName")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -480,12 +484,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("CreatedIP")
                         .IsRequired()
                         .HasColumnType("varchar(50)");
-
-                    b.Property<int?>("DepartmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0)
-                        .HasColumnName("DepartmentId");
 
                     b.Property<DateTimeOffset>("InstallationDate")
                         .HasColumnType("datetimeoffset")

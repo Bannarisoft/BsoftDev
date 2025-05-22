@@ -45,10 +45,10 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
             .IsRequired();
 
             builder.Property(mg => mg.DepartmentId)
-            .HasColumnName("DepartmentId")
-            .HasColumnType("int")
-            .IsRequired();
-    
+           .HasColumnName("DepartmentId")
+           .HasColumnType("int")
+           .IsRequired();
+      
              builder.Property(b => b.IsActive)
                 .HasColumnType("bit")
                 .HasConversion(statusConverter)

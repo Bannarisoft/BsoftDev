@@ -42,7 +42,9 @@ namespace FAM.Infrastructure.Repositories.AssetGroup
                 Code,
                 GroupName,
                 SortOrder,
-                IsActive
+                IsActive,
+                CreatedDate,
+                CreatedByName
             FROM FixedAsset.AssetGroup 
             WHERE 
             IsDeleted = 0

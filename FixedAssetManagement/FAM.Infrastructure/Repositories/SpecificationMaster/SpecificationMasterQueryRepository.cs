@@ -23,7 +23,7 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SpecificationName LIKE @Search)")}};
 
                 SELECT Id,SpecificationName,AssetGroupId,ISDefault,  IsActive
-                ,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
+                ,CreatedBy,CreatedDate as CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
                 FROM FixedAsset.SpecificationMaster  WHERE IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SpecificationName LIKE @Search )")}}
                 ORDER BY Id DESC

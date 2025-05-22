@@ -82,7 +82,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                     A.AuthorizedBy, 
                     A.AuthorizedDate, 
                     A.AuthorizedByName, 
-                    A.AuthorizedIP
+                    A.AuthorizedIP,
+                    A.GatePassNo
                 FROM FixedAsset.AssetTransferIssueHdr A
                 INNER JOIN Bannari.AppData.Unit FromUnit ON A.FromUnitId = FromUnit.Id
                 INNER JOIN Bannari.AppData.Unit ToUnit ON A.ToUnitId = ToUnit.Id
@@ -125,7 +126,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
         var UnitId = _iPAddressService.GetUnitId();
         const string query = @"
             SELECT Id as AssetTransferId , DocDate, TransferType, FromUnitId, ToUnitId, FromDepartmentId, ToDepartmentId, 
-                   FromCustodianId, ToCustodianId, Status, FromCustodianName, ToCustodianName
+                   FromCustodianId, ToCustodianId, Status, FromCustodianName, ToCustodianName,GatePassNo
+          
             FROM FixedAsset.AssetTransferIssueHdr
             WHERE Id = @AssetTransferId AND Status = 'Pending'  AND FromUnitId = @UnitId
             FOR JSON PATH, INCLUDE_NULL_VALUES;
@@ -145,6 +147,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
         {
             return null;
         }
+
+    
 
         var header = JsonSerializer.Deserialize<List<AssetTransferJsonDto>>(headerJson, new JsonSerializerOptions
         {

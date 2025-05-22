@@ -586,6 +586,9 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<int>("FromUnitId")
                         .HasColumnType("int");
 
+                    b.Property<string>("GatePassNo")
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("varchar(50)");
 
@@ -865,6 +868,10 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Property<string>("AssetDescription")
                         .HasColumnType("varchar(250)");
+
+                    b.Property<string>("AssetDocument")
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("AssetDocument");
 
                     b.Property<int>("AssetGroupId")
                         .HasColumnType("int");

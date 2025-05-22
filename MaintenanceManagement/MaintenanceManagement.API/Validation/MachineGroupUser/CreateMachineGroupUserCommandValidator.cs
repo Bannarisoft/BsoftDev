@@ -36,9 +36,10 @@ namespace MaintenanceManagement.API.Validation.MachineGroupUser
                             .WithMessage($"{nameof(CreateMachineGroupUserCommand.UserId)} {rule.Error}");
                         break;
                     case "AlreadyExists":
-                           RuleFor(x => x.MachineGroupId)
-                           .MustAsync(async (MachineGroupId, cancellation) => !await _machineGroupUserQuery.AlreadyExistsAsync(MachineGroupId))
-                           .WithName("Shift Name")
+                           RuleFor(x =>  new { x.MachineGroupId,x.DepartmentId,x.UserId })
+                           .MustAsync(async (shift, cancellation) => 
+                        !await _machineGroupUserQuery.AlreadyExistsAsync(shift.MachineGroupId,shift.DepartmentId,shift.UserId))             
+                           .WithName("Machine Group")
                             .WithMessage($"{rule.Error}");
                             break;                    
                       default:                        

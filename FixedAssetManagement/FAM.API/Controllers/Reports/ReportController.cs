@@ -88,7 +88,8 @@ namespace FAM.API.Controllers.Reports
             {
                 StatusCode = StatusCodes.Status200OK,
                 Message = result.Message,
-                Data = result.Data
+                Data = result.Data?.ToList()
+               
             });
         }
     }

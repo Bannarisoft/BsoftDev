@@ -22,9 +22,10 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransf
     public string? FromCustodianName { get; set; }
     public int ToCustodianId { get; set; }
     public string? ToCustodianName { get; set; }
+    public string? GatePassNo { get; set; }
  
     // List of assets associated with this transfer
-    public List<AssetTransferIssueDtlDto>? AssetTransferIssueDtls { get; set; }
+        public List<AssetTransferIssueDtlDto>? AssetTransferIssueDtls { get; set; }
 
 
     }

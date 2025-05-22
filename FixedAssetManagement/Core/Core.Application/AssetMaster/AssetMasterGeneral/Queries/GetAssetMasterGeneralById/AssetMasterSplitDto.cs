@@ -23,6 +23,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public int? UOMId { get; set; }
         public int? WorkingStatus { get; set; }
         public string? AssetImageName { get; set; }     
+        public string? AssetDocument { get; set; }
+        public string? AssetDocumentName { get; set; }
 
         public AssetParentDTO? AssetParent { get; set; }
         public AssetLocationDTO? AssetLocation { get; set; }

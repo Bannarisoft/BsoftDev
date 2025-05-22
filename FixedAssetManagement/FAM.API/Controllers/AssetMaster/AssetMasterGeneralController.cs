@@ -1,9 +1,12 @@
 
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMasterGeneral;
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteDocumentAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAssetMasterGeneral;
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.SaveAssetDocument;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral;
+using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadDocumentAssetMaster;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetCodePattern;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterByIdSplit;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
@@ -28,26 +31,25 @@ namespace FAM.API.Controllers.AssetMaster
         private readonly IValidator<UpdateAssetMasterGeneralCommand> _updateAssetMasterGeneralCommandValidator;
         private readonly IValidator<UploadFileAssetMasterGeneralCommand> _uploadFileCommandValidator;
         private readonly IValidator<DeleteAssetMasterGeneralCommand> _deleteAssetMasterGeneralCommandValidator;
+        private readonly IValidator<UploadDocumentAssetMasterGeneralCommand> _deleteDocumentAssetMasterGeneralCommandValidator;
 
         public AssetMasterGeneralController(
-
             ISender mediator, 
             IValidator<CreateAssetMasterGeneralCommand> createAssetMasterGeneralCommandValidator, 
             IValidator<UpdateAssetMasterGeneralCommand> updateAssetMasterGeneralCommandValidator, 
             IValidator<UploadFileAssetMasterGeneralCommand> uploadFileCommandValidator,
-            IValidator<DeleteAssetMasterGeneralCommand> deleteAssetMasterGeneralCommandValidator
-            ) 
-            : base(mediator)
-
+            IValidator<DeleteAssetMasterGeneralCommand> deleteAssetMasterGeneralCommandValidator,
+            IValidator<UploadDocumentAssetMasterGeneralCommand> deleteDocumentAssetMasterGeneralCommandValidator
+        )
+        : base(mediator)
         {
             _createAssetMasterGeneralCommandValidator = createAssetMasterGeneralCommandValidator;
             _updateAssetMasterGeneralCommandValidator = updateAssetMasterGeneralCommandValidator;
             _uploadFileCommandValidator = uploadFileCommandValidator;
             _deleteAssetMasterGeneralCommandValidator = deleteAssetMasterGeneralCommandValidator;   
+            _deleteDocumentAssetMasterGeneralCommandValidator=deleteDocumentAssetMasterGeneralCommandValidator;
         }
-
-        
-
+       
         [HttpGet]
         public async Task<IActionResult> GetAllAssetMasterGeneralAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
 
@@ -55,7 +57,6 @@ namespace FAM.API.Controllers.AssetMaster
             var assetMaster = await Mediator.Send(
                 new GetAssetMasterGeneralQuery
                 {
-
                     PageNumber = PageNumber,
                     PageSize = PageSize,
                     SearchTerm = SearchTerm
@@ -454,6 +455,96 @@ namespace FAM.API.Controllers.AssetMaster
                 message =result.Message,
                 errors = ""
             });            
-        }       
+        } 
+        [HttpPost("upload-document")]
+        public async Task<IActionResult> UploadDocument(UploadDocumentAssetMasterGeneralCommand uploadFileCommand)
+        {
+            var validationResult = await _deleteDocumentAssetMasterGeneralCommandValidator.ValidateAsync(uploadFileCommand);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                });
+            }
+            var file = await Mediator.Send(uploadFileCommand);
+            if (!file.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = file.Message,
+                    errors = ""
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = file.Message,
+                data = file.Data,
+                errors = ""
+            });
+        }
+        // DELETE: api/AssetMasterGeneral/delete-logo
+        [HttpDelete("delete-document")]
+        public async Task<IActionResult> DeleteDocument([FromBody] DeleteDocumentAssetMasterGeneralCommand deleteFileCommand)
+        {
+            if (deleteFileCommand == null || string.IsNullOrWhiteSpace(deleteFileCommand.assetPath))
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode = StatusCodes.Status400BadRequest, 
+                    message = "Invalid request. 'assetPath' cannot be null or empty.",
+                    errors = ""
+                });
+            }
+            var file = await Mediator.Send(deleteFileCommand);
+            if (!file.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = file.Message,
+                    errors = ""
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = file.Message,
+                errors = ""
+            });
+        } 
+        [HttpPost("saveDocument")]
+        public async Task<IActionResult> UpdateDocument([FromBody] SaveAssetDocumentCommand saveCommand)
+        {
+             if (saveCommand == null || string.IsNullOrWhiteSpace(saveCommand.assetPath))
+            {
+                return BadRequest(new 
+                { 
+                    StatusCode = StatusCodes.Status400BadRequest, 
+                    message = "Invalid request. 'assetPath' cannot be null or empty.",
+                    errors = ""
+                });
+            }
+            var saveDoc = await Mediator.Send(saveCommand);
+            if (!saveDoc.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = saveDoc.Message,
+                    errors = ""
+                });
+            }
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = saveDoc.Message,
+                errors = ""
+            });
+        }      
     }
 }

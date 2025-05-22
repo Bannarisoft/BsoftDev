@@ -1,7 +1,6 @@
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Domain.Entities;
-using Core.Domain.Entities.AssetPurchase;
-using Microsoft.EntityFrameworkCore.Storage;
+
 
 namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
 {
@@ -16,6 +15,7 @@ namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral
         Task<bool> RemoveAssetImageReferenceAsync(string assetId);
         Task<bool> RemoveAssetWarrantyAsync(string assetPath);    
         Task<bool> RemoveAssetDocumentReferenceAsync(string assetId);   
-        Task<bool> UpdateAssetDocumentAsync(int assetId, string imageName);       
+        Task<bool> UpdateAssetDocumentAsync(int assetId, string imageName); 
+        Task<bool> UpdateDocumentAsync(int AssetId, string imageName);      
     }
 }
