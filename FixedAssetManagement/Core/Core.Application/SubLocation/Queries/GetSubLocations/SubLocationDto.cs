@@ -17,5 +17,7 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
         public string? DepartmentName { get; set; }
         public int LocationId { get; set; }
         public Status IsActive { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public string? CreatedByName { get; set; }
     }
 }

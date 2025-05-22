@@ -18,6 +18,7 @@ namespace Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAsse
         public int ToCustodianId  { get; set; } 
         public string? FromCustodianName  { get; set; } 
         public string? ToCustodianName  { get; set; } 
+        public string? GatePassNo { get; set; }
         public string? Status { get; set; } 
         
     }

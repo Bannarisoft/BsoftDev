@@ -13,6 +13,9 @@ namespace Core.Application.AssetGroup.Queries.GetAssetGroup
         public string? GroupName { get; set; }
         public int SortOrder { get; set; }
         public Status IsActive { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public string? CreatedByName { get; set; }
+
 
 
 

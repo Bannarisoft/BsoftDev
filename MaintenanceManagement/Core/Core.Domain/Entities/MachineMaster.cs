@@ -13,7 +13,6 @@ namespace Core.Domain.Entities
         public int MachineGroupId { get; set; }
         public MachineGroup MachineGroup { get; set; } = null!;
         public int UnitId { get; set; }
-        public int? DepartmentId { get; set; }
         public decimal? ProductionCapacity { get; set; }
         public int UomId { get; set; }
         public int ShiftMasterId { get; set; }

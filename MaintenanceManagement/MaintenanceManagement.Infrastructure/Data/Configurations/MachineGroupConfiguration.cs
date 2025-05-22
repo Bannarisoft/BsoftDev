@@ -43,7 +43,12 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
             .HasColumnName("Manufacturer")
             .HasColumnType("int")
             .IsRequired();
-    
+
+            builder.Property(mg => mg.DepartmentId)
+           .HasColumnName("DepartmentId")
+           .HasColumnType("int")
+           .IsRequired();
+      
              builder.Property(b => b.IsActive)
                 .HasColumnType("bit")
                 .HasConversion(statusConverter)

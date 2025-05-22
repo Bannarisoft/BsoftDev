@@ -80,7 +80,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             existingmachinemaster.MachineName = machineMaster.MachineName;
             existingmachinemaster.MachineGroupId = machineMaster.MachineGroupId;
             existingmachinemaster.UnitId = machineMaster.UnitId;
-            existingmachinemaster.DepartmentId = machineMaster.DepartmentId;
             existingmachinemaster.ProductionCapacity = machineMaster.ProductionCapacity;
             existingmachinemaster.UomId = machineMaster.UomId;
             existingmachinemaster.ShiftMasterId = machineMaster.ShiftMasterId;

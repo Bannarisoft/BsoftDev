@@ -58,12 +58,6 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                .HasColumnType("int")
                .IsRequired();
 
-            builder.Property(m => m.DepartmentId)
-               .HasColumnName("DepartmentId")
-               .HasColumnType("int")
-               .IsRequired(false)
-               .HasDefaultValue(0);
-
             builder.Property(dg => dg.ProductionCapacity)
                 .HasColumnType("decimal(18,2)")
                 .IsRequired(false)
