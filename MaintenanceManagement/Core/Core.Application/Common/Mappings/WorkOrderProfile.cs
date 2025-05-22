@@ -18,8 +18,14 @@ namespace Core.Application.Common.Mappings
                 .ForMember(dest => dest.WorkOrderItems, opt => opt.MapFrom(src => src.WorkOrderItem))
                 .ForMember(dest => dest.WorkOrderTechnicians, opt => opt.MapFrom(src => src.WorkOrderTechnician))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id)); // optional if you want to keep the ID
+            
+                CreateMap<WorkOrderCombineDto, Core.Domain.Entities.WorkOrderMaster.WorkOrder>()
+                    .ForMember(dest => dest.WorkOrderActivities, opt => opt.MapFrom(src => src.WorkOrderActivity))
+                    .ForMember(dest => dest.WorkOrderCheckLists, opt => opt.MapFrom(src => src.WorkOrderCheckList))
+                    .ForMember(dest => dest.WorkOrderItems, opt => opt.MapFrom(src => src.WorkOrderItem))    
+                    .ForMember(dest => dest.Id, opt => opt.Ignore()); // Prevent mapping to existing ID
 
-            // ✅ Create to domain mappings
+                        // ✅ Create to domain mappings
             CreateMap<WorkOrderScheduleUpdateDto, WorkOrderSchedule>();
             CreateMap<WorkOrderActivityUpdateDto, WorkOrderActivity>().ReverseMap();
             CreateMap<WorkOrderItemUpdateDto, WorkOrderItem>().ReverseMap();
