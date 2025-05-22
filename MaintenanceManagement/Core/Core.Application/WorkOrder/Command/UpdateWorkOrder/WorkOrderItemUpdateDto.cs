@@ -12,6 +12,7 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
         public int UsedQty { get; set; }
         public int? ScarpQty { get; set; }
         public int? ToSubStoreQty { get; set; }
-        public string? Image { get; set; }        
+        public string? Image { get; set; }     
+        public decimal? Rate { get; set; }   
     }
 }
