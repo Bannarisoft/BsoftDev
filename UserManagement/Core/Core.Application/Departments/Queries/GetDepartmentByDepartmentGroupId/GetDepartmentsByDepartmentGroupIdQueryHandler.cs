@@ -27,9 +27,17 @@ namespace Core.Application.Departments.Queries.GetDepartmentByDepartmentGroupId
 
        public async Task<ApiResponseDTO<List<DepartmentWithGroupDto>>> Handle(GetDepartmentsByDepartmentGroupIdQuery request, CancellationToken cancellationToken)
         {
-        
+                  if (string.IsNullOrWhiteSpace(request.DepartmentGroupName))
+                        {
+                            return new ApiResponseDTO<List<DepartmentWithGroupDto>>
+                            {
+                                IsSuccess = false,
+                                Message = "DepartmentGroupName is required.",
+                                Data = new List<DepartmentWithGroupDto>()
+                            };
+                        }
 
-                    var departments = await _departmentRepository.GetDepartmentsByDepartmentGroupIdAsync(request.DepartmentGroupId);
+                    var departments = await _departmentRepository.GetDepartmentsByDepartmentGroupIdAsync(request.DepartmentGroupName);
 
                 if (departments == null)
                 {
@@ -39,9 +47,7 @@ namespace Core.Application.Departments.Queries.GetDepartmentByDepartmentGroupId
                         Message = "Department not found.",
                        Data = new List<DepartmentWithGroupDto>()
                     };
-                }
-
-              //  var dto = _mapper.Map<DepartmentWithGroupDto>(department); // ✅ Make sure mapping exists
+                }              
                var dtoList = _mapper.Map<List<DepartmentWithGroupDto>>(departments);
                 return new ApiResponseDTO<List<DepartmentWithGroupDto>>
                 {
