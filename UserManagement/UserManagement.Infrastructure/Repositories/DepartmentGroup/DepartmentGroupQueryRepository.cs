@@ -35,11 +35,11 @@ namespace UserManagement.Infrastructure.Repositories.DepartmentGroup
                     DepartmentGroupName,
                     IsActive,
                     CreatedBy,
-                    CreatedDate,
+                    CreatedDate AS CreatedAt,
                     CreatedByName,
                     CreatedIP,
                     ModifiedBy,
-                    ModifiedDate,
+                    ModifiedDate AS ModifiedAt,
                     ModifiedByName,
                     ModifiedIP,
                     IsDeleted
@@ -47,11 +47,11 @@ namespace UserManagement.Infrastructure.Repositories.DepartmentGroup
                 WHERE Id = @Id AND IsDeleted = 0";
 
             return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.DepartmentGroup>(sql, new { Id = id });
-        }     
-        
-                    public async Task<(List<Core.Domain.Entities.DepartmentGroup>, int)> GetAllDepartmentGroupAsync(int pageNumber, int pageSize, string? searchTerm)
-            {
-                var query = $$"""
+        }
+
+        public async Task<(List<Core.Domain.Entities.DepartmentGroup>, int)> GetAllDepartmentGroupAsync(int pageNumber, int pageSize, string? searchTerm)
+        {
+            var query = $$"""
                     DECLARE @TotalCount INT;
 
                     SELECT @TotalCount = COUNT(*) 
@@ -65,11 +65,11 @@ namespace UserManagement.Infrastructure.Repositories.DepartmentGroup
                         [DepartmentGroupName],
                         [IsActive],
                         [CreatedBy],
-                        [CreatedDate],
+                        [CreatedDate] AS CreatedAt,
                         [CreatedByName],
                         [CreatedIP],
                         [ModifiedBy],
-                        [ModifiedDate],
+                        [ModifiedDate] AS ModifiedAt,
                         [ModifiedByName],
                         [ModifiedIP],
                         [IsDeleted]
@@ -82,23 +82,86 @@ namespace UserManagement.Infrastructure.Repositories.DepartmentGroup
                     SELECT @TotalCount AS TotalCount;
                     """;
 
-                var parameters = new
-                {
-                    Search = $"%{searchTerm}%",
-                    Offset = (pageNumber - 1) * pageSize,
-                    PageSize = pageSize
-                };
+            var parameters = new
+            {
+                Search = $"%{searchTerm}%",
+                Offset = (pageNumber - 1) * pageSize,
+                PageSize = pageSize
+            };
 
-                var result = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var result = await _dbConnection.QueryMultipleAsync(query, parameters);
 
-                var departmentGroupList = (await result.ReadAsync<Core.Domain.Entities.DepartmentGroup>()).ToList();
-                var totalCount = await result.ReadFirstAsync<int>();
+            var departmentGroupList = (await result.ReadAsync<Core.Domain.Entities.DepartmentGroup>()).ToList();
+            var totalCount = await result.ReadFirstAsync<int>();
 
-                return (departmentGroupList, totalCount);
-            }
+            return (departmentGroupList, totalCount);
+        }
 
-      
 
+
+        public async Task<bool> SoftDeleteValidation(int Id)
+        {
+            const string query = @"
+                           SELECT 1 
+                           FROM [AppData].[DepartmentGroup] 
+                         WHERE Id = @Id AND   IsDeleted = 0  ;";
+
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+
+            var DepartmentGroupExists = await multi.ReadFirstOrDefaultAsync<int?>();
+
+            return DepartmentGroupExists.HasValue;
+        }
+
+        public async Task<List<Core.Domain.Entities.DepartmentGroup>> GetAllDepartmentGroupAsync(string searchPattern)
+        {
+            const string query = @"
+                    SELECT 
+                        [Id],
+                        [DepartmentGroupCode],
+                        [DepartmentGroupName],
+                        [IsActive],
+                        [CreatedBy],
+                        [CreatedDate]       AS CreatedAt,
+                        [CreatedByName],
+                        [CreatedIP],
+                        [ModifiedBy],
+                        [ModifiedDate]      AS ModifiedAt,
+                        [ModifiedByName],
+                        [ModifiedIP],
+                        [IsDeleted]
+                    FROM AppData.DepartmentGroup
+                    WHERE 
+                        (DepartmentGroupCode LIKE @SearchPattern OR DepartmentGroupName LIKE @SearchPattern)
+                        AND IsDeleted = 0 AND IsActive = 1
+                    ORDER BY Id DESC";
+
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.DepartmentGroup>(
+                query,
+                new { SearchPattern = $"%{searchPattern}%" }
+            );
+
+            return result.ToList();
+        }
+
+        
+        public async Task<Core.Domain.Entities.DepartmentGroup?> GetByDepartmentGroupNameAsync(string departmentGroupName)
+    {
+        const string query = @"
+            SELECT TOP 1 * 
+            FROM AppData.DepartmentGroup 
+            WHERE DepartmentGroupName = @DepartmentGroupName AND IsDeleted = 0";
+
+        var result = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.DepartmentGroup>(
+            query,
+            new { DepartmentGroupName = departmentGroupName }
+        );
+
+        return result;
+    }
+            
+
+                  
 
        
     }

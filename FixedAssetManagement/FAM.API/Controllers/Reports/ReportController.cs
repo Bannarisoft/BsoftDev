@@ -47,20 +47,11 @@ namespace FAM.API.Controllers.Reports
             };
             var result = await Mediator.Send(query);
 
-            if (result == null || result.Data == null || result.Data.Count == 0)
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = result?.Message ?? "No Asset Report found."
-                });
-            }
-
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = result.Message,
-                Data = result.Data
+                Message = result?.Message ?? "No Asset Report found.",
+                Data = result?.Data ?? new List<AssetReportDto>()
             });
         }
         

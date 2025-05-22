@@ -1,6 +1,7 @@
 
 using System.Data;
 using Core.Application.Common.Interfaces.ISpecificationMaster;
+using Core.Application.SpecificationMaster.Queries.GetSpecificationMaster;
 using Core.Domain.Entities;
 using Dapper;
 
@@ -13,7 +14,7 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
         {
             _dbConnection = dbConnection;
         }
-        public async Task<(List<SpecificationMasters>, int)> GetAllSpecificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<SpecificationMasterDTO>, int)> GetAllSpecificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
              var query = $$"""
                 DECLARE @TotalCount INT;
@@ -22,11 +23,13 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
                 WHERE IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SpecificationName LIKE @Search)")}};
 
-                SELECT Id,SpecificationName,AssetGroupId,ISDefault,  IsActive
-                ,CreatedBy,CreatedDate as CreatedAt,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP
-                FROM FixedAsset.SpecificationMaster  WHERE IsDeleted = 0
+                SELECT SM.Id,SpecificationName,AssetGroupId,ISDefault,  SM.IsActive
+                ,SM.CreatedBy,SM.CreatedDate,SM.CreatedByName,SM.CreatedIP,SM.ModifiedBy,SM.ModifiedDate,SM.ModifiedByName,SM.ModifiedIP,AG.GroupName
+                FROM FixedAsset.SpecificationMaster  SM
+                inner join FixedAsset.AssetGroup AG on AG.Id=SM.AssetGroupId
+                WHERE SM.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SpecificationName LIKE @Search )")}}
-                ORDER BY Id DESC
+                ORDER BY SM.Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
                 SELECT @TotalCount AS TotalCount;
                 """;
@@ -38,7 +41,7 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
                        };
 
             var specificationMaster = await _dbConnection.QueryMultipleAsync(query, parameters);
-            var specificationMasterList = (await specificationMaster.ReadAsync<SpecificationMasters>()).ToList();
+            var specificationMasterList = (await specificationMaster.ReadAsync<SpecificationMasterDTO>()).ToList();
             int totalCount = (await specificationMaster.ReadFirstAsync<int>());             
             return (specificationMasterList, totalCount);             
         }

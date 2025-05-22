@@ -12,5 +12,6 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
         public int? ScarpQty { get; set; }
         public int? ToSubStoreQty { get; set; }
         public string? Image { get; set; }
+        public decimal? Rate { get; set; }
     }
 }
