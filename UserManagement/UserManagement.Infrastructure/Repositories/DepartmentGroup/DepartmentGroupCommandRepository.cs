@@ -34,12 +34,25 @@ namespace UserManagement.Infrastructure.Repositories.DepartmentGroup
                 existingDepartmentGroup.DepartmentGroupCode = departmentGroup.DepartmentGroupCode;
                 existingDepartmentGroup.DepartmentGroupName = departmentGroup.DepartmentGroupName;
                 existingDepartmentGroup.IsActive = departmentGroup.IsActive;
-                
+
 
                 _applicationDbContext.DepartmentGroup.Update(existingDepartmentGroup);
                 return await _applicationDbContext.SaveChangesAsync() > 0;
             }
 
+            return false;
+        }
+        
+
+        public async Task<bool> DeleteAsync(int id, Core.Domain.Entities.DepartmentGroup departmentGroup)
+        {
+            var existingDepartmentGroup = await _applicationDbContext.DepartmentGroup.FirstOrDefaultAsync(u => u.Id == id);
+            if (existingDepartmentGroup != null)
+            {
+                existingDepartmentGroup.IsDeleted = departmentGroup.IsDeleted;
+            
+                return await _applicationDbContext.SaveChangesAsync() > 0;
+            }
             return false;
         }
 

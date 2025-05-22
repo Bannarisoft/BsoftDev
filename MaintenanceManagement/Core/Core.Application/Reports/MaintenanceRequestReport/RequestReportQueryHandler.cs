@@ -35,14 +35,22 @@ namespace Core.Application.Reports.MaintenanceRequestReport
 
 
             var requestReportDtos = _mapper.Map<List<RequestReportDto>>(requestReportEntities);
-
-            // Step 3: Fetch department and unit data
+               if (requestReportDtos == null || !requestReportDtos.Any())
+                {
+                    return new ApiResponseDTO<List<RequestReportDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "No maintenance requests found.",
+                        Data = new List<RequestReportDto>()
+                    };
+                }
+                          
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var units = await _unitGrpcClient.GetAllUnitAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
-            // Step 4: Assign DepartmentName and UnitName to each DTO
+           
             foreach (var dto in requestReportDtos)
             {
                 if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
@@ -55,13 +63,11 @@ namespace Core.Application.Reports.MaintenanceRequestReport
                     dto.UnitName = unitName;
                 }
             }
-            return new ApiResponseDTO<List<RequestReportDto>>
+           return new ApiResponseDTO<List<RequestReportDto>>
             {
-                IsSuccess = requestReportDtos != null && requestReportDtos.Any(),
-                Message = requestReportDtos != null && requestReportDtos.Any()
-? "Maintenance report retrieved successfully."
-: "No maintenance requests found.",
-                Data = requestReportDtos
+                IsSuccess = true,
+                Message = "Maintenance report retrieved successfully.",
+                Data = requestReportDtos ?? new List<RequestReportDto>()
             };
         }
 
