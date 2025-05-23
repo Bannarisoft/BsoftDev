@@ -10,6 +10,6 @@ namespace Core.Application.Departments.Queries.GetDepartmentByDepartmentGroupId
 {
     public class GetDepartmentsByDepartmentGroupIdQuery : IRequest<ApiResponseDTO<List<DepartmentWithGroupDto>>>
     {
-        public int DepartmentGroupId { get; set; }
+        public string? DepartmentGroupName { get; set; }
     }
 }

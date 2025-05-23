@@ -128,21 +128,20 @@ namespace UserManagement.API.Controllers
             
         }
 
-        [HttpGet("by-department-group/{departmentGroupId}")]
-            public async Task<IActionResult> GetDepartmentsByDepartmentGroupId(int departmentGroupId)
+        [HttpGet("by-department-group/{departmentGroupName}")]
+            public async Task<IActionResult> GetDepartmentsByDepartmentGroupId(string departmentGroupName)
             {
-                if (departmentGroupId <= 0)
-                {
-                    return BadRequest(new
+                if (string.IsNullOrEmpty(departmentGroupName))
                     {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Invalid Department Group ID."
-                    });
-                }
-
+                        return BadRequest(new
+                        {
+                            StatusCode = StatusCodes.Status400BadRequest,
+                            Message = "Invalid Department Group ID."
+                        });
+                    }
                 var result = await Mediator.Send(new GetDepartmentsByDepartmentGroupIdQuery
                 {
-                    DepartmentGroupId = departmentGroupId
+                    DepartmentGroupName = departmentGroupName
                 });
 
                 var dataList = result.Data ?? new List<DepartmentWithGroupDto>();

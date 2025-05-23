@@ -27,7 +27,7 @@ namespace UserManagement.Infrastructure.Repositories.Menu
               WITH RecursiveMenu AS (
                   SELECT Id, ModuleId, ParentId, MenuName, MenuUrl
                   FROM [AppData].[Menus]
-                  WHERE ParentId IN ({parentIdList}) 
+                  WHERE ParentId IN ({parentIdList}) AND IsDeleted=0
                   UNION ALL
                   SELECT m.Id, m.ModuleId, m.ParentId, m.MenuName, m.MenuUrl
                   FROM [AppData].[Menus] m
