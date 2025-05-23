@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Application.ActivityCheckListMaster.Command.UpdateActivityCheckListMaster;
 using Core.Application.ActivityMaster.Command.CreateActivityMaster;
 using Core.Application.ActivityMaster.Command.UpdateActivityMster;
+using Core.Application.ActivityMaster.Queries.GetActivityByMachinGroupId;
 using Core.Application.ActivityMaster.Queries.GetActivityType;
 using Core.Application.ActivityMaster.Queries.GetAllActivityMaster;
 using Core.Application.ActivityMaster.Queries.GetMachineGroupById;
@@ -192,6 +193,31 @@ namespace MaintenanceManagement.API.Controllers
                 }
 
 
+        [HttpGet("GetActivity/{machineGroupId}")]
+        public async Task<IActionResult> GetActivityByMachineGroupId(int machineGroupId)
+        {
+            var response = await Mediator.Send(new GetActivityByMachinGroupIdQuery
+            {
+                MachineGroupId = machineGroupId
+            });
+
+            if (!response.IsSuccess || response.Data == null || !response.Data.Any())
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = $"No activities found for Machine Group ID {machineGroupId}.",
+                    Errors = string.Empty
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = response.Message ?? "Activities retrieved successfully.",
+                Data = response.Data
+            });
+        }
 
 
 
