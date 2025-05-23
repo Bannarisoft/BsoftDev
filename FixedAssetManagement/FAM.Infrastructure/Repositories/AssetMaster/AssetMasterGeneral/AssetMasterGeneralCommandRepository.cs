@@ -68,7 +68,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 existingAssetGroup.WorkingStatus = assetMaster.WorkingStatus;
                 existingAssetGroup.AssetImage = assetMaster.AssetImage;
                 existingAssetGroup.ISDepreciated = assetMaster.ISDepreciated;
-                existingAssetGroup.IsTangible = assetMaster.IsTangible;                
+                existingAssetGroup.IsTangible = assetMaster.IsTangible;            
+                existingAssetGroup.IsActive = BaseEntity.Status.Active;    
                 
             if (assetMaster.AssetAdditionalCost?.Any() == true)
                    await _applicationDbContext.AssetAdditionalCost.AddRangeAsync(assetMaster.AssetAdditionalCost);
