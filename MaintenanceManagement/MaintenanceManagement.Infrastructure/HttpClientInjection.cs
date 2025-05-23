@@ -1,4 +1,6 @@
+using Contracts.Interfaces.External.IMaintenance;
 using Contracts.Interfaces.External.IUser;
+using GrpcServices.Background;
 using GrpcServices.UserManagement;
 using MaintenanceManagement.Infrastructure.GrpcClients;
 using MaintenanceManagement.Infrastructure.Services;
@@ -17,6 +19,7 @@ namespace MaintenanceManagement.Infrastructure
         public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
         {
             var userManagementUrl = configuration["GrpcSettings:UserManagementUrl"];
+            var backGroundServiceUrl = configuration["GrpcSettings:BackGroundUrl"];
 
             // ✅ Register Department gRPC Client
             services.AddGrpcClient<DepartmentService.DepartmentServiceClient>(options =>
@@ -85,6 +88,25 @@ namespace MaintenanceManagement.Infrastructure
 
             services.AddScoped<ICompanyGrpcClient, CompanyGrpcClient>();
 
+
+            services.AddGrpcClient<MaintenanceJobService.MaintenanceJobServiceClient>(options =>
+            {
+                options.Address = new Uri(backGroundServiceUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
+            
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                return new HttpClientHandler
+                {
+                    
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<IBackgroundServiceClient, BackgroundServiceClient>();
 
 
             return services;
