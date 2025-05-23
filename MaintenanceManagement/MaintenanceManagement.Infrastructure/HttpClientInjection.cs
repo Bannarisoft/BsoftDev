@@ -74,6 +74,20 @@ namespace MaintenanceManagement.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<IUnitGrpcClient, UnitGrpcClient>();
+            //Company             
+            services.AddGrpcClient<CompanyService.CompanyServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<ICompanyGrpcClient, CompanyGrpcClient>();
+
 
             services.AddGrpcClient<MaintenanceJobService.MaintenanceJobServiceClient>(options =>
             {

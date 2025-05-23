@@ -2,13 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "SagaOrchestrator.API",
+      "name": "C#: MaintenanceManagement.API [http]",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/SagaOrchestrator.API/bin/Debug/net8.0/SagaOrchestrator.API.dll",
+      "program": "${workspaceFolder}/MaintenanceManagement.API/bin/Debug/net8.0/MaintenanceManagement.API.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/SagaOrchestrator.API",
+      "cwd": "${workspaceFolder}/MaintenanceManagement.API",
       "stopAtEntry": false,
       "serverReadyAction": {
         "action": "openExternally",
@@ -18,18 +18,8 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "sourceFileMap": {
-        "/Views": "${workspaceFolder}/SagaOrchestrator.API/Views"
+        "/Views": "${workspaceFolder}/MaintenanceManagement.API/Views"
       }
-    },
-    {
-      "name": "C#: Launch Startup Project",
-      "type": "dotnet",
-      "request": "launch"
-    },
-    {
-      "name": "C#: Launch Startup Project",
-      "type": "dotnet",
-      "request": "launch"
     }
   ]
 }
