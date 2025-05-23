@@ -17,7 +17,7 @@ public class DepartmentGrpcService : DepartmentService.DepartmentServiceBase
 
     public override async Task<DepartmentListResponse> GetAllDepartment(Empty request, ServerCallContext context)
     {
-        var (departments, _) = await _departmentRepository.GetAllDepartmentAsync(1, 100, null);
+        var departments = await _departmentRepository.GetAllDepartmentAutoCompleteSearchAsync("");
 
         var response = new DepartmentListResponse();
         response.Departments.AddRange(departments.Select(d => new GrpcServices.UserManagement.DepartmentDto
