@@ -10,14 +10,15 @@ using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Departments.Queries.GetDepartments
 {
-    public class DepartmentDto : IMapFrom<ApiResponseDTO<Department>>
+    public class DepartmentDto 
     {
         public int Id { get; set; }
         public string? ShortName { get; set; }
         public string? DeptName { get; set; }
         public int CompanyId { get; set; }
         public int DepartmentGroupId { get; set; }
-         public string? DepartmentGroupName { get; set; }
+        public string? DepartmentGroupName { get; set; }
+        public Status  IsActive { get; set; } 
       
     }
 }

@@ -13,8 +13,8 @@ namespace BackgroundService.Application
             // Use a specific AddAutoMapper overload
             services.AddAutoMapper(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
             
-        services.AddScoped<UserUnlockservice>();
-        services.AddScoped<PreventiveScheduleService>();
+        // services.AddScoped<UserUnlockservice>();
+        // services.AddScoped<PreventiveScheduleService>();
             // Add MediatR
             // services.AddMediatR(cfg =>
             // {

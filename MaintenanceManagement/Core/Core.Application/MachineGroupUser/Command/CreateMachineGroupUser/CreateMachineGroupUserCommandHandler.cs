@@ -43,7 +43,7 @@ namespace Core.Application.MachineGroupUsers.Command.CreateMachineGroupUser
                     return new ApiResponseDTO<int>
                     {
                         IsSuccess = true, 
-                        Message = "MachineGroup Users successfully", 
+                        Message = "MachineGroup Users successfully created", 
                         Data = machineGroupUsersResult
                     };
                 }

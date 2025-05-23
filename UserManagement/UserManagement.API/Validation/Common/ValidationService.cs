@@ -82,6 +82,8 @@ using Core.Application.CustomFields.Commands.UpdateCustomField;
 using Core.Application.CustomFields.Commands.DeleteCustomField;
 using Core.Application.DepartmentGroup.Command.CreateDepartmentGroup;
 using UserManagement.API.Validation.DepartmentGroup;
+using Core.Application.DepartmentGroup.Command.UpdateDepartmentGroup;
+using Core.Application.DepartmentGroup.Command.DeleteDepartmentGroup;
 namespace UserManagement.API.Validation.Common
 {
     public class ValidationService
@@ -149,6 +151,8 @@ namespace UserManagement.API.Validation.Common
             services.AddScoped<IValidator<UpdateCustomFieldCommand>, UpdateCustomFieldCommandValidator>();
             services.AddScoped<IValidator<DeleteCustomFieldCommand>, DeleteCustomFieldCommandValidator>();
             services.AddScoped<IValidator<CreateDepartmentGroupCommand>, CreateDepartmentGroupCommandValidator>();
+            services.AddScoped<IValidator<UpdateDepartmentGroupCommand>, UpdateDepartmentGroupCommandValidator>();
+            services.AddScoped<IValidator<DeleteDepartmentGroupCommand>, DeleteDepartmentGroupCommandValidator>();
            
          }  
     }

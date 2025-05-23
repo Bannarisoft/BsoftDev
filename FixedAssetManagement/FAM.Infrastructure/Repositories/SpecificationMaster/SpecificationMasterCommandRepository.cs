@@ -29,9 +29,9 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
             }
             return 0;
         }
-        public async Task<int> UpdateAsync(int specId, SpecificationMasters specificationMaster)
+        public async Task<int> UpdateAsync(SpecificationMasters specificationMaster)
         {
-            var existingSepGroup = await _applicationDbContext.SpecificationMasters.FirstOrDefaultAsync(u => u.Id == specId);             
+            var existingSepGroup = await _applicationDbContext.SpecificationMasters.FirstOrDefaultAsync(u => u.Id == specificationMaster.Id);             
     
             if (existingSepGroup != null)
             {
@@ -40,7 +40,7 @@ namespace FAM.Infrastructure.Repositories.SpecificationMaster
                 existingSepGroup.ISDefault = specificationMaster.ISDefault;
                 existingSepGroup.IsActive = specificationMaster.IsActive;               
                 _applicationDbContext.SpecificationMasters.Update(existingSepGroup);
-                return await _applicationDbContext.SaveChangesAsync();
+                return await _applicationDbContext.SaveChangesAsync();  
             }
            return 0; 
         }

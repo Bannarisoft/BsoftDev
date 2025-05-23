@@ -10,8 +10,10 @@ namespace Core.Application.Common.Interfaces.IDepartmentGroup
     {
 
         Task<int> CreateAsync(Core.Domain.Entities.DepartmentGroup departmentGroup);
-      
+
         Task<bool> UpdateAsync(int id, Core.Domain.Entities.DepartmentGroup departmentGroup);
+
+        Task<bool> DeleteAsync(int id, Core.Domain.Entities.DepartmentGroup departmentGroup);
        
         
     }

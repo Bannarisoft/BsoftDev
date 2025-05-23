@@ -18,16 +18,16 @@ namespace Core.Application.Reports.AssetReport
         }      
         public async Task<ApiResponseDTO<List<AssetReportDto>>> Handle(AssetReportQuery request, CancellationToken cancellationToken)
         {
-            var reportEntities = await _reportQueryRepository.AssetReportAsync(request.FromDate,request.ToDate);
-            var reportDto = _mapper.Map<List<AssetReportDto>>(reportEntities);
+            var reportEntities = await _reportQueryRepository.AssetReportAsync(request.FromDate,request.ToDate) ?? new List<AssetReportDto>();             
+            var reportDto = _mapper.Map<List<AssetReportDto>>(reportEntities) ?? new List<AssetReportDto>();
          
             return new ApiResponseDTO<List<AssetReportDto>>
             {
-            IsSuccess = reportDto != null && reportDto.Any(),
-            Message = reportDto != null && reportDto.Any()
-            ? "Asset Report retrieved successfully."
-            : "No Asset Report found.",
-            Data = reportDto
+                IsSuccess = reportDto.Any(),
+                Message = reportDto.Any()
+                ? "Asset Report retrieved successfully."
+                : "No Asset Report found.",
+                Data = reportDto
             };
         }
     }

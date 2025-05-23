@@ -43,6 +43,7 @@ namespace UserManagement.Infrastructure.Repositories.Departments
     public async Task<int> DeleteAsync(int id ,Department department )
     {
         
+        
             var deptToDelete = await _applicationDbContext.Department.FirstOrDefaultAsync(u => u.Id == id);
             if (deptToDelete != null)
             {

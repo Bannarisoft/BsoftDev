@@ -2,6 +2,7 @@ using BackgroundService.Infrastructure;
 using BackgroundService.Application;
 using BackgroundService.API.Configurations;
 using BackgroundService.API;
+using BackgroundService.API.GrpcServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +20,11 @@ builder.Services.AddApplicationServices();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 // Load configuration
 var configuration = builder.Configuration;
 builder.Services.AddInfrastructureServices(configuration);
-
+builder.Services.AddGrpc();
 var app = builder.Build();
 
 // Enable Swagger in Development
@@ -33,8 +35,15 @@ var app = builder.Build();
 //}
 
 app.UseHttpsRedirection();
-app.UseCors();
+app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
+app.UseRouting(); 
+app.UseCors("AllowAll");
 app.UseAuthorization();
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGrpcService<MaintenanceJobGrpcService>().EnableGrpcWeb();
+    endpoints.MapControllers();
+});
+// app.MapControllers();
 app.ConfigureHangfireDashboard();
 app.Run();

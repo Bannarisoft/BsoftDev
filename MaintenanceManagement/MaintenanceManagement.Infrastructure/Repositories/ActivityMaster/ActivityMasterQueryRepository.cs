@@ -128,7 +128,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
                    const string query = @"
                        SELECT Id, ActivityName  
                        FROM Maintenance.ActivityMaster
-                       WHERE IsDeleted = 0 AND ActivityName LIKE @SearchPattern";
+                       WHERE IsDeleted = 0 AND IsActive = 1 AND ActivityName LIKE @SearchPattern";
 
                    var parameters = new 
                    { 
@@ -142,7 +142,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
                 {
                     var query = """
                     SELECT COUNT(1) FROM Maintenance.ActivityMaster
-                    WHERE ActivityName = @activityname AND IsDeleted = 0 
+                    WHERE ActivityName = @activityname AND IsDeleted = 0 AND IsActive = 1
                     """;
 
                     var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { ActivityName = activityname });

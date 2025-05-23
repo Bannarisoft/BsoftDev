@@ -8,7 +8,7 @@ namespace Core.Application.SpecificationMaster.Commands.CreateSpecificationMaste
     {
         public string? SpecificationName { get; set; }      
         public int? AssetGroupId { get; set; } 
-        public bool? ISDefault { get; set; }       
+        public byte ISDefault { get; set; }       
 
     }
 }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IExcelImport;
 using Core.Domain.Entities;
 using MediatR;
@@ -13,12 +14,14 @@ namespace Core.Application.ExcelImport
         private readonly IExcelImportCommandRepository _assetRepository;
         private readonly IExcelImportQueryRepository _assetQueryRepository;
         private readonly IMapper _mapper;
+        private readonly IIPAddressService _ipAddressService;
 
-        public ImportAssetCommandHandler(IExcelImportCommandRepository assetRepository, IExcelImportQueryRepository assetQueryRepository, IMapper mapper)
+        public ImportAssetCommandHandler(IExcelImportCommandRepository assetRepository, IExcelImportQueryRepository assetQueryRepository, IMapper mapper, IIPAddressService ipAddressService)
         {
             _assetRepository = assetRepository;
             _assetQueryRepository = assetQueryRepository;
             _mapper = mapper;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task< ApiResponseDTO<bool>> Handle(ImportAssetCommand request, CancellationToken cancellationToken)
@@ -53,17 +56,17 @@ namespace Core.Application.ExcelImport
                         {
                             currentRow = row;
                             var assetGroupHandler = new AssetGroupHandler(_assetRepository, _assetQueryRepository);
-                            var assetDetailsHandler = new AssetDetailsHandler(_assetRepository, _assetQueryRepository);
+                            var assetDetailsHandler = new AssetDetailsHandler(_assetRepository, _assetQueryRepository,_ipAddressService);
                             var assetPurchaseHandler = new AssetPurchaseHandler(worksheet, row);
                             var assetInsuranceHandler = new AssetInsuranceHandler(worksheet, row);
                             var assetAdditionalCostHandler = new AssetAdditionalCostHandler(worksheet, row);
                             var assetSpecificationHandler = new AssetSpecificationHandler(worksheet, row);
-                            var assetLocationHandler = new AssetLocationHandler(_assetRepository, _assetQueryRepository); // Pass the correct repositories                        
+                            //var assetLocationHandler = new AssetLocationHandler(_assetRepository, _assetQueryRepository); // Pass the correct repositories                        
 
                             // Extracting all required details
                             var assetDto = await assetGroupHandler.ProcessAssetGroupAsync(request, worksheet, row);
                             await assetDetailsHandler.ProcessAssetDetailsAsync(request, worksheet, row, assetDto);
-                            assetDto.AssetLocation = await assetLocationHandler.ProcessLocationAsync(worksheet, row);                         
+                            //assetDto.AssetLocation = await assetLocationHandler.ProcessLocationAsync(worksheet, row);                         
                             assetDto.AssetPurchaseDetails = assetPurchaseHandler.ProcessAssetPurchase();
                             assetDto.AssetInsurance = assetInsuranceHandler.ProcessAssetInsurance();
                             assetDto.AssetAdditionalCost = assetAdditionalCostHandler.ProcessAssetAdditionalCost();
