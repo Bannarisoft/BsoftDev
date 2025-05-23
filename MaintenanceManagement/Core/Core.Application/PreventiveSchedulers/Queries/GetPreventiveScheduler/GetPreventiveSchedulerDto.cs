@@ -10,6 +10,7 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
         public int Id { get; set; }
         public int DepartmentId { get; set; }
         public string? DepartmentName { get; set; }
+        public string PreventiveSchedulerName { get; set; }
         public int FrequencyInterval { get; set; }
         public string? EffectiveDate { get; set; }
         public int GraceDays { get; set; }

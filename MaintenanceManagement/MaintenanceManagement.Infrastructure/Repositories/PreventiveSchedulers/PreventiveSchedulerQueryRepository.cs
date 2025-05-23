@@ -69,6 +69,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PS.Id,
                     PS.DepartmentId,
                     PS.FrequencyInterval,
+                    PS.PreventiveSchedulerName,
                     PS.EffectiveDate,
                     PS.GraceDays,
                     PS.ReminderWorkOrderDays,
@@ -302,7 +303,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 {
                        var query = $@"
                             SELECT  
-                                PSD.Id,PS.PreventiveSchedulerName,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
+                                PS.Id AS HeaderId,PSD.Id AS DetailId,PS.PreventiveSchedulerName,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
                             FROM [Maintenance].[PreventiveSchedulerHeader] PS
                             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
                             INNER JOIN [Maintenance].[MachineMaster] M ON M.Id =PSD.MachineId
