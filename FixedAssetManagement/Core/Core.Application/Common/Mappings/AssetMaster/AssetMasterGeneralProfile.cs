@@ -45,8 +45,7 @@ namespace Core.Application.Common.Mappings.AssetMaster
             CreateMap<AssetMasterUpdateDto, AssetMasterGenerals>()
             .ForMember(dest => dest.AssetPurchase, opt => opt.MapFrom(src => src.AssetPurchaseDetails))
             .ForMember(dest => dest.AssetLocation, opt => opt.MapFrom(src => src.AssetLocation)) 
-            .ForMember(dest => dest.AssetAdditionalCost, opt => opt.MapFrom(src => src.AssetAdditionalCost))                        
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive))
+            .ForMember(dest => dest.AssetAdditionalCost, opt => opt.MapFrom(src => src.AssetAdditionalCost))                                    
             .ForMember(dest => dest.Id, opt => opt.Ignore());      
 
              CreateMap<AssetLocationUpdateDto, Core.Domain.Entities.AssetMaster.AssetLocation>()
