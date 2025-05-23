@@ -44,7 +44,7 @@ namespace Core.Domain.Common
         {
             public const string Code = "Closed";
         }
-         public static class MaintenanceStatusCancelled
+        public static class MaintenanceStatusCancelled
         {
             public const string Code = "Cancelled";
         }
@@ -111,10 +111,14 @@ namespace Core.Domain.Common
         {
             public const string Code = "BRK";
         }
-        
+
         public static class MachineLineNo
         {
             public const string Code = "MachineLineNo";
+        }
+          public static class FrequencyType
+        {
+            public const string Code = "Onetime";
         }
 
 
