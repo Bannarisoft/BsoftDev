@@ -127,6 +127,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             const string query = @"
             SELECT  
                     PS.Id,
+                    PS.PreventiveSchedulerName,
                     PS.MachineGroupId,
                     PS.DepartmentId,
                     PS.MaintenanceCategoryId,
@@ -301,7 +302,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 {
                        var query = $@"
                             SELECT  
-                                PSD.Id,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
+                                PSD.Id,PS.PreventiveSchedulerName,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
                             FROM [Maintenance].[PreventiveSchedulerHeader] PS
                             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
                             INNER JOIN [Maintenance].[MachineMaster] M ON M.Id =PSD.MachineId

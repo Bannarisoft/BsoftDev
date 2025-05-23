@@ -9,6 +9,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
 {
     public class UpdatePreventiveSchedulerCommand : IRequest<ApiResponseDTO<bool>>
     {
+        public string PreventiveSchedulerName { get; set; }
         public int Id { get; set; }
         public int MachineGroupId { get; set; }
         public int DepartmentId { get; set; }
