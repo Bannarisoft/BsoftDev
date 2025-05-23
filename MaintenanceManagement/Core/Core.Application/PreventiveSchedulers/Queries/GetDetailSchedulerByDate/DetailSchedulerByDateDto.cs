@@ -7,7 +7,8 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetDetailSchedulerByDate
 {
     public class DetailSchedulerByDateDto
     {
-        public int Id { get; set; }
+        public int HeaderId { get; set; }
+        public int DetailId { get; set; }
         public string PreventiveSchedulerName { get; set; }
         public int MachineGroupId { get; set; }
         public string GroupName { get; set; }
