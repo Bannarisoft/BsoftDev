@@ -94,10 +94,7 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
                     if (companyLookup.TryGetValue(request.WorkOrder.CompanyId, out var companyNameGrpc))
                     {
                         companyName= companyNameGrpc;
-                    }
-                        
-                    
-
+                    } 
                     //var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(request.WorkOrder.CompanyId, request.WorkOrder.UnitId);
                     string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);     
                     //string companyFolder = Path.Combine(baseDirectory, companyName.Trim());
