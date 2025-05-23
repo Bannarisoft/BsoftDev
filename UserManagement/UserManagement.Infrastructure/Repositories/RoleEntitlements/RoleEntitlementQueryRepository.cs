@@ -33,15 +33,15 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
 
                 SELECT m.Id AS MenuId,m.MenuName,m.ModuleId,m.ParentId FROM [AppData].[Menus] m
                 Inner join [AppSecurity].[RoleParent] rp ON rp.MenuId=m.Id
-                 WHERE   rp.RoleId = @RoleEntitlementId
+                 WHERE   rp.RoleId = @RoleEntitlementId AND m.IsDeleted=0
 
                  SELECT m.Id AS MenuId,m.MenuName,m.ModuleId,m.ParentId FROM [AppData].[Menus] m
                 Inner join [AppSecurity].[RoleChild] rc ON rc.MenuId=m.Id
-                 WHERE   rc.RoleId = @RoleEntitlementId
+                 WHERE   rc.RoleId = @RoleEntitlementId AND m.IsDeleted=0
                 
                 SELECT rmenu.Id,rmenu.RoleId,rmenu.MenuId,rmenu.CanView,rmenu.CanAdd,rmenu.CanUpdate,rmenu.CanDelete,rmenu.CanApprove,rmenu.CanExport,rmenu.CanView  FROM   [AppData].[Menus] m
 	             Inner join [AppSecurity].[RoleMenuPrivilege] rmenu ON rmenu.MenuId=m.Id
-                 WHERE rmenu.RoleId = @RoleEntitlementId
+                 WHERE rmenu.RoleId = @RoleEntitlementId AND m.IsDeleted=0
                 
                  ";
 
@@ -132,7 +132,7 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
     INNER JOIN [AppData].[Menus] Menu ON Menu.ModuleId = M.Id
 	INNER JOIN #MENUPERMISSION PM ON PM.MenuId=Menu.Id AND PM.RoleId=URA.UserRoleId
     LEFT JOIN [AppSecurity].[RoleMenuPrivilege] RMP ON RMP.MenuId = Menu.Id AND RMP.RoleId=URA.UserRoleId
-    WHERE URA.UserId = @UserId AND M.IsDeleted = 0
+    WHERE URA.UserId = @UserId AND M.IsDeleted = 0 AND Menu.IsDeleted=0
     ORDER BY Menu.ParentId, Menu.Id;"; 
 
     var result = await _dbConnection.QueryAsync<Modules, Core.Domain.Entities.Menu, RoleMenuPrivileges, Modules>(

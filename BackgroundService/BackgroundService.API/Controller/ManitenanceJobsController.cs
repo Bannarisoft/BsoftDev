@@ -13,18 +13,18 @@ namespace BackgroundService.API.Controller
     [Route("api/maintenancehangfirejobs")]
     public class ManitenanceJobsController : ControllerBase
     {
-          [HttpPost("scheduleWorkOrder")]        
-        public IActionResult SchedulePreventive([FromBody] ScheduleWorkOrderBackgroundCommand command)
-        {
-           /*  BackgroundJob.Schedule<UserUnlockBackgroundJob>(
-               job => job.Execute(command.UserName),
-                TimeSpan.FromMinutes(command.DelayInMinutes)
-            ); */
-          string newJobId = BackgroundJob.Schedule<UserUnlockservice>(
-                 job => job.ScheduleworkOrderExecute(command.PreventiveScheduleId),
-                TimeSpan.FromMinutes(command.DelayInMinutes)
-            );
-            return Ok(new { Message = "Work order scheduled", JobId = newJobId });   
-        }
+        //   [HttpPost("scheduleWorkOrder")]        
+        // public IActionResult SchedulePreventive([FromBody] ScheduleWorkOrderBackgroundCommand command)
+        // {
+        //    /*  BackgroundJob.Schedule<UserUnlockBackgroundJob>(
+        //        job => job.Execute(command.UserName),
+        //         TimeSpan.FromMinutes(command.DelayInMinutes)
+        //     ); */
+        //   string newJobId = BackgroundJob.Schedule<UserUnlockservice>(
+        //          job => job.ScheduleworkOrderExecute(command.PreventiveScheduleId),
+        //         TimeSpan.FromMinutes(command.DelayInMinutes)
+        //     );
+        //     return Ok(new { Message = "Work order scheduled", JobId = newJobId });   
+        // }
     }
 }

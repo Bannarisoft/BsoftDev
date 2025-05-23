@@ -265,7 +265,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 '' end AssetImage ,  
                 AM.AssetCategoryId,AM.AssetSubCategoryId,
                 AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName,
-                case when (isnull(AM.AssetDocument,'') <> '') then MM.Description+''+MM1.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetDocument  else 
+                case when (isnull(AM.AssetDocument,'') <> '') then MM.Description+''+MM2.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetDocument  else 
                 '' end AssetDocument ,  AM.AssetDocument AssetDocumentName
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
@@ -275,6 +275,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 LEFT JOIN [FixedAsset].[AssetMaster] AssetParent ON AM.AssetParentId = AssetParent.Id
                 LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'
                 LEFT JOIN FixedAsset.MiscTypeMaster MM1 on MM1.MiscTypeCode ='ASSETIMAGE'
+                LEFT JOIN FixedAsset.MiscTypeMaster MM2 on MM2.MiscTypeCode ='ASSETDocument'
                 LEFT JOIN Bannari.AppData.Unit UN on UN.Id=AM.UnitId
                 LEFT JOIN Bannari.AppData.Company C on C.Id=AM.CompanyId
                 WHERE  AM.CompanyId = @CompanyId AND AM.UnitId = @UnitId AND   AM.Id = @AssetId;

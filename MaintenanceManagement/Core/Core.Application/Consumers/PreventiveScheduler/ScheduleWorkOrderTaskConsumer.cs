@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Commands.Maintenance.PreventiveScheduler;
 using Contracts.Events.Maintenance.PreventiveScheduler;
-using Core.Application.Common.Interfaces.IBackgroundService;
+using Contracts.Interfaces.External.IMaintenance;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Application.Common.Interfaces.IWorkOrder;
