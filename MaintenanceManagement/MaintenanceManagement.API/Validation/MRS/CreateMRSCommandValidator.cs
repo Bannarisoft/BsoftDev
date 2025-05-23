@@ -36,9 +36,9 @@ namespace MaintenanceManagement.API.Validation.MRS
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateMRSCommand.Header.SubDepcode)} {rule.Error}");
 
-                             RuleFor(x => x.Header!.Refno)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(CreateMRSCommand.Header.Refno)} {rule.Error}");
+                            //  RuleFor(x => x.Header!.Refno)
+                            // .NotEmpty()
+                            // .WithMessage($"{nameof(CreateMRSCommand.Header.Refno)} {rule.Error}");
 
                             RuleFor(x => x.Header!.MaintenanceType)
                             .NotEmpty()
@@ -57,9 +57,9 @@ namespace MaintenanceManagement.API.Validation.MRS
                                     .NotEmpty()
                                     .WithMessage("ItemCode is required.");
 
-                                detail.RuleFor(d => d.Macno)
-                                    .NotEmpty()
-                                    .WithMessage("Macno is required.");
+                                // detail.RuleFor(d => d.Macno)
+                                //     .NotEmpty()
+                                //     .WithMessage("Macno is required.");
 
                                 detail.RuleFor(d => d.CatCode)
                                     .NotEmpty()
@@ -73,9 +73,9 @@ namespace MaintenanceManagement.API.Validation.MRS
                                 .NotNull()
                                 .WithMessage("QtyReqd is required.")
                                 .GreaterThan(0)
-                                .WithMessage("QtyReqd must be greater than 0.")
-                                .LessThanOrEqualTo(d => d.CurrStk)
-                                .WithMessage("QtyReqd cannot exceed current stock (CurrStk).");
+                                .WithMessage("QtyReqd must be greater than 0.");
+                                // .LessThanOrEqualTo(d => d.CurrStk)
+                                // .WithMessage("QtyReqd cannot exceed current stock (CurrStk).");
                             });
 
                         break;

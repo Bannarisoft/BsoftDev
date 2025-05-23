@@ -57,7 +57,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MRS
                 parameters.Add("@IRDATE", headerRequest.IrDate);
                 parameters.Add("@DEPCODE", headerRequest.Depcode);
                 parameters.Add("@SUBDEPCODE", headerRequest.SubDepcode);
-                parameters.Add("@REFNO", headerRequest.Refno);
+                parameters.Add("@REFNO", string.IsNullOrWhiteSpace(headerRequest.Refno) ? 0 : headerRequest.Refno);
                 parameters.Add("@MAINTENANCETYPE", headerRequest.MaintenanceType);
                 parameters.Add("@REMARKS", headerRequest.Remarks);
                 parameters.Add("@REQDATE", headerRequest.IrDate);
@@ -83,7 +83,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MRS
             detailParams.Add("@IRDATE", headerRequest.IrDate);
             detailParams.Add("@IRSNO", srno++);
             detailParams.Add("@ITEMCODE", detail.ItemCode);
-            detailParams.Add("@MACNO", detail.Macno);
+            detailParams.Add("@MACNO", string.IsNullOrWhiteSpace(detail.Macno) ? 0 : detail.Macno);
             detailParams.Add("@QTYREQD", detail.QtyReqd);
             detailParams.Add("@REQDATE", headerRequest.IrDate);
             detailParams.Add("@CATCODE", detail.CatCode);
