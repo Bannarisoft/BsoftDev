@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IReports;
 using MediatR;
@@ -13,12 +14,12 @@ namespace Core.Application.Reports.ScheduleReport
     { 
          private readonly IReportRepository _reportQueryRepository;
         private readonly IMapper _mapper;
-        //  private readonly IDepartmentService _departmentService;
-        public ScheduleReportQueryHandler(IReportRepository reportQueryRepository, IMapper mapper)
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        public ScheduleReportQueryHandler(IReportRepository reportQueryRepository, IMapper mapper,IDepartmentGrpcClient departmentGrpcClient)
         {
             _reportQueryRepository = reportQueryRepository;
             _mapper = mapper;
-            // _departmentService = departmentService;
+            _departmentGrpcClient = departmentGrpcClient;
         }
         public async Task<ApiResponseDTO<List<ScheduleReportDto>>> Handle(ScheduleReportQuery request, CancellationToken cancellationToken)
         {
@@ -26,18 +27,18 @@ namespace Core.Application.Reports.ScheduleReport
 
             var preventiveSchedulerList = _mapper.Map<List<ScheduleReportDto>>(reportEntities)?? new List<ScheduleReportDto>();
 
-            // var departments = await _departmentService.GetAllDepartmentAsync();
-            // var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var PreventiveSchedulerDictionary = new Dictionary<int, ScheduleReportDto>();
 
 
             foreach (var data in preventiveSchedulerList)
             {
 
-                // if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-                // {
-                //     data.Department = departmentName;
-                // }
+                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+                {
+                    data.Department = departmentName;
+                }
 
                 PreventiveSchedulerDictionary[data.DepartmentId] = data;
 

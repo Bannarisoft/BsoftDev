@@ -7,6 +7,7 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.MRS.Command.CreateMRS;
 using Core.Application.MRS.Queries;
 using Core.Application.MRS.Queries.GetCategory;
+using Core.Application.MRS.Queries.GetPendingQty;
 using Core.Application.MRS.Queries.GetSubCostCenter;
 using Core.Application.MRS.Queries.GetSubDepartment;
 using FluentValidation;
@@ -16,19 +17,19 @@ using Microsoft.Extensions.Logging;
 
 namespace MaintenanceManagement.API.Controllers
 {
-     [Route("api/[controller]")]
+    [Route("api/[controller]")]
     public class MRSController : ApiControllerBase
     {
         private readonly ILogger<MRSController> _logger;
         private readonly IMediator _mediator;
         private readonly IValidator<CreateMRSCommand> _createmrscommandvalidator;
 
-        public MRSController(ILogger<MRSController> logger,IMediator mediator,IValidator<CreateMRSCommand> createmrscommandvalidator)
+        public MRSController(ILogger<MRSController> logger, IMediator mediator, IValidator<CreateMRSCommand> createmrscommandvalidator)
          : base(mediator)
         {
             _logger = logger;
-            _mediator=mediator;
-            _createmrscommandvalidator=createmrscommandvalidator;
+            _mediator = mediator;
+            _createmrscommandvalidator = createmrscommandvalidator;
         }
 
         [HttpGet("department/{oldUnitcode}")]
@@ -38,7 +39,7 @@ namespace MaintenanceManagement.API.Controllers
             var stockItem = await _mediator.Send(new GetDepartmentbyIdQuery
             {
                 OldUnitcode = oldUnitcode
-                
+
             });
 
             if (stockItem.IsSuccess)
@@ -64,7 +65,7 @@ namespace MaintenanceManagement.API.Controllers
             var stockItem = await _mediator.Send(new GetSubCostCenterQuery
             {
                 OldUnitcode = oldUnitcode
-                
+
             });
 
             if (stockItem.IsSuccess)
@@ -91,7 +92,7 @@ namespace MaintenanceManagement.API.Controllers
             var stockItem = await _mediator.Send(new GetCategoryQuery
             {
                 OldUnitcode = oldUnitcode
-                
+
             });
 
             if (stockItem.IsSuccess)
@@ -117,7 +118,7 @@ namespace MaintenanceManagement.API.Controllers
             var stockItem = await _mediator.Send(new GetSubDepartmentQuery
             {
                 OldUnitcode = oldUnitcode
-                
+
             });
 
             if (stockItem.IsSuccess)
@@ -136,7 +137,7 @@ namespace MaintenanceManagement.API.Controllers
                 message = stockItem.Message
             });
         }
-       [HttpPost("CreateMRS")]
+        [HttpPost("CreateMRS")]
         public async Task<IActionResult> CreateMRS([FromBody] HeaderRequest headerRequest)
         {
             if (headerRequest == null)
@@ -168,20 +169,48 @@ namespace MaintenanceManagement.API.Controllers
 
             if (result.IsSuccess)
             {
-            
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status201Created,
-                message =result.Message,
-                data = result.Data
-            });
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status201Created,
+                    message = result.Message,
+                    data = result.Data
+                });
             }
 
-                return BadRequest(new
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = result.Message
+            });
+        }
+
+        [HttpGet("pending-issue")]
+        public async Task<IActionResult> GetPendingIssue([FromQuery] string oldUnitCode, [FromQuery] string itemCode)
+        {
+            var result = await _mediator.Send(new GetPendingQtyQuery
+            {
+                OldUnitcode = oldUnitCode,
+                ItemCode = itemCode
+            });
+
+            if (result.IsSuccess)
+            {
+                return Ok(new
                 {
-                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusCode = StatusCodes.Status200OK,
+                    data = result.Data ?? new GetPendingQtyDto { PendingQty = 0 },
                     message = result.Message
                 });
+            }
+
+            return NotFound(new
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                message = result.Message
+            });
+
+            
         }
 
        
