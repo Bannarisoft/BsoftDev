@@ -77,6 +77,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGrpcService<DepartmentGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<SessionGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<UnitGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<CompanyGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
 // app.MapGrpcService<DepartmentGrpcService>();
