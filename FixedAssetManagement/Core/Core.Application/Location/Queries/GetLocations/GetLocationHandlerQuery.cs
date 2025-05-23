@@ -30,20 +30,28 @@ namespace Core.Application.Location.Queries.GetLocations
             // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-            var LocationDictionary = new Dictionary<int, LocationDto>();
+            // var LocationDictionary = new Dictionary<int, LocationDto>();
 
             // 🔥 Map department names to location
-            foreach (var data in locationList)
-            {
+            // foreach (var data in locationList)
+            // {
 
-                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-                {
+            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+            //     {
 
-                    data.DepartmentName = departmentName;
-                }
-                LocationDictionary[data.DepartmentId] = data;
+            //         data.DepartmentName = departmentName;
+            //     }
+            //     LocationDictionary[data.DepartmentId] = data;
 
-            }
+            // }
+               var filteredLocation = locationList
+                 .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+                 .Select(p =>
+                 {
+                     p.DepartmentName = departmentLookup[p.DepartmentId];
+                     return p;
+                 })
+                 .ToList();
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetLocations",
@@ -57,7 +65,7 @@ namespace Core.Application.Location.Queries.GetLocations
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = locationList,
+                Data = filteredLocation,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
