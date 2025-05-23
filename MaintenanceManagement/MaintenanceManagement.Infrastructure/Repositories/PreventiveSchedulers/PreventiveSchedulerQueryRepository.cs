@@ -100,7 +100,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
-                WHERE PS.IsDeleted = 0
+                WHERE PS.IsDeleted = 0 
                 {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")}
                 ORDER BY PS.Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -301,7 +301,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 {
                        var query = $@"
                             SELECT  
-                                PS.Id,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
+                                PSD.Id,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
                             FROM [Maintenance].[PreventiveSchedulerHeader] PS
                             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
                             INNER JOIN [Maintenance].[MachineMaster] M ON M.Id =PSD.MachineId

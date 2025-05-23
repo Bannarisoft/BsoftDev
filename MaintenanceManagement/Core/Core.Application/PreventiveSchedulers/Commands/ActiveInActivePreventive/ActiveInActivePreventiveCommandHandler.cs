@@ -13,6 +13,7 @@ using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Domain.Entities;
 using Hangfire;
 using MediatR;
+using static Core.Domain.Common.BaseEntity;
 using static Core.Domain.Common.MiscEnumEntity;
 
 namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventive
@@ -48,6 +49,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
             Scheduledetail.EffectiveDate = DateOnly.FromDateTime(DateTime.Now);
             if (request.IsActive ==1)
             {
+                Scheduledetail.IsActive =Status.Active;
                  var response = await _preventiveSchedulerCommand.CreateAsync(Scheduledetail);
                 
                 var machineMaster = await _machineMasterQueryRepository.GetMachineByGroupAsync(Scheduledetail.MachineGroupId);
