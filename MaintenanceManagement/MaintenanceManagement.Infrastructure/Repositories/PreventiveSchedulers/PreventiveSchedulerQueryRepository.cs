@@ -8,6 +8,7 @@ using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Domain.Entities;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Migrations;
+using static Core.Domain.Common.MiscEnumEntity;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 {
@@ -53,6 +54,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
         public async Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+            var UnitId = _ipAddressService.GetUnitId();
            var query = $@"
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
@@ -62,7 +64,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
-                WHERE PS.IsDeleted = 0
+                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId
                 {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")};
 
                 SELECT  
@@ -101,7 +103,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
-                WHERE PS.IsDeleted = 0 
+                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId
                 {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")}
                 ORDER BY PS.Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -113,7 +115,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             {
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize = PageSize
+                PageSize = PageSize,
+                UnitId
             };
 
             using var multi = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -285,22 +288,28 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
              }
                public async Task<IEnumerable<dynamic>> GetAbstractSchedulerByDate()
                 {
+                    var UnitId = _ipAddressService.GetUnitId();
+                    var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status };
                        var query = $@"
                             SELECT  
                                 COUNT(PSD.MachineId) AS TotalScheduleCount,Cast(PSD.ActualWorkOrderDate as varchar) AS ScheduleDate
                             FROM [Maintenance].[PreventiveSchedulerHeader] PS
                             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
-                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 
+							LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
+							LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
+                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PS.UnitId=@UnitId AND MISC.Code IN @StatusCodes
                             GROUP BY PSD.ActualWorkOrderDate
                             ORDER BY PSD.ActualWorkOrderDate ASC
                         ";
-                         using var multi = await _dbConnection.QueryMultipleAsync(query);
+                         using var multi = await _dbConnection.QueryMultipleAsync(query, new {UnitId, StatusCodes = statusCodes });
                         var preventiveSchedulers = await multi.ReadAsync<dynamic>();
 
                         return preventiveSchedulers;
                 }
                  public async Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate)
                 {
+                    var UnitId = _ipAddressService.GetUnitId();
+                    var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status };
                        var query = $@"
                             SELECT  
                                 PS.Id AS HeaderId,PSD.Id AS DetailId,PS.PreventiveSchedulerName,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
@@ -308,12 +317,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
                             INNER JOIN [Maintenance].[MachineMaster] M ON M.Id =PSD.MachineId
                             INNER JOIN [Maintenance].[MachineGroup] MG ON MG.Id = PS.MachineGroupId
-                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PSD.ActualWorkOrderDate=@ActualWorkOrderDate
+                            LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
+							LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
+                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PSD.ActualWorkOrderDate=@ActualWorkOrderDate AND PS.UnitId=@UnitId AND MISC.Code IN @StatusCodes
                             ORDER BY PS.Id ASC
                         ";
                         var parameters = new
                         {
-                            ActualWorkOrderDate = schedulerDate
+                            ActualWorkOrderDate = schedulerDate,
+                            UnitId,
+                            StatusCodes = statusCodes 
                         };
                          using var multi = await _dbConnection.QueryMultipleAsync(query,parameters);
                         var preventiveSchedulers = await multi.ReadAsync<dynamic>();

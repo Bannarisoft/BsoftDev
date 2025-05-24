@@ -33,19 +33,27 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
             // var departments = departmentResponse.Departments.ToList();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            var PreventiveSchedulerDictionary = new Dictionary<int, GetPreventiveSchedulerDto>();
+            // var PreventiveSchedulerDictionary = new Dictionary<int, GetPreventiveSchedulerDto>();
             // 🔥 Map department names to preventiveScheduler
-            foreach (var data in preventiveSchedulerList)
-            {
+            // foreach (var data in preventiveSchedulerList)
+            // {
 
-                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-                {
-                    data.DepartmentName = departmentName;
-                }
+            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+            //     {
+            //         data.DepartmentName = departmentName;
+            //     }
 
-                PreventiveSchedulerDictionary[data.DepartmentId] = data;
+            //     PreventiveSchedulerDictionary[data.DepartmentId] = data;
 
-            }
+            // }
+                         var filteredPreventiveSchedulers = preventiveSchedulerList
+                 .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+                 .Select(p =>
+                 {
+                     p.DepartmentName = departmentLookup[p.DepartmentId];
+                     return p;
+                 })
+                 .ToList();
 
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetPreventiveScheduler",
@@ -59,7 +67,7 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = preventiveSchedulerList,
+                Data = filteredPreventiveSchedulers,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize

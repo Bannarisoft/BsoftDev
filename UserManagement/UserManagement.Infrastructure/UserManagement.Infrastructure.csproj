@@ -6,6 +6,10 @@
     <ProjectReference Include="..\..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj"/>
   </ItemGroup>
   <ItemGroup>
+  <Protobuf Include="..\..\Shared\Contracts\Protos\department_maintenance.proto" GrpcServices="Client" />
+</ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="9.0.0"/>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2"/>
