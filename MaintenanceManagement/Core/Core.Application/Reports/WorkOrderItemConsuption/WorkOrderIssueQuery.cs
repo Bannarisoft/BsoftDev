@@ -11,6 +11,6 @@ namespace Core.Application.Reports.WorkOrderItemConsuption
     {
         public DateTimeOffset? IssueFrom { get; set; }
         public DateTimeOffset? IssueTo { get; set; }
-        public int MaintenanceTypeId { get; set; }
+       
     }
 }

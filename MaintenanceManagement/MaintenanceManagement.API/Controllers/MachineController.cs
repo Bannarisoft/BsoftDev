@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Application.MachineMaster.Command.CreateMachineMaster;
 using Core.Application.MachineMaster.Command.DeleteMachineMaster;
 using Core.Application.MachineMaster.Command.UpdateMachineMaster;
+using Core.Application.MachineMaster.Queries.GetAssetSpecificationById;
 using Core.Application.MachineMaster.Queries.GetMachineDepartmentbyId;
 using Core.Application.MachineMaster.Queries.GetMachineLineNo;
 using Core.Application.MachineMaster.Queries.GetMachineMaster;
@@ -218,8 +219,8 @@ namespace MaintenanceManagement.API.Controllers
                 data = result.Data
             });
         }
-        
-        
+
+
         [HttpGet("MachineGroup/{MachineGroupId}")]
         [ActionName(nameof(GetMachineDepartmentByIdAsync))]
         public async Task<IActionResult> GetMachineDepartmentByIdAsync(int MachineGroupId)
@@ -232,6 +233,12 @@ namespace MaintenanceManagement.API.Controllers
                 return Ok(new { StatusCode = StatusCodes.Status200OK, data = machine.Data, message = machine.Message });
             }
             return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = machine.Message });
+        }
+         [HttpGet("GetByAssetId/{assetId}")]
+        public async Task<IActionResult> GetByAssetId(int assetId)
+        {
+            var result = await _mediator.Send(new GetAssetSpecificationByIdQuery { AssetId = assetId });
+            return Ok(result);
         }
 
 

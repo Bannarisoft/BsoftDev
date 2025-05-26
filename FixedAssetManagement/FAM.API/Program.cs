@@ -5,6 +5,7 @@ using FAM.API.Configurations;
 using MassTransit;
 using Contracts.Events;
 using FAM.API.Middleware;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,9 @@ builder.Services.AddInfrastructureServices(builder.Configuration, builder.Servic
 builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
+// Register gRPC
+builder.Services.AddGrpc();
+
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -57,7 +61,11 @@ app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGrpcService<AssetSpecificationGrpcService>().EnableGrpcWeb();
+    endpoints.MapControllers();
+});
 app.ConfigureHangfireDashboard();
 app.Run();
 

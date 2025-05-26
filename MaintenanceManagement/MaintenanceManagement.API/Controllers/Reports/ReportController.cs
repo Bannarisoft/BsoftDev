@@ -74,8 +74,7 @@ namespace MaintenanceManagement.API.Controllers.Reports
         [HttpGet("ItemConsumption")]
         public async Task<IActionResult> GetAllItemConsuption(
             [FromQuery] string? fromDate,
-            [FromQuery] string? toDate,
-            [FromQuery] int? maintenanceTypeId)
+            [FromQuery] string? toDate)
         {
             DateTimeOffset? parsedFromDate = null;
             DateTimeOffset? parsedToDate = null;
@@ -98,16 +97,13 @@ namespace MaintenanceManagement.API.Controllers.Reports
                 parsedToDate = toParsed;
             }
 
-            if (maintenanceTypeId is null or <= 0)
-            {
-                return BadRequest(new { message = "Invalid Maintenance Type Id" });
-            }
+           
 
             var workOrder = await Mediator.Send(new WorkOrderIssueQuery
             {
                 IssueFrom = parsedFromDate,
-                IssueTo = parsedToDate,
-                MaintenanceTypeId = maintenanceTypeId.Value
+                IssueTo = parsedToDate
+               
             });
 
             return Ok(new
