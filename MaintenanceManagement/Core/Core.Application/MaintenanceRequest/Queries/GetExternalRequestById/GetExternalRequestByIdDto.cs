@@ -17,7 +17,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetExternalRequestById
        public int  CompanyId { get; set; }
        public   int  UnitId { get; set; }       
        public int DepartmentId { get; set; }
-       public string? DepartmentName { get; set; }
+    //    public string? DepartmentName { get; set; }
        public int SourceId { get; set; }
        public int? VendorId  { get; set; }
        public string? VendorName  { get; set; } = null;

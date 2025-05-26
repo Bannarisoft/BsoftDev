@@ -1,6 +1,7 @@
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using Core.Application.Common.Interfaces.IReports;
 using MediatR;
@@ -12,8 +13,9 @@ namespace Core.Application.Reports.MaintenanceRequestReport
 
         private readonly IReportRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient;
+               private readonly IDepartmentGrpcClient _departmentGrpcClient;
         private readonly IUnitGrpcClient _unitGrpcClient;
+
 
         public RequestReportQueryHandler(IReportRepository maintenanceRequestQueryRepository, IMapper mapper, IDepartmentGrpcClient departmentService, IUnitGrpcClient unitGrpcClient)
         {
@@ -21,6 +23,7 @@ namespace Core.Application.Reports.MaintenanceRequestReport
             _mapper = mapper;
             _departmentGrpcClient = departmentService;
             _unitGrpcClient = unitGrpcClient;
+         
         }
 
         public async Task<ApiResponseDTO<List<RequestReportDto>>> Handle(RequestReportQuery request, CancellationToken cancellationToken)
@@ -46,7 +49,7 @@ namespace Core.Application.Reports.MaintenanceRequestReport
                 }
                           
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-            var units = await _unitGrpcClient.GetAllUnitAsync();
+            var units = await _unitGrpcClient.GetAllUnitAsync();           
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 

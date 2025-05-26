@@ -9,6 +9,7 @@ namespace Core.Application.Reports.WorkOderCheckListReport
     {
                        // WorkOrder Id
         public int CompanyId { get; set; }
+        public string? CompanyName { get; set;}
         public int UnitId { get; set; }
         public string? UnitName { get; set; }
         public DateTimeOffset CreatedDate { get; set; }

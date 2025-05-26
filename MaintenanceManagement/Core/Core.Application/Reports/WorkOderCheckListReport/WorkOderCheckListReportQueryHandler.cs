@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IReports;
 using MediatR;
 
@@ -14,17 +15,20 @@ namespace Core.Application.Reports.WorkOderCheckListReport
     {
 
         private readonly IReportRepository _workOrderCheckListQueryRepository;
-        private readonly IMapper _mapper;
-        // private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        private readonly IMapper _mapper;   
+        private readonly IIPAddressService _ipAddressService;    
         private readonly IUnitGrpcClient _unitGrpcClient;
-       
+        private readonly ICompanyGrpcClient _companyGrpcClient;
 
-        public WorkOderCheckListReportQueryHandler(IReportRepository workOrderCheckListQueryRepository, IMapper mapper, IUnitGrpcClient unitGrpcClient)
+
+        public WorkOderCheckListReportQueryHandler(IReportRepository workOrderCheckListQueryRepository, IMapper mapper, IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient, IIPAddressService ipAddressService)
         {
             _workOrderCheckListQueryRepository = workOrderCheckListQueryRepository;
             _mapper = mapper;
-            // _departmentGrpcClient = departmentService;
+
             _unitGrpcClient = unitGrpcClient;
+            _companyGrpcClient = companyGrpcClient;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<ApiResponseDTO<List<WorkOderCheckListReportDto>>> Handle(WorkOderCheckListReportQuery request, CancellationToken cancellationToken)
@@ -40,26 +44,35 @@ namespace Core.Application.Reports.WorkOderCheckListReport
            );
 
             var requestReportDtos = _mapper.Map<List<WorkOderCheckListReportDto>>(requestReportEntities);
+            var companyId = _ipAddressService.GetCompanyId();
+            var unitId = _ipAddressService.GetUnitId();
 
-            // Step 3: Fetch department and unit data
-            // var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-            // var Company = await _.GetCompanyAsync();
+            var companies = await _companyGrpcClient.GetAllCompanyAsync();
             var units = await _unitGrpcClient.GetAllUnitAsync();
-            // var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            var companyLookup = companies.ToDictionary(c => c.CompanyId, c => c.CompanyName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
-            // Step 4: Assign DepartmentName and UnitName to each DTO
             foreach (var dto in requestReportDtos)
             {
-                // if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
-                // {
-                //     dto.Department = departmentName;
-                // }
+                if (companyLookup.TryGetValue(dto.CompanyId, out var companyName))
+                {
+                    dto.CompanyName = companyName;
+                }
+
                 if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
                 {
                     dto.UnitName = unitName;
                 }
             }
+            // foreach (var dto in requestReportDtos)
+            // {
+
+            //     if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
+            //     {
+            //         dto.UnitName = unitName;
+            //     }
+            // }
             return new ApiResponseDTO<List<WorkOderCheckListReportDto>>
             {
                 IsSuccess = requestReportDtos != null && requestReportDtos.Any(),
