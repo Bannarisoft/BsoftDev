@@ -20,7 +20,7 @@ public class AssetSpecificationGrpcService : AssetSpecificationService.AssetSpec
 
    public override async Task<AssetSpecificationListResponse> GetAllAssetSpecification(Empty request, ServerCallContext context)
    {
-      var (items, totalCount) = await _assetSpecificationQueryRepository.GetAssetSpecBasedOnMachineNos(1, 100, null);
+      var (items, totalCount) = await _assetSpecificationQueryRepository.GetAssetSpecBasedOnMachineNos(1, int.MaxValue, null);
       var response = new AssetSpecificationListResponse();
       response.AssetSpecifications.AddRange(items.Select(d => new GrpcServices.FixedAssetManagement.AssetSpecificationDto
       {

@@ -26,6 +26,7 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroup
             _mediator = mediator;
             _departmentGrpcClient = departmentGrpcClient;
         }
+
         public async Task<ApiResponseDTO<List<MachineGroupDto>>> Handle(GetMachineGroupQuery request, CancellationToken cancellationToken)
         {
             // Fetch data from repository
@@ -37,16 +38,24 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroup
             // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+            // 🔥 Map department & unit names with DataControl to costCenters
+            foreach (var dto in machineGroupList)
+            {
+                if (departmentLookup.TryGetValue(dto.DepartmentId, out var deptName))
+                    dto.DepartmentName = deptName;
 
-            // 🔥 Map department names with DataControl to location
-            var filteredMachineGroupDtos = machineGroupList
-           .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-           .Select(p => new MachineGroupDto
-           {
-               DepartmentId = p.DepartmentId,
-               DepartmentName = departmentLookup[p.DepartmentId],
-           })
-           .ToList();
+             
+            }
+
+        //     // 🔥 Map department names with DataControl to location
+            //     var filteredMachineGroupDtos = machineGroupList
+            //    .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            //    .Select(p => new MachineGroupDto
+            //    {
+            //        DepartmentId = p.DepartmentId,
+            //        DepartmentName = departmentLookup[p.DepartmentId],
+            //    })
+            //    .ToList();
 
             // Publish domain event for auditing
             var domainEvent = new AuditLogsDomainEvent(
@@ -63,7 +72,7 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroup
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = filteredMachineGroupDtos,
+                Data = machineGroupList,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize

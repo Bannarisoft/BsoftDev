@@ -24,5 +24,7 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<PreventiveSchedulerHeader> GetWorkOrderScheduleDetailById(int Id);
         Task<bool> MachingroupValidation(int id);
         Task<bool> ExistWorkOrderBySchedulerDetailId(int id);
+        Task<bool> ExistPreventivescheduleItem(int id);
+        Task<PreventiveSchedulerHeader> GetWorkOrderScheduleDetailWithoutItemidById(int Id);
     }
 }

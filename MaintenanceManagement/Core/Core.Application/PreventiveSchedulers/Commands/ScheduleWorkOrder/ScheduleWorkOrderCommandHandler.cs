@@ -33,7 +33,12 @@ namespace Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder
         public async Task<ApiResponseDTO<bool>> Handle(ScheduleWorkOrderCommand request, CancellationToken cancellationToken)
         {
             var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode,StatusOpen.Code);
-            var scheduledetail = await _preventiveSchedulerQuery.GetWorkOrderScheduleDetailById(request.PreventiveScheduleId);
+         //   var ExistItems = await _preventiveSchedulerQuery.ExistPreventivescheduleItem(request.PreventiveScheduleId);
+           // var scheduledetail;
+           
+                 var scheduledetail = await _preventiveSchedulerQuery.GetWorkOrderScheduleDetailById(request.PreventiveScheduleId);
+            
+            
 
              
                 

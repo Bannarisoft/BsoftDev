@@ -50,7 +50,7 @@ namespace BackgroundService.Infrastructure
             
             // Add the Hangfire server
             services.AddHangfireServer(options => {
-                options.ServerName = "DEVSERVER";
+                options.ServerName = configuration["HangfireServer:Server"];
             options.Queues = new[] { "schedule_work_order_queue" };
         });
            // ✅ Correctly bind EmailSettings

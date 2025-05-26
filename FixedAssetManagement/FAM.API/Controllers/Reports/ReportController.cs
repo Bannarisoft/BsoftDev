@@ -17,12 +17,13 @@ namespace FAM.API.Controllers.Reports
         }
 
         [HttpGet("AssetReport")]
-        public async Task<IActionResult> AssetReportAsync([FromQuery] string? fromDate, [FromQuery] string? toDate)
+        public async Task<IActionResult> AssetReportAsync( [FromQuery] DateTimeOffset? fromDate = null,
+            [FromQuery] DateTimeOffset? toDate = null)
         {
-            DateTimeOffset? parsedFromDate = null;
+         /*   DateTimeOffset? parsedFromDate = null;
             DateTimeOffset? parsedToDate = null;
 
-            if (!string.IsNullOrWhiteSpace(fromDate))  // Allow null or empty values
+             if (!string.IsNullOrWhiteSpace(fromDate))  // Allow null or empty values
             {
                 if (!DateTimeOffset.TryParse(fromDate, out var parsedDate))
                 {
@@ -38,12 +39,12 @@ namespace FAM.API.Controllers.Reports
                     return BadRequest(new { message = "Invalid toDate format. Use yyyy-MM-dd." });
                 }
                 parsedToDate = parsedDate;
-            }
+            } */
 
             var query = new AssetReportQuery
             {
-                FromDate = parsedFromDate,
-                ToDate = parsedToDate
+                FromDate = fromDate,
+                ToDate = toDate
             };
             var result = await Mediator.Send(query);
 
