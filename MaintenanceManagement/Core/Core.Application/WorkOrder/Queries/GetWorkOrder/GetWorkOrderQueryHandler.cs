@@ -1,5 +1,6 @@
 
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.WorkOrder.Queries.GetWorkOrderById;
@@ -13,19 +14,37 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
         private readonly IWorkOrderQueryRepository _workOrderRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;
 
-        public GetWorkOrderQueryHandler(IWorkOrderQueryRepository workOrderRepository , IMapper mapper, IMediator mediator)
+        public GetWorkOrderQueryHandler(IWorkOrderQueryRepository workOrderRepository , IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
         {
             _workOrderRepository = workOrderRepository;
             _mapper = mapper;
             _mediator = mediator;
+            _departmentGrpcClient = departmentGrpcClient;
         }
   
         public async Task<ApiResponseDTO<List<Dictionary<string, List<GetWorkOrderDto>>>>> Handle(GetWorkOrderQuery request, CancellationToken cancellationToken)
         {
            var workOrder = await _workOrderRepository.GetAllWOAsync(request.fromDate,request.toDate, request.requestTypeId, request.departmentId);            
            var mappedWorkOrders = _mapper.Map<List<GetWorkOrderDto>>(workOrder);
-            var groupedWorkOrders = mappedWorkOrders
+
+             // 🔥 Fetch departments using gRPC
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync(); // ✅ Clean call
+
+            // var departments = departmentResponse.Departments.ToList();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            var filteredWorkOrders = mappedWorkOrders
+                 .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+                 .Select(p =>
+                 {
+                     p.Department = departmentLookup[p.DepartmentId];
+                     return p;
+                 })
+                 .ToList();
+
+            var groupedWorkOrders = filteredWorkOrders
             .GroupBy(w => w.MaintenanceType ?? "Unknown")
             .Select(g => new Dictionary<string, List<GetWorkOrderDto>>
             {

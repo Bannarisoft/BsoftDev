@@ -1,4 +1,5 @@
 using System.Data;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
@@ -13,11 +14,17 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 {
     public class AssetMasterGeneralQueryRepository : BaseQueryRepository,IAssetMasterGeneralQueryRepository
     {
-        private readonly IDbConnection _dbConnection;        
-        public AssetMasterGeneralQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
+        private readonly IDbConnection _dbConnection;   
+        private readonly ICompanyGrpcClient _companyGrpcClient;     
+        private readonly IUnitGrpcClient _unitGrpcClient;   
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;  
+        public AssetMasterGeneralQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService, ICompanyGrpcClient companyGrpcClient,IUnitGrpcClient unitGrpcClient,IDepartmentGrpcClient departmentGrpcClient)
             : base(ipAddressService) 
         {
-            _dbConnection = dbConnection;            
+            _dbConnection = dbConnection;      
+            _companyGrpcClient = companyGrpcClient;  
+            _unitGrpcClient=unitGrpcClient;   
+            _departmentGrpcClient=_departmentGrpcClient;
         }     
         public async Task<(List<AssetMasterGeneralDTO>, int)> GetAllAssetAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
@@ -255,17 +262,28 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             }
             return assetMaster;
         }
-
+   
         public async Task<(dynamic AssetResult, dynamic LocationResult, IEnumerable<dynamic> PurchaseDetails, IEnumerable<dynamic> Spec, IEnumerable<dynamic> Warranty, IEnumerable<dynamic> Amc, dynamic Disposal, IEnumerable<dynamic> Insurance, IEnumerable<dynamic> AdditionalCost)> GetAssetMasterByIdAsync(int assetId)
         {
+             
+            var companies = await _companyGrpcClient.GetAllCompanyAsync();
+            //var departments = await _companyGrpcClient.GetAllCompanyAsync();
+            var units = await _unitGrpcClient.GetAllUnitAsync();
+
+            var companyLookup = companies.ToDictionary(c => c.CompanyId, c => c.CompanyName);
+            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+            var CompanyName = companyLookup.TryGetValue(CompanyId, out var cName) ? cName : string.Empty;
+            var UnitName = unitLookup.TryGetValue(UnitId, out var uName) ? uName : string.Empty;
+
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
                 SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName ParentName,AM.AssetGroupId ,                
-                case when (isnull(AM.AssetImage,'') <> '') then MM.Description+''+MM1.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetImage  else 
+                case when (isnull(AM.AssetImage,'') <> '') then MM.Description+''+MM1.Description+'/'+ @companyName + '/' + @unitName +'/'+AM.AssetImage  else 
                 '' end AssetImage ,  
                 AM.AssetCategoryId,AM.AssetSubCategoryId,
                 AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName,
-                case when (isnull(AM.AssetDocument,'') <> '') then MM.Description+''+MM2.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetDocument  else 
+                case when (isnull(AM.AssetDocument,'') <> '') then MM.Description+''+MM2.Description+'/'+ @companyName + '/' + @unitName +'/'+AM.AssetDocument  else 
                 '' end AssetDocument ,  AM.AssetDocument AssetDocumentName
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
@@ -276,8 +294,6 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'
                 LEFT JOIN FixedAsset.MiscTypeMaster MM1 on MM1.MiscTypeCode ='ASSETIMAGE'
                 LEFT JOIN FixedAsset.MiscTypeMaster MM2 on MM2.MiscTypeCode ='ASSETDocument'
-                LEFT JOIN Bannari.AppData.Unit UN on UN.Id=AM.UnitId
-                LEFT JOIN Bannari.AppData.Company C on C.Id=AM.CompanyId
                 WHERE  AM.CompanyId = @CompanyId AND AM.UnitId = @UnitId AND   AM.Id = @AssetId;
 
                 -- Second Query: AssetLocation (One-to-One)
@@ -351,7 +367,9 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 {
                     CompanyId,
                     UnitId,
-                    AssetId = assetId
+                    AssetId = assetId,
+                    companyName = CompanyName,
+                    unitName = UnitName
                 });            
 
 
