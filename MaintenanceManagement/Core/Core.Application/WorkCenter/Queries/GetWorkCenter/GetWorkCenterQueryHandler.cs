@@ -39,15 +39,26 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
-            // 🔥 Map DepartmentName with DataControl and UnitName in one loop
-            var filteredworkCentersgroupDtos = workCentersgrouplist
-                         .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-                         .Select(p => new WorkCenterDto
-                         {
-                             DepartmentId = p.DepartmentId,
-                             DepartmentName = departmentLookup[p.DepartmentId],
-                         })
-                         .ToList();
+             // 🔥 Map department & unit names with DataControl to costCenters
+            foreach (var dto in workCentersgrouplist)
+            {
+                if (departmentLookup.TryGetValue(dto.DepartmentId, out var deptName))
+                    dto.DepartmentName = deptName;
+
+                if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
+                    dto.UnitName = unitName;
+            }
+
+            // // 🔥 Map DepartmentName with DataControl and UnitName in one loop
+            // var filteredworkCentersgroupDtos = workCentersgrouplist
+            //              .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            //              .Select(p => new WorkCenterDto
+            //              {
+            //                  DepartmentId = p.DepartmentId,
+            //                  DepartmentName = departmentLookup[p.DepartmentId],
+            //              })
+            //              .ToList();
+            
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetWorkCenter",
@@ -61,7 +72,7 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = filteredworkCentersgroupDtos,
+                Data = workCentersgrouplist,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize

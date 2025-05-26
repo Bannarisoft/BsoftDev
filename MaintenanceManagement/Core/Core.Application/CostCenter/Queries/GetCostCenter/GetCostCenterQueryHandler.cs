@@ -41,27 +41,27 @@ namespace Core.Application.CostCenter.Queries.GetCostCenter
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
-            // 🔥 Map department & unit names with DataControl to costCenters
-            // foreach (var dto in costCenterDtos)
-            // {
-            //     if (departmentLookup.TryGetValue(dto.DepartmentId, out var deptName))
-            //         dto.DepartmentName = deptName;
+           // 🔥 Map department & unit names with DataControl to costCenters
+            foreach (var dto in costCenterDtos)
+            {
+                if (departmentLookup.TryGetValue(dto.DepartmentId, out var deptName))
+                    dto.DepartmentName = deptName;
 
-            //     if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
-            //         dto.UnitName = unitName;
-            // }
+                if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
+                    dto.UnitName = unitName;
+            }
 
-            var filteredCostCenterDtos = costCenterDtos
-                    .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-                    .Select(p => new CostCenterDto
-                    {
-                        DepartmentId = p.DepartmentId,
-                        DepartmentName = departmentLookup[p.DepartmentId],
-                        UnitId = p.UnitId,
-                        UnitName = unitLookup.TryGetValue(p.UnitId, out var unitName) ? unitName : string.Empty,
-                        CostCenterName = p.CostCenterName,
-                    })
-                    .ToList();
+            // var filteredCostCenterDtos = costCenterDtos
+            //         .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            //         .Select(p => new CostCenterDto
+            //         {
+            //             DepartmentId = p.DepartmentId,
+            //             DepartmentName = departmentLookup[p.DepartmentId],
+            //             UnitId = p.UnitId,
+            //             UnitName = unitLookup.TryGetValue(p.UnitId, out var unitName) ? unitName : string.Empty,
+            //             CostCenterName = p.CostCenterName,
+            //         })
+            //         .ToList();
 
             // 📘 Log domain event
             var domainEvent = new AuditLogsDomainEvent(
@@ -78,7 +78,7 @@ namespace Core.Application.CostCenter.Queries.GetCostCenter
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = filteredCostCenterDtos,
+                Data = costCenterDtos,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
