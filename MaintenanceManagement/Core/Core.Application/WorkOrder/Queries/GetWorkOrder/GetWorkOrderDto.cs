@@ -21,6 +21,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
         public int RequestId { get; set; }
         public string? MachineName { get; set; }
         public string? ScheduleStatus { get; set; }
+        public string? DueDate { get; set; }
         public List<ScheduleDto> Schedules { get; set; } = new();
     }
 }
