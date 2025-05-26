@@ -82,7 +82,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapHub<PreventiveScheduleHub>("/preventiveschedulehub");
 });
 // app.MapControllers();
-app.ConfigureHangfireDashboard();
+// app.ConfigureHangfireDashboard();
 // app.UseWebSockets();
 // app.MapHub<PreventiveScheduleHub>("/preventiveschedulehub");
 app.Run();

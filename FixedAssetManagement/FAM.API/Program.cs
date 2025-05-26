@@ -66,7 +66,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGrpcService<AssetSpecificationGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
-app.ConfigureHangfireDashboard();
+// app.ConfigureHangfireDashboard();
 app.Run();
 
 
