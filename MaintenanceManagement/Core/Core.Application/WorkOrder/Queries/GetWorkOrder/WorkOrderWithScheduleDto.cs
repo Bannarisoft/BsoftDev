@@ -18,5 +18,6 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
         public int MaintenanceTypeId { get; set; }
         public string? MachineName { get; set; }
         public string? ScheduleStatus { get; set; }
+        public string? DueDate { get; set; }
     }
 }
