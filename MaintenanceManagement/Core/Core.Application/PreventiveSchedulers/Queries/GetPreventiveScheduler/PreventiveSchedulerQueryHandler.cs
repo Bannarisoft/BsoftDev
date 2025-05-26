@@ -28,13 +28,12 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
             var preventiveSchedulerList = _mapper.Map<List<GetPreventiveSchedulerDto>>(preventiveScheduler);
 
             // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentAsync(); // ✅ Clean call
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
 
             // var departments = departmentResponse.Departments.ToList();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            // var PreventiveSchedulerDictionary = new Dictionary<int, GetPreventiveSchedulerDto>();
-            // 🔥 Map department names to preventiveScheduler
+            // 🔥 Map department names with DataControl to preventiveScheduler
             // foreach (var data in preventiveSchedulerList)
             // {
 
@@ -46,14 +45,14 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
             //     PreventiveSchedulerDictionary[data.DepartmentId] = data;
 
             // }
-                         var filteredPreventiveSchedulers = preventiveSchedulerList
-                 .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-                 .Select(p =>
-                 {
-                     p.DepartmentName = departmentLookup[p.DepartmentId];
-                     return p;
-                 })
-                 .ToList();
+            var filteredPreventiveSchedulers = preventiveSchedulerList
+             .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+             .Select(p => new GetPreventiveSchedulerDto
+             {
+                 DepartmentId = p.DepartmentId,
+                 DepartmentName = departmentLookup[p.DepartmentId],
+             })
+             .ToList();
 
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetPreventiveScheduler",

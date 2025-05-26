@@ -36,7 +36,7 @@ namespace Core.Application.Departments.Commands.DeleteDepartment
         {
 
             _logger.LogInformation("DeleteDepartmentCommandHandler started for Department ID: {DepartmentId}", request.Id);
-            // ✅ Step 1: Call MaintenanceService via gRPC to check usage
+            // ✅Call MaintenanceService via gRPC to check usage
             bool isUsed = await _departmentValidationGrpcClient.CheckIfDepartmentIsUsedAsync(request.Id);
 
             if (isUsed)
