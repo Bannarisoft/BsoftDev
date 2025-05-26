@@ -32,23 +32,22 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
         {
             var (WorkCenter, totalCount) = await _iWorkCenterQueryRepository.GetAllWorkCenterGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var workCentersgrouplist = _mapper.Map<List<WorkCenterDto>>(WorkCenter);
-            // 🔥 Fetch lookups
+            // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var units = await _unitGrpcClient.GetAllUnitAsync();
 
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
-            // 🔁 Set DepartmentName and UnitName in one loop
-            foreach (var dto in workCentersgrouplist)
-            {
-                if (departmentLookup.TryGetValue(dto.DepartmentId, out var deptName))
-                    dto.DepartmentName = deptName;
-
-                if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
-                    dto.UnitName = unitName;
-            }
-
+            // 🔥 Map DepartmentName with DataControl and UnitName in one loop
+            var filteredworkCentersgroupDtos = workCentersgrouplist
+                         .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+                         .Select(p => new WorkCenterDto
+                         {
+                             DepartmentId = p.DepartmentId,
+                             DepartmentName = departmentLookup[p.DepartmentId],
+                         })
+                         .ToList();
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetWorkCenter",
@@ -62,7 +61,7 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = workCentersgrouplist,
+                Data = filteredworkCentersgroupDtos,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize

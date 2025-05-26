@@ -32,7 +32,7 @@ namespace Core.Application.Location.Queries.GetLocations
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             // var LocationDictionary = new Dictionary<int, LocationDto>();
 
-            // 🔥 Map department names to location
+            // 🔥 Map department names with DataControl to location
             // foreach (var data in locationList)
             // {
 
@@ -44,14 +44,15 @@ namespace Core.Application.Location.Queries.GetLocations
             //     LocationDictionary[data.DepartmentId] = data;
 
             // }
-               var filteredLocation = locationList
-                 .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-                 .Select(p =>
-                 {
-                     p.DepartmentName = departmentLookup[p.DepartmentId];
-                     return p;
-                 })
-                 .ToList();
+            var filteredLocationDtos = locationList
+                .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+                .Select(p => new LocationDto
+                {
+                    DepartmentId = p.DepartmentId,
+                    DepartmentName = departmentLookup[p.DepartmentId],
+                })
+                .ToList();
+
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetLocations",
@@ -65,7 +66,7 @@ namespace Core.Application.Location.Queries.GetLocations
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = filteredLocation,
+                Data = filteredLocationDtos,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize

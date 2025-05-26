@@ -36,7 +36,8 @@ namespace Core.Application.Reports.AssetTransferReport
 
             // Map to DTOs
             var assetTransfersReportDtos = _mapper.Map<List<AssetTransferDetailsDto>>(assetTransfersReports);
-                // 🔥 Fetch departments using HttpClientFactory
+            // 🔥 Fetch departments using gRPC
+
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var assetTransferDictionary = new Dictionary<int, AssetTransferDetailsDto>();
@@ -48,7 +49,7 @@ namespace Core.Application.Reports.AssetTransferReport
                 {
                     data.FromDepartmentName = departmentName;
                 }
-                    assetTransferDictionary[data.FromDepartmentId] = data;
+                assetTransferDictionary[data.FromDepartmentId] = data;
 
             }
 
