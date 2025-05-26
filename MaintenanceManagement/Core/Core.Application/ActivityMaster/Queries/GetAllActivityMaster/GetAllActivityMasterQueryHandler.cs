@@ -33,15 +33,29 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
             var activityMasterDictionary = new Dictionary<int, GetAllActivityMasterDto>();
+
+            
             //    🔥 Map department names with DataControl
-            var filteredactivitiesDtos = activityList
-                .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-                .Select(p => new GetAllActivityMasterDto
+                 foreach (var data in activityList)
+            {
+
+                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
                 {
-                    DepartmentId = p.DepartmentId,
-                    DepartmentName = departmentLookup[p.DepartmentId],
-                })
-                .ToList();
+
+                    data.DepartmentName = departmentName;
+                }
+                activityMasterDictionary[data.DepartmentId] = data;
+
+            }
+
+            // var filteredactivitiesDtos = activityList
+            //     .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            //     .Select(p => new GetAllActivityMasterDto
+            //     {
+            //         DepartmentId = p.DepartmentId,
+            //         DepartmentName = departmentLookup[p.DepartmentId],
+            //     })
+            //     .ToList();
 
             // Publish domain event for auditing
             var domainEvent = new AuditLogsDomainEvent(
@@ -58,7 +72,7 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = filteredactivitiesDtos,
+                Data = activityList,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
