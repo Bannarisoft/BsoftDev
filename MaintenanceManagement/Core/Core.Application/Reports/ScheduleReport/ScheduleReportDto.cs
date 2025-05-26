@@ -16,5 +16,6 @@ namespace Core.Application.Reports.ScheduleReport
         public string ActivityType { get; set; }
         public string DueDate { get; set; }
         public string LastCompletionDate { get; set; }
+        public string PreventiveSchedulerName { get; set; }
     }
 }

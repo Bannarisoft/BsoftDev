@@ -20,7 +20,8 @@ namespace Core.Application.Common.Mappings.AssetMaster
         public AssetMasterGeneralProfile()
         { 
             CreateMap<DeleteAssetMasterGeneralCommand, AssetMasterGenerals>()            
-            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));            
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));    
+                
             
             CreateMap<CreateAssetMasterGeneralCommand, AssetMasterGenerals>()
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))            
@@ -53,15 +54,21 @@ namespace Core.Application.Common.Mappings.AssetMaster
                 .ReverseMap(); 
             CreateMap<AssetAdditionalCostUpdateDto, Core.Domain.Entities.AssetPurchase.AssetAdditionalCost>()
                 .ReverseMap(); 
+
+
             CreateMap<AssetPurchaseUpdateDto, AssetPurchaseDetails>()
-             .ForMember(dest => dest.CapitalizationDate,
-                       opt => opt.MapFrom(src => src.CapitalizationDate.ToDateTime(TimeOnly.MinValue)));            
+                .ForMember(dest => dest.CapitalizationDate,
+                    opt => opt.MapFrom(src => src.CapitalizationDate.HasValue 
+                        ? src.CapitalizationDate.Value.ToDateTime(TimeOnly.MinValue) 
+                        : (DateTime?)null));         
              
 
             // **Add these mappings to clear your error:**
             CreateMap<AssetPurchaseCombineDto, AssetPurchaseDetails>()
-             .ForMember(dest => dest.CapitalizationDate,
-                       opt => opt.MapFrom(src => src.CapitalizationDate.ToDateTime(TimeOnly.MinValue)));
+                .ForMember(dest => dest.CapitalizationDate,
+                    opt => opt.MapFrom(src => src.CapitalizationDate.HasValue 
+                        ? src.CapitalizationDate.Value.ToDateTime(TimeOnly.MinValue) 
+                        : (DateTime?)null));
                // .ReverseMap();
     
              CreateMap<AssetLocationCombineDto, Core.Domain.Entities.AssetMaster.AssetLocation>()

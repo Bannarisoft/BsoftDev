@@ -52,6 +52,7 @@ namespace Core.Application.Common.Mappings
                     x.Id,
                     x.WorkOrderDocNo,
                     x.Department,
+                    x.DepartmentId,
                     x.Machine,
                     x.RequestDate,
                     x.RequestType,
@@ -59,13 +60,15 @@ namespace Core.Application.Common.Mappings
                     x.MaintenanceType,
                     x.RequestId,
                     x.MachineName,
-                    x.ScheduleStatus
+                    x.ScheduleStatus,
+                    x.DueDate
                 })
                 .Select(g => new GetWorkOrderDto
                 {
                     Id = g.Key.Id,
                     WorkOrderDocNo = g.Key.WorkOrderDocNo,
                     Department = g.Key.Department,
+                    DepartmentId = g.Key.DepartmentId,
                     Machine = g.Key.Machine,
                     RequestDate = g.Key.RequestDate,
                     RequestType = g.Key.RequestType,
@@ -74,6 +77,7 @@ namespace Core.Application.Common.Mappings
                     RequestId = g.Key.RequestId,
                     MachineName = g.Key.MachineName,
                     ScheduleStatus = g.Key.ScheduleStatus,
+                    DueDate = g.Key.DueDate,
                     Schedules = g
                         .Where(s => s.ScheduleStartTime.HasValue || s.ScheduleEndTime.HasValue)
                         .Select(s => new ScheduleDto

@@ -174,6 +174,11 @@ namespace FAM.Infrastructure.Services
             var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("UnitId")?.Value;    
             return claim != null ? Convert.ToInt32(claim) : 0;
         }
+        public string GetOldUnitId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("OldUnitId")?.Value;    
+            return claim  ?? string.Empty;
+        }
     }    
 }
 

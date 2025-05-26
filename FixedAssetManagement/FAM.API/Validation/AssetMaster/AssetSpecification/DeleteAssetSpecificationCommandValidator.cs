@@ -29,11 +29,7 @@ namespace FAM.API.Validation.AssetMaster.AssetSpecification
                             .NotEmpty()
                             .WithMessage($"{nameof(DeleteAssetSpecificationCommand.Id)} {rule.Error}");
                         break;
-                    case "SoftDelete":
-                         RuleFor(x => x.Id)
-                      .MustAsync(async (Id, cancellation) => !await _assetQueryRepository.SoftDeleteValidation(Id))
-                        .WithMessage($"{rule.Error}");
-                        break;
+               
                     default:                        
                         break;
                 }
