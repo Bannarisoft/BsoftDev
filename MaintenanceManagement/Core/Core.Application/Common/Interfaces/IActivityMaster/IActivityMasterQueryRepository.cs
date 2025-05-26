@@ -32,7 +32,7 @@ namespace Core.Application.Common.Interfaces.IActivityMaster
 
         Task<List<Core.Domain.Entities.MiscMaster>> GetActivityTypeAsync();
             
-        Task<List<GetActivityByMachinGroupDto>> GetActivityByMachinGroupId(int MachineGroupId);    
+        Task<List<GetActivityByMachineGroupDto>> GetActivityByMachinGroupId(int MachineGroupId);    
         
     }
 }

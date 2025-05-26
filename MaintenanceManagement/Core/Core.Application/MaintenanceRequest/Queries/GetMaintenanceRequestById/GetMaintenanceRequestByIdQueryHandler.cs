@@ -17,13 +17,13 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequestById
          private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        public GetMaintenanceRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService)
+       
+        public GetMaintenanceRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator )
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentGrpcClient = departmentService;
+           
         }
 
          public async Task<ApiResponseDTO<GetMaintenanceRequestDto>> Handle(GetMaintenanceRequestByIdQuery request, CancellationToken cancellationToken)
@@ -40,18 +40,6 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequestById
                     Data = null
                 };
             }
-
-           
-
-            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-
-            if (departmentLookup.TryGetValue(maintenanceRequest.DepartmentId, out string departmentName) && departmentName != null)
-            {
-                maintenanceRequest.DepartmentName = departmentName;
-            }
-
-
             // Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetById",
