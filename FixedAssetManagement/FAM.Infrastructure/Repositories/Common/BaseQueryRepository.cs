@@ -10,6 +10,7 @@ namespace FAM.Infrastructure.Repositories.Common
 
         protected int CompanyId => _ipAddressService.GetCompanyId();
         protected int UnitId => _ipAddressService.GetUnitId();
+        protected string OldUnitId => _ipAddressService.GetOldUnitId();        
 
         // ✅ Accept the interface here
         protected BaseQueryRepository(IIPAddressService ipAddressService)

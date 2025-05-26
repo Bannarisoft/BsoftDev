@@ -203,7 +203,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
         public async Task<bool> SoftDeleteValidation(int Id)
         {
             const string query = @"
-                SELECT 1 AM.Id
+                SELECT  AM.Id
                 FROM FixedAsset.AssetMaster AM
                 inner join  FixedAsset.AssetSpecifications AP on AP.AssetId = AM.Id
                 WHERE AP.Id = @Id AND   AM.IsDeleted = 0;";        

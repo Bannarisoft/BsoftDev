@@ -35,18 +35,16 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
             // var departments = departmentResponse.Departments.ToList();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            var PreventiveSchedulerDictionary = new Dictionary<int, GetWorkOrderDto>();
-            // 🔥 Map department names to preventiveScheduler
-            foreach (var data in mappedWorkOrders)
-            {
-                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-                {
-                    data.Department = departmentName;
-                }
-                PreventiveSchedulerDictionary[data.DepartmentId] = data;
-            }
+            var filteredWorkOrders = mappedWorkOrders
+                 .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+                 .Select(p =>
+                 {
+                     p.Department = departmentLookup[p.DepartmentId];
+                     return p;
+                 })
+                 .ToList();
 
-            var groupedWorkOrders = mappedWorkOrders
+            var groupedWorkOrders = filteredWorkOrders
             .GroupBy(w => w.MaintenanceType ?? "Unknown")
             .Select(g => new Dictionary<string, List<GetWorkOrderDto>>
             {
