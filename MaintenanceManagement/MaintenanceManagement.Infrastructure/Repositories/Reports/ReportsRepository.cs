@@ -192,7 +192,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
         {
             var query = $$"""
 
-                Select PSH.DepartmentId,MG.GroupName,MM.MachineName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
+                Select PSH.DepartmentId,PSH.PreventiveSchedulerName,MG.GroupName,MM.MachineName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
                 Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,PSD.LastMaintenanceActivityDate from [Maintenance].[PreventiveSchedulerHeader] PSH
                 Inner Join [Maintenance].[MachineGroup] MG ON PSH.MachineGroupId=MG.Id
                 Inner Join [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
@@ -204,7 +204,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 WHERE PSH.IsDeleted=0 AND PSD.IsActive=1
                 {{(FromDueDate.HasValue ? "AND PSD.ActualWorkOrderDate >= @FromDueDate" : "")}}
                 {{(ToDueDate.HasValue ? "AND PSD.ActualWorkOrderDate <= @ToDueDate" : "")}}
-                group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate,PSD.LastMaintenanceActivityDate,MM.MachineName 
+                group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate,PSD.LastMaintenanceActivityDate,MM.MachineName,PSH.PreventiveSchedulerName 
                 
                 ORDER BY PSH.Id desc
             """;

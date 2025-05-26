@@ -45,14 +45,18 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
             //     PreventiveSchedulerDictionary[data.DepartmentId] = data;
 
             // }
-            var filteredPreventiveSchedulers = preventiveSchedulerList
-             .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-             .Select(p => new GetPreventiveSchedulerDto
-             {
-                 DepartmentId = p.DepartmentId,
-                 DepartmentName = departmentLookup[p.DepartmentId],
-             })
-             .ToList();
+            foreach (var dto in preventiveSchedulerList)
+        {
+            if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
+            {
+                dto.DepartmentName = departmentName;
+            }
+        }
+
+                var filteredPreventiveSchedulers = preventiveSchedulerList
+            .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            .ToList();
+          
 
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetPreventiveScheduler",
