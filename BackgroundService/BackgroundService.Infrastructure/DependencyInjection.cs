@@ -9,6 +9,8 @@ using Hangfire;
 using Hangfire.SqlServer;
 using BackgroundService.Infrastructure.Jobs;
 using Polly;
+using System.Data;
+using Microsoft.Data.SqlClient;
 
 
 namespace BackgroundService.Infrastructure
@@ -26,6 +28,8 @@ namespace BackgroundService.Infrastructure
             {
                 throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
             }
+
+            services.AddTransient<IDbConnection>(sp => new SqlConnection(HangfireConnectionString));
 
               // Register Hangfire services
             services.AddHangfire(config =>
@@ -45,7 +49,10 @@ namespace BackgroundService.Infrastructure
             });
             
             // Add the Hangfire server
-            services.AddHangfireServer();
+            services.AddHangfireServer(options => {
+                options.ServerName = "DEVSERVER";
+            options.Queues = new[] { "schedule_work_order_queue" };
+        });
            // ✅ Correctly bind EmailSettings
             var emailSettings = new EmailSettings();
             configuration.GetSection("EmailSettings").Bind(emailSettings);
@@ -97,7 +104,7 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<IUserUnlockService, UserUnlockService>();                         
             services.AddTransient<IVerificationCodeCleanupService, VerificationCodeCleanupService>();                           
             services.AddScoped<IUserUnlockBackgroundJob, UserUnlockBackgroundJob>();
-            services.AddScoped<IMaintenance, MaintenanceService>();
+            services.AddTransient<IMaintenance, MaintenanceService>();
             
             return services;
     }

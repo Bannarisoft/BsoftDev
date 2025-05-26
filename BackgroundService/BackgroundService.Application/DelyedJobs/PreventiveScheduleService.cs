@@ -15,9 +15,9 @@ namespace BackgroundService.Application.DelyedJobs
         }
         
         
-        //  public async Task ScheduleworkOrderExecute(int PreventiveScheduleId)
-        // {
-        //     await _maintenance.SchedulerWorkOrderExecute(PreventiveScheduleId);
-        // }
+         public async Task ScheduleworkOrderExecute(int PreventiveScheduleId)
+        {
+            await _maintenance.SchedulerWorkOrderExecute(PreventiveScheduleId);
+        }
     }
 }
