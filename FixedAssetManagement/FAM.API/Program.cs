@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 var builder = WebApplication.CreateBuilder(args);
 
 
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")??"Development";
 
 
 // Load configuration files based on the environment

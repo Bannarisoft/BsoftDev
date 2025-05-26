@@ -1,5 +1,6 @@
 
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IWorkOrder;
@@ -14,15 +15,17 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;   
         private readonly IIPAddressService _ipAddressService;
-         private readonly IWorkOrderCommandRepository _workOrderRepository;      
+        private readonly IWorkOrderCommandRepository _workOrderRepository;     
+        private readonly IDepartmentGrpcClient _departmentGrpcClient; 
 
-        public GetWorkOrderByIdQueryHandler(IWorkOrderQueryRepository workOrderQueryRepository,  IMapper mapper, IMediator mediator, IIPAddressService ipAddressService,IWorkOrderCommandRepository workOrderRepository)
+        public GetWorkOrderByIdQueryHandler(IWorkOrderQueryRepository workOrderQueryRepository,  IMapper mapper, IMediator mediator, IIPAddressService ipAddressService,IWorkOrderCommandRepository workOrderRepository, IDepartmentGrpcClient departmentGrpcClient)
         {
             _workOrderQueryRepository =workOrderQueryRepository;
             _mapper =mapper;
             _mediator = mediator;           
             _ipAddressService = ipAddressService;
             _workOrderRepository = workOrderRepository; 
+            _departmentGrpcClient = departmentGrpcClient;
         }
         public async Task<ApiResponseDTO<GetWorkOrderByIdDto>> Handle(GetWorkOrderByIdQuery request, CancellationToken cancellationToken)
         {          
@@ -36,47 +39,43 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
                 };
             }
 
-            var asset = _mapper.Map<GetWorkOrderByIdDto>(woResult);         
+            var mappedWorkOrders = _mapper.Map<GetWorkOrderByIdDto>(woResult);      
+
+             // 🔥 Fetch departments using gRPC
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync(); // ✅ Clean call
+
+            // var departments = departmentResponse.Departments.ToList();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+           if (!departmentLookup.TryGetValue(mappedWorkOrders.DepartmentId, out string departmentName))
+            {
+                return new ApiResponseDTO<GetWorkOrderByIdDto>
+                {
+                    IsSuccess = false,
+                    Message = "No workorder details found"
+                    //Data = new GetWorkOrderByIdDto() // Return an empty DTO object
+                };
+            }
+            mappedWorkOrders.Department = departmentName;
             if (woActivity != null)
             {
-                asset.WOActivity  = _mapper.Map<List<GetWorkOrderActivityByIdDto>>(woActivity);
+                mappedWorkOrders.WOActivity  = _mapper.Map<List<GetWorkOrderActivityByIdDto>>(woActivity);
             }
             if (woItem != null)
             {
-                asset.WOItem  = _mapper.Map<List<GetWorkOrderItemByIdDto>>(woItem);
-               /* // 🔹 Path construction
-                //string baseDirectory = "ItemImages"; // or fetch from DB
-                 string baseDirectory =await _workOrderRepository.GetBaseDirectoryItemAsync();
-                var companyId = _ipAddressService.GetCompanyId();
-                var unitId = _ipAddressService.GetUnitId();
-                var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(companyId, unitId);
-                string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory);
-
-                foreach (var item in asset.WOItem)
-                {
-                    if (!string.IsNullOrEmpty(item.Image))
-                    {
-                        string imagePath = Path.Combine(uploadPath, companyName, unitName, item.Image);
-
-                        if (File.Exists(imagePath))
-                        {
-                            byte[] imageBytes = await File.ReadAllBytesAsync(imagePath);
-                            item.ImageBase64 = Convert.ToBase64String(imageBytes);
-                        }
-                    }
-                } */
+                mappedWorkOrders.WOItem  = _mapper.Map<List<GetWorkOrderItemByIdDto>>(woItem);             
             }
             if (woTechnician != null)
             {
-                asset.WOTechnician  = _mapper.Map<List<GetWorkOrderTechnicianByIdDto>>(woTechnician);
+                mappedWorkOrders.WOTechnician  = _mapper.Map<List<GetWorkOrderTechnicianByIdDto>>(woTechnician);
             }       
             if (woSchedule != null)
             {
-                asset.WOSchedule  = _mapper.Map<List<GetWorkOrderScheduleByIdDto>>(woSchedule);
+                mappedWorkOrders.WOSchedule  = _mapper.Map<List<GetWorkOrderScheduleByIdDto>>(woSchedule);
             }       
             if (woCheckList != null)
             {
-                asset.WOCheckList  = _mapper.Map<List<GetWorkOrderCheckListByIdDto>>(woCheckList);
+                mappedWorkOrders.WOCheckList  = _mapper.Map<List<GetWorkOrderCheckListByIdDto>>(woCheckList);
             }           
          
             //Domain Event
@@ -84,15 +83,15 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
                 actionDetail: "GetById",
                 actionCode:"",        
                 actionName: "",                
-                details: $"Asset ",
-                module:"AssetMasterGeneral"
+                details: $"mappedWorkOrders ",
+                module:"WorkOrder"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
             return new ApiResponseDTO<GetWorkOrderByIdDto>
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = asset
+                Data = mappedWorkOrders
             };       
         }      
     }

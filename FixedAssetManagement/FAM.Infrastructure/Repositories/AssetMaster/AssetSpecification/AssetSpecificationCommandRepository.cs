@@ -3,6 +3,7 @@ using Core.Domain.Common;
 using Core.Domain.Entities.AssetMaster;
 using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using static Core.Domain.Common.BaseEntity;
 
 namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
 {
@@ -19,15 +20,19 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
             await _applicationDbContext.SaveChangesAsync();
             return assetSpecifications;          
         }
-        public async Task<int> DeleteAsync(int depGroupId, AssetSpecifications assetSpecifications)
+        public async Task<int> DeleteAsync(int id, AssetSpecifications assetSpecifications)
         {
-            var assetSpecToDelete = await _applicationDbContext.AssetSpecifications.FirstOrDefaultAsync(u => u.Id == depGroupId);
-            if (assetSpecToDelete != null)
+            var assetSpecList = await _applicationDbContext.AssetSpecifications
+            .Where(u => u.AssetId == id)
+            .ToListAsync();
+
+            if (!assetSpecList.Any())
             {
-                assetSpecToDelete.IsDeleted = assetSpecifications.IsDeleted;              
-                return await _applicationDbContext.SaveChangesAsync();
+                return -1; // No records found
             }
-            return 0;
+            _applicationDbContext.AssetSpecifications.RemoveRange(assetSpecList);
+
+            return await _applicationDbContext.SaveChangesAsync();
         }
         public async Task<int> UpdateAsync(int assetId, AssetSpecifications assetSpecifications)
         {

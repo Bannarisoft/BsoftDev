@@ -17,6 +17,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
         public DateTimeOffset? DownTimeEnd { get; set; }
         public string? Machine { get; set; }
         public string? Department { get; set; }
+        public int DepartmentId { get; set; }
         public int? RequestId { get; set; }
         public string? AssetCode { get; set; }
         public string? AssetLocation { get; set; }        

@@ -32,6 +32,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? PjDocSr { get; set;}
         public int PjDocNo { get; set; }
         public int AssetSourceId { get; set; }   
-        public DateOnly CapitalizationDate { get; set; }
+        public DateOnly? CapitalizationDate { get; set; }
     }
 }
