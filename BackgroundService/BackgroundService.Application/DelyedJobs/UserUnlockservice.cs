@@ -22,10 +22,10 @@ namespace BackgroundService.Application.DelyedJobs
         {
             await _userUnlockService.UnlockUser(userName);
         }
-        public async Task ScheduleworkOrderExecute(int PreventiveScheduleId)
-        {
-            await _maintenance.SchedulerWorkOrderExecute(PreventiveScheduleId);
-        }
+        // public async Task ScheduleworkOrderExecute(int PreventiveScheduleId)
+        // {
+        //     await _maintenance.SchedulerWorkOrderExecute(PreventiveScheduleId);
+        // }
         public async Task VerificationCleanup(string userName,int delayMinutes)
         {
             await _verificationCleanupService.RemoveVerificationCode(userName,delayMinutes);

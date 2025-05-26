@@ -1,6 +1,8 @@
+using Contracts.Interfaces.External.IFixedAssetManagement;
 using Contracts.Interfaces.External.IMaintenance;
 using Contracts.Interfaces.External.IUser;
 using GrpcServices.Background;
+using GrpcServices.FixedAssetManagement;
 using GrpcServices.UserManagement;
 using MaintenanceManagement.Infrastructure.GrpcClients;
 using MaintenanceManagement.Infrastructure.Services;
@@ -20,6 +22,7 @@ namespace MaintenanceManagement.Infrastructure
         {
             var userManagementUrl = configuration["GrpcSettings:UserManagementUrl"];
             var backGroundServiceUrl = configuration["GrpcSettings:BackGroundUrl"];
+            var fixedassetmanagementUrl = configuration["GrpcSettings:FixedAssetUrl"];
 
             // ✅ Register Department gRPC Client
             services.AddGrpcClient<DepartmentService.DepartmentServiceClient>(options =>
@@ -107,6 +110,20 @@ namespace MaintenanceManagement.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<IBackgroundServiceClient, BackgroundServiceClient>();
+
+            // ✅ Register AssetSpecifications gRPC Client
+            services.AddGrpcClient<AssetSpecificationService.AssetSpecificationServiceClient>(options =>
+            {
+                options.Address = new Uri(fixedassetmanagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<IAssetSpecificationGrpcClient, AssetSpecificationGrpcClient>();
 
 
             return services;
