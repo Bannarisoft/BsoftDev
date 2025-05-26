@@ -17,6 +17,7 @@ namespace Core.Application.Reports.WorkOderCheckListReport
         private readonly IMapper _mapper;
         // private readonly IDepartmentGrpcClient _departmentGrpcClient;
         private readonly IUnitGrpcClient _unitGrpcClient;
+       
 
         public WorkOderCheckListReportQueryHandler(IReportRepository workOrderCheckListQueryRepository, IMapper mapper, IUnitGrpcClient unitGrpcClient)
         {
@@ -42,6 +43,7 @@ namespace Core.Application.Reports.WorkOderCheckListReport
 
             // Step 3: Fetch department and unit data
             // var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            // var Company = await _.GetCompanyAsync();
             var units = await _unitGrpcClient.GetAllUnitAsync();
             // var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);

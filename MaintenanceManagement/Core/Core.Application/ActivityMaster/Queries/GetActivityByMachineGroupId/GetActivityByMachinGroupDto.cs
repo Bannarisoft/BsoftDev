@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.ActivityMaster.Queries.GetActivityByMachinGroupId
 {
-    public class GetActivityByMachinGroupDto
+    public class GetActivityByMachineGroupDto
     {
         public int Id { get; set; }        
         public string? ActivityName { get; set; }       
