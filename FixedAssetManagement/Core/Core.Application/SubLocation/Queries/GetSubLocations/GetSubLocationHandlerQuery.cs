@@ -31,20 +31,28 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-            var subLocationDictionary = new Dictionary<int, SubLocationDto>();
+            // var subLocationDictionary = new Dictionary<int, SubLocationDto>();
 
             // 🔥 Map department names to Sublocation
-            foreach (var data in sublocationList)
-            {
+            // foreach (var data in sublocationList)
+            // {
 
-                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-                {
-                    data.DepartmentName = departmentName;
-                }
+            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+            //     {
+            //         data.DepartmentName = departmentName;
+            //     }
 
-                subLocationDictionary[data.DepartmentId] = data;
+            //     subLocationDictionary[data.DepartmentId] = data;
 
-            }
+            // }
+             var filteredSubLocation = sublocationList
+                 .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+                 .Select(p =>
+                 {
+                     p.DepartmentName = departmentLookup[p.DepartmentId];
+                     return p;
+                 })
+                 .ToList();
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetSubLocations",
@@ -58,7 +66,7 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = sublocationList,
+                Data = filteredSubLocation,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize

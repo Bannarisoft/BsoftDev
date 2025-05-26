@@ -29,6 +29,10 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
             builder.ToTable("PreventiveSchedulerHeader", "Maintenance");
 
             builder.HasKey(b => b.Id);
+            builder.Property(b => b.PreventiveSchedulerName)
+                .HasColumnName("PreventiveSchedulerName")
+                .HasColumnType("varchar(50)")
+                .IsRequired();
 
             builder.Property(b => b.MachineGroupId)
                 .HasColumnName("MachineGroupId")

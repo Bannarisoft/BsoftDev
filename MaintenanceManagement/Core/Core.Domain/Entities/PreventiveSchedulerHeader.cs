@@ -8,6 +8,7 @@ namespace Core.Domain.Entities
 {
     public class PreventiveSchedulerHeader : BaseEntity
     {
+        public string PreventiveSchedulerName { get; set; }
         public int MachineGroupId { get; set; }
         public required MachineGroup MachineGroup { get; set; }
         public int DepartmentId { get; set; }

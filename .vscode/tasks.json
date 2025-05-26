@@ -1,108 +1,130 @@
 {
 	"version": "2.0.0",
 	"tasks": [
-		{
-			"label": "Watch FAM.API",
-			"type": "process",
-			"command": "dotnet",
-			"args": [
-				"watch",
-				"run",
-				"--project",
-				"${workspaceFolder}/FixedAssetManagement/FAM.API/FAM.API.csproj"
-			],
-			"problemMatcher": [],
-			"group": {
-				"kind": "build",
-				"isDefault": false
-			}
-		},
-		{
-			"label": "Watch UserManagement",
-			"command": "dotnet",
-			"type": "process",
-			"args": [
-				"watch",
-				"run",
-				"--project",
-				"${workspaceFolder}/UserManagement/UserManagement.csproj"
-			],
-			"problemMatcher": "$msCompile"
-		},
-		{
-			"label": "Watch SagaOrchestrator",
-			"command": "dotnet",
-			"type": "process",
-			"args": [
-				"watch",
-				"run",
-				"--project",
-				"${workspaceFolder}/SagaOrchestrator/SagaOrchestrator.csproj"
-			],
-			"problemMatcher": "$msCompile"
-		},
-		{
-			"label": "Build UserManagement",
-			"command": "dotnet",
-			"type": "process",
-			"args": [
-				"build",
-				"${workspaceFolder}/UserManagement/UserManagement.csproj",
-				"/property:GenerateFullPaths=true",
-				"/consoleloggerparameters:NoSummary;ForceNoAlign"
-			],
-			"problemMatcher": "$msCompile",
-			"group": {
-				"kind": "build",
-				"isDefault": false
-			}
-		},
-		{
-			"label": "Build SagaOrchestrator",
-			"command": "dotnet",
-			"type": "process",
-			"args": [
-				"build",
-				"${workspaceFolder}/SagaOrchestrator/SagaOrchestrator.csproj",
-				"/property:GenerateFullPaths=true",
-				"/consoleloggerparameters:NoSummary;ForceNoAlign"
-			],
-			"problemMatcher": "$msCompile"
-		},
-		{
-			"label": "Publish UserManagement",
-			"command": "dotnet",
-			"type": "process",
-			"args": [
-				"publish",
-				"${workspaceFolder}/UserManagement/UserManagement.csproj",
-				"/property:GenerateFullPaths=true",
-				"/consoleloggerparameters:NoSummary;ForceNoAlign"
-			],
-			"problemMatcher": "$msCompile"
-		},
-		{
-			"label": "Publish SagaOrchestrator",
-			"command": "dotnet",
-			"type": "process",
-			"args": [
-				"publish",
-				"${workspaceFolder}/SagaOrchestrator/SagaOrchestrator.csproj",
-				"/property:GenerateFullPaths=true",
-				"/consoleloggerparameters:NoSummary;ForceNoAlign"
-			],
-			"problemMatcher": "$msCompile"
-		},
-		{
-			"type": "dotnet",
-			"task": "watch UserManagement.API",
-			"file": "D:\\MyProjects\\gRPC\\BSOFT\\UserManagement\\UserManagement.API\\UserManagement.API.csproj",
-			"problemMatcher": [],
-			"label": "dotnet: watch UserManagement.API",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
+	  {
+		"label": "Watch FAM.API",
+		"type": "process",
+		"command": "dotnet",
+		"args": [
+		  "watch",
+		  "run",
+		  "--project",
+		  "${workspaceFolder}/FixedAssetManagement/FAM.API/FAM.API.csproj"
+		],
+		"problemMatcher": [],
+		"group": {
+		  "kind": "build",
+		  "isDefault": false
 		}
+	  },
+	  {
+		"label": "Watch UserManagement",
+		"type": "process",
+		"command": "dotnet",
+		"args": [
+		  "watch",
+		  "run",
+		  "--project",
+		  "${workspaceFolder}/UserManagement/UserManagement.csproj"
+		],
+		"problemMatcher": "$msCompile"
+	  },
+	  {
+		"label": "Watch SagaOrchestrator",
+		"type": "process",
+		"command": "dotnet",
+		"args": [
+		  "watch",
+		  "run",
+		  "--project",
+		  "${workspaceFolder}/SagaOrchestrator/SagaOrchestrator.csproj"
+		],
+		"problemMatcher": "$msCompile"
+	  },
+	  {
+		"label": "Watch MaintenanceManagement.API",
+		"type": "process",
+		"command": "dotnet",
+		"args": [
+		  "watch",
+		  "run",
+		  "--project",
+		  "${workspaceFolder}/MaintenanceManagement/MaintenanceManagement.API/MaintenanceManagement.API.csproj"
+		],
+		"problemMatcher": "$msCompile",
+		"group": {
+		  "kind": "build",
+		  "isDefault": false
+		}
+	  },
+	  {
+		"label": "Build UserManagement",
+		"type": "process",
+		"command": "dotnet",
+		"args": [
+		  "build",
+		  "${workspaceFolder}/UserManagement/UserManagement.csproj",
+		  "/property:GenerateFullPaths=true",
+		  "/consoleloggerparameters:NoSummary;ForceNoAlign"
+		],
+		"problemMatcher": "$msCompile",
+		"group": {
+		  "kind": "build",
+		  "isDefault": false
+		}
+	  },
+	  {
+		"label": "Build SagaOrchestrator",
+		"type": "process",
+		"command": "dotnet",
+		"args": [
+		  "build",
+		  "${workspaceFolder}/SagaOrchestrator/SagaOrchestrator.csproj",
+		  "/property:GenerateFullPaths=true",
+		  "/consoleloggerparameters:NoSummary;ForceNoAlign"
+		],
+		"problemMatcher": "$msCompile"
+	  },
+	  {
+		"label": "Publish UserManagement",
+		"type": "process",
+		"command": "dotnet",
+		"args": [
+		  "publish",
+		  "${workspaceFolder}/UserManagement/UserManagement.csproj",
+		  "/property:GenerateFullPaths=true",
+		  "/consoleloggerparameters:NoSummary;ForceNoAlign"
+		],
+		"problemMatcher": "$msCompile"
+	  },
+	  {
+		"label": "Publish SagaOrchestrator",
+		"type": "process",
+		"command": "dotnet",
+		"args": [
+		  "publish",
+		  "${workspaceFolder}/SagaOrchestrator/SagaOrchestrator.csproj",
+		  "/property:GenerateFullPaths=true",
+		  "/consoleloggerparameters:NoSummary;ForceNoAlign"
+		],
+		"problemMatcher": "$msCompile"
+	  },
+	  {
+		"label": "Watch UserManagement.API",
+		"type": "process",
+		"command": "dotnet",
+		"args": [
+		  "watch",
+		  "run",
+		  "--project",
+		  "${workspaceFolder}/UserManagement/UserManagement.API/UserManagement.API.csproj"
+		],
+		"problemMatcher": [],
+		"group": {
+		  "kind": "build",
+		  "isDefault": true
+		}
+	  }
 	]
-}
+  }
+  
