@@ -28,23 +28,20 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
             // Map domain entities to DTOs
             var activityList = _mapper.Map<List<GetAllActivityMasterDto>>(activities);
 
-
+            // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
             var activityMasterDictionary = new Dictionary<int, GetAllActivityMasterDto>();
-
-            foreach (var data in activityList)
-            {
-
-                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+            //    🔥 Map department names with DataControl
+            var filteredactivitiesDtos = activityList
+                .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+                .Select(p => new GetAllActivityMasterDto
                 {
-                    data.DepartmentName = departmentName;
-                }
-
-                activityMasterDictionary[data.DepartmentId] = data;
-
-            }
+                    DepartmentId = p.DepartmentId,
+                    DepartmentName = departmentLookup[p.DepartmentId],
+                })
+                .ToList();
 
             // Publish domain event for auditing
             var domainEvent = new AuditLogsDomainEvent(
@@ -61,7 +58,7 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = activityList,
+                Data = filteredactivitiesDtos,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
