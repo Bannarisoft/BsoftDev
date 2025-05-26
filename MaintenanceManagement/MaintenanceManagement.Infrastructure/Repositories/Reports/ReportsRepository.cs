@@ -74,13 +74,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             return result.ToList(); 
         }
 
-        public async Task<List<WorkOrderIssueDto>> GetItemConsumptionAsync(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate, int maintenanceTypeId)
+        public async Task<List<WorkOrderIssueDto>> GetItemConsumptionAsync(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@FromDate", IssueFromDate);
             parameters.Add("@ToDate", IssueToDate);
             parameters.Add("@UnitId", UnitId);
-            parameters.Add("@MaintenanceTypeId", maintenanceTypeId);
+           
 
             var result = await _dbConnection.QueryAsync<WorkOrderIssueDto>(
                 "GetItemConsumptionDetails",

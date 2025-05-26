@@ -14,7 +14,7 @@ namespace Core.Application.Common.Interfaces.IReports
 
         Task<List<RequestReportDto>> MaintenanceReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? RequestType, int? requestType, int? departmentId);
         Task<List<WorkOrderReportDto>> WorkOrderReportAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate, int? RequestTypeId);
-        Task<List<WorkOrderIssueDto>> GetItemConsumptionAsync(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate, int maintenanceTypeId);
+        Task<List<WorkOrderIssueDto>> GetItemConsumptionAsync(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate);
         Task<List<StockLedgerReportDto>> GetSubStoresStockLedger(string OldUnitcode, DateTime FromDate, DateTime ToDate, string? Itemcode);
         Task<List<CurrentStockDto>> GetStockDetails(string OldUnitcode);
         Task<List<WorkOderCheckListReportDto>> GetWorkOrderChecklistReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? machineGroupId, int? machineId, int? activityId);
