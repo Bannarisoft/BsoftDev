@@ -54,6 +54,7 @@
   <Protobuf Include="..\..\Shared\Contracts\Protos\department.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\unit.proto" GrpcServices="Client" />
+ <Protobuf Include="..\..\Shared\Contracts\Protos\company.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\background_service.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\AssetSpecification.proto" GrpcServices="Client" />
 </ItemGroup> 

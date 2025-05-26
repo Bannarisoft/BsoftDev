@@ -8,6 +8,7 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerBy
     public class PreventiveSchedulerHdrByIdDto
     {
         public int Id { get; set; }
+        public string PreventiveSchedulerName { get; set; }
         public int MachineGroupId { get; set; }
         public int DepartmentId { get; set; }
         public int MaintenanceCategoryId { get; set; }

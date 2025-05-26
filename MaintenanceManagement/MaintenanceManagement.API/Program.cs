@@ -6,6 +6,7 @@ using MaintenanceManagement.API.Middleware;
 using Core.Application.Common.RealTimeNotificationHub;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using MaintenanceManagement.API.GrpcServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,9 @@ builder.Services.AddInfrastructureServices(builder.Configuration, builder.Servic
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 builder.Services.AddMemoryCache();
+// ✅ Add gRPC
+builder.Services.AddGrpc();
+
 
 var app = builder.Build();
 
@@ -69,10 +73,18 @@ app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseMiddleware<MaintenanceManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
-app.MapControllers();
-app.ConfigureHangfireDashboard();
 app.UseWebSockets();
-app.MapHub<PreventiveScheduleHub>("/preventiveschedulehub");
+// Map endpoints
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGrpcService<DepartmentValidationGrpcService>().EnableGrpcWeb();
+    endpoints.MapControllers();
+    endpoints.MapHub<PreventiveScheduleHub>("/preventiveschedulehub");
+});
+// app.MapControllers();
+app.ConfigureHangfireDashboard();
+// app.UseWebSockets();
+// app.MapHub<PreventiveScheduleHub>("/preventiveschedulehub");
 app.Run();
 
 

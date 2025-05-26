@@ -20,7 +20,7 @@ namespace Core.Application.DepreciationDetail.Queries.GetDepreciationDetail
         }        
         public async Task<ApiResponseDTO<List<DepreciationDto>>> Handle(GetDepreciationDetailQuery request, CancellationToken cancellationToken)
         {
-            var (assetSpecification, totalCount) = await _depreciationDetailRepository.CalculateDepreciationAsync(request.companyId,request.unitId, request.finYearId, request.startDate,request.endDate,request.depreciationType,request.PageNumber, request.PageSize, request.SearchTerm,request.depreciationPeriod);
+            var (assetSpecification, totalCount,isSuccess,errorMsg) = await _depreciationDetailRepository.CalculateDepreciationAsync(request.companyId,request.unitId, request.finYearId, request.startDate,request.endDate,request.depreciationType,request.PageNumber, request.PageSize, request.SearchTerm,request.depreciationPeriod);
             var assetSpecificationList = _mapper.Map<List<DepreciationDto>>(assetSpecification);
 
             //Domain Event
@@ -36,7 +36,7 @@ namespace Core.Application.DepreciationDetail.Queries.GetDepreciationDetail
             return new ApiResponseDTO<List<DepreciationDto>>
             {
                 IsSuccess = true,
-                Message = "Success",
+                Message = isSuccess ? "Success" : $"Depreciation calculation failed: {errorMsg}",
                 Data = assetSpecificationList,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
