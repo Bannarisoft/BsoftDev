@@ -99,6 +99,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderActivities ?? []);
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderItems ?? []);
+            
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderTechnicians ?? []);
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderCheckLists ?? []);
             var result = await _applicationDbContext.SaveChangesAsync();
