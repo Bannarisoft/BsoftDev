@@ -90,20 +90,20 @@ namespace FAM.Infrastructure
                                                 .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
                                                 .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
 
-            var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
-                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
-                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
-                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
+            // var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
+            //                                     .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
+            //                                     .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
+            //                                     .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
 
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
             }
-            if (string.IsNullOrWhiteSpace(HangfireConnectionString))
-            {
-                throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
-            }
+            // if (string.IsNullOrWhiteSpace(HangfireConnectionString))
+            // {
+            //     throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
+            // }
 
             // Register ApplicationDbContext with SQL Server
 
@@ -150,23 +150,23 @@ namespace FAM.Infrastructure
             });
 
             // Register Hangfire services
-            services.AddHangfire(config =>
-            {
-                config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                      .UseSimpleAssemblyNameTypeSerializer()
-                      .UseDefaultTypeSerializer()
-                      .UseSqlServerStorage(HangfireConnectionString, new SqlServerStorageOptions
-                      {
-                          CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                          SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                          QueuePollInterval = TimeSpan.Zero,
-                          UseRecommendedIsolationLevel = true,
-                          UsePageLocksOnDequeue = true,
-                          DisableGlobalLocks = true
-                      });
-            });
-            // Add the Hangfire server
-            services.AddHangfireServer();
+            // services.AddHangfire(config =>
+            // {
+            //     config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            //           .UseSimpleAssemblyNameTypeSerializer()
+            //           .UseDefaultTypeSerializer()
+            //           .UseSqlServerStorage(HangfireConnectionString, new SqlServerStorageOptions
+            //           {
+            //               CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+            //               SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+            //               QueuePollInterval = TimeSpan.Zero,
+            //               UseRecommendedIsolationLevel = true,
+            //               UsePageLocksOnDequeue = true,
+            //               DisableGlobalLocks = true
+            //           });
+            // });
+            // // Add the Hangfire server
+            // services.AddHangfireServer();
 
             // Register ILogger<T>
             services.AddLogging(builder =>
