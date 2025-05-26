@@ -29,30 +29,42 @@ namespace Core.Application.Reports.ScheduleReport
 
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-            var PreventiveSchedulerDictionary = new Dictionary<int, ScheduleReportDto>();
+            // var PreventiveSchedulerDictionary = new Dictionary<int, ScheduleReportDto>();
 
 
-            foreach (var data in preventiveSchedulerList)
+            // foreach (var data in preventiveSchedulerList)
+            // {
+
+            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+            //     {
+            //         data.Department = departmentName;
+            //     }
+
+            //     PreventiveSchedulerDictionary[data.DepartmentId] = data;
+
+            // }
+
+              foreach (var dto in preventiveSchedulerList)
+        {
+            if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
             {
-
-                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-                {
-                    data.Department = departmentName;
-                }
-
-                PreventiveSchedulerDictionary[data.DepartmentId] = data;
-
+                dto.DepartmentName = departmentName;
             }
+        }
+
+                var filteredPreventiveSchedulers = preventiveSchedulerList
+            .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            .ToList();
 
 
 
             return new ApiResponseDTO<List<ScheduleReportDto>>
             {
-                IsSuccess = preventiveSchedulerList.Any(),
-                Message = preventiveSchedulerList.Any()
+                IsSuccess = filteredPreventiveSchedulers.Any(),
+                Message = filteredPreventiveSchedulers.Any()
                  ? "Scheduler Report retrieved successfully."
                  : "No Scheduler Report found.",
-                Data = preventiveSchedulerList
+                Data = filteredPreventiveSchedulers
             };
         }
     }
