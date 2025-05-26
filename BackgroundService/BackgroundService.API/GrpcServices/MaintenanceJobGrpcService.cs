@@ -1,8 +1,11 @@
 using BackgroundService.Application.DelyedJobs;
 using BackgroundService.Application.Interfaces;
+using BackgroundService.Application.Jobhistory;
+using BackgroundService.Infrastructure.Services;
 using Grpc.Core;
 using GrpcServices.Background; // This is from generated proto
 using Hangfire;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace BackgroundService.API.GrpcServices
@@ -10,29 +13,35 @@ namespace BackgroundService.API.GrpcServices
     public class MaintenanceJobGrpcService : MaintenanceJobService.MaintenanceJobServiceBase
     {
         private readonly ILogger<MaintenanceJobGrpcService> _logger;
-
-        public MaintenanceJobGrpcService(ILogger<MaintenanceJobGrpcService> logger)
+        
+        private readonly IMediator _mediator;
+        public MaintenanceJobGrpcService(ILogger<MaintenanceJobGrpcService> logger, IMediator mediator)
         {
             _logger = logger;
+            _mediator = mediator;
+            
         }
 
-        public override Task<ScheduleWorkOrderResponse> ScheduleWorkOrder(ScheduleWorkOrderRequest request, ServerCallContext context)
+        public override async Task<ScheduleWorkOrderResponse> ScheduleWorkOrder(ScheduleWorkOrderRequest request, ServerCallContext context)
         {
             _logger.LogInformation("Received request to schedule PreventiveScheduleId: {Id}",
                 request.PreventiveScheduleId);
+            //  var result = await _mediator.Send(new GetJobsQuery());
+            //  int delayMin = result.TotalJobs * 2;
 
-            // Schedule Hangfire Job
-            string jobId = BackgroundJob.Schedule<UserUnlockservice>(
-                job => job.ScheduleworkOrderExecute(request.PreventiveScheduleId),
+            string jobId = BackgroundJob.Schedule<MaintenanceService>(
+                job => job.SchedulerWorkOrderExecute(request.PreventiveScheduleId),
                 TimeSpan.FromMinutes(request.DelayInMinutes)
             );
+         
+                
 
             _logger.LogInformation("Scheduled Hangfire Job ID: {JobId}", jobId);
 
-            return Task.FromResult(new ScheduleWorkOrderResponse
+            return new ScheduleWorkOrderResponse
             {
                 JobId = jobId
-            });
+            };
         }
     }
 }

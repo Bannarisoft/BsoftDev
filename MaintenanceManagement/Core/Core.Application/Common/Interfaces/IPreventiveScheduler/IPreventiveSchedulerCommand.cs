@@ -16,7 +16,8 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<bool> UpdateRescheduleDate(int id, DateOnly RescheduleDate);
         Task<bool> CreateNextSchedulerDetailAsync(int Id);
         Task<bool> ScheduleInActive(PreventiveSchedulerHeader preventiveSchedulerHdr);
-        Task<bool> DeleteDetailAsync(int id);   
-        Task<bool> AddReScheduleDetailAsync(int Id,DateOnly RescheduleDate);
+        Task<bool> DeleteDetailAsync(int id);
+        Task<bool> AddReScheduleDetailAsync(int Id, DateOnly RescheduleDate);
+        
     }
 }

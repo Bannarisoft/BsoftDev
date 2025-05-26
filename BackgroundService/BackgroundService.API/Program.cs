@@ -4,6 +4,8 @@ using BackgroundService.API.Configurations;
 using BackgroundService.API;
 using BackgroundService.API.GrpcServices;
 using BackgroundService.Application.DelyedJobs;
+using BackgroundService.Application.Interfaces;
+using BackgroundService.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +28,8 @@ builder.Services.AddSwaggerGen();
 var configuration = builder.Configuration;
 builder.Services.AddInfrastructureServices(configuration);
 builder.Services.AddGrpc();
-builder.Services.AddTransient<UserUnlockservice>();
+builder.Services.AddTransient<PreventiveScheduleService>();
+
 var app = builder.Build();
 
 // Enable Swagger in Development

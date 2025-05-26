@@ -47,7 +47,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder
                         workOrderRequest.CreatedDate=DateTime.Now;
                         workOrderRequest.CreatedIP="192.168";
                         
-                        var response = await _workOrderRepository.CreateAsync(workOrderRequest,scheduledetail.MaintenanceCategoryId, cancellationToken);
+                        var response = await _workOrderRepository.CreatePreventiveAsync(workOrderRequest,scheduledetail.MaintenanceCategoryId,scheduledetail.CompanyId,scheduledetail.UnitId, cancellationToken);
                         if (response.Id == 0)
                         {
                              return new ApiResponseDTO<bool>
