@@ -11,11 +11,11 @@ using MediatR;
 namespace Core.Application.Reports.ScheduleReport
 {
     public class ScheduleReportQueryHandler : IRequestHandler<ScheduleReportQuery, ApiResponseDTO<List<ScheduleReportDto>>>
-    { 
-         private readonly IReportRepository _reportQueryRepository;
+    {
+        private readonly IReportRepository _reportQueryRepository;
         private readonly IMapper _mapper;
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        public ScheduleReportQueryHandler(IReportRepository reportQueryRepository, IMapper mapper,IDepartmentGrpcClient departmentGrpcClient)
+        public ScheduleReportQueryHandler(IReportRepository reportQueryRepository, IMapper mapper, IDepartmentGrpcClient departmentGrpcClient)
         {
             _reportQueryRepository = reportQueryRepository;
             _mapper = mapper;
@@ -23,9 +23,9 @@ namespace Core.Application.Reports.ScheduleReport
         }
         public async Task<ApiResponseDTO<List<ScheduleReportDto>>> Handle(ScheduleReportQuery request, CancellationToken cancellationToken)
         {
-            var reportEntities = await _reportQueryRepository.ScheduleReportAsync(request.FromDueDate, request.ToDueDate)?? new List<ScheduleReportDto>();   
+            var reportEntities = await _reportQueryRepository.ScheduleReportAsync(request.FromDueDate, request.ToDueDate) ?? new List<ScheduleReportDto>();
 
-            var preventiveSchedulerList = _mapper.Map<List<ScheduleReportDto>>(reportEntities)?? new List<ScheduleReportDto>();
+            var preventiveSchedulerList = _mapper.Map<List<ScheduleReportDto>>(reportEntities) ?? new List<ScheduleReportDto>();
 
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
@@ -44,16 +44,16 @@ namespace Core.Application.Reports.ScheduleReport
 
             }
 
-            
-               
-                return new ApiResponseDTO<List<ScheduleReportDto>>
-                {
-                  IsSuccess =preventiveSchedulerList.Any(),
-                     Message =preventiveSchedulerList.Any()
-                     ? "Scheduler Report retrieved successfully."
-                     : "No Scheduler Report found.",
-                     Data = preventiveSchedulerList
-                };
+
+
+            return new ApiResponseDTO<List<ScheduleReportDto>>
+            {
+                IsSuccess = preventiveSchedulerList.Any(),
+                Message = preventiveSchedulerList.Any()
+                 ? "Scheduler Report retrieved successfully."
+                 : "No Scheduler Report found.",
+                Data = preventiveSchedulerList
+            };
         }
     }
 }

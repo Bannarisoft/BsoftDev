@@ -33,7 +33,7 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             // var subLocationDictionary = new Dictionary<int, SubLocationDto>();
 
-            // 🔥 Map department names to Sublocation
+            // 🔥 Map department names with DataControl to location
             // foreach (var data in sublocationList)
             // {
 
@@ -45,14 +45,15 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             //     subLocationDictionary[data.DepartmentId] = data;
 
             // }
-             var filteredSubLocation = sublocationList
-                 .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-                 .Select(p =>
-                 {
-                     p.DepartmentName = departmentLookup[p.DepartmentId];
-                     return p;
-                 })
-                 .ToList();
+            var filteredSubLocationDtos = sublocationList
+              .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+              .Select(p => new SubLocationDto
+              {
+                  DepartmentId = p.DepartmentId,
+                  DepartmentName = departmentLookup[p.DepartmentId],
+              })
+              .ToList();
+
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetSubLocations",
@@ -66,7 +67,7 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = filteredSubLocation,
+                Data = filteredSubLocationDtos,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
