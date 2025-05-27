@@ -60,7 +60,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var PreventiveSchedulerToDelete = await _applicationDbContext.PreventiveSchedulerHdr.FirstOrDefaultAsync(u => u.Id == id);
             if (PreventiveSchedulerToDelete != null)
             {
-                PreventiveSchedulerToDelete.IsDeleted = preventiveSchedulerHdr.IsDeleted;
+                PreventiveSchedulerToDelete.IsDeleted = IsDelete.Deleted;
                 return await _applicationDbContext.SaveChangesAsync() > 0;
             }
             return false;

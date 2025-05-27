@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
   <Protobuf Include="..\..\Shared\Contracts\Protos\background_service.proto" GrpcServices="Server" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\hangfirejob_delete.proto" GrpcServices="Server" />
 </ItemGroup>
 
 </Project>

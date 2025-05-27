@@ -30,7 +30,9 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
         private readonly IIPAddressService _ipAddressService;
         private readonly ITimeZoneService _timeZoneService;
         private readonly IBackgroundServiceClient  _backgroundServiceClient;
-        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderCommandRepository workOrderRepository, IIPAddressService ipAddressService, ITimeZoneService timeZoneService,IBackgroundServiceClient backgroundServiceClient)
+        public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator,
+        IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderCommandRepository workOrderRepository,
+        IIPAddressService ipAddressService, ITimeZoneService timeZoneService,IBackgroundServiceClient backgroundServiceClient)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
@@ -70,7 +72,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
 
                       if (!string.IsNullOrEmpty(detail.HangfireJobId))
                      {
-                         BackgroundJob.Delete(detail.HangfireJobId); 
+                         _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId); 
                      }
 
                      

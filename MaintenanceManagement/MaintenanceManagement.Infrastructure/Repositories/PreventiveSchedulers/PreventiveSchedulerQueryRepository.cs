@@ -174,8 +174,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     }
 
                     existingPreventiveScheduler.PreventiveSchedulerActivities!.Add(preventiveSchedulerActivity);
-
-                    existingPreventiveScheduler.PreventiveSchedulerItems!.Add(preventiveSchedulerItems);
+                    if (preventiveSchedulerItems != null && preventiveSchedulerItems.OldItemId != null)
+                    {
+                        existingPreventiveScheduler.PreventiveSchedulerItems!.Add(preventiveSchedulerItems);
+                    }
 
 
                     return existingPreventiveScheduler;
