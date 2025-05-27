@@ -18,6 +18,7 @@ using UserManagement.Infrastructure.Services;
 using Core.Application.Users.Commands.ResetUserPassword;
 using Contracts.Events;
 using MassTransit;
+using Core.Application.Users.Commands.RemoveVerificationCode;
 
 namespace UserManagement.API.Controllers
 {
@@ -394,6 +395,13 @@ namespace UserManagement.API.Controllers
         }
         [HttpPost("rollback-delete")]
         public async Task<IActionResult> RollbackDeleteUser([FromBody] DeleteUserCommand command)
+        {
+            var result = await Mediator.Send(command);
+            return result.IsSuccess ? Ok(result) : StatusCode(500, result);
+        }
+        [HttpPost("verfication-code-remove")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerificationCodeRemove([FromBody] RemoveVerficationCodeCommand command)
         {
             var result = await Mediator.Send(command);
             return result.IsSuccess ? Ok(result) : StatusCode(500, result);

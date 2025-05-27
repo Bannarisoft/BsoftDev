@@ -1,4 +1,3 @@
-using BackgroundService.Application.DelyedJobs;
 using BackgroundService.Application.Interfaces;
 using BackgroundService.Application.Jobhistory;
 using BackgroundService.Infrastructure.Services;
@@ -14,11 +13,9 @@ namespace BackgroundService.API.GrpcServices
     {
         private readonly ILogger<MaintenanceJobGrpcService> _logger;
         
-        private readonly IMediator _mediator;
-        public MaintenanceJobGrpcService(ILogger<MaintenanceJobGrpcService> logger, IMediator mediator)
+        public MaintenanceJobGrpcService(ILogger<MaintenanceJobGrpcService> logger)
         {
             _logger = logger;
-            _mediator = mediator;
             
         }
 
@@ -26,8 +23,6 @@ namespace BackgroundService.API.GrpcServices
         {
             _logger.LogInformation("Received request to schedule PreventiveScheduleId: {Id}",
                 request.PreventiveScheduleId);
-            //  var result = await _mediator.Send(new GetJobsQuery());
-            //  int delayMin = result.TotalJobs * 2;
 
             string jobId = BackgroundJob.Schedule<MaintenanceService>(
                 job => job.SchedulerWorkOrderExecute(request.PreventiveScheduleId),
