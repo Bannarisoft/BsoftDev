@@ -44,18 +44,21 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
 
             // 🔥 Map department names with DataControl to location
 
-
            foreach (var data in maintenanceRequestList)
             {
 
-                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+                if (departmentLookup.TryGetValue(data.ProductionDepartmentId, out var departmentName) && departmentName != null)
                 {
 
-                    data.DepartmentName = departmentName;
+                    data.ProductionDepartmentName = departmentName;
                 }
-                maintenanceRequestDictionary[data.DepartmentId] = data;
+                maintenanceRequestDictionary[data.ProductionDepartmentId] = data;
 
             }
+
+               var filteredMaintenanceRequest = maintenanceRequestList
+            .Where(p => departmentLookup.ContainsKey(p.ProductionDepartmentId))
+            .ToList();
             // var filteredmaintenanceRequestDtos = maintenanceRequestList
             //  .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
             //  .Select(p => new GetMaintenanceRequestDto
@@ -79,7 +82,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = maintenanceRequestList,
+                Data = filteredMaintenanceRequest,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
