@@ -5,7 +5,7 @@ import "google/protobuf/empty.proto";
 option csharp_namespace = "GrpcServices.UserManagement";
 
 service CityService {
-    rpc GetAllCity (google.protobuf.empty) returns (CityListReponse);
+    rpc GetAllCity (google.protobuf.Empty) returns (CityListReponse);
 }
 
 message CityDto {
