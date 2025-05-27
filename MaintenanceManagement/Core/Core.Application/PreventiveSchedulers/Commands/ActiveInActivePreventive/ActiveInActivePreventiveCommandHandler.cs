@@ -42,11 +42,19 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
         public async Task<ApiResponseDTO<bool>> Handle(ActiveInActivePreventiveCommand request, CancellationToken cancellationToken)
         {
             var Scheduledetail = await _preventiveSchedulerQuery.GetByIdAsync(request.Id);
-            Scheduledetail.Id =0;
-            Scheduledetail.PreventiveSchedulerActivities.FirstOrDefault().Id =0;
-            Scheduledetail.PreventiveSchedulerItems.FirstOrDefault().Id =0;
-            Scheduledetail.Id =0;
+            Scheduledetail.Id = 0;
             Scheduledetail.EffectiveDate = DateOnly.FromDateTime(DateTime.Now);
+
+            
+            foreach (var activity in Scheduledetail.PreventiveSchedulerActivities ?? new List<PreventiveSchedulerActivity>())
+            {
+                activity.Id = 0;
+            }
+
+            foreach (var item in Scheduledetail.PreventiveSchedulerItems ?? new List<PreventiveSchedulerItems>())
+            {
+                item.Id = 0;
+            }
             if (request.IsActive ==1)
             {
                 Scheduledetail.IsActive =Status.Active;

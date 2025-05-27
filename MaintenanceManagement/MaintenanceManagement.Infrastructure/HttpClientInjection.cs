@@ -3,6 +3,7 @@ using Contracts.Interfaces.External.IMaintenance;
 using Contracts.Interfaces.External.IUser;
 using GrpcServices.Background;
 using GrpcServices.FixedAssetManagement;
+using GrpcServices.HangfireDelete;
 using GrpcServices.UserManagement;
 using MaintenanceManagement.Infrastructure.GrpcClients;
 using MaintenanceManagement.Infrastructure.Services;
@@ -93,6 +94,23 @@ namespace MaintenanceManagement.Infrastructure
 
 
             services.AddGrpcClient<MaintenanceJobService.MaintenanceJobServiceClient>(options =>
+            {
+                options.Address = new Uri(backGroundServiceUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
+            
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                return new HttpClientHandler
+                {
+                    
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+            
+             services.AddGrpcClient<MaintenanceHangfireDeleteService.MaintenanceHangfireDeleteServiceClient>(options =>
             {
                 options.Address = new Uri(backGroundServiceUrl);
             })

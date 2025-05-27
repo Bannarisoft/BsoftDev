@@ -45,6 +45,7 @@ app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapGrpcService<MaintenanceJobGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<MaintenanceHangfireRemoveGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
 // app.MapControllers();
