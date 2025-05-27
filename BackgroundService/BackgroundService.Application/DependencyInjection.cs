@@ -1,5 +1,4 @@
 using System.Reflection;
-using BackgroundService.Application.DelyedJobs;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundService.Application

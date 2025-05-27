@@ -3,7 +3,6 @@ using BackgroundService.Application;
 using BackgroundService.API.Configurations;
 using BackgroundService.API;
 using BackgroundService.API.GrpcServices;
-using BackgroundService.Application.DelyedJobs;
 using BackgroundService.Application.Interfaces;
 using BackgroundService.Infrastructure.Services;
 
@@ -28,7 +27,6 @@ builder.Services.AddSwaggerGen();
 var configuration = builder.Configuration;
 builder.Services.AddInfrastructureServices(configuration);
 builder.Services.AddGrpc();
-builder.Services.AddTransient<PreventiveScheduleService>();
 
 var app = builder.Build();
 

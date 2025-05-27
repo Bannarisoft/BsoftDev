@@ -15,6 +15,7 @@ using Polly.Timeout;
 using Serilog;
 using System.Collections.Concurrent;
 using Core.Application.UserLogin.Commands.UserLogin;
+using Core.Application.Common.Utilities;
 
 namespace UserManagement.Infrastructure.Repositories
 {
@@ -116,6 +117,12 @@ namespace UserManagement.Infrastructure.Repositories
                         return await _applicationDbContext.SaveChangesAsync() > 0;
                     }
               return false;
+        }
+
+        public Task<bool> RemoveVerficationCode(string username)
+        {
+            ForgotPasswordCache.RemoveVerificationCode(username);
+            return Task.FromResult(true);
         }
 
         public async Task<int> SetAdminPassword(int userId, User user)
