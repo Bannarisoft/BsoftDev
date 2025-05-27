@@ -17,20 +17,6 @@ builder.Configuration
 .AddJsonFile($"settings/serilogsetting.{environment}.json", optional: false, reloadOnChange: true)
 .AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
 .AddEnvironmentVariables();
-
-// builder.WebHost.ConfigureKestrel(options =>
-// {
-//     options.ListenAnyIP(5293, listenOptions =>
-//     {
-//         listenOptions.Protocols = HttpProtocols.Http1;
-//     });
-//     options.ListenAnyIP(7243, listenOptions =>
-//     {
-//         listenOptions.Protocols = HttpProtocols.Http2;
-//     });
-// });
-
-
 // Configure Serilog
 builder.Host.ConfigureSerilog();
 
