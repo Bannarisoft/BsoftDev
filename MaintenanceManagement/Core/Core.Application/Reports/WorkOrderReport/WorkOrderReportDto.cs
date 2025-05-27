@@ -17,6 +17,7 @@ namespace Core.Application.Reports.WorkOrderReport
         public string? MaintenanceEndTime { get; set; } 
         public string? TotalMaintenanceTime { get; set; } 
         public string? Department { get; set; } 
+        public int DepartmentId { get; set; }         
         public decimal ItemCost { get; set; } 
     }
 }
