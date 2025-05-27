@@ -52,7 +52,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 parameters,
                 commandType: CommandType.StoredProcedure
             );
-
             return result.ToList();
         }
 
@@ -69,8 +68,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 "dbo.Rpt_WorkOrderReport", 
                 parameters, 
                 commandType: CommandType.StoredProcedure,
-                commandTimeout: 120);
-                
+                commandTimeout: 120);                
             return result.ToList(); 
         }
 
