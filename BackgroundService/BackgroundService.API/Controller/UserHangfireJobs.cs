@@ -1,4 +1,3 @@
-using BackgroundService.Application.DelyedJobs;
 using BackgroundService.Application.Interfaces;
 using BackgroundService.Infrastructure.Jobs;
 using BackgroundService.Infrastructure.Services;
@@ -17,12 +16,9 @@ namespace BackgroundService.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult ScheduleVerificationCodeRemoval([FromBody] ScheduleRemoveCodeCommand command)
         {
-           /*  BackgroundJob.Schedule<IVerificationCodeCleanupService>(
-                service => service.RemoveVerificationCode(command.UserName, command.DelayInMinutes),
-                TimeSpan.FromMinutes(command.DelayInMinutes)
-            ); */
-             BackgroundJob.Schedule<UserUnlockservice>(
-                 job => job.VerificationCleanup(command.UserName,command.DelayInMinutes),
+           
+             BackgroundJob.Schedule<VerificationCodeCleanupService>(
+                 job => job.RemoveVerificationCode(command.UserName,command.DelayInMinutes),
                 TimeSpan.FromMinutes(1)
             );
 
@@ -32,12 +28,9 @@ namespace BackgroundService.API.Controllers
         [HttpPost("user-unlock")]        
         public IActionResult ScheduleUserUnlock([FromBody] ScheduleRemoveCodeCommand command)
         {
-           /*  BackgroundJob.Schedule<UserUnlockBackgroundJob>(
-               job => job.Execute(command.UserName),
-                TimeSpan.FromMinutes(command.DelayInMinutes)
-            ); */
-            BackgroundJob.Schedule<UserUnlockservice>(
-                 job => job.Execute(command.UserName),
+           
+            BackgroundJob.Schedule<UserUnlockService>(
+                 job => job.UnlockUser(command.UserName),
                 TimeSpan.FromMinutes(1)
             );
             return Ok("User unlock scheduled successfully.");   
