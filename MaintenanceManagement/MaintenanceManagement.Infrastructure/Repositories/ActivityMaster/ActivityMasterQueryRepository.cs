@@ -170,7 +170,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query, parameters);
             return result.ToList();
         } 
-        public async Task<List<GetActivityByMachinGroupDto>> GetActivityByMachinGroupId(int machineGroupById)
+        public async Task<List<GetActivityByMachineGroupDto>> GetActivityByMachinGroupId(int machineGroupById)
         {
                     const string query = @"
                 SELECT a.Id , a.ActivityName
@@ -180,7 +180,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
                 WHERE c.Id = @MachineGroupId
             ";
 
-            var activityList = await _dbConnection.QueryAsync<GetActivityByMachinGroupDto>(query, new { MachineGroupId = machineGroupById });
+            var activityList = await _dbConnection.QueryAsync<GetActivityByMachineGroupDto>(query, new { MachineGroupId = machineGroupById });
             return activityList.ToList();
 
         }

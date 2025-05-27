@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.ActivityMaster.Queries.GetActivityByMachinGroupId
 {
-    public class GetActivityByMachinGroupIdQueryHandler : IRequestHandler<GetActivityByMachinGroupIdQuery, ApiResponseDTO<List<GetActivityByMachinGroupDto>>>
+    public class GetActivityByMachinGroupIdQueryHandler : IRequestHandler<GetActivityByMachinGroupIdQuery, ApiResponseDTO<List<GetActivityByMachineGroupDto>>>
     {
 
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
@@ -24,13 +24,13 @@ namespace Core.Application.ActivityMaster.Queries.GetActivityByMachinGroupId
             _mediator = mediator;
         }
         
-        public async Task<ApiResponseDTO<List<GetActivityByMachinGroupDto>>> Handle(GetActivityByMachinGroupIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<GetActivityByMachineGroupDto>>> Handle(GetActivityByMachinGroupIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _activityMasterQueryRepository.GetActivityByMachinGroupId(request.MachineGroupId);
 
             if (result == null || !result.Any()) // Check if the list is empty
             {
-                return new ApiResponseDTO<List<GetActivityByMachinGroupDto>>
+                return new ApiResponseDTO<List<GetActivityByMachineGroupDto>>
                 {
                     IsSuccess = false,
                     Message = $"Activity Name  for MachineGroup with Id {request.MachineGroupId} not found.",
@@ -38,7 +38,7 @@ namespace Core.Application.ActivityMaster.Queries.GetActivityByMachinGroupId
                 };
             }
 
-            var ActivityList = _mapper.Map<List<GetActivityByMachinGroupDto>>(result); // Map the list
+            var ActivityList = _mapper.Map<List<GetActivityByMachineGroupDto>>(result); // Map the list
 
             
 
@@ -53,7 +53,7 @@ namespace Core.Application.ActivityMaster.Queries.GetActivityByMachinGroupId
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<List<GetActivityByMachinGroupDto>>
+            return new ApiResponseDTO<List<GetActivityByMachineGroupDto>>
             {
                 IsSuccess = true,
                 Message = "Success",

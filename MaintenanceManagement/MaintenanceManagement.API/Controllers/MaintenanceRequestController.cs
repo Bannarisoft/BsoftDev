@@ -103,7 +103,7 @@ namespace MaintenanceManagement.API.Controllers
         }
 
 
-          [HttpGet("external-requests/{id}")]
+          [HttpGet("Internal-requests/{id}")]
         [ActionName(nameof(GetByIdAsync))]
         public async Task<IActionResult> GetByIdAsync(int id)
         {

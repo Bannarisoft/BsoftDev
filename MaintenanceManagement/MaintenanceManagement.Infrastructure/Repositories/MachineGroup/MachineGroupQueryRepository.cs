@@ -19,7 +19,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
 
         }
        
-       public async Task<Core.Domain.Entities.MachineGroup> GetByIdAsync(int id)
+       public async Task<Core.Domain.Entities.MachineGroup?>GetByIdAsync(int id)
         {            
             const string query = @"
                 SELECT 
