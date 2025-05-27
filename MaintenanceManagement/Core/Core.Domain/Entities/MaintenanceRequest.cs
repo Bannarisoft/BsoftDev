@@ -17,7 +17,9 @@ namespace Core.Domain.Entities
        public MachineMaster Machine { get; set; } = null!;
        public int  CompanyId { get; set; }
        public int  UnitId { get; set; }
-       public int DepartmentId { get; set; }
+       public int MaintenanceDepartmentId { get; set; }
+       public int ProductionDepartmentId { get; set; }
+
        public int SourceId { get; set; }
        public int? VendorId  { get; set; }
        public string? VendorName { get; set; }

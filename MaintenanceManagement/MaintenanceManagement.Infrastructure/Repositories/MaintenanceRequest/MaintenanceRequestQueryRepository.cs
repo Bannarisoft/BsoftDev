@@ -54,7 +54,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                                             
                         SELECT 
                             A.Id,
-                            A.DepartmentId,
+                            A.ProductionDepartmentId AS ProductionDepartmentId,
+                            A.MaintenanceDepartmentId AS MaintenanceDepartmentId,
                             A.SourceId,
                             A.VendorId,
                             A.VendorName,
@@ -161,7 +162,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                                             
                         SELECT 
                             A.Id,
-                            A.DepartmentId,
+                           A.ProductionDepartmentId AS ProductionDepartmentId,
+                            A.MaintenanceDepartmentId AS MaintenanceDepartmentId,
                             A.SourceId,
                             A.VendorId,
                             A.VendorName,
@@ -248,7 +250,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                     var query = @"
                         SELECT 
                             A.Id,
-                            A.DepartmentId,
+                            A.ProductionDepartmentId AS ProductionDepartmentId,
+                            A.MaintenanceDepartmentId AS MaintenanceDepartmentId,
                             A.SourceId,
                             A.VendorId,
                             A.VendorName,
@@ -319,7 +322,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                     var query = @"
                         SELECT 
                             A.Id,
-                            A.DepartmentId,
+                           A.ProductionDepartmentId AS ProductionDepartmentId,
+                            A.MaintenanceDepartmentId AS MaintenanceDepartmentId,
                             A.SourceId,
                             A.VendorId,
                             A.VendorName,
@@ -541,7 +545,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                     {
                         RequestId = id,
                         MiscTypeCode = MiscEnumEntity.WOStatus.MiscCode,
-                        MiscCode= MiscEnumEntity.StatusOpen.Code ,
+                        MiscCode= MiscEnumEntity.GetStatusId.Status ,
                        MiscCodeexternal = MiscEnumEntity.MaintenanceRequestTypeInternal.Code,
                        Maintenancetype =MiscEnumEntity.MaintenanceType.Code
 
@@ -550,20 +554,22 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                      var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
                         return count > 0;
                 } 
+                
+                
 
                   public async Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceStatusDescAsync()
-                    {
-                    const string query = @"
+        {
+            const string query = @"
                         SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder            
                         FROM Maintenance.MiscMaster M
                         INNER JOIN Maintenance.MiscTypeMaster T on T.ID=M.MiscTypeId
                         WHERE (MiscTypeCode = @MiscTypeCode) 
                         AND  M.IsDeleted=0 and M.IsActive=1
-                        ORDER BY SortOrder DESC";    
-                        var parameters = new { MiscTypeCode = MiscEnumEntity.MaintenanceRequestType.MiscCode };        
-                        var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
-                        return result.ToList();
-                    } 
+                        ORDER BY SortOrder DESC";
+            var parameters = new { MiscTypeCode = MiscEnumEntity.MaintenanceRequestType.MiscCode };
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query, parameters);
+            return result.ToList();
+        } 
 
                     public async Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceServiceDescAsync()
                     {
