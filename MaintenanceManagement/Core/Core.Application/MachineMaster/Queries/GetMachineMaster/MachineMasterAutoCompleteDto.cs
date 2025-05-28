@@ -10,5 +10,10 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMaster
         public int Id { get; set; }
         public string? MachineName { get; set; }
         public string? MachineCode { get; set; }
+
+        public int MachineGroupId { get; set; }
+        public int  DepartmentId { get; set; }
+ 
+
     }
 }

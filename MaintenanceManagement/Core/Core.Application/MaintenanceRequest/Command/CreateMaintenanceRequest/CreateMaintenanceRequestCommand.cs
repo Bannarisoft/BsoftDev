@@ -14,7 +14,8 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
        public int RequestTypeId  { get; set; }       
        public int MaintenanceTypeId  { get; set; }     
        public int MachineId { get; set; }               
-       public int DepartmentId { get; set; }
+       public int ProductionDepartmentId { get; set; }
+       public int MaintenanceDepartmentId { get; set; }
        public int? SourceId { get; set; }
        public int? VendorId  { get; set; }
        public string? VendorName { get; set; } = null;
