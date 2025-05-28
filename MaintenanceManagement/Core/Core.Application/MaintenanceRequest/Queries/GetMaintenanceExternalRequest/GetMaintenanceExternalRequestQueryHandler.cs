@@ -49,17 +49,17 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceExternalRequ
             foreach (var data in maintenanceRequestList)
             {
 
-                if (departmentLookup.TryGetValue(data.MaintenanceDepartmentId, out var departmentName) && departmentName != null)
+                if (departmentLookup.TryGetValue(data.ProductionDepartmentId, out var departmentName) && departmentName != null)
                 {
 
-                    data.MaintenanceDepartmentName = departmentName;
+                    data.ProductionDepartmentName = departmentName;
                 }
-                maintenanceRequestDictionary[data.MaintenanceDepartmentId] = data;
+                maintenanceRequestDictionary[data.ProductionDepartmentId] = data;
 
             }
 
                var filteredMaintenanceRequest = maintenanceRequestList
-            .Where(p => departmentLookup.ContainsKey(p.MaintenanceDepartmentId))
+            .Where(p => departmentLookup.ContainsKey(p.ProductionDepartmentId))
             .ToList();
 
             //    🔥 Map department names with DataControl
@@ -87,7 +87,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceExternalRequ
                 IsSuccess = true,
                 Message = "Success",
                 Data = filteredMaintenanceRequest,
-                TotalCount = totalCount,
+                TotalCount =  filteredMaintenanceRequest.Count,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
             };
