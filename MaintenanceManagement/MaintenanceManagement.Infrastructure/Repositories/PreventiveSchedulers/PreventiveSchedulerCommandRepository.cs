@@ -267,16 +267,34 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 
                   existingPreventiveScheduler.IsActive = Status.Inactive;
                 _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
+                
+                
 
-                existingPreventiveScheduler.Id = 0;
-                existingPreventiveScheduler.WorkOrderCreationStartDate = RescheduleDate;
-                existingPreventiveScheduler.ActualWorkOrderDate = RescheduleDate;
-                existingPreventiveScheduler.LastMaintenanceActivityDate = null;
+                 var newScheduler = new PreventiveSchedulerDetail
+                 {
+                     PreventiveSchedulerHeaderId = existingPreventiveScheduler.PreventiveSchedulerHeaderId,
+                     WorkOrderCreationStartDate = RescheduleDate,
+                     ActualWorkOrderDate = RescheduleDate,
+                     LastMaintenanceActivityDate = null,
+                     IsActive = Status.Active,
+                     PreventiveScheduler = existingPreventiveScheduler.PreventiveScheduler,
+                     MachineId =existingPreventiveScheduler.MachineId,
+                     Machine =  existingPreventiveScheduler.Machine
+                    
+                 };
+
+                // existingPreventiveScheduler.Id = 0;
+                // existingPreventiveScheduler.WorkOrderCreationStartDate = RescheduleDate;
+                // existingPreventiveScheduler.ActualWorkOrderDate = RescheduleDate;
+                // existingPreventiveScheduler.LastMaintenanceActivityDate = null;
+                // existingPreventiveScheduler.IsActive = Status.Active;
 
 
 
-                await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(existingPreventiveScheduler);
+                await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(newScheduler);
                 await _applicationDbContext.SaveChangesAsync();
+
+                _backgroundServiceClient.RemoveHangFireJob(existingPreventiveScheduler.HangfireJobId);
                 var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
                 string newJobId;
                 var delayInMinutes = (int)delay.TotalMinutes;
