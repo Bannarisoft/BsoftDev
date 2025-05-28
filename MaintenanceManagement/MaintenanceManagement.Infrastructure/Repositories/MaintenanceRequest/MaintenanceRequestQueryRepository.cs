@@ -48,7 +48,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         WHERE 
                         A.IsDeleted = 0   AND  B.Code = @MiscCode  AND J.Code <> @MaintenanceStatusUpdate
                         AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
-                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate)
+                        AND (@ToDate IS NULL OR A.CreatedDate < @ToDate)
                         AND A.UnitId = @UnitId                      
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search  OR F.Code LIKE @Search OR G.Code LIKE @Search OR E.MachineName LIKE @Search OR H.Code LIKE @Search OR I.Code LIKE @Search OR J.Code LIKE @Search ) ")}};
                                             
@@ -86,7 +86,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             I.Id AS SparesTypeId,
                             I.Code AS SparesType,
                             J.Id AS RequestStatusId,
-                            J.Code AS RequestStatus
+                            J.Code AS RequestStatus,
+                            D.DeptName AS ProductionDepartmentName
 
                         FROM Maintenance.MaintenanceRequest A
                         INNER JOIN Maintenance.MiscMaster B ON A.RequestTypeId = B.Id
@@ -96,13 +97,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster G ON A.ServiceLocationId = G.Id  
                         LEFT JOIN Maintenance.MiscMaster H ON A.ModeOfDispatchId = H.Id 
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id 
-                        LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id
-                          
-                       
+                        LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id   
+                        left join Bannari.AppData.Department D on A.ProductionDepartmentId = D.Id                                          
 
                         WHERE A.IsDeleted = 0   AND  B.Code = @MiscCode  AND J.Code <> @MaintenanceStatusUpdate
                         AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
-                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate)
+                        AND (@ToDate IS NULL OR A.CreatedDate < @ToDate)
                         AND A.UnitId = @UnitId
                        
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search OR F.Code LIKE @Search or G.Code LIKE @Search OR H.Code LIKE @Search  OR E.MachineName LIKE @Search OR I.Code LIKE @Search  or J.Code LIKE @Search) ")}}
@@ -120,7 +120,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         Offset = (PageNumber - 1) * PageSize,
                         PageSize,
                         FromDate = FromDate?.Date,
-                        ToDate = ToDate?.Date.AddDays(1).AddTicks(-1),
+                        //ToDate = ToDate?.Date.AddDays(1).AddTicks(-1),
+                        ToDate = ToDate?.Date.AddDays(1),
                         UnitId
 
                         
@@ -156,7 +157,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
 
                         WHERE   B.Code = @MiscCode  AND C.Code <> @MaintenanceStatusUpdate 
                         AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
-                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate) AND A.UnitId = @UnitId 
+                        AND (@ToDate IS NULL OR A.CreatedDate < @ToDate) AND A.UnitId = @UnitId 
                         AND A.Id NOT IN (SELECT RequestId FROM Maintenance.WorkOrder WHERE K.RequestId IS NOT NULL)
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search  OR F.Code LIKE @Search OR G.Code LIKE @Search OR E.MachineName LIKE @Search OR H.Code LIKE @Search OR I.Code LIKE @Search OR J.Code LIKE @Search ) ")}};
                                             
@@ -196,7 +197,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                             I.Id AS SparesTypeId,
                             I.Code AS SparesType,
                             J.Id AS RequestStatusId,
-                            J.Code AS RequestStatus
+                            J.Code AS RequestStatus,
+                            D.DeptName AS ProductionDepartmentName
+
 
                         FROM Maintenance.MaintenanceRequest A
                         INNER JOIN Maintenance.MiscMaster B ON A.RequestTypeId = B.Id
@@ -208,10 +211,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         LEFT JOIN Maintenance.MiscMaster I ON A.SparesTypeId = I.Id 
                         LEFT JOIN Maintenance.MiscMaster J ON A.RequestStatusId = J.Id 
                         LEFT JOIN Maintenance.WorkOrder K ON A.Id = K.RequestId
+                        Left join Bannari.AppData.Department D on A.ProductionDepartmentId = D.Id    
 
                         WHERE  B.Code = @MiscCode  AND C.Code <> @MaintenanceStatusUpdate 
                         AND (@FromDate IS NULL OR A.CreatedDate >= @FromDate)
-                        AND (@ToDate IS NULL OR A.CreatedDate <= @ToDate) AND A.UnitId = @UnitId 
+                        AND (@ToDate IS NULL OR A.CreatedDate < @ToDate) AND A.UnitId = @UnitId 
                         AND A.Id NOT IN (SELECT    RequestId FROM Maintenance.WorkOrder WHERE  K.RequestId IS NOT NULL)
                         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search OR A.Remarks LIKE @Search OR B.Code LIKE @Search OR C.Code LIKE @Search OR F.Code LIKE @Search or G.Code LIKE @Search OR H.Code LIKE @Search  OR E.MachineName LIKE @Search OR I.Code LIKE @Search  or J.Code LIKE @Search) ")}}
                         ORDER BY A.Id DESC
@@ -229,7 +233,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         Offset = (PageNumber - 1) * PageSize,
                         PageSize,
                         FromDate = FromDate?.Date,
-                        ToDate = ToDate?.Date.AddDays(1).AddTicks(-1),
+                        // ToDate = ToDate?.Date.AddDays(1).AddTicks(-1),
+                       ToDate = ToDate?.Date.AddDays(1),
                         UnitId
                     };
 
