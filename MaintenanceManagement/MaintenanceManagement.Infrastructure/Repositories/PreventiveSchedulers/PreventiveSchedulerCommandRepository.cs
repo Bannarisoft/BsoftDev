@@ -267,7 +267,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 
                   existingPreventiveScheduler.IsActive = Status.Inactive;
                 _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
-
+                _backgroundServiceClient.RemoveHangFireJob(existingPreventiveScheduler.HangfireJobId);
+                
                 existingPreventiveScheduler.Id = 0;
                 existingPreventiveScheduler.WorkOrderCreationStartDate = RescheduleDate;
                 existingPreventiveScheduler.ActualWorkOrderDate = RescheduleDate;
