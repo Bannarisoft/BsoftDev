@@ -548,7 +548,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         MiscCode= MiscEnumEntity.GetStatusId.Status ,
                        MiscCodeexternal = MiscEnumEntity.MaintenanceRequestTypeInternal.Code,
                        Maintenancetype =MiscEnumEntity.MaintenanceType.Code
-
                     };
                     
                      var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
