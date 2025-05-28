@@ -45,14 +45,16 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             //     subLocationDictionary[data.DepartmentId] = data;
 
             // }
+            foreach (var dto in sublocationList)
+            {
+                if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
+                {
+                    dto.DepartmentName = departmentName;
+                }
+            }
             var filteredSubLocationDtos = sublocationList
-              .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-              .Select(p => new SubLocationDto
-              {
-                  DepartmentId = p.DepartmentId,
-                  DepartmentName = departmentLookup[p.DepartmentId],
-              })
-              .ToList();
+                .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+                .ToList();
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(

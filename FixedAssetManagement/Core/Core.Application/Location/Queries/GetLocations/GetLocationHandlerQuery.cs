@@ -33,24 +33,17 @@ namespace Core.Application.Location.Queries.GetLocations
             // var LocationDictionary = new Dictionary<int, LocationDto>();
 
             // 🔥 Map department names with DataControl to location
-            // foreach (var data in locationList)
-            // {
 
-            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-            //     {
+            foreach (var dto in locationList)
+            {
+                if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
+                {
+                    dto.DepartmentName = departmentName;
+                }
+            }
 
-            //         data.DepartmentName = departmentName;
-            //     }
-            //     LocationDictionary[data.DepartmentId] = data;
-
-            // }
             var filteredLocationDtos = locationList
                 .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-                .Select(p => new LocationDto
-                {
-                    DepartmentId = p.DepartmentId,
-                    DepartmentName = departmentLookup[p.DepartmentId],
-                })
                 .ToList();
 
             //Domain Event
