@@ -47,18 +47,19 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
            foreach (var data in maintenanceRequestList)
             {
 
-                if (departmentLookup.TryGetValue(data.ProductionDepartmentId, out var departmentName) && departmentName != null)
+                if (departmentLookup.TryGetValue(data.MaintenanceDepartmentId, out var departmentName) && departmentName != null)
                 {
 
-                    data.ProductionDepartmentName = departmentName;
+                    data.MaintenanceDepartmentName = departmentName;
                 }
-                maintenanceRequestDictionary[data.ProductionDepartmentId] = data;
+                maintenanceRequestDictionary[data.MaintenanceDepartmentId] = data;
 
             }
 
                var filteredMaintenanceRequest = maintenanceRequestList
-            .Where(p => departmentLookup.ContainsKey(p.ProductionDepartmentId))
+            .Where(p => departmentLookup.ContainsKey(p.MaintenanceDepartmentId))
             .ToList();
+            
             // var filteredmaintenanceRequestDtos = maintenanceRequestList
             //  .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
             //  .Select(p => new GetMaintenanceRequestDto
