@@ -278,6 +278,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                      LastMaintenanceActivityDate = null,
                      IsActive = Status.Active,
                      PreventiveScheduler = existingPreventiveScheduler.PreventiveScheduler,
+                     MachineId =existingPreventiveScheduler.MachineId,
                      Machine =  existingPreventiveScheduler.Machine
                     
                  };
@@ -292,7 +293,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                 await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(newScheduler);
                 await _applicationDbContext.SaveChangesAsync();
-                
+
                 _backgroundServiceClient.RemoveHangFireJob(existingPreventiveScheduler.HangfireJobId);
                 var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
                 string newJobId;
