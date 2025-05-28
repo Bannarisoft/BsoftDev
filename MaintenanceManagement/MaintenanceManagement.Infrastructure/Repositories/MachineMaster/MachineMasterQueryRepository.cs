@@ -72,47 +72,67 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
 
         public async Task<Core.Domain.Entities.MachineMaster?> GetByIdAsync(int Id)
         {
-             var UnitId = _ipAddressService.GetUnitId();
+             var unitId = _ipAddressService.GetUnitId();
              const string query = @"
                     SELECT * 
                     FROM Maintenance.MachineMaster 
                     WHERE Id = @Id AND IsDeleted = 0 AND UnitId = @UnitId";
 
-                    var machineMaster = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineMaster>(query, new { Id,UnitId });
+                    var machineMaster = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineMaster>(query, new { Id,unitId });
                     return machineMaster;
         }
-
         public async Task<List<Core.Domain.Entities.MachineMaster>> GetMachineAsync(string searchPattern)
         {
-            var UnitId = _ipAddressService.GetUnitId();
-            searchPattern = searchPattern ?? string.Empty; // Prevent null issues
+            var unitId = _ipAddressService.GetUnitId();
+            searchPattern = searchPattern ?? string.Empty; // Prevent null issues 
+            const string query = @"SELECT 
+            M.Id, M.MachineName, M.MachineCode, M.MachineGroupId,
+            MG.Id AS MachineGroupId, 
+            MG.DepartmentId
+                FROM Maintenance.MachineMaster M
+                INNER JOIN Maintenance.MachineGroup MG ON M.MachineGroupId = MG.Id 
+                WHERE M.IsDeleted = 0 
+                AND M.UnitId = @UnitId
+                AND (M.MachineName LIKE @SearchPattern OR M.MachineCode LIKE @SearchPattern)";
 
-            const string query = @"
-            SELECT Id, MachineName, MachineCode 
-            FROM Maintenance.MachineMaster 
-            WHERE IsDeleted = 0 
-            AND UnitId = @UnitId
-            AND (MachineName LIKE @SearchPattern OR MachineCode LIKE @SearchPattern)";  
-            var parameters = new 
-            { 
-            SearchPattern = $"%{searchPattern}%" ,
-            UnitId
-            };
+           var lookup = new Dictionary<int, Core.Domain.Entities.MachineMaster>();
+                        var machines = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster, Core.Domain.Entities.MachineGroup, Core.Domain.Entities.MachineMaster>(
+                    query,
+                    (machine, group) =>
+                    {
+                        if (!lookup.TryGetValue(machine.Id, out var machineEntry))
+                        {
+                            machineEntry = machine;
+                            machineEntry.MachineGroup = group;
+                            lookup[machine.Id] = machineEntry;
+                        }
 
-            var machineMasters = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
-            return machineMasters.ToList();
+                        return machineEntry;
+                    },
+                    new { UnitId = unitId, SearchPattern = $"%{searchPattern}%" },
+                    splitOn: "MachineGroupId" 
+                );
+
+             foreach (var machine in machines)
+            {
+                var departmentId = machine.MachineGroup.DepartmentId;
+                Console.WriteLine($"Machine: {machine.MachineName}, DepartmentId: {departmentId}");
+            }
+
+            return lookup.Values.ToList();  
+
         }
 
         public async Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroupAsync(int MachineGroupId)
         {
             var UnitId = _ipAddressService.GetUnitId();
-             const string query = @"
+            const string query = @"
                     SELECT Id 
                     FROM Maintenance.MachineMaster 
                     WHERE MachineGroupId = @MachineGroupId AND IsDeleted = 0 AND UnitId = @UnitId";
 
-                    var machineMaster = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, new { MachineGroupId, UnitId });
-                    return machineMaster.ToList();
+            var machineMaster = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, new { MachineGroupId, UnitId });
+            return machineMaster.ToList();
         }
         // public async Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroup(int MachineGroupId)
         // {

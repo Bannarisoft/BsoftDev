@@ -8,6 +8,7 @@ namespace Core.Application.MachineMaster.Queries.GetMachineDepartmentbyId
     public class MachineDepartmentGroupDto
     {
         public string? GroupName { get; set; }
+        public string? DepartmentId { get;}
         public string? DepartmentName { get; set; }
         public string? DepartmentGroupName { get; set; }
     }
