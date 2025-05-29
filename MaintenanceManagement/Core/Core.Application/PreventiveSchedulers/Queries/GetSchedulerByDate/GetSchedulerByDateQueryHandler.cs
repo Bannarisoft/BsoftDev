@@ -24,7 +24,7 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetSchedulerByDate
         }
         public async Task<ApiResponseDTO<List<SchedulerByDateDto>>> Handle(GetSchedulerByDateQuery request, CancellationToken cancellationToken)
         {
-            var preventiveScheduler = await _preventiveSchedulerQuery.GetAbstractSchedulerByDate();
+            var preventiveScheduler = await _preventiveSchedulerQuery.GetAbstractSchedulerByDate(request.DepartmentId);
             
             var preventiveSchedulerList = _mapper.Map<List<SchedulerByDateDto>>(preventiveScheduler);
             

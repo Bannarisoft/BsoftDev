@@ -288,7 +288,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
             return count > 0;
         }
-        public async Task<IEnumerable<dynamic>> GetAbstractSchedulerByDate()
+        public async Task<IEnumerable<dynamic>> GetAbstractSchedulerByDate(int DepartmentId)
         {
             var UnitId = _ipAddressService.GetUnitId();
             var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status };
@@ -300,16 +300,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 							LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
 							LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
                             WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PS.UnitId=@UnitId AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)
-                            AND PSD.IsActive=1
+                            AND PSD.IsActive=1 AND PS.DepartmentId=@DepartmentId
                             GROUP BY PSD.ActualWorkOrderDate,PS.DepartmentId
                             ORDER BY PSD.ActualWorkOrderDate ASC
                         ";
-            using var multi = await _dbConnection.QueryMultipleAsync(query, new { UnitId, StatusCodes = statusCodes });
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { UnitId, StatusCodes = statusCodes,DepartmentId });
             var preventiveSchedulers = await multi.ReadAsync<dynamic>();
 
             return preventiveSchedulers;
         }
-        public async Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate)
+        public async Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate,int DepartmentId)
         {
             var UnitId = _ipAddressService.GetUnitId();
             var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status };
@@ -323,14 +323,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
 							LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
                             WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PSD.ActualWorkOrderDate=@ActualWorkOrderDate AND PS.UnitId=@UnitId 
-                            AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL) AND PSD.IsActive=1
+                            AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL) AND PSD.IsActive=1 AND PS.DepartmentId=@DepartmentId
                             ORDER BY PS.Id ASC
                         ";
             var parameters = new
             {
                 ActualWorkOrderDate = schedulerDate,
                 UnitId,
-                StatusCodes = statusCodes
+                StatusCodes = statusCodes,
+                DepartmentId
             };
             using var multi = await _dbConnection.QueryMultipleAsync(query, parameters);
             var preventiveSchedulers = await multi.ReadAsync<dynamic>();

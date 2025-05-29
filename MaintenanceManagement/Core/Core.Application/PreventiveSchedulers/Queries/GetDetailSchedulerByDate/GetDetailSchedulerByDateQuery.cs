@@ -8,7 +8,8 @@ using MediatR;
 namespace Core.Application.PreventiveSchedulers.Queries.GetDetailSchedulerByDate
 {
     public class GetDetailSchedulerByDateQuery : IRequest<ApiResponseDTO<List<DetailSchedulerByDateDto>>>
-    { 
+    {
         public DateOnly SchedulerDate { get; set; }
+        public int DepartmentId { get; set; }
     }
 }
