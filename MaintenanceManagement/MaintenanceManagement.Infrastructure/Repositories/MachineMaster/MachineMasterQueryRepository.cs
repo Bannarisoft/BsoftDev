@@ -86,13 +86,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             var unitId = _ipAddressService.GetUnitId();
             searchPattern = searchPattern ?? string.Empty; // Prevent null issues 
             const string query = @"SELECT 
-            M.Id, M.MachineName, M.MachineCode, M.MachineGroupId,
-            MG.Id AS MachineGroupId, 
-            MG.DepartmentId
+                M.Id, M.MachineName, M.MachineCode, M.MachineGroupId,
+                MG.Id AS MachineGroupId, 
+                MG.DepartmentId
                 FROM Maintenance.MachineMaster M
                 INNER JOIN Maintenance.MachineGroup MG ON M.MachineGroupId = MG.Id 
                 WHERE M.IsDeleted = 0 
-                AND M.UnitId = @UnitId
+                AND M.UnitId = @UnitId 
                 AND (M.MachineName LIKE @SearchPattern OR M.MachineCode LIKE @SearchPattern)";
 
            var lookup = new Dictionary<int, Core.Domain.Entities.MachineMaster>();
@@ -116,7 +116,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
              foreach (var machine in machines)
             {
                 var departmentId = machine.MachineGroup.DepartmentId;
-                Console.WriteLine($"Machine: {machine.MachineName}, DepartmentId: {departmentId}");
+               
             }
 
             return lookup.Values.ToList();  

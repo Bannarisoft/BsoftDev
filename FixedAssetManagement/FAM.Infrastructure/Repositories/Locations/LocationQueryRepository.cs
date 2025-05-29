@@ -1,4 +1,5 @@
 using System.Data;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ILocation;
 using Core.Domain.Entities;
 using Dapper;
@@ -8,18 +9,21 @@ namespace FAM.Infrastructure.Repositories.Locations
     public class LocationQueryRepository : ILocationQueryRepository
     {
         private readonly IDbConnection _dbConnection;
-        public LocationQueryRepository(IDbConnection dbConnection)
+        private readonly IIPAddressService _ipAddressService;
+
+        public LocationQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
             _dbConnection = dbConnection;
-            
-        }        
+            _ipAddressService = ipAddressService;
+        }
         public async Task<(List<Location>, int)> GetAllLocationAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             var query = $$"""
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
                FROM FixedAsset.Location 
-              WHERE IsDeleted = 0
+              WHERE IsDeleted = 0 AND UnitId=@UnitId
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR LocationName LIKE @Search)")}};
 
                 SELECT 
@@ -35,7 +39,7 @@ namespace FAM.Infrastructure.Repositories.Locations
                 CreatedByName
             FROM FixedAsset.Location 
             WHERE 
-            IsDeleted = 0
+            IsDeleted = 0 AND UnitId=@UnitId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR LocationName LIKE @Search )")}}
                 ORDER BY Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -43,17 +47,18 @@ namespace FAM.Infrastructure.Repositories.Locations
                 SELECT @TotalCount AS TotalCount;
             """;
 
-            
-             var parameters = new
-                       {
-                           Search = $"%{SearchTerm}%",
-                           Offset = (PageNumber - 1) * PageSize,
-                           PageSize
-                       };
 
-               var location = await _dbConnection.QueryMultipleAsync(query, parameters);
-             var locationlist = (await location.ReadAsync<Location>()).ToList();
-             int totalCount = (await location.ReadFirstAsync<int>());
+            var parameters = new
+            {
+                Search = $"%{SearchTerm}%",
+                Offset = (PageNumber - 1) * PageSize,
+                PageSize,
+                UnitId
+            };
+
+            var location = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var locationlist = (await location.ReadAsync<Location>()).ToList();
+            int totalCount = (await location.ReadFirstAsync<int>());
             return (locationlist, totalCount);
         }
 
@@ -70,23 +75,23 @@ namespace FAM.Infrastructure.Repositories.Locations
                  WHERE LocationName = @LocationName AND IsDeleted = 0
                  """;
 
-             var parameters = new DynamicParameters(new { LocationName = name });
+            var parameters = new DynamicParameters(new { LocationName = name });
 
-             if (id is not null)
-             {
-                 query += " AND Id != @Id";
-                 parameters.Add("Id", id);
-             }
+            if (id is not null)
+            {
+                query += " AND Id != @Id";
+                parameters.Add("Id", id);
+            }
 
             return await _dbConnection.QueryFirstOrDefaultAsync<Location>(query, parameters);
         }
-        public async Task<List<Location>> GetLocation(string searchPattern=null)
+        public async Task<List<Location>> GetLocation(string searchPattern = null)
         {
             const string query = @"
                 SELECT Id, LocationName 
                 FROM FixedAsset.Location 
                 WHERE IsDeleted = 0 AND LocationName LIKE @SearchPattern";
-                
+
             var locations = await _dbConnection.QueryAsync<Location>(query, new { SearchPattern = $"%{searchPattern}%" });
             return locations.ToList();
         }
