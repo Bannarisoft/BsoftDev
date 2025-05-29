@@ -20,17 +20,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         private readonly IDbConnection _dbConnection;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<WorkOrderCommandRepository> _logger;
-        private readonly IMediator _mediator;
 
         public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService, IDbConnection dbConnection,
-        IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger, IMediator mediator)
+        IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger)
         {
             _applicationDbContext = applicationDbContext;
             _ipAddressService = ipAddressService;
             _dbConnection = dbConnection;
             _publishEndpoint = publishEndpoint;
             _logger = logger;
-            _mediator = mediator;
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, CancellationToken cancellationToken)
         {
@@ -405,16 +403,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                    );
 
                    workOrder.WorkOrderDocNo = newAssetCode;
-
-                   await AuditLogPublisher.PublishAuditLogAsync(
-                     _mediator,
-                     actionDetail: $"Schedule Work Order Repository",
-                     actionCode: "Schedule Work Order SP execution",
-                     actionName: "schedule Work Order SP execution",
-                     module: "Preventive",
-                     requestData: workOrder,
-                     cancellationToken
-                    );
 
                    await _applicationDbContext.WorkOrder.AddAsync(workOrder, cancellationToken);
                    await _applicationDbContext.SaveChangesAsync(cancellationToken);
