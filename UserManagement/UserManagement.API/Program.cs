@@ -81,9 +81,5 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGrpcService<CompanyGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
-// app.MapGrpcService<DepartmentGrpcService>();
-// app.MapGrpcService<SessionGrpcService>();
-// app.MapGrpcService<UnitGrpcService>();
-// app.MapControllers();
-//app.ConfigureHangfireDashboard();
+
 app.Run();
