@@ -11,7 +11,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? PolicyNo { get; set; }
         public string? StartDate { get; set; }
         public string? EndDate { get; set; }
-        public int InsurancePeriod { get; set; }
+        public int Insuranceperiod { get; set; }
         public string? PolicyAmount { get; set; }
         public string? VendorCode { get; set; }
         public string? RenewalStatus { get; set; }
