@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IMaintenance;
+using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 // using Core.Application.Common.Interfaces.IBackgroundService;
 using Core.Application.Common.Interfaces.IMachineMaster;
@@ -55,67 +56,108 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
             {
                 item.Id = 0;
             }
-            if (request.IsActive ==1)
+            
+             
+            if (request.IsActive == 1)
             {
-                Scheduledetail.IsActive =Status.Active;
-                 var response = await _preventiveSchedulerCommand.CreateAsync(Scheduledetail);
-                
+                Scheduledetail.IsActive = Status.Active;
+
+                 await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: "Schedule Active Header",
+                     actionCode: "Active",
+                     actionName: "Schedule Active Header Creation",
+                     module: "Preventive",
+                     requestData: Scheduledetail,
+                     cancellationToken
+                    );
+                var response = await _preventiveSchedulerCommand.CreateAsync(Scheduledetail);
+
                 var machineMaster = await _machineMasterQueryRepository.GetMachineByGroupAsync(Scheduledetail.MachineGroupId);
-                
+
                 var details = _mapper.Map<List<PreventiveSchedulerDetail>>(machineMaster);
                 var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(Scheduledetail.FrequencyUnitId);
-                
-                var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode,StatusOpen.Code);
+
+                var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode, StatusOpen.Code);
                 var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(Scheduledetail.EffectiveDate.ToDateTime(TimeOnly.MinValue), Scheduledetail.FrequencyInterval, frequencyUnit.Code ?? "", Scheduledetail.ReminderWorkOrderDays);
                 var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(Scheduledetail.EffectiveDate.ToDateTime(TimeOnly.MinValue), Scheduledetail.FrequencyInterval, frequencyUnit.Code ?? "", Scheduledetail.ReminderMaterialReqDays);
 
-                 foreach (var detail in details)
-                 {
-                     detail.PreventiveSchedulerHeaderId = response;
-                     detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate); 
-                     detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
-                     detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
+                foreach (var detail in details)
+                {
+                    detail.PreventiveSchedulerHeaderId = response;
+                    detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
+                    detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
+                    detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
 
-                     var detailsResponse = await _preventiveSchedulerCommand.CreateDetailAsync(detail);
+                    await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: "Schedule Active Detail",
+                     actionCode: "Active",
+                     actionName: "Schedule Active Detail Creation",
+                     module: "Preventive",
+                     requestData: detail,
+                     cancellationToken
+                    );
 
-                       var workOrderRequest =  _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(Scheduledetail, opt =>
-                        {
-                            opt.Items["StatusId"] = miscdetail.Id;
-                            opt.Items["PreventiveSchedulerDetailId"] = detailsResponse.Id;
-                        });
+                    var detailsResponse = await _preventiveSchedulerCommand.CreateDetailAsync(detail);
 
-                          var delay = reminderDate - DateTime.Now;
+                    // var workOrderRequest = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(Scheduledetail, opt =>
+                    //  {
+                    //      opt.Items["StatusId"] = miscdetail.Id;
+                    //      opt.Items["PreventiveSchedulerDetailId"] = detailsResponse.Id;
+                    //  });
 
-                         string newJobId;
-                         var delayInMinutes = (int)delay.TotalMinutes;
-                        if (delay.TotalSeconds > 0)
-                        {
-                             newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(detailsResponse.Id,delayInMinutes);
-                        }
-                        else
-                        {
-                               newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(detailsResponse.Id,5);
-                        }
-                  
-                         await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id,newJobId);
-                 }
-                  await _preventiveSchedulerCommand.DeleteAsync(request.Id,Scheduledetail);
-                  return new ApiResponseDTO<bool>
+                    var delay = reminderDate - DateTime.Now;
+
+                    string newJobId;
+                    var delayInMinutes = (int)delay.TotalMinutes;
+                    if (delay.TotalSeconds > 0)
                     {
-                        IsSuccess = true, 
-                        Message = "Preventive scheduler old one inactive and new one created successfully"
-                    };
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detailsResponse.Id, delayInMinutes);
+                    }
+                    else
+                    {
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detailsResponse.Id, 5);
+                    }
+
+                    await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: $"Schedule WorkOrder delayInMinutes:{delayInMinutes} JobId:{newJobId}",
+                     actionCode: "Schedule WorkOrder",
+                     actionName: "Schedule WorkOrder",
+                     module: "Preventive",
+                     requestData: detailsResponse,
+                     cancellationToken
+                    );
+
+                    await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id, newJobId);
+                }
+                await _preventiveSchedulerCommand.DeleteAsync(request.Id, Scheduledetail);
+                return new ApiResponseDTO<bool>
+                {
+                    IsSuccess = true,
+                    Message = "Preventive scheduler old one inactive and new one created successfully"
+                };
             }
             else
             {
+                 await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: $"Schedule Inactive",
+                     actionCode: "Schedule Inactive",
+                     actionName: "Schedule Inactive",
+                     module: "Preventive",
+                     requestData: request,
+                     cancellationToken
+                    );
                 var preventiveSchedulerHeader = _mapper.Map<PreventiveSchedulerHeader>(request);
                 await _preventiveSchedulerCommand.ScheduleInActive(preventiveSchedulerHeader);
 
-                 return new ApiResponseDTO<bool>
-                    {
-                        IsSuccess = true, 
-                        Message = "Preventive scheduler inactive successfully"
-                    };
+                return new ApiResponseDTO<bool>
+                {
+                    IsSuccess = true,
+                    Message = "Preventive scheduler inactive successfully"
+                };
             }
         }
     }

@@ -7,6 +7,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
@@ -373,25 +374,52 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreatePreventiveAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, int companyId, int unitId, CancellationToken cancellationToken)
         {
-            var entry = _applicationDbContext.Entry(workOrder);
-            workOrder.WorkOrderDocNo = await GetLatestPreventiveDocNo(requestTypeId,companyId,unitId);
-            await _applicationDbContext.WorkOrder.AddAsync(workOrder);
-            await _applicationDbContext.SaveChangesAsync();
-            return workOrder;
+             using var transaction = await _applicationDbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
+    
+          try
+          {
+              
+              var parameters = new DynamicParameters();
+              parameters.Add("@CompanyId", companyId);
+              parameters.Add("@UnitId", unitId);
+              parameters.Add("@TypeId", requestTypeId);
+
+              var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
+                  "dbo.Usp_GetWorkOrderDocNo", 
+                  parameters,
+                  commandType: CommandType.StoredProcedure,
+                  commandTimeout: 120,
+                  transaction: transaction.GetDbTransaction() 
+              );
+
+              workOrder.WorkOrderDocNo = newAssetCode;
+
+              await _applicationDbContext.WorkOrder.AddAsync(workOrder, cancellationToken);
+              await _applicationDbContext.SaveChangesAsync(cancellationToken);
+
+              await transaction.CommitAsync(cancellationToken);
+
+              return workOrder;
+          }
+          catch
+          {
+              await transaction.RollbackAsync(cancellationToken);
+              throw;
+          }
         }
-         public async Task<string?> GetLatestPreventiveDocNo(int TypeId,int companyId,int unitId)
-        {
+        //  public async Task<string?> GetLatestPreventiveDocNo(int TypeId,int companyId,int unitId)
+        // {
                       
-            var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", companyId);
-            parameters.Add("@UnitId", unitId);
-            parameters.Add("@TypeId", TypeId);
-            var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
-                "dbo.Usp_GetWorkOrderDocNo", 
-                parameters, 
-                commandType: CommandType.StoredProcedure,
-                commandTimeout: 120);
-            return newAssetCode; 
-        }
+        //     var parameters = new DynamicParameters();
+        //     parameters.Add("@CompanyId", companyId);
+        //     parameters.Add("@UnitId", unitId);
+        //     parameters.Add("@TypeId", TypeId);
+        //     var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
+        //         "dbo.Usp_GetWorkOrderDocNo", 
+        //         parameters, 
+        //         commandType: CommandType.StoredProcedure,
+        //         commandTimeout: 120);
+        //     return newAssetCode; 
+        // }
     }
 }
