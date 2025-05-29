@@ -275,6 +275,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                      PreventiveSchedulerHeaderId = existingPreventiveScheduler.PreventiveSchedulerHeaderId,
                      WorkOrderCreationStartDate = RescheduleDate,
                      ActualWorkOrderDate = RescheduleDate,
+                     MaterialReqStartDays =RescheduleDate,
                      LastMaintenanceActivityDate = null,
                      IsActive = Status.Active,
                      PreventiveScheduler = existingPreventiveScheduler.PreventiveScheduler,
