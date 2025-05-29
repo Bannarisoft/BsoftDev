@@ -7,6 +7,7 @@ using Core.Application.Common.Interfaces.IMRS;
 using Core.Application.MRS.Queries;
 using Core.Application.MRS.Queries.GetCategory;
 using Core.Application.MRS.Queries.GetDepartment;
+using Core.Application.MRS.Queries.GetPendingQty;
 using Core.Application.MRS.Queries.GetSubCostCenter;
 using Core.Application.MRS.Queries.GetSubDepartment;
 using Dapper;
@@ -57,7 +58,26 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MRS
             return departments.ToList();
         }
 
-        
+        public async Task<GetPendingQtyDto?> GetPendingIssueAsync(string oldUnitCode, string itemCode)
+        {
+            oldUnitCode ??= string.Empty;
+            itemCode ??= string.Empty;
+
+            var parameters = new 
+            {
+                OldUnitcode = oldUnitCode,
+                ItemCode = itemCode
+            };
+
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<GetPendingQtyDto>(
+                "KalsoftePrimeIssueRequestPending", // Stored Procedure Name
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return result;
+        }
+
         public async Task<List<MSubCostCenterDto>> GetSubCostCenter(string OldUnitcode)
         {
             OldUnitcode ??= string.Empty;

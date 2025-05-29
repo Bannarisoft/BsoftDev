@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
 {
-    public class GetMaintenanceRequestQueryHandler: IRequestHandler<GetMaintenanceRequestQuery, ApiResponseDTO<List<GetMaintenanceRequestDto>>>
+    public class GetMaintenanceRequestQueryHandler : IRequestHandler<GetMaintenanceRequestQuery, ApiResponseDTO<List<GetMaintenanceRequestDto>>>
     {
         private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
@@ -19,41 +19,55 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
         public GetMaintenanceRequestQueryHandler(
             IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository,
             IMapper mapper,
-            IMediator mediator ,
+            IMediator mediator,
             IDepartmentGrpcClient departmentService)
-            
+
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
             _departmentGrpcClient = departmentService;
-            
+
 
         }
 
         public async Task<ApiResponseDTO<List<GetMaintenanceRequestDto>>> Handle(GetMaintenanceRequestQuery request, CancellationToken cancellationToken)
         {
-            var (maintenanceRequests, totalCount) = await _maintenanceRequestQueryRepository.GetAllMaintenanceRequestAsync(request.PageNumber, request.PageSize, request.SearchTerm,request.FromDate,request.ToDate);
+            var (maintenanceRequests, totalCount) = await _maintenanceRequestQueryRepository.GetAllMaintenanceRequestAsync(request.PageNumber, request.PageSize, request.SearchTerm, request.FromDate, request.ToDate);
             var maintenanceRequestList = _mapper.Map<List<GetMaintenanceRequestDto>>(maintenanceRequests);
 
-        
+            // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync(); // ✅ Clean call
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
             var maintenanceRequestDictionary = new Dictionary<int, GetMaintenanceRequestDto>();
-            
-           
-            foreach (var data in maintenanceRequestList)
-            {
-              
-                    if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName )&& departmentName != null)
-                    {
-                        data.DepartmentName = departmentName;
-                    }
 
-                    maintenanceRequestDictionary[data.DepartmentId] = data;
-                
+            // 🔥 Map department names with DataControl to location
+
+           foreach (var data in maintenanceRequestList)
+            {
+
+                if (departmentLookup.TryGetValue(data.MaintenanceDepartmentId, out var departmentName) && departmentName != null)
+                {
+
+                    data.MaintenanceDepartmentName = departmentName;
+                }
+                maintenanceRequestDictionary[data.MaintenanceDepartmentId] = data;
+
             }
+
+               var filteredMaintenanceRequest = maintenanceRequestList
+            .Where(p => departmentLookup.ContainsKey(p.MaintenanceDepartmentId))
+            .ToList();
+            
+            // var filteredmaintenanceRequestDtos = maintenanceRequestList
+            //  .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            //  .Select(p => new GetMaintenanceRequestDto
+            //  {
+            //      DepartmentId = p.DepartmentId,
+            //      DepartmentName = departmentLookup[p.DepartmentId],
+            //  })
+            //  .ToList();
 
             // Domain Event Logging
             var domainEvent = new AuditLogsDomainEvent(
@@ -69,7 +83,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = maintenanceRequestList,
+                Data = filteredMaintenanceRequest,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize

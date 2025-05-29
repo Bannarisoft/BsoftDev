@@ -16,13 +16,12 @@ namespace Core.Application.MaintenanceRequest.Queries.GetExternalRequestById
         private readonly IMaintenanceRequestQueryRepository _maintenanceRequestQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        public GetExternalRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService)
+               public GetExternalRequestByIdQueryHandler(IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IMapper mapper, IMediator mediator)
         {
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentGrpcClient = departmentService;
+           
         }
         public async Task<ApiResponseDTO<List<GetExternalRequestByIdDto>>> Handle(GetExternalRequestsByIdsQuery request, CancellationToken cancellationToken)
         {
@@ -39,20 +38,7 @@ namespace Core.Application.MaintenanceRequest.Queries.GetExternalRequestById
 
             var externalRequests = await _maintenanceRequestQueryRepository.GetExternalRequestByIdAsync(request.Ids);
 
-            // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-
-            // 🔥 Map department names to each external request
-            foreach (var requestDto in externalRequests)
-            {
-                if (requestDto.DepartmentId != 0 && departmentLookup.TryGetValue(requestDto.DepartmentId, out var deptName))
-                {
-                    requestDto.DepartmentName = deptName;
-                }
-            }
-
-
+           
             if (!externalRequests.Any())
             {
                 return new ApiResponseDTO<List<GetExternalRequestByIdDto>>

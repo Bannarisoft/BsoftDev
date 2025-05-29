@@ -31,20 +31,29 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-            var subLocationDictionary = new Dictionary<int, SubLocationDto>();
+            // var subLocationDictionary = new Dictionary<int, SubLocationDto>();
 
-            // 🔥 Map department names to Sublocation
-            foreach (var data in sublocationList)
-            {
+            // 🔥 Map department names with DataControl to location
+            // foreach (var data in sublocationList)
+            // {
 
-                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-                {
-                    data.DepartmentName = departmentName;
-                }
+            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+            //     {
+            //         data.DepartmentName = departmentName;
+            //     }
 
-                subLocationDictionary[data.DepartmentId] = data;
+            //     subLocationDictionary[data.DepartmentId] = data;
 
-            }
+            // }
+            var filteredSubLocationDtos = sublocationList
+              .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+              .Select(p => new SubLocationDto
+              {
+                  DepartmentId = p.DepartmentId,
+                  DepartmentName = departmentLookup[p.DepartmentId],
+              })
+              .ToList();
+
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetSubLocations",
@@ -58,7 +67,7 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = sublocationList,
+                Data = filteredSubLocationDtos,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize

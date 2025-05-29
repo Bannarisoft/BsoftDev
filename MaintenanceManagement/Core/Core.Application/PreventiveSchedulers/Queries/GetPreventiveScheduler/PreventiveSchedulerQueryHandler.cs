@@ -28,24 +28,35 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
             var preventiveSchedulerList = _mapper.Map<List<GetPreventiveSchedulerDto>>(preventiveScheduler);
 
             // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentAsync(); // ✅ Clean call
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
 
             // var departments = departmentResponse.Departments.ToList();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            var PreventiveSchedulerDictionary = new Dictionary<int, GetPreventiveSchedulerDto>();
-            // 🔥 Map department names to preventiveScheduler
-            foreach (var data in preventiveSchedulerList)
+            // 🔥 Map department names with DataControl to preventiveScheduler
+            // foreach (var data in preventiveSchedulerList)
+            // {
+
+            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+            //     {
+            //         data.DepartmentName = departmentName;
+            //     }
+
+            //     PreventiveSchedulerDictionary[data.DepartmentId] = data;
+
+            // }
+            foreach (var dto in preventiveSchedulerList)
+        {
+            if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
             {
-
-                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-                {
-                    data.DepartmentName = departmentName;
-                }
-
-                PreventiveSchedulerDictionary[data.DepartmentId] = data;
-
+                dto.DepartmentName = departmentName;
             }
+        }
+
+                var filteredPreventiveSchedulers = preventiveSchedulerList
+            .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            .ToList();
+          
 
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetPreventiveScheduler",
@@ -59,7 +70,7 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = preventiveSchedulerList,
+                Data = filteredPreventiveSchedulers,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize

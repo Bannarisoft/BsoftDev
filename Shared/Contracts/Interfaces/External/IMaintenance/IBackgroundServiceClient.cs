@@ -8,5 +8,6 @@ namespace Contracts.Interfaces.External.IMaintenance
     public interface IBackgroundServiceClient
     {
         Task<string> ScheduleWorkOrder(int preventiveScheduleId, int delayInMinutes);
+        Task<bool> RemoveHangFireJob(string HangfireJobId);
     }
 }

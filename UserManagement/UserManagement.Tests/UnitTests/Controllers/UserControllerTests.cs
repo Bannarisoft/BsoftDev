@@ -10,16 +10,19 @@ using Core.Application.Users.Queries.GetUserById;
 using Core.Application.Users.Queries.GetUsers;
 using FluentAssertions;
 using FluentValidation;
-using FluentValidation.Results;
+using FluentValidationResult = FluentValidation.Results.ValidationResult;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UserManagement.API.Controllers;
+using UserManagement.Infrastructure.Data;
+using Core.Application.Common.Interfaces; // ✅ Required for IIPAddressService, ITimeZoneService
 
 namespace UserManagement.Tests.UnitTests.Controllers
 {
@@ -28,12 +31,29 @@ namespace UserManagement.Tests.UnitTests.Controllers
     {
         private Mock<ISender> _mediatorMock = null!;
         private Mock<ILogger<UserController>> _loggerMock = null!;
+        private ApplicationDbContext _dbContext = null!;
+        private Mock<IPublishEndpoint> _publishEndpointMock = null!;
+        private Mock<IIPAddressService> _ipAddressServiceMock = null!;
+        private Mock<ITimeZoneService> _timeZoneServiceMock = null!;
 
         [TestInitialize]
         public void Setup()
         {
             _mediatorMock = new Mock<ISender>();
             _loggerMock = new Mock<ILogger<UserController>>();
+            _publishEndpointMock = new Mock<IPublishEndpoint>();
+            _ipAddressServiceMock = new Mock<IIPAddressService>();
+            _timeZoneServiceMock = new Mock<ITimeZoneService>();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase(databaseName: "UserManagementTestDb")
+                .Options;
+
+            _dbContext = new ApplicationDbContext(
+                options,
+                _ipAddressServiceMock.Object,
+                _timeZoneServiceMock.Object
+            );
         }
 
         private UserController SetupController(
@@ -48,11 +68,13 @@ namespace UserManagement.Tests.UnitTests.Controllers
                 _mediatorMock.Object,
                 createValidator ?? Mock.Of<IValidator<CreateUserCommand>>(),
                 updateValidator ?? Mock.Of<IValidator<UpdateUserCommand>>(),
+                _dbContext,
                 firstTimeValidator ?? Mock.Of<IValidator<FirstTimeUserPasswordCommand>>(),
                 changeValidator ?? Mock.Of<IValidator<ChangeUserPasswordCommand>>(),
                 _loggerMock.Object,
                 forgotValidator ?? Mock.Of<IValidator<ForgotUserPasswordCommand>>(),
-                resetValidator ?? Mock.Of<IValidator<ResetUserPasswordCommand>>()
+                resetValidator ?? Mock.Of<IValidator<ResetUserPasswordCommand>>(),
+                _publishEndpointMock.Object
             );
         }
 
@@ -63,7 +85,7 @@ namespace UserManagement.Tests.UnitTests.Controllers
 
             var validator = new Mock<IValidator<UpdateUserCommand>>();
             validator.Setup(v => v.ValidateAsync(updateCommand, It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(new ValidationResult());
+                     .ReturnsAsync(new FluentValidationResult());
 
             _mediatorMock
                 .Setup(m => m.Send(It.Is<GetUserByIdQuery>(q => q.UserId == 99), It.IsAny<CancellationToken>()))
@@ -126,7 +148,7 @@ namespace UserManagement.Tests.UnitTests.Controllers
 
             var validator = new Mock<IValidator<ChangeUserPasswordCommand>>();
             validator.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(new ValidationResult());
+                     .ReturnsAsync(new FluentValidationResult());
 
             _mediatorMock
                 .Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
@@ -150,7 +172,7 @@ namespace UserManagement.Tests.UnitTests.Controllers
 
             var validator = new Mock<IValidator<FirstTimeUserPasswordCommand>>();
             validator.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(new ValidationResult());
+                     .ReturnsAsync(new FluentValidationResult());
 
             _mediatorMock
                 .Setup(m => m.Send(command, It.IsAny<CancellationToken>()))

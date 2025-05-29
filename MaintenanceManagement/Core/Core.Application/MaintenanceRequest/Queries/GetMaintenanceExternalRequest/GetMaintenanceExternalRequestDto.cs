@@ -16,8 +16,10 @@ namespace Core.Application.MaintenanceRequest.Queries.GetMaintenanceExternalRequ
        public string? MachineName { get; set; }
        public int  CompanyId { get; set; }
        public   int  UnitId { get; set; }       
-       public int DepartmentId { get; set; }
-       public string? DepartmentName { get; set; }
+        public int ProductionDepartmentId { get; set; }
+       public string? ProductionDepartmentName { get; set; }      
+       public int MaintenanceDepartmentId { get; set; }
+       public string? MaintenanceDepartmentName { get; set; }
        public int SourceId { get; set; }
        public int? VendorId  { get; set; }
        public string? VendorName  { get; set; } = null;

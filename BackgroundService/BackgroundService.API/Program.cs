@@ -3,6 +3,8 @@ using BackgroundService.Application;
 using BackgroundService.API.Configurations;
 using BackgroundService.API;
 using BackgroundService.API.GrpcServices;
+using BackgroundService.Application.Interfaces;
+using BackgroundService.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,7 @@ builder.Services.AddSwaggerGen();
 var configuration = builder.Configuration;
 builder.Services.AddInfrastructureServices(configuration);
 builder.Services.AddGrpc();
+
 var app = builder.Build();
 
 // Enable Swagger in Development
@@ -42,6 +45,7 @@ app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapGrpcService<MaintenanceJobGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<MaintenanceHangfireRemoveGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
 // app.MapControllers();

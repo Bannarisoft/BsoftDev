@@ -1,46 +1,55 @@
 using MediatR;
-using Core.Application.Common.Interfaces;
 using Core.Domain.Entities;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
-using  Core.Application.Departments.Queries.GetDepartments;
 using Core.Application.Common.Interfaces.IDepartment;
-using Core.Application.Departments.Commands.DeleteDepartment;
 using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
-using Core.Application.Common;
 using Microsoft.Extensions.Logging;
+using Contracts.Interfaces.External.IMaintenance;
 
 namespace Core.Application.Departments.Commands.DeleteDepartment
 {
 
-    public class DeleteDepartmentCommandHandler :IRequestHandler<DeleteDepartmentCommand ,ApiResponseDTO<int>>
+    public class DeleteDepartmentCommandHandler : IRequestHandler<DeleteDepartmentCommand, ApiResponseDTO<int>>
     {
 
-      private readonly IDepartmentCommandRepository _IdepartmentCommandRepository;  
-       private readonly IMapper _Imapper;          
+        private readonly IDepartmentCommandRepository _IdepartmentCommandRepository;
+        private readonly IMapper _Imapper;
         private readonly IDepartmentQueryRepository _IdepartmentQueryRepository;
-   
-        private readonly IMediator _mediator; 
-             private readonly ILogger<DeleteDepartmentCommandHandler> _logger;
-      
+        private readonly IMediator _mediator;
+        private readonly ILogger<DeleteDepartmentCommandHandler> _logger;
+        private readonly IDepartmentValidationGrpcClient _departmentValidationGrpcClient;
 
-      public DeleteDepartmentCommandHandler (IDepartmentCommandRepository departmentRepository ,IDepartmentQueryRepository departmentQueryRepository,IMediator mediator, IMapper mapper,ILogger<DeleteDepartmentCommandHandler> logger)
-      {
+        public DeleteDepartmentCommandHandler(IDepartmentCommandRepository departmentRepository, IDepartmentQueryRepository departmentQueryRepository, IMediator mediator, IMapper mapper, ILogger<DeleteDepartmentCommandHandler> logger, IDepartmentValidationGrpcClient departmentValidationGrpcClient)
+        {
 
-         _IdepartmentCommandRepository = departmentRepository;
-         _Imapper = mapper;                       
-          _IdepartmentQueryRepository = departmentQueryRepository;
-          _mediator = mediator;
-          _logger = logger;
-      }
+            _IdepartmentCommandRepository = departmentRepository;
+            _Imapper = mapper;
+            _IdepartmentQueryRepository = departmentQueryRepository;
+            _mediator = mediator;
+            _logger = logger;
+            _departmentValidationGrpcClient = departmentValidationGrpcClient;
+        }
 
 
-      public async Task<ApiResponseDTO<int>>Handle(DeleteDepartmentCommand request, CancellationToken cancellationToken)
-      {       
+        public async Task<ApiResponseDTO<int>> Handle(DeleteDepartmentCommand request, CancellationToken cancellationToken)
+        {
 
-                  _logger.LogInformation("DeleteDepartmentCommandHandler started for Department ID: {DepartmentId}", request.Id);
+            _logger.LogInformation("DeleteDepartmentCommandHandler started for Department ID: {DepartmentId}", request.Id);
+            // ✅Call MaintenanceService via gRPC to check usage
+            bool isUsed = await _departmentValidationGrpcClient.CheckIfDepartmentIsUsedAsync(request.Id);
+
+            if (isUsed)
+            {
+                _logger.LogWarning("Cannot delete Department ID {DepartmentId} - it is in use by CostCenters.", request.Id);
+                return new ApiResponseDTO<int>
+                {
+                    IsSuccess = false,
+                    Message = "Cannot delete department. It is still in use in Maintenance system.",
+                    Data = 0
+                };
+            }
+            
             // Map request to entity and delete
             var updatedDepartment = _Imapper.Map<Department>(request);
             var result = await _IdepartmentCommandRepository.DeleteAsync(request.Id, updatedDepartment);
@@ -75,9 +84,9 @@ namespace Core.Application.Departments.Commands.DeleteDepartment
                 IsSuccess = true,
                 Message = "Department deleted successfully",
                 Data = result
-            };  
+            };
 
-      }
+        }
 
     }
 }

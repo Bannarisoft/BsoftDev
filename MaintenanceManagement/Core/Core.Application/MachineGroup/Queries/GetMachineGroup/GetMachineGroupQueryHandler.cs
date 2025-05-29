@@ -13,7 +13,7 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroup
 {
     public class GetMachineGroupQueryHandler : IRequestHandler<GetMachineGroupQuery, ApiResponseDTO<List<MachineGroupDto>>>
     {
-       private readonly IMachineGroupQueryRepository _machineGroupQueryRepository;
+        private readonly IMachineGroupQueryRepository _machineGroupQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
@@ -26,24 +26,36 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroup
             _mediator = mediator;
             _departmentGrpcClient = departmentGrpcClient;
         }
-         public async Task<ApiResponseDTO<List<MachineGroupDto>>> Handle(GetMachineGroupQuery request, CancellationToken cancellationToken)
+
+        public async Task<ApiResponseDTO<List<MachineGroupDto>>> Handle(GetMachineGroupQuery request, CancellationToken cancellationToken)
         {
             // Fetch data from repository
             var (machineGroups, totalCount) = await _machineGroupQueryRepository.GetAllMachineGroupsAsync(request.PageNumber, request.PageSize, request.SearchTerm);
 
             // Map domain entities to DTOs
             var machineGroupList = _mapper.Map<List<MachineGroupDto>>(machineGroups);
-              // 🔥 Fetch lookups
+            
+            // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-                 // 🔁 Set DepartmentName and UnitName in one loop
+            // 🔥 Map department & unit names with DataControl to costCenters
             foreach (var dto in machineGroupList)
             {
                 if (departmentLookup.TryGetValue(dto.DepartmentId, out var deptName))
                     dto.DepartmentName = deptName;
 
-              
+             
             }
+
+        //     // 🔥 Map department names with DataControl to location
+            //     var filteredMachineGroupDtos = machineGroupList
+            //    .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            //    .Select(p => new MachineGroupDto
+            //    {
+            //        DepartmentId = p.DepartmentId,
+            //        DepartmentName = departmentLookup[p.DepartmentId],
+            //    })
+            //    .ToList();
 
             // Publish domain event for auditing
             var domainEvent = new AuditLogsDomainEvent(

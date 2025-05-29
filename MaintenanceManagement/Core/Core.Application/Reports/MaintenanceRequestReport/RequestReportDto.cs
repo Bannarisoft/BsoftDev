@@ -22,11 +22,11 @@ namespace Core.Application.Reports.MaintenanceRequestReport
         public int? WorkOrderId { get; set; }
         public int? StatusId { get; set; }
         public string? Status { get; set; }
-        public DateTimeOffset ModifiedDate { get; set; }
+        public DateTimeOffset? ModifiedDate { get; set; }
         public string? OldVendorId { get; set; }
         public string? OldVendorName { get; set; }
 
-        public DateTimeOffset ExpectedDispatchDate { get; set; }
+        public DateTimeOffset? ExpectedDispatchDate { get; set; }
         public decimal? EstimatedSpareCost { get; set; }
         public decimal? EstimatedServiceCost { get; set; }
 

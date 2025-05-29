@@ -1,5 +1,6 @@
 using AutoMapper;
 using Contracts.Events.Maintenance;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IWorkOrder;
@@ -20,8 +21,10 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
         private readonly IEventPublisher _eventPublisher;
         private readonly ILogger<UpdateWorkOrderCommandHandler> _logger;        
         private readonly ILogQueryService _logQueryService;
+        private readonly IUnitGrpcClient _unitGrpcClient; 
+        private readonly ICompanyGrpcClient _companyGrpcClient; 
 
-        public UpdateWorkOrderCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper,IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IEventPublisher eventPublisher, ILogger<UpdateWorkOrderCommandHandler> logger, ILogQueryService logQueryService) 
+        public UpdateWorkOrderCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper,IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IEventPublisher eventPublisher, ILogger<UpdateWorkOrderCommandHandler> logger, ILogQueryService logQueryService, IUnitGrpcClient unitGrpcClient,ICompanyGrpcClient companyGrpcClient) 
                {
             _workOrderRepository = workOrderRepository;
             _mapper = mapper;
@@ -30,6 +33,8 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
             _eventPublisher = eventPublisher;
             _logger = logger;         
             _logQueryService = logQueryService ?? throw new ArgumentNullException(nameof(logQueryService));  
+             _unitGrpcClient = unitGrpcClient;
+            _companyGrpcClient=companyGrpcClient;
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(UpdateWorkOrderCommand request, CancellationToken cancellationToken)
@@ -74,8 +79,23 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
                 string tempFilePath = request.WorkOrder.Image;
                 if (tempFilePath != null){
                     string baseDirectory = await _workOrderQueryRepository.GetBaseDirectoryAsync();
+                       //GRPC
+                    var units = await _unitGrpcClient.GetAllUnitAsync();
+                    var companies = await _companyGrpcClient.GetAllCompanyAsync();
+                    var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+                    var companyLookup = companies.ToDictionary(u => u.CompanyId, u => u.CompanyName);
+                    string? unitName = null;
+                    string? companyName = null;
 
-                    var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(request.WorkOrder.CompanyId, request.WorkOrder.UnitId);
+                    if (unitLookup.TryGetValue(request.WorkOrder.UnitId, out var unitNameGrpc))
+                    {
+                        unitName= unitNameGrpc;
+                    }
+                    if (companyLookup.TryGetValue(request.WorkOrder.CompanyId, out var companyNameGrpc))
+                    {
+                        companyName= companyNameGrpc;
+                    } 
+                    //var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(request.WorkOrder.CompanyId, request.WorkOrder.UnitId);
                     string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);     
                     //string companyFolder = Path.Combine(baseDirectory, companyName.Trim());
                     //string unitFolder = Path.Combine(companyFolder,unitName.Trim());

@@ -1,5 +1,8 @@
+using UserManagement.Infrastructure.Data;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Core.Application.Users.Queries.GetUsers;
 using Core.Application.Users.Queries.GetUserById;
@@ -11,8 +14,11 @@ using Core.Application.Users.Commands.UpdateFirstTimeUserPassword;
 using Core.Application.Users.Commands.ChangeUserPassword;
 using Microsoft.AspNetCore.Authorization;
 using Core.Application.Users.Commands.ForgotUserPassword;
+using UserManagement.Infrastructure.Services;
 using Core.Application.Users.Commands.ResetUserPassword;
+using Contracts.Events;
 using MassTransit;
+using Core.Application.Users.Commands.RemoveVerificationCode;
 
 namespace UserManagement.API.Controllers
 {
@@ -23,27 +29,33 @@ namespace UserManagement.API.Controllers
     {
         private readonly IValidator<CreateUserCommand> _createUserCommandValidator;
         private readonly IValidator<UpdateUserCommand> _updateUserCommandValidator;
+        private readonly ApplicationDbContext _dbContext;
         private readonly IValidator<FirstTimeUserPasswordCommand> _firstTimeUserPasswordCommandValidator;
         private readonly IValidator<ChangeUserPasswordCommand> _changeUserPasswordCommandValidator;
         private readonly ILogger<UserController> _logger;
+        private readonly IPublishEndpoint _publishEndpoint;
         private readonly IValidator<ForgotUserPasswordCommand> _forgotUserPasswordCommandValidator;
         private readonly IValidator<ResetUserPasswordCommand> _resetUserPasswordCommandValidator;
 
         public UserController(ISender mediator,
                               IValidator<CreateUserCommand> createUserCommandValidator,
                               IValidator<UpdateUserCommand> updateUserCommandValidator,
+                              ApplicationDbContext dbContext,
                               IValidator<FirstTimeUserPasswordCommand> firstTimeUserPasswordCommandValidator,
                               IValidator<ChangeUserPasswordCommand> changeUserPasswordCommandValidator,
                               ILogger<UserController> logger,
                               IValidator<ForgotUserPasswordCommand> forgotUserPasswordCommandValidator,
-                              IValidator<ResetUserPasswordCommand> resetUserPasswordCommandValidator)
+                              IValidator<ResetUserPasswordCommand> resetUserPasswordCommandValidator,
+                              IPublishEndpoint publishEndpoint)
           : base(mediator)
         {
             _createUserCommandValidator = createUserCommandValidator;
+            _dbContext = dbContext;
             _updateUserCommandValidator = updateUserCommandValidator;
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
             _logger = logger;
+            _publishEndpoint = publishEndpoint;
             _forgotUserPasswordCommandValidator = forgotUserPasswordCommandValidator;
             _resetUserPasswordCommandValidator = resetUserPasswordCommandValidator;
         }
@@ -379,6 +391,19 @@ namespace UserManagement.API.Controllers
 
 
             return Ok(new { StatusCode = StatusCodes.Status200OK, message = response });
+        }
+        [HttpPost("rollback-delete")]
+        public async Task<IActionResult> RollbackDeleteUser([FromBody] DeleteUserCommand command)
+        {
+            var result = await Mediator.Send(command);
+            return result.IsSuccess ? Ok(result) : StatusCode(500, result);
+        }
+        [HttpPost("verfication-code-remove")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerificationCodeRemove([FromBody] RemoveVerficationCodeCommand command)
+        {
+            var result = await Mediator.Send(command);
+            return result.IsSuccess ? Ok(result) : StatusCode(500, result);
         }
     }
 }

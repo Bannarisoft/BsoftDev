@@ -635,9 +635,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("CreatedIP")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int");
-
                     b.Property<decimal?>("EstimatedServiceCost")
                         .HasColumnType("decimal");
 
@@ -654,6 +651,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("MachineId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaintenanceDepartmentId")
                         .HasColumnType("int");
 
                     b.Property<int>("MaintenanceTypeId")
@@ -679,6 +679,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("OldVendorName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductionDepartmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
@@ -1101,6 +1104,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
+
+                    b.Property<string>("PreventiveSchedulerName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("PreventiveSchedulerName");
 
                     b.Property<int>("ReminderMaterialReqDays")
                         .HasColumnType("int")

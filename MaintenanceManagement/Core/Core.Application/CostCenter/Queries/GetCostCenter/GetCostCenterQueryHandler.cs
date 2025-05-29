@@ -34,14 +34,14 @@ namespace Core.Application.CostCenter.Queries.GetCostCenter
             var (costCenters, totalCount) = await _iCostCenterQueryRepository.GetAllCostCenterGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var costCenterDtos = _mapper.Map<List<CostCenterDto>>(costCenters);
 
-            // 🔥 Fetch lookups
+            // 🔥 Fetch departments using gRPC
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var units = await _unitGrpcClient.GetAllUnitAsync();
 
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
-            // 🔁 Set DepartmentName and UnitName in one loop
+           // 🔥 Map department & unit names with DataControl to costCenters
             foreach (var dto in costCenterDtos)
             {
                 if (departmentLookup.TryGetValue(dto.DepartmentId, out var deptName))
@@ -50,6 +50,18 @@ namespace Core.Application.CostCenter.Queries.GetCostCenter
                 if (unitLookup.TryGetValue(dto.UnitId, out var unitName))
                     dto.UnitName = unitName;
             }
+
+            // var filteredCostCenterDtos = costCenterDtos
+            //         .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            //         .Select(p => new CostCenterDto
+            //         {
+            //             DepartmentId = p.DepartmentId,
+            //             DepartmentName = departmentLookup[p.DepartmentId],
+            //             UnitId = p.UnitId,
+            //             UnitName = unitLookup.TryGetValue(p.UnitId, out var unitName) ? unitName : string.Empty,
+            //             CostCenterName = p.CostCenterName,
+            //         })
+            //         .ToList();
 
             // 📘 Log domain event
             var domainEvent = new AuditLogsDomainEvent(

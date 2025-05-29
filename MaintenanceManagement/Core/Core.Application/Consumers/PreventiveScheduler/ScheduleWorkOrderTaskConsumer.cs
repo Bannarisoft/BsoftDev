@@ -44,29 +44,34 @@ namespace Core.Application.Consumers.PreventiveScheduler
             var getWorkOrderDetail = await _preventiveSchedulerQuery.GetByIdAsync(context.Message.PreventiveSchedulerHeaderId);
             
             var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode,StatusOpen.Code);
+
+                int jobDelayMin = 0;
                      foreach (var detail in getMachineWiseDetail)
+                {
+
+
+                    var startDateTime = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
+                    var delay = startDateTime - DateTime.Now;
+                    string newJobId;
+                    var delayInMinutes = (int)delay.TotalMinutes;
+                    var workOrderRequest = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(getWorkOrderDetail, opt =>
                      {
-                         var startDateTime = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
-                         var delay = startDateTime  - DateTime.Now;
-                           string newJobId;
-                         var delayInMinutes = (int)delay.TotalMinutes;
-                             var workOrderRequest =  _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(getWorkOrderDetail, opt =>
-                              {
-                                  opt.Items["StatusId"] = miscdetail.Id;
-                                  opt.Items["PreventiveSchedulerDetailId"] = detail.Id;
-                              });
-                         if (delay.TotalSeconds > 0)
-                        {
-                            newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(detail.Id,delayInMinutes);
-                        }
-                        else
-                        {
-                        
-                           newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(detail.Id,5);
-                        }
-                          detail.HangfireJobId = newJobId;
-                        await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id,newJobId);
-                     }
+                         opt.Items["StatusId"] = miscdetail.Id;
+                         opt.Items["PreventiveSchedulerDetailId"] = detail.Id;
+                     });
+                    if (delay.TotalSeconds > 0)
+                    {
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, delayInMinutes);
+                    }
+                    else
+                    {
+                        jobDelayMin += 2;
+
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, jobDelayMin);
+                    }
+                    detail.HangfireJobId = newJobId;
+                    await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id, newJobId);
+                }
                 var headerId = context.Message.PreventiveSchedulerHeaderId;
                      if(getMachineWiseDetail.Count > 0)
                      {

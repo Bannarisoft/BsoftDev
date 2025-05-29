@@ -23,7 +23,7 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             _applicationDbContext = applicationDbContext;        
         }
     
-        public async Task<(List<DepreciationDto>, int)> CalculateDepreciationAsync(int companyId, int unitId, int finYearId, DateTimeOffset? startDate, DateTimeOffset? endDate,int depreciationType, int PageNumber, int PageSize, string? SearchTerm,int depreciationPeriod)
+        public async Task<(List<DepreciationDto>, int,bool, string)> CalculateDepreciationAsync(int companyId, int unitId, int finYearId, DateTimeOffset? startDate, DateTimeOffset? endDate,int depreciationType, int PageNumber, int PageSize, string? SearchTerm,int depreciationPeriod)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", companyId);
@@ -37,16 +37,35 @@ namespace FAM.Infrastructure.Repositories.DepreciationDetail
             parameters.Add("@PageNumber", PageNumber );
             parameters.Add("@PageSize", PageSize );
             parameters.Add("@SearchTerm", SearchTerm);
+        
+         using var multiResult = await _dbConnection.QueryMultipleAsync(
+        "dbo.FAM_DepreciationCalculation", parameters, commandType: CommandType.StoredProcedure);
 
-                // ✅ Ensure using statement to properly handle GridReader disposal
-            using var multiResult = await _dbConnection.QueryMultipleAsync(
-                "dbo.FAM_DepreciationCalculation", parameters, commandType: CommandType.StoredProcedure);
+        // Read first result set as dynamic to check for error
+        var firstResult = await multiResult.ReadAsync();
+        var firstRow = firstResult.FirstOrDefault();
 
-            // ✅ Read all data before exiting the using block
-            var depreciationList = (await multiResult.ReadAsync<DepreciationDto>()).ToList();
-            int totalCount = await multiResult.ReadFirstOrDefaultAsync<int>();
+        if (firstRow is IDictionary<string, object> dict &&
+            dict.TryGetValue("StatusCode", out var statusCodeObj) &&
+            Convert.ToInt32(statusCodeObj) != 0)
+        {
+            // Read the dummy second result
+            await multiResult.ReadAsync(); // SELECT 0
+            string message = dict.TryGetValue("Status", out var statusMessageObj)
+                ? statusMessageObj?.ToString()
+                : "Unknown error";
+            return (new List<DepreciationDto>(), 0, false, message ?? "Unknown error");
+        }
 
-            return (depreciationList, totalCount);   
+        // ✅ Re-read result set as DepreciationDto
+        var depreciationList = (await _dbConnection.QueryAsync<DepreciationDto>(
+            "dbo.FAM_DepreciationCalculation", parameters, commandType: CommandType.StoredProcedure)).ToList();
+
+        // ✅ Get total count separately if needed
+        int totalCount = depreciationList.Count;
+
+        return (depreciationList, totalCount, true, "");
+    
         }
 
         public async Task<(string message, int statusCode)>  CreateAsync( int finYearId,  int depreciationType,int depreciationPeriod)

@@ -10,58 +10,58 @@ using Microsoft.Extensions.Logging;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
-    public class WorkOrderCommandRepository: IWorkOrderCommandRepository
+    public class WorkOrderCommandRepository : IWorkOrderCommandRepository
     {
-        private readonly ApplicationDbContext _applicationDbContext;       
-        private readonly IIPAddressService _ipAddressService; 
+        private readonly ApplicationDbContext _applicationDbContext;
+        private readonly IIPAddressService _ipAddressService;
         private readonly IDbConnection _dbConnection;
-        private readonly IPublishEndpoint _publishEndpoint;   
+        private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<WorkOrderCommandRepository> _logger;
 
-        public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService,IDbConnection dbConnection, IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger )
+        public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService, IDbConnection dbConnection, IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger)
         {
-            _applicationDbContext = applicationDbContext; 
-            _ipAddressService = ipAddressService;     
-            _dbConnection = dbConnection;     
+            _applicationDbContext = applicationDbContext;
+            _ipAddressService = ipAddressService;
+            _dbConnection = dbConnection;
             _publishEndpoint = publishEndpoint;
             _logger = logger;
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, CancellationToken cancellationToken)
         {
-            var entry =_applicationDbContext.Entry(workOrder);
+            var entry = _applicationDbContext.Entry(workOrder);
             workOrder.WorkOrderDocNo = await GetLatestWorkOrderDocNo(requestTypeId);
             await _applicationDbContext.WorkOrder.AddAsync(workOrder);
             await _applicationDbContext.SaveChangesAsync();
-            return workOrder;   
-        }      
+            return workOrder;
+        }
         public async Task<string?> GetLatestWorkOrderDocNo(int TypeId)
         {
             var companyId = _ipAddressService.GetCompanyId();
-            var unitId = _ipAddressService.GetUnitId();           
+            var unitId = _ipAddressService.GetUnitId();
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", companyId);
             parameters.Add("@UnitId", unitId);
             parameters.Add("@TypeId", TypeId);
             var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
-                "dbo.Usp_GetWorkOrderDocNo", 
-                parameters, 
+                "dbo.Usp_GetWorkOrderDocNo",
+                parameters,
                 commandType: CommandType.StoredProcedure,
                 commandTimeout: 120);
-            return newAssetCode; 
+            return newAssetCode;
         }
-        public async Task<bool> UpdateAsync(int workOrderId,Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder)
+        public async Task<bool> UpdateAsync(int workOrderId, Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder)
         {
-             var oldUnitId = _ipAddressService.GetOldUnitId();
-             var existingWorkOrder = await _applicationDbContext.WorkOrder
-                   .Include(cf => cf.WorkOrderItems)
-                   .Include(cf => cf.WorkOrderActivities)                   
-                   .Include(cf => cf.WorkOrderTechnicians)
-                   .Include(cf => cf.WorkOrderCheckLists)
-                   .FirstOrDefaultAsync(u => u.Id ==workOrderId);
+            var oldUnitId = _ipAddressService.GetOldUnitId();
+            var existingWorkOrder = await _applicationDbContext.WorkOrder
+                  .Include(cf => cf.WorkOrderItems)
+                  .Include(cf => cf.WorkOrderActivities)
+                  .Include(cf => cf.WorkOrderTechnicians)
+                  .Include(cf => cf.WorkOrderCheckLists)
+                  .FirstOrDefaultAsync(u => u.Id == workOrderId);
 
             if (existingWorkOrder == null)
                 return false;
-            
+
             _applicationDbContext.WorkOrderActivity.RemoveRange(
                 _applicationDbContext.WorkOrderActivity.Where(x => x.WorkOrderId == workOrderId));
 
@@ -69,38 +69,40 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 _applicationDbContext.WorkOrderCheckList.Where(x => x.WorkOrderId == workOrderId));
 
             _applicationDbContext.WorkOrderItem.RemoveRange(
-                _applicationDbContext.WorkOrderItem.Where(x => x.WorkOrderId == workOrderId));                
-        
+                _applicationDbContext.WorkOrderItem.Where(x => x.WorkOrderId == workOrderId));
+
             _applicationDbContext.WorkOrderTechnician.RemoveRange(
                 _applicationDbContext.WorkOrderTechnician.Where(x => x.WorkOrderId == workOrderId));
-        
- /*            var createdBy = existingWorkOrder.CreatedBy;
-            var createdByName = existingWorkOrder.CreatedByName;
-            var createdIP  = existingWorkOrder.CreatedIP ;
-            var createdDate  = existingWorkOrder.CreatedDate  */;
+
+            /*            var createdBy = existingWorkOrder.CreatedBy;
+                       var createdByName = existingWorkOrder.CreatedByName;
+                       var createdIP  = existingWorkOrder.CreatedIP ;
+                       var createdDate  = existingWorkOrder.CreatedDate  */
+            ;
 
 
-                // Update scalar fields
+            // Update scalar fields
             //_applicationDbContext.Entry(existingWorkOrder).CurrentValues.SetValues(workOrder);
-  /*           existingWorkOrder.CreatedBy = createdBy;
-            existingWorkOrder.CreatedByName = createdByName;
-            existingWorkOrder.CreatedIP = createdIP;           
-            existingWorkOrder.CreatedDate = createdDate;     */ 
+            /*           existingWorkOrder.CreatedBy = createdBy;
+                      existingWorkOrder.CreatedByName = createdByName;
+                      existingWorkOrder.CreatedIP = createdIP;           
+                      existingWorkOrder.CreatedDate = createdDate;     */
 
             existingWorkOrder.DowntimeStart = workOrder.DowntimeStart;
             existingWorkOrder.DowntimeEnd = workOrder.DowntimeEnd;
             existingWorkOrder.Image = workOrder.Image;
-            existingWorkOrder.Remarks = workOrder.Remarks;            
-            existingWorkOrder.StatusId = workOrder.StatusId;            
-            existingWorkOrder.RootCauseId = workOrder.RootCauseId;   
+            existingWorkOrder.Remarks = workOrder.Remarks;
+            existingWorkOrder.StatusId = workOrder.StatusId;
+            existingWorkOrder.RootCauseId = workOrder.RootCauseId;
 
             _applicationDbContext.WorkOrder.Update(existingWorkOrder);
 
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderActivities ?? []);
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderItems ?? []);
+            
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderTechnicians ?? []);
-            await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderCheckLists ?? []);   
-            var result= await _applicationDbContext.SaveChangesAsync();         
+            await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderCheckLists ?? []);
+            var result = await _applicationDbContext.SaveChangesAsync();
 
             int docSerialNumber = 1;
             foreach (var item in workOrder.WorkOrderItems ?? [])
@@ -108,12 +110,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 if ((item.UsedQty > 0) || (item.ToSubStoreQty > 0) || (item.ScarpQty > 0))
                 {
                     var parameters = new DynamicParameters();
-                    parameters.Add("@OldUnitCode", oldUnitId);                                        
+                    parameters.Add("@OldUnitCode", oldUnitId);
                     parameters.Add("@DocNo", workOrder.Id);
-                    parameters.Add("@DocSNo", docSerialNumber);                    
+                    parameters.Add("@DocSNo", docSerialNumber);
                     parameters.Add("@ItemCode", item.OldItemCode);
-                    parameters.Add("@ItemName", item.ItemName);                    
-                    parameters.Add("@UsedQty", item.UsedQty);                    
+                    parameters.Add("@ItemName", item.ItemName);
+                    parameters.Add("@UsedQty", item.UsedQty);
                     parameters.Add("@SubStoreQty", item.ToSubStoreQty);
                     parameters.Add("@ScrapQty", item.ScarpQty);
                     parameters.Add("@Rate", item.Rate);
@@ -122,21 +124,22 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                         "usp_InsertStockLedger",  // your stored procedure name
                         parameters,
                         commandType: CommandType.StoredProcedure
-                    );                     
+                    );
                 }
                 string tempItemFilePath = item.Image;
-                if (tempItemFilePath != null){
-                    string baseDirectory =await GetBaseDirectoryItemAsync();
+                if (tempItemFilePath != null)
+                {
+                    string baseDirectory = await GetBaseDirectoryItemAsync();
 
                     var (companyName, unitName) = await GetCompanyUnitAsync(workOrder.CompanyId, workOrder.UnitId);
-                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);       
+                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory, companyName, unitName);
 
                     //string companyFolder = Path.Combine(uploadPath, companyName.Trim());
                     //EnsureDirectoryExists(companyFolder);              
                     //string unitFolder = Path.Combine(companyFolder,unitName.Trim());
                     //EnsureDirectoryExists(companyFolder); 
-                    string filePath = Path.Combine(uploadPath, tempItemFilePath);  
-                    EnsureDirectoryExists(Path.GetDirectoryName(filePath));      
+                    string filePath = Path.Combine(uploadPath, tempItemFilePath);
+                    EnsureDirectoryExists(Path.GetDirectoryName(filePath));
 
                     if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
                     {
@@ -144,7 +147,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                         string newFileName = $"{workOrder.WorkOrderDocNo}-{docSerialNumber}{Path.GetExtension(tempItemFilePath)}";
                         string newFilePath = Path.Combine(directory, newFileName);
 
-                        try 
+                        try
                         {
                             File.Move(filePath, newFilePath);
                             //assetEntity.AssetImage = newFileName;
@@ -157,7 +160,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                     }
                 }
                 docSerialNumber++;
-            }       
+            }
             // ✅ Update TotalManPower and TotalSpentHours if status is "Closed"
             var closedStatusId = await _applicationDbContext.MiscMaster
                 .Where(x => x.Code == MiscEnumEntity.MaintenanceStatusUpdate.Code)
@@ -172,22 +175,22 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 existingWorkOrder.TotalManPower = technicianCount;
                 existingWorkOrder.TotalSpentHours = (decimal?)Math.Round(totalHours, 2);
 
-                  // 🔥 Publish event for next scheduler creation
-               /*  if (workOrder.PreventiveScheduleId.HasValue)
-                {
-                    var correlationId = Guid.NewGuid();
-                    await  _publishEndpoint.Publish (new WorkOrderClosedEvent
-                    {
-                        CorrelationId = correlationId, 
-                        PreventiveSchedulerDetailId =workOrder.PreventiveScheduleId.Value,
-                        WorkOrderId = workOrder.Id
-                    });
-                }                 */
-            }               
+                // 🔥 Publish event for next scheduler creation
+                /*  if (workOrder.PreventiveScheduleId.HasValue)
+                 {
+                     var correlationId = Guid.NewGuid();
+                     await  _publishEndpoint.Publish (new WorkOrderClosedEvent
+                     {
+                         CorrelationId = correlationId, 
+                         PreventiveSchedulerDetailId =workOrder.PreventiveScheduleId.Value,
+                         WorkOrderId = workOrder.Id
+                     });
+                 }                 */
+            }
 
-            return result> 0;
+            return result > 0;
         }
-         private void EnsureDirectoryExists(string path)
+        private void EnsureDirectoryExists(string path)
         {
             if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
             {
@@ -202,11 +205,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 WHERE MiscTypeCode='WOItemImage'  
                 AND IsDeleted=0
             ";
-             var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
-            return result;               
-        }  
-        
-        public async Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId,int unitId)
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
+            return result;
+        }
+
+        public async Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId, int unitId)
         {
             const string query = @"
                 SELECT CompanyName 
@@ -223,7 +226,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             var unitName = (await multiQuery.ReadFirstOrDefaultAsync<string>())?.Trim();
 
             return (companyName, unitName);
-        }    
+        }
         public async Task<bool> RemoveWOImageReferenceAsync(int workOrderId)
         {
             var asset = await _applicationDbContext.WorkOrder.FindAsync(workOrderId);
@@ -238,24 +241,24 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         }
 
         public async Task<int> CreateScheduleAsync(int workOrderId, Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule workOrderSchedule)
-        {       
+        {
             await _applicationDbContext.WorkOrderSchedule.AddAsync(workOrderSchedule);
             await _applicationDbContext.SaveChangesAsync();
 
             // Check if this is the only schedule for the given WorkOrderId
             var existingScheduleCount = await _applicationDbContext.WorkOrderSchedule
-                .CountAsync(ws => ws.WorkOrderId == workOrderId);           
+                .CountAsync(ws => ws.WorkOrderId == workOrderId);
             // If it's the first schedule, update MaintenanceRequest status
             if (existingScheduleCount == 1)
             {
-                var workOrder  = await _applicationDbContext.WorkOrder
-                .FirstOrDefaultAsync(wo  => wo.Id == workOrderId);
+                var workOrder = await _applicationDbContext.WorkOrder
+                .FirstOrDefaultAsync(wo => wo.Id == workOrderId);
 
-                var status  = await _applicationDbContext.MiscMaster
+                var status = await _applicationDbContext.MiscMaster
                 .FirstOrDefaultAsync(mm => mm.Code == MiscEnumEntity.GetStatusId.Status);
 
 
-                workOrder.StatusId =status.Id; // Start work
+                workOrder.StatusId = status.Id; // Start work
                 _applicationDbContext.WorkOrder.Update(workOrder);
                 await _applicationDbContext.SaveChangesAsync();
 
@@ -264,15 +267,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
                 if (maintenanceRequest != null)
                 {
-                    maintenanceRequest.RequestStatusId =status.Id; // Start work
+                    maintenanceRequest.RequestStatusId = status.Id; // Start work
                     _applicationDbContext.MaintenanceRequest.Update(maintenanceRequest);
                     await _applicationDbContext.SaveChangesAsync();
                 }
             }
-            return workOrderSchedule.Id;                       
+            return workOrderSchedule.Id;
         }
         public async Task<bool> UpdateScheduleAsync(int workOrderId, Core.Domain.Entities.WorkOrderMaster.WorkOrderSchedule workOrderSchedule)
-        {           
+        {
             //var existingWO =await _applicationDbContext.WorkOrderSchedule.FirstOrDefaultAsync(m =>m.WorkOrderId == workOrderId);
             var existingWO = await _applicationDbContext.WorkOrderSchedule
                 .Where(m => m.WorkOrderId == workOrderId)
@@ -281,25 +284,25 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             if (existingWO != null)
             {
                 existingWO.EndTime = workOrderSchedule.EndTime;
-                existingWO.IsCompleted=workOrderSchedule.IsCompleted;
-                existingWO.StatusId=workOrderSchedule.StatusId;
+                existingWO.IsCompleted = workOrderSchedule.IsCompleted;
+                existingWO.StatusId = workOrderSchedule.StatusId;
                 _applicationDbContext.WorkOrderSchedule.Update(existingWO);
                 return await _applicationDbContext.SaveChangesAsync() > 0;
             }
-           return false;                    
+            return false;
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> GetByIdAsync(int workOrderId)
         {
-           return await _applicationDbContext.WorkOrder
-                     .FirstOrDefaultAsync(x => x.Id == workOrderId);
+            return await _applicationDbContext.WorkOrder
+                      .FirstOrDefaultAsync(x => x.Id == workOrderId);
         }
         public async Task<bool> UpdateWOImageAsync(int workOrderId, string imageName)
         {
             var workOrder = await _applicationDbContext.WorkOrder.FindAsync(workOrderId);
             if (workOrder == null)
             {
-                return false;  
-            }          
+                return false;
+            }
             workOrder.Image = imageName;
             await _applicationDbContext.SaveChangesAsync();
             return true;
@@ -309,8 +312,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             var workOrder = await _applicationDbContext.WorkOrder.FirstOrDefaultAsync(x => x.Image == imageName);
             if (workOrder == null)
             {
-                return false;  
-            }          
+                return false;
+            }
             workOrder.Image = "";
             await _applicationDbContext.SaveChangesAsync();
             return true;
@@ -320,8 +323,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             var workOrder = await _applicationDbContext.WorkOrderItem.FindAsync(workOrderId);
             if (workOrder == null)
             {
-                return false;  
-            }          
+                return false;
+            }
             workOrder.Image = imageName;
             await _applicationDbContext.SaveChangesAsync();
             return true;
@@ -331,8 +334,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             var workOrder = await _applicationDbContext.WorkOrderItem.FirstOrDefaultAsync(x => x.Image == imageName);
             if (workOrder == null)
             {
-                return false;  
-            }          
+                return false;
+            }
             workOrder.Image = "";
             await _applicationDbContext.SaveChangesAsync();
             return true;
@@ -358,7 +361,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             .Select(x => x.Id)
             .FirstOrDefaultAsync();
 
-            workOrder.StatusId = openStatusId; 
+            workOrder.StatusId = openStatusId;
             workOrder.ModifiedDate = DateTime.UtcNow;
 
             _applicationDbContext.WorkOrder.Update(workOrder);
@@ -366,6 +369,29 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
             _logger.LogInformation("✅ Work order status reverted for ID: {id}", workOrderId);
             return true;
-        }                      
+        }
+
+        public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreatePreventiveAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, int companyId, int unitId, CancellationToken cancellationToken)
+        {
+            var entry = _applicationDbContext.Entry(workOrder);
+            workOrder.WorkOrderDocNo = await GetLatestPreventiveDocNo(requestTypeId,companyId,unitId);
+            await _applicationDbContext.WorkOrder.AddAsync(workOrder);
+            await _applicationDbContext.SaveChangesAsync();
+            return workOrder;
+        }
+         public async Task<string?> GetLatestPreventiveDocNo(int TypeId,int companyId,int unitId)
+        {
+                      
+            var parameters = new DynamicParameters();
+            parameters.Add("@CompanyId", companyId);
+            parameters.Add("@UnitId", unitId);
+            parameters.Add("@TypeId", TypeId);
+            var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
+                "dbo.Usp_GetWorkOrderDocNo", 
+                parameters, 
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 120);
+            return newAssetCode; 
+        }
     }
 }

@@ -33,7 +33,12 @@ namespace Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder
         public async Task<ApiResponseDTO<bool>> Handle(ScheduleWorkOrderCommand request, CancellationToken cancellationToken)
         {
             var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode,StatusOpen.Code);
-            var scheduledetail = await _preventiveSchedulerQuery.GetWorkOrderScheduleDetailById(request.PreventiveScheduleId);
+         //   var ExistItems = await _preventiveSchedulerQuery.ExistPreventivescheduleItem(request.PreventiveScheduleId);
+           // var scheduledetail;
+           
+                 var scheduledetail = await _preventiveSchedulerQuery.GetWorkOrderScheduleDetailById(request.PreventiveScheduleId);
+            
+            
 
              
                 
@@ -47,7 +52,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder
                         workOrderRequest.CreatedDate=DateTime.Now;
                         workOrderRequest.CreatedIP="192.168";
                         
-                        var response = await _workOrderRepository.CreateAsync(workOrderRequest,scheduledetail.MaintenanceCategoryId, cancellationToken);
+                        var response = await _workOrderRepository.CreatePreventiveAsync(workOrderRequest,scheduledetail.MaintenanceCategoryId,scheduledetail.CompanyId,scheduledetail.UnitId, cancellationToken);
                         if (response.Id == 0)
                         {
                              return new ApiResponseDTO<bool>

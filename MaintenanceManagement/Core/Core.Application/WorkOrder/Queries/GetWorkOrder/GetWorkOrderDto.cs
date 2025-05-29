@@ -12,6 +12,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
         public int Id { get; set; }                   
         public string? WorkOrderDocNo { get; set; }
         public string? Department { get; set; }
+        public int DepartmentId { get; set; }        
         public string? Machine { get; set; }
         public string? RequestDate { get; set; }
         public string? RequestType { get; set; }
@@ -20,6 +21,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
         public int RequestId { get; set; }
         public string? MachineName { get; set; }
         public string? ScheduleStatus { get; set; }
+        public string? DueDate { get; set; }
         public List<ScheduleDto> Schedules { get; set; } = new();
     }
 }

@@ -2,6 +2,7 @@
 using System.Data;
 using System.Text.Json;
 using Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecification;
+using Core.Application.AssetMaster.AssetSpecification.Queries.GetAssetSpecificationBasedMachineNo;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetSpecification;
 using Dapper;
 
@@ -89,6 +90,46 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
 
         return (assetDictionary.Values.ToList(), totalRecords);
     }
+
+        public async Task<(List<AssetSpecBasedOnMachineNoDto>, int)> GetAssetSpecBasedOnMachineNos(int PageNumber, int PageSize, string? SearchTerm)
+        {
+            var query = $$"""
+                DECLARE @TotalCount INT;
+
+                SELECT @TotalCount = COUNT(*)
+                FROM FixedAsset.SpecificationMaster A
+                INNER JOIN FixedAsset.AssetSpecifications B ON A.Id = B.SpecificationId
+                LEFT JOIN FixedAsset.AssetPurchaseDetails C ON B.AssetId = C.AssetId
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (A.SpecificationName LIKE @Search OR CAST(B.AssetId AS VARCHAR) LIKE @Search)")}};
+                
+                SELECT 
+                    B.AssetId,
+                    A.SpecificationName,
+                    B.SpecificationValue,
+                    C.CapitalizationDate
+                FROM FixedAsset.SpecificationMaster A
+                INNER JOIN FixedAsset.AssetSpecifications B ON A.Id = B.SpecificationId
+                LEFT JOIN FixedAsset.AssetPurchaseDetails C ON B.AssetId = C.AssetId
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (A.SpecificationName LIKE @Search OR CAST(B.AssetId AS VARCHAR) LIKE @Search)")}}
+                ORDER BY B.AssetId DESC
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+                SELECT @TotalCount AS TotalCount;
+            """;
+
+            var parameters = new
+            {
+                Search = $"%{SearchTerm}%",
+                Offset = (PageNumber - 1) * PageSize,
+                PageSize
+            };
+
+            var result = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var list = (await result.ReadAsync<AssetSpecBasedOnMachineNoDto>()).ToList();
+            int totalCount = await result.ReadFirstAsync<int>();
+
+            return (list, totalCount);
+        }
 
         public async Task<List<AssetSpecificationJsonDto>> GetByAssetSpecificationNameAsync(string searchPattern)
         {
@@ -203,7 +244,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
         public async Task<bool> SoftDeleteValidation(int Id)
         {
             const string query = @"
-                SELECT 1 AM.Id
+                SELECT  AM.Id
                 FROM FixedAsset.AssetMaster AM
                 inner join  FixedAsset.AssetSpecifications AP on AP.AssetId = AM.Id
                 WHERE AP.Id = @Id AND   AM.IsDeleted = 0;";        
@@ -211,5 +252,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetSpecification
             var warrantyExists = await multi.ReadFirstOrDefaultAsync<int?>();          
             return warrantyExists.HasValue ;
         }
+
+        
     }
 }

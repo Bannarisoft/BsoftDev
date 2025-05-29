@@ -52,7 +52,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 parameters,
                 commandType: CommandType.StoredProcedure
             );
-
             return result.ToList();
         }
 
@@ -69,18 +68,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 "dbo.Rpt_WorkOrderReport", 
                 parameters, 
                 commandType: CommandType.StoredProcedure,
-                commandTimeout: 120);
-                
+                commandTimeout: 120);                
             return result.ToList(); 
         }
 
-        public async Task<List<WorkOrderIssueDto>> GetItemConsumptionAsync(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate, int maintenanceTypeId)
+        public async Task<List<WorkOrderIssueDto>> GetItemConsumptionAsync(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@FromDate", IssueFromDate);
             parameters.Add("@ToDate", IssueToDate);
             parameters.Add("@UnitId", UnitId);
-            parameters.Add("@MaintenanceTypeId", maintenanceTypeId);
+           
 
             var result = await _dbConnection.QueryAsync<WorkOrderIssueDto>(
                 "GetItemConsumptionDetails",
@@ -192,19 +190,19 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
         {
             var query = $$"""
 
-                Select PSH.DepartmentId,MG.GroupName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
+                Select PSH.DepartmentId,PSH.PreventiveSchedulerName,MG.GroupName,MM.MachineName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
                 Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,PSD.LastMaintenanceActivityDate from [Maintenance].[PreventiveSchedulerHeader] PSH
                 Inner Join [Maintenance].[MachineGroup] MG ON PSH.MachineGroupId=MG.Id
                 Inner Join [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
                 Inner Join [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId=PSH.Id
-                Inner Join [Maintenance].[MachineMaster] MM ON MM.MachineGroupId=MG.Id
+                Inner Join [Maintenance].[MachineMaster] MM ON MM.Id=PSD.MachineId
                 Inner Join [Maintenance].[MiscMaster] MISC ON MISC.Id=PSH.MaintenanceCategoryId
                 Inner Join [Maintenance].[ActivityMaster] A ON A.Id=PSA.ActivityId
                 Inner Join [Maintenance].[MiscMaster] ActivityType ON ActivityType.Id=A.ActivityType
                 WHERE PSH.IsDeleted=0 AND PSD.IsActive=1
                 {{(FromDueDate.HasValue ? "AND PSD.ActualWorkOrderDate >= @FromDueDate" : "")}}
                 {{(ToDueDate.HasValue ? "AND PSD.ActualWorkOrderDate <= @ToDueDate" : "")}}
-                group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate,PSD.LastMaintenanceActivityDate 
+                group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate,PSD.LastMaintenanceActivityDate,MM.MachineName,PSH.PreventiveSchedulerName 
                 
                 ORDER BY PSH.Id desc
             """;

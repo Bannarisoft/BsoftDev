@@ -9,6 +9,7 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Domain.Entities;
+using Hangfire;
 using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using static Core.Domain.Common.BaseEntity;
@@ -59,7 +60,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var PreventiveSchedulerToDelete = await _applicationDbContext.PreventiveSchedulerHdr.FirstOrDefaultAsync(u => u.Id == id);
             if (PreventiveSchedulerToDelete != null)
             {
-                PreventiveSchedulerToDelete.IsDeleted = preventiveSchedulerHdr.IsDeleted;
+                PreventiveSchedulerToDelete.IsDeleted = IsDelete.Deleted;
                 return await _applicationDbContext.SaveChangesAsync() > 0;
             }
             return false;
@@ -168,50 +169,57 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 u.IsActive == Status.Active &&
                 u.IsDeleted == IsDelete.NotDeleted);
 
-
+            
             if (existingPreventiveScheduler != null)
             {
                 DateTimeOffset? lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(existingPreventiveScheduler.MachineId, existingPreventiveScheduler.PreventiveSchedulerHeaderId, WOStatus.MiscCode, MaintenanceStatusUpdate.Code);
 
                 var headerInfo = await _preventiveSchedulerQuery.GetByIdAsync(existingPreventiveScheduler.PreventiveSchedulerHeaderId);
-                var miscdetail = await _miscMasterQueryRepository.GetByIdAsync(headerInfo.FrequencyUnitId);
-                if (lastMaintenanceDate == null)
-                    throw new Exception("Last maintenance date is null, cannot proceed.");
-
-                //   DateTime validDate = lastMaintenanceDate;
-                var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(lastMaintenanceDate.Value.DateTime, headerInfo.FrequencyInterval, miscdetail.Code ?? "", headerInfo.ReminderWorkOrderDays);
-                var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(lastMaintenanceDate.Value.DateTime, headerInfo.FrequencyInterval, miscdetail.Code ?? "", headerInfo.ReminderMaterialReqDays);
-
-                //   var details = _mapper.Map<PreventiveSchedulerDetail>(existingPreventiveScheduler);
-
-                existingPreventiveScheduler.IsActive = Status.Inactive;
-                _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
-
-                existingPreventiveScheduler.Id = 0;
-                existingPreventiveScheduler.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
-                existingPreventiveScheduler.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
-                existingPreventiveScheduler.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
-                existingPreventiveScheduler.LastMaintenanceActivityDate = DateOnly.FromDateTime(lastMaintenanceDate.Value.DateTime);
-
-
-
-                await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(existingPreventiveScheduler);
-                await _applicationDbContext.SaveChangesAsync();
-                var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
-                string newJobId;
-                var delayInMinutes = (int)delay.TotalMinutes;
-
-                if (delay.TotalSeconds > 0)
-                {
-                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id, delayInMinutes);
-                }
-                else
+                var frequencytype = await _miscMasterQueryRepository.GetByIdAsync(headerInfo.FrequencyTypeId);
+                if (frequencytype.Code != FrequencyType.Code)
                 {
 
-                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id, 5);
+                    var miscdetail = await _miscMasterQueryRepository.GetByIdAsync(headerInfo.FrequencyUnitId);
+                    if (lastMaintenanceDate == null)
+                        throw new Exception("Last maintenance date is null, cannot proceed.");
+
+                    //   DateTime validDate = lastMaintenanceDate;
+                    var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(lastMaintenanceDate.Value.DateTime, headerInfo.FrequencyInterval, miscdetail.Code ?? "", headerInfo.ReminderWorkOrderDays);
+                    var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(lastMaintenanceDate.Value.DateTime, headerInfo.FrequencyInterval, miscdetail.Code ?? "", headerInfo.ReminderMaterialReqDays);
+
+                    //   var details = _mapper.Map<PreventiveSchedulerDetail>(existingPreventiveScheduler);
+
+                    existingPreventiveScheduler.IsActive = Status.Inactive;
+                    _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
+
+                    existingPreventiveScheduler.Id = 0;
+                    existingPreventiveScheduler.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
+                    existingPreventiveScheduler.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
+                    existingPreventiveScheduler.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
+                    existingPreventiveScheduler.LastMaintenanceActivityDate = DateOnly.FromDateTime(lastMaintenanceDate.Value.DateTime);
+                    existingPreventiveScheduler.IsActive = Status.Active;
+                    existingPreventiveScheduler.IsDeleted = IsDelete.NotDeleted;
+
+
+
+                    await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(existingPreventiveScheduler);
+                    await _applicationDbContext.SaveChangesAsync();
+                    var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
+                    string newJobId;
+                    var delayInMinutes = (int)delay.TotalMinutes;
+
+                    if (delay.TotalSeconds > 0)
+                    {
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id, delayInMinutes);
+                    }
+                    else
+                    {
+
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id, 5);
+                    }
                 }
                 // await _preventiveSchedulerCommand.UpdateDetailAsync(existingPreventiveScheduler.Id,newJobId);
-                return true;
+                    return true;
             }
 
 
@@ -259,17 +267,35 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 
                   existingPreventiveScheduler.IsActive = Status.Inactive;
                 _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
+                
+                
 
-                existingPreventiveScheduler.Id = 0;
-                existingPreventiveScheduler.WorkOrderCreationStartDate = RescheduleDate;
-                existingPreventiveScheduler.ActualWorkOrderDate = RescheduleDate;
-                existingPreventiveScheduler.LastMaintenanceActivityDate = null;
+                 var newScheduler = new PreventiveSchedulerDetail
+                 {
+                     PreventiveSchedulerHeaderId = existingPreventiveScheduler.PreventiveSchedulerHeaderId,
+                     WorkOrderCreationStartDate = RescheduleDate,
+                     ActualWorkOrderDate = RescheduleDate,
+                     LastMaintenanceActivityDate = null,
+                     IsActive = Status.Active,
+                     PreventiveScheduler = existingPreventiveScheduler.PreventiveScheduler,
+                     MachineId =existingPreventiveScheduler.MachineId,
+                     Machine =  existingPreventiveScheduler.Machine
+                    
+                 };
+
+                // existingPreventiveScheduler.Id = 0;
+                // existingPreventiveScheduler.WorkOrderCreationStartDate = RescheduleDate;
+                // existingPreventiveScheduler.ActualWorkOrderDate = RescheduleDate;
+                // existingPreventiveScheduler.LastMaintenanceActivityDate = null;
+                // existingPreventiveScheduler.IsActive = Status.Active;
 
 
 
-                await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(existingPreventiveScheduler);
+                await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(newScheduler);
                 await _applicationDbContext.SaveChangesAsync();
-                var delay = existingPreventiveScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
+
+                _backgroundServiceClient.RemoveHangFireJob(existingPreventiveScheduler.HangfireJobId);
+                var delay = newScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
                 string newJobId;
                 var delayInMinutes = (int)delay.TotalMinutes;
 
@@ -289,5 +315,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             return false;
         }
+
     }
 }

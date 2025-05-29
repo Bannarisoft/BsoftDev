@@ -8,6 +8,7 @@ using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Domain.Entities;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Migrations;
+using static Core.Domain.Common.MiscEnumEntity;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 {
@@ -15,45 +16,46 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
     {
         private readonly IDbConnection _dbConnection;
         private readonly IIPAddressService _ipAddressService;
-        public PreventiveSchedulerQueryRepository(IDbConnection dbConnection,IIPAddressService iPAddressService)
+        public PreventiveSchedulerQueryRepository(IDbConnection dbConnection, IIPAddressService iPAddressService)
         {
             _dbConnection = dbConnection;
             _ipAddressService = iPAddressService;
         }
-        public async Task<bool> AlreadyExistsAsync(int activityId,int machinegroupId,int? id = null)
+        public async Task<bool> AlreadyExistsAsync(int activityId, int machinegroupId, int? id = null)
         {
             var query = @"
                     SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] PSH
                  INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId = PSH.Id
                    WHERE PSA.ActivityId = @ActivityId AND PSH.MachineGroupId =@MachineGroupId   AND PSH.IsDeleted = 0";
-                var parameters = new DynamicParameters(new { ActivityId = activityId, MachineGroupId =machinegroupId });
+            var parameters = new DynamicParameters(new { ActivityId = activityId, MachineGroupId = machinegroupId });
 
-             if (id is not null)
-             {
-                 query += " AND PSH.Id != @Id";
-                 parameters.Add("Id", id);
-             }
-                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
-                return count > 0;
+            if (id is not null)
+            {
+                query += " AND PSH.Id != @Id";
+                parameters.Add("Id", id);
+            }
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+            return count > 0;
         }
 
         public async Task<(DateTime nextDate, DateTime reminderDate)> CalculateNextScheduleDate(DateTime startDate, int interval, string unit, int reminderDays)
         {
-             DateTime nextDate = unit.ToLower() switch
-              {
-                  "days" => startDate.AddDays(interval),
-                  "months" => startDate.AddMonths(interval),
-                  "years" => startDate.AddYears(interval),
-                  _ => throw new ArgumentException("Unsupported frequency unit.")
-              };
-               DateTime reminderDate = nextDate.AddDays(-reminderDays);
+            DateTime nextDate = unit.ToLower() switch
+            {
+                "days" => startDate.AddDays(interval),
+                "months" => startDate.AddMonths(interval),
+                "years" => startDate.AddYears(interval),
+                _ => throw new ArgumentException("Unsupported frequency unit.")
+            };
+            DateTime reminderDate = nextDate.AddDays(-reminderDays);
 
             return (nextDate, reminderDate);
         }
 
         public async Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-           var query = $@"
+            var UnitId = _ipAddressService.GetUnitId();
+            var query = $@"
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
                 FROM [Maintenance].[PreventiveSchedulerHeader] PS
@@ -62,13 +64,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
-                WHERE PS.IsDeleted = 0
+                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId
                 {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")};
 
                 SELECT  
                     PS.Id,
                     PS.DepartmentId,
                     PS.FrequencyInterval,
+                    PS.PreventiveSchedulerName,
                     PS.EffectiveDate,
                     PS.GraceDays,
                     PS.ReminderWorkOrderDays,
@@ -100,7 +103,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
-                WHERE PS.IsDeleted = 0
+                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId
                 {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")}
                 ORDER BY PS.Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -112,7 +115,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             {
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize = PageSize
+                PageSize = PageSize,
+                UnitId
             };
 
             using var multi = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -127,6 +131,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             const string query = @"
             SELECT  
                     PS.Id,
+                    PS.PreventiveSchedulerName,
                     PS.MachineGroupId,
                     PS.DepartmentId,
                     PS.MaintenanceCategoryId,
@@ -156,28 +161,30 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 WHERE PS.IsDeleted = 0 AND PS.Id = @Id";
             var PreventiveSchedulerDictionary = new Dictionary<int, PreventiveSchedulerHeader>();
 
-    var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader,PreventiveSchedulerActivity,PreventiveSchedulerItems, PreventiveSchedulerHeader>(
-        query,
-        (preventiveScheduler, preventiveSchedulerActivity, preventiveSchedulerItems) =>
-        {
-            if (!PreventiveSchedulerDictionary.TryGetValue(preventiveScheduler.Id, out var existingPreventiveScheduler))
-            {
-                existingPreventiveScheduler = preventiveScheduler;
-                existingPreventiveScheduler.PreventiveSchedulerActivities = new List<PreventiveSchedulerActivity>();
-                existingPreventiveScheduler.PreventiveSchedulerItems = new List<PreventiveSchedulerItems>();
-                PreventiveSchedulerDictionary[preventiveScheduler.Id] = existingPreventiveScheduler;
-            }
+            var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader, PreventiveSchedulerActivity, PreventiveSchedulerItems, PreventiveSchedulerHeader>(
+                query,
+                (preventiveScheduler, preventiveSchedulerActivity, preventiveSchedulerItems) =>
+                {
+                    if (!PreventiveSchedulerDictionary.TryGetValue(preventiveScheduler.Id, out var existingPreventiveScheduler))
+                    {
+                        existingPreventiveScheduler = preventiveScheduler;
+                        existingPreventiveScheduler.PreventiveSchedulerActivities = new List<PreventiveSchedulerActivity>();
+                        existingPreventiveScheduler.PreventiveSchedulerItems = new List<PreventiveSchedulerItems>();
+                        PreventiveSchedulerDictionary[preventiveScheduler.Id] = existingPreventiveScheduler;
+                    }
 
-                existingPreventiveScheduler.PreventiveSchedulerActivities!.Add(preventiveSchedulerActivity);
-          
-                existingPreventiveScheduler.PreventiveSchedulerItems!.Add(preventiveSchedulerItems);
-            
+                    existingPreventiveScheduler.PreventiveSchedulerActivities!.Add(preventiveSchedulerActivity);
+                    if (preventiveSchedulerItems != null && preventiveSchedulerItems.OldItemId != null)
+                    {
+                        existingPreventiveScheduler.PreventiveSchedulerItems!.Add(preventiveSchedulerItems);
+                    }
 
-            return existingPreventiveScheduler;
-        },
-        new { id },
-        splitOn: "Id,Id" 
-        );
+
+                    return existingPreventiveScheduler;
+                },
+                new { id },
+                splitOn: "Id,Id"
+                );
 
             return PreventiveSchedulerResponse.FirstOrDefault()!;
         }
@@ -208,23 +215,23 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 PreventiveSchedulerId = PreventiveSchedulerId
             };
             var result = await _dbConnection.QueryAsync<PreventiveSchedulerDetail>(query, parameters);
-            
+
             return result.ToList();
         }
 
         public async Task<bool> NotFoundAsync(int id)
         {
             var query = "SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] WHERE Id = @Id AND IsDeleted = 0";
-             
-                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
-                return count > 0;
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+            return count > 0;
         }
 
         public Task<bool> SoftDeleteValidation(int Id)
         {
             throw new NotImplementedException();
         }
-       public async Task<DateTimeOffset?> GetLastMaintenanceDateAsync(int machineId,int PreventiveSchedulerId,string miscType,string misccode)
+        public async Task<DateTimeOffset?> GetLastMaintenanceDateAsync(int machineId, int PreventiveSchedulerId, string miscType, string misccode)
         {
             const string query = @"
                  SELECT MAX(WS.EndTime) AS EndTime   FROM [Maintenance].[WorkOrder] W
@@ -240,16 +247,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 MachineId = machineId,
                 StatusTypeCode = miscType,
                 StatusCode = misccode,
-                PreventiveSchedulerId =PreventiveSchedulerId
+                PreventiveSchedulerId = PreventiveSchedulerId
             };
 
             var result = await _dbConnection.QueryFirstOrDefaultAsync<DateTimeOffset?>(query, parameters);
             return result;
         }
 
-            public async Task<PreventiveSchedulerDetail> GetPreventiveSchedulerDetailById(int Id)
-           {
-               var query = $@"
+        public async Task<PreventiveSchedulerDetail> GetPreventiveSchedulerDetailById(int Id)
+        {
+            var query = $@"
                    SELECT  
                        Id,
                        PreventiveSchedulerId,
@@ -262,65 +269,77 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                        
                    FROM [Maintenance].[PreventiveSchedulerDetail] WHERE Id =@Id AND IsDeleted = 0
                ";
-    
-               var parameters = new
-               {
-                   Id = Id
-               };
-               var result = await _dbConnection.QueryFirstOrDefaultAsync<PreventiveSchedulerDetail>(query, parameters);
-               
-               return result;
-           }
-             public async Task<bool> UpdateValidation(int id)
-             {
-                 var query = @"SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] PSH
+
+            var parameters = new
+            {
+                Id = Id
+            };
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<PreventiveSchedulerDetail>(query, parameters);
+
+            return result;
+        }
+        public async Task<bool> UpdateValidation(int id)
+        {
+            var query = @"SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] PSH
                  INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
                 INNER JOIN [Maintenance].[WorkOrder] W ON W.PreventiveScheduleId =PSD.Id
                   WHERE PSH.Id = @Id AND PSH.IsDeleted = 0";
 
-                     var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
-                     return count > 0;
-             }
-               public async Task<IEnumerable<dynamic>> GetAbstractSchedulerByDate()
-                {
-                       var query = $@"
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+            return count > 0;
+        }
+        public async Task<IEnumerable<dynamic>> GetAbstractSchedulerByDate()
+        {
+            var UnitId = _ipAddressService.GetUnitId();
+            var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status };
+            var query = $@"
                             SELECT  
                                 COUNT(PSD.MachineId) AS TotalScheduleCount,Cast(PSD.ActualWorkOrderDate as varchar) AS ScheduleDate
                             FROM [Maintenance].[PreventiveSchedulerHeader] PS
                             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
-                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 
+							LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
+							LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
+                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PS.UnitId=@UnitId AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)
+                            AND PSD.IsActive=1
                             GROUP BY PSD.ActualWorkOrderDate
                             ORDER BY PSD.ActualWorkOrderDate ASC
                         ";
-                         using var multi = await _dbConnection.QueryMultipleAsync(query);
-                        var preventiveSchedulers = await multi.ReadAsync<dynamic>();
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { UnitId, StatusCodes = statusCodes });
+            var preventiveSchedulers = await multi.ReadAsync<dynamic>();
 
-                        return preventiveSchedulers;
-                }
-                 public async Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate)
-                {
-                       var query = $@"
+            return preventiveSchedulers;
+        }
+        public async Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate)
+        {
+            var UnitId = _ipAddressService.GetUnitId();
+            var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status };
+            var query = $@"
                             SELECT  
-                                PS.Id,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
+                                PS.Id AS HeaderId,PSD.Id AS DetailId,PS.PreventiveSchedulerName,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName
                             FROM [Maintenance].[PreventiveSchedulerHeader] PS
                             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
                             INNER JOIN [Maintenance].[MachineMaster] M ON M.Id =PSD.MachineId
                             INNER JOIN [Maintenance].[MachineGroup] MG ON MG.Id = PS.MachineGroupId
-                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PSD.ActualWorkOrderDate=@ActualWorkOrderDate
+                            LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
+							LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
+                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PSD.ActualWorkOrderDate=@ActualWorkOrderDate AND PS.UnitId=@UnitId 
+                            AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL) AND PSD.IsActive=1
                             ORDER BY PS.Id ASC
                         ";
-                        var parameters = new
-                        {
-                            ActualWorkOrderDate = schedulerDate
-                        };
-                         using var multi = await _dbConnection.QueryMultipleAsync(query,parameters);
-                        var preventiveSchedulers = await multi.ReadAsync<dynamic>();
+            var parameters = new
+            {
+                ActualWorkOrderDate = schedulerDate,
+                UnitId,
+                StatusCodes = statusCodes
+            };
+            using var multi = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var preventiveSchedulers = await multi.ReadAsync<dynamic>();
 
-                        return preventiveSchedulers;
-                }
-                public async Task<PreventiveSchedulerHeader> GetWorkOrderScheduleDetailById(int Id)
-           {
-               var query = $@"
+            return preventiveSchedulers;
+        }
+        public async Task<PreventiveSchedulerHeader> GetWorkOrderScheduleDetailById(int Id)
+        {
+            var query = $@"
                     SELECT  
 						 PSH.Id,
 						PSH.CompanyId,
@@ -336,18 +355,95 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 				   WHERE PSD.Id =@Id AND PSD.IsDeleted = 0  AND PSH.IsDeleted = 0
                ";
 
+            var PreventiveSchedulerDictionary = new Dictionary<int, PreventiveSchedulerHeader>();
+
+            var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader, PreventiveSchedulerDetail, PreventiveSchedulerActivity, PreventiveSchedulerItems, PreventiveSchedulerHeader>(
+            query,
+            (preventiveScheduler, preventiveSchedulerDetail, preventiveSchedulerActivity, preventiveSchedulerItems) =>
+            {
+                if (!PreventiveSchedulerDictionary.TryGetValue(preventiveScheduler.Id, out var existingPreventiveScheduler))
+                {
+                    existingPreventiveScheduler = preventiveScheduler;
+                    existingPreventiveScheduler.PreventiveSchedulerDetails = new List<PreventiveSchedulerDetail>();
+                    existingPreventiveScheduler.PreventiveSchedulerActivities = new List<PreventiveSchedulerActivity>();
+                    existingPreventiveScheduler.PreventiveSchedulerItems = new List<PreventiveSchedulerItems>();
+                    PreventiveSchedulerDictionary[preventiveScheduler.Id] = existingPreventiveScheduler;
+                }
+
+                existingPreventiveScheduler.PreventiveSchedulerDetails!.Add(preventiveSchedulerDetail);
+
+                existingPreventiveScheduler.PreventiveSchedulerActivities!.Add(preventiveSchedulerActivity);
+                if (preventiveSchedulerItems != null && preventiveSchedulerItems.OldItemId != null)
+                {
+                    existingPreventiveScheduler.PreventiveSchedulerItems!.Add(preventiveSchedulerItems);
+                }
+
+
+                return existingPreventiveScheduler;
+            },
+            new { Id },
+            splitOn: "Id,ActivityId,OldItemId"
+            );
+
+            return PreventiveSchedulerResponse.FirstOrDefault()!;
+        }
+        public async Task<bool> MachingroupValidation(int id)
+        {
+            var UnitId = _ipAddressService.GetUnitId();
+            var query = @"SELECT COUNT(1) FROM [Maintenance].[MachineGroup] MG
+                 INNER JOIN [Maintenance].[MachineMaster] MM ON MM.MachineGroupId=MG.Id
+                  WHERE MG.Id = @Id AND MG.IsDeleted = 0 AND MM.Unitid=@UnitId";
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id, UnitId });
+            return count > 0;
+        }
+        public async Task<bool> ExistWorkOrderBySchedulerDetailId(int id)
+        {
+
+            var query = @"SELECT COUNT(1) FROM [Maintenance].[WorkOrder]
+                  WHERE PreventiveScheduleId = @Id ";
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+            return count > 0;
+        }
+
+        public async Task<bool> ExistPreventivescheduleItem(int id)
+        {
+            var query = @"SELECT COUNT(*) FROM [Maintenance].[PreventiveSchedulerDetail] PSD
+				   INNER JOIN [Maintenance].[PreventiveSchedulerItems] PSI ON PSI.PreventiveSchedulerHeaderId=PSD.PreventiveSchedulerHeaderId
+				   WHERE PSD.Id =@Id  AND PSD.IsDeleted = 0 ";
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+            return count > 0;
+        }
+
+        public async Task<PreventiveSchedulerHeader> GetWorkOrderScheduleDetailWithoutItemidById(int Id)
+        {
+            var query = $@"
+                    SELECT  
+						 PSH.Id,
+						PSH.CompanyId,
+                       PSH.UnitId,
+                       PSH.MaintenanceCategoryId,
+                       PSD.Id,
+                       PSA.ActivityId
+					   FROM [Maintenance].[PreventiveSchedulerDetail] PSD
+				   INNER JOIN [Maintenance].[PreventiveSchedulerHeader] PSH ON PSD.PreventiveSchedulerHeaderId=PSH.Id
+				   INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId=PSD.PreventiveSchedulerHeaderId
+				   WHERE PSD.Id =@Id AND PSD.IsDeleted = 0  AND PSH.IsDeleted = 0
+               ";
+
                    var PreventiveSchedulerDictionary = new Dictionary<int, PreventiveSchedulerHeader>();
 
-              var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader,PreventiveSchedulerDetail,PreventiveSchedulerActivity,PreventiveSchedulerItems, PreventiveSchedulerHeader>(
+              var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader,PreventiveSchedulerDetail,PreventiveSchedulerActivity, PreventiveSchedulerHeader>(
               query,
-              (preventiveScheduler, preventiveSchedulerDetail,preventiveSchedulerActivity, preventiveSchedulerItems) =>
+              (preventiveScheduler, preventiveSchedulerDetail,preventiveSchedulerActivity) =>
               {
                   if (!PreventiveSchedulerDictionary.TryGetValue(preventiveScheduler.Id, out var existingPreventiveScheduler))
                   {
                       existingPreventiveScheduler = preventiveScheduler;
                       existingPreventiveScheduler.PreventiveSchedulerDetails = new List<PreventiveSchedulerDetail>();
                       existingPreventiveScheduler.PreventiveSchedulerActivities = new List<PreventiveSchedulerActivity>();
-                      existingPreventiveScheduler.PreventiveSchedulerItems = new List<PreventiveSchedulerItems>();
                       PreventiveSchedulerDictionary[preventiveScheduler.Id] = existingPreventiveScheduler;
                   }
 
@@ -355,37 +451,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                       existingPreventiveScheduler.PreventiveSchedulerActivities!.Add(preventiveSchedulerActivity);
 
-                      existingPreventiveScheduler.PreventiveSchedulerItems!.Add(preventiveSchedulerItems);
-
 
                   return existingPreventiveScheduler;
               },
               new { Id },
-              splitOn: "Id,ActivityId,OldItemId" 
+              splitOn: "Id,ActivityId" 
               );
 
             return PreventiveSchedulerResponse.FirstOrDefault()!;
-           }
-            public async Task<bool> MachingroupValidation(int id)
-             {
-                var UnitId =_ipAddressService.GetUnitId();
-                 var query = @"SELECT COUNT(1) FROM [Maintenance].[MachineGroup] MG
-                 INNER JOIN [Maintenance].[MachineMaster] MM ON MM.MachineGroupId=MG.Id
-                  WHERE MG.Id = @Id AND MG.IsDeleted = 0 AND MM.Unitid=@UnitId";
-
-                     var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id,UnitId });
-                     return count > 0;
-             }
-               public async Task<bool> ExistWorkOrderBySchedulerDetailId(int id)
-             {
-                
-                 var query = @"SELECT COUNT(1) FROM [Maintenance].[WorkOrder]
-                  WHERE PreventiveScheduleId = @Id ";
-
-                     var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
-                     return count > 0;
-             }
-             
-
+        }
+        
     }
 }
