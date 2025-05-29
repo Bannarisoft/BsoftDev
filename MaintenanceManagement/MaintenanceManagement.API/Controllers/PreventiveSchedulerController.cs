@@ -251,12 +251,12 @@ namespace MaintenanceManagement.API.Controllers
             }); 
         }
           [HttpGet("SchedulerAbstractByDate")]
-        public async Task<IActionResult> GetScheduler()
+        public async Task<IActionResult> GetScheduler([FromQuery] int DepartmentId )
         {
            var response = await Mediator.Send(
             new GetSchedulerByDateQuery
             {
-
+                DepartmentId =DepartmentId
             });
            
             return Ok( new 
