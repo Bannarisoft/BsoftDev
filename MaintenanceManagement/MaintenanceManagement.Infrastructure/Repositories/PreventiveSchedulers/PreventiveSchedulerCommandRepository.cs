@@ -27,10 +27,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         private readonly IMapper _mapper;
         private readonly IIPAddressService _ipAddressService;
         private readonly IBackgroundServiceClient _backgroundServiceClient;
-        private readonly IMediator _mediator;
         // private readonly IPreventiveSchedulerCommand _preventiveSchedulerCommand;
         public PreventiveSchedulerCommandRepository(ApplicationDbContext applicationDbContext, IPreventiveSchedulerQuery preventiveSchedulerQuery, IMiscMasterQueryRepository miscMasterQueryRepository,
-        IMapper mapper, IIPAddressService ipAddressService, IBackgroundServiceClient backgroundServiceClient, IMediator mediator)
+        IMapper mapper, IIPAddressService ipAddressService, IBackgroundServiceClient backgroundServiceClient)
         {
             _applicationDbContext = applicationDbContext;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
@@ -38,7 +37,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             _mapper = mapper;
             _ipAddressService = ipAddressService;
             _backgroundServiceClient = backgroundServiceClient;
-            _mediator = mediator;
             // _preventiveSchedulerCommand = preventiveSchedulerCommand;
         }
 
@@ -274,15 +272,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
                 
                 
-                await AuditLogPublisher.PublishAuditLogAsync(
-                     _mediator,
-                     actionDetail: $"Reschedule header update",
-                     actionCode: "Reschedule",
-                     actionName: "Reschedule",
-                     module: "Preventive",
-                     requestData: existingPreventiveScheduler,
-                     cancellationToken
-                    );
+               
                  var newScheduler = new PreventiveSchedulerDetail
                  {
                      PreventiveSchedulerHeaderId = existingPreventiveScheduler.PreventiveSchedulerHeaderId,
@@ -303,15 +293,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 // existingPreventiveScheduler.LastMaintenanceActivityDate = null;
                 // existingPreventiveScheduler.IsActive = Status.Active;
 
-            await AuditLogPublisher.PublishAuditLogAsync(
-                     _mediator,
-                     actionDetail: $"Reschedule detail create",
-                     actionCode: "Reschedule",
-                     actionName: "Reschedule",
-                     module: "Preventive",
-                     requestData: newScheduler,
-                     cancellationToken
-                    );
+           
 
                 await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(newScheduler);
                 await _applicationDbContext.SaveChangesAsync();
