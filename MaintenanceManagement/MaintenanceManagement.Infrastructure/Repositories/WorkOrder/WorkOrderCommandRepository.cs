@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.Storage;
+using Core.Application.Common;
+using MediatR;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
@@ -18,14 +20,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         private readonly IDbConnection _dbConnection;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<WorkOrderCommandRepository> _logger;
+        private readonly IMediator _mediator;
 
-        public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService, IDbConnection dbConnection, IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger)
+        public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService, IDbConnection dbConnection,
+        IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger, IMediator mediator)
         {
             _applicationDbContext = applicationDbContext;
             _ipAddressService = ipAddressService;
             _dbConnection = dbConnection;
             _publishEndpoint = publishEndpoint;
             _logger = logger;
+            _mediator = mediator;
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, CancellationToken cancellationToken)
         {
@@ -374,38 +379,55 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreatePreventiveAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, int companyId, int unitId, CancellationToken cancellationToken)
         {
-             using var transaction = await _applicationDbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
-    
-          try
-          {
-              
-              var parameters = new DynamicParameters();
-              parameters.Add("@CompanyId", companyId);
-              parameters.Add("@UnitId", unitId);
-              parameters.Add("@TypeId", requestTypeId);
+                      var connection = _applicationDbContext.Database.GetDbConnection();
 
-              var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
-                  "dbo.Usp_GetWorkOrderDocNo", 
-                  parameters,
-                  commandType: CommandType.StoredProcedure,
-                  commandTimeout: 120,
-                  transaction: transaction.GetDbTransaction() 
-              );
+               // Must open manually
+               if (connection.State != ConnectionState.Open)
+                   await connection.OpenAsync(cancellationToken);
 
-              workOrder.WorkOrderDocNo = newAssetCode;
+               // Begin SERIALIZABLE transaction using EF Core
+               using var transaction = await _applicationDbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
-              await _applicationDbContext.WorkOrder.AddAsync(workOrder, cancellationToken);
-              await _applicationDbContext.SaveChangesAsync(cancellationToken);
+               try
+               {
+                   // Dapper parameters
+                   var parameters = new DynamicParameters();
+                   parameters.Add("@CompanyId", companyId);
+                   parameters.Add("@UnitId", unitId);
+                   parameters.Add("@TypeId", requestTypeId);
 
-              await transaction.CommitAsync(cancellationToken);
+                   // ✅ Use Dapper with EF Core's connection and transaction
+                   var newAssetCode = await connection.QueryFirstOrDefaultAsync<string>(
+                       "dbo.Usp_GetWorkOrderDocNo",
+                       parameters,
+                       commandType: CommandType.StoredProcedure,
+                       transaction: transaction.GetDbTransaction()  // Correct transaction binding
+                   );
 
-              return workOrder;
-          }
-          catch
-          {
-              await transaction.RollbackAsync(cancellationToken);
-              throw;
-          }
+                   workOrder.WorkOrderDocNo = newAssetCode;
+
+                   await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: $"Schedule Work Order Repository",
+                     actionCode: "Schedule Work Order SP execution",
+                     actionName: "schedule Work Order SP execution",
+                     module: "Preventive",
+                     requestData: workOrder,
+                     cancellationToken
+                    );
+
+                   await _applicationDbContext.WorkOrder.AddAsync(workOrder, cancellationToken);
+                   await _applicationDbContext.SaveChangesAsync(cancellationToken);
+
+                   await transaction.CommitAsync(cancellationToken);
+
+                   return workOrder;
+               }
+               catch
+               {
+                   await transaction.RollbackAsync(cancellationToken);
+                   throw;
+               }
         }
         //  public async Task<string?> GetLatestPreventiveDocNo(int TypeId,int companyId,int unitId)
         // {

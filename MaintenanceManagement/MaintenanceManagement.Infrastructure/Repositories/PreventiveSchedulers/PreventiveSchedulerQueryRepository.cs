@@ -173,11 +173,19 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                         PreventiveSchedulerDictionary[preventiveScheduler.Id] = existingPreventiveScheduler;
                     }
 
-                    existingPreventiveScheduler.PreventiveSchedulerActivities!.Add(preventiveSchedulerActivity);
-                    if (preventiveSchedulerItems != null && preventiveSchedulerItems.OldItemId != null)
+                    if (!existingPreventiveScheduler.PreventiveSchedulerActivities!
+                        .Any(a => a.Id == preventiveSchedulerActivity.Id))
                     {
-                        existingPreventiveScheduler.PreventiveSchedulerItems!.Add(preventiveSchedulerItems);
+                        existingPreventiveScheduler.PreventiveSchedulerActivities.Add(preventiveSchedulerActivity);
                     }
+
+                     if (preventiveSchedulerItems != null &&
+                preventiveSchedulerItems.OldItemId != null &&
+                !existingPreventiveScheduler.PreventiveSchedulerItems!
+                    .Any(i => i.Id == preventiveSchedulerItems.Id))
+                     {
+                         existingPreventiveScheduler.PreventiveSchedulerItems.Add(preventiveSchedulerItems);
+                     }
 
 
                     return existingPreventiveScheduler;
