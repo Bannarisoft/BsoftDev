@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IMaintenance;
+using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 // using Core.Application.Common.Interfaces.IBackgroundService;
@@ -53,31 +54,46 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
                 
                 
                 var DetailResult = await _preventiveSchedulerQuery.GetPreventiveSchedulerDetail(request.Id);
+                
+                  await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: $"Schedule Update request",
+                     actionCode: "Schedule Update",
+                     actionName: "Schedule Update",
+                     module: "Preventive",
+                     requestData: request,
+                     cancellationToken
+                    );
                  foreach (var detail in DetailResult)
-                 {
-                            // var lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(detail.MachineId);
+            {
 
-                        //   DateTimeOffset baseDate = (!lastMaintenanceDate.HasValue || lastMaintenanceDate.Value < request.EffectiveDate.ToDateTime(TimeOnly.MinValue))
-                        //    ? request.EffectiveDate.ToDateTime(TimeOnly.MinValue)
-                        //         : lastMaintenanceDate.Value;
+                var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
+                var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
 
-                            var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
-                            var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
+                detail.PreventiveSchedulerHeaderId = request.Id;
+                detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
+                detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
+                detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
+                detail.IsActive = preventiveScheduler.IsActive;
 
-                     detail.PreventiveSchedulerHeaderId = request.Id;
-                     detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate); 
-                     detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
-                     detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
-                     detail.IsActive = preventiveScheduler.IsActive;
+                if (!string.IsNullOrEmpty(detail.HangfireJobId))
+                {
+                    _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId);
+                }
 
-                      if (!string.IsNullOrEmpty(detail.HangfireJobId))
-                     {
-                         _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId); 
-                     }
 
-                     
-                 }
+            }
                  preventiveScheduler.PreventiveSchedulerDetails = DetailResult;
+
+                  await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: $"Schedule Update DetailResult",
+                     actionCode: "Schedule Update",
+                     actionName: "Schedule Update",
+                     module: "Preventive",
+                     requestData: DetailResult,
+                     cancellationToken
+                    );
          
                 var response  = await _preventiveSchedulerCommand.UpdateAsync(preventiveScheduler);
                 var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode,StatusOpen.Code);
@@ -123,18 +139,28 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
                             //  TimeSpan.FromMinutes(15));
                             newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(detail.Id,5);
                         }
-                        await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id,newJobId);
+                        
+                         await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: $"Schedule work order delayInMinutes: {delayInMinutes} newJobId:{newJobId}",
+                     actionCode: "Schedule Update",
+                     actionName: "Schedule Update",
+                     module: "Preventive",
+                     requestData: detail,
+                     cancellationToken
+                    );
+                        await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id, newJobId);
                 }
 
                 
-                    var domainEvent = new AuditLogsDomainEvent(
-                        actionDetail: "Update",
-                        actionCode: "update",
-                        actionName: "Update Preventive Scheduler",
-                        details: $"Update Preventive Scheduler",
-                        module:"Preventive Scheduler"
-                    );               
-                    await _mediator.Publish(domainEvent, cancellationToken); 
+                    // var domainEvent = new AuditLogsDomainEvent(
+                    //     actionDetail: "Update",
+                    //     actionCode: "update",
+                    //     actionName: "Update Preventive Scheduler",
+                    //     details: $"Update Preventive Scheduler",
+                    //     module:"Preventive Scheduler"
+                    // );               
+                    // await _mediator.Publish(domainEvent, cancellationToken); 
               
                 if(response.Id > 0)
                 {

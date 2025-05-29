@@ -23,7 +23,7 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetDetailSchedulerByDate
         }
         public async Task<ApiResponseDTO<List<DetailSchedulerByDateDto>>> Handle(GetDetailSchedulerByDateQuery request, CancellationToken cancellationToken)
         {
-             var preventiveScheduler = await _preventiveSchedulerQuery.GetDetailSchedulerByDate(request.SchedulerDate);
+             var preventiveScheduler = await _preventiveSchedulerQuery.GetDetailSchedulerByDate(request.SchedulerDate,request.DepartmentId);
             var preventiveSchedulerList = _mapper.Map<List<DetailSchedulerByDateDto>>(preventiveScheduler);
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
