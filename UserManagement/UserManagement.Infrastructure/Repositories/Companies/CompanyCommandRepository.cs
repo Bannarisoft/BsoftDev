@@ -67,6 +67,7 @@ namespace UserManagement.Infrastructure.Repositories.Companies
                 existingCompany.CompanyAddress.PinCode = company.CompanyAddress.PinCode;
                 existingCompany.CompanyAddress.AlternatePhone = company.CompanyAddress.AlternatePhone;
                 existingCompany.CompanyAddress.Phone = company.CompanyAddress.Phone;
+                existingCompany.CompanyAddress.CountryId = company.CompanyAddress.CountryId;
                 existingCompany.CompanyAddress.CityId = company.CompanyAddress.CityId;
                 existingCompany.CompanyAddress.StateId = company.CompanyAddress.StateId;
                 existingCompany.CompanyContact.Designation = company.CompanyContact.Designation;

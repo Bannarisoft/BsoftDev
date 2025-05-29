@@ -86,7 +86,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
         public async Task<ShiftMasterDetail> GetByIdAsync(int ShiftMasterId)
         {
             var UnitId = _ipAddressService.GetUnitId();
-            const string query = "SELECT * FROM [Maintenance].[ShiftMasterDetails]  WHERE ShiftMasterId = @ShiftMasterId AND IsDeleted = 0 AND UnitId = @UnitId";
+            const string query = "SELECT * FROM [Maintenance].[ShiftMasterDetails]  WHERE Id = @ShiftMasterId AND IsDeleted = 0 AND UnitId = @UnitId";
             return await _dbConnection.QueryFirstOrDefaultAsync<ShiftMasterDetail>(query, new { ShiftMasterId =ShiftMasterId, UnitId = UnitId });
         }
 
