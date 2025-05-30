@@ -127,6 +127,32 @@ namespace UserManagement.API.Controllers
                     });
             
         }
+        [HttpGet("withoutDatacontrol")]
+        public async Task<IActionResult> GetAllDepartment([FromQuery] string? name)
+        {
+                var query = new GetDepartmentwithoutDataControl { SearchPattern = name ?? string.Empty };
+                var result = await Mediator.Send(query);
+
+             
+               if (result.IsSuccess )
+               {
+                _logger.LogInformation($"Departments found for search pattern: {name}. Returning data." );
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Data = result.Data
+                });        
+               }
+                  _logger.LogWarning($"No departments found for search pattern: {name}");
+
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "No matching departments found."
+                    });
+            
+        }
 
         [HttpGet("by-department-group/{departmentGroupName}")]
             public async Task<IActionResult> GetDepartmentsByDepartmentGroupId(string departmentGroupName)

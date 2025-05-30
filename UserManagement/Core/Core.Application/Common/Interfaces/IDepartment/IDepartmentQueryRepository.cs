@@ -15,7 +15,8 @@ namespace Core.Application.Common.Interfaces.IDepartment
         Task<(List<DepartmentDto>, int)> GetAllDepartmentAsync(int PageNumber, int PageSize, string? SearchTerm);
 
         Task<Department> GetByIdAsync(int id);
-        Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync(string SearchDept);
+        Task<List<Department>> GetAllDepartmentAutoCompleteSearchAsync(string SearchDept);      
+        
         Task<bool> FKColumnExistValidation(int Id);
         Task<List<Department>> GetDepartment_SuperAdmin(string SearchDept);
 
