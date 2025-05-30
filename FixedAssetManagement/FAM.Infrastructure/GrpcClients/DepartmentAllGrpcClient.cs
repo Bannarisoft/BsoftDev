@@ -1,6 +1,4 @@
-
-
-
+using Contracts.Dtos.Users;
 using Contracts.Interfaces.External.IUser;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -9,30 +7,28 @@ using Microsoft.AspNetCore.Http;
 
 namespace FAM.Infrastructure.GrpcClients
 {
-    public class DepartmentGrpcClient : IDepartmentGrpcClient
+    public class DepartmentAllGrpcClient : IDepartmentAllGrpcClient
     {
-        private readonly DepartmentService.DepartmentServiceClient _client;
+        private readonly DepartmentAllService.DepartmentAllServiceClient _client;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DepartmentGrpcClient(DepartmentService.DepartmentServiceClient client, IHttpContextAccessor httpContextAccessor)
+        public DepartmentAllGrpcClient(DepartmentAllService.DepartmentAllServiceClient client, IHttpContextAccessor httpContextAccessor)
         {
             _client = client;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<List<Contracts.Dtos.Maintenance.DepartmentDto>> GetAllDepartmentAsync()
+        public async Task<List<Contracts.Dtos.Users.DepartmentAllDto>> GetDepartmentAllAsync()
         {
-            // ✅ Get token from current HTTP Context
             var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
 
             if (string.IsNullOrEmpty(token))
             {
                 throw new Exception("No Authorization token found in the current context.");
             }
-            //  ✅ Ensure it has "Bearer " prefix
+
             if (!token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
-
                 token = $"Bearer {token}";
             }
 
@@ -41,20 +37,18 @@ namespace FAM.Infrastructure.GrpcClients
                 { "Authorization", token }
             };
 
-            //  ✅ Attach Authorization header
             var callOptions = new CallOptions(metadata);
 
-            var response = await _client.GetAllDepartmentAsync(new Empty(), callOptions);
+            var response = await _client.GetDepartmentAllAsync(new Empty(), callOptions);
 
-            var departments = response.Departments
-                .Select(proto => new Contracts.Dtos.Maintenance.DepartmentDto
-                {
-                    DepartmentId = proto.DepartmentId,
-                    DepartmentName = proto.DepartmentName,
-                    ShortName = proto.ShortName
-                }).ToList();
-
-            return departments;
+            return response.Departments.Select(proto => new Contracts.Dtos.Users.DepartmentAllDto
+            {
+                DepartmentId = proto.DepartmentId,
+                DepartmentName = proto.DepartmentName,
+                ShortName = proto.ShortName,
+                Departmentgroupid = proto.DepartmentGroupId
+            }).ToList();
         }
+
     }
 }

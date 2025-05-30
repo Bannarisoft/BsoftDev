@@ -12,15 +12,15 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
         private readonly ISubLocationQueryRepository _sublocationQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        private readonly IDepartmentAllGrpcClient _departmentAllGrpcClient;
 
 
-        public GetSubLocationHandlerQuery(ISubLocationQueryRepository sublocationQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService)
+        public GetSubLocationHandlerQuery(ISubLocationQueryRepository sublocationQueryRepository, IMapper mapper, IMediator mediator, IDepartmentAllGrpcClient departmentAllGrpcClient)
         {
             _sublocationQueryRepository = sublocationQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentGrpcClient = departmentService;
+            _departmentAllGrpcClient = departmentAllGrpcClient;
 
         }
         public async Task<ApiResponseDTO<List<SubLocationDto>>> Handle(GetSubLocationQuery request, CancellationToken cancellationToken)
@@ -29,32 +29,22 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             var sublocationList = _mapper.Map<List<SubLocationDto>>(sublocations);
 
             // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            var departments = await _departmentAllGrpcClient.GetDepartmentAllAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-            // var subLocationDictionary = new Dictionary<int, SubLocationDto>();
+            var subLocationDictionary = new Dictionary<int, SubLocationDto>();
 
             // 🔥 Map department names with DataControl to location
-            // foreach (var data in sublocationList)
-            // {
-
-            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-            //     {
-            //         data.DepartmentName = departmentName;
-            //     }
-
-            //     subLocationDictionary[data.DepartmentId] = data;
-
-            // }
-            foreach (var dto in sublocationList)
+            foreach (var data in sublocationList)
             {
-                if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
+
+                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
                 {
-                    dto.DepartmentName = departmentName;
+                    data.DepartmentName = departmentName;
                 }
+
+                subLocationDictionary[data.DepartmentId] = data;
+
             }
-            var filteredSubLocationDtos = sublocationList
-                .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-                .ToList();
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -69,7 +59,7 @@ namespace Core.Application.SubLocation.Queries.GetSubLocations
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = filteredSubLocationDtos,
+                Data = sublocationList,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
