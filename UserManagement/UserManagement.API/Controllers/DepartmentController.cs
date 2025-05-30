@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Core.Application.Departments.Queries.GetDepartments;
 using Core.Application.Departments.Queries.GetDepartmentById;
@@ -7,11 +6,8 @@ using Core.Application.Departments.Commands.CreateDepartment;
 using Core.Application.Departments.Commands.UpdateDepartment;
 using Core.Application.Departments.Commands.DeleteDepartment;
 using Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
-using Core.Application.Common.Interfaces;
-using System.Data.Common;
 using UserManagement.Infrastructure.Data;
 using FluentValidation;
-using Microsoft.Extensions.Logging;
 using Core.Application.Departments.Queries.GetDepartmentByDepartmentGroupId;
 
 namespace UserManagement.API.Controllers
