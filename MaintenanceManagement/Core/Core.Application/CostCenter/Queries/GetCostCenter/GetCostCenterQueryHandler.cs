@@ -52,7 +52,7 @@ namespace Core.Application.CostCenter.Queries.GetCostCenter
                 {
                     data.DepartmentName = departmentName;
                 }
-                if (departmentLookup.TryGetValue(data.UnitId, out var unitName) && unitName != null)
+                if (unitLookup.TryGetValue(data.UnitId, out var unitName) && unitName != null)
                 {
                     data.UnitName = unitName;
                 }
