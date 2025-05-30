@@ -23,11 +23,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         }
         public async Task<bool> AlreadyExistsAsync(int activityId, int machinegroupId, int? id = null)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             var query = @"
                     SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] PSH
                  INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId = PSH.Id
-                   WHERE PSA.ActivityId = @ActivityId AND PSH.MachineGroupId =@MachineGroupId   AND PSH.IsDeleted = 0";
-            var parameters = new DynamicParameters(new { ActivityId = activityId, MachineGroupId = machinegroupId });
+                   WHERE PSA.ActivityId = @ActivityId AND PSH.MachineGroupId =@MachineGroupId   AND PSH.IsDeleted = 0 AND PSH.UnitId=@UnitId ";
+            var parameters = new DynamicParameters(new { ActivityId = activityId, MachineGroupId = machinegroupId,UnitId });
 
             if (id is not null)
             {
