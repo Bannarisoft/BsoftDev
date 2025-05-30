@@ -377,45 +377,41 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreatePreventiveAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, int companyId, int unitId, CancellationToken cancellationToken)
         {
-                      var connection = _applicationDbContext.Database.GetDbConnection();
 
-               // Must open manually
-               if (connection.State != ConnectionState.Open)
-                   await connection.OpenAsync(cancellationToken);
+          var strategy = _applicationDbContext.Database.CreateExecutionStrategy();
 
-               // Begin SERIALIZABLE transaction using EF Core
-               using var transaction = await _applicationDbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            return await strategy.ExecuteAsync(async () =>
+            {
+                await using var transaction = await _applicationDbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
-               try
-               {
-                   // Dapper parameters
-                   var parameters = new DynamicParameters();
-                   parameters.Add("@CompanyId", companyId);
-                   parameters.Add("@UnitId", unitId);
-                   parameters.Add("@TypeId", requestTypeId);
+                try
+                {
+                    var resultList = await _applicationDbContext
+                        .Database
+                        .SqlQuery<string>(
+                            $"EXEC dbo.Usp_GetWorkOrderDocNo @CompanyId = {companyId}, @UnitId = {unitId}, @TypeId = {requestTypeId}")
+                        .ToListAsync(cancellationToken);
 
-                   // ✅ Use Dapper with EF Core's connection and transaction
-                   var newAssetCode = await connection.QueryFirstOrDefaultAsync<string>(
-                       "dbo.Usp_GetWorkOrderDocNo",
-                       parameters,
-                       commandType: CommandType.StoredProcedure,
-                       transaction: transaction.GetDbTransaction()  // Correct transaction binding
-                   );
+                        var result = resultList.FirstOrDefault();
 
-                   workOrder.WorkOrderDocNo = newAssetCode;
+                    if (string.IsNullOrWhiteSpace(result))
+                        throw new InvalidOperationException("Failed to generate new Work Order Doc No.");
 
-                   await _applicationDbContext.WorkOrder.AddAsync(workOrder, cancellationToken);
-                   await _applicationDbContext.SaveChangesAsync(cancellationToken);
+                    workOrder.WorkOrderDocNo = result;
 
-                   await transaction.CommitAsync(cancellationToken);
+                    await _applicationDbContext.WorkOrder.AddAsync(workOrder, cancellationToken);
+                    await _applicationDbContext.SaveChangesAsync(cancellationToken);
+                    await transaction.CommitAsync(cancellationToken);
 
-                   return workOrder;
-               }
-               catch
-               {
-                   await transaction.RollbackAsync(cancellationToken);
-                   throw;
-               }
+                    return workOrder;
+                }
+                catch
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    throw;
+                }
+            });
+
         }
         //  public async Task<string?> GetLatestPreventiveDocNo(int TypeId,int companyId,int unitId)
         // {
