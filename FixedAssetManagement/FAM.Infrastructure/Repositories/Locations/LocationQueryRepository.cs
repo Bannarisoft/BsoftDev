@@ -9,21 +9,21 @@ namespace FAM.Infrastructure.Repositories.Locations
     public class LocationQueryRepository : ILocationQueryRepository
     {
         private readonly IDbConnection _dbConnection;
-        private readonly IIPAddressService _ipAddressService;
+        // private readonly IIPAddressService _ipAddressService;
 
-        public LocationQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
+        public LocationQueryRepository(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
-            _ipAddressService = ipAddressService;
+            // _ipAddressService = ipAddressService;
         }
         public async Task<(List<Location>, int)> GetAllLocationAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-            var UnitId = _ipAddressService.GetUnitId();
+            // var UnitId = _ipAddressService.GetUnitId();
             var query = $$"""
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
                FROM FixedAsset.Location 
-              WHERE IsDeleted = 0 AND UnitId=@UnitId
+              WHERE IsDeleted = 0 
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR LocationName LIKE @Search)")}};
 
                 SELECT 
@@ -39,7 +39,7 @@ namespace FAM.Infrastructure.Repositories.Locations
                 CreatedByName
             FROM FixedAsset.Location 
             WHERE 
-            IsDeleted = 0 AND UnitId=@UnitId
+            IsDeleted = 0 
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR LocationName LIKE @Search )")}}
                 ORDER BY Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -52,8 +52,7 @@ namespace FAM.Infrastructure.Repositories.Locations
             {
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize,
-                UnitId
+                PageSize
             };
 
             var location = await _dbConnection.QueryMultipleAsync(query, parameters);
