@@ -16,15 +16,15 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
         private readonly IWorkCenterQueryRepository _iWorkCenterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        private readonly IDepartmentAllGrpcClient _departmentAllGrpcClient; // 👈 gRPC Inject here
         private readonly IUnitGrpcClient _unitGrpcClient;
 
-        public GetWorkCenterQueryHandler(IWorkCenterQueryRepository iWorkCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentService, IUnitGrpcClient unitGrpcClient)
+        public GetWorkCenterQueryHandler(IWorkCenterQueryRepository iWorkCenterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentAllGrpcClient departmentAllGrpcClient, IUnitGrpcClient unitGrpcClient)
         {
             _iWorkCenterQueryRepository = iWorkCenterQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentGrpcClient = departmentService;
+            _departmentAllGrpcClient = departmentAllGrpcClient;
             _unitGrpcClient = unitGrpcClient;
         }
 
@@ -33,13 +33,13 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
             var (WorkCenter, totalCount) = await _iWorkCenterQueryRepository.GetAllWorkCenterGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var workCentersgrouplist = _mapper.Map<List<WorkCenterDto>>(WorkCenter);
             // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            var departments = await _departmentAllGrpcClient.GetDepartmentAllAsync();
             var units = await _unitGrpcClient.GetAllUnitAsync();
 
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
-             // 🔥 Map department & unit names with DataControl to costCenters
+            // 🔥 Map department & unit names with DataControl to costCenters
             foreach (var dto in workCentersgrouplist)
             {
                 if (departmentLookup.TryGetValue(dto.DepartmentId, out var deptName))
@@ -49,16 +49,6 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
                     dto.UnitName = unitName;
             }
 
-            // // 🔥 Map DepartmentName with DataControl and UnitName in one loop
-            // var filteredworkCentersgroupDtos = workCentersgrouplist
-            //              .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-            //              .Select(p => new WorkCenterDto
-            //              {
-            //                  DepartmentId = p.DepartmentId,
-            //                  DepartmentName = departmentLookup[p.DepartmentId],
-            //              })
-            //              .ToList();
-            
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetWorkCenter",

@@ -24,6 +24,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
         public string? AssetLocation { get; set; }        
         public string? RequestDesc { get; set; }
         public int? PreventiveScheduleId { get; set; }
+        public string? CreatedUser { get; set; }
 
 
         public IList<GetWorkOrderActivityByIdDto>? WOActivity { get; set; }

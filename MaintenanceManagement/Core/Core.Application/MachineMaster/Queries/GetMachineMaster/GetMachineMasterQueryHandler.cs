@@ -12,15 +12,13 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMaster
         private readonly IMachineMasterQueryRepository _imachineMasterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient;
 
 
-        public GetMachineMasterQueryHandler(IMachineMasterQueryRepository imachineMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
+        public GetMachineMasterQueryHandler(IMachineMasterQueryRepository imachineMasterQueryRepository, IMapper mapper, IMediator mediator)
         {
             _imachineMasterQueryRepository = imachineMasterQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentGrpcClient = departmentGrpcClient;
         }
 
         public async Task<ApiResponseDTO<List<MachineMasterDto>>> Handle(GetMachineMasterQuery request, CancellationToken cancellationToken)

@@ -8,22 +8,18 @@ namespace FAM.Infrastructure.Repositories.SubLocation
     public class SubLocationQueryRepository : ISubLocationQueryRepository
     {
         private readonly IDbConnection _dbConnection;
-        private readonly IIPAddressService _ipAddressService;
 
-        public SubLocationQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
+        public SubLocationQueryRepository(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
-            _ipAddressService = ipAddressService;
         }
         public async Task<(List<Core.Domain.Entities.SubLocation>, int)> GetAllSubLocationAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-            var UnitId = _ipAddressService.GetUnitId();
-
             var query = $$"""
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
                FROM FixedAsset.SubLocation 
-              WHERE IsDeleted = 0 AND UnitId=@UnitId
+              WHERE IsDeleted = 0
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR SubLocationName LIKE @Search)")}};
 
             SELECT 
@@ -39,7 +35,7 @@ namespace FAM.Infrastructure.Repositories.SubLocation
                 CreatedByName
             FROM FixedAsset.SubLocation 
             WHERE 
-            IsDeleted = 0 AND UnitId=@UnitId
+            IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR SubLocationName LIKE @Search )")}}
                 ORDER BY Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -52,8 +48,8 @@ namespace FAM.Infrastructure.Repositories.SubLocation
             {
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize,
-                UnitId
+                PageSize
+
             };
 
             var sublocation = await _dbConnection.QueryMultipleAsync(query, parameters);

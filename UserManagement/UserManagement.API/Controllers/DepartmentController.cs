@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Core.Application.Departments.Queries.GetDepartments;
 using Core.Application.Departments.Queries.GetDepartmentById;
@@ -7,11 +6,8 @@ using Core.Application.Departments.Commands.CreateDepartment;
 using Core.Application.Departments.Commands.UpdateDepartment;
 using Core.Application.Departments.Commands.DeleteDepartment;
 using Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
-using Core.Application.Common.Interfaces;
-using System.Data.Common;
 using UserManagement.Infrastructure.Data;
 using FluentValidation;
-using Microsoft.Extensions.Logging;
 using Core.Application.Departments.Queries.GetDepartmentByDepartmentGroupId;
 
 namespace UserManagement.API.Controllers
@@ -105,6 +101,32 @@ namespace UserManagement.API.Controllers
         {
             _logger.LogInformation($"Starting GetAllDepartmentAutoCompleteSearchAsync with search pattern: {name} ");
              var query = new GetDepartmentAutoCompleteSearchQuery { SearchPattern = name ?? string.Empty };
+                var result = await Mediator.Send(query);
+
+             
+               if (result.IsSuccess )
+               {
+                _logger.LogInformation($"Departments found for search pattern: {name}. Returning data." );
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Data = result.Data
+                });        
+               }
+                  _logger.LogWarning($"No departments found for search pattern: {name}");
+
+                    return NotFound(new
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "No matching departments found."
+                    });
+            
+        }
+        [HttpGet("withoutDatacontrol")]
+        public async Task<IActionResult> GetAllDepartment([FromQuery] string? name)
+        {
+                var query = new GetDepartmentwithoutDataControl { SearchPattern = name ?? string.Empty };
                 var result = await Mediator.Send(query);
 
              
