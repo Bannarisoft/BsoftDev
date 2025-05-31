@@ -6,7 +6,6 @@ using GrpcServices.FixedAssetManagement;
 using GrpcServices.HangfireDelete;
 using GrpcServices.UserManagement;
 using MaintenanceManagement.Infrastructure.GrpcClients;
-using MaintenanceManagement.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Infrastructure.HttpClientPolly;
@@ -78,7 +77,8 @@ namespace MaintenanceManagement.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<IUnitGrpcClient, UnitGrpcClient>();
-            //Company             
+
+            // ✅ Register Company gRPC Client         
             services.AddGrpcClient<CompanyService.CompanyServiceClient>(options =>
             {
                 options.Address = new Uri(userManagementUrl);
@@ -98,34 +98,34 @@ namespace MaintenanceManagement.Infrastructure
                 options.Address = new Uri(backGroundServiceUrl);
             })
             .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
-            
+
             .ConfigurePrimaryHttpMessageHandler(() =>
             {
                 return new HttpClientHandler
                 {
-                    
+
                     ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
                 };
             })
             .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
-            
-             services.AddGrpcClient<MaintenanceHangfireDeleteService.MaintenanceHangfireDeleteServiceClient>(options =>
-            {
-                options.Address = new Uri(backGroundServiceUrl);
-            })
-            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
-            
-            .ConfigurePrimaryHttpMessageHandler(() =>
-            {
-                return new HttpClientHandler
-                {
-                    
-                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-                };
-            })
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
-            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddGrpcClient<MaintenanceHangfireDeleteService.MaintenanceHangfireDeleteServiceClient>(options =>
+           {
+               options.Address = new Uri(backGroundServiceUrl);
+           })
+           .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
+
+           .ConfigurePrimaryHttpMessageHandler(() =>
+           {
+               return new HttpClientHandler
+               {
+
+                   ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+               };
+           })
+           .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+           .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<IBackgroundServiceClient, BackgroundServiceClient>();
 
@@ -142,6 +142,20 @@ namespace MaintenanceManagement.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<IAssetSpecificationGrpcClient, AssetSpecificationGrpcClient>();
+
+            // ✅ Register AllDepartment gRPC Client
+            services.AddGrpcClient<DepartmentAllService.DepartmentAllServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<IDepartmentAllGrpcClient, DepartmentAllGrpcClient>();
 
 
             return services;

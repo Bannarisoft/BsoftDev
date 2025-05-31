@@ -58,6 +58,8 @@
   <Protobuf Include="..\..\Shared\Contracts\Protos\background_service.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\AssetSpecification.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\hangfirejob_delete.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\alldepartment.proto" GrpcServices="Client" />
+
 </ItemGroup> 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
