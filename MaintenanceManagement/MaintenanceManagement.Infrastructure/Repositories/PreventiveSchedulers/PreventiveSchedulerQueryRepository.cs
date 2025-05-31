@@ -28,7 +28,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerHeader] PSH
                  INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId = PSH.Id
                    WHERE PSA.ActivityId = @ActivityId AND PSH.MachineGroupId =@MachineGroupId   AND PSH.IsDeleted = 0 AND PSH.UnitId=@UnitId ";
-            var parameters = new DynamicParameters(new { ActivityId = activityId, MachineGroupId = machinegroupId,UnitId });
+            var parameters = new DynamicParameters(new { ActivityId = activityId, MachineGroupId = machinegroupId, UnitId });
 
             if (id is not null)
             {
@@ -180,13 +180,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                         existingPreventiveScheduler.PreventiveSchedulerActivities.Add(preventiveSchedulerActivity);
                     }
 
-                     if (preventiveSchedulerItems != null &&
-                preventiveSchedulerItems.OldItemId != null &&
-                !existingPreventiveScheduler.PreventiveSchedulerItems!
-                    .Any(i => i.Id == preventiveSchedulerItems.Id))
-                     {
-                         existingPreventiveScheduler.PreventiveSchedulerItems.Add(preventiveSchedulerItems);
-                     }
+                    if (preventiveSchedulerItems != null &&
+               preventiveSchedulerItems.OldItemId != null &&
+               !existingPreventiveScheduler.PreventiveSchedulerItems!
+                   .Any(i => i.Id == preventiveSchedulerItems.Id))
+                    {
+                        existingPreventiveScheduler.PreventiveSchedulerItems.Add(preventiveSchedulerItems);
+                    }
 
 
                     return existingPreventiveScheduler;
@@ -313,12 +313,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             GROUP BY PSD.ActualWorkOrderDate,PS.DepartmentId
                             ORDER BY PSD.ActualWorkOrderDate ASC
                         ";
-            using var multi = await _dbConnection.QueryMultipleAsync(query, new { UnitId, StatusCodes = statusCodes,DepartmentId });
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { UnitId, StatusCodes = statusCodes, DepartmentId });
             var preventiveSchedulers = await multi.ReadAsync<dynamic>();
 
             return preventiveSchedulers;
         }
-        public async Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate,int DepartmentId)
+        public async Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate, int DepartmentId)
         {
             var UnitId = _ipAddressService.GetUnitId();
             var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status };
@@ -443,33 +443,103 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 				   WHERE PSD.Id =@Id AND PSD.IsDeleted = 0  AND PSH.IsDeleted = 0
                ";
 
-                   var PreventiveSchedulerDictionary = new Dictionary<int, PreventiveSchedulerHeader>();
+            var PreventiveSchedulerDictionary = new Dictionary<int, PreventiveSchedulerHeader>();
 
-              var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader,PreventiveSchedulerDetail,PreventiveSchedulerActivity, PreventiveSchedulerHeader>(
-              query,
-              (preventiveScheduler, preventiveSchedulerDetail,preventiveSchedulerActivity) =>
-              {
-                  if (!PreventiveSchedulerDictionary.TryGetValue(preventiveScheduler.Id, out var existingPreventiveScheduler))
-                  {
-                      existingPreventiveScheduler = preventiveScheduler;
-                      existingPreventiveScheduler.PreventiveSchedulerDetails = new List<PreventiveSchedulerDetail>();
-                      existingPreventiveScheduler.PreventiveSchedulerActivities = new List<PreventiveSchedulerActivity>();
-                      PreventiveSchedulerDictionary[preventiveScheduler.Id] = existingPreventiveScheduler;
-                  }
+            var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader, PreventiveSchedulerDetail, PreventiveSchedulerActivity, PreventiveSchedulerHeader>(
+            query,
+            (preventiveScheduler, preventiveSchedulerDetail, preventiveSchedulerActivity) =>
+            {
+                if (!PreventiveSchedulerDictionary.TryGetValue(preventiveScheduler.Id, out var existingPreventiveScheduler))
+                {
+                    existingPreventiveScheduler = preventiveScheduler;
+                    existingPreventiveScheduler.PreventiveSchedulerDetails = new List<PreventiveSchedulerDetail>();
+                    existingPreventiveScheduler.PreventiveSchedulerActivities = new List<PreventiveSchedulerActivity>();
+                    PreventiveSchedulerDictionary[preventiveScheduler.Id] = existingPreventiveScheduler;
+                }
 
-                  existingPreventiveScheduler.PreventiveSchedulerDetails!.Add(preventiveSchedulerDetail);
+                existingPreventiveScheduler.PreventiveSchedulerDetails!.Add(preventiveSchedulerDetail);
 
-                      existingPreventiveScheduler.PreventiveSchedulerActivities!.Add(preventiveSchedulerActivity);
+                existingPreventiveScheduler.PreventiveSchedulerActivities!.Add(preventiveSchedulerActivity);
 
 
-                  return existingPreventiveScheduler;
-              },
-              new { Id },
-              splitOn: "Id,ActivityId" 
-              );
+                return existingPreventiveScheduler;
+            },
+            new { Id },
+            splitOn: "Id,ActivityId"
+            );
 
             return PreventiveSchedulerResponse.FirstOrDefault()!;
         }
-        
+        public async Task<Core.Domain.Entities.MachineGroup> GetMachineGroupIdByName(string MachineGroupName)
+        {
+            const string query = @"
+                       SELECT Id, GroupName  
+                       FROM Maintenance.MachineGroup
+                       WHERE IsDeleted = 0 AND GroupName = @SearchPattern";
+
+            var parameters = new
+            {
+                SearchPattern = MachineGroupName
+            };
+            var machineGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineGroup>(query, parameters);
+            return machineGroups.FirstOrDefault();
+        }
+
+        public async Task<Core.Domain.Entities.MachineMaster> GetMachineIdByCode(string MachineCode)
+        {
+            const string query = @"
+                       SELECT Id, MachineCode  
+                       FROM [Maintenance].[MachineMaster]
+                       WHERE IsDeleted = 0 AND MachineCode = @SearchPattern";
+
+            var parameters = new
+            {
+                SearchPattern = MachineCode
+            };
+            var machines = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
+            return machines.FirstOrDefault();
+        }
+         public async Task<PreventiveSchedulerDetail> GetPreventiveSchedulerDetailByName(string PreventiveSchedulerName,string MachineId)
+        {
+            var query = $@"
+                SELECT  
+                    PSD.Id,
+                    PSD.PreventiveSchedulerHeaderId,
+                    PSD.MachineId,
+                    PSD.WorkOrderCreationStartDate,
+                    PSD.ActualWorkOrderDate,
+                    PSD.RescheduleReason,
+                    PSD.MaterialReqStartDays,
+                    PSD.HangfireJobId
+                    
+                FROM [Maintenance].[PreventiveSchedulerDetail] PSD
+        INNER JOIN [Maintenance].[PreventiveSchedulerHeader] PSH ON PSD.PreventiveSchedulerHeaderId=PSH.Id
+        WHERE PreventiveSchedulerName =@PreventiveSchedulerName AND PSD.MachineId=@MachineId AND PSD.IsDeleted = 0
+            ";
+
+            var parameters = new
+            {
+                PreventiveSchedulerName,
+                 MachineId
+            };
+            var result = await _dbConnection.QueryAsync<PreventiveSchedulerDetail>(query, parameters);
+
+            return result.FirstOrDefault();
+        }
+
+        public async Task<Core.Domain.Entities.ActivityMaster> GetActivityIdByName(string ActivityName)
+        {
+            const string query = @"
+                       SELECT Id, ActivityName  
+                       FROM Maintenance.ActivityMaster
+                       WHERE IsDeleted = 0 AND IsActive = 1 AND ActivityName = @SearchPattern";
+
+            var parameters = new
+            {
+                SearchPattern = ActivityName
+            };
+            var machineGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.ActivityMaster>(query, parameters);
+            return machineGroups.FirstOrDefault();
+        }
     }
 }
