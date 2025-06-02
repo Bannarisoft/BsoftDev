@@ -90,13 +90,19 @@ namespace UserManagement.Infrastructure.Repositories.Country
                                 const string query = @"
                            SELECT 1 
                            FROM [AppData].[State] 
-                         WHERE CountryId = @Id AND   IsDeleted = 0;";
+                         WHERE CountryId = @Id AND   IsDeleted = 0;
+                         
+                         SELECT 1 
+                           FROM [AppData].[Company] C
+                           INNER JOIN [AppData].[CompanyAddress] CA ON C.Id=CA.CompanyId 
+                         WHERE CA.CountryId = @Id AND   C.IsDeleted = 0;";
                     
                        using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
                     
-                       var StateExists = await multi.ReadFirstOrDefaultAsync<int?>();  
+                       var StateExists = await multi.ReadFirstOrDefaultAsync<int?>(); 
+                       var CompanyExists = await multi.ReadFirstOrDefaultAsync<int?>(); 
                     
-                       return StateExists.HasValue ;
+                       return StateExists.HasValue || CompanyExists.HasValue;
             }
     }
 }

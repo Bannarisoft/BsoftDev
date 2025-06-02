@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using MediatR;
@@ -13,24 +14,41 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetSchedulerByDate
     {
          private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
          private readonly IMapper _mapper;
-        
-        public GetSchedulerByDateQueryHandler(IPreventiveSchedulerQuery preventiveSchedulerQuery,IMapper mapper)
+         private readonly IDepartmentGrpcClient _departmentGrpcClient;
+
+        public GetSchedulerByDateQueryHandler(IPreventiveSchedulerQuery preventiveSchedulerQuery, IMapper mapper, IDepartmentGrpcClient departmentGrpcClient)
         {
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _mapper = mapper;
+            _departmentGrpcClient = departmentGrpcClient;
         }
         public async Task<ApiResponseDTO<List<SchedulerByDateDto>>> Handle(GetSchedulerByDateQuery request, CancellationToken cancellationToken)
         {
-            var preventiveScheduler = await _preventiveSchedulerQuery.GetAbstractSchedulerByDate();
+            var preventiveScheduler = await _preventiveSchedulerQuery.GetAbstractSchedulerByDate(request.DepartmentId);
             
             var preventiveSchedulerList = _mapper.Map<List<SchedulerByDateDto>>(preventiveScheduler);
+            
+             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+                foreach (var dto in preventiveSchedulerList)
+               {
+                   if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
+                   {
+                       dto.DepartmentName = departmentName;
+                   }
+               }
+
+                var filteredPreventiveSchedulers = preventiveSchedulerList
+            .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            .ToList();
 
           
-            return new ApiResponseDTO<List<SchedulerByDateDto>> 
-            { 
-                IsSuccess = true, 
-                Message = "Success", 
-                Data = preventiveSchedulerList 
+            return new ApiResponseDTO<List<SchedulerByDateDto>>
+            {
+                IsSuccess = true,
+                Message = "Success",
+                Data = filteredPreventiveSchedulers
             };
         }
     }

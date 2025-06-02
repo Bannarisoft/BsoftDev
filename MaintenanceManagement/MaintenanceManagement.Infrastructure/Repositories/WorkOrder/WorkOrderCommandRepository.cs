@@ -7,6 +7,9 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.Storage;
+using Core.Application.Common;
+using MediatR;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
@@ -18,7 +21,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<WorkOrderCommandRepository> _logger;
 
-        public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService, IDbConnection dbConnection, IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger)
+        public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService, IDbConnection dbConnection,
+        IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger)
         {
             _applicationDbContext = applicationDbContext;
             _ipAddressService = ipAddressService;
@@ -373,25 +377,55 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreatePreventiveAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, int companyId, int unitId, CancellationToken cancellationToken)
         {
-            var entry = _applicationDbContext.Entry(workOrder);
-            workOrder.WorkOrderDocNo = await GetLatestPreventiveDocNo(requestTypeId,companyId,unitId);
-            await _applicationDbContext.WorkOrder.AddAsync(workOrder);
-            await _applicationDbContext.SaveChangesAsync();
-            return workOrder;
+
+          var strategy = _applicationDbContext.Database.CreateExecutionStrategy();
+
+            return await strategy.ExecuteAsync(async () =>
+            {
+                await using var transaction = await _applicationDbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+
+                try
+                {
+                    var resultList = await _applicationDbContext
+                        .Database
+                        .SqlQuery<string>(
+                            $"EXEC dbo.Usp_GetWorkOrderDocNo @CompanyId = {companyId}, @UnitId = {unitId}, @TypeId = {requestTypeId}")
+                        .ToListAsync(cancellationToken);
+
+                        var result = resultList.FirstOrDefault();
+
+                    if (string.IsNullOrWhiteSpace(result))
+                        throw new InvalidOperationException("Failed to generate new Work Order Doc No.");
+
+                    workOrder.WorkOrderDocNo = result;
+
+                    await _applicationDbContext.WorkOrder.AddAsync(workOrder, cancellationToken);
+                    await _applicationDbContext.SaveChangesAsync(cancellationToken);
+                    await transaction.CommitAsync(cancellationToken);
+
+                    return workOrder;
+                }
+                catch
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    throw;
+                }
+            });
+
         }
-         public async Task<string?> GetLatestPreventiveDocNo(int TypeId,int companyId,int unitId)
-        {
+        //  public async Task<string?> GetLatestPreventiveDocNo(int TypeId,int companyId,int unitId)
+        // {
                       
-            var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", companyId);
-            parameters.Add("@UnitId", unitId);
-            parameters.Add("@TypeId", TypeId);
-            var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
-                "dbo.Usp_GetWorkOrderDocNo", 
-                parameters, 
-                commandType: CommandType.StoredProcedure,
-                commandTimeout: 120);
-            return newAssetCode; 
-        }
+        //     var parameters = new DynamicParameters();
+        //     parameters.Add("@CompanyId", companyId);
+        //     parameters.Add("@UnitId", unitId);
+        //     parameters.Add("@TypeId", TypeId);
+        //     var newAssetCode = await _dbConnection.QueryFirstOrDefaultAsync<string>(
+        //         "dbo.Usp_GetWorkOrderDocNo", 
+        //         parameters, 
+        //         commandType: CommandType.StoredProcedure,
+        //         commandTimeout: 120);
+        //     return newAssetCode; 
+        // }
     }
 }

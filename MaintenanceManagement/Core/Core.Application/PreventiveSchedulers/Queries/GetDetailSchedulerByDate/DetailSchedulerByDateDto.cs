@@ -14,5 +14,7 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetDetailSchedulerByDate
         public string GroupName { get; set; }
         public int MachineId { get; set; }
         public string MachineName { get; set; }
+        public int DepartmentId { get; set; }
+        public string DepartmentName { get; set; }
     }
 }

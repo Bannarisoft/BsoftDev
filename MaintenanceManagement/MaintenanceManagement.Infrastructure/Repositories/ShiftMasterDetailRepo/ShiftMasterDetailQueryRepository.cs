@@ -54,7 +54,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
                 SMD.EndTime,
                 SMD.DurationInHours,
                 SMD.BreakDurationInMinutes,
-                 Cast(SMD.EffectiveDate as varchar) AS EffectiveDate
+                 Cast(SMD.EffectiveDate as varchar) AS EffectiveDate,
+                 SMD.ShiftSupervisorId
             FROM [Maintenance].[ShiftMaster] SM
             INNER JOIN [Maintenance].[ShiftMasterDetails] SMD ON SMD.ShiftMasterId=SM.Id
             WHERE 
@@ -85,7 +86,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
         public async Task<ShiftMasterDetail> GetByIdAsync(int ShiftMasterId)
         {
             var UnitId = _ipAddressService.GetUnitId();
-            const string query = "SELECT * FROM [Maintenance].[ShiftMasterDetails]  WHERE ShiftMasterId = @ShiftMasterId AND IsDeleted = 0 AND UnitId = @UnitId";
+            const string query = "SELECT * FROM [Maintenance].[ShiftMasterDetails]  WHERE Id = @ShiftMasterId AND IsDeleted = 0 AND UnitId = @UnitId";
             return await _dbConnection.QueryFirstOrDefaultAsync<ShiftMasterDetail>(query, new { ShiftMasterId =ShiftMasterId, UnitId = UnitId });
         }
 

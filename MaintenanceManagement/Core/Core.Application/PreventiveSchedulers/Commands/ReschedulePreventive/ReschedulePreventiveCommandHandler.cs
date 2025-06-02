@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
@@ -31,11 +32,29 @@ namespace Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive
             bool  DetailResult;
             if (result == true)
             {
+                 await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: $"Reschedule Update DueDate",
+                     actionCode: "Update DueDate",
+                     actionName: "Update DueDate",
+                     module: "Preventive",
+                     requestData: request,
+                     cancellationToken
+                    );
                  DetailResult = await _preventiveSchedulerCommand.UpdateRescheduleDate(request.PreventiveScheduleDetailId, request.RescheduleDate);
             }
             else
             {
-                 DetailResult = await _preventiveSchedulerCommand.AddReScheduleDetailAsync(request.PreventiveScheduleDetailId, request.RescheduleDate);
+                 await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: $"Reschedule",
+                     actionCode: "Reschedule",
+                     actionName: "Reschedule",
+                     module: "Preventive",
+                     requestData: request,
+                     cancellationToken
+                    );
+                 DetailResult = await _preventiveSchedulerCommand.AddReScheduleDetailAsync(request.PreventiveScheduleDetailId, request.RescheduleDate,cancellationToken);
             }
 
             if (DetailResult)

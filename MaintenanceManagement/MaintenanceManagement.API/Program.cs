@@ -67,10 +67,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
     endpoints.MapHub<PreventiveScheduleHub>("/preventiveschedulehub");
 });
-// app.MapControllers();
-// app.ConfigureHangfireDashboard();
-// app.UseWebSockets();
-// app.MapHub<PreventiveScheduleHub>("/preventiveschedulehub");
+
 app.Run();
 
 

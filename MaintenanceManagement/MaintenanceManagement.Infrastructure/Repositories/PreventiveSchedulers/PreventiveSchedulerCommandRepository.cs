@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IMaintenance;
+using Core.Application.Common;
 using Core.Application.Common.Interfaces;
 // using Core.Application.Common.Interfaces.IBackgroundService;
 using Core.Application.Common.Interfaces.IMiscMaster;
@@ -11,6 +12,7 @@ using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Domain.Entities;
 using Hangfire;
 using MaintenanceManagement.Infrastructure.Data;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using static Core.Domain.Common.BaseEntity;
 using static Core.Domain.Common.MiscEnumEntity;
@@ -26,7 +28,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         private readonly IIPAddressService _ipAddressService;
         private readonly IBackgroundServiceClient _backgroundServiceClient;
         // private readonly IPreventiveSchedulerCommand _preventiveSchedulerCommand;
-        public PreventiveSchedulerCommandRepository(ApplicationDbContext applicationDbContext, IPreventiveSchedulerQuery preventiveSchedulerQuery, IMiscMasterQueryRepository miscMasterQueryRepository, IMapper mapper, IIPAddressService ipAddressService, IBackgroundServiceClient backgroundServiceClient)
+        public PreventiveSchedulerCommandRepository(ApplicationDbContext applicationDbContext, IPreventiveSchedulerQuery preventiveSchedulerQuery, IMiscMasterQueryRepository miscMasterQueryRepository,
+        IMapper mapper, IIPAddressService ipAddressService, IBackgroundServiceClient backgroundServiceClient)
         {
             _applicationDbContext = applicationDbContext;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
@@ -169,7 +172,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 u.IsActive == Status.Active &&
                 u.IsDeleted == IsDelete.NotDeleted);
 
-            
+
             if (existingPreventiveScheduler != null)
             {
                 DateTimeOffset? lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(existingPreventiveScheduler.MachineId, existingPreventiveScheduler.PreventiveSchedulerHeaderId, WOStatus.MiscCode, MaintenanceStatusUpdate.Code);
@@ -219,7 +222,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     }
                 }
                 // await _preventiveSchedulerCommand.UpdateDetailAsync(existingPreventiveScheduler.Id,newJobId);
-                    return true;
+                return true;
             }
 
 
@@ -249,7 +252,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             }
             return false;
         }
-        public async Task<bool> AddReScheduleDetailAsync(int Id,DateOnly RescheduleDate)
+        public async Task<bool> AddReScheduleDetailAsync(int Id, DateOnly RescheduleDate, CancellationToken cancellationToken)
         {
             var existingPreventiveScheduler = await _applicationDbContext.PreventiveSchedulerDtl
             .Include(ps => ps.PreventiveScheduler)
@@ -261,27 +264,28 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             if (existingPreventiveScheduler != null)
             {
-               
+
                 var headerInfo = await _preventiveSchedulerQuery.GetByIdAsync(existingPreventiveScheduler.PreventiveSchedulerHeaderId);
                 var miscdetail = await _miscMasterQueryRepository.GetByIdAsync(headerInfo.FrequencyUnitId);
-                
-                  existingPreventiveScheduler.IsActive = Status.Inactive;
-                _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
-                
-                
 
-                 var newScheduler = new PreventiveSchedulerDetail
-                 {
-                     PreventiveSchedulerHeaderId = existingPreventiveScheduler.PreventiveSchedulerHeaderId,
-                     WorkOrderCreationStartDate = RescheduleDate,
-                     ActualWorkOrderDate = RescheduleDate,
-                     LastMaintenanceActivityDate = null,
-                     IsActive = Status.Active,
-                     PreventiveScheduler = existingPreventiveScheduler.PreventiveScheduler,
-                     MachineId =existingPreventiveScheduler.MachineId,
-                     Machine =  existingPreventiveScheduler.Machine
-                    
-                 };
+                existingPreventiveScheduler.IsActive = Status.Inactive;
+                _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
+
+
+
+                var newScheduler = new PreventiveSchedulerDetail
+                {
+                    PreventiveSchedulerHeaderId = existingPreventiveScheduler.PreventiveSchedulerHeaderId,
+                    WorkOrderCreationStartDate = RescheduleDate,
+                    ActualWorkOrderDate = RescheduleDate,
+                    MaterialReqStartDays = RescheduleDate,
+                    LastMaintenanceActivityDate = null,
+                    IsActive = Status.Active,
+                    PreventiveScheduler = existingPreventiveScheduler.PreventiveScheduler,
+                    MachineId = existingPreventiveScheduler.MachineId,
+                    Machine = existingPreventiveScheduler.Machine
+
+                };
 
                 // existingPreventiveScheduler.Id = 0;
                 // existingPreventiveScheduler.WorkOrderCreationStartDate = RescheduleDate;
@@ -308,7 +312,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                     newJobId = await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id, 5);
                 }
-                
+
                 return true;
             }
 
@@ -316,5 +320,30 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return false;
         }
 
+        public async Task<PreventiveSchedulerDetail?> GetDetailByMachineActivityAndUnitAsync(string machineCode, string activityName, int unitId)
+        {
+            return await (
+           from m in _applicationDbContext.MachineMaster
+           join psd in _applicationDbContext.PreventiveSchedulerDtl on m.Id equals psd.MachineId
+           join psa in _applicationDbContext.PreventiveSchedulerActivity on psd.PreventiveSchedulerHeaderId equals psa.PreventiveSchedulerHeaderId
+           join am in _applicationDbContext.ActivityMaster on psa.ActivityId equals am.Id
+           join psh in _applicationDbContext.PreventiveSchedulerHdr on psd.PreventiveSchedulerHeaderId equals psh.Id
+           where m.MachineCode == machineCode
+                 && am.ActivityName == activityName
+                 && psh.UnitId == unitId
+           select psd
+       ).FirstOrDefaultAsync();
+        }
+         public async Task SaveChangesAsync(CancellationToken cancellationToken)
+         {
+             await _applicationDbContext.SaveChangesAsync(cancellationToken);
+         }
+
+        public async Task<List<PreventiveSchedulerHeader>> BulkImportPreventiveHeaderAsync(List<PreventiveSchedulerHeader> preventiveSchedulerHeaders)
+        {
+             await _applicationDbContext.PreventiveSchedulerHdr.AddRangeAsync(preventiveSchedulerHeaders);
+            await _applicationDbContext.SaveChangesAsync();
+            return preventiveSchedulerHeaders;
+        }
     }
 }

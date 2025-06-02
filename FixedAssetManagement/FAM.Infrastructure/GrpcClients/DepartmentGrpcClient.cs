@@ -8,7 +8,7 @@ using GrpcServices.UserManagement;
 using Microsoft.AspNetCore.Http;
 
 namespace FAM.Infrastructure.GrpcClients
- {
+{
     public class DepartmentGrpcClient : IDepartmentGrpcClient
     {
         private readonly DepartmentService.DepartmentServiceClient _client;
@@ -32,7 +32,7 @@ namespace FAM.Infrastructure.GrpcClients
             //  ✅ Ensure it has "Bearer " prefix
             if (!token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
-                
+
                 token = $"Bearer {token}";
             }
 
@@ -55,6 +55,6 @@ namespace FAM.Infrastructure.GrpcClients
                 }).ToList();
 
             return departments;
-        }   
-     }
- }
+        }
+    }
+}

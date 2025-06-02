@@ -9,6 +9,6 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetSchedulerByDate
 {
     public class GetSchedulerByDateQuery : IRequest<ApiResponseDTO<List<SchedulerByDateDto>>>
     {
-        
+        public int DepartmentId { get; set; }
     }
 }

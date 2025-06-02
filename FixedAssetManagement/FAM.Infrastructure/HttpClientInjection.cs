@@ -39,7 +39,7 @@ namespace FAM.Infrastructure
 
             services.AddScoped<IUserSessionGrpcClient, GrpcUserSessionClient>();
 
-            // ✅ Register Session gRPC Client
+            // ✅ Register Unit gRPC Client
             services.AddGrpcClient<UnitService.UnitServiceClient>(options =>
             {
                 options.Address = new Uri(userManagementUrl);
@@ -49,7 +49,7 @@ namespace FAM.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
             services.AddScoped<IUnitGrpcClient, UnitGrpcClient>();
 
-            //Company             
+            // ✅ Register Company gRPC Client
             services.AddGrpcClient<CompanyService.CompanyServiceClient>(options =>
             {
                 options.Address = new Uri(userManagementUrl);
@@ -62,6 +62,20 @@ namespace FAM.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
 
             services.AddScoped<ICompanyGrpcClient, CompanyGrpcClient>();
+
+            // ✅ Register AllDepartment gRPC Client
+            services.AddGrpcClient<DepartmentAllService.DepartmentAllServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddScoped<IDepartmentAllGrpcClient, DepartmentAllGrpcClient>();
 
 
             return services;

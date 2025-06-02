@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMiscMaster;
@@ -40,7 +41,15 @@ namespace Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder
             
             
 
-             
+             await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: $"Schedule Work Order request",
+                     actionCode: "Schedule work order",
+                     actionName: "Schedule work order",
+                     module: "Preventive",
+                     requestData: request,
+                     cancellationToken
+                    );
                 
                        var workOrderRequest =  _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(scheduledetail, opt =>
                         {
@@ -52,6 +61,16 @@ namespace Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder
                         workOrderRequest.CreatedDate=DateTime.Now;
                         workOrderRequest.CreatedIP="192.168";
                         
+                        await AuditLogPublisher.PublishAuditLogAsync(
+                     _mediator,
+                     actionDetail: $"Schedule Work Order creation request MaintenanceCategoryId:{scheduledetail.MaintenanceCategoryId}CompanyId:{scheduledetail.CompanyId}UnitId:{scheduledetail.UnitId}",
+                     actionCode: "Schedule work order",
+                     actionName: "Schedule work order",
+                     module: "Preventive",
+                     requestData: workOrderRequest,
+                     cancellationToken
+                    );
+
                         var response = await _workOrderRepository.CreatePreventiveAsync(workOrderRequest,scheduledetail.MaintenanceCategoryId,scheduledetail.CompanyId,scheduledetail.UnitId, cancellationToken);
                         if (response.Id == 0)
                         {

@@ -12,15 +12,14 @@ namespace Core.Application.Location.Queries.GetLocations
         private readonly ILocationQueryRepository _locationQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        private readonly IDepartmentAllGrpcClient _departmentAllGrpcClient;
 
-        public GetLocationHandlerQuery(ILocationQueryRepository locationQueryRepository, IMediator mediator, IMapper mapper, IDepartmentGrpcClient departmentService)
+        public GetLocationHandlerQuery(ILocationQueryRepository locationQueryRepository, IMediator mediator, IMapper mapper, IDepartmentAllGrpcClient departmentService)
         {
             _locationQueryRepository = locationQueryRepository;
             _mediator = mediator;
             _mapper = mapper;
-            _departmentGrpcClient = departmentService;
-
+            _departmentAllGrpcClient = departmentService;
         }
         public async Task<ApiResponseDTO<List<LocationDto>>> Handle(GetLocationQuery request, CancellationToken cancellationToken)
         {
@@ -28,30 +27,35 @@ namespace Core.Application.Location.Queries.GetLocations
             var locationList = _mapper.Map<List<LocationDto>>(locations);
 
             // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            var departments = await _departmentAllGrpcClient.GetDepartmentAllAsync();
+
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-            // var LocationDictionary = new Dictionary<int, LocationDto>();
+            var LocationDictionary = new Dictionary<int, LocationDto>();
 
             // 🔥 Map department names with DataControl to location
-            // foreach (var data in locationList)
-            // {
+            foreach (var data in locationList)
+            {
 
-            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-            //     {
-
-            //         data.DepartmentName = departmentName;
-            //     }
-            //     LocationDictionary[data.DepartmentId] = data;
-
-            // }
-            var filteredLocationDtos = locationList
-                .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-                .Select(p => new LocationDto
+                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
                 {
-                    DepartmentId = p.DepartmentId,
-                    DepartmentName = departmentLookup[p.DepartmentId],
-                })
-                .ToList();
+                    data.DepartmentName = departmentName;
+                }
+
+                LocationDictionary[data.DepartmentId] = data;
+
+            }
+
+            // foreach (var dto in locationList)
+            // {
+            //     if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
+            //     {
+            //         dto.DepartmentName = departmentName;
+            //     }
+            // }
+
+            // var filteredLocationDtos = locationList
+            //     .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            //     .ToList();
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -66,7 +70,7 @@ namespace Core.Application.Location.Queries.GetLocations
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = filteredLocationDtos,
+                Data = locationList,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize

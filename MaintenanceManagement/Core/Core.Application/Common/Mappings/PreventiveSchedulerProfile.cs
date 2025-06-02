@@ -7,6 +7,7 @@ using Core.Application.Common.Interfaces;
 using Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventive;
 using Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.DeletePreventiveScheduler;
+using Core.Application.PreventiveSchedulers.Commands.RescheduleBulkImport;
 using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerById;
 using Core.Domain.Entities;
@@ -17,7 +18,7 @@ namespace Core.Application.Common.Mappings
 {
     public class PreventiveSchedulerProfile : Profile
     {
-        
+
         public PreventiveSchedulerProfile()
         {
             CreateMap<CreatePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
@@ -28,14 +29,14 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
-             CreateMap<PreventiveSchedulerActivityDto, PreventiveSchedulerActivity>();
-             CreateMap<PreventiveSchedulerItemsDto, PreventiveSchedulerItems>()
-             .ForMember(dest => dest.OldItemId, opt => opt.MapFrom(src => src.ItemId))
-             .ForMember(dest => dest.ItemId, opt => opt.Ignore());
+            CreateMap<PreventiveSchedulerActivityDto, PreventiveSchedulerActivity>();
+            CreateMap<PreventiveSchedulerItemsDto, PreventiveSchedulerItems>()
+            .ForMember(dest => dest.OldItemId, opt => opt.MapFrom(src => src.ItemId))
+            .ForMember(dest => dest.ItemId, opt => opt.Ignore());
 
-             CreateMap<UpdatePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
-            .ForMember(dest => dest.PreventiveSchedulerActivities, opt => opt.MapFrom(src => src.Activity))
-             .ForMember(dest => dest.PreventiveSchedulerItems, opt => opt.MapFrom(src => src.Items));
+            CreateMap<UpdatePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
+           .ForMember(dest => dest.PreventiveSchedulerActivities, opt => opt.MapFrom(src => src.Activity))
+            .ForMember(dest => dest.PreventiveSchedulerItems, opt => opt.MapFrom(src => src.Items));
             // .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
 
             CreateMap<PreventiveSchedulerActivityUpdateDto, PreventiveSchedulerActivity>();
@@ -46,10 +47,10 @@ namespace Core.Application.Common.Mappings
             CreateMap<DeletePreventiveSchedulerCommand, PreventiveSchedulerHeader>()
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
 
-             CreateMap<PreventiveSchedulerHeader, PreventiveSchedulerHdrByIdDto>()
-            .ForMember(dest => dest.Activity, opt => opt.MapFrom(src => src.PreventiveSchedulerActivities)) 
-            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.PreventiveSchedulerItems))
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0));
+            CreateMap<PreventiveSchedulerHeader, PreventiveSchedulerHdrByIdDto>()
+           .ForMember(dest => dest.Activity, opt => opt.MapFrom(src => src.PreventiveSchedulerActivities))
+           .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.PreventiveSchedulerItems))
+           .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0));
 
             CreateMap<PreventiveSchedulerActivity, PreventiveSchedulerActivityByIdDto>();
             CreateMap<PreventiveSchedulerItems, PreventiveSchedulerItemByIdDto>()
@@ -93,16 +94,30 @@ namespace Core.Application.Common.Mappings
             .ForMember(dest => dest.WorkOrderId, opt => opt.Ignore())
             .ForMember(dest => dest.ActivityId, opt => opt.MapFrom(src => src.ActivityId));
 
-              CreateMap<PreventiveSchedulerItems, WorkOrderItem>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.WorkOrderId, opt => opt.Ignore())
-            // .ForMember(dest => dest.Sou, opt => opt.MapFrom(src => src.SourceId))
-            .ForMember(dest => dest.OldItemCode, opt => opt.MapFrom(src => src.OldItemId));
+            CreateMap<PreventiveSchedulerItems, WorkOrderItem>()
+          .ForMember(dest => dest.Id, opt => opt.Ignore())
+          .ForMember(dest => dest.WorkOrderId, opt => opt.Ignore())
+          // .ForMember(dest => dest.Sou, opt => opt.MapFrom(src => src.SourceId))
+          .ForMember(dest => dest.OldItemCode, opt => opt.MapFrom(src => src.OldItemId));
             CreateMap<PreventiveSchedulerDetail, PreventiveSchedulerDetail>()
             .ForMember(dest => dest.Id, opt => opt.Ignore());
 
             CreateMap<ActiveInActivePreventiveCommand, PreventiveSchedulerHeader>()
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive));
+
+            CreateMap<PreventiveSchedulerHeaderBulkImportDto, PreventiveSchedulerHeader>()
+            .ForMember(dest => dest.PreventiveSchedulerDetails, opt => opt.MapFrom(src => src.PreventDetails))
+            .ForMember(dest => dest.PreventiveSchedulerActivities, opt => opt.MapFrom(src => src.PreventActivities))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+
+            CreateMap<PrevetiveSchedulerDetailBulkImportDto, PreventiveSchedulerDetail>()
+            .ForMember(dest => dest.PreventiveSchedulerHeaderId, opt => opt.Ignore())
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+
+            CreateMap<PreventiveSchedulerBulkImprotActivityDto, PreventiveSchedulerActivity>()
+            .ForMember(dest => dest.PreventiveSchedulerHeaderId, opt => opt.Ignore());
         }
     }
 }

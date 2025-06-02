@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 var builder = WebApplication.CreateBuilder(args);
 
 
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")??"Development";
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
 
 // Load configuration files based on the environment
@@ -66,7 +66,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGrpcService<AssetSpecificationGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
-// app.ConfigureHangfireDashboard();
 app.Run();
 
 
