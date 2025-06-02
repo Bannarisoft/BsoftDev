@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.MachineMaster.Queries.GetMachineDepartmentbyId;
+using Core.Application.MachineMaster.Queries.GetMachineMaster;
 using Core.Domain.Common;
 using Dapper;
 
@@ -20,41 +21,47 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             _dbConnection = dbConnection;
             _ipAddressService = ipAddressService;
         }
-        public async Task<(List<Core.Domain.Entities.MachineMaster>, int)> GetAllMachineAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<MachineMasterDto>, int)> GetAllMachineAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             var UnitId = _ipAddressService.GetUnitId();
-            var query = $$"""
-             DECLARE @TotalCount INT;
-             SELECT @TotalCount = COUNT(*) 
-             FROM Maintenance.MachineMaster
-             WHERE IsDeleted = 0 AND UnitId = @UnitId
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MachineCode LIKE @Search OR MachineName LIKE @Search)")}};
+           var query = $$"""
+                        DECLARE @TotalCount INT;
 
-                SELECT 
-                Id, 
-                MachineCode,
-                MachineName,
-                MachineGroupId,
-                UnitId,
-                ProductionCapacity,
-                UomId,
-                ShiftMasterId,
-                CostCenterId,
-                WorkCenterId,
-                InstallationDate,
-                AssetId,
-                [LineNo],
-                IsActive
-            FROM Maintenance.MachineMaster 
-            WHERE 
-            IsDeleted = 0 AND UnitId = @UnitId
-                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MachineCode LIKE @Search OR MachineName LIKE @Search )")}}
-                ORDER BY Id desc
-                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+                        -- Count total records
+                        SELECT @TotalCount = COUNT(*) 
+                        FROM Maintenance.MachineMaster mm
+                        LEFT JOIN Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
+                        WHERE mm.IsDeleted = 0 AND mm.UnitId = @UnitId
+                        {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (mm.MachineCode LIKE @Search OR mm.MachineName LIKE @Search)")}};
 
-                SELECT @TotalCount AS TotalCount;
-            """;
+                        -- Fetch paged records with MachineGroupName
+                        SELECT 
+                            mm.Id, 
+                            mm.MachineCode,
+                            mm.MachineName,
+                            mm.MachineGroupId,
+                            mg.GroupName AS MachineGroupName, -- <- correct mapping
+                            mm.UnitId,
+                            mm.ProductionCapacity,
+                            mm.UomId,
+                            mm.ShiftMasterId,
+                            mm.CostCenterId,
+                            mm.WorkCenterId,
+                            mm.InstallationDate,
+                            mm.AssetId,
+                            mm.[LineNo],
+                            mm.IsActive
+                        FROM Maintenance.MachineMaster mm
+                        LEFT JOIN Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
+                        WHERE 
+                            mm.IsDeleted = 0 AND mm.UnitId = @UnitId
+                            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (mm.MachineCode LIKE @Search OR mm.MachineName LIKE @Search)")}}
+                        ORDER BY mm.Id DESC
+                        OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
+                        -- Return total count
+                        SELECT @TotalCount AS TotalCount;
+                        """;
             
              var parameters = new
                        {
@@ -65,20 +72,28 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                        };
 
              var maintenanceCategory = await _dbConnection.QueryMultipleAsync(query, parameters);
-             var maintenanceCategorylist = (await maintenanceCategory.ReadAsync<Core.Domain.Entities.MachineMaster>()).ToList();
+             var maintenanceCategorylist = (await maintenanceCategory.ReadAsync<MachineMasterDto>()).ToList();
              int totalCount = (await maintenanceCategory.ReadFirstAsync<int>());
              return (maintenanceCategorylist, totalCount);
         }
 
-        public async Task<Core.Domain.Entities.MachineMaster?> GetByIdAsync(int Id)
+        public async Task<MachineMasterDto?> GetByIdAsync(int Id)
         {
              var unitId = _ipAddressService.GetUnitId();
              const string query = @"
-                    SELECT * 
-                    FROM Maintenance.MachineMaster 
-                    WHERE Id = @Id AND IsDeleted = 0 AND UnitId = @UnitId";
+                                SELECT 
+                                mm.*, 
+                                mg.GroupName AS MachineGroupName
+                            FROM 
+                                Maintenance.MachineMaster mm
+                            LEFT JOIN 
+                                Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
+                            WHERE 
+                                mm.Id = @Id 
+                                AND mm.IsDeleted = 0 
+                                AND mm.UnitId = @UnitId";
 
-                    var machineMaster = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineMaster>(query, new { Id,unitId });
+                    var machineMaster = await _dbConnection.QueryFirstOrDefaultAsync<MachineMasterDto>(query, new { Id,unitId });
                     return machineMaster;
         }
         public async Task<List<Core.Domain.Entities.MachineMaster>> GetMachineAsync(string searchPattern)
