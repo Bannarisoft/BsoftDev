@@ -5,7 +5,8 @@ namespace Core.Application.MachineGroupUser.Queries.GetMachineGroupUserAutoCompl
     {
         public int Id { get; set; }
         public string? GroupName { get; set; }
-        public string? DeptName { get; set; }
+        public int DepartmentId { get; set; }
+        public string? DepartmentName { get; set; }
         public string? UserName { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }

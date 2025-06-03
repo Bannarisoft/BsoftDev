@@ -44,7 +44,6 @@ namespace Core.Application.MachineGroupUser.Queries.GetMachineGroupUser
                 }
 
                 LocationDictionary[data.DepartmentId] = data;
-
             }
 
             //Domain Event

@@ -1,26 +1,23 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+using Contracts.Interfaces.External.IUser;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IManufacture;
 using Core.Application.Manufacture.Queries.GetManufacture;
 using Core.Domain.Common;
-using Core.Domain.Entities;
 using Dapper;
 
 namespace FAM.Infrastructure.Repositories.Manufacture
 {
     public class ManufactureQueryRepository : IManufactureQueryRepository
     {
-        private readonly IDbConnection _dbConnection;
+        private readonly IDbConnection _dbConnection;                
         public ManufactureQueryRepository(IDbConnection dbConnection)
         {
-            _dbConnection = dbConnection;
+            _dbConnection = dbConnection;            
         }     
         public async Task<(List<ManufactureDTO>, int)> GetAllManufactureAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-             var query = $$"""
+            var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
                 FROM FixedAsset.Manufacture 
@@ -29,12 +26,9 @@ namespace FAM.Infrastructure.Repositories.Manufacture
 
                 SELECT M.Id,M.Code,ManufactureName,ManufactureType,M.CountryId,M.StateId,CityId,AddressLine1,AddressLine2,PinCode,PersonName,PhoneNumber,Email,  M.IsActive
                 ,M.CreatedBy,M.CreatedDate as CreatedAt,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
-                ,C.CountryName,S.StateName,CS.CityName,MM.description ManufactureTypeDescription
+                ,'' CountryName,'' StateName,'' CityName,MM.description ManufactureTypeDescription
                 FROM FixedAsset.Manufacture M
-                INNER JOIN FixedAsset.MiscMaster MM on MM.Id =M.ManufactureType
-                INNER JOIN Bannari.AppData.Country C on C.Id=M.CountryId
-                INNER JOIN Bannari.AppData.State S on S.Id=M.StateId
-                INNER JOIN Bannari.AppData.City CS on CS.Id=M.CityId
+                INNER JOIN FixedAsset.MiscMaster MM on MM.Id =M.ManufactureType              
                 WHERE M.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (M.Code LIKE @Search OR M.ManufactureName LIKE @Search )")}}
                 ORDER BY M.Id desc
@@ -50,7 +44,7 @@ namespace FAM.Infrastructure.Repositories.Manufacture
 
             var manufacture = await _dbConnection.QueryMultipleAsync(query, parameters);
             var manufactureList = (await manufacture.ReadAsync<ManufactureDTO>()).ToList();
-            int totalCount = (await manufacture.ReadFirstAsync<int>());             
+            int totalCount = (await manufacture.ReadFirstAsync<int>());              
             return (manufactureList, totalCount);             
         }
 
@@ -59,12 +53,9 @@ namespace FAM.Infrastructure.Repositories.Manufacture
             const string query = @"
             SELECT M.Id,M.Code,ManufactureName,ManufactureType,M.CountryId,M.StateId,CityId,AddressLine1,AddressLine2,PinCode,PersonName,PhoneNumber,Email,  M.IsActive
             ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
-            ,C.CountryName,S.StateName,CS.CityName,MM.description ManufactureTypeDescription
+            ,'' CountryName,'' StateName,'' CityName,MM.description ManufactureTypeDescription
             FROM FixedAsset.Manufacture M
-            INNER JOIN FixedAsset.MiscMaster MM on MM.Id =M.ManufactureType
-            INNER JOIN Bannari.AppData.Country C on C.Id=M.CountryId
-            INNER JOIN Bannari.AppData.State S on S.Id=M.StateId
-            INNER JOIN Bannari.AppData.City CS on CS.Id=M.CityId
+            INNER JOIN FixedAsset.MiscMaster MM on MM.Id =M.ManufactureType            
             WHERE (M.ManufactureName LIKE @SearchPattern OR M.Code LIKE @SearchPattern) 
             AND  M.IsDeleted=0 and M.IsActive=1
             ORDER BY M.ID DESC";            
@@ -77,12 +68,9 @@ namespace FAM.Infrastructure.Repositories.Manufacture
             const string query = @"
             SELECT M.Id,M.Code,ManufactureName,ManufactureType,M.CountryId,M.StateId,CityId,AddressLine1,AddressLine2,PinCode,PersonName,PhoneNumber,Email,  M.IsActive
             ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
-            ,C.CountryName,S.StateName,CS.CityName,MM.description ManufactureTypeDescription
+            ,'' CountryName,'' StateName,'' CityName,MM.description ManufactureTypeDescription
             FROM FixedAsset.Manufacture M
-            INNER JOIN FixedAsset.MiscMaster MM on MM.Id =M.ManufactureType
-            INNER JOIN Bannari.AppData.Country C on C.Id=M.CountryId
-            INNER JOIN Bannari.AppData.State S on S.Id=M.StateId
-            INNER JOIN Bannari.AppData.City CS on CS.Id=M.CityId 
+            INNER JOIN FixedAsset.MiscMaster MM on MM.Id =M.ManufactureType          
             WHERE M.Id = @Id AND M.IsDeleted=0";
             var manufacture = await _dbConnection.QueryFirstOrDefaultAsync<ManufactureDTO>(query, new { Id });           
             if (manufacture is null)
