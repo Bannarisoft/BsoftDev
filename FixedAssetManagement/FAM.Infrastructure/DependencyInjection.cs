@@ -238,6 +238,7 @@ namespace FAM.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
+            services.AddTransient<ILocationLookupService, LocationLookupService>();
 
             // AutoMapper profiles
             services.AddAutoMapper(

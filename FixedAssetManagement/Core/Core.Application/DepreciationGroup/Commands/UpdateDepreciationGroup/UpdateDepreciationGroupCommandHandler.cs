@@ -36,7 +36,7 @@ namespace Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup
 
               // Check for duplicate GroupName or SortOrder
             var (isNameDuplicate, isCodeDuplicate,isSortOrderDuplicate) = await _depreciationGroupRepository
-                                    .CheckForDuplicatesAsync(request.DepreciationGroupName ?? string.Empty,request.Code ?? string.Empty, request.SortOrder, request.Id);
+                                    .CheckForDuplicatesAsync(request.DepreciationGroupName ?? string.Empty,request.Code ?? string.Empty, request.SortOrder, request.Id,request.IsActive);
 
             if (isNameDuplicate || isCodeDuplicate || isSortOrderDuplicate)
             {
