@@ -14,14 +14,14 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
         private readonly IWorkOrderQueryRepository _workOrderRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
-        private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        private readonly IDepartmentAllGrpcClient _departmentAllGrpcClient;
 
-        public GetWorkOrderQueryHandler(IWorkOrderQueryRepository workOrderRepository , IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
+        public GetWorkOrderQueryHandler(IWorkOrderQueryRepository workOrderRepository , IMapper mapper, IMediator mediator,  IDepartmentAllGrpcClient departmentAllGrpcClient)
         {
             _workOrderRepository = workOrderRepository;
             _mapper = mapper;
             _mediator = mediator;
-            _departmentGrpcClient = departmentGrpcClient;
+            _departmentAllGrpcClient = departmentAllGrpcClient;
         }
   
         public async Task<ApiResponseDTO<List<Dictionary<string, List<GetWorkOrderDto>>>>> Handle(GetWorkOrderQuery request, CancellationToken cancellationToken)
@@ -30,7 +30,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
            var mappedWorkOrders = _mapper.Map<List<GetWorkOrderDto>>(workOrder);
 
              // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentAsync(); // ✅ Clean call
+            var departments = await _departmentAllGrpcClient.GetDepartmentAllAsync(); // ✅ Clean call
 
             // var departments = departmentResponse.Departments.ToList();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
