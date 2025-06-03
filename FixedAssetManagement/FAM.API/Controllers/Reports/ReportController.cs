@@ -72,7 +72,8 @@ namespace FAM.API.Controllers.Reports
                 return NotFound(new
                 {
                     StatusCode = StatusCodes.Status404NotFound,
-                    Message = result?.Message ?? "No Asset Transfer Report found."
+                    Message = result?.Message ?? "No Asset Transfer Report found.",
+                    Data = new List<AssetTransferDetailsDto>()
                 });
             }
 
@@ -80,7 +81,7 @@ namespace FAM.API.Controllers.Reports
             {
                 StatusCode = StatusCodes.Status200OK,
                 Message = result.Message,
-                Data = result.Data?.ToList()
+                Data = result.Data?.ToList() ?? new List<AssetTransferDetailsDto>()
                
             });
         }

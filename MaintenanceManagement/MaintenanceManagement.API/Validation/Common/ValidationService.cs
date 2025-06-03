@@ -70,6 +70,7 @@ using MaintenanceManagement.API.Validation.PreventiveSchedulers;
 using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.DeletePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventive;
+using Core.Application.PreventiveSchedulers.Commands.RescheduleBulkImport;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -79,66 +80,67 @@ namespace MaintenanceManagement.API.Validation.Common
         public void AddValidationServices(IServiceCollection services)
         {
 
-        services.AddScoped<MaxLengthProvider>();
-        services.AddScoped<IValidator<CreateMachineGroupCommand>, CreateMachineGroupCommandValidator>();
-        services.AddScoped<IValidator<DeleteMachineGroupCommand>, DeleteMachineGroupCommandValidator>();
-        services.AddScoped<IValidator<UpdateMachineGroupCommand>, UpdateMachineGroupCommandValidator>();   
-        services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
-        services.AddScoped<IValidator<DeleteMiscTypeMasterCommand>, DeleteMiscTypeMasterCommandValidator>();
-        services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
-        services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
-        services.AddScoped<IValidator<DeleteMiscMasterCommand>, DeleteMiscMasterCommandValidator>();
-        services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>(); 
+            services.AddScoped<MaxLengthProvider>();
+            services.AddScoped<IValidator<CreateMachineGroupCommand>, CreateMachineGroupCommandValidator>();
+            services.AddScoped<IValidator<DeleteMachineGroupCommand>, DeleteMachineGroupCommandValidator>();
+            services.AddScoped<IValidator<UpdateMachineGroupCommand>, UpdateMachineGroupCommandValidator>();
+            services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteMiscTypeMasterCommand>, DeleteMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteMiscMasterCommand>, DeleteMiscMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>();
 
 
 
-        services.AddScoped<IValidator<CreateShiftMasterCommand>, CreateShiftMasterCommandValidator>();
-        services.AddScoped<IValidator<UpdateShiftMasterCommand>, UpdateShiftMasterCommandValidator>();
-        services.AddScoped<IValidator<DeleteShiftMasterCommand>, DeleteShiftMasterCommandValidator>();
-        services.AddScoped<IValidator<CreateShiftMasterDetailCommand>, CreateShiftMasterDetailCommandValidator>();
-        services.AddScoped<IValidator<UpdateShiftMasterDetailCommand>, UpdateShiftMasterDetailCommandValidator>();
-        services.AddScoped<IValidator<DeleteShiftMasterDetailCommand>, DeleteShiftMasterDetailCommandValidator>();
-        services.AddScoped<IValidator<CreateCostCenterCommand>, CreateCostCenterCommandValidator>();
-        services.AddScoped<IValidator<UpdateCostCenterCommand>, UpdateCostCenterCommandValidator>();
-        services.AddScoped<IValidator<DeleteCostCenterCommand>, DeleteCostCenterCommandValidator>();
-        services.AddScoped<IValidator<CreateWorkCenterCommand>, CreateWorkCenterCommandValidator>();
-        services.AddScoped<IValidator<UpdateWorkCenterCommand>, UpdateWorkCenterCommandValidator>();
-        services.AddScoped<IValidator<DeleteWorkCenterCommand>, DeleteWorkCenterCommandValidator>();
-        services.AddScoped<IValidator<CreateMaintenanceCategoryCommand>, CreateMaintenanceCategoryCommandValidator>();
-        services.AddScoped<IValidator<UpdateMaintenanceCategoryCommand>, UpdateMaintenanceCategoryCommandValidator>();
-        services.AddScoped<IValidator<DeleteMaintenanceCategoryCommand>, DeleteMaintenanceCategoryCommandValidator>();
-        services.AddScoped<IValidator<CreateMaintenanceTypeCommand>, CreateMaintenanceTypeCommandValidator>();
-        services.AddScoped<IValidator<UpdateMaintenanceTypeCommand>, UpdateMaintenanceTypeCommandValidator>();
-        services.AddScoped<IValidator<DeleteMaintenanceTypeCommand>, DeleteMaintenanceTypeCommandValidator>();
+            services.AddScoped<IValidator<CreateShiftMasterCommand>, CreateShiftMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateShiftMasterCommand>, UpdateShiftMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteShiftMasterCommand>, DeleteShiftMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateShiftMasterDetailCommand>, CreateShiftMasterDetailCommandValidator>();
+            services.AddScoped<IValidator<UpdateShiftMasterDetailCommand>, UpdateShiftMasterDetailCommandValidator>();
+            services.AddScoped<IValidator<DeleteShiftMasterDetailCommand>, DeleteShiftMasterDetailCommandValidator>();
+            services.AddScoped<IValidator<CreateCostCenterCommand>, CreateCostCenterCommandValidator>();
+            services.AddScoped<IValidator<UpdateCostCenterCommand>, UpdateCostCenterCommandValidator>();
+            services.AddScoped<IValidator<DeleteCostCenterCommand>, DeleteCostCenterCommandValidator>();
+            services.AddScoped<IValidator<CreateWorkCenterCommand>, CreateWorkCenterCommandValidator>();
+            services.AddScoped<IValidator<UpdateWorkCenterCommand>, UpdateWorkCenterCommandValidator>();
+            services.AddScoped<IValidator<DeleteWorkCenterCommand>, DeleteWorkCenterCommandValidator>();
+            services.AddScoped<IValidator<CreateMaintenanceCategoryCommand>, CreateMaintenanceCategoryCommandValidator>();
+            services.AddScoped<IValidator<UpdateMaintenanceCategoryCommand>, UpdateMaintenanceCategoryCommandValidator>();
+            services.AddScoped<IValidator<DeleteMaintenanceCategoryCommand>, DeleteMaintenanceCategoryCommandValidator>();
+            services.AddScoped<IValidator<CreateMaintenanceTypeCommand>, CreateMaintenanceTypeCommandValidator>();
+            services.AddScoped<IValidator<UpdateMaintenanceTypeCommand>, UpdateMaintenanceTypeCommandValidator>();
+            services.AddScoped<IValidator<DeleteMaintenanceTypeCommand>, DeleteMaintenanceTypeCommandValidator>();
 
             services.AddScoped<IValidator<CreateActivityMasterCommand>, CreateActivityMasterCommandValidator>();
             services.AddScoped<IValidator<CreateMachineMasterCommand>, CreateMachineMasterCommandValidator>();
             services.AddScoped<IValidator<UpdateMachineMasterCommand>, UpdateMachineMasterCommandValidator>();
             services.AddScoped<IValidator<DeleteMachineMasterCommand>, DeleteMachineMasterCommandValidator>();
-        services.AddScoped<IValidator<UpdateActivityMasterCommand>, UpdateActivityMasterCommandValidator>();
-        services.AddScoped<IValidator<CreateMachineGroupUserCommand>, CreateMachineGroupUserCommandValidator>();
-        services.AddScoped<IValidator<UpdateMachineGroupUserCommand>, UpdateMachineGroupUserCommandValidator>();
-        services.AddScoped<IValidator<DeleteMachineGroupUserCommand>, DeleteMachineGroupUserCommandValidator>();
+            services.AddScoped<IValidator<UpdateActivityMasterCommand>, UpdateActivityMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateMachineGroupUserCommand>, CreateMachineGroupUserCommandValidator>();
+            services.AddScoped<IValidator<UpdateMachineGroupUserCommand>, UpdateMachineGroupUserCommandValidator>();
+            services.AddScoped<IValidator<DeleteMachineGroupUserCommand>, DeleteMachineGroupUserCommandValidator>();
 
 
-        services.AddScoped<IValidator<CreateWorkOrderCommand>, CreateWorkOrderCommandValidator>();
-        services.AddScoped<IValidator<UpdateWorkOrderCommand>, UpdateWorkOrderCommandValidator>();
-        services.AddScoped<IValidator<UploadFileWorkOrderCommand>, UploadWorkOrderCommandValidator>();
-        services.AddScoped<IValidator<UploadFileItemCommand>, UploadItemCommandValidator>();
+            services.AddScoped<IValidator<CreateWorkOrderCommand>, CreateWorkOrderCommandValidator>();
+            services.AddScoped<IValidator<UpdateWorkOrderCommand>, UpdateWorkOrderCommandValidator>();
+            services.AddScoped<IValidator<UploadFileWorkOrderCommand>, UploadWorkOrderCommandValidator>();
+            services.AddScoped<IValidator<UploadFileItemCommand>, UploadItemCommandValidator>();
 
-        services.AddScoped<IValidator<CreateActivityCheckListMasterCommand>, CreateActivityCheckListMasterCommandValidator>();
-        services.AddScoped<IValidator<UpdateActivityCheckListMasterCommand>, UpdateActivityCheckListMasterCommandValidator>();
-        services.AddScoped<IValidator<CreateMaintenanceRequestCommand>, CreateMaintenanceRequestCommandValidator>();
-        services.AddScoped<IValidator<UpdateMaintenanceRequestCommand>, UpdateMaintenanceRequestCommandValidator>();
-        services.AddScoped<IValidator<UpdateWOScheduleCommand>, UpdateWOScheduleCommandValidator>();
+            services.AddScoped<IValidator<CreateActivityCheckListMasterCommand>, CreateActivityCheckListMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateActivityCheckListMasterCommand>, UpdateActivityCheckListMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateMaintenanceRequestCommand>, CreateMaintenanceRequestCommandValidator>();
+            services.AddScoped<IValidator<UpdateMaintenanceRequestCommand>, UpdateMaintenanceRequestCommandValidator>();
+            services.AddScoped<IValidator<UpdateWOScheduleCommand>, UpdateWOScheduleCommandValidator>();
 
 
-        services.AddScoped<IValidator<CreateWOScheduleCommand>, CreateWOScheduleCommandValidator>();
-        services.AddScoped<IValidator<CreateMRSCommand>, CreateMRSCommandValidator>();        
-        services.AddScoped<IValidator<CreatePreventiveSchedulerCommand>, CreatePreventiveSchedulerCommandValidator>();
-        services.AddScoped<IValidator<UpdatePreventiveSchedulerCommand>, UpdatePreventiveSchedulerCommandValidator>();
-        services.AddScoped<IValidator<DeletePreventiveSchedulerCommand>, DeletePreventiveSchedulerCommandValidator>();
-        services.AddScoped<IValidator<ActiveInActivePreventiveCommand>, UpdateActiveStatusCommandValidator>();        
+            services.AddScoped<IValidator<CreateWOScheduleCommand>, CreateWOScheduleCommandValidator>();
+            services.AddScoped<IValidator<CreateMRSCommand>, CreateMRSCommandValidator>();
+            services.AddScoped<IValidator<CreatePreventiveSchedulerCommand>, CreatePreventiveSchedulerCommandValidator>();
+            services.AddScoped<IValidator<UpdatePreventiveSchedulerCommand>, UpdatePreventiveSchedulerCommandValidator>();
+            services.AddScoped<IValidator<DeletePreventiveSchedulerCommand>, DeletePreventiveSchedulerCommandValidator>();
+            services.AddScoped<IValidator<ActiveInActivePreventiveCommand>, UpdateActiveStatusCommandValidator>();
+        services.AddScoped<IValidator<RescheduleBulkImportCommand>, BulkImportPreventiveSchedulerCommandValidator>();        
         }  
     }
 }

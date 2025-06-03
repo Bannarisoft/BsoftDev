@@ -69,7 +69,7 @@ namespace Core.Application.Reports.AssetTransferReport
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = assetTransfersReportDtos,
+                Data = assetTransfersReportDtos ?? new List<AssetTransferDetailsDto>(),
                 TotalCount = assetTransfersReportDtos.Count
             };
         }
