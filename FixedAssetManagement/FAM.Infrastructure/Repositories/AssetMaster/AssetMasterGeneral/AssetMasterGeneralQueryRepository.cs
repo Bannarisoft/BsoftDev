@@ -17,14 +17,14 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         private readonly IDbConnection _dbConnection;   
         private readonly ICompanyGrpcClient _companyGrpcClient;     
         private readonly IUnitGrpcClient _unitGrpcClient;   
-        private readonly IDepartmentGrpcClient _departmentGrpcClient;  
-        public AssetMasterGeneralQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService, ICompanyGrpcClient companyGrpcClient,IUnitGrpcClient unitGrpcClient,IDepartmentGrpcClient departmentGrpcClient)
+        private readonly IDepartmentAllGrpcClient _departmentAllGrpcClient;  
+        public AssetMasterGeneralQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService, ICompanyGrpcClient companyGrpcClient,IUnitGrpcClient unitGrpcClient,IDepartmentAllGrpcClient departmentAllGrpcClient)
             : base(ipAddressService) 
         {
             _dbConnection = dbConnection;      
             _companyGrpcClient = companyGrpcClient;  
             _unitGrpcClient=unitGrpcClient;   
-            _departmentGrpcClient=_departmentGrpcClient;
+            _departmentAllGrpcClient=departmentAllGrpcClient;
         }     
         public async Task<(List<AssetMasterGeneralDTO>, int)> GetAllAssetAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
@@ -82,7 +82,6 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 });
             return result.ToList();
         }
-
        public async Task<AssetMasterGeneralDTO> GetByIdAsync(int assetId)
         {
             const string query = @"            
@@ -267,14 +266,18 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         {
              
             var companies = await _companyGrpcClient.GetAllCompanyAsync();
-            //var departments = await _companyGrpcClient.GetAllCompanyAsync();
+            var departments = await _departmentAllGrpcClient.GetDepartmentAllAsync();
             var units = await _unitGrpcClient.GetAllUnitAsync();
 
             var companyLookup = companies.ToDictionary(c => c.CompanyId, c => c.CompanyName);
             var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+            var oldUnitLookup = units.Where(u => !string.IsNullOrEmpty(u.OldUnitId))
+                                .ToDictionary(u => u.OldUnitId, u => u.UnitName);
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
             var CompanyName = companyLookup.TryGetValue(CompanyId, out var cName) ? cName : string.Empty;
             var UnitName = unitLookup.TryGetValue(UnitId, out var uName) ? uName : string.Empty;
+            var OldUnitName = oldUnitLookup.TryGetValue(OldUnitId, out var oName) ? oName : string.Empty;
 
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
@@ -297,23 +300,20 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 WHERE  AM.CompanyId = @CompanyId AND AM.UnitId = @UnitId AND   AM.Id = @AssetId;
 
                 -- Second Query: AssetLocation (One-to-One)
-                SELECT U.UnitName,D.DeptName,L.LocationName,SL.SubLocationName,U.OldUnitId,AL.CustodianId,AL.UserId,AL.DepartmentId,AL.LocationId,AL.SubLocationId
+                SELECT @unitName UnitName,'' DeptName,L.LocationName,SL.SubLocationName,@oldUnitId OldUnitId,AL.CustodianId,AL.UserId,AL.DepartmentId,AL.LocationId,AL.SubLocationId
                 FROM [FixedAsset].[AssetLocation] AL
                 INNER JOIN [FixedAsset].[Location] L ON L.Id=AL.LocationId
-                INNER JOIN [FixedAsset].[SubLocation] SL ON SL.Id=AL.SubLocationId
-                LEFT JOIN [Bannari].[AppData].[Unit] U ON AL.UnitId = U.Id
-                LEFT JOIN [Bannari].[AppData].[Department] D ON AL.DepartmentId=D.Id                
+                INNER JOIN [FixedAsset].[SubLocation] SL ON SL.Id=AL.SubLocationId                
                 WHERE AL.UnitId = @UnitId AND AL.AssetId = @AssetId;                
 
                 -- Third Query: AssetPurchaseDetails (One-to-Many)
-                SELECT distinct AP.Id,AP.VendorCode, AP.VendorName,U.UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
+                SELECT distinct AP.Id,AP.VendorCode, AP.VendorName,@oldUnitName UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
                 AP.GrnSno,AP.GrnValue,AP.PoNo,Cast(AP.PoDate AS date) AS PoDate,AP.PurchaseValue,AP.AcceptedQty,AP.Uom,
                 AP.PoSno,AP.ItemCode,AP.ItemName,AP.BillNo,Cast(AP.BillDate AS date) AS BillDate ,AP.BinLocation 
                 ,AP.PjYear,AP.PjDocId,AP.PjDocSr,AP.PjDocNo,AP.AssetSourceId ,cast(AP.CapitalizationDate as date)CapitalizationDate
-                FROM [FixedAsset].[AssetPurchaseDetails] AP
-                LEFT JOIN [Bannari].[AppData].[Unit] U ON AP.OldUnitId = U.OldUnitId
+                FROM [FixedAsset].[AssetPurchaseDetails] AP                
                 INNER JOIN [FixedAsset].[AssetSource] ASource ON ASource.Id=AP.AssetSourceId
-                WHERE U.Id = @UnitId AND AP.AssetId = @AssetId;
+                WHERE  AP.OldUnitId=@oldUnitId AND AP.AssetId = @AssetId;
 
                 SELECT A.Id,SM.SpecificationName,A.SpecificationValue,A.SpecificationId,SM.IsDefault FROM  [FixedAsset].[AssetSpecifications] A
                 INNER JOIN [FixedAsset].[SpecificationMaster] SM ON SM.Id=A.SpecificationId
@@ -348,7 +348,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 INNER JOIN [FixedAsset].[MiscMaster] MMDisposal ON MMDisposal.Id=AD.DisposalType
                 WHERE AD.AssetId=@AssetId
 
-                SELECT Id, PolicyNo,CAST(StartDate AS DATE) AS StartDate,CAST(EndDate AS DATE) AS EndDate,Insuranceperiod,PolicyAmount,
+                SELECT Id, PolicyNo,CAST(StartDate AS DATE) AS StartDate,CAST(EndDate AS DATE) AS EndDate,InsurancePeriod,PolicyAmount,
                 VendorCode,RenewalStatus,CAST(RenewedDate AS DATE) AS RenewedDate,IsActive
                 FROM [FixedAsset].[AssetInsurance]
                 WHERE AssetId=@AssetId
@@ -369,7 +369,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                     UnitId,
                     AssetId = assetId,
                     companyName = CompanyName,
-                    unitName = UnitName
+                    unitName = UnitName, oldUnitId = OldUnitId,oldUnitName=OldUnitName
                 });            
 
 
@@ -383,62 +383,67 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             var insuranceDetails = (await multi.ReadAsync<dynamic>()).ToList();
             var additionalCost   = (await multi.ReadAsync<dynamic>()).ToList();
 
-       
-            if (locationResult != null && !string.IsNullOrEmpty(locationResult.OldUnitId))
-            {
-                // Fetch Custodian
-                if (locationResult.CustodianId > 0)
+        if (locationResult != null)
+        {
+            if (departmentLookup.TryGetValue(locationResult.DepartmentId, out string deptName))
                 {
-                    var custodianParams = new
-                    {
-                        DivCode = locationResult.OldUnitId,
-                        EmpNo = locationResult.CustodianId
-                    };
-
-                    var custodianEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
-                        "dbo.GetEmployeeByDivision",
-                        custodianParams,
-                        commandType: CommandType.StoredProcedure
-                    );
-
-                    if (custodianEmployee != null)
-                        locationResult.CustodianName = custodianEmployee.Empname;
-                }
-
-                // Fetch User
-                if (locationResult.UserId > 0)
-                {
-                    var userParams = new
-                    {
-                        DivCode = locationResult.OldUnitId,
-                        EmpNo = locationResult.UserId
-                    };
-
-                    var userEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
-                        "dbo.GetEmployeeByDivision",
-                        userParams,
-                        commandType: CommandType.StoredProcedure
-                    );
-
-                    if (userEmployee != null)
-                        locationResult.UserName = userEmployee.Empname;
-                }
+                locationResult.DeptName = deptName;
             }
+        
+            // Fetch Custodian
+            if (!string.IsNullOrEmpty(locationResult.OldUnitId) && locationResult.CustodianId > 0)
+            {
+                var custodian = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
+                    "dbo.GetEmployeeByDivision",
+                    new { DivCode = locationResult.OldUnitId, EmpNo = locationResult.CustodianId },
+                    commandType: CommandType.StoredProcedure
+                );
 
-            return (assetResult, locationResult, purchaseDetails, specDetails, warrantyDetails, amcDetails, disposalResult, insuranceDetails,additionalCost);
-       
+                if (custodian != null)
+                    locationResult.CustodianName = custodian.Empname;
+            }
+            // Fill User Name
+            if (!string.IsNullOrEmpty(locationResult.OldUnitId) && locationResult.UserId > 0)
+            {
+                var user = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
+                    "dbo.GetEmployeeByDivision",
+                    new { DivCode = locationResult.OldUnitId, EmpNo = locationResult.UserId },
+                    commandType: CommandType.StoredProcedure
+                );
+
+                if (user != null)
+                    locationResult.UserName = user.Empname;
+            }           
+        }
+        return (assetResult, locationResult, purchaseDetails, specDetails, warrantyDetails, amcDetails, disposalResult, insuranceDetails,additionalCost);       
         }
 
         public async Task<(dynamic AssetResult, dynamic LocationResult, IEnumerable<dynamic> PurchaseDetails, IEnumerable<dynamic> AdditionalCost)> GetAssetMasterSplitByIdAsync(int assetId)
         {
+            var companies = await _companyGrpcClient.GetAllCompanyAsync();
+            var departments = await _departmentAllGrpcClient.GetDepartmentAllAsync();
+            var units = await _unitGrpcClient.GetAllUnitAsync();
+
+            var companyLookup = companies.ToDictionary(c => c.CompanyId, c => c.CompanyName);
+            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+            var oldUnitLookup = units.Where(u => !string.IsNullOrEmpty(u.OldUnitId))
+            .ToDictionary(u => u.OldUnitId, u => u.UnitName);
+
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            var CompanyName = companyLookup.TryGetValue(CompanyId, out var cName) ? cName : string.Empty;
+            var UnitName = unitLookup.TryGetValue(UnitId, out var uName) ? uName : string.Empty;
+            var OldUnitName = oldUnitLookup.TryGetValue(OldUnitId, out var oName) ? oName : string.Empty;
+
+
            var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
                 SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,                
-                case when (isnull(AM.AssetImage,'') <> '') then MM.Description+''+MM1.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetImage  else 
+                case when (isnull(AM.AssetImage,'') <> '') then MM.Description+''+MM1.Description+'/'+@companyName+'/'+@unitName +'/'+AM.AssetImage  else 
                 '' end AssetImage ,  
                 AM.AssetCategoryId,AM.AssetSubCategoryId,
                 AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName,
-                case when (isnull(AM.AssetDocument,'') <> '') then MM.Description+''+MM2.Description+'/'+trim(C.CompanyName)+'/'+trim(UN.UnitName) +'/'+AM.AssetDocument  else 
+                case when (isnull(AM.AssetDocument,'') <> '') then MM.Description+''+MM2.Description+'/'+@companyName+'/'+@unitName  +'/'+AM.AssetDocument  else 
                 '' end AssetDocument ,  AM.AssetDocument AssetDocumentName
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
@@ -446,32 +451,27 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 INNER JOIN [FixedAsset].[AssetCategories] AC ON AM.AssetCategoryId = AC.Id
                 INNER JOIN [FixedAsset].[AssetSubCategories] ASUBC ON AM.AssetSubCategoryId = ASUBC.Id
                 LEFT JOIN [FixedAsset].[AssetMaster] AssetParent ON AM.AssetParentId = AssetParent.Id                
-                   LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'               
+                LEFT JOIN FixedAsset.MiscTypeMaster MM on MM.MiscTypeCode ='GETASSETIMAGE'               
                 LEFT JOIN FixedAsset.MiscTypeMaster MM1 on MM1.MiscTypeCode ='ASSETIMAGE'
                 LEFT JOIN FixedAsset.MiscTypeMaster MM2 on MM2.MiscTypeCode ='ASSETDocument'
-                LEFT JOIN Bannari.AppData.Unit UN on UN.Id=AM.UnitId
-                LEFT JOIN Bannari.AppData.Company C on C.Id=AM.CompanyId
                 WHERE AM.CompanyId = @CompanyId AND AM.UnitId = @UnitId AND AM.Id = @AssetId;
 
                 -- Second Query: AssetLocation (One-to-One)
-                SELECT U.UnitName,D.DeptName,L.LocationName,SL.SubLocationName,U.OldUnitId,AL.CustodianId,AL.UserId,AL.DepartmentId,AL.LocationId,AL.SubLocationId
+                SELECT @unitName UnitName,'' DeptName,L.LocationName,SL.SubLocationName,@oldUnitId as OldUnitId,AL.CustodianId,AL.UserId,AL.DepartmentId,AL.LocationId,AL.SubLocationId
                 FROM [FixedAsset].[AssetLocation] AL
                 INNER JOIN [FixedAsset].[Location] L ON L.Id=AL.LocationId
-                INNER JOIN [FixedAsset].[SubLocation] SL ON SL.Id=AL.SubLocationId
-                LEFT JOIN [Bannari].[AppData].[Unit] U ON AL.UnitId = U.Id
-                LEFT JOIN [Bannari].[AppData].[Department] D ON AL.DepartmentId=D.Id                
+                INNER JOIN [FixedAsset].[SubLocation] SL ON SL.Id=AL.SubLocationId                            
                 WHERE AL.UnitId = @UnitId AND  AL.AssetId = @AssetId;
                 
 
                 -- Third Query: AssetPurchaseDetails (One-to-Many)
-                SELECT distinct AP.Id,AP.VendorCode, AP.VendorName,U.UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
+                SELECT distinct AP.Id,AP.VendorCode, AP.VendorName,@oldUnitId UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
                 AP.GrnSno,AP.GrnValue,AP.PoNo,Cast(AP.PoDate AS date) AS PoDate,AP.PurchaseValue,AP.AcceptedQty,AP.Uom,
                 AP.PoSno,AP.ItemCode,AP.ItemName,AP.BillNo,Cast(AP.BillDate AS date) AS BillDate ,AP.BinLocation 
                 ,AP.PjYear,AP.PjDocId,AP.PjDocSr,AP.PjDocNo,AP.AssetSourceId ,cast(AP.CapitalizationDate as varchar)CapitalizationDate
-                FROM [FixedAsset].[AssetPurchaseDetails] AP
-                LEFT JOIN [Bannari].[AppData].[Unit] U ON AP.OldUnitId = U.OldUnitId
+                FROM [FixedAsset].[AssetPurchaseDetails] AP                
                 INNER JOIN [FixedAsset].[AssetSource] ASource ON ASource.Id=AP.AssetSourceId
-                WHERE U.Id = @UnitId AND AP.AssetId = @AssetId;             
+                WHERE  AP.OldUnitId=@oldUnitId  AND AP.AssetId = @AssetId;             
 
                 SELECT AC.Id,AssetSourceId,Amount,JournalNo,CostType,MM.Code CostTypeDesc
                 FROM [FixedAsset].[AssetAdditionalCost]AC
@@ -487,32 +487,27 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 {
                     CompanyId,
                     UnitId,
-                   AssetId = assetId
-                });       
-
-
-
+                    AssetId = assetId,companyName = CompanyName,
+                    unitName = UnitName, oldUnitId = OldUnitId,oldUnitName=OldUnitName
+                });    
             var assetResult     = (await multi.ReadAsync<dynamic>()).FirstOrDefault();
             var locationResult  = (await multi.ReadAsync<dynamic>()).FirstOrDefault();
             var purchaseDetails = (await multi.ReadAsync<dynamic>()).ToList();
             var additionalCost   = (await multi.ReadAsync<dynamic>()).ToList();
 
-
-       
-            if (locationResult != null && !string.IsNullOrEmpty(locationResult.OldUnitId))
+            if (locationResult != null)
             {
-                // Fetch Custodian
-                if (locationResult.CustodianId > 0)
+                if (departmentLookup.TryGetValue(locationResult.DepartmentId, out string deptName))
                 {
-                    var custodianParams = new
-                    {
-                        DivCode = locationResult.OldUnitId,
-                        EmpNo = locationResult.CustodianId
-                    };
+                    locationResult.DeptName = deptName;
+                }
+                // Fetch Custodian
+                if (!string.IsNullOrEmpty(locationResult.OldUnitId) && locationResult.CustodianId > 0)
+                {                   
 
                     var custodianEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
                         "dbo.GetEmployeeByDivision",
-                        custodianParams,
+                        new { DivCode = locationResult.OldUnitId, EmpNo = locationResult.CustodianId },
                         commandType: CommandType.StoredProcedure
                     );
 
@@ -521,46 +516,21 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 }
 
                 // Fetch User
-                if (locationResult.UserId > 0)
+                if (!string.IsNullOrEmpty(locationResult.OldUnitId) && locationResult.UserId > 0)
                 {
-                    var userParams = new
-                    {
-                        DivCode = locationResult.OldUnitId,
-                        EmpNo = locationResult.UserId
-                    };
-
-                    var userEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
+                    var user = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
                         "dbo.GetEmployeeByDivision",
-                        userParams,
+                        new { DivCode = locationResult.OldUnitId, EmpNo = locationResult.UserId },
                         commandType: CommandType.StoredProcedure
                     );
 
-                    if (userEmployee != null)
-                        locationResult.UserName = userEmployee.Empname;
-                }
-            }
-
+                    if (user != null)
+                        locationResult.UserName = user.Empname;
+                }   
+            }            
             return (assetResult, locationResult, purchaseDetails, additionalCost);
        
-        }
-        public async Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId,int unitId)
-        {
-            const string query = @"
-                SELECT CompanyName 
-                FROM Bannari.AppData.Company 
-                WHERE Id = @CompanyId;
-
-                SELECT UnitName  
-                FROM Bannari.AppData.Unit 
-                WHERE Id = @UnitId;
-            ";
-            using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { CompanyId = companyId, UnitId = unitId });
-
-            var companyName = (await multiQuery.ReadFirstOrDefaultAsync<string>())?.Trim();
-            var unitName = (await multiQuery.ReadFirstOrDefaultAsync<string>())?.Trim();
-
-            return (companyName, unitName);
-        }
+        }       
 
         public async Task<string> GetDocumentDirectoryAsync()
         {

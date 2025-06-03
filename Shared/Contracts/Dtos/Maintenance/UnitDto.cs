@@ -14,5 +14,6 @@ namespace Contracts.Dtos.Maintenance
         public string UnitName { get; set; }
         public string ShortName { get; set; }
         public string UnitHeadName { get; set; }
+        public string OldUnitId { get; set; }
     }
 }
