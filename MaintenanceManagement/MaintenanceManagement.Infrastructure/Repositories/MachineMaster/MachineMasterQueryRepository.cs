@@ -7,6 +7,7 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.MachineMaster.Queries.GetMachineDepartmentbyId;
 using Core.Application.MachineMaster.Queries.GetMachineMaster;
+using Core.Application.MachineMaster.Queries.GetMachineNoDepartmentbyId;
 using Core.Domain.Common;
 using Dapper;
 
@@ -203,6 +204,19 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             ORDER BY M.ID DESC";    
             var parameters = new { MiscTypeCode = MiscEnumEntity.MachineLineNo.Code };        
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+            return result.ToList();
+        }
+
+        public async Task<List<GetMachineNoDepartmentbyIdDto>> GetMachineNoDepartmentAsync(int DepartmentId)
+        {
+            const string query = @"
+                SELECT A.Id, A.MachineCode, A.MachineName
+                FROM Maintenance.MachineMaster A
+                INNER JOIN Maintenance.MachineGroup B ON A.MachineGroupId = B.Id
+                WHERE B.DepartmentId = @DepartmentId";
+
+            var result = await _dbConnection.QueryAsync<GetMachineNoDepartmentbyIdDto>(query, new { DepartmentId = DepartmentId });
+
             return result.ToList();
         }
     }
