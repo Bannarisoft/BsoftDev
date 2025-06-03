@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.MachineMaster.Queries.GetMachineDepartmentbyId;
+using Core.Application.MachineMaster.Queries.GetMachineMaster;
+using Core.Application.MachineMaster.Queries.GetMachineNoDepartmentbyId;
 
 namespace Core.Application.Common.Interfaces.IMachineMaster
 {
     public interface IMachineMasterQueryRepository
     {
-        Task<Core.Domain.Entities.MachineMaster?> GetByIdAsync(int Id);
-        Task<(List<Core.Domain.Entities.MachineMaster>, int)> GetAllMachineAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<MachineMasterDto?> GetByIdAsync(int Id);
+        Task<(List<MachineMasterDto>, int)> GetAllMachineAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<List<Core.Domain.Entities.MachineMaster>> GetMachineAsync(string searchPattern);
+        Task<List<GetMachineNoDepartmentbyIdDto>> GetMachineNoDepartmentAsync(int DepartmentId);
         Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroupAsync(int MachineGroupId);
         // Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroup(int MachineGroupId);
         Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroupSagaAsync(int MachineGroupId, int UnitId);

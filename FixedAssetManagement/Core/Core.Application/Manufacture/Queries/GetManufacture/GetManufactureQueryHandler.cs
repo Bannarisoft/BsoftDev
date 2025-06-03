@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IManufacture;
 using Core.Domain.Events;
 using MediatR;
@@ -15,17 +16,37 @@ namespace Core.Application.Manufacture.Queries.GetManufacture
         private readonly IManufactureQueryRepository _manufactureRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
+        private readonly ILocationLookupService _locationLookupService;  
 
-        public GetManufactureQueryHandler(IManufactureQueryRepository manufactureRepository , IMapper mapper, IMediator mediator)
+        public GetManufactureQueryHandler(IManufactureQueryRepository manufactureRepository , IMapper mapper, IMediator mediator,ILocationLookupService locationLookupService)
         {
             _manufactureRepository = manufactureRepository;
             _mapper = mapper;
             _mediator = mediator;
+            _locationLookupService=locationLookupService;
         }
         public async Task<ApiResponseDTO<List<ManufactureDTO>>> Handle(GetManufactureQuery request, CancellationToken cancellationToken)
         {
             var (manufacture, totalCount) = await _manufactureRepository.GetAllManufactureAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var manufactureList = _mapper.Map<List<ManufactureDTO>>(manufacture);
+           
+            // Get lookup data for geo enrichment
+            var countries = await _locationLookupService.GetCountryLookupAsync();
+            var states = await _locationLookupService.GetStateLookupAsync();
+            var cities = await _locationLookupService.GetCityLookupAsync();
+
+            // Enrich DTOs with country/state/city names
+            foreach (var m in manufactureList)
+            {
+                if (countries.TryGetValue(m.CountryId, out var countryName))
+                    m.CountryName = countryName;
+
+                if (states.TryGetValue(m.StateId, out var stateName))
+                    m.StateName = stateName;
+
+                if (cities.TryGetValue(m.CityId, out var cityName))
+                    m.CityName = cityName;
+            }
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(

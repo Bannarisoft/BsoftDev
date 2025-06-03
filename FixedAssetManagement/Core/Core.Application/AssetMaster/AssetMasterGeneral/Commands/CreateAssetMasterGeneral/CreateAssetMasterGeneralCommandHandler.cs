@@ -1,5 +1,6 @@
 using AutoMapper;
 using Contracts.Events.Users;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
@@ -16,15 +17,19 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
         private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly IMediator _mediator;
-        private readonly IEventPublisher _eventPublisher;  // Use IEventPublisher instead of IPublishEndpoint
+        private readonly IEventPublisher _eventPublisher;  
+        private readonly IUnitGrpcClient _unitGrpcClient;
+        private readonly ICompanyGrpcClient _companyGrpcClient;
 
-        public CreateAssetMasterGeneralCommandHandler(IMapper mapper,IAssetMasterGeneralCommandRepository  assetMasterGeneralRepository, IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository, IMediator mediator, IEventPublisher eventPublisher)
+        public CreateAssetMasterGeneralCommandHandler(IMapper mapper,IAssetMasterGeneralCommandRepository  assetMasterGeneralRepository, IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository, IMediator mediator, IEventPublisher eventPublisher,IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient)
         {
             _mapper = mapper;
             _assetMasterGeneralRepository = assetMasterGeneralRepository;
             _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
             _mediator = mediator;
             _eventPublisher = eventPublisher;
+            _unitGrpcClient = unitGrpcClient;
+            _companyGrpcClient = companyGrpcClient;
         }
 
         public async Task<ApiResponseDTO<AssetMasterDto>> Handle(CreateAssetMasterGeneralCommand request, CancellationToken cancellationToken)
@@ -66,12 +71,20 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
 
             var assetMasterDTO = _mapper.Map<AssetMasterDto>(result);
             if (result.Id > 0)
-            {
-             
+            {             
                 string tempFilePath = request.AssetMaster.AssetImage;
                 if (tempFilePath != null){
+                    var companies = await _companyGrpcClient.GetAllCompanyAsync();
+                    var units = await _unitGrpcClient.GetAllUnitAsync();
+                     var companyLookup = companies.ToDictionary(c => c.CompanyId, c => c.CompanyName);
+                    var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+                    var companyName = companyLookup.TryGetValue(request.AssetMaster.CompanyId, out var cname) ? cname : string.Empty;
+                    var unitName = unitLookup.TryGetValue(request.AssetMaster.UnitId, out var uname) ? uname : string.Empty;   
+
                     string baseDirectory = await _assetMasterGeneralQueryRepository.GetBaseDirectoryAsync();
-                    var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(request.AssetMaster.CompanyId ,request.AssetMaster.UnitId);
+
+                    //var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(request.AssetMaster.CompanyId ,request.AssetMaster.UnitId);
                     string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);   
                     string filePath = Path.Combine(uploadPath, tempFilePath);
                     EnsureDirectoryExists(Path.GetDirectoryName(filePath));             
