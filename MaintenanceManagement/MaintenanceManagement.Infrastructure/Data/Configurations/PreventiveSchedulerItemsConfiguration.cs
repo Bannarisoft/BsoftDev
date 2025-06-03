@@ -34,7 +34,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(50)");
                   builder.Property(t => t.OldCategoryDescription)
                 .HasColumnName("OldCategoryDescription")
-                .HasColumnType("varchar(50)");
+                .HasColumnType("varchar(max)");
                   builder.Property(t => t.OldGroupName)
                 .HasColumnName("OldGroupName")
                 .HasColumnType("varchar(50)");
