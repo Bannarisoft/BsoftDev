@@ -316,10 +316,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                     newJobId = await _backgroundServiceClient.ScheduleWorkOrder(newScheduler.Id, 5);
                 }
-                newScheduler.HangfireJobId = newJobId;
+                // newScheduler.HangfireJobId = newJobId;
 
-                _applicationDbContext.PreventiveSchedulerDtl.Update(newScheduler);
-                await _applicationDbContext.SaveChangesAsync();
+                // _applicationDbContext.PreventiveSchedulerDtl.Update(newScheduler);
+                // await _applicationDbContext.SaveChangesAsync();
                 return true;
             }
 
