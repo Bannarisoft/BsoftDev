@@ -18,7 +18,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _dbConnection = dbConnection;            
         }
 
-        public async Task<List<WorkOrderWithScheduleDto>> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,int? requestTypeId, int? departmentId)
+        public async Task<List<WorkOrderWithScheduleDto>> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,int? requestTypeId, int? departmentId,int? machineId)
         {         
             var parameters = new DynamicParameters();
             parameters.Add("@CompanyId", CompanyId);
@@ -27,6 +27,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             parameters.Add("@ToDate", toDate);
             parameters.Add("@RequestType", requestTypeId);
             parameters.Add("@DepartmentId", departmentId );
+            parameters.Add("@MachineId", machineId);
 
             List<WorkOrderWithScheduleDto> workOrderList;
             int totalCount;

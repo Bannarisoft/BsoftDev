@@ -26,7 +26,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
   
         public async Task<ApiResponseDTO<List<Dictionary<string, List<GetWorkOrderDto>>>>> Handle(GetWorkOrderQuery request, CancellationToken cancellationToken)
         {
-           var workOrder = await _workOrderRepository.GetAllWOAsync(request.fromDate,request.toDate, request.requestTypeId, request.departmentId);            
+           var workOrder = await _workOrderRepository.GetAllWOAsync(request.fromDate,request.toDate, request.requestTypeId, request.departmentId,request.machineId);            
            var mappedWorkOrders = _mapper.Map<List<GetWorkOrderDto>>(workOrder);
 
              // 🔥 Fetch departments using gRPC

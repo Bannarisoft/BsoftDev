@@ -443,7 +443,7 @@ namespace MaintenanceManagement.API.Controllers
         }
         [HttpGet]
         public async Task<IActionResult> GetByAllAsync([FromQuery] string? fromDate, [FromQuery] string? toDate, [FromQuery] int? requestTypeId
-       , [FromQuery] int? departmentId)
+       , [FromQuery] int? departmentId, [FromQuery] int? machineId)
         {
             DateTimeOffset? parsedStartDate = null;
             DateTimeOffset? parsedEndDate = null;
@@ -476,6 +476,7 @@ namespace MaintenanceManagement.API.Controllers
                    toDate = parsedEndDate,
                    requestTypeId = requestTypeId,
                    departmentId = departmentId,
+                   machineId = machineId
                });
             return Ok(new
             {

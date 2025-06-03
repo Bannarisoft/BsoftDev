@@ -8,8 +8,7 @@ namespace Core.Application.ExcelImport
         private readonly ExcelWorksheet _worksheet;
         private readonly int _row;
 
-        public 
-        AssetAdditionalCostHandler(ExcelWorksheet worksheet, int row)
+        public AssetAdditionalCostHandler(ExcelWorksheet worksheet, int row)
         {
             _worksheet = worksheet;
             _row = row;
