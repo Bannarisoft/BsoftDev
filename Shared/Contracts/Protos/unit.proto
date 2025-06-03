@@ -13,6 +13,7 @@ message UnitDto {
     string unitName = 2;
     string shortName = 3;
     string unitHeadName = 4;
+    string OldUnitId = 5;
 }
 
 message UnitListResponse {

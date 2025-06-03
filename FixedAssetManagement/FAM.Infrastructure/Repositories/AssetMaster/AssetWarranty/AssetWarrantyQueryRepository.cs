@@ -8,10 +8,12 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty
 {
     public class AssetWarrantyQueryRepository : IAssetWarrantyQueryRepository    
     {
-          private readonly IDbConnection _dbConnection;
-        public AssetWarrantyQueryRepository(IDbConnection dbConnection)
+        private readonly IDbConnection _dbConnection;
+        private readonly ICountryGrpcClient _countryGrpcClient;   
+        public AssetWarrantyQueryRepository(IDbConnection dbConnection,ICountryGrpcClient countryGrpcClient)
         {
             _dbConnection = dbConnection;
+            _countryGrpcClient=countryGrpcClient;
         }     
         public async Task<(List<AssetWarrantyDTO>, int)> GetAllAssetWarrantyAsync(int PageNumber, int PageSize, string? SearchTerm)
         {

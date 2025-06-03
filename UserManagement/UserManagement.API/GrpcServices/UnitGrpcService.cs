@@ -7,6 +7,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using GrpcServices.UserManagement;
 
+
 namespace UserManagement.API.GrpcServices
 {
     public class UnitGrpcService : UnitService.UnitServiceBase
@@ -28,10 +29,10 @@ namespace UserManagement.API.GrpcServices
                     UnitId = unit.Id,
                     UnitName = unit.UnitName,
                     ShortName = unit.ShortName,
-                    UnitHeadName = unit.UnitHeadName
+                    UnitHeadName = unit.UnitHeadName,
+                    OldUnitId = unit.OldUnitId
                 });
             }
-
             return response;
         }
 
