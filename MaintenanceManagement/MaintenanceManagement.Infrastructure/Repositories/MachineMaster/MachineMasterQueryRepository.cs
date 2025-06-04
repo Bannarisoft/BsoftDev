@@ -217,7 +217,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                 var UnitId = _ipAddressService.GetUnitId();
                 var CompanyId = _ipAddressService.GetCompanyId();
             const string query = @"
-                select MM.Id,MachineCode,MachineName 
+                select distinct MM.Id,MachineCode,MachineName 
                 from Maintenance.WorkOrder WO with(nolock)              
                 LEFT JOIN [Maintenance].[MaintenanceRequest]  MR with(nolock) on MR.ID=WO.RequestId                        
                 LEFT JOIN [Maintenance].[PreventiveSchedulerDetail]  PS with(nolock) on PS.ID=WO.PreventiveScheduleId                        
