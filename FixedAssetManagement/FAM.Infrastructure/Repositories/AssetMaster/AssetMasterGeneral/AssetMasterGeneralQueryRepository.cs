@@ -317,7 +317,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 
                 SELECT A.Id,SM.SpecificationName,A.SpecificationValue,A.SpecificationId,SM.IsDefault FROM  [FixedAsset].[AssetSpecifications] A
                 INNER JOIN [FixedAsset].[SpecificationMaster] SM ON SM.Id=A.SpecificationId
-                WHERE A.AssetId=@AssetId  and IsDeleted=0
+                WHERE A.AssetId=@AssetId  and A.IsDeleted=0
 
                 SELECT Aw.Id,CAST(AW.StartDate AS DATE) AS StartDate,CAST(AW.EndDate AS DATE) AS EndDate,AW.Period,MMWaranty.description AS WarrantyType,MMClaim.description AS ServiceClaimStatus,
                 AW.WarrantyProvider,AW.MobileNumber,AW.ContactPerson,AW.Description,AW.Email,AW.Document,C.CountryName,S.StateName,City.CityName,
@@ -331,7 +331,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 INNER JOIN [Bannari].[AppData].[Country] C ON C.Id=AW.ServiceCountryId
                 INNER JOIN [Bannari].[AppData].[State] S ON S.Id=AW.ServiceStateId
                 INNER JOIN [Bannari].[AppData].[City] City ON City.Id=AW.ServiceCityId
-                WHERE AW.AssetId=@AssetId  and IsDeleted=0
+                WHERE AW.AssetId=@AssetId  and AW.IsDeleted=0
 
                 SELECT AA.Id,CAST(AA.StartDate AS DATE) AS StartDate,CAST(AA.EndDate AS DATE) AS EndDate,AA.Period,AA.VendorCode,AA.VendorName,
                 MMCoverage.description AS CoverageType,
@@ -340,13 +340,13 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 FROM [FixedAsset].[AssetAmc] AA
                 INNER JOIN [FixedAsset].[MiscMaster] MMCoverage ON MMCoverage.Id=AA.CoverageType
                 INNER JOIN [FixedAsset].[MiscMaster] MMRenewal ON MMRenewal.Id=AA.RenewalStatus
-                WHERE AA.AssetId=@AssetId  and IsDeleted=0
+                WHERE AA.AssetId=@AssetId  and AA.IsDeleted=0
 
                 SELECT AD.Id,MMDisposal.description AS DisposalType,CAST(AD.DisposalDate AS DATE) AS DisposalDate,AD.DisposalReason,
                 AD.DisposalAmount,AD.DisposalType AS DisposalTypeId  ,AD.AssetPurchaseId
                 FROM [FixedAsset].[AssetDisposal] AD
                 INNER JOIN [FixedAsset].[MiscMaster] MMDisposal ON MMDisposal.Id=AD.DisposalType
-                WHERE AD.AssetId=@AssetId  and IsDeleted=0
+                WHERE AD.AssetId=@AssetId  and AD.IsDeleted=0
 
                 SELECT Id, PolicyNo,CAST(StartDate AS DATE) AS StartDate,CAST(EndDate AS DATE) AS EndDate,InsurancePeriod,PolicyAmount,
                 VendorCode,RenewalStatus,CAST(RenewedDate AS DATE) AS RenewedDate,IsActive
