@@ -324,7 +324,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status };
             var query = $@"
                             SELECT  
-                                PS.Id AS HeaderId,PSD.Id AS DetailId,PS.PreventiveSchedulerName,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName,PS.DepartmentId
+                                PS.Id AS HeaderId,PSD.Id AS DetailId,WO.Id AS WorkOrderId,PS.PreventiveSchedulerName,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName,PS.DepartmentId
                             FROM [Maintenance].[PreventiveSchedulerHeader] PS
                             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
                             INNER JOIN [Maintenance].[MachineMaster] M ON M.Id =PSD.MachineId
