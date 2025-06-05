@@ -18,5 +18,8 @@ namespace Core.Application.Reports.MaterialPlanningReport
         public int CurrentStock { get; set; }
         public int RequiredQty { get; set; }
         public int Shortfall_Excess { get; set; }
+        public int ProductionDepartmentId { get; set; }
+        public string ProductionDepartment { get; set; }
+        public string MachineCode { get; set; }
     }
 }

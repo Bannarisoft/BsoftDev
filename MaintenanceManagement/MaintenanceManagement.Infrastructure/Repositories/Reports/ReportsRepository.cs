@@ -191,7 +191,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             var query = $$"""
 
                 Select PSH.DepartmentId,PSH.PreventiveSchedulerName,MG.GroupName,MM.MachineName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
-                Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,PSD.LastMaintenanceActivityDate from [Maintenance].[PreventiveSchedulerHeader] PSH
+                Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,PSD.LastMaintenanceActivityDate AS LastCompletionDate from [Maintenance].[PreventiveSchedulerHeader] PSH
                 Inner Join [Maintenance].[MachineGroup] MG ON PSH.MachineGroupId=MG.Id
                 Inner Join [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
                 Inner Join [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId=PSH.Id
@@ -253,7 +253,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                SS.CategoryDescription, 
                SS.GroupName;
 
-           SELECT 
+           SELECT
+                MM.MachineCode,MG.DepartmentId AS ProductionDepartmentId, 
                MM.MachineName,
                MISC.Description AS MaintenanceCategory,
                A.ActivityName,
@@ -275,7 +276,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
            INNER JOIN [Maintenance].[PreventiveSchedulerItems] PSI 
                ON PSI.PreventiveSchedulerHeaderId = PSH.Id
            INNER JOIN [Maintenance].[MachineMaster] MM 
-               ON MM.MachineGroupId = MG.Id
+               ON MM.MachineGroupId = MG.Id AND PSD.MachineId=MM.Id
            INNER JOIN [Maintenance].[MiscMaster] MISC 
                ON MISC.Id = PSH.MaintenanceCategoryId
            INNER JOIN [Maintenance].[ActivityMaster] A 
@@ -301,7 +302,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                PSI.OldCategoryDescription,
                SQ.UOM, 
                SQ.TotQty, 
-               PSI.RequiredQty
+               PSI.RequiredQty,MM.MachineCode,MG.DepartmentId
            ORDER BY PSH.Id DESC;
         """;
 
