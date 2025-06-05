@@ -97,7 +97,7 @@
     {
         "rule": "FilePDFValidation",  
         "allowedExtensions": [".pdf"],      
-        "error": "must be a PNG or JPG file and less than 2 MB in size."    
+        "error": "must be a PDF file and less than 2 MB in size."    
     },
     {
         "rule": "Pincode",

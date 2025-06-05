@@ -1,3 +1,4 @@
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
@@ -15,22 +16,33 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.DeleteFileAssetWar
         private readonly IIPAddressService _ipAddressService;
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralRepository;
         private readonly IAssetWarrantyQueryRepository _assetWarrantQueryRepository;
+         private readonly IUnitGrpcClient _unitGrpcClient;
+        private readonly ICompanyGrpcClient _companyGrpcClient;
 
         public DeleteFileAssetWarrantyCommandHandler(
             IFileUploadService fileUploadService,
             IAssetWarrantyCommandRepository assetWarrantyRepository,
-            ILogger<DeleteFileAssetWarrantyCommandHandler> logger, IIPAddressService ipAddressService,IAssetMasterGeneralQueryRepository assetMasterGeneralRepository,IAssetWarrantyQueryRepository assetWarrantQueryRepository)
+            ILogger<DeleteFileAssetWarrantyCommandHandler> logger, IIPAddressService ipAddressService,IAssetMasterGeneralQueryRepository assetMasterGeneralRepository,IAssetWarrantyQueryRepository assetWarrantQueryRepository, IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient)
         {
             _fileUploadService = fileUploadService;
             _assetWarrantyRepository = assetWarrantyRepository;
             _logger = logger; _ipAddressService = ipAddressService;_assetMasterGeneralRepository=assetMasterGeneralRepository;_assetWarrantQueryRepository=assetWarrantQueryRepository;
+            _unitGrpcClient = unitGrpcClient;
+            _companyGrpcClient = companyGrpcClient;
         }
 
        public async Task<ApiResponseDTO<bool>> Handle(DeleteFileAssetWarrantyCommand request, CancellationToken cancellationToken)
         {
             var companyId = _ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
-            var (companyName, unitName) = await _assetMasterGeneralRepository.GetCompanyUnitAsync(companyId, unitId);
+            var companies = await _companyGrpcClient.GetAllCompanyAsync();
+            var units = await _unitGrpcClient.GetAllUnitAsync();
+
+            var companyLookup = companies.ToDictionary(c => c.CompanyId, c => c.CompanyName);
+            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+            var companyName = companyLookup.TryGetValue(companyId, out var cname) ? cname : string.Empty;
+            var unitName = unitLookup.TryGetValue(unitId, out var uname) ? uname : string.Empty; 
             
             string baseDirectory = await _assetWarrantQueryRepository.GetBaseDirectoryAsync();
             if (string.IsNullOrWhiteSpace(baseDirectory))

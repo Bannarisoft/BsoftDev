@@ -15,8 +15,7 @@ namespace Core.Application.Common.Interfaces.IWorkOrder
         Task<bool> RemoveWOImageReferenceAsync(int workOrderId);
         Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> GetByIdAsync(int workOrderId);
         Task<string?> GetLatestWorkOrderDocNo(int TypeId);
-        Task<string> GetBaseDirectoryItemAsync();
-        Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId, int unitId);
+        Task<string> GetBaseDirectoryItemAsync();                
         Task<Core.Domain.Entities.MiscMaster> GetMiscMasterByCodeAsync(string code);
         Task<bool> RevertWorkOrderStatusAsync(int workOrderId);
         public Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreatePreventiveAsync( Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId,int companyId,int unitId, CancellationToken cancellationToken);

@@ -42,8 +42,6 @@ builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
-
-
 // Register gRPC
 builder.Services.AddGrpc();
 
@@ -80,6 +78,9 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGrpcService<UnitGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<CompanyGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<DepartmentAllGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<CityGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<StatesGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<CountryGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
 

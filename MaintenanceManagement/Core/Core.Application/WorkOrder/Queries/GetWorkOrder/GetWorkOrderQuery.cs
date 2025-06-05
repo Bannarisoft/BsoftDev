@@ -9,6 +9,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrder
         public DateTimeOffset? fromDate {get; set;}
         public DateTimeOffset? toDate {get; set;}
         public int? requestTypeId {get; set;}
-        public int? departmentId { get; set; }       
+        public int? departmentId { get; set; } 
+        public int? machineId { get; set; } 
     }
 }

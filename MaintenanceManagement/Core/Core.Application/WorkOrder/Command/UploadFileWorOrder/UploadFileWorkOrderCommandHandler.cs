@@ -1,6 +1,7 @@
 
 
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IWorkOrder;
@@ -16,15 +17,19 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
         private readonly ILogger<UploadFileWorkOrderCommandHandler> _logger;
          private readonly IIPAddressService _ipAddressService;
          private readonly IWorkOrderCommandRepository _workOrderRepository;
+        private readonly IUnitGrpcClient _unitGrpcClient;
+        private readonly ICompanyGrpcClient _companyGrpcClient;
 
         public UploadFileWorkOrderCommandHandler( 
             IWorkOrderQueryRepository woQueryRepository,
-            ILogger<UploadFileWorkOrderCommandHandler> logger, IIPAddressService ipAddressService,IWorkOrderCommandRepository workOrderRepository)
+            ILogger<UploadFileWorkOrderCommandHandler> logger, IIPAddressService ipAddressService,IWorkOrderCommandRepository workOrderRepository,IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient)
         {           
             _woQueryRepository = woQueryRepository;
             _logger = logger;
             _ipAddressService = ipAddressService;
             _workOrderRepository = workOrderRepository;
+            _unitGrpcClient = unitGrpcClient;
+            _companyGrpcClient = companyGrpcClient;
         }
 
         public async Task<ApiResponseDTO<WorkOrderImageDto>> Handle(UploadFileWorkOrderCommand request, CancellationToken cancellationToken)
@@ -42,7 +47,15 @@ namespace Core.Application.WorkOrder.Command.UploadFileWorOrder
             }
             var companyId =_ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
-            var (companyName, unitName) = await _workOrderRepository.GetCompanyUnitAsync(companyId, unitId);
+            
+               var companies = await _companyGrpcClient.GetAllCompanyAsync();
+            var units = await _unitGrpcClient.GetAllUnitAsync();
+
+            var companyLookup = companies.ToDictionary(c => c.CompanyId, c => c.CompanyName);
+            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+            var companyName = companyLookup.TryGetValue(companyId, out var cname) ? cname : string.Empty;
+            var unitName = unitLookup.TryGetValue(unitId, out var uname) ? uname : string.Empty;   
 
             string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);                
             EnsureDirectoryExists(uploadPath);

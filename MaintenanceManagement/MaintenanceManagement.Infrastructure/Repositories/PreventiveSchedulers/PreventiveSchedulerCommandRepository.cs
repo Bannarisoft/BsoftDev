@@ -175,7 +175,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             if (existingPreventiveScheduler != null)
             {
-                DateTimeOffset? lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(existingPreventiveScheduler.MachineId, existingPreventiveScheduler.PreventiveSchedulerHeaderId, WOStatus.MiscCode, MaintenanceStatusUpdate.Code);
+                DateTimeOffset? lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(existingPreventiveScheduler.MachineId, Id, WOStatus.MiscCode, MaintenanceStatusUpdate.Code);
 
                 var headerInfo = await _preventiveSchedulerQuery.GetByIdAsync(existingPreventiveScheduler.PreventiveSchedulerHeaderId);
                 var frequencytype = await _miscMasterQueryRepository.GetByIdAsync(headerInfo.FrequencyTypeId);
@@ -220,8 +220,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                         newJobId = await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id, 5);
                     }
+                    existingPreventiveScheduler.HangfireJobId = newJobId;
+
+                _applicationDbContext.PreventiveSchedulerDtl.Update(existingPreventiveScheduler);
+                await _applicationDbContext.SaveChangesAsync();
                 }
-                // await _preventiveSchedulerCommand.UpdateDetailAsync(existingPreventiveScheduler.Id,newJobId);
+                
                 return true;
             }
 
@@ -279,7 +283,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     WorkOrderCreationStartDate = RescheduleDate,
                     ActualWorkOrderDate = RescheduleDate,
                     MaterialReqStartDays = RescheduleDate,
-                    LastMaintenanceActivityDate = null,
+                    LastMaintenanceActivityDate = existingPreventiveScheduler.LastMaintenanceActivityDate ?? null,
                     IsActive = Status.Active,
                     PreventiveScheduler = existingPreventiveScheduler.PreventiveScheduler,
                     MachineId = existingPreventiveScheduler.MachineId,
@@ -305,14 +309,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                 if (delay.TotalSeconds > 0)
                 {
-                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id, delayInMinutes);
+                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(newScheduler.Id, delayInMinutes);
                 }
                 else
                 {
 
-                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(existingPreventiveScheduler.Id, 5);
+                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(newScheduler.Id, 5);
                 }
+                // newScheduler.HangfireJobId = newJobId;
 
+                // _applicationDbContext.PreventiveSchedulerDtl.Update(newScheduler);
+                // await _applicationDbContext.SaveChangesAsync();
                 return true;
             }
 

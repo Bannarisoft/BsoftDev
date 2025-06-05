@@ -62,16 +62,17 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
         {
             return await _applicationDbContext.DepreciationGroups.MaxAsync(ac => (int?)ac.SortOrder) ?? -1;
         }       
-        public async Task<(bool IsNameDuplicate,bool IsCodeDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name,string code, int sortOrder, int excludeId)
-        {
+        public async Task<(bool IsNameDuplicate,bool IsCodeDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name,string code, int sortOrder, int excludeId,BaseEntity.Status isActive)
+        {            
+
             var isNameDuplicate = await _applicationDbContext.DepreciationGroups
-                .AnyAsync(ag => ag.DepreciationGroupName == name && ag.Id != excludeId);
+                .AnyAsync(ag => ag.DepreciationGroupName == name && ag.Id != excludeId && ag.IsActive==isActive);
 
             var IsCodeDuplicate = await _applicationDbContext.DepreciationGroups
-                .AnyAsync(ag => ag.Code == code && ag.Id != excludeId);
+                .AnyAsync(ag => ag.Code == code && ag.Id != excludeId  && ag.IsActive==isActive);
 
             var isSortOrderDuplicate = await _applicationDbContext.DepreciationGroups
-                .AnyAsync(ag => ag.SortOrder == sortOrder && ag.Id != excludeId);
+                .AnyAsync(ag => ag.SortOrder == sortOrder && ag.Id != excludeId  && ag.IsActive==isActive);
 
             return (isNameDuplicate, IsCodeDuplicate,isSortOrderDuplicate);
        }

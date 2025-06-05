@@ -240,23 +240,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         {
             throw new NotImplementedException();
         }
-        public async Task<DateTimeOffset?> GetLastMaintenanceDateAsync(int machineId, int PreventiveSchedulerId, string miscType, string misccode)
+        public async Task<DateTimeOffset?> GetLastMaintenanceDateAsync(int machineId, int PreventiveDetailId, string miscType, string misccode)
         {
             const string query = @"
-                 SELECT MAX(WS.EndTime) AS EndTime   FROM [Maintenance].[WorkOrder] W
-            INNER JOIN [Maintenance].[WorkOrderSchedule] WS ON W.Id=WS.WorkOrderId
-            INNER JOIN Maintenance.MiscMaster M ON W.StatusId=M.Id
-            INNER JOIN Maintenance.MiscTypeMaster MT ON MT.Id =M.MiscTypeId
-            INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.Id=W.PreventiveScheduleId
-            where MT.MiscTypeCode=@StatusTypeCode AND M.Code=@StatusCode AND PSD.MachineId=@MachineId AND PSD.PreventiveSchedulerHeaderId=@PreventiveSchedulerId
+                 SELECT DowntimeEnd AS EndTime   FROM [Maintenance].[WorkOrder] 
+            where  PreventiveScheduleId=@PreventiveSchedulerId
             ";
 
             var parameters = new
             {
-                MachineId = machineId,
-                StatusTypeCode = miscType,
-                StatusCode = misccode,
-                PreventiveSchedulerId = PreventiveSchedulerId
+                PreventiveSchedulerId = PreventiveDetailId
             };
 
             var result = await _dbConnection.QueryFirstOrDefaultAsync<DateTimeOffset?>(query, parameters);
@@ -324,7 +317,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status };
             var query = $@"
                             SELECT  
-                                PS.Id AS HeaderId,PSD.Id AS DetailId,PS.PreventiveSchedulerName,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName,PS.DepartmentId
+                                PS.Id AS HeaderId,PSD.Id AS DetailId,WO.Id AS WorkOrderId,PS.PreventiveSchedulerName,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineName,PS.DepartmentId
                             FROM [Maintenance].[PreventiveSchedulerHeader] PS
                             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
                             INNER JOIN [Maintenance].[MachineMaster] M ON M.Id =PSD.MachineId

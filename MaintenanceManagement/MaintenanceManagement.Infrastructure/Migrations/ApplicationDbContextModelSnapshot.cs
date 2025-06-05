@@ -1209,7 +1209,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnName("ItemId");
 
                     b.Property<string>("OldCategoryDescription")
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("varchar(max)")
                         .HasColumnName("OldCategoryDescription");
 
                     b.Property<string>("OldGroupName")

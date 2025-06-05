@@ -16,16 +16,16 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
         private readonly IMediator _mediator;   
         private readonly IIPAddressService _ipAddressService;
         private readonly IWorkOrderCommandRepository _workOrderRepository;     
-        private readonly IDepartmentGrpcClient _departmentGrpcClient; 
+        private readonly IDepartmentAllGrpcClient _departmentAllGrpcClient; 
 
-        public GetWorkOrderByIdQueryHandler(IWorkOrderQueryRepository workOrderQueryRepository,  IMapper mapper, IMediator mediator, IIPAddressService ipAddressService,IWorkOrderCommandRepository workOrderRepository, IDepartmentGrpcClient departmentGrpcClient)
+        public GetWorkOrderByIdQueryHandler(IWorkOrderQueryRepository workOrderQueryRepository,  IMapper mapper, IMediator mediator, IIPAddressService ipAddressService,IWorkOrderCommandRepository workOrderRepository,  IDepartmentAllGrpcClient departmentAllGrpcClient)
         {
             _workOrderQueryRepository =workOrderQueryRepository;
             _mapper =mapper;
             _mediator = mediator;           
             _ipAddressService = ipAddressService;
             _workOrderRepository = workOrderRepository; 
-            _departmentGrpcClient = departmentGrpcClient;
+            _departmentAllGrpcClient = departmentAllGrpcClient;
         }
         public async Task<ApiResponseDTO<GetWorkOrderByIdDto>> Handle(GetWorkOrderByIdQuery request, CancellationToken cancellationToken)
         {          
@@ -42,7 +42,7 @@ namespace Core.Application.WorkOrder.Queries.GetWorkOrderById
             var mappedWorkOrders = _mapper.Map<GetWorkOrderByIdDto>(woResult);      
 
              // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentAsync(); // ✅ Clean call
+            var departments = await _departmentAllGrpcClient.GetDepartmentAllAsync(); // ✅ Clean call
 
             // var departments = departmentResponse.Departments.ToList();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);

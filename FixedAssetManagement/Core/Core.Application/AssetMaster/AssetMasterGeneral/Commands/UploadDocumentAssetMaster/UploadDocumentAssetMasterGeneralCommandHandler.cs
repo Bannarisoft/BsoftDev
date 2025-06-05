@@ -1,3 +1,4 @@
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
@@ -11,14 +12,18 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadDocumen
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly ILogger<UploadDocumentAssetMasterGeneralCommandHandler> _logger;
         private readonly IIPAddressService _ipAddressService;
+        private readonly IUnitGrpcClient _unitGrpcClient;
+        private readonly ICompanyGrpcClient _companyGrpcClient;
 
         public UploadDocumentAssetMasterGeneralCommandHandler(          
             IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository,
-            ILogger<UploadDocumentAssetMasterGeneralCommandHandler> logger, IIPAddressService ipAddressService)
+            ILogger<UploadDocumentAssetMasterGeneralCommandHandler> logger, IIPAddressService ipAddressService, IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient)
         {          
             _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
             _logger = logger;
             _ipAddressService = ipAddressService;
+            _unitGrpcClient = unitGrpcClient;
+            _companyGrpcClient = companyGrpcClient;
         }
 
         public async Task<ApiResponseDTO<AssetMasterDocumentDto>> Handle(UploadDocumentAssetMasterGeneralCommand request, CancellationToken cancellationToken)
@@ -27,7 +32,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadDocumen
             {
                 return new ApiResponseDTO<AssetMasterDocumentDto> { IsSuccess = false, Message = "No file uploaded" };
             }
-
              // 🔹 Fetch Base Directory from Database
             string baseDirectory = await _assetMasterGeneralQueryRepository.GetDocumentDirectoryAsync();
             if (string.IsNullOrWhiteSpace(baseDirectory))
@@ -38,7 +42,15 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadDocumen
             
             var companyId =_ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
-            var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(companyId, unitId);
+
+            var companies = await _companyGrpcClient.GetAllCompanyAsync();
+            var units = await _unitGrpcClient.GetAllUnitAsync();
+
+            var companyLookup = companies.ToDictionary(c => c.CompanyId, c => c.CompanyName);
+            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+            var companyName = companyLookup.TryGetValue(companyId, out var cname) ? cname : string.Empty;
+            var unitName = unitLookup.TryGetValue(unitId, out var uname) ? uname : string.Empty;            
             
             string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);                
             EnsureDirectoryExists(uploadPath);

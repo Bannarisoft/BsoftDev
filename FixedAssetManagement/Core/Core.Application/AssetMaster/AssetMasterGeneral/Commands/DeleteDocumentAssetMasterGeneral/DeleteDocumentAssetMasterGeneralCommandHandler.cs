@@ -1,3 +1,4 @@
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
@@ -12,23 +13,35 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteDocumen
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly ILogger<DeleteDocumentAssetMasterGeneralCommandHandler> _logger;
         private readonly IIPAddressService _ipAddressService;
-        private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
+        private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;              
+        private readonly IUnitGrpcClient _unitGrpcClient;
+        private readonly ICompanyGrpcClient _companyGrpcClient;
 
         public DeleteDocumentAssetMasterGeneralCommandHandler(
             IFileUploadService fileUploadService,            
             IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository,
-            ILogger<DeleteDocumentAssetMasterGeneralCommandHandler> logger, IIPAddressService ipAddressService,IAssetMasterGeneralCommandRepository assetMasterGeneralRepository)
+            ILogger<DeleteDocumentAssetMasterGeneralCommandHandler> logger, IIPAddressService ipAddressService,IAssetMasterGeneralCommandRepository assetMasterGeneralRepository ,IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient)
         {
             _fileUploadService = fileUploadService;            
             _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
             _logger = logger;  _ipAddressService = ipAddressService;_assetMasterGeneralRepository=assetMasterGeneralRepository;
+             _unitGrpcClient = unitGrpcClient;
+            _companyGrpcClient = companyGrpcClient;            
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(DeleteDocumentAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         { 
             var companyId = _ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
-            var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(companyId, unitId);
+            //var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(companyId, unitId);
+             var companies = await _companyGrpcClient.GetAllCompanyAsync();
+            var units = await _unitGrpcClient.GetAllUnitAsync();
+
+            var companyLookup = companies.ToDictionary(c => c.CompanyId, c => c.CompanyName);
+            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+            var companyName = companyLookup.TryGetValue(companyId, out var cname) ? cname : string.Empty;
+            var unitName = unitLookup.TryGetValue(unitId, out var uname) ? uname : string.Empty;
             
             string baseDirectory = await _assetMasterGeneralQueryRepository.GetDocumentDirectoryAsync();
             if (string.IsNullOrWhiteSpace(baseDirectory))
