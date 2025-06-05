@@ -71,6 +71,10 @@ using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.DeletePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventive;
 using Core.Application.PreventiveSchedulers.Commands.RescheduleBulkImport;
+using Core.Application.Power.FeederGroup.Command.CreateFeederGroup;
+using MaintenanceManagement.API.Validation.Power.FeederGroup;
+using Core.Application.Power.FeederGroup.Command.UpdateFeederGroup;
+using Core.Application.Power.FeederGroup.Command.DeleteFeederGroup;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -140,7 +144,10 @@ namespace MaintenanceManagement.API.Validation.Common
             services.AddScoped<IValidator<UpdatePreventiveSchedulerCommand>, UpdatePreventiveSchedulerCommandValidator>();
             services.AddScoped<IValidator<DeletePreventiveSchedulerCommand>, DeletePreventiveSchedulerCommandValidator>();
             services.AddScoped<IValidator<ActiveInActivePreventiveCommand>, UpdateActiveStatusCommandValidator>();
-        services.AddScoped<IValidator<RescheduleBulkImportCommand>, BulkImportPreventiveSchedulerCommandValidator>();        
+            services.AddScoped<IValidator<RescheduleBulkImportCommand>, BulkImportPreventiveSchedulerCommandValidator>();
+            services.AddScoped<IValidator<CreateFeederGroupCommand>, CreateFeederGroupCommandValidator>();
+            services.AddScoped<IValidator<UpdateFeederGroupCommand>, UpdateFeederGroupCommandValidator>();
+            services.AddScoped<IValidator<DeleteFeederGroupCommand>, DeleteFeederGroupCommandValidator>();  
         }  
     }
 }

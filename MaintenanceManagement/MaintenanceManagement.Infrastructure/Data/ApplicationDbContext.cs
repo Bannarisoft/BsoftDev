@@ -6,6 +6,8 @@ using Core.Domain.Common;
 using MaintenanceManagement.Infrastructure.Data.Configurations;
 using Core.Domain.Entities.WorkOrderMaster;
 using MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMaster;
+using Core.Domain.Entities.Power;
+using MaintenanceManagement.Infrastructure.Data.Configurations.Power;
 
 
 
@@ -52,15 +54,17 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<PreventiveSchedulerItems>  PreventiveSchedulerItems { get; set; }
         public DbSet<PreventiveSchedulerActivity>  PreventiveSchedulerActivity { get; set; }
         public DbSet<ItemTransactions> SubStores { get; set; }
-        public DbSet<StockLedger> StockLedger { get; set; }       
+        public DbSet<StockLedger> StockLedger { get; set; }  
+
+        public DbSet<FeederGroup> FeederGroup { get; set; }     
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 
-        {            
-           modelBuilder.ApplyConfiguration( new MachineGroupConfiguration());
-           modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
-           modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+        {
+            modelBuilder.ApplyConfiguration(new MachineGroupConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
             modelBuilder.ApplyConfiguration(new ShiftMasterConfiguration());
             modelBuilder.ApplyConfiguration(new ShiftMasterDetailsConfiguration());
             modelBuilder.ApplyConfiguration(new CostCenterConfiguration());
@@ -69,27 +73,28 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new MaintenanceCategoryConfiguration());
             modelBuilder.ApplyConfiguration(new ActivityMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MachineMasterConfiguration());
-            modelBuilder.ApplyConfiguration( new ActivityMachineGroupConfiguration());   
-                     
-            modelBuilder.ApplyConfiguration( new WorkOrderConfiguration());
-            modelBuilder.ApplyConfiguration( new WorkOrderActivityConfiguration());
-            modelBuilder.ApplyConfiguration( new WorkOrderItemConfiguration());
-            modelBuilder.ApplyConfiguration( new WorkOrderScheduleConfiguration());
-            modelBuilder.ApplyConfiguration( new WorkOrderTechnicianConfiguration());           
-            modelBuilder.ApplyConfiguration( new WorkOrderCheckListConfiguration());           
-            
-            modelBuilder.ApplyConfiguration( new ActivityCheckListMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new ActivityMachineGroupConfiguration());
+
+            modelBuilder.ApplyConfiguration(new WorkOrderConfiguration());
+            modelBuilder.ApplyConfiguration(new WorkOrderActivityConfiguration());
+            modelBuilder.ApplyConfiguration(new WorkOrderItemConfiguration());
+            modelBuilder.ApplyConfiguration(new WorkOrderScheduleConfiguration());
+            modelBuilder.ApplyConfiguration(new WorkOrderTechnicianConfiguration());
+            modelBuilder.ApplyConfiguration(new WorkOrderCheckListConfiguration());
+
+            modelBuilder.ApplyConfiguration(new ActivityCheckListMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MaintenanceRequestConfiguration());
-            modelBuilder.ApplyConfiguration( new PreventiveSchedulerHdrConfiguration());
-            modelBuilder.ApplyConfiguration( new PreventiveSchedulerDtlConfiguration());
-            modelBuilder.ApplyConfiguration( new PreventiveSchedulerItemsConfiguration());
-            modelBuilder.ApplyConfiguration( new PreventiveSchedulerActivityConfiguration());
-            modelBuilder.ApplyConfiguration( new MachineGroupUserConfiguration());
-            modelBuilder.ApplyConfiguration( new ItemTransactionsConfiguration());
-            modelBuilder.ApplyConfiguration( new StockLedgerConfiguration());
+            modelBuilder.ApplyConfiguration(new PreventiveSchedulerHdrConfiguration());
+            modelBuilder.ApplyConfiguration(new PreventiveSchedulerDtlConfiguration());
+            modelBuilder.ApplyConfiguration(new PreventiveSchedulerItemsConfiguration());
+            modelBuilder.ApplyConfiguration(new PreventiveSchedulerActivityConfiguration());
+            modelBuilder.ApplyConfiguration(new MachineGroupUserConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemTransactionsConfiguration());
+            modelBuilder.ApplyConfiguration(new StockLedgerConfiguration());
+            modelBuilder.ApplyConfiguration(new FeederGroupConfiguration());
             base.OnModelCreating(modelBuilder);
 
-             
+
         }
          public override int SaveChanges()
         {

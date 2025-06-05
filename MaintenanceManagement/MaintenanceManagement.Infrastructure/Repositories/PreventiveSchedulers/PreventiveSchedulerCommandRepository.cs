@@ -175,7 +175,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             if (existingPreventiveScheduler != null)
             {
-                DateTimeOffset? lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(existingPreventiveScheduler.MachineId, existingPreventiveScheduler.PreventiveSchedulerHeaderId, WOStatus.MiscCode, MaintenanceStatusUpdate.Code);
+                DateTimeOffset? lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(existingPreventiveScheduler.MachineId, Id, WOStatus.MiscCode, MaintenanceStatusUpdate.Code);
 
                 var headerInfo = await _preventiveSchedulerQuery.GetByIdAsync(existingPreventiveScheduler.PreventiveSchedulerHeaderId);
                 var frequencytype = await _miscMasterQueryRepository.GetByIdAsync(headerInfo.FrequencyTypeId);

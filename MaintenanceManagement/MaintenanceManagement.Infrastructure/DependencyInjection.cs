@@ -62,6 +62,8 @@ using MaintenanceManagement.Infrastructure.Repositories.MRS;
 // using Core.Application.Common.Interfaces.IBackgroundService;
 using MaintenanceManagement.Infrastructure.Repositories.Reports;
 using Core.Application.Common.Interfaces.IReports;
+using Core.Application.Common.Interfaces.Power.IFeederGroup;
+using MaintenanceManagement.Infrastructure.Repositories.Power.FeederGroup;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -212,9 +214,12 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMainStoreStockQueryRepository, MainStoreStockQueryRepository>();
             services.AddScoped<IMRSQueryRepository, MRSQueryRepository>();
             services.AddScoped<IMRSCommandRepository, MRSCommandRepository>();
+
+             services.AddScoped<IFeederGroupQueryRepository, FeederGroupQueryRepository>();  
+             services.AddScoped<IFeederGroupCommandRepository, FeederGroupCommandRepository>();
             // services.AddScoped<IBackgroundServiceClient, BackgroundServiceClient>();  
             services.AddScoped<IReportRepository, ReportsRepository>();  
-
+            
             
             // Miscellaneous services
 
@@ -224,7 +229,8 @@ namespace MaintenanceManagement.Infrastructure
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
 
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();                     
-            services.AddScoped<ILogQueryService, LogQueryService>();   
+            services.AddScoped<ILogQueryService, LogQueryService>();
+            
             
             // AutoMapper profiles
             services.AddAutoMapper(
