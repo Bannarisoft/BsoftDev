@@ -191,7 +191,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             var query = $$"""
 
                 Select PSH.DepartmentId,PSH.PreventiveSchedulerName,MG.GroupName,MM.MachineName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
-                Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,PSD.LastMaintenanceActivityDate AS LastCompletionDate from [Maintenance].[PreventiveSchedulerHeader] PSH
+                Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,Cast(PSD.LastMaintenanceActivityDate AS varchar) AS LastCompletionDate from [Maintenance].[PreventiveSchedulerHeader] PSH
                 Inner Join [Maintenance].[MachineGroup] MG ON PSH.MachineGroupId=MG.Id
                 Inner Join [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
                 Inner Join [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId=PSH.Id
