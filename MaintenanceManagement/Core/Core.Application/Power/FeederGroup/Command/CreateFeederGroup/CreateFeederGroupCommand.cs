@@ -2,11 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.HttpResponse;
+using MediatR;
 
 namespace Core.Application.Power.FeederGroup.Command.CreateFeederGroup
 {
-    public class CreateFeederGroupCommand
+    public class CreateFeederGroupCommand  : IRequest<ApiResponseDTO<int>>
     {
-        
+        public string? FeederGroupCode { get; set; }  
+        public string? FeederGroupName { get; set; }
+       
     }
 }

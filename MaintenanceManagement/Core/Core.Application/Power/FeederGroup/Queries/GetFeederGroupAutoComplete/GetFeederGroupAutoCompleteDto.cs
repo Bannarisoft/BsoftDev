@@ -2,17 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Domain.Common;
 
-namespace Core.Domain.Entities.Power
+namespace Core.Application.Power.FeederGroup.Queries.GetFeederGroupAutoComplete
 {
-    public class FeederGroup : BaseEntity
+    public class GetFeederGroupAutoCompleteDto
     {
-       
+        public int Id { get; set; }
         public string? FeederGroupCode { get; set; }
-
         public string? FeederGroupName { get; set; }
 
-        
     }
 }
