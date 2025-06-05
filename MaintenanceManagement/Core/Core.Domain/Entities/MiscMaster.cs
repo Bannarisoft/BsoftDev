@@ -1,4 +1,5 @@
 using Core.Domain.Common;
+using Core.Domain.Entities.Power;
 using Core.Domain.Entities.WorkOrderMaster;
 
 
@@ -13,7 +14,6 @@ namespace Core.Domain.Entities
         public string? Description { get; set; }
         public int SortOrder { get; set; }
         public Status IsActive { get; set; }
-
         public MiscTypeMaster? MiscTypeMaster { get; set; }
         public ICollection<MaintenanceRequest>? RequestType { get; set; }
         public ICollection<MaintenanceRequest>? MaintenanceType { get; set; }
@@ -36,6 +36,8 @@ namespace Core.Domain.Entities
 
         public ICollection<ActivityMaster>? ActivityType { get; set; }
         public ICollection<MachineMaster>? MachineMasterLineNo { get; set; }
+
+         public ICollection<Feeder>? Feeders { get; set; }
 
 
 

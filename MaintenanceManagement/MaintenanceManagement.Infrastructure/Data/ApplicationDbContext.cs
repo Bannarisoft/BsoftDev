@@ -56,7 +56,8 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<ItemTransactions> SubStores { get; set; }
         public DbSet<StockLedger> StockLedger { get; set; }  
 
-        public DbSet<FeederGroup> FeederGroup { get; set; }     
+        public DbSet<FeederGroup> FeederGroup { get; set; } 
+        public DbSet<FeederGroup> Feeder { get; set; }     
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -92,6 +93,7 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new ItemTransactionsConfiguration());
             modelBuilder.ApplyConfiguration(new StockLedgerConfiguration());
             modelBuilder.ApplyConfiguration(new FeederGroupConfiguration());
+            modelBuilder.ApplyConfiguration(new FeederConfiguration());
             base.OnModelCreating(modelBuilder);
 
 
