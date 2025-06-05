@@ -8,11 +8,13 @@ namespace Core.Domain.Entities.Power
 {
     public class FeederGroup : BaseEntity
     {
-       
+
         public string? FeederGroupCode { get; set; }
 
         public string? FeederGroupName { get; set; }
 
+        public ICollection<Feeder>? Feeders { get; set; }
+        
         
     }
 }
