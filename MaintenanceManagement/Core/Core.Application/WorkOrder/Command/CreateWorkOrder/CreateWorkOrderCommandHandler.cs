@@ -20,10 +20,9 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
         private readonly IMediator _mediator;
         private readonly IIPAddressService _ipAddressService;
         private readonly IUnitGrpcClient _unitGrpcClient; 
-        private readonly ICompanyGrpcClient _companyGrpcClient; 
-        private readonly IHubContext<WorkOrderScheduleHub> _hubContext;
+        private readonly ICompanyGrpcClient _companyGrpcClient;         
 
-        public CreateWorkOrderCommandHandler(IMapper mapper, IWorkOrderCommandRepository workOrderRepository, IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IIPAddressService ipAddressService, IUnitGrpcClient unitGrpcClient,ICompanyGrpcClient companyGrpcClient, IHubContext<WorkOrderScheduleHub> hubContext)
+        public CreateWorkOrderCommandHandler(IMapper mapper, IWorkOrderCommandRepository workOrderRepository, IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IIPAddressService ipAddressService, IUnitGrpcClient unitGrpcClient,ICompanyGrpcClient companyGrpcClient)
         {
             _mapper = mapper;
             _workOrderRepository = workOrderRepository;
@@ -31,8 +30,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
             _mediator = mediator;     
             _ipAddressService = ipAddressService;    
             _unitGrpcClient = unitGrpcClient;
-            _companyGrpcClient=companyGrpcClient;
-            _hubContext = hubContext;  
+            _companyGrpcClient=companyGrpcClient;            
         }
 
         public async Task<ApiResponseDTO<WorkOrderCombineDto>> Handle(CreateWorkOrderCommand request, CancellationToken cancellationToken)
@@ -69,8 +67,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
             if (result.Id > 0)
             {    
                 // Notify clients via SignalR
-                await _hubContext.Clients.Group(woEntity.CreatedBy.ToString())
-                    .SendAsync("ReceiveMessage", $"🛠️ New Work Order '{woEntity.WorkOrderDocNo}' created by user {woEntity.CreatedBy}");
+              
        
                 string tempFilePath = request.WorkOrderDto.Image;
                 if (tempFilePath != null){

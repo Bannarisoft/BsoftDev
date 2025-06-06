@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Core.Application.Common;
 using MediatR;
 using Contracts.Interfaces.External.IUser;
+using Microsoft.AspNetCore.SignalR;
+using Core.Application.Common.RealTimeNotificationHub;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
@@ -22,10 +24,11 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<WorkOrderCommandRepository> _logger;
         private readonly ICompanyGrpcClient _companyGrpcClient;     
-        private readonly IUnitGrpcClient _unitGrpcClient;           
+        private readonly IUnitGrpcClient _unitGrpcClient; 
+        private readonly IHubContext<WorkOrderScheduleHub> _hubContext;          
 
         public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService, IDbConnection dbConnection,
-        IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger, ICompanyGrpcClient companyGrpcClient,IUnitGrpcClient unitGrpcClient)
+        IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger, ICompanyGrpcClient companyGrpcClient,IUnitGrpcClient unitGrpcClient, IHubContext<WorkOrderScheduleHub> hubContext)
         {
             _applicationDbContext = applicationDbContext;
             _ipAddressService = ipAddressService;
@@ -33,10 +36,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _publishEndpoint = publishEndpoint;
             _logger = logger;
             _companyGrpcClient = companyGrpcClient;  
-            _unitGrpcClient=unitGrpcClient;             
+            _unitGrpcClient=unitGrpcClient;    
+            _hubContext = hubContext;           
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, CancellationToken cancellationToken)
         {
+              await _hubContext.Clients.Group(workOrder.CreatedBy.ToString())
+                    .SendAsync("ReceiveMessage", $"🛠️ New Work Order '{workOrder.WorkOrderDocNo}' created by user {workOrder.CreatedBy}");
+
             var entry = _applicationDbContext.Entry(workOrder);
             workOrder.WorkOrderDocNo = await GetLatestWorkOrderDocNo(requestTypeId);
             await _applicationDbContext.WorkOrder.AddAsync(workOrder);
