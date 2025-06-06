@@ -5,8 +5,10 @@ using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IWorkOrder;
+using Core.Application.Common.RealTimeNotificationHub;
 using Core.Domain.Events;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Core.Application.WorkOrder.Command.CreateWorkOrder
 {
@@ -19,8 +21,9 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
         private readonly IIPAddressService _ipAddressService;
         private readonly IUnitGrpcClient _unitGrpcClient; 
         private readonly ICompanyGrpcClient _companyGrpcClient; 
+        private readonly IHubContext<WorkOrderScheduleHub> _hubContext;
 
-        public CreateWorkOrderCommandHandler(IMapper mapper, IWorkOrderCommandRepository workOrderRepository, IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IIPAddressService ipAddressService, IUnitGrpcClient unitGrpcClient,ICompanyGrpcClient companyGrpcClient)
+        public CreateWorkOrderCommandHandler(IMapper mapper, IWorkOrderCommandRepository workOrderRepository, IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IIPAddressService ipAddressService, IUnitGrpcClient unitGrpcClient,ICompanyGrpcClient companyGrpcClient, IHubContext<WorkOrderScheduleHub> hubContext)
         {
             _mapper = mapper;
             _workOrderRepository = workOrderRepository;
@@ -29,6 +32,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
             _ipAddressService = ipAddressService;    
             _unitGrpcClient = unitGrpcClient;
             _companyGrpcClient=companyGrpcClient;
+            _hubContext = hubContext;  
         }
 
         public async Task<ApiResponseDTO<WorkOrderCombineDto>> Handle(CreateWorkOrderCommand request, CancellationToken cancellationToken)
@@ -63,7 +67,11 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
         
             var woMasterDTO = _mapper.Map<WorkOrderCombineDto>(result);
             if (result.Id > 0)
-            {           
+            {    
+                // Notify clients via SignalR
+                await _hubContext.Clients.Group(woEntity.CreatedBy.ToString())
+                    .SendAsync("ReceiveMessage", $"🛠️ New Work Order '{woEntity.WorkOrderDocNo}' created by user {woEntity.CreatedBy}");
+       
                 string tempFilePath = request.WorkOrderDto.Image;
                 if (tempFilePath != null){
                     string baseDirectory = await _workOrderQueryRepository.GetBaseDirectoryAsync();

@@ -16,5 +16,6 @@ namespace Core.Application.MachineGroupUser.Queries.GetMachineGroupUser
         public string? UserName { get; set; }
         public byte IsActive { get; set; }
         public byte IsDeleted { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
     }
 }

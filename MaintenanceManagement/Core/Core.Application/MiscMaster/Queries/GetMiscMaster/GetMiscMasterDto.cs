@@ -15,5 +15,6 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMaster
         public int SortOrder  { get; set;}
         public Status  IsActive { get; set; }
         public IsDelete IsDeleted { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
     }
 }

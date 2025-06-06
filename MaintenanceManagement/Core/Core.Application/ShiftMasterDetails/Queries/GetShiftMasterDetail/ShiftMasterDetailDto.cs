@@ -16,5 +16,6 @@ namespace Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetail
         public string BreakDurationInMinutes { get; set; }
         public string EffectiveDate { get; set; }
         public int ShiftSupervisorId { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
     }
 }
