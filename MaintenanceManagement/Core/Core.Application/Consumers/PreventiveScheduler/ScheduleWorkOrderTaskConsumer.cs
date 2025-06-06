@@ -73,26 +73,28 @@ namespace Core.Application.Consumers.PreventiveScheduler
                     await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id, newJobId);
                 }
                 var headerId = context.Message.PreventiveSchedulerHeaderId;
-                     if(getMachineWiseDetail.Count > 0)
-                     {
-                        
-                       await _hubContext.Clients.All.SendAsync("ReceiveMessage", 
-                       $"Preventive Schedule created successfully: {headerId}");
+                if (getMachineWiseDetail.Count > 0)
+                {
 
-                         await context.Publish(new ScheduleWorkOrderCreationEvent
+                    await _hubContext.Clients.All.SendAsync("ReceiveMessage",
+                    $"Preventive Schedule created successfully: {headerId}");
+
+                    await context.Publish(new ScheduleWorkOrderCreationEvent
                     {
                         CorrelationId = context.Message.CorrelationId
                     });
-                     }
-                     
-                 
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", 
-                $"Preventive Schedule creation failed: {headerId}");
+                }
 
-                await context.Publish(new ScheduleWorkOrderFailedEvent
+                else
                 {
-                    CorrelationId = context.Message.CorrelationId
-                });
+                    await _hubContext.Clients.All.SendAsync("ReceiveMessage",
+                    $"Preventive Schedule creation failed: {headerId}");
+
+                    await context.Publish(new ScheduleWorkOrderFailedEvent
+                    {
+                        CorrelationId = context.Message.CorrelationId
+                    });
+                }
              }
             catch (Exception ex)
             {
