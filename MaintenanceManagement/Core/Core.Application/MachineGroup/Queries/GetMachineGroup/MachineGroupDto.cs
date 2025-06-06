@@ -15,6 +15,7 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroup
         public string? DepartmentName { get; set; }
         public Status IsActive { get; set; }
         public IsDelete IsDeleted { get; set; } 
+        public DateTimeOffset CreatedDate { get; set; }
 
     }
 }

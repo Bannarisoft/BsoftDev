@@ -17,6 +17,7 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
         public int ActivityType { get; set; }
         public string? ActivityTypeDescription { get; set; }        
         public Status  IsActive { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
 
         
         

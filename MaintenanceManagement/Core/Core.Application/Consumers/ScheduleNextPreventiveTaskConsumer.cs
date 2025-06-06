@@ -2,17 +2,21 @@
 using Contracts.Commands.Maintenance;
 using Contracts.Events.Maintenance;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.RealTimeNotificationHub;
 using MassTransit;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Core.Application.Consumers
 {
     public class ScheduleNextPreventiveTaskConsumer : IConsumer<ScheduleNextPreventiveTaskCommand>
     {
         private readonly IPreventiveSchedulerCommand _nextScheduleService;
+        private readonly IHubContext<WorkOrderScheduleHub> _hubContext;
 
-        public ScheduleNextPreventiveTaskConsumer(IPreventiveSchedulerCommand nextScheduleService)
+        public ScheduleNextPreventiveTaskConsumer(IPreventiveSchedulerCommand nextScheduleService, IHubContext<WorkOrderScheduleHub> hubContext)
         {
             _nextScheduleService = nextScheduleService;
+            _hubContext = hubContext;
         }
 
         public async Task Consume(ConsumeContext<ScheduleNextPreventiveTaskCommand> context)
@@ -25,10 +29,16 @@ namespace Core.Application.Consumers
                     await context.Publish(new NextSchedulerCreatedEvent
                     {
                         CorrelationId = context.Message.CorrelationId
-                    });
+                    });            
+            
+                    await _hubContext.Clients.Group(context.Message.SchedulerId.ToString())
+                        .SendAsync("ReceiveMessage", $"✅ Schedule updated: {context.Message.SchedulerId}");
                 }
                 else
                 {
+                    await _hubContext.Clients.Group(context.Message.SchedulerId.ToString())
+                             .SendAsync("ReceiveMessage", $"❌ Failed to create schedule: {context.Message.SchedulerId}");
+
                     await context.Publish(new NextSchedulerCreationFailedEvent
                     {
                         CorrelationId = context.Message.CorrelationId,
@@ -38,6 +48,9 @@ namespace Core.Application.Consumers
             }
             catch (Exception ex)
             {
+                await _hubContext.Clients.Group(context.Message.SchedulerId.ToString())
+                    .SendAsync("ReceiveMessage", $"❌ Exception for schedule {context.Message.SchedulerId}: {ex.Message}");
+
                 await context.RespondAsync(new NextSchedulerCreationFailedEvent
                 {
                     CorrelationId = context.Message.CorrelationId,

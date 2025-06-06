@@ -29,7 +29,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceCategory
                 Id, 
                 CategoryName,
                 Description,
-                IsActive
+                IsActive,CreatedDate
             FROM Maintenance.MaintenanceCategory 
             WHERE 
             IsDeleted = 0

@@ -12,6 +12,7 @@ namespace Core.Application.MaintenanceCategory.Queries.GetMaintenanceCategory
         public string? CategoryName { get; set; }
         public string? Description { get; set; }
         public Status IsActive { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
 
     }
 }

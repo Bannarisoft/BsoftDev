@@ -35,7 +35,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkCenter
                 WorkCenterName,
                 UnitId,
                 DepartmentId,
-                IsActive
+                IsActive,CreatedDate
             FROM Maintenance.WorkCenter 
             WHERE 
             IsDeleted = 0

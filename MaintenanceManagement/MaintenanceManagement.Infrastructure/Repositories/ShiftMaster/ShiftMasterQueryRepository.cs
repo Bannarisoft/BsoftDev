@@ -44,7 +44,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMaster
                 ShiftCode,
                 ShiftName,
                 EffectiveDate,
-                IsActive
+                IsActive,CreatedDate
             FROM [Maintenance].[ShiftMaster] 
             WHERE 
             IsDeleted = 0
