@@ -10,9 +10,10 @@ namespace MaintenanceManagement.API.Configurations
                 options.AddPolicy("AllowAll", builder =>
                 {
                     builder
-                        .AllowAnyOrigin() // In production: replace with .WithOrigins("https://your-frontend.com")
+                        .SetIsOriginAllowed(_ => true) 
                         .AllowAnyMethod()
-                        .AllowAnyHeader();
+                        .AllowAnyHeader()
+                        .AllowCredentials();
                 });
             });
         }

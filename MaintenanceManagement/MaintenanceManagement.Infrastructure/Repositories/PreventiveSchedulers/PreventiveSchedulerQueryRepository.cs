@@ -81,7 +81,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PS.DownTimeEstimateHrs,
                     PS.IsActive,
                     PS.CreatedBy,
-                    PS.CreatedDate,
+                   Cast(PS.CreatedDate as varchar)  AS CreatedDate,
                     PS.CreatedByName,
                     PS.[CreatedIP],
                     PS.[ModifiedBy],
