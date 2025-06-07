@@ -6,6 +6,7 @@ namespace Core.Application.Common.RealTimeNotificationHub
     {        
         public async Task JoinGroup(string groupName)
         {
+            Console.WriteLine($"User joined group: {groupName}");
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         }
 
