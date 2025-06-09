@@ -10,6 +10,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.Storage;
 using Core.Application.Common;
 using MediatR;
+using Contracts.Interfaces.External.IUser;
+using Microsoft.AspNetCore.SignalR;
+using Core.Application.Common.RealTimeNotificationHub;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
@@ -20,18 +23,27 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         private readonly IDbConnection _dbConnection;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<WorkOrderCommandRepository> _logger;
+        private readonly ICompanyGrpcClient _companyGrpcClient;     
+        private readonly IUnitGrpcClient _unitGrpcClient; 
+        private readonly IHubContext<WorkOrderScheduleHub> _hubContext;          
 
         public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService, IDbConnection dbConnection,
-        IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger)
+        IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger, ICompanyGrpcClient companyGrpcClient,IUnitGrpcClient unitGrpcClient, IHubContext<WorkOrderScheduleHub> hubContext)
         {
             _applicationDbContext = applicationDbContext;
             _ipAddressService = ipAddressService;
             _dbConnection = dbConnection;
             _publishEndpoint = publishEndpoint;
             _logger = logger;
+            _companyGrpcClient = companyGrpcClient;  
+            _unitGrpcClient=unitGrpcClient;    
+            _hubContext = hubContext;           
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, CancellationToken cancellationToken)
         {
+              await _hubContext.Clients.Group(workOrder.CreatedBy.ToString())
+                    .SendAsync("ReceiveMessage", $"🛠️ New Work Order '{workOrder.WorkOrderDocNo}' created by user {workOrder.CreatedBy}");
+
             var entry = _applicationDbContext.Entry(workOrder);
             workOrder.WorkOrderDocNo = await GetLatestWorkOrderDocNo(requestTypeId);
             await _applicationDbContext.WorkOrder.AddAsync(workOrder);
@@ -78,20 +90,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _applicationDbContext.WorkOrderTechnician.RemoveRange(
                 _applicationDbContext.WorkOrderTechnician.Where(x => x.WorkOrderId == workOrderId));
 
-            /*            var createdBy = existingWorkOrder.CreatedBy;
-                       var createdByName = existingWorkOrder.CreatedByName;
-                       var createdIP  = existingWorkOrder.CreatedIP ;
-                       var createdDate  = existingWorkOrder.CreatedDate  */
-            ;
-
-
-            // Update scalar fields
-            //_applicationDbContext.Entry(existingWorkOrder).CurrentValues.SetValues(workOrder);
-            /*           existingWorkOrder.CreatedBy = createdBy;
-                      existingWorkOrder.CreatedByName = createdByName;
-                      existingWorkOrder.CreatedIP = createdIP;           
-                      existingWorkOrder.CreatedDate = createdDate;     */
-
             existingWorkOrder.DowntimeStart = workOrder.DowntimeStart;
             existingWorkOrder.DowntimeEnd = workOrder.DowntimeEnd;
             existingWorkOrder.Image = workOrder.Image;
@@ -135,13 +133,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 {
                     string baseDirectory = await GetBaseDirectoryItemAsync();
 
-                    var (companyName, unitName) = await GetCompanyUnitAsync(workOrder.CompanyId, workOrder.UnitId);
-                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory, companyName, unitName);
+                     var companies = await _companyGrpcClient.GetAllCompanyAsync();
+                    var units = await _unitGrpcClient.GetAllUnitAsync();
 
-                    //string companyFolder = Path.Combine(uploadPath, companyName.Trim());
-                    //EnsureDirectoryExists(companyFolder);              
-                    //string unitFolder = Path.Combine(companyFolder,unitName.Trim());
-                    //EnsureDirectoryExists(companyFolder); 
+                    var companyLookup = companies.ToDictionary(c => c.CompanyId, c => c.CompanyName);
+                    var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+                    var companyName = companyLookup.TryGetValue(workOrder.CompanyId, out var cname) ? cname : string.Empty;
+                    var unitName = unitLookup.TryGetValue(workOrder.UnitId, out var uname) ? uname : string.Empty;   
+
+                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory, companyName, unitName);
                     string filePath = Path.Combine(uploadPath, tempItemFilePath);
                     EnsureDirectoryExists(Path.GetDirectoryName(filePath));
 
@@ -211,26 +212,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             ";
             var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query);
             return result;
-        }
-
-        public async Task<(string CompanyName, string UnitName)> GetCompanyUnitAsync(int companyId, int unitId)
-        {
-            const string query = @"
-                SELECT CompanyName 
-                FROM Bannari.AppData.Company 
-                WHERE Id = @CompanyId;
-
-                SELECT UnitName  
-                FROM Bannari.AppData.Unit 
-                WHERE Id = @UnitId;
-            ";
-            using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { CompanyId = companyId, UnitId = unitId });
-
-            var companyName = (await multiQuery.ReadFirstOrDefaultAsync<string>())?.Trim();
-            var unitName = (await multiQuery.ReadFirstOrDefaultAsync<string>())?.Trim();
-
-            return (companyName, unitName);
-        }
+        }      
         public async Task<bool> RemoveWOImageReferenceAsync(int workOrderId)
         {
             var asset = await _applicationDbContext.WorkOrder.FindAsync(workOrderId);

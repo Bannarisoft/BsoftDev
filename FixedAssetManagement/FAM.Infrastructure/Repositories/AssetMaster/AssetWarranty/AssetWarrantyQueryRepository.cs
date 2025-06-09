@@ -8,14 +8,14 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty
 {
     public class AssetWarrantyQueryRepository : IAssetWarrantyQueryRepository    
     {
-          private readonly IDbConnection _dbConnection;
+        private readonly IDbConnection _dbConnection;
         public AssetWarrantyQueryRepository(IDbConnection dbConnection)
         {
-            _dbConnection = dbConnection;
+            _dbConnection = dbConnection;          
         }     
         public async Task<(List<AssetWarrantyDTO>, int)> GetAllAssetWarrantyAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-             var query = $$"""
+            var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
                 FROM FixedAsset.AssetWarranty A              
@@ -25,14 +25,11 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty
                 SELECT A.Id,A.AssetId,A.StartDate,A.EndDate,A.Period,A.WarrantyType,A.Description,A.ContactPerson,A.MobileNumber,A.Email,A.ServiceCountryId,A.ServiceStateId,A.ServiceCityId,
                 A.ServiceAddressLine1,A.ServiceAddressLine2,A.ServicePinCode,A.ServiceContactPerson,A.ServiceMobileNumber,A.ServiceEmail,A.ServiceClaimProcessDescription,A.ServiceLastClaimDate,A.ServiceClaimStatus
                 ,A.IsActive,A.CreatedBy,A.CreatedDate,A.CreatedByName,A.CreatedIP,A.ModifiedBy,A.ModifiedDate,A.ModifiedByName,A.ModifiedIP
-                ,AM.AssetCode,AM.AssetName ,M.Description WarrantyTypeDesc,M1.Description WarrantyClaimStatus, C.CountryName,S.StateName,CS.CityName
+                ,AM.AssetCode,AM.AssetName ,M.Description WarrantyTypeDesc,M1.Description WarrantyClaimStatus, '' CountryName,'' StateName,'' CityName
                 FROM FixedAsset.AssetWarranty A
                 INNER JOIN FixedAsset.AssetMaster AM on AM.Id=A.AssetId             
                 LEFT JOIN FixedAsset.MiscMaster M on M.Id =A.WarrantyType
-                LEFT JOIN FixedAsset.MiscMaster M1 on M1.Id =A.ServiceClaimStatus
-                INNER JOIN Bannari.AppData.Country C on C.Id=A.ServiceCountryId
-                INNER JOIN Bannari.AppData.State S on S.Id=A.ServiceStateId
-                INNER JOIN Bannari.AppData.City CS on CS.Id=A.ServiceCityId
+                LEFT JOIN FixedAsset.MiscMaster M1 on M1.Id =A.ServiceClaimStatus 
                 WHERE A.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (AssetCode LIKE @Search OR AssetName LIKE @Search  OR M.Description LIKE @Search OR A.Description LIKE @Search )")}}
                 ORDER BY A.Id desc
@@ -58,14 +55,11 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty
             SELECT A.Id,A.AssetId,A.StartDate,A.EndDate,A.Period,A.WarrantyType,A.Description,A.ContactPerson,A.MobileNumber,A.Email,A.ServiceCountryId,A.ServiceStateId,A.ServiceCityId,
             A.ServiceAddressLine1,A.ServiceAddressLine2,A.ServicePinCode,A.ServiceContactPerson,A.ServiceMobileNumber,A.ServiceEmail,A.ServiceClaimProcessDescription,A.ServiceLastClaimDate,A.ServiceClaimStatus
             ,A.IsActive,A.CreatedBy,A.CreatedDate,A.CreatedByName,A.CreatedIP,A.ModifiedBy,A.ModifiedDate,A.ModifiedByName,A.ModifiedIP
-            ,AM.AssetCode,AM.AssetName ,M.Description WarrantyTypeDesc,M1.Description WarrantyClaimStatus, C.CountryName,S.StateName,CS.CityName
+            ,AM.AssetCode,AM.AssetName ,M.Description WarrantyTypeDesc,M1.Description WarrantyClaimStatus
             FROM FixedAsset.AssetWarranty A
             INNER JOIN FixedAsset.AssetMaster AM on AM.Id=A.AssetId             
             LEFT JOIN FixedAsset.MiscMaster M on M.Id =A.WarrantyType
-            LEFT JOIN FixedAsset.MiscMaster M1 on M1.Id =A.ServiceClaimStatus
-            INNER JOIN Bannari.AppData.Country C on C.Id=A.ServiceCountryId
-            INNER JOIN Bannari.AppData.State S on S.Id=A.ServiceStateId
-            INNER JOIN Bannari.AppData.City CS on CS.Id=A.ServiceCityId
+            LEFT JOIN FixedAsset.MiscMaster M1 on M1.Id =A.ServiceClaimStatus         
             WHERE  (AssetCode LIKE @searchPattern OR AssetName LIKE @searchPattern  OR A.Description LIKE @searchPattern OR M.Description LIKE @searchPattern )
             AND  A.IsDeleted=0 and A.IsActive=1
             ORDER BY A.ID DESC";            
@@ -79,14 +73,11 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetWarranty
             SELECT A.Id,A.AssetId,A.StartDate,A.EndDate,A.Period,A.WarrantyType,A.Description,A.ContactPerson,A.MobileNumber,A.Email,A.ServiceCountryId,A.ServiceStateId,A.ServiceCityId,
             A.ServiceAddressLine1,A.ServiceAddressLine2,A.ServicePinCode,A.ServiceContactPerson,A.ServiceMobileNumber,A.ServiceEmail,A.ServiceClaimProcessDescription,A.ServiceLastClaimDate,A.ServiceClaimStatus
             ,A.IsActive,A.CreatedBy,A.CreatedDate,A.CreatedByName,A.CreatedIP,A.ModifiedBy,A.ModifiedDate,A.ModifiedByName,A.ModifiedIP
-            ,AM.AssetCode,AM.AssetName ,M.Description WarrantyTypeDesc,M1.Description WarrantyClaimStatus, C.CountryName,S.StateName,CS.CityName
+            ,AM.AssetCode,AM.AssetName ,M.Description WarrantyTypeDesc,M1.Description WarrantyClaimStatus
             FROM FixedAsset.AssetWarranty A
             INNER JOIN FixedAsset.AssetMaster AM on AM.Id=A.AssetId             
             LEFT JOIN FixedAsset.MiscMaster M on M.Id =A.WarrantyType
-            LEFT JOIN FixedAsset.MiscMaster M1 on M1.Id =A.ServiceClaimStatus
-            INNER JOIN Bannari.AppData.Country C on C.Id=A.ServiceCountryId
-            INNER JOIN Bannari.AppData.State S on S.Id=A.ServiceStateId
-            INNER JOIN Bannari.AppData.City CS on CS.Id=A.ServiceCityId
+            LEFT JOIN FixedAsset.MiscMaster M1 on M1.Id =A.ServiceClaimStatus           
             WHERE A.Id = @assetId AND A.IsDeleted=0";
             var assetWarranties = await _dbConnection.QueryFirstOrDefaultAsync<AssetWarrantyDTO>(query, new { assetId });           
             if (assetWarranties is null)

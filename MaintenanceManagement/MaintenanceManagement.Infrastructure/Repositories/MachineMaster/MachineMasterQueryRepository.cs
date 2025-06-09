@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.MachineMaster.Queries.GetMachineDepartmentbyId;
+using Core.Application.MachineMaster.Queries.GetMachineMaster;
+using Core.Application.MachineMaster.Queries.GetMachineNoDepartmentbyId;
 using Core.Domain.Common;
 using Dapper;
 
@@ -20,41 +22,47 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             _dbConnection = dbConnection;
             _ipAddressService = ipAddressService;
         }
-        public async Task<(List<Core.Domain.Entities.MachineMaster>, int)> GetAllMachineAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<MachineMasterDto>, int)> GetAllMachineAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             var UnitId = _ipAddressService.GetUnitId();
-            var query = $$"""
-             DECLARE @TotalCount INT;
-             SELECT @TotalCount = COUNT(*) 
-             FROM Maintenance.MachineMaster
-             WHERE IsDeleted = 0 AND UnitId = @UnitId
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MachineCode LIKE @Search OR MachineName LIKE @Search)")}};
+           var query = $$"""
+                        DECLARE @TotalCount INT;
 
-                SELECT 
-                Id, 
-                MachineCode,
-                MachineName,
-                MachineGroupId,
-                UnitId,
-                ProductionCapacity,
-                UomId,
-                ShiftMasterId,
-                CostCenterId,
-                WorkCenterId,
-                InstallationDate,
-                AssetId,
-                [LineNo],
-                IsActive
-            FROM Maintenance.MachineMaster 
-            WHERE 
-            IsDeleted = 0 AND UnitId = @UnitId
-                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MachineCode LIKE @Search OR MachineName LIKE @Search )")}}
-                ORDER BY Id desc
-                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+                        -- Count total records
+                        SELECT @TotalCount = COUNT(*) 
+                        FROM Maintenance.MachineMaster mm
+                        LEFT JOIN Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
+                        WHERE mm.IsDeleted = 0 AND mm.UnitId = @UnitId
+                        {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (mm.MachineCode LIKE @Search OR mm.MachineName LIKE @Search)")}};
 
-                SELECT @TotalCount AS TotalCount;
-            """;
+                        -- Fetch paged records with MachineGroupName
+                        SELECT 
+                            mm.Id, 
+                            mm.MachineCode,
+                            mm.MachineName,
+                            mm.MachineGroupId,
+                            mg.GroupName AS MachineGroupName, -- <- correct mapping
+                            mm.UnitId,
+                            mm.ProductionCapacity,
+                            mm.UomId,
+                            mm.ShiftMasterId,
+                            mm.CostCenterId,
+                            mm.WorkCenterId,
+                            mm.InstallationDate,
+                            mm.AssetId,
+                            mm.[LineNo],
+                            mm.IsActive
+                        FROM Maintenance.MachineMaster mm
+                        LEFT JOIN Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
+                        WHERE 
+                            mm.IsDeleted = 0 AND mm.UnitId = @UnitId
+                            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (mm.MachineCode LIKE @Search OR mm.MachineName LIKE @Search)")}}
+                        ORDER BY mm.Id DESC
+                        OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
+                        -- Return total count
+                        SELECT @TotalCount AS TotalCount;
+                        """;
             
              var parameters = new
                        {
@@ -65,20 +73,28 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                        };
 
              var maintenanceCategory = await _dbConnection.QueryMultipleAsync(query, parameters);
-             var maintenanceCategorylist = (await maintenanceCategory.ReadAsync<Core.Domain.Entities.MachineMaster>()).ToList();
+             var maintenanceCategorylist = (await maintenanceCategory.ReadAsync<MachineMasterDto>()).ToList();
              int totalCount = (await maintenanceCategory.ReadFirstAsync<int>());
              return (maintenanceCategorylist, totalCount);
         }
 
-        public async Task<Core.Domain.Entities.MachineMaster?> GetByIdAsync(int Id)
+        public async Task<MachineMasterDto?> GetByIdAsync(int Id)
         {
              var unitId = _ipAddressService.GetUnitId();
              const string query = @"
-                    SELECT * 
-                    FROM Maintenance.MachineMaster 
-                    WHERE Id = @Id AND IsDeleted = 0 AND UnitId = @UnitId";
+                                SELECT 
+                                mm.*, 
+                                mg.GroupName AS MachineGroupName
+                            FROM 
+                                Maintenance.MachineMaster mm
+                            LEFT JOIN 
+                                Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
+                            WHERE 
+                                mm.Id = @Id 
+                                AND mm.IsDeleted = 0 
+                                AND mm.UnitId = @UnitId";
 
-                    var machineMaster = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineMaster>(query, new { Id,unitId });
+                    var machineMaster = await _dbConnection.QueryFirstOrDefaultAsync<MachineMasterDto>(query, new { Id,unitId });
                     return machineMaster;
         }
         public async Task<List<Core.Domain.Entities.MachineMaster>> GetMachineAsync(string searchPattern)
@@ -188,6 +204,30 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             ORDER BY M.ID DESC";    
             var parameters = new { MiscTypeCode = MiscEnumEntity.MachineLineNo.Code };        
             var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+            return result.ToList();
+        }
+
+        public async Task<List<GetMachineNoDepartmentbyIdDto>> GetMachineNoDepartmentAsync(int DepartmentId)
+        {
+           /*  const string query = @"
+                SELECT A.Id, A.MachineCode, A.MachineName
+                FROM Maintenance.MachineMaster A
+                INNER JOIN Maintenance.MachineGroup B ON A.MachineGroupId = B.Id
+                WHERE B.DepartmentId = @DepartmentId"; */
+                var UnitId = _ipAddressService.GetUnitId();
+                var CompanyId = _ipAddressService.GetCompanyId();
+            const string query = @"
+                select distinct MM.Id,MachineCode,MachineName 
+                from Maintenance.WorkOrder WO with(nolock)              
+                LEFT JOIN [Maintenance].[MaintenanceRequest]  MR with(nolock) on MR.ID=WO.RequestId                        
+                LEFT JOIN [Maintenance].[PreventiveSchedulerDetail]  PS with(nolock) on PS.ID=WO.PreventiveScheduleId                        
+                LEFT JOIN [Maintenance].[PreventiveSchedulerHeader] PH with(nolock) on PH.Id=PS.PreventiveSchedulerHeaderId  
+                inner join Maintenance.MachineMaster MM on MM.Id= case when isnull(requestid,0)<>0 then MR.MachineId else PS.MachineId end
+                INNER JOIN Maintenance.MiscMaster T on T.ID=WO.StatusId and T.Code not in('Closed','Cancelled')
+                where WO.CompanyId=@CompanyId and WO.UnitId=@UnitId  and (case when isnull(requestid,0)<>0 then MR.MaintenanceDepartmentId else PH.DepartmentId end) = @DepartmentId   ";
+
+            var result = await _dbConnection.QueryAsync<GetMachineNoDepartmentbyIdDto>(query, new {CompanyId=CompanyId,UnitId=UnitId ,DepartmentId = DepartmentId });
+
             return result.ToList();
         }
     }

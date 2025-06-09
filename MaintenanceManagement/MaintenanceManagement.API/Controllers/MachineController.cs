@@ -12,7 +12,9 @@ using Core.Application.MachineMaster.Queries.GetMachineLineNo;
 using Core.Application.MachineMaster.Queries.GetMachineMaster;
 using Core.Application.MachineMaster.Queries.GetMachineMasterAutoComplete;
 using Core.Application.MachineMaster.Queries.GetMachineMasterById;
+using Core.Application.MachineMaster.Queries.GetMachineNoDepartmentbyId;
 using FluentValidation;
+using MassTransit.Futures.Contracts;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -234,13 +236,19 @@ namespace MaintenanceManagement.API.Controllers
             }
             return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = machine.Message });
         }
-         [HttpGet("GetByAssetId/{assetId}")]
+        [HttpGet("GetByAssetId/{assetId}")]
         public async Task<IActionResult> GetByAssetId(int assetId)
         {
             var result = await _mediator.Send(new GetAssetSpecificationByIdQuery { AssetId = assetId });
             return Ok(result);
         }
 
+        [HttpGet("GetMachinesByDepartmentId/{departmentId}")]
+        public async Task<IActionResult> GetMachinesByDepartmentId(int departmentId)
+        {
+            var result = await _mediator.Send(new GetMachineNoDepartmentbyIdQuery { DepartmentId = departmentId });
+            return Ok(result);
+        }
 
         
     }

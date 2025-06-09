@@ -913,6 +913,152 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("MiscTypeMaster", "Maintenance");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Power.Feeder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("Description");
+
+                    b.Property<DateTimeOffset>("EffectiveDate")
+                        .HasColumnType("DateTimeOffset")
+                        .HasColumnName("EffectiveDate");
+
+                    b.Property<string>("FeederCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("FeederCode");
+
+                    b.Property<int>("FeederGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FeederName")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("FeederName");
+
+                    b.Property<int>("FeederTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("HighPriority")
+                        .HasColumnType("bit")
+                        .HasColumnName("HighPriority");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal>("MultiplicationFactor")
+                        .HasColumnType("Decimal(18,2)")
+                        .HasColumnName("MultiplicationFactor");
+
+                    b.Property<decimal>("OpeningReading")
+                        .HasColumnType("Decimal(18,2)")
+                        .HasColumnName("OpeningReading");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeederGroupId");
+
+                    b.HasIndex("FeederTypeId");
+
+                    b.ToTable("Feeder", "Maintenance");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Power.FeederGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("FeederGroupCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("FeederGroupName")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FeederGroup", "Maintenance");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerActivity", b =>
                 {
                     b.Property<int>("Id")
@@ -1154,7 +1300,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnName("ItemId");
 
                     b.Property<string>("OldCategoryDescription")
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("varchar(max)")
                         .HasColumnName("OldCategoryDescription");
 
                     b.Property<string>("OldGroupName")
@@ -1926,6 +2072,25 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("MiscTypeMaster");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Power.Feeder", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Power.FeederGroup", "FeederGroup")
+                        .WithMany("Feeders")
+                        .HasForeignKey("FeederGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "FeederType")
+                        .WithMany("Feeders")
+                        .HasForeignKey("FeederTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FeederGroup");
+
+                    b.Navigation("FeederType");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerActivity", b =>
                 {
                     b.HasOne("Core.Domain.Entities.ActivityMaster", "Activity")
@@ -2203,6 +2368,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                 {
                     b.Navigation("ActivityType");
 
+                    b.Navigation("Feeders");
+
                     b.Navigation("FrequencyType");
 
                     b.Navigation("FrequencyUnit");
@@ -2241,6 +2408,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
                 {
                     b.Navigation("MiscMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Power.FeederGroup", b =>
+                {
+                    b.Navigation("Feeders");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerDetail", b =>

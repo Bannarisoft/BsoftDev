@@ -1,4 +1,5 @@
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
@@ -17,6 +18,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly ILogger<UploadFileAssetMasterGeneralCommandHandler> _logger;
         private readonly IIPAddressService _ipAddressService;
+        private readonly IUnitGrpcClient _unitGrpcClient;
+        private readonly ICompanyGrpcClient _companyGrpcClient;
 
         public UploadFileAssetMasterGeneralCommandHandler(
             IFileUploadService fileUploadService,
@@ -24,7 +27,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             IMapper mapper,
             IAssetMasterGeneralCommandRepository assetMasterGeneralRepository,
             IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository,
-            ILogger<UploadFileAssetMasterGeneralCommandHandler> logger, IIPAddressService ipAddressService)
+            ILogger<UploadFileAssetMasterGeneralCommandHandler> logger, IIPAddressService ipAddressService, IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient)
         {
             _fileUploadService = fileUploadService;
             _mediator = mediator;
@@ -33,6 +36,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
             _logger = logger;
             _ipAddressService = ipAddressService;
+            _unitGrpcClient = unitGrpcClient;
+            _companyGrpcClient = companyGrpcClient;
         }
 
         public async Task<ApiResponseDTO<AssetMasterImageDto>> Handle(UploadFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
@@ -52,7 +57,15 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             
             var companyId =_ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
-            var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(companyId, unitId);
+            //var (companyName, unitName) = await _assetMasterGeneralQueryRepository.GetCompanyUnitAsync(companyId, unitId);
+             var companies = await _companyGrpcClient.GetAllCompanyAsync();
+            var units = await _unitGrpcClient.GetAllUnitAsync();
+
+            var companyLookup = companies.ToDictionary(c => c.CompanyId, c => c.CompanyName);
+            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+            var companyName = companyLookup.TryGetValue(companyId, out var cname) ? cname : string.Empty;
+            var unitName = unitLookup.TryGetValue(unitId, out var uname) ? uname : string.Empty;     
             
             string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);                
             EnsureDirectoryExists(uploadPath);

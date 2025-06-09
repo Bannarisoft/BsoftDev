@@ -9,6 +9,7 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetDetailSchedulerByDate
     {
         public int HeaderId { get; set; }
         public int DetailId { get; set; }
+        public int WorkOrderId { get; set; }
         public string PreventiveSchedulerName { get; set; }
         public int MachineGroupId { get; set; }
         public string GroupName { get; set; }
@@ -16,5 +17,6 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetDetailSchedulerByDate
         public string MachineName { get; set; }
         public int DepartmentId { get; set; }
         public string DepartmentName { get; set; }
+        public string MachineCode { get; set; }
     }
 }

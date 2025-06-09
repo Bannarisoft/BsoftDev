@@ -8,6 +8,6 @@ namespace Contracts.Interfaces.External.IUser
 {
     public interface ICityGrpcClient
     {
-         Task<List<CityDto>> GetAllCities();
+         Task<List<CityDto>> GetAllCityAsync();
     }
 }
