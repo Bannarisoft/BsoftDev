@@ -8,7 +8,7 @@ using MediatR; // ✅ Correct namespace for IMediator
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace UserManagement.Tests.UnitTests.Handlers
+namespace UserManagement.Tests.UnitTests.Handlers.Queries
 {
     [TestClass]
     public class GetUserQueryHandlerTests

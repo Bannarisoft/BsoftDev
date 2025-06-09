@@ -25,11 +25,11 @@ namespace UserManagement.API.Validation.Users
         private readonly IDepartmentQueryRepository _departmentQueryRepository;
         private readonly IUserRoleQueryRepository _userRoleQueryRepository;
         private readonly IUnitQueryRepository _unitQueryRepository;
-        private readonly IIPAddressService _ipAddressService; 
+        private readonly IIPAddressService _ipAddressService;
 
-        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userRepository, ICompanyQueryRepository companyQueryRepository, IDivisionQueryRepository divisionQueryRepository, IDepartmentQueryRepository departmentQueryRepository, IUserRoleQueryRepository userRoleQueryRepository, IUnitQueryRepository unitQueryRepository,IIPAddressService ipAddressService)
+        public CreateUserCommandValidator(MaxLengthProvider maxLengthProvider, IUserQueryRepository userRepository, ICompanyQueryRepository companyQueryRepository, IDivisionQueryRepository divisionQueryRepository, IDepartmentQueryRepository departmentQueryRepository, IUserRoleQueryRepository userRoleQueryRepository, IUnitQueryRepository unitQueryRepository, IIPAddressService ipAddressService)
         {
-           var MaxLen = maxLengthProvider.GetMaxLength<User>("FirstName") ?? 25;
+            var MaxLen = maxLengthProvider.GetMaxLength<User>("FirstName") ?? 25;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();
             _userQueryRepository = userRepository;
@@ -44,7 +44,7 @@ namespace UserManagement.API.Validation.Users
                 throw new InvalidOperationException("Validation rules could not be loaded.");
             }
 
-             foreach (var rule in _validationRules)
+            foreach (var rule in _validationRules)
             {
                 switch (rule.Rule)
                 {
@@ -97,13 +97,13 @@ namespace UserManagement.API.Validation.Users
                         .WithMessage($"{rule.Error}")
                         .When(x => _ipAddressService.GetGroupcode() == "USER");
 
-                         RuleFor(x => x.userDepartments)
-                         .Cascade(CascadeMode.Stop)
-                         .NotNull()
-                        .WithMessage($"{rule.Error}")
-                        .Must(x => x.Count > 0)
-                        .WithMessage($"{rule.Error}")
-                        .When(x => _ipAddressService.GetGroupcode() == "USER");
+                        RuleFor(x => x.userDepartments)
+                        .Cascade(CascadeMode.Stop)
+                        .NotNull()
+                       .WithMessage($"{rule.Error}")
+                       .Must(x => x.Count > 0)
+                       .WithMessage($"{rule.Error}")
+                       .When(x => _ipAddressService.GetGroupcode() == "USER");
 
                         RuleFor(x => x.userRoleAllocations)
                          .NotNull()
@@ -116,57 +116,57 @@ namespace UserManagement.API.Validation.Users
                         // Apply MaxLength validation using dynamic max length values
                         RuleFor(x => x.FirstName)
                             .MaximumLength(MaxLen) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateUserCommand.FirstName)} {rule.Error} {MaxLen}");   
+                            .WithMessage($"{nameof(CreateUserCommand.FirstName)} {rule.Error} {MaxLen}");
 
-                             RuleFor(x => x.LastName)
-                            .MaximumLength(MaxLen) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateUserCommand.LastName)} {rule.Error} {MaxLen}"); 
+                        RuleFor(x => x.LastName)
+                       .MaximumLength(MaxLen) // Dynamic value from MaxLengthProvider
+                       .WithMessage($"{nameof(CreateUserCommand.LastName)} {rule.Error} {MaxLen}");
 
-                             RuleFor(x => x.UserName)
-                            .MaximumLength(MaxLen) // Dynamic value from MaxLengthProvider
-                            .WithMessage($"{nameof(CreateUserCommand.UserName)} {rule.Error} {MaxLen}");
+                        RuleFor(x => x.UserName)
+                       .MaximumLength(MaxLen) // Dynamic value from MaxLengthProvider
+                       .WithMessage($"{nameof(CreateUserCommand.UserName)} {rule.Error} {MaxLen}");
 
-                        break; 
-                         
+                        break;
+
                     case "Email":
                         RuleFor(x => x.EmailId)
                             .EmailAddress()
-                            .WithMessage($"{nameof(CreateUserCommand.EmailId)} {rule.Error}");   
-                        break; 
+                            .WithMessage($"{nameof(CreateUserCommand.EmailId)} {rule.Error}");
+                        break;
 
-                    case "MobileNumber": 
-                        RuleFor(x => x.Mobile) 
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                        .WithMessage($"{nameof(CreateUserCommand.Mobile)} {rule.Error}"); 
-                        break; 
-                        
+                    case "MobileNumber":
+                        RuleFor(x => x.Mobile)
+                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                        .WithMessage($"{nameof(CreateUserCommand.Mobile)} {rule.Error}");
+                        break;
+
                     case "AlreadyExists":
-                           RuleFor(x => x.UserName)
-                           .MustAsync(async (UserName, cancellation) => !await _userQueryRepository.AlreadyExistsAsync(UserName))
-                           .WithName("User Name")
-                            .WithMessage($"{rule.Error}");
-                            break;
+                        RuleFor(x => x.UserName)
+                        .MustAsync(async (UserName, cancellation) => !await _userQueryRepository.AlreadyExistsAsync(UserName))
+                        .WithName("User Name")
+                         .WithMessage($"{rule.Error}");
+                        break;
                     case "PasswordMaxLength":
                         RuleFor(x => x.Password)
-                        .Length(8,10)
-                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}"); 
+                        .Length(8, 10)
+                        .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
                         break;
                     case "UpperCase":
                         RuleFor(x => x.Password)
                         .Matches(@"[A-Z]+")
                         .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
                         break;
-                        case "LowerCase":
+                    case "LowerCase":
                         RuleFor(x => x.Password)
                         .Matches(@"[a-z]+")
                         .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
                         break;
-                         case "Numeric":
+                    case "Numeric":
                         RuleFor(x => x.Password)
                         .Matches(@"[0-9]+")
                         .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
                         break;
-                         case "SpecialCharacter":
+                    case "SpecialCharacter":
                         RuleFor(x => x.Password)
                         .Matches(@"[!@#$%^&*(),.?""{}|<>]")
                         .WithMessage($"{nameof(CreateUserCommand.Password)} {rule.Error}");
@@ -175,51 +175,63 @@ namespace UserManagement.API.Validation.Users
                         RuleFor(x => x.UserCompanies)
                              .ForEach(companyRule =>
                              {
-                                 companyRule.MustAsync(async (company, cancellation) => 
+                                 companyRule.MustAsync(async (company, cancellation) =>
                                      await _companyQueryRepository.FKColumnExistValidation(company.CompanyId))
-                                     .WithMessage($"{rule.Error}");  
+                                     .WithMessage($"{rule.Error}");
                              })
                              .When(x => _ipAddressService.GetGroupcode() == "USER");
-                             
-                     RuleFor(x => x.userDivisions)
-                             .ForEach(divisionRule =>
-                             {
-                                 divisionRule.MustAsync(async (division, cancellation) => 
-                                     await _divisionQueryRepository.FKColumnExistValidation(division.DivisionId))
-                                     .WithMessage($"{rule.Error}");  
-                             })
-                             .When(x => _ipAddressService.GetGroupcode() == "USER");
+
+                        RuleFor(x => x.userDivisions)
+                                .ForEach(divisionRule =>
+                                {
+                                    divisionRule.MustAsync(async (division, cancellation) =>
+                                        await _divisionQueryRepository.FKColumnExistValidation(division.DivisionId))
+                                        .WithMessage($"{rule.Error}");
+                                })
+                                .When(x => _ipAddressService.GetGroupcode() == "USER");
                         RuleFor(x => x.userUnits)
                              .ForEach(unitRule =>
                              {
-                                 unitRule.MustAsync(async (unit, cancellation) => 
+                                 unitRule.MustAsync(async (unit, cancellation) =>
                                      await _unitQueryRepository.FKColumnExistValidation(unit.UnitId))
-                                     .WithMessage($"{rule.Error}");  
+                                     .WithMessage($"{rule.Error}");
                              })
                              .When(x => _ipAddressService.GetGroupcode() == "USER");
                         RuleFor(x => x.userRoleAllocations)
                              .ForEach(RoleRule =>
                              {
-                                 RoleRule.MustAsync(async (role, cancellation) => 
+                                 RoleRule.MustAsync(async (role, cancellation) =>
                                      await _userRoleQueryRepository.FKColumnExistValidation(role.UserRoleId))
-                                     .WithMessage($"{rule.Error}");  
+                                     .WithMessage($"{rule.Error}");
                              });
 
                         RuleFor(x => x.userDepartments)
                              .ForEach(departmentRule =>
                              {
-                                 departmentRule.MustAsync(async (department, cancellation) => 
+                                 departmentRule.MustAsync(async (department, cancellation) =>
                                      await _departmentQueryRepository.FKColumnExistValidation(department.DepartmentId))
-                                     .WithMessage($"{rule.Error}");  
+                                     .WithMessage($"{rule.Error}");
                              })
                              .When(x => _ipAddressService.GetGroupcode() == "USER");
-                             
-                        break; 
 
-                    default:                        
+                        break;
+
+                    default:
                         break;
                 }
             }
+            // Add explicit SQL Injection detection for UserName for Security Testing
+            RuleFor(x => x.UserName)
+                .Must(userName => !ContainsSqlInjectionPatterns(userName))
+                .WithMessage($"{nameof(CreateUserCommand.UserName)} contains invalid characters or patterns.");
+        }
+        private bool ContainsSqlInjectionPatterns(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return false;
+
+            var pattern = @"(--|;|'|\b(SELECT|UPDATE|DELETE|INSERT|DROP|ALTER|CREATE|EXEC|UNION)\b)";
+            return System.Text.RegularExpressions.Regex.IsMatch(input, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
     }
 }

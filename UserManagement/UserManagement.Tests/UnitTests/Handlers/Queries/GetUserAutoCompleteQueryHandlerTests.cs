@@ -12,7 +12,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace UserManagement.Tests.UnitTests.Handlers
+namespace UserManagement.Tests.UnitTests.Handlers.Queries
 {
     [TestClass]
     public class GetUserAutoCompleteQueryHandlerTests
