@@ -7,10 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
 using Core.Application.Common.Interfaces.IWorkOrder;
+using Core.Application.Common.RealTimeNotificationHub;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest;
 using Core.Domain.Common;
 using Core.Domain.Events;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using static Core.Domain.Common.MiscEnumEntity;
 
 namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
@@ -24,11 +26,11 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
        private readonly IMediator _mediator;
        private readonly IMaintenanceRequestQueryRepository  _maintenanceRequestQueryRepository;
        private readonly IWorkOrderCommandRepository _workOrderCommandRepository;
-         private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
-        private readonly IIPAddressService _ipAddressService;
-       
+       private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
+       private readonly IIPAddressService _ipAddressService;
+       private readonly IHubContext<WorkOrderScheduleHub> _hubContext;
 
-       public CreateMaintenanceRequestCommandHandler( IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository, IMapper imapper, IMediator mediator, IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IWorkOrderCommandRepository workOrderCommandRepository , IWorkOrderQueryRepository workOrderQueryQueryRepository , IIPAddressService ipAddressService )
+       public CreateMaintenanceRequestCommandHandler( IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository, IMapper imapper, IMediator mediator, IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IWorkOrderCommandRepository workOrderCommandRepository , IWorkOrderQueryRepository workOrderQueryQueryRepository , IIPAddressService ipAddressService, IHubContext<WorkOrderScheduleHub> hubContext )
        {
            _maintenanceRequestCommandRepository = maintenanceRequestCommandRepository;
            _imapper = imapper;
@@ -37,6 +39,7 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
            _workOrderCommandRepository = workOrderCommandRepository;
            _workOrderQueryRepository = workOrderQueryQueryRepository;
            _ipAddressService = ipAddressService;
+            _hubContext = hubContext;
        }
 
         public async Task<ApiResponseDTO<int>> Handle(CreateMaintenanceRequestCommand request, CancellationToken cancellationToken)
@@ -76,6 +79,20 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
             workOrder.UnitId = _ipAddressService.GetUnitId();
             
             await _workOrderCommandRepository.CreateAsync(workOrder,request.MaintenanceTypeId, cancellationToken);  
+            
+                //SignalR
+                var departmentGroupName = request.ProductionDepartmentId.ToString(); // or use department name if preferred
+
+                var notification = new
+                {
+                    Title = "Work Order Created",
+                    Message = $"Work Order '{workOrder.WorkOrderDocNo}' created from Maintenance Request {result}.",
+                    CreatedBy = maintenanceRequest.CreatedByName,
+                    Timestamp = DateTime.UtcNow
+                };
+
+                await _hubContext.Clients.Group(departmentGroupName)
+                    .SendAsync("ReceiveMessage", notification, cancellationToken);
             }                                     
             // 🔹 Publish domain event for auditing/logging
             var domainEvent = new AuditLogsDomainEvent(
