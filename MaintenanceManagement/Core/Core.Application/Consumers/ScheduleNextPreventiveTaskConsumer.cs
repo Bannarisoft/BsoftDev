@@ -30,14 +30,19 @@ namespace Core.Application.Consumers
                     {
                         CorrelationId = context.Message.CorrelationId
                     });            
-            
-                    await _hubContext.Clients.Group(context.Message.SchedulerId.ToString())
-                        .SendAsync("ReceiveMessage", $"✅ Schedule updated: {context.Message.SchedulerId}");
+                    var headerId = context.Message.SchedulerId;
+                    //await _hubContext.Clients.Group(context.Message.SchedulerId.ToString())
+                    //    .SendAsync("ReceiveMessage", $"✅ Schedule updated: {context.Message.SchedulerId}");
+                    await _hubContext.Clients.All.SendAsync("ReceiveMessage",
+                    $"Preventive Schedule created successfully: {headerId}");
                 }
                 else
                 {
-                    await _hubContext.Clients.Group(context.Message.SchedulerId.ToString())
-                             .SendAsync("ReceiveMessage", $"❌ Failed to create schedule: {context.Message.SchedulerId}");
+                    var headerId = context.Message.SchedulerId;
+                   // await _hubContext.Clients.Group(context.Message.SchedulerId.ToString())
+                     //        .SendAsync("ReceiveMessage", $"❌ Failed to create schedule: {context.Message.SchedulerId}");
+                    await _hubContext.Clients.All.SendAsync("ReceiveMessage",
+                    $"Preventive Schedule created successfully: {headerId}");
 
                     await context.Publish(new NextSchedulerCreationFailedEvent
                     {
@@ -48,8 +53,11 @@ namespace Core.Application.Consumers
             }
             catch (Exception ex)
             {
-                await _hubContext.Clients.Group(context.Message.SchedulerId.ToString())
-                    .SendAsync("ReceiveMessage", $"❌ Exception for schedule {context.Message.SchedulerId}: {ex.Message}");
+                var headerId = context.Message.SchedulerId;
+                //await _hubContext.Clients.Group(context.Message.SchedulerId.ToString())
+                //    .SendAsync("ReceiveMessage", $"❌ Exception for schedule {context.Message.SchedulerId}: {ex.Message}");
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", 
+                $"Preventive Schedule creation failed: {headerId}");
 
                 await context.RespondAsync(new NextSchedulerCreationFailedEvent
                 {

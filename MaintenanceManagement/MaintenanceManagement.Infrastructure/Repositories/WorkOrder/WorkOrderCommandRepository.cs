@@ -41,7 +41,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, CancellationToken cancellationToken)
         {
-              await _hubContext.Clients.Group(workOrder.CreatedBy.ToString())
+            await _hubContext.Clients.Group(workOrder.CreatedBy.ToString())
                     .SendAsync("ReceiveMessage", $"🛠️ New Work Order '{workOrder.WorkOrderDocNo}' created by user {workOrder.CreatedBy}");
 
             var entry = _applicationDbContext.Entry(workOrder);
