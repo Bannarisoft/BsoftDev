@@ -28,8 +28,8 @@ namespace Core.Application.ExcelImport
             // Asset SubLocation
             string assetSubLocationName = worksheet.Cells[row, 14].Value?.ToString() ?? string.Empty;
             if (assetLocationName != ""){
-            int? assetSubLocationId = await _assetRepository.GetAssetSubLocationIdByNameAsync(assetSubLocationName);
-        /*     if (assetSubLocationId == null)
+            int? assetSubLocationId = await _assetRepository.GetAssetSubLocationIdByNameAsync(assetSubLocationName,assetLocationName);
+            /*     if (assetSubLocationId == null)
             {
                 throw new Exception($"Invalid Asset SubLocation Name '{assetSubLocationName}' at Excel Row {row}");
             } */

@@ -5,8 +5,10 @@ using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IWorkOrder;
+using Core.Application.Common.RealTimeNotificationHub;
 using Core.Domain.Events;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Core.Application.WorkOrder.Command.CreateWorkOrder
 {
@@ -18,7 +20,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
         private readonly IMediator _mediator;
         private readonly IIPAddressService _ipAddressService;
         private readonly IUnitGrpcClient _unitGrpcClient; 
-        private readonly ICompanyGrpcClient _companyGrpcClient; 
+        private readonly ICompanyGrpcClient _companyGrpcClient;         
 
         public CreateWorkOrderCommandHandler(IMapper mapper, IWorkOrderCommandRepository workOrderRepository, IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IIPAddressService ipAddressService, IUnitGrpcClient unitGrpcClient,ICompanyGrpcClient companyGrpcClient)
         {
@@ -28,7 +30,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
             _mediator = mediator;     
             _ipAddressService = ipAddressService;    
             _unitGrpcClient = unitGrpcClient;
-            _companyGrpcClient=companyGrpcClient;
+            _companyGrpcClient=companyGrpcClient;            
         }
 
         public async Task<ApiResponseDTO<WorkOrderCombineDto>> Handle(CreateWorkOrderCommand request, CancellationToken cancellationToken)
@@ -63,7 +65,10 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
         
             var woMasterDTO = _mapper.Map<WorkOrderCombineDto>(result);
             if (result.Id > 0)
-            {           
+            {    
+                // Notify clients via SignalR
+              
+       
                 string tempFilePath = request.WorkOrderDto.Image;
                 if (tempFilePath != null){
                     string baseDirectory = await _workOrderQueryRepository.GetBaseDirectoryAsync();

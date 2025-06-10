@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Core.Application.Common;
 using MediatR;
 using Contracts.Interfaces.External.IUser;
+using Microsoft.AspNetCore.SignalR;
+using Core.Application.Common.RealTimeNotificationHub;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
@@ -22,7 +24,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<WorkOrderCommandRepository> _logger;
         private readonly ICompanyGrpcClient _companyGrpcClient;     
-        private readonly IUnitGrpcClient _unitGrpcClient;   
+        private readonly IUnitGrpcClient _unitGrpcClient;             
 
         public WorkOrderCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService, IDbConnection dbConnection,
         IPublishEndpoint publishEndpoint, ILogger<WorkOrderCommandRepository> logger, ICompanyGrpcClient companyGrpcClient,IUnitGrpcClient unitGrpcClient)
@@ -33,7 +35,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             _publishEndpoint = publishEndpoint;
             _logger = logger;
             _companyGrpcClient = companyGrpcClient;  
-            _unitGrpcClient=unitGrpcClient;   
+            _unitGrpcClient=unitGrpcClient;                      
         }
         public async Task<Core.Domain.Entities.WorkOrderMaster.WorkOrder> CreateAsync(Core.Domain.Entities.WorkOrderMaster.WorkOrder workOrder, int requestTypeId, CancellationToken cancellationToken)
         {

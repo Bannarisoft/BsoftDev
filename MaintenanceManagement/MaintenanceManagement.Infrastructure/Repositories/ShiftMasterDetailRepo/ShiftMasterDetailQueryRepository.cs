@@ -55,7 +55,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
                 SMD.DurationInHours,
                 SMD.BreakDurationInMinutes,
                  Cast(SMD.EffectiveDate as varchar) AS EffectiveDate,
-                 SMD.ShiftSupervisorId
+                 SMD.ShiftSupervisorId,SMD.CreatedDate
             FROM [Maintenance].[ShiftMaster] SM
             INNER JOIN [Maintenance].[ShiftMasterDetails] SMD ON SMD.ShiftMasterId=SM.Id
             WHERE 
