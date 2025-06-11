@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.Power.IFeederGroup;
 using Core.Application.Power.FeederGroup.Command.CreateFeederGroup;
 using FluentValidation;
@@ -13,15 +14,18 @@ namespace MaintenanceManagement.API.Validation.Power.FeederGroup
     {
 
         private readonly List<ValidationRule> _validationRules;
+        
+
 
         private readonly IFeederGroupQueryRepository _feederGroupQueryRepository;
 
-        public CreateFeederGroupCommandValidator(IFeederGroupQueryRepository feederGroupQueryRepository, MaxLengthProvider maxLengthProvider)
+        public CreateFeederGroupCommandValidator(IFeederGroupQueryRepository feederGroupQueryRepository, MaxLengthProvider maxLengthProvider , IIPAddressService ipAddressService)
         {
             var FeederGroupCodeMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.Power.FeederGroup>("FeederGroupCode") ?? 50;
             var FeederGroupNameMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.Power.FeederGroup>("FeederGroupName") ?? 250;
             _validationRules = ValidationRuleLoader.LoadValidationRules();
             _feederGroupQueryRepository = feederGroupQueryRepository;
+          
             if (_validationRules == null || !_validationRules.Any())
             {
                 throw new InvalidOperationException("Validation rules could not be loaded.");
@@ -47,10 +51,11 @@ namespace MaintenanceManagement.API.Validation.Power.FeederGroup
                         break;
 
                     case "AlreadyExists":
-                        RuleFor(x => x.FeederGroupCode)
-                            .MustAsync(async (feederGroupCode, cancellation) =>
-                                !await _feederGroupQueryRepository.AlreadyExistsAsync(feederGroupCode))
-                            .WithMessage("FeederGroupcode already exists.");
+                       RuleFor(x => x.FeederGroupCode)
+                        .MustAsync(async (request, feederGroupCode, cancellation) =>
+                            feederGroupCode != null && !await _feederGroupQueryRepository.AlreadyExistsAsync(feederGroupCode, request.UnitId))
+                        .WithMessage((request, feederGroupCode) =>
+                            $"FeederGroupCode '{feederGroupCode}' already exists in Unit ID: {request.UnitId}");
                         break;      
                 }
             }

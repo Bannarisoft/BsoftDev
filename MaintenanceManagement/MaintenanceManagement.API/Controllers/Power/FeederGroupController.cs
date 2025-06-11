@@ -64,24 +64,32 @@ namespace MaintenanceManagement.API.Controllers.Power
                 PageNumber = FeederGroup.PageNumber,
                 PageSize = FeederGroup.PageSize
             });
-        }
+        }     
 
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+                [HttpGet("{id}")]
+       
+        public async Task<IActionResult> GetFeederById(int id)
         {
             var result = await Mediator.Send(new GetFeederGroupByIdQuery { Id = id });
 
-            if (!result.IsSuccess || result.Data == null)
-                return NotFound(new ApiResponseDTO<GetFeederGroupByIdDto>
+            if (result.IsSuccess && result.Data != null)
+            {
+                return Ok(new
                 {
-                    IsSuccess = false,
-                    Message = $"FeederGroup with Id {id} not found.",
-                    Data = null
+                    StatusCode = StatusCodes.Status200OK,
+                    data = result.Data,
+                    message = result.Message
                 });
+            }
 
-            return Ok(result);
+            return NotFound(new
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                message = $"FeederGroup ID {id} not found.",
+                errors = ""
+            });
         }
+
         [HttpPost("create")]
         public async Task<ActionResult<ApiResponseDTO<int>>> Create([FromBody] CreateFeederGroupCommand command)
         {
@@ -101,7 +109,7 @@ namespace MaintenanceManagement.API.Controllers.Power
 
             if (response.IsSuccess)
             {
-                return CreatedAtAction(nameof(GetById), new { id = response.Data }, new
+                return CreatedAtAction(nameof(GetFeederById), new { id = response.Data }, new
                 {
                     StatusCode = StatusCodes.Status201Created,
                     message = response.Message,
@@ -185,12 +193,12 @@ namespace MaintenanceManagement.API.Controllers.Power
         public async Task<IActionResult> GetFeederGroup([FromQuery] string? name)
         {
           
-            var miscmaster = await Mediator.Send(new GetFeederGroupAutoCompleteQuery {SearchPattern = name});
-            if(miscmaster.IsSuccess)
+            var feederGroup = await Mediator.Send(new GetFeederGroupAutoCompleteQuery {SearchPattern = name});
+            if(feederGroup.IsSuccess)
             {
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = miscmaster.Data });
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = feederGroup.Data });
             }
-            return NotFound( new { StatusCode=miscmaster.Message}) ;
+            return NotFound( new { StatusCode=feederGroup.Message}) ;
         }
             
 

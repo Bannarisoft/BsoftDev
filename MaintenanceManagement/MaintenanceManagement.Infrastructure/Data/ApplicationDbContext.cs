@@ -57,7 +57,7 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<StockLedger> StockLedger { get; set; }  
 
         public DbSet<FeederGroup> FeederGroup { get; set; } 
-        public DbSet<FeederGroup> Feeder { get; set; }     
+        public DbSet<Feeder> Feeder { get; set; }     
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

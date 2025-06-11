@@ -48,13 +48,13 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.Power
                 .WithMany(g => g.Feeders)
                 .HasForeignKey(f => f.FeederGroupId)
                 .OnDelete(DeleteBehavior.Restrict);
-                
+
 
             builder.HasOne(f => f.FeederType)
                 .WithMany(m => m.Feeders)
                 .HasForeignKey(f => f.FeederTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
-                
+
 
             builder.Property(t => t.DepartmentId)
                 .HasColumnName("DepartmentId")
@@ -78,15 +78,36 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.Power
 
             builder.Property(t => t.OpeningReading)
                 .HasColumnName("OpeningReading")
-                .HasColumnType("Decimal(18,2)")
+                .HasColumnType("Decimal(18,3)")
                 .IsRequired();
 
             builder.Property(t => t.HighPriority)
                 .HasColumnName("HighPriority")
                 .HasColumnType("bit")
-                .IsRequired();              
-               
-               builder.Property(t => t.IsActive)
+                .IsRequired();
+
+            builder.Property(t => t.Target)
+                .HasColumnName("Target")
+                .HasColumnType("Decimal(18,3)")
+                .IsRequired();
+
+            builder.Property(t => t.UnitId)
+            .HasColumnName("UnitId")
+            .HasColumnType("int")
+            .IsRequired();
+
+            builder.Property(t => t.ParentFeederId)
+            .HasColumnName("ParentFeederId")
+            .HasColumnType("int")
+                .IsRequired(false);
+
+             builder.HasOne(f => f.ParentFeeder)
+            .WithMany(f => f.SubFeeders)
+            .HasForeignKey(f => f.ParentFeederId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+            builder.Property(t => t.IsActive)
             .HasColumnType("bit")
             .HasConversion(statusConverter)
             .IsRequired();
@@ -96,10 +117,10 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.Power
             .HasColumnType("bit")
             .IsRequired()
             .HasConversion(isDeleteConverter);
-            
-             builder.Property(t => t.CreatedByName)
-                .IsRequired()
-                .HasColumnType("varchar(max)");
+
+            builder.Property(t => t.CreatedByName)
+               .IsRequired()
+               .HasColumnType("varchar(max)");
 
             builder.Property(t => t.CreatedIP)
                 .IsRequired()
@@ -109,7 +130,10 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.Power
                 .HasColumnType("varchar(max)");
 
             builder.Property(t => t.ModifiedIP)
-                .HasColumnType("varchar(50)");  
+                .HasColumnType("varchar(50)"); 
+                
+          
+
         }
     }
 }

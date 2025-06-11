@@ -68,6 +68,15 @@ namespace UserManagement.Infrastructure.Repositories.Users
                                 ur.EmailId,
                                 ur.IsFirstTimeUser,
                                 ur.IsDeleted,UG.Id AS UserGroupId
+                                ,ur.createdAt, 
+                                ur.createdBy,
+                                ur.CreatedByName,
+                                ur.createdIp,
+                                ur.ModifiedAt,
+                                ur.ModifiedBy,
+                                ur.ModifiedByName,
+                                ur.ModifiedIp
+
                 FROM AppSecurity.Users ur
                 left join AppSecurity.UserGroup UG on UG.Id=ur.UserGroupId and UG.IsActive=1
                 LEFT JOIN [AppSecurity].[UserUnit] UU ON UU.UserId=ur.UserId AND UU.IsActive=1

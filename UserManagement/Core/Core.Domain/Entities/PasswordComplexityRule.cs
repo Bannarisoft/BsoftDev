@@ -11,7 +11,7 @@ namespace Core.Domain.Entities
 
        public int Id { get; set; }
        
-        public string PwdComplexityRule  { get; set; }
+        public string? PwdComplexityRule  { get; set; }
 
        
     }

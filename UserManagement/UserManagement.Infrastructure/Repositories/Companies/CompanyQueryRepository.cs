@@ -44,7 +44,15 @@ namespace UserManagement.Infrastructure.Repositories.Companies
             C.Website,
             C.Logo,
             C.EntityId, 
-            C.IsActive
+            C.IsActive,
+            C.CreatedByName,
+            C.CreatedAt ,
+            C.CreatedBy,
+            C.CreatedIP,
+            C.ModifiedByName,
+            C.ModifiedAt,
+            C.ModifiedBy,
+            C.ModifiedIP
              FROM AppData.Company C
               WHERE C.IsDeleted = 0 AND EntityId=@EntityId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (C.CompanyName LIKE @Search OR C.LegalName LIKE @Search)")}}

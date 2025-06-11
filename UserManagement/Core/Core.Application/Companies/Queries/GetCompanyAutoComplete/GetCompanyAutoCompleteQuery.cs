@@ -7,6 +7,6 @@ namespace Core.Application.Companies.Queries.GetCompanyAutoComplete
     public class GetCompanyAutoCompleteQuery : IRequest<ApiResponseDTO<List<CompanyAutoCompleteDTO>>>
     {
         
-        public string SearchPattern { get; set; }
+        public string? SearchPattern { get; set; }
     }
 }
