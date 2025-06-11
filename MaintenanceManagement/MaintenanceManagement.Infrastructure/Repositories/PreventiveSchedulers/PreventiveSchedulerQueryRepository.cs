@@ -314,7 +314,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         public async Task<IEnumerable<dynamic>> GetDetailSchedulerByDate(DateOnly schedulerDate, int DepartmentId)
         {
             var UnitId = _ipAddressService.GetUnitId();
-            var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status };
+            var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status, WorkOrderHold.Code };
             var query = $@"
                             SELECT  
                                 PS.Id AS HeaderId,PSD.Id AS DetailId,WO.Id AS WorkOrderId,PS.PreventiveSchedulerName,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineCode,M.MachineName,PS.DepartmentId
@@ -533,6 +533,35 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             };
             var machineGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.ActivityMaster>(query, parameters);
             return machineGroups.FirstOrDefault();
+        }
+
+        public async Task<IEnumerable<dynamic>> GetDetailSchedulerByPreventiveScheduleId(int Id)
+        {
+            var UnitId = _ipAddressService.GetUnitId();
+            var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status, WorkOrderHold.Code };
+            var query = $@"
+                            SELECT  
+                                PS.Id AS HeaderId,PSD.Id AS DetailId,WO.Id AS WorkOrderId,PS.PreventiveSchedulerName,PS.MachineGroupId,MG.GroupName,PSD.MachineId,M.MachineCode,M.MachineName,PS.DepartmentId
+                            FROM [Maintenance].[PreventiveSchedulerHeader] PS
+                            INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
+                            INNER JOIN [Maintenance].[MachineMaster] M ON M.Id =PSD.MachineId
+                            INNER JOIN [Maintenance].[MachineGroup] MG ON MG.Id = PS.MachineGroupId
+                            LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
+							LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
+                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PS.Id=@PreventiveScheduleId AND PS.UnitId=@UnitId 
+                            AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL) AND PSD.IsActive=1 
+                            ORDER BY PS.Id ASC
+                        ";
+            var parameters = new
+            {
+                PreventiveScheduleId = Id,
+                UnitId,
+                StatusCodes = statusCodes
+            };
+            using var multi = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var preventiveSchedulers = await multi.ReadAsync<dynamic>();
+
+            return preventiveSchedulers;
         }
     }
 }

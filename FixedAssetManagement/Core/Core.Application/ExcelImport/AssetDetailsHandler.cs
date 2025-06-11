@@ -48,9 +48,11 @@ namespace Core.Application.ExcelImport
             }
             assetDto.CompanyName = companyName;
             assetDto.CompanyId = request.ImportDto.CompanyId; */
+            
             // Extract Location Details
             int? locationId = await _assetRepository.GetAssetLocationIdByNameAsync(worksheet.Cells[row, 13].Value?.ToString() ?? "");
-            int? subLocationId = await _assetRepository.GetAssetSubLocationIdByNameAsync(worksheet.Cells[row, 14].Value?.ToString() ?? "");
+            int? subLocationId = await _assetRepository.GetAssetSubLocationIdByNameAsync(worksheet.Cells[row, 14].Value?.ToString() ?? "",worksheet.Cells[row, 13].Value?.ToString() ?? "");
+
             int custodianId = int.TryParse(worksheet.Cells[row, 15].Value?.ToString(), out int parsedCustodianId) ? parsedCustodianId : 0;
             string assetDeptName = worksheet.Cells[row, 12].Value?.ToString() ?? string.Empty;
             int? assetDeptId = await _assetQueryRepository.GetAssetDeptIdByNameAsync(assetDeptName);

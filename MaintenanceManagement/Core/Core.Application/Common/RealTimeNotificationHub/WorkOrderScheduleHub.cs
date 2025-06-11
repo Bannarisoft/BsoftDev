@@ -4,15 +4,14 @@ namespace Core.Application.Common.RealTimeNotificationHub
 {
     public class WorkOrderScheduleHub : Hub
     {        
-        public async Task JoinGroup(string groupName)
+       public async Task JoinDepartmentGroup(string departmentName)
         {
-            Console.WriteLine($"User joined group: {groupName}");
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+            await Groups.AddToGroupAsync(Context.ConnectionId, departmentName);
         }
 
-        public async Task LeaveGroup(string groupName)
+        public async Task LeaveDepartmentGroup(string departmentName)
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, departmentName);
         }
     }
 }

@@ -1,7 +1,11 @@
 using System.Data;
+using System.Net;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IExcelImport;
+using Core.Application.Common.Interfaces.ILocation;
+using Core.Application.Common.Interfaces.ISubLocation;
 using Core.Domain.Entities;
 using FAM.Infrastructure.Data;
 using MediatR;
@@ -13,10 +17,16 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
     {
         private readonly ApplicationDbContext _applicationDbContext;       
         private readonly IMediator _mediator;
-        public ExcelImportCommandRepository(ApplicationDbContext applicationDbContext, IMediator mediator)
+        private readonly ILocationCommandRepository _locationCommandRepository;
+        private readonly IIPAddressService _ipAddressService;
+        private readonly ISubLocationCommandRepository _subLocationCommandRepository;
+        public ExcelImportCommandRepository(ApplicationDbContext applicationDbContext, IMediator mediator,ILocationCommandRepository locationCommandRepository, IIPAddressService ipAddressService,ISubLocationCommandRepository subLocationCommandRepository)
         {
-        _applicationDbContext = applicationDbContext;
-         _mediator = mediator;           
+            _applicationDbContext = applicationDbContext;
+            _mediator = mediator;   
+            _locationCommandRepository = locationCommandRepository; 
+            _ipAddressService = ipAddressService;   
+            _subLocationCommandRepository = subLocationCommandRepository;    
         }
 
         public async Task AddRangeAsync(IEnumerable<AssetMasterGenerals> assets)
@@ -112,24 +122,99 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
 
         public async Task<int?> GetAssetLocationIdByNameAsync(string locationName)
         {
-            locationName=locationName.Trim();
+/*             locationName=locationName.Trim();
             var assetLocation = await _applicationDbContext.Locations
             .Where(a => a.LocationName == locationName  && a.IsDeleted == 0)
             .Select(a => a.Id)
             .FirstOrDefaultAsync();        
-            return assetLocation == 0 ? null : assetLocation; 
-        }
+            return assetLocation == 0 ? null : assetLocation;  */            
 
-        public async Task<int?> GetAssetSubLocationIdByNameAsync(string subLocationName)
+            if (string.IsNullOrWhiteSpace(locationName))
+                return null;
+
+            locationName = locationName.Trim();
+
+            // Try to find the location
+            var assetLocationId = await _applicationDbContext.Locations
+                .Where(a => a.LocationName == locationName && a.IsDeleted == 0)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+
+            if (assetLocationId != 0)
+                return assetLocationId;
+
+            // Location not found – create it
+            var newLocation = new Location
+            {
+                LocationName = locationName,
+                Code = GenerateLocationCode(locationName), 
+                Description="Excel Import",                
+                UnitId=_ipAddressService.GetUnitId(),
+                DepartmentId=0,
+                IsDeleted = 0,
+                CreatedBy=_ipAddressService.GetUserId(),
+                CreatedByName=_ipAddressService.GetUserName(),
+                CreatedIP=_ipAddressService.GetSystemIPAddress(),
+                CreatedDate=DateTime.UtcNow
+            };
+            // Reuse CreateAsync from your repository (assumes DI of _locationCommandRepository)
+            var createdLocation = await _locationCommandRepository.CreateAsync(newLocation);
+            return createdLocation.Id > 0 ? createdLocation.Id : null;
+        }
+        private string GenerateLocationCode(string locationName)
         {
-            subLocationName=subLocationName.Trim();
-            var assetSubLocation= await _applicationDbContext.SubLocations
-            .Where(a => a.SubLocationName == subLocationName  && a.IsDeleted == 0)
-            .Select(a => a.Id)
-            .FirstOrDefaultAsync();        
-            return assetSubLocation == 0 ? null : assetSubLocation; 
+            return $"LOC-{DateTime.UtcNow.Ticks % 10000}";
         }
 
+        public async Task<int?> GetAssetSubLocationIdByNameAsync(string subLocationName,string locationName)
+        {
+            if (string.IsNullOrWhiteSpace(subLocationName))
+                return null;
+
+            subLocationName = subLocationName.Trim();
+
+
+            locationName = locationName.Trim();
+
+            // Try to find the location
+            var assetLocationId = await _applicationDbContext.Locations
+                .Where(a => a.LocationName == locationName && a.IsDeleted == 0)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+
+
+            // Check if sublocation already exists (case-insensitive match)
+            var subLocationId = await _applicationDbContext.SubLocations
+                .Where(s => s.SubLocationName == subLocationName && s.IsDeleted == 0)
+                .Select(s => s.Id)
+                .FirstOrDefaultAsync();
+
+            if (subLocationId != 0)
+                return subLocationId;
+
+            // If not found, create new SubLocation
+            var newSubLocation = new Core.Domain.Entities.SubLocation
+            {
+                SubLocationName = subLocationName,
+                Code = GenerateSubLocationCode(subLocationName),
+                Description="Excel Import",                
+                LocationId = assetLocationId,
+                DepartmentId = 0,
+                UnitId = _ipAddressService.GetUnitId(),
+                IsDeleted = 0,
+                CreatedBy=_ipAddressService.GetUserId(),
+                CreatedByName=_ipAddressService.GetUserName(),
+                CreatedIP=_ipAddressService.GetSystemIPAddress(),
+                CreatedDate=DateTime.UtcNow
+            };
+
+            var created = await _subLocationCommandRepository.CreateAsync(newSubLocation);
+            return created.Id > 0 ? created.Id : null;
+        }
+        private string GenerateSubLocationCode(string name)
+        {
+            return $"SUB-{DateTime.UtcNow.Ticks % 10000}";
+        }
         public async Task<int?> GetAssetIdByNameAsync(string assetCode)
         {
             var assetMaster = await _applicationDbContext.AssetMasterGenerals
