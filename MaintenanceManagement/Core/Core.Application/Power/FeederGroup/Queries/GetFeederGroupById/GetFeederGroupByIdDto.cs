@@ -10,6 +10,7 @@ namespace Core.Application.Power.FeederGroup.Queries.GetFeederGroupById
          public int Id { get; set; }
         public string? FeederGroupCode { get; set; }
         public string? FeederGroupName { get; set; }
+         public int  UnitId { get; set; }
         public bool IsActive { get; set; }
         public string? CreatedBy { get; set; }
         public DateTimeOffset? CreatedDate { get; set; }

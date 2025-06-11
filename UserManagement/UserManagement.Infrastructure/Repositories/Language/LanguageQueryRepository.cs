@@ -29,7 +29,13 @@ namespace UserManagement.Infrastructure.Repositories.Language
                 Id, 
                 Code,
                 Name,
-                IsActive
+                IsActive,
+                CreatedAt,
+                CreatedByName,
+                CreatedIP,
+                ModifiedAt,
+                ModifiedByName,
+                ModifiedIP
             FROM AppData.Language WHERE IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (Code LIKE @Search OR Name LIKE @Search )")}}
                 ORDER BY Id desc

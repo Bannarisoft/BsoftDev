@@ -10,7 +10,7 @@ namespace Core.Domain.Entities
     {
         public int Id { get; set; }
         public int CompanyId { get; set; }
-        public Company company { get; set; }
+        public Company? company { get; set; }
         public int PasswordHistoryCount { get; set; }
         public int SessionTimeout { get; set; }
         public int FailedLoginAttempts { get; set; }
@@ -21,12 +21,12 @@ namespace Core.Domain.Entities
         public int MaxConcurrentLogins { get; set; }
         public int ForgotPasswordCodeExpiry { get; set; }
         public byte CaptchaOnLogin { get; set; }
-        public Currency Currency { get; set; }
+        public Currency? Currency { get; set; }
         public int CurrencyId { get; set; }
-        public Language Language { get; set; }
+        public Language? Language { get; set; }
         public int LanguageId { get; set; }
         public int TimeZone { get; set; }
-        public FinancialYear FinancialYear { get; set; }
+        public FinancialYear? FinancialYear { get; set; }
         public int FinancialYearId { get; set; }
     }
 }

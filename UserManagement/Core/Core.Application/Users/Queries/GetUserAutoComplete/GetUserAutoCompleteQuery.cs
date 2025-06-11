@@ -6,6 +6,6 @@ namespace Core.Application.Users.Queries.GetUserAutoComplete
 {
     public class GetUserAutoCompleteQuery: IRequest<ApiResponseDTO<List<UserAutoCompleteDto>>>
     {
-        public string SearchPattern { get; set; }
+        public string? SearchPattern { get; set; }
     }
 }

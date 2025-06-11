@@ -992,14 +992,28 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnName("MultiplicationFactor");
 
                     b.Property<decimal>("OpeningReading")
-                        .HasColumnType("Decimal(18,2)")
+                        .HasColumnType("Decimal(18,3)")
                         .HasColumnName("OpeningReading");
+
+                    b.Property<int?>("ParentFeederId")
+                        .HasColumnType("int")
+                        .HasColumnName("ParentFeederId");
+
+                    b.Property<decimal>("Target")
+                        .HasColumnType("Decimal(18,3)")
+                        .HasColumnName("Target");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FeederGroupId");
 
                     b.HasIndex("FeederTypeId");
+
+                    b.HasIndex("ParentFeederId");
 
                     b.ToTable("Feeder", "Maintenance");
                 });
@@ -1053,6 +1067,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(50)");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
 
                     b.HasKey("Id");
 
@@ -2086,9 +2104,16 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.Power.Feeder", "ParentFeeder")
+                        .WithMany("SubFeeders")
+                        .HasForeignKey("ParentFeederId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("FeederGroup");
 
                     b.Navigation("FeederType");
+
+                    b.Navigation("ParentFeeder");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerActivity", b =>
@@ -2408,6 +2433,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
                 {
                     b.Navigation("MiscMaster");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Power.Feeder", b =>
+                {
+                    b.Navigation("SubFeeders");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Power.FeederGroup", b =>

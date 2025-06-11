@@ -9,6 +9,6 @@ namespace Core.Application.Menu.Queries.GetChildMenuByModule
 {
     public class GetChildMenuByModuleQuery : IRequest<ApiResponseDTO<List<ChildMenuDTO>>>
     {
-        public List<int> ParentId { get; set; }
+        public List<int>? ParentId { get; set; }
     }
 }

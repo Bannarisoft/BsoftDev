@@ -9,6 +9,6 @@ namespace Core.Application.RoleEntitlements.Queries.GetRoleEntitlements
     {
         public int Id { get; set; }
         public int ParentId { get; set; }
-        public IList<MenuDTO> ChildMenu { get; set; }
+        public IList<MenuDTO>? ChildMenu { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace Core.Application.UserLogin.Commands.DeactivateUserSession
 {
     public class DeactivateUserSessionCommand : IRequest<ApiResponseDTO<bool>>
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
     }
 }

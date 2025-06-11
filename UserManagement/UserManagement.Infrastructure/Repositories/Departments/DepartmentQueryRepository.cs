@@ -21,57 +21,7 @@ namespace UserManagement.Infrastructure.Repositories.Departments
       _dbConnection = dbConnection;
       _ipAddressService = ipAddressService;
     }
-    //     public async Task<(IEnumerable<dynamic>, int)> GetAllDepartmentAsync(int PageNumber, int PageSize, string? SearchTerm)
-    // {
-    //     var query = $$"""
-    //         DECLARE @TotalCount INT;
-
-    //         SELECT @TotalCount = COUNT(*)
-    //         FROM AppData.Department D
-    //         INNER JOIN AppData.DepartmentGroup DG ON DG.Id = D.DepartmentGroupId
-    //         WHERE D.IsDeleted = 0
-    //         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (D.ShortName LIKE @Search OR D.DeptName LIKE @Search OR DG.DepartmentGroupName LIKE @Search)")}};
-
-    //         SELECT 
-    //             D.Id,
-    //             D.CompanyId AS CompanyId,
-    //             D.ShortName,
-    //             D.DeptName,
-    //             D.DepartmentGroupId AS DepartmentGroupId,
-    //             DG.DepartmentGroupName AS DepartmentGroupName,
-    //             D.CreatedIP,
-    //             D.IsActive,
-    //             D.CreatedBy,
-    //             D.CreatedByName,
-    //             D.CreatedAt,
-    //             D.ModifiedBy,
-    //             D.ModifiedByName,
-    //             D.ModifiedAt,
-    //             D.ModifiedIP,
-    //             D.IsDeleted
-    //         FROM AppData.Department D
-    //         INNER JOIN AppData.DepartmentGroup DG ON DG.Id = D.DepartmentGroupId
-    //         WHERE D.IsDeleted = 0
-    //         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (D.ShortName LIKE @Search OR D.DeptName LIKE @Search OR DG.DepartmentGroupName LIKE @Search)")}}
-    //         ORDER BY D.Id DESC
-    //         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
-
-    //         SELECT @TotalCount AS TotalCount;
-    //     """;
-
-    //     var parameters = new
-    //     {
-    //         Search = $"%{SearchTerm}%",
-    //         Offset = (PageNumber - 1) * PageSize,
-    //         PageSize
-    //     };
-
-    //     var result = await _dbConnection.QueryMultipleAsync(query, parameters);
-    //     var departmentList = await result.ReadAsync<dynamic>();
-    //     int totalCount = await result.ReadFirstAsync<int>();
-
-    //     return (departmentList, totalCount);
-    // }
+   
 
     public async Task<(List<DepartmentDto>, int)> GetAllDepartmentAsync(int PageNumber, int PageSize, string? SearchTerm)
     {
@@ -125,53 +75,7 @@ namespace UserManagement.Infrastructure.Repositories.Departments
       return (departmentList, totalCount);
     }
 
-    //  public async Task<List<Department>>GetAllDepartmentAsync()
-    // public async Task<(List<Department>,int)> GetAllDepartmentAsync(int PageNumber, int PageSize, string? SearchTerm)
-    // {
-
-    //        var query = $$"""
-    //          DECLARE @TotalCount INT;
-    //          SELECT @TotalCount = COUNT(*) 
-    //            FROM AppData.Department
-    //           WHERE IsDeleted = 0  
-    //         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShortName LIKE @Search OR DeptName LIKE @Search)")}};
-
-    //          SELECT Id
-    //             ,CompanyId
-    //             ,ShortName
-    //             ,DeptName
-    //             ,DepartmentGroupId
-    //             ,CreatedIP
-    //             ,IsActive
-    //             ,CreatedBy
-    //             ,CreatedByName
-    //             ,CreatedAt
-    //             ,ModifiedBy
-    //             ,ModifiedByName
-    //             ,ModifiedAt
-    //             ,ModifiedIP
-    //             ,IsDeleted
-    //             FROM AppData.Department WHERE IsDeleted = 0
-    //         {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ShortName LIKE @Search OR DeptName LIKE @Search )")}}
-    //         ORDER BY Id DESC              
-    //         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
-    //         SELECT @TotalCount AS TotalCount ;
-    //         """;
-
-    //        var parameters = new
-    //                    {
-    //                        Search = $"%{SearchTerm}%",
-    //                        Offset = (PageNumber - 1) * PageSize,
-    //                        PageSize
-    //                    };
-
-    //            var department = await _dbConnection.QueryMultipleAsync(query, parameters);
-    //          var departmentlist = (await department.ReadAsync<Department>()).ToList();
-    //          int totalCount = (await department.ReadFirstAsync<int>());
-    //         return (departmentlist, totalCount);        
-
-
-    // }
+   
 
     public async Task<Department?> GetByIdAsync(int id)
     {
@@ -202,7 +106,7 @@ namespace UserManagement.Infrastructure.Repositories.Departments
                 D.IsActive
             FROM AppData.Department D           
             INNER JOIN AppData.DepartmentGroup DG ON DG.Id = D.DepartmentGroupId
-            WHERE DG.DepartmentGroupName = @DepartmentGroupName";
+            WHERE DG.DepartmentGroupName = @DepartmentGroupName AND D.IsDeleted = 0 AND D.IsActive = 1";
 
       var departments = await _dbConnection.QueryAsync<DepartmentWithGroupDto>(query, new { DepartmentGroupName = departmentGroupName });
 
