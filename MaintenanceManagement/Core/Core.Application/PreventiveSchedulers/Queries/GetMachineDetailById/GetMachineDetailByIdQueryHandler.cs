@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.PreventiveSchedulers.Queries.GetMachineDetailById
 {
-    public class GetMachineDetailByIdQueryHandler : IRequestHandler<GetMachineDetailByIdQuery, ApiResponseDTO<List<MachineDetailByHeaderIdDto>>>
+    public class GetMachineDetailByIdQueryHandler : IRequestHandler<GetMachineDetailByIdQuery, ApiResponseDTO<PreventiveSchedulerDto>>
     {
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
          private readonly IMapper _mapper;
@@ -21,30 +21,29 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetMachineDetailById
             _mapper = mapper;
             _departmentGrpcClient = departmentGrpcClient;
         }
-        public async Task<ApiResponseDTO<List<MachineDetailByHeaderIdDto>>> Handle(GetMachineDetailByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<PreventiveSchedulerDto>> Handle(GetMachineDetailByIdQuery request, CancellationToken cancellationToken)
         {
                var preventiveScheduler = await _preventiveSchedulerQuery.GetDetailSchedulerByPreventiveScheduleId(request.Id);
-            var preventiveSchedulerList = _mapper.Map<List<MachineDetailByHeaderIdDto>>(preventiveScheduler);
+            var preventiveSchedulerList = _mapper.Map<PreventiveSchedulerDto>(preventiveScheduler);
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-                foreach (var dto in preventiveSchedulerList)
-               {
-                   if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
+              
+                   if (departmentLookup.TryGetValue(preventiveSchedulerList.DepartmentId, out var departmentName))
                    {
-                       dto.DepartmentName = departmentName;
+                       preventiveSchedulerList.DepartmentName = departmentName;
                    }
-               }
+               
 
-                var filteredPreventiveSchedulers = preventiveSchedulerList
-            .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-            .ToList();
+            //     var filteredPreventiveSchedulers = preventiveSchedulerList
+            // .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            // .ToList();
           
-            return new ApiResponseDTO<List<MachineDetailByHeaderIdDto>>
+            return new ApiResponseDTO<PreventiveSchedulerDto>
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = filteredPreventiveSchedulers
+                Data = preventiveSchedulerList
             };
         }
     }

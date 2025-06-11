@@ -30,6 +30,6 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<Core.Domain.Entities.MachineMaster> GetMachineIdByCode(string MachineCode);
         Task<PreventiveSchedulerDetail> GetPreventiveSchedulerDetailByName(string PreventiveSchedulerName, string MachineCode);
         Task<Core.Domain.Entities.ActivityMaster> GetActivityIdByName(string ActivityName);
-        Task<IEnumerable<dynamic>> GetDetailSchedulerByPreventiveScheduleId(int Id);
+        Task<PreventiveSchedulerHeader> GetDetailSchedulerByPreventiveScheduleId(int Id);
     }
 }
