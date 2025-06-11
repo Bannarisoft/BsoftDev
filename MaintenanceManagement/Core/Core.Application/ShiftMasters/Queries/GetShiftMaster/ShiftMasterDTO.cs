@@ -11,5 +11,6 @@ namespace Core.Application.ShiftMasters.Queries.GetShiftMaster
         public string ShiftCode { get; set; }
         public string ShiftName { get; set; }
         public DateOnly EffectiveDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; } // Use DateTimeOffset for accurate date
     }
 }

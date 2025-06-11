@@ -9,6 +9,6 @@ namespace Core.Application.Users.Commands.RemoveVerificationCode
 {
     public class RemoveVerficationCodeCommand : IRequest<ApiResponseDTO<bool>>
     {
-        public string UserName { get; set; }
+        public string? UserName { get; set; }
     }
 }

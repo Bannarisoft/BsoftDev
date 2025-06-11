@@ -10,6 +10,7 @@ using Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive;
 using Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder;
 using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Queries.GetDetailSchedulerByDate;
+using Core.Application.PreventiveSchedulers.Queries.GetMachineDetailById;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerById;
 using Core.Application.PreventiveSchedulers.Queries.GetSchedulerByDate;
@@ -297,12 +298,12 @@ namespace MaintenanceManagement.API.Controllers
                 data = response.Data
             });
         }
-             [HttpPost("bulk-upload-schedule")]
-            public async Task<IActionResult> UploadPreventiveSchedule(RescheduleBulkImportCommand command)
-            {
+        [HttpPost("bulk-upload-schedule")]
+        public async Task<IActionResult> UploadPreventiveSchedule(RescheduleBulkImportCommand command)
+        {
             // if (file == null || file.Length == 0)
             //     return BadRequest("Invalid file.");
-                  var validationResult = await _rescheduleBulkImportCommand.ValidateAsync(command);
+            var validationResult = await _rescheduleBulkImportCommand.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
                 return BadRequest(new
@@ -313,8 +314,22 @@ namespace MaintenanceManagement.API.Controllers
                 });
             }
 
-                var result = await Mediator.Send(command);
-                return Ok(result);
-            }
+            var result = await Mediator.Send(command);
+            return Ok(result);
+        }
+            [HttpGet("MachineDetailBySchedule")]
+        public async Task<IActionResult> GetMachineDetail([FromQuery] int Id)
+        {
+            var response = await Mediator.Send(new GetMachineDetailByIdQuery
+             {
+                 Id = Id
+             });
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = response.Data
+            });
+        }
     }
 }

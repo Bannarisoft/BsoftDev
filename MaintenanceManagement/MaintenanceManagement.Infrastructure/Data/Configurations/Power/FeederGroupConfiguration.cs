@@ -46,6 +46,11 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.Power
                 .HasColumnType("varchar(250)")
                 .IsRequired();
 
+                builder.Property(t => t.UnitId)
+            .HasColumnName("UnitId")
+            .HasColumnType("int")
+            .IsRequired();
+
             builder.Property(t => t.IsActive)
             .HasColumnType("bit")
             .HasConversion(statusConverter)

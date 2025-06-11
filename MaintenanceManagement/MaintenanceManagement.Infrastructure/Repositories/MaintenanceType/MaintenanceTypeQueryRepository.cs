@@ -27,7 +27,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceType
                 SELECT 
                 Id, 
                 TypeName,
-                IsActive
+                IsActive,CreatedDate
             FROM Maintenance.MaintenanceType 
             WHERE 
             IsDeleted = 0

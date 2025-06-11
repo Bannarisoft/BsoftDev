@@ -223,7 +223,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                 LEFT JOIN [Maintenance].[PreventiveSchedulerDetail]  PS with(nolock) on PS.ID=WO.PreventiveScheduleId                        
                 LEFT JOIN [Maintenance].[PreventiveSchedulerHeader] PH with(nolock) on PH.Id=PS.PreventiveSchedulerHeaderId  
                 inner join Maintenance.MachineMaster MM on MM.Id= case when isnull(requestid,0)<>0 then MR.MachineId else PS.MachineId end
-                where WO.CompanyId=@CompanyId and WO.UnitId=@UnitId  and WO.StatusId not in(7,8)  and (case when isnull(requestid,0)<>0 then MR.MaintenanceDepartmentId else PH.DepartmentId end) = @DepartmentId   ";
+                INNER JOIN Maintenance.MiscMaster T on T.ID=WO.StatusId and T.Code not in('Closed','Cancelled')
+                where WO.CompanyId=@CompanyId and WO.UnitId=@UnitId  and (case when isnull(requestid,0)<>0 then MR.MaintenanceDepartmentId else PH.DepartmentId end) = @DepartmentId   ";
 
             var result = await _dbConnection.QueryAsync<GetMachineNoDepartmentbyIdDto>(query, new {CompanyId=CompanyId,UnitId=UnitId ,DepartmentId = DepartmentId });
 

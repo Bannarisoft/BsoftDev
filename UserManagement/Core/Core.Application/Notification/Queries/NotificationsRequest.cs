@@ -9,6 +9,6 @@ namespace Core.Application.Notification.Queries
 {
     public class NotificationRequest : IRequest<ApiResponseDTO<NotificationResponse>>
     {
-        public string Username { get; set; }
+        public string? Username { get; set; }
     }
 }

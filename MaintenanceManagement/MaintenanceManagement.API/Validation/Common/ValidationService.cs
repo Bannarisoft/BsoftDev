@@ -77,6 +77,10 @@ using Core.Application.Power.FeederGroup.Command.UpdateFeederGroup;
 using Core.Application.Power.FeederGroup.Command.DeleteFeederGroup;
 using Core.Application.Power.PowerConsumption.Command.CreatePowerConsumption;
 using MaintenanceManagement.API.Validation.Power.PowerConsumption;
+using Core.Application.Power.Feeder.Command.CreateFeeder;
+using MaintenanceManagement.API.Validation.Power.Feeder;
+using Core.Application.Power.Feeder.Command.UpdateFeeder;
+using Core.Application.Power.Feeder.Command.DeleteFeeder;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -149,7 +153,12 @@ namespace MaintenanceManagement.API.Validation.Common
             services.AddScoped<IValidator<RescheduleBulkImportCommand>, BulkImportPreventiveSchedulerCommandValidator>();
             services.AddScoped<IValidator<CreateFeederGroupCommand>, CreateFeederGroupCommandValidator>();
             services.AddScoped<IValidator<UpdateFeederGroupCommand>, UpdateFeederGroupCommandValidator>();
-            services.AddScoped<IValidator<DeleteFeederGroupCommand>, DeleteFeederGroupCommandValidator>();  
+
+            services.AddScoped<IValidator<DeleteFeederGroupCommand>, DeleteFeederGroupCommandValidator>();
+            services.AddScoped<IValidator<CreateFeederCommand>, CreateFeederCommandValidator>();
+            services.AddScoped<IValidator<UpdateFeederCommand>, UpdateFeederCommandValidator>();
+            services.AddScoped<IValidator<DeleteFeederCommand>, DeleteFeederCommandValidator>();
+           
             services.AddScoped<IValidator<CreatePowerConsumptionCommand>, CreatePowerConsumptionCommandValidator>();
         }  
     }

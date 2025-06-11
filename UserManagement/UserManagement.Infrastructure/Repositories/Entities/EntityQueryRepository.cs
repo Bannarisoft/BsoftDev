@@ -57,7 +57,15 @@ namespace UserManagement.Infrastructure.Repositories.Entities
                 Address,
                 Phone,
                 Email,
-                IsActive
+                IsActive,
+                IsDeleted,
+                CreatedAt,
+                CreatedByName,
+                CreatedIP,
+                ModifiedAt,
+                ModifiedByName,
+                ModifiedIP
+                
             FROM AppData.Entity 
             WHERE 
             IsDeleted = 0

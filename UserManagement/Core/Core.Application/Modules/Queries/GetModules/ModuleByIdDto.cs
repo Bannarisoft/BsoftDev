@@ -8,9 +8,9 @@ namespace Core.Application.Modules.Queries.GetModules
     public class ModuleByIdDto
     {
         public int Id { get; set; }
-        public string ModuleName { get; set; }
-        public string IsDeleted { get; set; }
+        public string? ModuleName { get; set; }
+        public string? IsDeleted { get; set; }
 
-        public List<string> Menus { get; set; }
+        public List<string>? Menus { get; set; }
     }
 }

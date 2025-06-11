@@ -11,6 +11,6 @@ namespace Core.Application.Companies.Commands.UploadFileCompany
 {
     public class UploadFileCompanyCommand : IRequest<ApiResponseDTO<GetCompanyDTO>>
     {
-        public IFormFile File { get; set; }
+        public IFormFile? File { get; set; }
     }
 }

@@ -66,6 +66,8 @@ using Core.Application.Common.Interfaces.Power.IFeederGroup;
 using MaintenanceManagement.Infrastructure.Repositories.Power.FeederGroup;
 using Core.Application.Common.Interfaces.Power.IPowerConsumption;
 using MaintenanceManagement.Infrastructure.Repositories.Power.PowerConsumption;
+using Core.Application.Common.Interfaces.Power.IFeeder;
+using MaintenanceManagement.Infrastructure.Repositories.Power.Feeder;
 using Core.Application.Common.Mappings.Power;
 
 namespace MaintenanceManagement.Infrastructure
@@ -222,8 +224,11 @@ namespace MaintenanceManagement.Infrastructure
              services.AddScoped<IFeederGroupCommandRepository, FeederGroupCommandRepository>();
              services.AddScoped<IPowerConsumptionQueryRepository, PowerConsumptionQueryRepository>();
             services.AddScoped<IPowerConsumptionCommandRepository, PowerConsumptionCommandRepository>();
+             services.AddScoped<IFeederQueryRepository, FeederQueryRepository>();
+             services.AddScoped<IFeederCommandRepository, FeederCommandRepository>();
             // services.AddScoped<IBackgroundServiceClient, BackgroundServiceClient>();  
             services.AddScoped<IReportRepository, ReportsRepository>();  
+            
             
             
             // Miscellaneous services
@@ -256,8 +261,12 @@ namespace MaintenanceManagement.Infrastructure
             typeof(MachineGroupUserProfile),
             typeof(WorkOrderProfile),            
             typeof(ActivityCheckListMasterProfile),
+
+
+            typeof(PowerConsumptionProfile),
             typeof(ItemProfile),
-            typeof(PowerConsumptionProfile)
+            typeof(FeederGroupProfile),
+            typeof(FeederProfile)
 
 
 

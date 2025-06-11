@@ -9,6 +9,6 @@ namespace Core.Application.EntityLevelAdmin.Commands.SendOTP
 {
     public class SendOTPCommand : IRequest<ApiResponseDTO<SendOTPDTO>>
     {
-        public string Email { get; set; }
+        public string? Email { get; set; }
     }
 }

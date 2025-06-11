@@ -19,5 +19,6 @@ namespace Core.Application.Reports.WorkOrderReport
         public string? Department { get; set; } 
         public int DepartmentId { get; set; }         
         public decimal ItemCost { get; set; } 
+        public string? ActivityName { get; set; }
     }
 }

@@ -7,6 +7,6 @@ namespace Core.Application.Entity.Queries.GetEntityAutoComplete
 {
     public class GetEntityAutocompleteQuery : IRequest<ApiResponseDTO<List<EntityAutoCompleteDto>>>
     {
-        public string SearchPattern { get; set; }
+        public string? SearchPattern { get; set; }
     }
 }

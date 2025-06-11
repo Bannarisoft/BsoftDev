@@ -10,8 +10,8 @@ namespace Core.Application.Language.Commands.UpdateLanguage
     public class UpdateLanguageCommand : IRequest<ApiResponseDTO<bool>>
     {
         public int Id { get; set; }
-        public string Code { get; set; }
-        public string Name { get; set; }
+        public string? Code { get; set; }
+        public string? Name { get; set; }
         public byte IsActive { get; set; }
     }
 }

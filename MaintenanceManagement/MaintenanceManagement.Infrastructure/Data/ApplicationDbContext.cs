@@ -57,8 +57,8 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<StockLedger> StockLedger { get; set; }  
 
         public DbSet<FeederGroup> FeederGroup { get; set; } 
-        public DbSet<FeederGroup> Feeder { get; set; }    
-        public DbSet<PowerConsumption> PowerConsumption { get; set; } 
+        public DbSet<Feeder> Feeder { get; set; }   
+		public DbSet<PowerConsumption> PowerConsumption { get; set; }   
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -95,7 +95,7 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new StockLedgerConfiguration());
             modelBuilder.ApplyConfiguration(new FeederGroupConfiguration());
             modelBuilder.ApplyConfiguration(new FeederConfiguration());
-            modelBuilder.ApplyConfiguration(new PowerConsumptionConfiguration());
+			modelBuilder.ApplyConfiguration(new PowerConsumptionConfiguration());
             base.OnModelCreating(modelBuilder);
 
 
@@ -140,3 +140,4 @@ namespace MaintenanceManagement.Infrastructure.Data
         }
     }
 }
+
