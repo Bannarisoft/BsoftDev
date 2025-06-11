@@ -26,7 +26,7 @@ namespace Core.Application.SubLocation.Command.CreateSubLocation
         }
         public async Task<ApiResponseDTO<SubLocationDto>> Handle(CreateSubLocationCommand request, CancellationToken cancellationToken)
         {
-            var existingsubLocation = await _sublocationQueryRepository.GetBySubLocationNameAsync(request.SubLocationName);
+            var existingsubLocation = await _sublocationQueryRepository.GetBySubLocationNameAsync(request.SubLocationName,request.DepartmentId);
 
                if (existingsubLocation != null)
                {
