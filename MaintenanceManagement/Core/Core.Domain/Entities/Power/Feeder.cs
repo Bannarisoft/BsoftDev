@@ -19,7 +19,8 @@ namespace Core.Domain.Entities.Power
         public decimal? MultiplicationFactor { get; set; }
         public DateTimeOffset EffectiveDate { get; set; }
         public decimal? OpeningReading { get; set; }
-        public bool HighPriority { get; set; }        
+        public bool HighPriority { get; set; }  
+        public ICollection<PowerConsumption>? FeederConsumptions { get; set; }      
         
     }
 }

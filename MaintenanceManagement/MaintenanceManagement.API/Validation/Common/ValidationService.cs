@@ -75,6 +75,8 @@ using Core.Application.Power.FeederGroup.Command.CreateFeederGroup;
 using MaintenanceManagement.API.Validation.Power.FeederGroup;
 using Core.Application.Power.FeederGroup.Command.UpdateFeederGroup;
 using Core.Application.Power.FeederGroup.Command.DeleteFeederGroup;
+using Core.Application.Power.PowerConsumption.Command.CreatePowerConsumption;
+using MaintenanceManagement.API.Validation.Power.PowerConsumption;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -148,6 +150,7 @@ namespace MaintenanceManagement.API.Validation.Common
             services.AddScoped<IValidator<CreateFeederGroupCommand>, CreateFeederGroupCommandValidator>();
             services.AddScoped<IValidator<UpdateFeederGroupCommand>, UpdateFeederGroupCommandValidator>();
             services.AddScoped<IValidator<DeleteFeederGroupCommand>, DeleteFeederGroupCommandValidator>();  
+            services.AddScoped<IValidator<CreatePowerConsumptionCommand>, CreatePowerConsumptionCommandValidator>();
         }  
     }
 }
