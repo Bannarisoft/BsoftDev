@@ -11,6 +11,7 @@ using Core.Application.WorkOrder.Command.CreateWorkOrder;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Repositories.Common;
 using Core.Application.Reports.MRS;
+using static Core.Domain.Common.MiscEnumEntity;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.Reports
 {
@@ -191,7 +192,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             var query = $$"""
 
                 Select PSH.DepartmentId,PSH.PreventiveSchedulerName,MG.GroupName,MM.MachineName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
-                Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,Cast(PSD.LastMaintenanceActivityDate AS varchar) AS LastCompletionDate from [Maintenance].[PreventiveSchedulerHeader] PSH
+                Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,Cast(PSD.LastMaintenanceActivityDate AS varchar) AS LastCompletionDate,MM.MachineCode,
+                WOStatus.Code AS WorkOrderStatus,WO.WorkOrderDocNo 
+                from [Maintenance].[PreventiveSchedulerHeader] PSH
                 Inner Join [Maintenance].[MachineGroup] MG ON PSH.MachineGroupId=MG.Id
                 Inner Join [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
                 Inner Join [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId=PSH.Id
@@ -199,10 +202,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 Inner Join [Maintenance].[MiscMaster] MISC ON MISC.Id=PSH.MaintenanceCategoryId
                 Inner Join [Maintenance].[ActivityMaster] A ON A.Id=PSA.ActivityId
                 Inner Join [Maintenance].[MiscMaster] ActivityType ON ActivityType.Id=A.ActivityType
+                LEFT JOIN [Maintenance].[WorkOrder] WO ON WO.PreventiveScheduleId=PSD.Id
+                Inner Join [Maintenance].[MiscMaster] WOStatus ON WOStatus.Id=WO.StatusId
                 WHERE PSH.IsDeleted=0 AND PSD.IsActive=1
                 {{(FromDueDate.HasValue ? "AND PSD.ActualWorkOrderDate >= @FromDueDate" : "")}}
                 {{(ToDueDate.HasValue ? "AND PSD.ActualWorkOrderDate <= @ToDueDate" : "")}}
-                group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate,PSD.LastMaintenanceActivityDate,MM.MachineName,PSH.PreventiveSchedulerName 
+                group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate,PSD.LastMaintenanceActivityDate,
+                MM.MachineName,PSH.PreventiveSchedulerName,MM.MachineCode,WOStatus.Code,WO.WorkOrderDocNo 
                 
                 ORDER BY PSH.Id desc
             """;
@@ -287,7 +293,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                ON SQ.ItemCode = PSI.OldItemId 
                AND PSI.OldCategoryDescription = SQ.CategoryDescription 
                AND PSI.OldGroupName = SQ.GroupName
-           WHERE PSH.IsDeleted = 0 AND PSD.IsActive=1
+               LEFT JOIN [Maintenance].[WorkOrder] WO ON WO.PreventiveScheduleId=PSD.Id
+               Inner Join [Maintenance].[MiscMaster] WOStatus ON WOStatus.Id=WO.StatusId
+           WHERE PSH.IsDeleted = 0 AND PSD.IsActive=1 AND (
+           WO.Id IS NULL
+           OR WOStatus.Code IN @Status
+           )
            {{(FromDueDate.HasValue ? "AND PSD.ActualWorkOrderDate >= @FromDueDate" : "")}}
             {{(ToDueDate.HasValue ? "AND PSD.ActualWorkOrderDate <= @ToDueDate" : "")}}
            GROUP BY 
@@ -306,11 +317,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
            ORDER BY PSH.Id DESC;
         """;
 
-            
+            var statuses = new List<string> { StatusOpen.Code, GetStatusId.Status };
               var parameters = new
-                       {
-                           FromDueDate = FromDueDate,
-                           ToDueDate  = ToDueDate 
+              {
+                  FromDueDate = FromDueDate,
+                  ToDueDate = ToDueDate,
+                  Status =statuses
+                            
                        };
 
              var schedule = await _dbConnection.QueryMultipleAsync(query, parameters);

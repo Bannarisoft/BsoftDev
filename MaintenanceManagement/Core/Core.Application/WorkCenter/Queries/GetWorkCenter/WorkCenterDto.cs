@@ -16,5 +16,6 @@ namespace Core.Application.WorkCenter.Queries.GetWorkCenter
         public int DepartmentId { get; set; }
         public string? DepartmentName { get; set; }
         public Status IsActive { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
     }
 }

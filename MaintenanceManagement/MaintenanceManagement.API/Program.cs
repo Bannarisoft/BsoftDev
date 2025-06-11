@@ -66,6 +66,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGrpcService<DepartmentValidationGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
     endpoints.MapHub<PreventiveScheduleHub>("/preventiveschedulehub");
+    endpoints.MapHub<WorkOrderScheduleHub>("/workorderschedulehub");
 });
 
 app.Run();

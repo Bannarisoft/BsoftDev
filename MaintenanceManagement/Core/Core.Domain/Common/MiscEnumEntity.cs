@@ -116,9 +116,13 @@ namespace Core.Domain.Common
         {
             public const string Code = "MachineLineNo";
         }
-          public static class FrequencyType
+        public static class FrequencyType
         {
             public const string Code = "Onetime";
+        }
+        public static class WorkOrderHold
+        {
+            public const string Code = "Hold";
         }
 
 
