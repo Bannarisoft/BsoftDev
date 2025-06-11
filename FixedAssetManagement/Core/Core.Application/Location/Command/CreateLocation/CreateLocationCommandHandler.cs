@@ -26,7 +26,7 @@ namespace Core.Application.Location.Command.CreateLocation
         }
         public async Task<ApiResponseDTO<LocationDto>> Handle(CreateLocationCommand request, CancellationToken cancellationToken)
         {
-               var existingLocation = await _locationQueryRepository.GetByLocationNameAsync(request.LocationName);
+               var existingLocation = await _locationQueryRepository.GetByLocationNameAsync(request.LocationName, request.DepartmentId);
 
                if (existingLocation != null)
                {

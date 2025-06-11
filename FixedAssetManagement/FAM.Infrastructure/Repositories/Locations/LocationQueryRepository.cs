@@ -67,22 +67,48 @@ namespace FAM.Infrastructure.Repositories.Locations
             return await _dbConnection.QueryFirstOrDefaultAsync<Location>(query, new { id });
         }
 
-        public async Task<Location?> GetByLocationNameAsync(string name, int? id = null)
+        public async Task<Location?> GetByLocationNameAsync(string name, int DepartmentId, int? id = null)
         {
-            var query = """
-                 SELECT * FROM FixedAsset.Location
-                 WHERE LocationName = @LocationName AND IsDeleted = 0
-                 """;
+            var query = @"
+            SELECT 
+                L.Id,
+                L.Code,
+                L.LocationName,
+                L.Description,
+                L.SortOrder,
+                L.UnitId,
+                L.DepartmentId,
+                L.IsActive,
+                L.IsDeleted,
+                L.CreatedBy,
+                L.CreatedDate,
+                L.CreatedByName,
+                L.CreatedIP,
+                L.ModifiedBy,
+                L.ModifiedDate,
+                L.ModifiedByName,
+                L.ModifiedIP
+            FROM FixedAsset.Location L
+            JOIN Bannari.AppData.Department D ON D.Id = L.DepartmentId
+            JOIN Bannari.AppData.Unit U ON U.Id = L.UnitId
+            WHERE L.LocationName = @LocationName AND L.IsDeleted = 0 AND L.DepartmentId = @DepartmentId
+        ";
 
-            var parameters = new DynamicParameters(new { LocationName = name });
+            return await _dbConnection.QueryFirstOrDefaultAsync<Location>(query, new { LocationName = name, DepartmentId = DepartmentId });
+            // var query = """
+            //      SELECT * FROM FixedAsset.Location
+            //      WHERE LocationName = @LocationName AND IsDeleted = 0
+            //      """;
 
-            if (id is not null)
-            {
-                query += " AND Id != @Id";
-                parameters.Add("Id", id);
-            }
+            // var parameters = new DynamicParameters(new { LocationName = name });
 
-            return await _dbConnection.QueryFirstOrDefaultAsync<Location>(query, parameters);
+            // if (id is not null)
+            // {
+            //     query += " AND Id != @Id";
+            //     parameters.Add("Id", id);
+            // }
+
+            // return await _dbConnection.QueryFirstOrDefaultAsync<Location>(query, parameters);
         }
         public async Task<List<Location>> GetLocation(string searchPattern = null)
         {
