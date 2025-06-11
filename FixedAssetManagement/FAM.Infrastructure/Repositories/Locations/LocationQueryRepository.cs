@@ -3,6 +3,7 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.ILocation;
 using Core.Domain.Entities;
 using Dapper;
+using MediatR;
 
 namespace FAM.Infrastructure.Repositories.Locations
 {
@@ -67,7 +68,7 @@ namespace FAM.Infrastructure.Repositories.Locations
             return await _dbConnection.QueryFirstOrDefaultAsync<Location>(query, new { id });
         }
 
-        public async Task<Location?> GetByLocationNameAsync(string name, int DepartmentId, int? id = null)
+        public async Task<Location?> GetByLocationNameAsync(string name, int DepartmentId,int UnitId, int? id = null)
         {
             var query = @"
             SELECT 
@@ -91,10 +92,11 @@ namespace FAM.Infrastructure.Repositories.Locations
             FROM FixedAsset.Location L
             JOIN Bannari.AppData.Department D ON D.Id = L.DepartmentId
             JOIN Bannari.AppData.Unit U ON U.Id = L.UnitId
-            WHERE L.LocationName = @LocationName AND L.IsDeleted = 0 AND L.DepartmentId = @DepartmentId
+            WHERE L.LocationName = @LocationName AND L.IsDeleted = 0 AND L.DepartmentId = @DepartmentId AND L.UnitId = @UnitId
+            
         ";
 
-            return await _dbConnection.QueryFirstOrDefaultAsync<Location>(query, new { LocationName = name, DepartmentId = DepartmentId });
+            return await _dbConnection.QueryFirstOrDefaultAsync<Location>(query, new { LocationName = name, DepartmentId = DepartmentId,UnitId = UnitId });
             // var query = """
             //      SELECT * FROM FixedAsset.Location
             //      WHERE LocationName = @LocationName AND IsDeleted = 0
