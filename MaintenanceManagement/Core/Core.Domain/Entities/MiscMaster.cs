@@ -37,7 +37,8 @@ namespace Core.Domain.Entities
         public ICollection<ActivityMaster>? ActivityType { get; set; }
         public ICollection<MachineMaster>? MachineMasterLineNo { get; set; }
 
-         public ICollection<Feeder>? Feeders { get; set; }
+        public ICollection<Feeder>? Feeders { get; set; }
+        public ICollection<PowerConsumption>? FeedersPower { get; set; }
 
 
 

@@ -25,6 +25,7 @@ namespace Core.Domain.Entities.Power
         public int? ParentFeederId { get; set; }
         public Feeder? ParentFeeder { get; set; }
         public ICollection<Feeder>? SubFeeders { get; set; }      
+		public ICollection<PowerConsumption>? FeederConsumptions { get; set; }  
         
     }
 }

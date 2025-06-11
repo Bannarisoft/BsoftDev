@@ -25,7 +25,7 @@ namespace Core.Application.Power.FeederGroup.Queries.GetFeederGroupAutoComplete
         {
             var machineGroup  = await _feederGroupQueryRepository.GetFeederGroupAutoComplete(request.SearchPattern);
 
-                    if (machineGroup == null || !machineGroup.Any())
+            if (machineGroup == null || !machineGroup.Any())
             {
                 return new ApiResponseDTO<List<GetFeederGroupAutoCompleteDto>>
                 {
