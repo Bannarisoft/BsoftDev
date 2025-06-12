@@ -578,6 +578,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PSD.Id,
                     PSD.MachineId,
                     PSD.WorkOrderCreationStartDate,
+                    PSD.ActualWorkOrderDate,
                     PSD.LastMaintenanceActivityDate,
                     PSA.Id,
                     PSA.PreventiveSchedulerHeaderId,
