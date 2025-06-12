@@ -1,14 +1,15 @@
 using AutoMapper;
-using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.Interfaces.IDepreciationGroup;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationGroup;
 using Core.Domain.Entities;
 using Core.Domain.Events;
 using MediatR;
 
+
 namespace Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup
 {
-    public class CreateDepreciationGroupCommandHandler : IRequestHandler<CreateDepreciationGroupCommand, ApiResponseDTO<DepreciationGroupDTO>>
+    public class CreateDepreciationGroupCommandHandler : IRequestHandler<CreateDepreciationGroupCommand, DepreciationGroupDTO>
     {
         private readonly IMapper _mapper;
         private readonly IDepreciationGroupCommandRepository _depreciationGroupRepository;
@@ -21,28 +22,14 @@ namespace Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup
             _mediator = mediator;    
         } 
 
-        public async Task<ApiResponseDTO<DepreciationGroupDTO>> Handle(CreateDepreciationGroupCommand request, CancellationToken cancellationToken)
+        public async Task<DepreciationGroupDTO> Handle(CreateDepreciationGroupCommand request, CancellationToken cancellationToken)
         {
-            var depreciationGroupsExists = await _depreciationGroupRepository.ExistsByCodeAsync(request.Code??string.Empty);
-            if (depreciationGroupsExists)
-            {
-                return new ApiResponseDTO<DepreciationGroupDTO> {
-                    IsSuccess = false, 
-                    Message = "DepreciationGroup Code already exists."
-                };                 
-            }
+            if (await _depreciationGroupRepository.ExistsByCodeAsync(request.Code ?? string.Empty))
+             throw new EntityAlreadyExistsException("DepreciationGroup", "Code", request.Code ?? "");
 
-            // ✅ Check if AssetGroupId exists before creating the record
-            var assetGroupExists = await _depreciationGroupRepository.ExistsByAssetGroupIdAsync(request.AssetGroupId);
-            if (!assetGroupExists)
-            {
-                return new ApiResponseDTO<DepreciationGroupDTO>
-                {
-                    IsSuccess = false,
-                    Message = $"AssetGroupId {request.AssetGroupId} does not exist."
-                };
-            }
-            
+            if (!await _depreciationGroupRepository.ExistsByAssetGroupIdAsync(request.AssetGroupId))
+             throw new EntityNotFoundException("AssetGroup", request.AssetGroupId);
+
             var depreciationGroupEntity = _mapper.Map<DepreciationGroups>(request);            
             var result = await _depreciationGroupRepository.CreateAsync(depreciationGroupEntity);
             
@@ -56,19 +43,8 @@ namespace Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup
             );
             await _mediator.Publish(domainEvent, cancellationToken);
             
-            var depreciationGroupDTO = _mapper.Map<DepreciationGroupDTO>(result);
-            if (depreciationGroupDTO.Id > 0)
-            {
-                return new ApiResponseDTO<DepreciationGroupDTO>{
-                    IsSuccess = true, 
-                    Message = "DepreciationGroup created successfully.",
-                    Data = depreciationGroupDTO
-                };
-            }
-            return  new ApiResponseDTO<DepreciationGroupDTO>{
-                IsSuccess = false, 
-                Message = "DepreciationGroup not created."
-            };      
+            var dto  = _mapper.Map<DepreciationGroupDTO>(result);
+            return dto.Id > 0 ? dto : throw new ExceptionRules("Failed to create DepreciationGroup.");
         }
     }
 }

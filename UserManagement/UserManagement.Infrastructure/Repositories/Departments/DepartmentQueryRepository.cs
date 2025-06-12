@@ -8,6 +8,7 @@ using System.Data;
 using Dapper;
 using Core.Application.Departments.Queries.GetDepartments;
 using Core.Application.Common.Interfaces;
+using Core.Application.Departments.Queries.GetDepartmentByGroupWithControl;
 
 namespace UserManagement.Infrastructure.Repositories.Departments
 {
@@ -159,8 +160,25 @@ namespace UserManagement.Infrastructure.Repositories.Departments
       var departments = await _dbConnection.QueryAsync<Department>(query, parameters);
       return departments.ToList();
     }
-        
 
-       
+        public async Task<List<DepartmentWithControlByGroupDto>> GetDepartmentsByDepartmentGroupWithControl(string departmentGroupName)
+        {
+          var userId = _ipAddressService.GetUserId();
+                   const string query = @"
+                 SELECT 
+                     D.Id,
+                     D.ShortName,
+                     D.DeptName,
+                     D.DepartmentGroupId,
+                     DG.DepartmentGroupName
+                 FROM AppData.Department D           
+                 INNER JOIN AppData.DepartmentGroup DG ON DG.Id = D.DepartmentGroupId
+                 INNER JOIN [AppSecurity].[UserDepartment] UD ON UD.DepartmentId = D.Id
+                 WHERE DG.DepartmentGroupName = @DepartmentGroupName AND D.IsDeleted = 0 AND D.IsActive = 1 AND UD.UserId =@UserId AND UD.IsActive=1";
+
+           var departments = await _dbConnection.QueryAsync<DepartmentWithControlByGroupDto>(query, new { DepartmentGroupName = departmentGroupName,UserId = userId});
+
+           return departments.ToList();
+        }
     }
 }

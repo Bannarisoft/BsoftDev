@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Queries.GetDepreciationMethodQuery
 {
-   public class GetDepreciationMethodQuery : IRequest<ApiResponseDTO<List<GetMiscMasterDto>>> 
+   public class GetDepreciationMethodQuery : IRequest<List<GetMiscMasterDto>>
     {
         
     }
