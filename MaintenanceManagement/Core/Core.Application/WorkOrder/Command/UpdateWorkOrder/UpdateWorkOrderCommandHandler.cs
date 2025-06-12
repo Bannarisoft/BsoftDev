@@ -9,6 +9,7 @@ using Core.Domain.Events;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
 {
@@ -116,7 +117,7 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Failed to rename file: {ex.Message}");
+                            Log.Error(ex, "Failed to rename file: {ErrorMessage}", ex.Message);
                         }
                     }
                 }                    

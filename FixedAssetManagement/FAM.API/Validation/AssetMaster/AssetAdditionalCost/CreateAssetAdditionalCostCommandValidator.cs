@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.AssetMaster.AssetAdditionalCost.Commands.CreateAssetAdditionalCost;
 using FAM.API.Validation.Common;
 using FluentValidation;
+using Serilog;
 
 namespace FAM.API.Validation.AssetMaster.AssetAdditionalCost
 {
@@ -68,7 +69,7 @@ namespace FAM.API.Validation.AssetMaster.AssetAdditionalCost
                         break;
                         default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information("Warning: Unknown rule '{Rule}' encountered.", rule.Rule);
                         break;
                 }
             }

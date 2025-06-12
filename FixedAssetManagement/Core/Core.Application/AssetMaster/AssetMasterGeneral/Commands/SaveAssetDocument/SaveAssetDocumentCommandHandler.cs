@@ -7,6 +7,7 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.SaveAssetDocument
 {
@@ -73,7 +74,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.SaveAssetDocu
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Failed to rename file: {ex.Message}");
+                        Log.Information(ex, "Failed to rename file.");
                     }
                 }
             }                    
