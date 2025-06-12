@@ -9,6 +9,7 @@ using Core.Application.Common.RealTimeNotificationHub;
 using Core.Domain.Events;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
+using Serilog;
 
 namespace Core.Application.WorkOrder.Command.CreateWorkOrder
 {
@@ -109,7 +110,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Failed to rename file: {ex.Message}");
+                            Log.Information(ex, "Failed to rename file: {Message}", ex.Message);
                         }
                     }                    
                 }

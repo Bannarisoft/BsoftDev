@@ -7,6 +7,7 @@ using Core.Application.Common.Interfaces.IItem;
 using Core.Application.Item.ItemGroup.Queries;
 using Core.Domain.Entities;
 using Dapper;
+using Serilog;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.Item
 {
@@ -29,7 +30,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Item
             );
             if (!itemGroupCodes.Any())
             {
-            Console.WriteLine("No data returned from stored procedure!");
+            Log.Information("No data returned from stored procedure!");
             }
             return itemGroupCodes?.ToList() ?? new List<ItemGroupCode>();
         }
@@ -49,7 +50,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Item
 
             if (!result.Any())
             {
-            Console.WriteLine("No data returned from stored procedure!");
+            Log.Information("No data returned from stored procedure!");
             }
 
             return result.ToList()?? new List<ItemMaster>();
