@@ -109,9 +109,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.FeederGroup
                        SELECT Id, FeederGroupCode,FeederGroupName  
                        FROM Maintenance.FeederGroup
                        WHERE IsDeleted = 0 AND (FeederGroupName LIKE @SearchPattern OR FeederGroupCode LIKE @SearchPattern) AND UnitId = @UnitId";
-                   var parameters = new 
-                   { 
+                   var parameters = new
+                   {
                        SearchPattern = $"%{searchPattern ?? string.Empty}%"
+                       , UnitId
                    };
                var feederGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.Power.FeederGroup>(query, parameters);
                
