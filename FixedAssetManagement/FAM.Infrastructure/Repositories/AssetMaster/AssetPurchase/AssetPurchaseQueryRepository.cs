@@ -8,6 +8,7 @@ using Core.Application.Common.Interfaces.IAssetMaster.IAssetPurchase;
 using Core.Domain.Entities;
 using Core.Domain.Entities.AssetPurchase;
 using Dapper;
+using Serilog;
 
 namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
 {
@@ -108,7 +109,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
 
         if (!grnList.Any())
         {
-        Console.WriteLine("No data returned from stored procedure!");
+        Log.Information("No data returned from stored procedure!");
         }
 
         return grnList?.ToList() ?? new List<AssetGrnItem>();
@@ -174,7 +175,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
         );
         if (!grnList.Any())
         {
-        Console.WriteLine("No data returned from stored procedure!");
+        Log.Information("No data returned from stored procedure!");
         }
 
         return grnList?.ToList() ?? new List<AssetGrnDetails>();
@@ -224,7 +225,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetPurchase
 
         if (!grnList.Any())
         {
-        Console.WriteLine("No data returned from stored procedure!");
+        Log.Information("No data returned from stored procedure!");
         }
 
         return grnList?.ToList() ?? new List<AssetGrn>();

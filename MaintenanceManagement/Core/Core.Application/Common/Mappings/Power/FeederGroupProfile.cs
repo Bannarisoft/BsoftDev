@@ -20,10 +20,10 @@ namespace Core.Application.Common.Mappings.Power
         public FeederGroupProfile()
         {
             CreateMap<Core.Domain.Entities.Power.FeederGroup, FeederGroupDto>();
-            CreateMap<Core.Domain.Entities.Power.FeederGroup, GetFeederGroupByIdDto>()            
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active));
+            CreateMap<Core.Domain.Entities.Power.FeederGroup, GetFeederGroupByIdDto>()
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active));
 
-            CreateMap<Core.Domain.Entities.Power.FeederGroup, GetFeederGroupAutoCompleteDto>();   
+            CreateMap<Core.Domain.Entities.Power.FeederGroup, GetFeederGroupAutoCompleteDto>();
 
             CreateMap<CreateFeederGroupCommand, Core.Domain.Entities.Power.FeederGroup>();
             CreateMap<UpdateFeederGroupCommand, Core.Domain.Entities.Power.FeederGroup>()
@@ -31,6 +31,8 @@ namespace Core.Application.Common.Mappings.Power
 
             CreateMap<DeleteFeederGroupCommand, Core.Domain.Entities.Power.FeederGroup>()
              .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
+             
+             
         }
         
     }

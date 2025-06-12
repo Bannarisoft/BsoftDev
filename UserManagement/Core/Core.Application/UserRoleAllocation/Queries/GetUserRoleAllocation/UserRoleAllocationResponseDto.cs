@@ -14,7 +14,7 @@ namespace Core.Application.UserRoleAllocation.Queries.GetUserRoleAllocation
     public int UserRoleAllocationId { get; set; }
     public int UserId { get; set; }
     public int UserRoleId { get; set; }
-    public string RoleName { get; set; }
+    public string? RoleName { get; set; }
         
     }
 }

@@ -10,7 +10,7 @@ namespace Core.Application.Common.Interfaces.ILocation
         Task<(List<Core.Domain.Entities.Location>,int)> GetAllLocationAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<Core.Domain.Entities.Location> GetByIdAsync(int id);
         Task<List<Core.Domain.Entities.Location>> GetLocation(string searchPattern);
-        Task<Core.Domain.Entities.Location?> GetByLocationNameAsync(string name,int? id = null);
+        Task<Core.Domain.Entities.Location?> GetByLocationNameAsync(string name,int DepartmentId,int UnitId,int? id = null);
         
     }
 }

@@ -36,7 +36,13 @@ namespace UserManagement.Infrastructure.Repositories.Divisions
                 ShortName,
                 Name,
                 CompanyId,
-                IsActive
+                IsActive,
+                 CreatedAt,
+                CreatedByName,
+                CreatedIP,
+                 ModifiedAt,
+                ModifiedByName,
+                ModifiedIP
             FROM AppData.Division 
             WHERE 
             IsDeleted = 0 AND CompanyId=@CompanyId

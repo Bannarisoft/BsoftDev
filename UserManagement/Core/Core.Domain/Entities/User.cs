@@ -35,8 +35,8 @@ namespace Core.Domain.Entities
      public Entity? Entity { get; set; }
      public int? UserGroupId { get; set; }
      public UserGroup? UserGroup { get; set; }
-     public IList<UserDivision> userDivisions { get; set; }
-     public IList<UserDepartment> userDepartments { get; set; }
+     public IList<UserDivision>? userDivisions { get; set; }
+     public IList<UserDepartment>? userDepartments { get; set; }
 
     public void SetPassword(string password)
     {

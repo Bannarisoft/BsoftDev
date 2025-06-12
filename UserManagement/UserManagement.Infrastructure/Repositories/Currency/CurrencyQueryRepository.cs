@@ -47,7 +47,16 @@ namespace UserManagement.Infrastructure.Repositories.Currency
                 Id, 
                 Code,
                 Name,
-                IsActive
+                IsActive,
+                CreatedBy,
+                CreatedAt,
+                CreatedByName,
+                CreatedIP,
+                ModifiedBy,
+                ModifiedAt,
+                ModifiedByName,
+                ModifiedIP
+               
             FROM AppData.Currency 
             WHERE 
             IsDeleted = 0

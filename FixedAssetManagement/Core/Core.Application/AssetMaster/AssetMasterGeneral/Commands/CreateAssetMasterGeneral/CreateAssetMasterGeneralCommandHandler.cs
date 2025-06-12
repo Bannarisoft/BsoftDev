@@ -8,6 +8,7 @@ using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Domain.Entities;
 using Core.Domain.Events;
 using MediatR;
+using Serilog;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral
 {
@@ -103,7 +104,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Failed to rename file: {ex.Message}");
+                            Log.Information(ex, "Failed to rename file.");
                         }
                     }
                 }

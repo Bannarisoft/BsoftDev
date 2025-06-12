@@ -25,7 +25,7 @@ namespace Core.Application.Location.Command.UpdateLocation
         }
         public async Task<ApiResponseDTO<bool>> Handle(UpdateLocationCommand request, CancellationToken cancellationToken)
         {
-            var existingLocation = await _locationQueryRepository.GetByLocationNameAsync(request.LocationName, request.Id);
+            var existingLocation = await _locationQueryRepository.GetByLocationNameAsync(request.LocationName,request.DepartmentId,request.UnitId, request.Id);
 
                 if (existingLocation != null)
                 {

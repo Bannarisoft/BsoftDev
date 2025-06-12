@@ -15,7 +15,7 @@ namespace Core.Application.FinancialYear.Command.UpdateFinancialYear
 {
     public class UpdateFinancialYearCommandHandler  :  IRequestHandler<UpdateFinancialYearCommand, ApiResponseDTO<int>>
     {
-         private readonly IFinancialYearQueryRepository _financialYearQueryRepository;
+       
         private readonly IFinancialYearCommandRepository _financialYearCommandRepository;
         private readonly IMapper _Imapper;
         private readonly ILogger<UpdateFinancialYearCommandHandler> _logger;

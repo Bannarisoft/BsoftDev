@@ -64,22 +64,50 @@ namespace FAM.Infrastructure.Repositories.SubLocation
             return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.SubLocation>(query, new { id });
         }
 
-        public async Task<Core.Domain.Entities.SubLocation?> GetBySubLocationNameAsync(string name, int? id = null)
+        public async Task<Core.Domain.Entities.SubLocation?> GetBySubLocationNameAsync(string name, int DepartmentId,int LocationId,int UnitId, int? id = null)
         {
-            var query = """
-                 SELECT * FROM FixedAsset.SubLocation
-                 WHERE SubLocationName = @SubLocationName AND IsDeleted = 0
-                 """;
+            var query = @"
+            SELECT 
+                S.Id,
+                S.Code,
+                S.SubLocationName,
+                S.Description,
+                S.UnitId,
+                S.DepartmentId,
+				S.LocationId,
+                S.IsActive,
+                S.IsDeleted,
+                S.CreatedBy,
+                S.CreatedDate,
+                S.CreatedByName,
+                S.CreatedIP,
+                S.ModifiedBy,
+                S.ModifiedDate,
+                S.ModifiedByName,
+                S.ModifiedIP
+            FROM FixedAsset.SubLocation S
+            JOIN Bannari.AppData.Department D ON D.Id = S.DepartmentId
+            JOIN Bannari.AppData.Unit U ON U.Id = S.UnitId
+			JOIN FixedAsset.Location L on L.Id= S.LocationId
+            WHERE S.SubLocationName = @SubLocationName AND S.IsDeleted = 0 AND S.DepartmentId = @DepartmentId AND S.LocationId=@LocationId AND S.UnitId = @UnitId
+            
+        ";
 
-            var parameters = new DynamicParameters(new { SubLocationName = name });
+            return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.SubLocation>(query, new { SubLocationName = name, DepartmentId = DepartmentId , LocationId = LocationId, UnitId = UnitId });
+            // var query = """
+            //      SELECT * FROM FixedAsset.SubLocation
+            //      WHERE SubLocationName = @SubLocationName AND IsDeleted = 0
+            //      """;
 
-            if (id is not null)
-            {
-                query += " AND Id != @Id";
-                parameters.Add("Id", id);
-            }
+            // var parameters = new DynamicParameters(new { SubLocationName = name });
 
-            return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.SubLocation>(query, parameters);
+            // if (id is not null)
+            // {
+            //     query += " AND Id != @Id";
+            //     parameters.Add("Id", id);
+            // }
+
+            // return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.SubLocation>(query, parameters);
         }
 
         public async Task<List<Core.Domain.Entities.SubLocation>> GetSubLocation(string searchPattern)

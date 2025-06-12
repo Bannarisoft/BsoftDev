@@ -317,10 +317,13 @@ namespace MaintenanceManagement.API.Controllers
             var result = await Mediator.Send(command);
             return Ok(result);
         }
-            [HttpPost("MachineDetailBySchedule")]
-        public async Task<IActionResult> GetMachineDetail(GetMachineDetailByIdQuery command)
+            [HttpGet("MachineDetailBySchedule")]
+        public async Task<IActionResult> GetMachineDetail([FromQuery] int Id)
         {
-            var response = await Mediator.Send(command);
+            var response = await Mediator.Send(new GetMachineDetailByIdQuery
+             {
+                 Id = Id
+             });
 
             return Ok(new
             {

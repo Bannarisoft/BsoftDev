@@ -33,7 +33,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                         FROM Maintenance.MachineMaster mm
                         LEFT JOIN Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
                         WHERE mm.IsDeleted = 0 AND mm.UnitId = @UnitId
-                        {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (mm.MachineCode LIKE @Search OR mm.MachineName LIKE @Search)")}};
+                        {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (mm.MachineCode LIKE @Search OR mm.MachineName LIKE @Search OR mg.GroupName LIKE @Search)")}};
 
                         -- Fetch paged records with MachineGroupName
                         SELECT 
@@ -56,7 +56,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                         LEFT JOIN Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
                         WHERE 
                             mm.IsDeleted = 0 AND mm.UnitId = @UnitId
-                            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (mm.MachineCode LIKE @Search OR mm.MachineName LIKE @Search)")}}
+                            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (mm.MachineCode LIKE @Search OR mm.MachineName LIKE @Search OR mg.GroupName LIKE @Search)")}}
                         ORDER BY mm.Id DESC
                         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
