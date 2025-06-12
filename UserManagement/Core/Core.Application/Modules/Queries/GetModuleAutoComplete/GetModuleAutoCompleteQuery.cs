@@ -10,6 +10,6 @@ namespace Core.Application.Modules.Queries.GetModuleAutoComplete
 {
     public class GetModuleAutoCompleteQuery : IRequest<ApiResponseDTO<List<ModuleAutoCompleteDTO>>>
     {
-        public string SearchPattern { get; set; }
+        public string? SearchPattern { get; set; }
     }
 }

@@ -992,14 +992,28 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnName("MultiplicationFactor");
 
                     b.Property<decimal>("OpeningReading")
-                        .HasColumnType("Decimal(18,2)")
+                        .HasColumnType("Decimal(18,3)")
                         .HasColumnName("OpeningReading");
+
+                    b.Property<int?>("ParentFeederId")
+                        .HasColumnType("int")
+                        .HasColumnName("ParentFeederId");
+
+                    b.Property<decimal>("Target")
+                        .HasColumnType("Decimal(18,3)")
+                        .HasColumnName("Target");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FeederGroupId");
 
                     b.HasIndex("FeederTypeId");
+
+                    b.HasIndex("ParentFeederId");
 
                     b.ToTable("Feeder", "Maintenance");
                 });
@@ -1053,6 +1067,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(50)");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
 
                     b.HasKey("Id");
 
@@ -2086,9 +2104,16 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.Power.Feeder", "ParentFeeder")
+                        .WithMany("SubFeeders")
+                        .HasForeignKey("ParentFeederId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("FeederGroup");
 
                     b.Navigation("FeederType");
+
+                    b.Navigation("ParentFeeder");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerActivity", b =>
@@ -2369,6 +2394,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("ActivityType");
 
                     b.Navigation("Feeders");
+					b.Navigation("FeedersPower");
 
                     b.Navigation("FrequencyType");
 
@@ -2408,6 +2434,15 @@ namespace MaintenanceManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>
                 {
                     b.Navigation("MiscMaster");
+                });
+			modelBuilder.Entity("Core.Domain.Entities.Power.Feeder", b =>
+                {
+                    b.Navigation("FeederConsumptions");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Power.Feeder", b =>
+                {
+                    b.Navigation("SubFeeders");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Power.FeederGroup", b =>
@@ -2453,7 +2488,100 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Navigation("WorkOrderTechnicians");
                 });
+
+modelBuilder.Entity("Core.Domain.Entities.Power.PowerConsumption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("ClosingReading")
+                        .HasColumnType("Decimal(18,3)")
+                        .HasColumnName("ClosingReading");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("FeederId")
+                        .HasColumnType("int")
+                        .HasColumnName("FeederId");
+
+                    b.Property<int>("FeederTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("FeederTypeId");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal>("OpeningReading")
+                        .HasColumnType("Decimal(18,3)")
+                        .HasColumnName("OpeningReading");
+
+                    b.Property<decimal>("TotalUnits")
+                        .HasColumnType("Decimal(18,3)")
+                        .HasColumnName("TotalUnits");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeederId");
+
+                    b.HasIndex("FeederTypeId");
+
+                    b.ToTable("PowerConsumption", "Maintenance");
+                });
+ modelBuilder.Entity("Core.Domain.Entities.Power.PowerConsumption", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Power.Feeder", "FeederPower")
+                        .WithMany("FeederConsumptions")
+                        .HasForeignKey("FeederId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "FeederTypePower")
+                        .WithMany("FeedersPower")
+                        .HasForeignKey("FeederTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FeederPower");
+
+                    b.Navigation("FeederTypePower");
+                });
 #pragma warning restore 612, 618
         }
     }
 }
+

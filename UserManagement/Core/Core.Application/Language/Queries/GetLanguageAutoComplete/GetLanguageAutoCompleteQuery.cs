@@ -10,6 +10,6 @@ namespace Core.Application.Language.Queries.GetLanguageAutoComplete
 {
     public class GetLanguageAutoCompleteQuery : IRequest<ApiResponseDTO<List<LanguageAutoCompleteDTO>>>
     {
-        public string SearchPattern { get; set; }
+        public string? SearchPattern { get; set; }
     }
 }

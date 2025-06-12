@@ -6,6 +6,7 @@ using Core.Application.Reports.WorkOrderReport;
 using Core.Application.StockLedger.Queries.GetCurrentStock;
 using Core.Application.Reports.WorkOderCheckListReport;
 using Core.Application.Reports.MRS;
+using Core.Application.Reports.PowerConsumption;
 
 namespace Core.Application.Common.Interfaces.IReports
 {
@@ -21,5 +22,6 @@ namespace Core.Application.Common.Interfaces.IReports
         Task<List<MRSReportDto>> GetMRSReports(DateTimeOffset IssueFromDate, DateTimeOffset IssueToDate, string OldUnitCode);
         Task<IEnumerable<dynamic>> ScheduleReportAsync(DateTime? FromDueDate, DateTime? ToDueDate);
         Task<IEnumerable<dynamic>> MaterialPlanningReportAsync(DateTime? FromDueDate, DateTime? ToDueDate);
+        Task<List<PowerReportDto>> GetPowerReports(DateTimeOffset? FromDate, DateTimeOffset? ToDate);
     }
 }

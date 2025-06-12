@@ -9,16 +9,16 @@ namespace Core.Domain.Entities
     public class CustomField : BaseEntity
     {
         public int Id { get; set; }
-        public string LabelName { get; set; }
+        public string? LabelName { get; set; }
         public int DataTypeId { get; set; }
-        public MiscMaster DataType { get; set; }
+        public MiscMaster? DataType { get; set; }
         public int? Length { get; set; }
         public int LabelTypeId { get; set; }
-        public MiscMaster LabelType { get; set; }
+        public MiscMaster? LabelType { get; set; }
         public byte IsRequired { get; set; }
-        public IList<CustomFieldMenu> CustomFieldMenu { get; set; }
-        public IList<CustomFieldUnit> CustomFieldUnits { get; set; }
-        public IList<CustomFieldOptionalValue> CustomFieldOptionalValues { get; set; }
+        public IList<CustomFieldMenu>? CustomFieldMenu { get; set; }
+        public IList<CustomFieldUnit>? CustomFieldUnits { get; set; }
+        public IList<CustomFieldOptionalValue>? CustomFieldOptionalValues { get; set; }
         
         
     }

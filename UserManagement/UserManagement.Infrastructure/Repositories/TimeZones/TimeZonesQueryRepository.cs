@@ -31,7 +31,13 @@ namespace UserManagement.Infrastructure.Repositories.TimeZones
                 Name,
                 Location,
                 Offset,
-                IsActive
+                IsActive,
+                CreatedByName,
+                CreatedAt,
+                CreatedIP,
+                ModifiedByName,
+                ModifiedAt,
+                ModifiedIP
             FROM AppData.TimeZones 
             WHERE 
             IsDeleted = 0
