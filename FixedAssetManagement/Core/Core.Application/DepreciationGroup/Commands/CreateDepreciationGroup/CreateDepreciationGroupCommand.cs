@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup
 {
-    public class CreateDepreciationGroupCommand : IRequest<ApiResponseDTO<DepreciationGroupDTO>>  
+    public class CreateDepreciationGroupCommand : IRequest<DepreciationGroupDTO> 
     {        
         public string? Code { get; set; }
         public string? DepreciationGroupName { get; set; } 

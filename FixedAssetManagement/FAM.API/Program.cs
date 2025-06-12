@@ -6,6 +6,7 @@ using MassTransit;
 using Contracts.Events;
 using FAM.API.Middleware;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using FAM.Infrastructure.Logging.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +38,7 @@ builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
 builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddProblemDetails();
+//builder.Services.AddProblemDetails();
 // Register gRPC
 builder.Services.AddGrpc();
 
@@ -59,7 +60,7 @@ app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
-app.UseMiddleware<FAM.Infrastructure.Logging.Middleware.LoggingMiddleware>();
+app.UseMiddleware<LoggingMiddleware>();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
