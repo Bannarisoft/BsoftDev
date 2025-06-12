@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.PreventiveSchedulers.Queries.GetMachineDetailById
 {
-    public class GetMachineDetailByIdQuery : IRequest<ApiResponseDTO<List<MachineDetailByHeaderIdDto>>>
+    public class GetMachineDetailByIdQuery : IRequest<ApiResponseDTO<PreventiveSchedulerDto>>
     {
         public int Id { get; set; }
     }

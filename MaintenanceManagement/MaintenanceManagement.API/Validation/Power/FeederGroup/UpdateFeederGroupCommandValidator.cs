@@ -48,11 +48,13 @@ namespace MaintenanceManagement.API.Validation.Power.FeederGroup
                         break;
 
                     case "AlreadyExists":
-                        RuleFor(x => x.FeederGroupCode)
-                            .MustAsync(async (request ,feederGroupCode, cancellation) =>
-                                !await _feederGroupQueryRepository.AlreadyExistsAsync(feederGroupCode, request.Id))
-                            .WithMessage("FeederGroupcode already exists.");
-                        break;
+                       RuleFor(x => x.FeederGroupCode)
+                        .MustAsync(async (request, feederGroupCode, cancellation) =>
+                            feederGroupCode != null && !await _feederGroupQueryRepository.AlreadyExistsAsync(feederGroupCode, request.Id))
+                        .WithMessage((request, feederGroupCode) =>
+                            $"FeederGroupCode '{feederGroupCode}' already exists in Unit ID: {request.UnitId}");
+
+                        break;  
                 }
             }
 

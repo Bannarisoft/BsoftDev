@@ -10,6 +10,6 @@ namespace Core.Application.TimeZones.Queries.GetTimeZonesAutoComplete
 {
     public class GetTimeZonesAutocompleteQuery : IRequest<ApiResponseDTO<List<TimeZonesAutoCompleteDto>>>
     {
-         public string SearchPattern { get; set; }
+         public string? SearchPattern { get; set; }
     }
 }

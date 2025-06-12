@@ -12,6 +12,7 @@ namespace Core.Application.Power.FeederGroup.Queries.GetFeederGroup
 
          public string? FeederGroupCode { get; set; }  
         public string? FeederGroupName { get; set; }
+        public int  UnitId { get; set; }
         public Status IsActive { get; set; }
     }
 }

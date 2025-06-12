@@ -8,9 +8,9 @@ namespace Core.Application.Menu.Queries.GetChildMenuByModule
     public class ChildMenuDTO
     {
         public int Id { get; set; }
-        public string MenuName { get; set; }
+        public string? MenuName { get; set; }
         public int ParentId { get; set; }
-        public string MenuUrl { get; set; }
+        public string? MenuUrl { get; set; }
         public int ModuleId { get; set; }
     }
 }

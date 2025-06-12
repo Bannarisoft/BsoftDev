@@ -11,7 +11,7 @@ namespace Core.Domain.Entities
     public string? ModuleName { get; set; }
     public bool IsDeleted { get; set; }
     // public ICollection<RoleEntitlement> RoleEntitlements { get; set; } = new List<RoleEntitlement>();
-    public IList<Menu> Menus { get; set; }
-    public IList<RoleModule> RoleModules { get; set; }
+    public IList<Menu>? Menus { get; set; }
+    public IList<RoleModule>? RoleModules { get; set; }
     }
 }

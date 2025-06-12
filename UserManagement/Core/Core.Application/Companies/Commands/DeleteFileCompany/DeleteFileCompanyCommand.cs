@@ -9,6 +9,6 @@ namespace Core.Application.Companies.Commands.DeleteFileCompany
 {
     public class DeleteFileCompanyCommand : IRequest<ApiResponseDTO<bool>>
     {
-        public string Logo { get; set; }
+        public string? Logo { get; set; }
     }
 }
