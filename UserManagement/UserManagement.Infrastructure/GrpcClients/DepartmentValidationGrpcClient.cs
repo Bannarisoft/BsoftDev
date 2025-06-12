@@ -4,6 +4,7 @@ using Contracts.Interfaces.External.IMaintenance;
 using Grpc.Core;
 using GrpcServices.Maintenance;
 using Microsoft.AspNetCore.Http;
+using Serilog;
 
 namespace UserManagement.Infrastructure.GrpcClients
 {
@@ -31,7 +32,7 @@ namespace UserManagement.Infrastructure.GrpcClients
                     token = $"Bearer {token}";
 
                 metadata.Add("Authorization", token);
-                Console.WriteLine($"[gRPC] Sending token: {token}");
+                Log.Information("[gRPC] Sending token: {Token}", token);
             }
 
             var request = new DepartmentUsageRequest { DepartmentId = departmentId };

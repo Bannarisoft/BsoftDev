@@ -8,6 +8,7 @@ using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
 using Core.Domain.Common;
 using Core.Domain.Entities.AssetMaster;
 using Dapper;
+using Serilog;
 
 namespace FAM.Infrastructure.Repositories.AssetMaster.AssetAmc
 {
@@ -132,7 +133,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetAmc
 
             if (!vendorDetailsList.Any())
             {
-                Console.WriteLine("No data returned from stored procedure!");
+                Log.Information("No data returned from stored procedure!");
             }
 
                 return vendorDetailsList?.ToList() ?? new List<ExistingVendorDetails>();

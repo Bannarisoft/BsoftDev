@@ -4,6 +4,7 @@ using System.Net.Mail;
 using BackgroundService.Infrastructure.Configurations;
 using Contracts.Events.Notifications;
 using Core.Application.Common.Interfaces;
+using Serilog;
 
 namespace BackgroundService.Infrastructure.Services
 {
@@ -21,7 +22,7 @@ namespace BackgroundService.Infrastructure.Services
             var providerKey = string.IsNullOrEmpty(command.Provider) ? "Gmail" : command.Provider;
             if (!_emailSettings.Providers.TryGetValue(providerKey, out var provider))
             {
-                Console.WriteLine($"Provider '{providerKey}' not found in EmailSettings.");
+                Log.Information("Provider '{ProviderKey}' not found in EmailSettings.", providerKey);
                 return false;
             }
             try
@@ -46,12 +47,12 @@ namespace BackgroundService.Infrastructure.Services
                 mail.To.Add(command.ToEmail!);
 
                 await smtpClient.SendMailAsync(mail);
-                Console.WriteLine($"✅ Email sent to {command.ToEmail} via {providerKey}");
+                Log.Information("✅ Email sent to {ToEmail} via {ProviderKey}", command.ToEmail, providerKey);
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Failed to send email: {ex.Message}");
+                Log.Error(ex, "❌ Failed to send email: {ErrorMessage}", ex.Message);
                 return false;
             }
         }

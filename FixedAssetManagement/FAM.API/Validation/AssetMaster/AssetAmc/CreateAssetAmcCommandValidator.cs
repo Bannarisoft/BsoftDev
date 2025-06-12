@@ -6,6 +6,7 @@ using Core.Application.AssetMaster.AssetAmc.Command.CreateAssetAmc;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
 using FAM.API.Validation.Common;
 using FluentValidation;
+using Serilog;
 
 namespace FAM.API.Validation.AssetMaster.AssetAmc
 {
@@ -119,7 +120,7 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
                      
                         default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information("Warning: Unknown rule '{Rule}' encountered.", rule.Rule);
                         break;
                 }
             }
