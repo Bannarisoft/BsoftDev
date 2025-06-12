@@ -31,9 +31,9 @@ namespace FAM.API.Validation.Locations
                         RuleFor(x => x.LocationName)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateLocationCommand.LocationName)} {rule.Error}");
-                            RuleFor(x => x.Description)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateLocationCommand.Description)} {rule.Error}");
+                            // RuleFor(x => x.Description)
+                            // .NotEmpty()
+                            // .WithMessage($"{nameof(UpdateLocationCommand.Description)} {rule.Error}");
                             RuleFor(x => x.SortOrder)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateLocationCommand.SortOrder)} {rule.Error}");
