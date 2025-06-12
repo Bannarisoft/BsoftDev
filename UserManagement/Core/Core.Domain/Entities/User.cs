@@ -23,7 +23,7 @@ namespace Core.Domain.Entities
     public int? UserType { get; set; }
     public string? Mobile { get; set; }
     public string? EmailId { get; set; } 
-    public byte IsLocked  { get; set; }   
+    public byte IsLocked  { get; set; }       
     
     public IList<UserRoleAllocation>? UserRoleAllocations { get; set; }
 

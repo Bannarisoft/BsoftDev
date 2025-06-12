@@ -1,6 +1,7 @@
 
 
 using System.Globalization;
+using Core.Application.Common.HttpResponse;
 using Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail;
 using Core.Application.DepreciationDetail.Commands.DeleteDepreciationDetail;
 using Core.Application.DepreciationDetail.Commands.UpdateDepreciationDetail;
@@ -115,30 +116,20 @@ namespace FAM.API.Controllers
             { 
                 StatusCode = StatusCodes.Status200OK, 
                 message = assetMaster.Message,
-                data = assetMaster.Data.ToList()               
+                data = assetMaster.Data?.ToList()               
             });
         }
         [HttpPost]               
         public async Task<IActionResult> CreateAsync(CreateDepreciationDetailCommand  command)
         {             
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
+           return Ok(new ApiResponseDTO<string>
             {
-                return Ok(new 
-                { 
-                    StatusCode=StatusCodes.Status201Created,
-                    message = result.Message, 
-                    data = result.Data
-                });
-            }  
-            else
-            {      
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = result.Message
-                });
-            } 
+                IsSuccess = true,
+                Message = result,
+                Data = result,
+                StatusCode = StatusCodes.Status201Created
+            });
         }        
         [HttpDelete]        
         public async Task<IActionResult> DeleteAsync(DeleteDepreciationDetailCommand  command)
