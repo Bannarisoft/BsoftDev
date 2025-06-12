@@ -12,8 +12,8 @@ namespace Core.Application.Reports.WorkOrderReport
         
         private readonly IReportRepository _reportQueryRepository;
         private readonly IMapper _mapper;
-        private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        public WorkOrderReportQueryHandler( IReportRepository reportQueryRepository, IMapper mapper, IDepartmentGrpcClient departmentGrpcClient)
+        private readonly IDepartmentAllGrpcClient _departmentGrpcClient;
+        public WorkOrderReportQueryHandler( IReportRepository reportQueryRepository, IMapper mapper, IDepartmentAllGrpcClient departmentGrpcClient)
         {
             _reportQueryRepository = reportQueryRepository;
             _mapper = mapper;
@@ -26,19 +26,22 @@ namespace Core.Application.Reports.WorkOrderReport
 
 
             // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentAsync(); // ✅ Clean call
-
-            // var departments = departmentResponse.Departments.ToList();
+            var departments = await _departmentGrpcClient.GetDepartmentAllAsync(); 
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
             var filteredWorkOrders = reportDto
-                 .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-                 .Select(p =>
-                 {
-                     p.Department = departmentLookup[p.DepartmentId];
-                     return p;
-                 })
-                 .ToList();
+                .Where(p => departmentLookup.ContainsKey(p.DepartmentId) || departmentLookup.ContainsKey(p.ProductionDepartmentId))
+                .Select(p =>
+                {
+                    if (departmentLookup.TryGetValue(p.DepartmentId, out var deptName))
+                        p.Department = deptName;
+
+                    if (departmentLookup.TryGetValue(p.ProductionDepartmentId, out var prodDeptName))
+                        p.ProductionDepartment = prodDeptName;
+
+                    return p;
+                })
+                .ToList(); 
          
             return new ApiResponseDTO<List<WorkOrderReportDto>>
             {
