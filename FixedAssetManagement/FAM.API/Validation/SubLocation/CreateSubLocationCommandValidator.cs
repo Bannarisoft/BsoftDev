@@ -33,9 +33,9 @@ namespace FAM.API.Validation.SubLocation
                         RuleFor(x => x.SubLocationName)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateSubLocationCommand.SubLocationName)} {rule.Error}");
-                        RuleFor(x => x.Description)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(CreateSubLocationCommand.Description)} {rule.Error}");
+                        // RuleFor(x => x.Description)
+                        //     .NotEmpty()
+                        //     .WithMessage($"{nameof(CreateSubLocationCommand.Description)} {rule.Error}");
                         break;
                     case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values
