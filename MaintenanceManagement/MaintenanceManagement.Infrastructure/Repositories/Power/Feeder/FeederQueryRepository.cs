@@ -43,6 +43,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.Feeder
                 F.EffectiveDate,
                 F.OpeningReading,
                 F.HighPriority,
+                F.Target,
                 F.IsActive,
                 F.IsDeleted,
                 F.CreatedBy,
@@ -85,7 +86,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.Feeder
             var UnitId = _ipAddressService.GetUnitId();
             var query = """
                 SELECT 
-                    Id,FeederCode,FeederName,ParentFeederId,FeederGroupId,FeederTypeId,DepartmentId,Description,MultiplicationFactor,EffectiveDate,OpeningReading,HighPriority,IsActive,
+                    Id,FeederCode,FeederName,ParentFeederId,FeederGroupId,FeederTypeId,DepartmentId,Description,MultiplicationFactor,EffectiveDate,OpeningReading,HighPriority,Target,IsActive,
                     IsDeleted,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP ,UnitId FROM [Maintenance].[Feeder]
                 WHERE IsDeleted = 0 AND Id = @Id AND UnitId = @UnitId;
             """;
