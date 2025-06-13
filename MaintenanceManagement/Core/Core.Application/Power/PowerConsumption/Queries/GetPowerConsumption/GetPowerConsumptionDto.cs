@@ -10,7 +10,9 @@ namespace Core.Application.Power.PowerConsumption.Queries.GetPowerConsumption
     {
         public int Id { get; set; }
         public int FeederTypeId { get; set; }
+        public string? FeederType { get; set; }
         public int FeederId { get; set; }
+        public string? FeederName { get; set; }
         public int UnitId { get; set; }
         public string? UnitName { get; set; }
         public decimal OpeningReading { get; set; }

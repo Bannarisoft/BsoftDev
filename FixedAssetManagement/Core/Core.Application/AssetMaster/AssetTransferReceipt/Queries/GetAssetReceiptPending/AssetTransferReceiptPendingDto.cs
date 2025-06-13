@@ -16,7 +16,9 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
         // public int AssetId { get; set; }       
         public string? FromUnitname { get; set; }  
         public string? ToUnitname { get; set; } 
+        public int FromDepartmentId { get; set; }
         public string? FromDepartment { get; set; }
+        public int ToDepartmentId { get; set; } 
         public string? ToDepartment { get; set; }  
         public string? FromCustodianName  { get; set; } 
         public string? ToCustodianName  { get; set; } 

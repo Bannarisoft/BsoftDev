@@ -154,6 +154,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferReceipt
                     E.UnitName AS ToUnitName,
                     A.FromDepartmentId,
                     F.DeptName AS FromDepartment,
+                    A.ToDepartmentId,
                     G.DeptName AS ToDepartment,
                     A.FromCustodianName,
                     A.ToCustodianName,
