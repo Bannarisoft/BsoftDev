@@ -54,7 +54,7 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
 
                             var response = await _mediator.Send(command, cancellationToken);
 
-                            if (response == null || !response.IsSuccess)
+                            if (response == null )
                             {
                                 throw new Exception($"Error creating asset '{assetDto.AssetName}' at row.");
                             }

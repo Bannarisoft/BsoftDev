@@ -1,6 +1,7 @@
 
 using AutoMapper;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Domain.Common;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMasterGeneral
 {
-    public class DeleteAssetMasterGeneralCommandHandler : IRequestHandler<DeleteAssetMasterGeneralCommand, ApiResponseDTO<AssetMasterGeneralDTO>>
+    public class DeleteAssetMasterGeneralCommandHandler : IRequestHandler<DeleteAssetMasterGeneralCommand, AssetMasterGeneralDTO>
     {
         private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
         private readonly IMapper _mapper;
@@ -25,45 +26,28 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteAssetMa
             _assetMasterGeneralQueryRepository=assetMasterGeneralQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<AssetMasterGeneralDTO>> Handle(DeleteAssetMasterGeneralCommand request, CancellationToken cancellationToken)
+        public async Task<AssetMasterGeneralDTO> Handle(DeleteAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         {
             var assetMasterGeneral = await _assetMasterGeneralQueryRepository.GetByIdAsync(request.Id);
-            if (assetMasterGeneral is null )
-            {
-                return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid AssetId."
-                };
-            }            
+            if (assetMasterGeneral is null)
+                    throw new EntityNotFoundException("AssetMaster", request.Id);
+          
             var assetMasterDelete = _mapper.Map<AssetMasterGenerals>(request);      
             var updateResult = await _assetMasterGeneralRepository.DeleteAsync(request.Id, assetMasterDelete);
-            
-            if (updateResult)
-            {
-                var assetMasterDto = _mapper.Map<AssetMasterGeneralDTO>(assetMasterDelete);  
-                //Domain Event  
-                var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "Delete",
-                    actionCode: assetMasterDelete.AssetCode ?? string.Empty,
-                    actionName: assetMasterDelete.AssetName ?? string.Empty,
-                    details: $"AssetMaster '{assetMasterDto.AssetName}' was created. Code: {assetMasterDto.AssetCode}",
-                    module:"AssetMaster"
-                );               
-                await _mediator.Publish(domainEvent, cancellationToken);                 
-                return new ApiResponseDTO<AssetMasterGeneralDTO>
-                {
-                    IsSuccess = true,
-                    Message = "AssetMaster deleted successfully.",
-                    Data = assetMasterDto
-                };
-            }
 
-            return new ApiResponseDTO<AssetMasterGeneralDTO>
-            {
-                IsSuccess = false,
-                Message = "AssetMaster deletion failed."                             
-            };
+             if (!updateResult)
+                throw new ExceptionRules("AssetMaster deletion failed.");
+        
+            var assetMasterDto = _mapper.Map<AssetMasterGeneralDTO>(assetMasterDelete);                  
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "Delete",
+                actionCode: assetMasterDelete.AssetCode ?? string.Empty,
+                actionName: assetMasterDelete.AssetName ?? string.Empty,
+                details: $"AssetMaster '{assetMasterDto.AssetName}' was created. Code: {assetMasterDto.AssetCode}",
+                module:"AssetMaster"
+            );               
+            await _mediator.Publish(domainEvent, cancellationToken);                 
+            return assetMasterDto;    
         }
     }
 }
