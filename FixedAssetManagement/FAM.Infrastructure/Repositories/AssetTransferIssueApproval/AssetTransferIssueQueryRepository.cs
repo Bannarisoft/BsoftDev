@@ -17,6 +17,7 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
             _ipAddressService = ipAddressService;
         }
 
+
     public async Task<(List<AssetTransferIssueApprovalDto>, int)> GetAllPendingAssetTransferAsync(
     int PageNumber, 
     int PageSize, 
@@ -45,7 +46,9 @@ namespace FAM.Infrastructure.Repositories.AssetTransferIssueApproval
                     c.Description AS TransferType, 
                     d.UnitName AS FromUnitName, 
                     e.UnitName AS ToUnitName, 
+                    a.FromDepartmentId As FromDepartmentId,
                     f.DeptName AS FromDepartment, 
+                    a.ToDepartmentId As ToDepartmentId,
                     g.DeptName AS ToDepartment, 
                     a.FromCustodianId, 
                     a.FromCustodianName, 

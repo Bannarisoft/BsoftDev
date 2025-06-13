@@ -29,15 +29,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.PowerConsumpti
             var query = $$"""
             DECLARE @TotalCount INT;
             SELECT @TotalCount = COUNT(*) 
-            FROM [Maintenance].[PowerConsumption] FG
+            FROM [Maintenance].[PowerConsumption] FG INNER JOIN [Maintenance].[MiscMaster] MM ON FG.FeederTypeId=MM.Id INNER JOIN [Maintenance].[Feeder] FF ON FG.FeederId=FF.Id
             WHERE FG.IsDeleted = 0 AND FG.UnitId = @UnitId
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (FG.FeederTypeId LIKE @Search OR FG.FeederId LIKE @Search)")}}; 
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MM.description LIKE @Search OR FF.FeederName LIKE @Search)")}}; 
 
-            SELECT FG.Id, FG.FeederTypeId, FG.FeederId,FG.UnitId,FG.OpeningReading, FG.ClosingReading, 
-                   FG.TotalUnits, FG.IsActive, FG.CreatedDate, FG.CreatedByName
-            FROM [Maintenance].[PowerConsumption] FG
-            WHERE FG.IsDeleted = 0 AND FG.UnitId = @UnitId
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (FG.FeederTypeId LIKE @Search OR FG.FeederId LIKE @Search)")}}
+            SELECT FG.Id, FG.FeederTypeId,MM.description as FeederType,FF.FeederName ,FG.FeederId,FG.UnitId,FG.OpeningReading, FG.ClosingReading, 
+            FG.TotalUnits, FG.IsActive, FG.CreatedDate, FG.CreatedByName
+            FROM [Maintenance].[PowerConsumption] FG INNER JOIN [Maintenance].[MiscMaster] MM ON FG.FeederTypeId=MM.Id INNER JOIN [Maintenance].[Feeder] FF ON FG.FeederId=FF.Id WHERE FG.IsDeleted = 0 AND FG.UnitId = @UnitId
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MM.description LIKE @Search OR FF.FeederName LIKE @Search)")}}
             ORDER BY FG.CreatedDate DESC 
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
