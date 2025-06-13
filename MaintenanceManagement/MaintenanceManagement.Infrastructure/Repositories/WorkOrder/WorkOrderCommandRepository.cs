@@ -95,6 +95,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             existingWorkOrder.Remarks = workOrder.Remarks;
             existingWorkOrder.StatusId = workOrder.StatusId;
             existingWorkOrder.RootCauseId = workOrder.RootCauseId;
+            existingWorkOrder.ModifiedBy = _ipAddressService.GetUserId();
+            existingWorkOrder.ModifiedByName = _ipAddressService.GetUserName();
+            existingWorkOrder.ModifiedIP =  _ipAddressService.GetSystemIPAddress();
+            existingWorkOrder.ModifiedDate = DateTime.UtcNow;
 
             _applicationDbContext.WorkOrder.Update(existingWorkOrder);
 

@@ -126,7 +126,7 @@ namespace FAM.API.Controllers
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                throw new ExceptionRules(string.Join(" | ", errors));  // 👈 Throw custom exception
+                throw new ExceptionRules(string.Join(" | ", errors)); 
             }
             if (id <= 0)
             {
