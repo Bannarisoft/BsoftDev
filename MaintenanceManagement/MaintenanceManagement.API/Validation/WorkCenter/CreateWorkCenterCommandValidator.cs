@@ -6,6 +6,7 @@ using Core.Application.Common.Interfaces.IWorkCenter;
 using Core.Application.WorkCenter.Command.CreateWorkCenter;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
+using Serilog;
 
 namespace MaintenanceManagement.API.Validation.WorkCenter
 {
@@ -72,7 +73,7 @@ namespace MaintenanceManagement.API.Validation.WorkCenter
                             break;                    
                     default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information("Warning: Unknown rule '{Rule}' encountered.", rule.Rule);
                         break;
                 }
             }  

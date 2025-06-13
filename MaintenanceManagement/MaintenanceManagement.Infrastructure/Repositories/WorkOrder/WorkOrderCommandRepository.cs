@@ -13,6 +13,7 @@ using MediatR;
 using Contracts.Interfaces.External.IUser;
 using Microsoft.AspNetCore.SignalR;
 using Core.Application.Common.RealTimeNotificationHub;
+using Serilog;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
 {
@@ -158,7 +159,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Failed to rename file: {ex.Message}");
+                            Log.Information(ex, "Failed to rename file.");
                         }
                     }
                 }

@@ -47,7 +47,7 @@ namespace UserManagement.Infrastructure.Repositories
             } 
         }
 
-      public string GenerateToken(string? username,int userid,string Mobile,string EmailId,string IsFirstTimeUser,int EntityId,string GroupCode,int CompanyId,int DivisionId,int UnitId,string? OldUnitId, out string jti)
+      public string GenerateToken(string? username,int userid,string Mobile,string EmailId,string IsFirstTimeUser,int EntityId,string GroupCode,int CompanyId,int DivisionId,int UnitId,string? OldUnitId,string? FirstName,string? LastName,  out string jti)       
         {
             jti = Guid.NewGuid().ToString();            
             var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
@@ -56,12 +56,7 @@ namespace UserManagement.Infrastructure.Repositories
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, username),
-                new Claim(JwtRegisteredClaimNames.NameId, userid.ToString()),
-                // new Claim(JwtRegisteredClaimNames.Typ, usertype.ToString()),
-                // new Claim(JwtRegisteredClaimNames.PhoneNumber, mobile.ToString()),
-                // new Claim(JwtRegisteredClaimNames.Email, email.ToString()),
-                // new Claim(JwtRegisteredClaimNames.Typ, unitId.ToString()),
-                // new Claim(JwtRegisteredClaimNames.Typ, companyId.ToString()),
+                new Claim(JwtRegisteredClaimNames.NameId, userid.ToString()), 
                 new Claim("Mobile", Mobile.ToString()),
                 new Claim("EmailId", EmailId.ToString()),
                 new Claim("CompanyId", CompanyId.ToString()),
@@ -71,6 +66,9 @@ namespace UserManagement.Infrastructure.Repositories
                 new Claim("EntityId", EntityId.ToString()),
                 new Claim("GroupCode", GroupCode.ToString()),
                 new Claim("OldUnitId", OldUnitId.ToString()),
+                new Claim("FirstName", FirstName.ToString()),
+                new Claim("LastName", LastName.ToString()),
+                new Claim("TimeStamp", DateTimeOffset.UtcNow.ToString("o")),
                 new Claim(JwtRegisteredClaimNames.Jti, jti),
                 new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(currentTime).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             };

@@ -1,3 +1,5 @@
+using Core.Application.Common.Exceptions;
+using Core.Application.Common.HttpResponse;
 using Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup;
 using Core.Application.DepreciationGroup.Commands.DeleteDepreciationGroup;
 using Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup;
@@ -6,6 +8,7 @@ using Core.Application.DepreciationGroup.Queries.GetDepreciationGroup;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationGroupAutoComplete;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationGroupById;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationMethodQuery;
+using Core.Application.MiscMaster.Queries.GetMiscMaster;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -34,22 +37,25 @@ namespace FAM.API.Controllers
         [HttpGet]                
         public async Task<IActionResult> GetAllDepreciationGroupsAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {            
-            var depreciationGroups = await Mediator.Send(
-            new GetDepreciationGroupQuery
+            var (data, totalCount) = await Mediator.Send(new GetDepreciationGroupQuery
             {
-                PageNumber = PageNumber, 
-                PageSize = PageSize, 
+                PageNumber = PageNumber,
+                PageSize = PageSize,
                 SearchTerm = SearchTerm
             });
-            return Ok(new 
-            { 
-                StatusCode=StatusCodes.Status200OK, 
-                message = depreciationGroups.Message,
-                data = depreciationGroups.Data.ToList(),
-                TotalCount = depreciationGroups.TotalCount,
-                PageNumber = depreciationGroups.PageNumber,
-                PageSize = depreciationGroups.PageSize
-            });
+
+            var response = new ApiResponseDTO<List<DepreciationGroupDTO>>
+            {
+                IsSuccess = true,
+                Message = "Depreciation groups retrieved successfully.",
+                Data = data,
+                TotalCount = totalCount,
+                PageNumber = PageNumber,
+                PageSize = PageSize,
+                StatusCode = StatusCodes.Status200OK
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]  
@@ -57,27 +63,20 @@ namespace FAM.API.Controllers
         public async Task<IActionResult> GetByIdAsync(int id)
         {
              if (id <= 0)
+                throw new ExceptionRules("Invalid DepreciationGroup ID. ID must be greater than 0.");
+
+            var result = await Mediator.Send(new GetDepreciationGroupByIdQuery { Id = id });
+
+            if (result is null)
+                throw new EntityNotFoundException("DepreciationGroup", id);
+
+            return Ok(new ApiResponseDTO<DepreciationGroupDTO>
             {
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = "Invalid DepreciationGroup ID" 
-                });
-            }
-            var result = await Mediator.Send(new GetDepreciationGroupByIdQuery { Id = id });            
-            if (result is null )
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode=StatusCodes.Status404NotFound,
-                    message = $"DepreciationGroupId {id} not found", 
-                });
-            }
-            return Ok(new 
-            {
-                StatusCode=StatusCodes.Status200OK,
-                data = result.Data
-            });   
+                IsSuccess = true,
+                Message = "DepreciationGroup retrieved successfully.",
+                Data = result,
+                StatusCode = StatusCodes.Status200OK
+            });
         }
 
         [HttpPost]               
@@ -86,31 +85,20 @@ namespace FAM.API.Controllers
             var validationResult = await _createDepreciationGroupCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                return BadRequest(new
+                return BadRequest(new  ApiResponseDTO<object>
                 {
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                    IsSuccess = false,
+                    Message = "Validation failed",
+                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
                 });
             }        
-            var result = await Mediator.Send(command);
-            if (result.IsSuccess)
+            var result = await Mediator.Send(command);          
+            return Ok(new ApiResponseDTO<string>
             {
-                return Ok(new 
-                { 
-                    StatusCode=StatusCodes.Status201Created,
-                    message = result.Message, 
-                    data = result.Data
-                });
-            }  
-            else
-            {      
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = result.Message
-                });
-            } 
+                StatusCode = StatusCodes.Status200OK,
+                IsSuccess = true,
+                Message = "DepreciationGroup created successfully."                
+            });
         }
         [HttpPut]        
         public async Task<IActionResult> UpdateAsync(UpdateDepreciationGroupCommand command)
@@ -118,31 +106,17 @@ namespace FAM.API.Controllers
             var validationResult = await _updateDepreciationGroupCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                return BadRequest(
-                    new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "Validation failed",
-                        errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                    }
-                );
-            }            
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new ExceptionRules("Validation failed.") { HelpLink = string.Join(", ", errors) };
+            }     
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
+            return Ok(new ApiResponseDTO<string>
             {
-                return Ok(new 
-                {   StatusCode=StatusCodes.Status200OK,
-                    message = result.Message, 
-                    asset = result.Data
-                });
-            }
-                
-                return BadRequest( new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = result.Message
-                });
-                
+                StatusCode = StatusCodes.Status200OK,
+                IsSuccess = true,
+                Message = "DepreciationGroup updated successfully.",
+                Data = $"DepreciationGroup ID {command.Id} updated."
+            });                
         }
         [HttpDelete("{id}")]        
         public async Task<IActionResult> DeleteAsync(int id)
@@ -151,94 +125,67 @@ namespace FAM.API.Controllers
             var validationResult = await  _deleteDepreciationGroupCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                return BadRequest(new
-                {
-                    message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
-                    statusCode = StatusCodes.Status400BadRequest
-                });
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new ExceptionRules(string.Join(" | ", errors));  // 👈 Throw custom exception
             }
             if (id <= 0)
             {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Invalid Asset ID"
-                });
+                throw new ExceptionRules("Invalid ID. ID must be greater than 0."); 
             }            
-              var result = await Mediator.Send(new DeleteDepreciationGroupCommand { Id = id });                 
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
-            return Ok(new
+            var result = await Mediator.Send(command);                            
+            return Ok(new ApiResponseDTO<string>
             {
                 StatusCode = StatusCodes.Status200OK,
-                data =$"DepreciationGroup ID {id} Deleted" ,
-                message = result.Message
+                IsSuccess = true,
+                Message = "DepreciationGroup deleted successfully.",
+                Data = $"DepreciationGroup ID {id} Deleted"
             });
         }
              
         [HttpGet("by-name")]  
         public async Task<IActionResult> GetDepreciationGroup([FromQuery] string? name)
-        {          
-            var result = await Mediator.Send(new GetDepreciationGroupAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
-            if (!result.IsSuccess)
+        {                  
+            var result = await Mediator.Send(new GetDepreciationGroupAutoCompleteQuery { SearchPattern = name });
+
+            return Ok(new ApiResponseDTO<List<DepreciationGroupAutoCompleteDTO>>
             {
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                }); 
-            }
-            return Ok(new
-            {
-                StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
-                data = result.Data
+                IsSuccess = true,
+                Message = "Fetched depreciation group.",
+                Data = result,
+                StatusCode = StatusCodes.Status200OK
             });
         }
        [HttpGet("bookType")]
         public async Task<IActionResult> GetBookTypes()
         {
             var result = await Mediator.Send(new GetBookTypeQuery());
-
-            if (result == null || result.Data == null || result.Data.Count == 0)
+            if (result == null ||  result.Count == 0)
             {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = "No Book Types found."
-                });
+                throw new EntityNotFoundException("BookType", "All");
             }
-            return Ok(new
+
+            return Ok(new ApiResponseDTO<List<GetMiscMasterDto>>
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = "Book Types fetched successfully.",
-                data = result.Data
-            });
+                IsSuccess = true,
+                Message = "Book Types fetched successfully.",
+                Data = result
+            });               
         }
         [HttpGet("DepMethod")]
         public async Task<IActionResult> GetDepreciationMethods()
         {
             var result = await Mediator.Send(new GetDepreciationMethodQuery());
-
-            if (result == null || result.Data == null || result.Data.Count == 0)
+            if (result == null || result.Count == 0)
             {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = "No Depreciation Method Types found."
-                });
+                throw new EntityNotFoundException("Depreciation Method", "All");
             }
-            return Ok(new
+            return Ok(new ApiResponseDTO<List<GetMiscMasterDto>>
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = "Depreciation Method  fetched successfully.",
-                data = result.Data
+                IsSuccess = true,
+                Message = "Book Types fetched successfully.",
+                Data = result
             });
         }
     }

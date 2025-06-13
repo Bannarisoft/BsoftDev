@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Queries.GetDepreciationMethodQuery
 {
-    public class GetDepreciationMethodQueryHandler : IRequestHandler<GetDepreciationMethodQuery, ApiResponseDTO<List<GetMiscMasterDto>>>
+    public class GetDepreciationMethodQueryHandler : IRequestHandler<GetDepreciationMethodQuery, List<GetMiscMasterDto>>
     {
         private readonly IDepreciationGroupQueryRepository _repository;
         private readonly IMapper _mapper;
@@ -17,18 +17,11 @@ namespace Core.Application.DepreciationGroup.Queries.GetDepreciationMethodQuery
             _mapper = mapper;
         }
 
-        public async Task<ApiResponseDTO<List<GetMiscMasterDto>>> Handle(GetDepreciationMethodQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetMiscMasterDto>> Handle(GetDepreciationMethodQuery request, CancellationToken cancellationToken)
         {
             var DepMethod = await _repository.GetDepreciationMethodAsync();
             var DepMethodDtoList = _mapper.Map<List<GetMiscMasterDto>>(DepMethod);
-
-            return new ApiResponseDTO<List<GetMiscMasterDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = DepMethodDtoList,
-                TotalCount = DepMethodDtoList.Count
-            };
+            return DepMethodDtoList;
         }
     }
 }

@@ -1,13 +1,11 @@
 using AutoMapper;
-using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.Interfaces.IDepreciationDetail;
-using Core.Application.DepreciationDetail.Queries.GetDepreciationDetail;
-using Core.Domain.Events;
 using MediatR;
 
 namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
 {
-    public class CreateDepreciationDetailCommandHandler : IRequestHandler<CreateDepreciationDetailCommand, ApiResponseDTO<string>>
+    public class CreateDepreciationDetailCommandHandler : IRequestHandler<CreateDepreciationDetailCommand, string>
     {
         private readonly IMapper _mapper;
         private readonly IDepreciationDetailQueryRepository _depreciationDetailQueryRepository;
@@ -23,58 +21,20 @@ namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<string>> Handle(CreateDepreciationDetailCommand request, CancellationToken cancellationToken)
-        {
-            // Check if Depreciation already exists
-          /*   var exists = await _depreciationDetailQueryRepository.ExistDataAsync(
-                request.companyId, request.unitId, request.finYearId, request.depreciationType, request.depreciationPeriod
-            );
-
-            if (exists)
-            {
-                return new ApiResponseDTO<string>
-                {
-                    IsSuccess = false,
-                    Message = "Depreciation details already exist for the given parameters."
-                };
-            }
- */
+        public async Task<string> Handle(CreateDepreciationDetailCommand request, CancellationToken cancellationToken)
+        {          
             // Call CreateAsync and get the status message and code
             var (creationMessage, statusCode) = await _depreciationDetailQueryRepository.CreateAsync(               
                 request.finYearId,
                 request.depreciationType,
                 request.depreciationPeriod
-            );
-
-            // Handle the response based on status code
-            if (statusCode == 1)
+            );  
+            return statusCode switch
             {
-                // Success
-                return new ApiResponseDTO<string>
-                {
-                    IsSuccess = true,
-                    Message = creationMessage
-                };
-            }
-            else if (statusCode == -1)
-            {
-                // Error/Warning
-                return new ApiResponseDTO<string>
-                {
-                    IsSuccess = false,
-                    Message = creationMessage
-                };
-            }
-            else
-            {
-                // Default unknown error
-                return new ApiResponseDTO<string>
-                {
-                    IsSuccess = false,
-                    Message = "Unknown error occurred."
-                };
-            }
+                1 => creationMessage,
+                -1 => throw new ExceptionRules(creationMessage),
+                _ => throw new ExceptionRules("Unknown error occurred while creating depreciation detail.")
+            };  
         }
     }
-
 }
