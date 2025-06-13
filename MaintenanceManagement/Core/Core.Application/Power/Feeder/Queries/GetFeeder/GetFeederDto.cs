@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.Power.Feeder.Queries.GetFeeder
@@ -15,6 +11,7 @@ namespace Core.Application.Power.Feeder.Queries.GetFeeder
         public int FeederGroupId { get; set; }
         public int FeederTypeId { get; set; }
         public int UnitId { get; set; }
+        public string? UnitName { get; set; }
         public int DepartmentId { get; set; }
         public string ? DepartmentName { get; set; }
         public string? Description { get; set; }
@@ -22,6 +19,9 @@ namespace Core.Application.Power.Feeder.Queries.GetFeeder
         public DateTimeOffset EffectiveDate { get; set; }
         public decimal OpeningReading { get; set; }
         public byte HighPriority { get; set; }
+
+        public decimal? Target { get; set; }
+       
         public Status IsActive { get; set; }
 
 

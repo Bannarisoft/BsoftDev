@@ -17,13 +17,16 @@ namespace Core.Application.Power.Feeder.Queries.GetFeeder
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IDepartmentAllGrpcClient _departmentAllGrpcClient;
+        private readonly IUnitGrpcClient _unitGrpcClient;
 
-        public GetFeederQueryHandler(IFeederQueryRepository feederQueryRepository, IMapper mapper, IMediator mediator, IDepartmentAllGrpcClient departmentAllGrpcClient)
+
+        public GetFeederQueryHandler(IFeederQueryRepository feederQueryRepository, IMapper mapper, IMediator mediator, IDepartmentAllGrpcClient departmentAllGrpcClient, IUnitGrpcClient unitGrpcClient)
         {
             _feederQueryRepository = feederQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
             _departmentAllGrpcClient = departmentAllGrpcClient;
+            _unitGrpcClient = unitGrpcClient;
         }
 
         public async Task<ApiResponseDTO<List<GetFeederDto>>> Handle(GetFeederQuery request, CancellationToken cancellationToken)
@@ -40,6 +43,23 @@ namespace Core.Application.Power.Feeder.Queries.GetFeeder
                     dto.DepartmentName = deptName;
 
             }
+            
+              var units = await _unitGrpcClient.GetAllUnitAsync();
+            var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);  
+            var powerConsumptionDictionary = new Dictionary<int, GetFeederDto>();
+
+            // 🔥 Map unit names with DataControl to costCenters
+            foreach (var data in Feederlist)
+            {
+                if (unitLookup.TryGetValue(data.UnitId, out var unitName) && unitName != null)
+                {
+                    data.UnitName = unitName;
+                }
+
+                powerConsumptionDictionary[data.UnitId] = data;
+
+            }     
+
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetFeederGroupQuery",
