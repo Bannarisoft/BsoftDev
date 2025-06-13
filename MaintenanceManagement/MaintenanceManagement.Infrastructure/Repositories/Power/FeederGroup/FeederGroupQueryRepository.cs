@@ -13,7 +13,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.FeederGroup
     {
 
         private readonly IDbConnection _dbConnection;
-         private readonly IIPAddressService _ipAddressService;
+        private readonly IIPAddressService _ipAddressService;
 
         public FeederGroupQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
@@ -23,7 +23,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.FeederGroup
         public async Task<(List<Core.Domain.Entities.Power.FeederGroup>, int)> GetAllFeederGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
 
-             var UnitId = _ipAddressService.GetUnitId();
+            var UnitId = _ipAddressService.GetUnitId();
             var query = $$"""
             DECLARE @TotalCount INT;
             SELECT @TotalCount = COUNT(*) 
@@ -59,7 +59,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.FeederGroup
 
             return (feederGroupList, totalCount);
         }
-        public async Task<Core.Domain.Entities.Power.FeederGroup> GetFeederGroupByIdAsync(int id )
+        public async Task<Core.Domain.Entities.Power.FeederGroup> GetFeederGroupByIdAsync(int id)
         {
 
             var UnitId = _ipAddressService.GetUnitId();
@@ -71,18 +71,18 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.FeederGroup
                 WHERE FG.IsDeleted = 0 AND FG.Id = @Id AND FG.UnitId = @UnitId;
                 """;
 
-            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.Power.FeederGroup>(query, new { Id = id , UnitId});
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.Power.FeederGroup>(query, new { Id = id, UnitId });
             return result.FirstOrDefault();
         }
 
-        public async Task<bool> AlreadyExistsAsync(string feederGroupCode,  int? id = null)
+        public async Task<bool> AlreadyExistsAsync(string feederGroupCode, int? id = null)
         {
-              var UnitId = _ipAddressService.GetUnitId();
+            var UnitId = _ipAddressService.GetUnitId();
             var query = "SELECT COUNT(1) FROM [Maintenance].[FeederGroup] WHERE FeederGroupCode = @feederGroupCode AND UnitId = @UnitId AND IsDeleted = 0";
 
             var parameters = new DynamicParameters();
             parameters.Add("FeederGroupCode", feederGroupCode);
-            parameters.Add("UnitId", UnitId); 
+            parameters.Add("UnitId", UnitId);
 
             if (id is not null)
             {
@@ -100,24 +100,36 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.FeederGroup
 
             var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
             return count > 0;
-        }  
-        
-         public async Task<List<Core.Domain.Entities.Power.FeederGroup>> GetFeederGroupAutoComplete(string searchPattern)
-            {
-                var UnitId = _ipAddressService.GetUnitId();
-                   const string query = @"
+        }
+
+        public async Task<List<Core.Domain.Entities.Power.FeederGroup>> GetFeederGroupAutoComplete(string searchPattern)
+        {
+            var UnitId = _ipAddressService.GetUnitId();
+            const string query = @"
                        SELECT Id, FeederGroupCode,FeederGroupName  
                        FROM Maintenance.FeederGroup
                        WHERE IsDeleted = 0 AND (FeederGroupName LIKE @SearchPattern OR FeederGroupCode LIKE @SearchPattern) AND UnitId = @UnitId";
-                   var parameters = new
-                   {
-                       SearchPattern = $"%{searchPattern ?? string.Empty}%"
-                       , UnitId
-                   };
-               var feederGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.Power.FeederGroup>(query, parameters);
-               
-                   return feederGroups.ToList();
-            } 
+            var parameters = new
+            {
+                SearchPattern = $"%{searchPattern ?? string.Empty}%"
+                ,
+                UnitId
+            };
+            var feederGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.Power.FeederGroup>(query, parameters);
+
+            return feederGroups.ToList();
+        } 
+            
+                public async Task<bool> SoftDeleteValidation(int id)
+            {
+                const string query = @"
+                    SELECT 1 
+                    FROM Maintenance.Feeder 
+                    WHERE FeederGroupId = @Id AND IsDeleted = 0";
+
+                var exists = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { Id = id });
+                return exists.HasValue; // return true = can delete
+            }
 
 
     }

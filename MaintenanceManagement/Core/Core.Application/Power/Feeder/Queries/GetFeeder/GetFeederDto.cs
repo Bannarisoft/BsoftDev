@@ -8,6 +8,7 @@ namespace Core.Application.Power.Feeder.Queries.GetFeeder
 {
     public class GetFeederDto
     {
+        public int Id { get; set;}
         public string FeederCode { get; set; } = string.Empty;
         public string FeederName { get; set; } = string.Empty;
         public int? ParentFeederId { get; set; }
@@ -15,7 +16,6 @@ namespace Core.Application.Power.Feeder.Queries.GetFeeder
         public int FeederTypeId { get; set; }
         public int UnitId { get; set; }
         public int DepartmentId { get; set; }
-
         public string ? DepartmentName { get; set; }
         public string? Description { get; set; }
         public decimal MultiplicationFactor { get; set; }

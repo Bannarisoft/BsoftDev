@@ -51,8 +51,6 @@ namespace MaintenanceManagement.API.Validation.ActivityCheckListMaster
                         Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
                         break;          
 
-
-
                 }
             }                
                    
