@@ -46,7 +46,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMasterDetailRep
               WHERE SMD.IsDeleted = 0 AND SMD.UnitId = @UnitId
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SM.ShiftName LIKE @Search OR SM.ShiftCode LIKE @Search)")}};
 
-                SELECT 
+                SELECT
+                SM.Id AS ShiftMasterId, 
                 SMD.Id,
                 SM.ShiftCode,
                 SM.ShiftName,
