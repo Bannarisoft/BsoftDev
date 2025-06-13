@@ -31,9 +31,14 @@ namespace FAM.API.Validation.AssetMaster.AssetMasterGeneral
                             .NotEmpty()
                             .WithMessage($"{nameof(DeleteAssetMasterGeneralCommand.Id)} {rule.Error}");
                         break;
+                    case "Positive":                         
+                        RuleFor(x => x.Id)
+                        .GreaterThan(0)
+                        .WithMessage("ID must be greater than 0.");
+                    break;
                     case "SoftDelete":
-                         RuleFor(x => x.Id)
-                      .MustAsync(async (Id, cancellation) => !await _assetQueryRepository.GetAssetChildDetails(Id))
+                        RuleFor(x => x.Id)
+                        .MustAsync(async (Id, cancellation) => !await _assetQueryRepository.GetAssetChildDetails(Id))
                         .WithMessage($"{rule.Error}");
                         break;
                     default:                        
