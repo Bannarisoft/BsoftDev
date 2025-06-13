@@ -206,22 +206,24 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         public async Task<List<PreventiveSchedulerDetail>> GetPreventiveSchedulerDetail(int PreventiveSchedulerId)
         {
             var query = $@"
-                SELECT  
-                    Id,
-                    PreventiveSchedulerHeaderId,
-                    MachineId,
-                    WorkOrderCreationStartDate,
-                    ActualWorkOrderDate,
-                    RescheduleReason,
-                    MaterialReqStartDays,
-                    HangfireJobId
+                  SELECT  
+                    PSD.*
                     
-                FROM [Maintenance].[PreventiveSchedulerDetail] WHERE PreventiveSchedulerHeaderId =@PreventiveSchedulerId AND IsDeleted = 0
+                FROM [Maintenance].[PreventiveSchedulerDetail] PSD
+				LEFT JOIN [Maintenance].[WorkOrder] WO ON WO.PreventiveScheduleId=PSD.Id
+                LEFT Join [Maintenance].[MiscMaster] WOStatus ON WOStatus.Id=WO.StatusId 
+				WHERE PSD.PreventiveSchedulerHeaderId =@PreventiveSchedulerId AND PSD.IsDeleted = 0
+				AND (
+           WO.Id IS NULL
+           OR WOStatus.Code IN @Status
+           )
             ";
 
+        var statuses = new List<string> { StatusOpen.Code };
             var parameters = new
             {
-                PreventiveSchedulerId = PreventiveSchedulerId
+                PreventiveSchedulerId = PreventiveSchedulerId,
+                Status = statuses
             };
             var result = await _dbConnection.QueryAsync<PreventiveSchedulerDetail>(query, parameters);
 
@@ -259,15 +261,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         public async Task<PreventiveSchedulerDetail> GetPreventiveSchedulerDetailById(int Id)
         {
             var query = $@"
-                   SELECT  
-                       Id,
-                       PreventiveSchedulerId,
-                       MachineId,
-                       WorkOrderCreationStartDate,
-                       ActualWorkOrderDate,
-                       RescheduleReason,
-                       MaterialReqStartDays,
-                       HangfireJobId
+                   SELECT
+                     
+                       *
                        
                    FROM [Maintenance].[PreventiveSchedulerDetail] WHERE Id =@Id AND IsDeleted = 0
                ";

@@ -9,7 +9,7 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
     public interface IPreventiveSchedulerCommand
     {
         Task<int> CreateAsync(PreventiveSchedulerHeader preventiveSchedulerHdr);
-        Task<PreventiveSchedulerHeader> UpdateAsync(PreventiveSchedulerHeader preventiveSchedulerHdr);
+        Task<List<PreventiveSchedulerDetail>> UpdateScheduleDetails(int HeaderId, List<PreventiveSchedulerDetail> preventiveSchedulerDetail);
         Task<bool> DeleteAsync(int id, PreventiveSchedulerHeader preventiveSchedulerHdr);
         Task<PreventiveSchedulerDetail> CreateDetailAsync(PreventiveSchedulerDetail preventiveSchedulerDetail);
         Task<bool> UpdateDetailAsync(int id, string HangfireJobId);
@@ -21,6 +21,8 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<PreventiveSchedulerDetail?> GetDetailByMachineActivityAndUnitAsync(string machineCode, string activityName, int unitId);
         Task<List<PreventiveSchedulerHeader>> BulkImportPreventiveHeaderAsync(List<PreventiveSchedulerHeader> preventiveSchedulerHeaders);
         Task SaveChangesAsync(CancellationToken cancellationToken);
+        Task<PreventiveSchedulerHeader> UpdateScheduleMetadata(PreventiveSchedulerHeader preventiveSchedulerHdr);
+        Task<PreventiveSchedulerDetail> UpdateScheduleDetails(PreventiveSchedulerDetail preventiveSchedulerDetail);
         
     }
 }
