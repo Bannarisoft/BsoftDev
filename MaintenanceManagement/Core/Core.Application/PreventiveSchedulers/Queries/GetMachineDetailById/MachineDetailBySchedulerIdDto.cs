@@ -11,5 +11,6 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetMachineDetailById
         public string MachineName { get; set; }
         public DateOnly WorkOrderCreationStartDate { get; set; }
         public DateOnly LastMaintenanceActivityDate { get; set; }
+        public DateOnly ActualWorkOrderDate { get; set; }
     }
 }

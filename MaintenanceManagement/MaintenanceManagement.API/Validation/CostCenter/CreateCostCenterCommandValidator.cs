@@ -7,6 +7,7 @@ using Core.Application.Common.Interfaces.ICostCenter;
 using Core.Application.CostCenter.Command.CreateCostCenter;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
+using Serilog;
 
 namespace MaintenanceManagement.API.Validation.CostCenter
 {
@@ -94,7 +95,7 @@ namespace MaintenanceManagement.API.Validation.CostCenter
                             break;                    
                     default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information("Warning: Unknown rule '{Rule}' encountered.", rule.Rule);
                         break;
                 }
             }  

@@ -1575,7 +1575,6 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("varchar(250)")
                         .HasColumnName("Description");
 
@@ -1925,7 +1924,6 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("varchar(250)")
                         .HasColumnName("Description");
 

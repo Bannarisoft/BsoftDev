@@ -1,5 +1,6 @@
 
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IDepreciationGroup;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationGroup;
@@ -8,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroupById
 {
-    public class GetDepreciationGroupByIdQueryHandler : IRequestHandler<GetDepreciationGroupByIdQuery, ApiResponseDTO<DepreciationGroupDTO>>
+    public class GetDepreciationGroupByIdQueryHandler : IRequestHandler<GetDepreciationGroupByIdQuery, DepreciationGroupDTO>
     {
         private readonly IDepreciationGroupQueryRepository _depreciationGroupRepository;
         private readonly IMapper _mapper;
@@ -21,33 +22,26 @@ namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroupById
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<DepreciationGroupDTO>> Handle(GetDepreciationGroupByIdQuery request, CancellationToken cancellationToken)
+        public async Task<DepreciationGroupDTO> Handle(GetDepreciationGroupByIdQuery request, CancellationToken cancellationToken)
         {
-            var depreciationGroup = await _depreciationGroupRepository.GetByIdAsync(request.Id);                
-            var depreciationGroupDto = _mapper.Map<DepreciationGroupDTO>(depreciationGroup);
-            if (depreciationGroup is null)
-            {                
-                return new ApiResponseDTO<DepreciationGroupDTO>
-                {
-                    IsSuccess = false,
-                    Message = "DepreciationGroup with ID {request.Id} not found."
-                };   
-            }       
-                //Domain Event
-            var domainEvent = new AuditLogsDomainEvent(
-                actionDetail: "GetById",
-                actionCode: depreciationGroupDto.Code ?? string.Empty,        
-                actionName: depreciationGroupDto.DepreciationGroupName ?? string.Empty,                
-                details: $"DepreciationGroup '{depreciationGroupDto.DepreciationGroupName}' was created. Code: {depreciationGroupDto.Code}",
-                module:"DepreciationGroup"
-            );
-            await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<DepreciationGroupDTO>
             {
-                IsSuccess = true,
-                Message = "Success",
-                Data = depreciationGroupDto
-            };       
+                var depreciationGroup = await _depreciationGroupRepository.GetByIdAsync(request.Id);   
+                if (depreciationGroup is null)
+                    throw new EntityNotFoundException("DepreciationGroup", request.Id);
+
+                var depreciationGroupDto = _mapper.Map<DepreciationGroupDTO>(depreciationGroup);
+            
+                //Domain Event
+                var domainEvent = new AuditLogsDomainEvent(
+                    actionDetail: "GetById",
+                    actionCode: depreciationGroupDto.Code ?? string.Empty,        
+                    actionName: depreciationGroupDto.DepreciationGroupName ?? string.Empty,                
+                    details: $"DepreciationGroup '{depreciationGroupDto.DepreciationGroupName}' was created. Code: {depreciationGroupDto.Code}",
+                    module:"DepreciationGroup"
+                );
+                await _mediator.Publish(domainEvent, cancellationToken);
+                return depreciationGroupDto;
+            }
         }
     }
 }

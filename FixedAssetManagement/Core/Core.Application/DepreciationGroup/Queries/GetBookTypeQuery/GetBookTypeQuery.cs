@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Queries.GetBookTypeQuery
 {
-   public class GetBookTypeQuery : IRequest<ApiResponseDTO<List<GetMiscMasterDto>>> 
+   public class GetBookTypeQuery : IRequest<List<GetMiscMasterDto>>
     {
         
     }

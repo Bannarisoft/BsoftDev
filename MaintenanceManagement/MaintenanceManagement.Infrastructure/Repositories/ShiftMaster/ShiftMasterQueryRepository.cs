@@ -29,10 +29,24 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMaster
                 var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
                 return count > 0;
         }
+         public async Task<bool> AlreadyExistsShiftCodeAsync(string ShiftCode, int? id = null)
+        {   
+
+              var query = "SELECT COUNT(1) FROM [Maintenance].[ShiftMaster] WHERE ShiftCode = @ShiftCode AND IsDeleted = 0";
+                var parameters = new DynamicParameters(new { ShiftCode = ShiftCode });
+
+             if (id is not null)
+             {
+                 query += " AND Id != @Id";
+                 parameters.Add("Id", id);
+             }
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+        }
 
         public async Task<(List<Core.Domain.Entities.ShiftMaster>, int)> GetAllShiftMasterAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-               var query = $$"""
+            var query = $$"""
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
                FROM [Maintenance].[ShiftMaster] 
@@ -55,17 +69,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ShiftMaster
                 SELECT @TotalCount AS TotalCount;
             """;
 
-            
-             var parameters = new
-                       {
-                           Search = $"%{SearchTerm}%",
-                           Offset = (PageNumber - 1) * PageSize,
-                           PageSize
-                       };
 
-             var shiftmaster = await _dbConnection.QueryMultipleAsync(query, parameters);
-             var shiftMasterlist = (await shiftmaster.ReadAsync<Core.Domain.Entities.ShiftMaster>()).ToList();
-             int totalCount = (await shiftmaster.ReadFirstAsync<int>());
+            var parameters = new
+            {
+                Search = $"%{SearchTerm}%",
+                Offset = (PageNumber - 1) * PageSize,
+                PageSize
+            };
+
+            var shiftmaster = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var shiftMasterlist = (await shiftmaster.ReadAsync<Core.Domain.Entities.ShiftMaster>()).ToList();
+            int totalCount = (await shiftmaster.ReadFirstAsync<int>());
 
             return (shiftMasterlist, totalCount);
         }

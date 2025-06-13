@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.AssetGroup.Command.CreateAssetGroup;
 using FAM.API.Validation.Common;
 using FluentValidation;
+using Serilog;
 
 namespace FAM.API.Validation.AssetGroup
 {
@@ -57,7 +58,7 @@ namespace FAM.API.Validation.AssetGroup
                         break;
                     default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information("Warning: Unknown rule '{Rule}' encountered.", rule.Rule);
                         break;
                 }
             }  

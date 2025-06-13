@@ -8,6 +8,7 @@ using Core.Domain.Common;
 using Core.Domain.Entities;
 using Core.Domain.Events;
 using MediatR;
+using Serilog;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral
 {
@@ -91,7 +92,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Failed to rename file: {ex.Message}");
+                            Log.Information(ex, "Failed to rename file.");
                         }
                     }
                 }  
@@ -115,7 +116,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Failed to rename file: {ex.Message}");
+                            Log.Information(ex, "Failed to rename file: {ErrorMessage}", ex.Message);
                         }
                     }
                 }       

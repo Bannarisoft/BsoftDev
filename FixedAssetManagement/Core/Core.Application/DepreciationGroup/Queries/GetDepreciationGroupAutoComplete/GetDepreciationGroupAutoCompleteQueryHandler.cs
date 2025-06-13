@@ -1,4 +1,5 @@
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IDepreciationGroup;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationGroup;
@@ -7,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroupAutoComplete
 {
-    public class GetDepreciationGroupAutoCompleteQueryHandler : IRequestHandler<GetDepreciationGroupAutoCompleteQuery, ApiResponseDTO<List<DepreciationGroupAutoCompleteDTO>>>
+    public class GetDepreciationGroupAutoCompleteQueryHandler : IRequestHandler<GetDepreciationGroupAutoCompleteQuery, List<DepreciationGroupAutoCompleteDTO>>
     {
         private readonly IDepreciationGroupQueryRepository _depreciationGroupRepository;
         private readonly IMapper _mapper;
@@ -20,17 +21,12 @@ namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroupAutoCom
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<DepreciationGroupAutoCompleteDTO>>> Handle(GetDepreciationGroupAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<DepreciationGroupAutoCompleteDTO>> Handle(GetDepreciationGroupAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _depreciationGroupRepository.GetByDepreciationNameAsync(request.SearchPattern ?? string.Empty);
-            if (result is null || result.Count is 0)
-            {
-                return new ApiResponseDTO<List<DepreciationGroupAutoCompleteDTO>>
-                {
-                    IsSuccess = false,
-                    Message = "No Depreciation Groups found matching the search pattern."
-                };
-            }
+            if (result is null)
+                throw new EntityNotFoundException("DepreciationGroup", request.SearchPattern);
+          
             var depreciationGroupsDto = _mapper.Map<List<DepreciationGroupAutoCompleteDTO>>(result);
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -41,12 +37,7 @@ namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroupAutoCom
                 module:"DepreciationGroup"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<DepreciationGroupAutoCompleteDTO>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = depreciationGroupsDto
-            };          
+            return depreciationGroupsDto;      
         }
     }
 }

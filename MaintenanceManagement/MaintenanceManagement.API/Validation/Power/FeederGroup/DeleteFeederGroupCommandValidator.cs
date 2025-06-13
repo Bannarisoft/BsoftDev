@@ -40,6 +40,12 @@ namespace MaintenanceManagement.API.Validation.Power.FeederGroup
                            .WithName("FeederGroup Id")
                             .WithMessage($"{rule.Error}");
                             break; 
+
+                      case "SoftDelete":
+                         RuleFor(x => x.Id)
+                      .MustAsync(async (Id, cancellation) => !await _feederGroupQueryRepository.SoftDeleteValidation(Id))
+                        .WithMessage($"{rule.Error}");
+                        break;
                     default:
                         break;
 

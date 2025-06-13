@@ -6,6 +6,7 @@ using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.MachineMaster.Command.UpdateMachineMaster;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
+using Serilog;
 
 namespace MaintenanceManagement.API.Validation.MachineMaster
 {
@@ -121,7 +122,7 @@ namespace MaintenanceManagement.API.Validation.MachineMaster
                        
                     default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information("Warning: Unknown rule '{Rule}' encountered.", rule.Rule);
                         break;
                 }
             }

@@ -67,7 +67,7 @@ namespace FAM.API.Validation.DepreciationGroup
                         break;          
                     case "NumericOnly":       
                         RuleFor(x => x.ResidualValue)
-                        .InclusiveBetween(1, 10)
+                        .InclusiveBetween(1, int.MaxValue)
                         .WithMessage($"{nameof(UpdateDepreciationGroupCommand.ResidualValue)} {rule.Error}");
                         RuleFor(x => x.UsefulLife)
                         .InclusiveBetween(1, int.MaxValue)
@@ -81,7 +81,7 @@ namespace FAM.API.Validation.DepreciationGroup
                                 x.AssetGroupId == command.AssetGroupId &&
                                 x.DepreciationMethod == command.DepreciationMethod &&
                                 x.BookType == command.BookType &&  x.UsefulLife == command.UsefulLife && x.ResidualValue == command.ResidualValue &&
-                                x.IsActive == Status.Active, token);
+                                x.IsActive == Status.Active && x.Id != command.Id, token);
                         })
                         .WithMessage(rule.Error);
                         break;

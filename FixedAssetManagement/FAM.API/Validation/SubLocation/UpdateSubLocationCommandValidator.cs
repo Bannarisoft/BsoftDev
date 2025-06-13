@@ -29,9 +29,9 @@ namespace FAM.API.Validation.SubLocation
                         RuleFor(x => x.SubLocationName)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateSubLocationCommand.SubLocationName)} {rule.Error}");
-                            RuleFor(x => x.Description)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateSubLocationCommand.Description)} {rule.Error}");
+                        // RuleFor(x => x.Description)
+                        // .NotEmpty()
+                        // .WithMessage($"{nameof(UpdateSubLocationCommand.Description)} {rule.Error}");
                         break;
                     case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values
@@ -42,17 +42,17 @@ namespace FAM.API.Validation.SubLocation
                             .MaximumLength(DescriptionMaxLength)
                             .WithMessage($"{nameof(UpdateSubLocationCommand.Description)} {rule.Error}");
                         break;
-                        case "MinLength":
+                    case "MinLength":
                         RuleFor(x => x.UnitId)
                             .GreaterThanOrEqualTo(1)
-                            .WithMessage($"{nameof(UpdateSubLocationCommand.UnitId)} {rule.Error} {0}");   
-                            RuleFor(x => x.DepartmentId)
-                            .GreaterThanOrEqualTo(1)
-                            .WithMessage($"{nameof(UpdateSubLocationCommand.DepartmentId)} {rule.Error} {0}"); 
-                             RuleFor(x => x.LocationId)
-                            .GreaterThanOrEqualTo(1)
-                            .WithMessage($"{nameof(UpdateSubLocationCommand.LocationId)} {rule.Error} {0}");     
-                        break; 
+                            .WithMessage($"{nameof(UpdateSubLocationCommand.UnitId)} {rule.Error} {0}");
+                        RuleFor(x => x.DepartmentId)
+                        .GreaterThanOrEqualTo(1)
+                        .WithMessage($"{nameof(UpdateSubLocationCommand.DepartmentId)} {rule.Error} {0}");
+                        RuleFor(x => x.LocationId)
+                       .GreaterThanOrEqualTo(1)
+                       .WithMessage($"{nameof(UpdateSubLocationCommand.LocationId)} {rule.Error} {0}");
+                        break;
                 }
             }
 

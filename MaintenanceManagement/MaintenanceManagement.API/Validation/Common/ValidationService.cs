@@ -81,6 +81,7 @@ using Core.Application.Power.Feeder.Command.CreateFeeder;
 using MaintenanceManagement.API.Validation.Power.Feeder;
 using Core.Application.Power.Feeder.Command.UpdateFeeder;
 using Core.Application.Power.Feeder.Command.DeleteFeeder;
+using Core.Application.ActivityCheckListMaster.Command.DeleteActivityCheckListMaster;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -139,6 +140,7 @@ namespace MaintenanceManagement.API.Validation.Common
 
             services.AddScoped<IValidator<CreateActivityCheckListMasterCommand>, CreateActivityCheckListMasterCommandValidator>();
             services.AddScoped<IValidator<UpdateActivityCheckListMasterCommand>, UpdateActivityCheckListMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteActivityCheckListMasterCommand>, DeleteActivityCheckListMasterCommandValidator>();
             services.AddScoped<IValidator<CreateMaintenanceRequestCommand>, CreateMaintenanceRequestCommandValidator>();
             services.AddScoped<IValidator<UpdateMaintenanceRequestCommand>, UpdateMaintenanceRequestCommandValidator>();
             services.AddScoped<IValidator<UpdateWOScheduleCommand>, UpdateWOScheduleCommandValidator>();
