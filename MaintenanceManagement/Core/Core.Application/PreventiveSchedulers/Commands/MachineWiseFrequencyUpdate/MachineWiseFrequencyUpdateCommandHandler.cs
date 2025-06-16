@@ -40,6 +40,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
 
                       
                       DetailResult.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
+                      DetailResult.FrequencyInterval = request.FrequencyInterval;
                       
 
                 var result = await _preventiveSchedulerQuery.ExistWorkOrderBySchedulerDetailId(DetailResult.Id);

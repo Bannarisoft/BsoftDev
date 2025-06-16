@@ -44,6 +44,7 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
                     detail.PreventiveSchedulerHeaderId = context.Message.PreventiveSchedulerHeaderId;
                     
                     detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
+                    detail.FrequencyInterval = context.Message.FrequencyInterval;
                     
 
                     var result = await _preventiveSchedulerQuery.ExistWorkOrderBySchedulerDetailId(detail.Id);
