@@ -25,7 +25,7 @@ namespace Core.Application.StockLedger.Queries.GetCurrentStockItemsById
 
         public async Task<ApiResponseDTO<List<StockItemCodeDto>>> Handle(GetCurrentStockItemsByIdQuery request, CancellationToken cancellationToken)
         {
-             var result = await _stockLedgerQueryRepository.GetStockItemCodes(request.OldUnitcode);
+             var result = await _stockLedgerQueryRepository.GetStockItemCodes(request.OldUnitcode,request.DepartmentId);
             var costCenters = _mapper.Map<List<StockItemCodeDto>>(result);
              //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
