@@ -32,22 +32,22 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
             var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(DetailResult.FrequencyUnitId ?? 0);
             if (request.IsActive == 1)
             {
-                 var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((DetailResult.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue),
-                                 request.FrequencyInterval, frequencyUnit.Code ?? "", DetailResult.ReminderWorkOrderDays);
-                      var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((DetailResult.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue),
-                               request.FrequencyInterval, frequencyUnit.Code ?? "", DetailResult.ReminderMaterialReqDays);
+                var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((DetailResult.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue),
+                                request.FrequencyInterval, frequencyUnit.Code ?? "", DetailResult.ReminderWorkOrderDays);
+                var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((DetailResult.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue),
+                         request.FrequencyInterval, frequencyUnit.Code ?? "", DetailResult.ReminderMaterialReqDays);
 
 
-                      
-                      DetailResult.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
-                      DetailResult.FrequencyInterval = request.FrequencyInterval;
-                      
+
+                DetailResult.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
+                DetailResult.FrequencyInterval = request.FrequencyInterval;
+
 
                 var result = await _preventiveSchedulerQuery.ExistWorkOrderBySchedulerDetailId(DetailResult.Id);
-                
+
                 if (result != true)
                 {
-                     DetailResult.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
+                    DetailResult.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
 
                     DetailResult.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
 
@@ -76,7 +76,12 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
             }
             else
             {
-                DetailResult.IsActive = Status.Active;
+                DetailResult.IsActive = Status.Inactive;
+                
+                if (!string.IsNullOrEmpty(DetailResult.HangfireJobId))
+                 {
+                     _backgroundServiceClient.RemoveHangFireJob(DetailResult.HangfireJobId);
+                 }
             }
 
             var response = await _preventiveSchedulerCommand.UpdateScheduleDetails(DetailResult);
