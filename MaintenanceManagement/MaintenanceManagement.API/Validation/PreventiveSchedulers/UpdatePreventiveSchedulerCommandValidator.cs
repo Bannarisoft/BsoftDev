@@ -147,23 +147,23 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                 //                 .Must(BeAValidDate)
                 //                 .WithMessage($"{rule.Error}"); 
                 //     break;
-                    case "PastDateValidation":
-                     RuleFor(x => x.EffectiveDate)
-                                .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
-                                .WithMessage($"{rule.Error}"); 
-                    break;
+                //     case "PastDateValidation":
+                //      RuleFor(x => x.EffectiveDate)
+                //                 .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
+                //                 .WithMessage($"{rule.Error}"); 
+                //     break;
                     case "NotFound":
                      RuleFor(x => x.Id )
                            .MustAsync(async (Id, cancellation) => 
                         await _preventiveSchedulerQuery.NotFoundAsync(Id))
                             .WithMessage($"{rule.Error}");
                             break;  
-                  case "WorkOrderValidate":
-                     RuleFor(x => x.Id )
-                           .MustAsync(async (Id, cancellation) => 
-                        !await _preventiveSchedulerQuery.UpdateValidation(Id))
-                            .WithMessage($"{rule.Error}");
-                            break;  
+                //   case "WorkOrderValidate":
+                //      RuleFor(x => x.Id )
+                //            .MustAsync(async (Id, cancellation) => 
+               //  //         !await _preventiveSchedulerQuery.UpdateValidation(Id))
+                //             .WithMessage($"{rule.Error}");
+                //             break;  
                   case "AlreadyExists":
                         RuleForEach(x => x.Activity)
                          .MustAsync(async (command, activityDto, context, cancellation) =>

@@ -17,7 +17,7 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
         Task<bool> CreateNextSchedulerDetailAsync(int Id);
         Task<bool> ScheduleInActive(PreventiveSchedulerHeader preventiveSchedulerHdr);
         Task<bool> DeleteDetailAsync(int id);
-        Task<bool> AddReScheduleDetailAsync(int Id, DateOnly RescheduleDate, CancellationToken cancellationToken);
+        Task<PreventiveSchedulerDetail> AddReScheduleDetailAsync(int Id, DateOnly RescheduleDate, CancellationToken cancellationToken);
         Task<PreventiveSchedulerDetail?> GetDetailByMachineActivityAndUnitAsync(string machineCode, string activityName, int unitId);
         Task<List<PreventiveSchedulerHeader>> BulkImportPreventiveHeaderAsync(List<PreventiveSchedulerHeader> preventiveSchedulerHeaders);
         Task SaveChangesAsync(CancellationToken cancellationToken);

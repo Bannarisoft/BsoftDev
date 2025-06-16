@@ -221,7 +221,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             }
             return false;
         }
-        public async Task<bool> AddReScheduleDetailAsync(int Id, DateOnly RescheduleDate, CancellationToken cancellationToken)
+        public async Task<PreventiveSchedulerDetail> AddReScheduleDetailAsync(int Id, DateOnly RescheduleDate, CancellationToken cancellationToken)
         {
             var existingPreventiveScheduler = await _applicationDbContext.PreventiveSchedulerDtl
             .Include(ps => ps.PreventiveScheduler)
@@ -242,55 +242,51 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
 
 
-                // var newScheduler = new PreventiveSchedulerDetail
-                // {
-                //     PreventiveSchedulerHeaderId = existingPreventiveScheduler.PreventiveSchedulerHeaderId,
-                //     WorkOrderCreationStartDate = RescheduleDate,
-                //     ActualWorkOrderDate = RescheduleDate,
-                //     MaterialReqStartDays = RescheduleDate,
-                //     LastMaintenanceActivityDate = existingPreventiveScheduler.LastMaintenanceActivityDate ?? null,
-                //     IsActive = Status.Active,
-                //     PreventiveScheduler = existingPreventiveScheduler.PreventiveScheduler,
-                //     MachineId = existingPreventiveScheduler.MachineId,
-                //     Machine = existingPreventiveScheduler.Machine,
-                //     FrequencyInterval = existingPreventiveScheduler.FrequencyInterval,
-                //     ScheduleId = existingPreventiveScheduler.ScheduleId,
-                //     FrequencyTypeId = existingPreventiveScheduler.FrequencyTypeId,
-                //     FrequencyUnitId = existingPreventiveScheduler.FrequencyUnitId,
-                //     GraceDays = existingPreventiveScheduler.GraceDays,
-                //     ReminderWorkOrderDays = existingPreventiveScheduler.ReminderWorkOrderDays,
-                //     ReminderMaterialReqDays = existingPreventiveScheduler.ReminderMaterialReqDays,
-                //     IsDownTimeRequired = existingPreventiveScheduler.IsDownTimeRequired
+                var newScheduler = new PreventiveSchedulerDetail
+                {
+                    PreventiveSchedulerHeaderId = existingPreventiveScheduler.PreventiveSchedulerHeaderId,
+                    WorkOrderCreationStartDate = RescheduleDate,
+                    ActualWorkOrderDate = RescheduleDate,
+                    MaterialReqStartDays = RescheduleDate,
+                    LastMaintenanceActivityDate = existingPreventiveScheduler.LastMaintenanceActivityDate ?? null,
+                    IsActive = Status.Active,
+                    PreventiveScheduler = existingPreventiveScheduler.PreventiveScheduler,
+                    MachineId = existingPreventiveScheduler.MachineId,
+                    Machine = existingPreventiveScheduler.Machine,
+                    FrequencyInterval = existingPreventiveScheduler.FrequencyInterval,
+                    ScheduleId = existingPreventiveScheduler.ScheduleId,
+                    FrequencyTypeId = existingPreventiveScheduler.FrequencyTypeId,
+                    FrequencyUnitId = existingPreventiveScheduler.FrequencyUnitId,
+                    GraceDays = existingPreventiveScheduler.GraceDays,
+                    ReminderWorkOrderDays = existingPreventiveScheduler.ReminderWorkOrderDays,
+                    ReminderMaterialReqDays = existingPreventiveScheduler.ReminderMaterialReqDays,
+                    IsDownTimeRequired = existingPreventiveScheduler.IsDownTimeRequired
 
-                // };
+                };
 
-             
+                await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(newScheduler);
+                await _applicationDbContext.SaveChangesAsync();
 
+                _backgroundServiceClient.RemoveHangFireJob(existingPreventiveScheduler.HangfireJobId);
+                var delay = newScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
+                string newJobId;
+                var delayInMinutes = (int)delay.TotalMinutes;
 
+                if (delay.TotalSeconds > 0)
+                {
+                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(newScheduler.Id, delayInMinutes);
+                }
+                else
+                {
 
-                // await _applicationDbContext.PreventiveSchedulerDtl.AddAsync(newScheduler);
-                // await _applicationDbContext.SaveChangesAsync();
-
-                // _backgroundServiceClient.RemoveHangFireJob(existingPreventiveScheduler.HangfireJobId);
-                // var delay = newScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
-                // string newJobId;
-                // var delayInMinutes = (int)delay.TotalMinutes;
-
-                // if (delay.TotalSeconds > 0)
-                // {
-                //     newJobId = await _backgroundServiceClient.ScheduleWorkOrder(newScheduler.Id, delayInMinutes);
-                // }
-                // else
-                // {
-
-                //     newJobId = await _backgroundServiceClient.ScheduleWorkOrder(newScheduler.Id, 5);
-                // }
-               
-                return true;
+                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(newScheduler.Id, 5);
+                }
+               newScheduler.HangfireJobId = newJobId;
+                return newScheduler;
             }
 
 
-            return false;
+            return existingPreventiveScheduler;
         }
 
         public async Task<PreventiveSchedulerDetail?> GetDetailByMachineActivityAndUnitAsync(string machineCode, string activityName, int unitId)

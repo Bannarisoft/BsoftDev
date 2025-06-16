@@ -198,10 +198,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return PreventiveSchedulerResponse.FirstOrDefault()!;
         }
 
-        public Task<List<PreventiveSchedulerHeader>> GetPreventiveScheduler(string searchPattern)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public async Task<List<PreventiveSchedulerDetail>> GetPreventiveSchedulerDetail(int PreventiveSchedulerId)
         {
@@ -219,7 +216,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
            )
             ";
 
-        var statuses = new List<string> { StatusOpen.Code };
+            var statuses = new List<string> { StatusOpen.Code };
             var parameters = new
             {
                 PreventiveSchedulerId = PreventiveSchedulerId,
@@ -488,7 +485,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var machines = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
             return machines.FirstOrDefault();
         }
-         public async Task<PreventiveSchedulerDetail> GetPreventiveSchedulerDetailByName(string PreventiveSchedulerName,string MachineId)
+        public async Task<PreventiveSchedulerDetail> GetPreventiveSchedulerDetailByName(string PreventiveSchedulerName, string MachineId)
         {
             var query = $@"
                 SELECT  
@@ -509,7 +506,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var parameters = new
             {
                 PreventiveSchedulerName,
-                 MachineId
+                MachineId
             };
             var result = await _dbConnection.QueryAsync<PreventiveSchedulerDetail>(query, parameters);
 
@@ -543,7 +540,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             //                 INNER JOIN [Maintenance].[MachineMaster] M ON M.Id =PSD.MachineId
             //                 INNER JOIN [Maintenance].[MachineGroup] MG ON MG.Id = PS.MachineGroupId
             //                 LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
-			// 				LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
+            // 				LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
             //                 WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PS.Id=@PreventiveScheduleId AND PS.UnitId=@UnitId 
             //                 AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL) AND PSD.IsActive=1 
             //                 ORDER BY PS.Id ASC
@@ -576,6 +573,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PSD.WorkOrderCreationStartDate,
                     PSD.ActualWorkOrderDate,
                     PSD.LastMaintenanceActivityDate,
+                    PSD.FrequencyInterval,
+                    PSD.IsActive,
                     PSA.Id,
                     PSA.PreventiveSchedulerHeaderId,
                     PSA.ActivityId,
@@ -602,9 +601,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL) AND PSD.IsActive=1 ";
             var PreventiveSchedulerDictionary = new Dictionary<int, PreventiveSchedulerHeader>();
 
-            var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader, PreventiveSchedulerDetail,PreventiveSchedulerActivity, PreventiveSchedulerItems,Core.Domain.Entities.MachineMaster,Core.Domain.Entities.MachineGroup,Core.Domain.Entities.ActivityMaster, PreventiveSchedulerHeader>(
+            var PreventiveSchedulerResponse = await _dbConnection.QueryAsync<PreventiveSchedulerHeader, PreventiveSchedulerDetail, PreventiveSchedulerActivity, PreventiveSchedulerItems, Core.Domain.Entities.MachineMaster, Core.Domain.Entities.MachineGroup, Core.Domain.Entities.ActivityMaster, PreventiveSchedulerHeader>(
                 query,
-                (preventiveScheduler, preventiveScheduleDetail,preventiveSchedulerActivity, preventiveSchedulerItems, machine, group,activity) =>
+                (preventiveScheduler, preventiveScheduleDetail, preventiveSchedulerActivity, preventiveSchedulerItems, machine, group, activity) =>
                 {
                     if (!PreventiveSchedulerDictionary.TryGetValue(preventiveScheduler.Id, out var existingPreventiveScheduler))
                     {
@@ -625,7 +624,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     if (!existingPreventiveScheduler.PreventiveSchedulerActivities!
                         .Any(a => a.Id == preventiveSchedulerActivity.Id))
                     {
-                        preventiveSchedulerActivity.Activity =activity;
+                        preventiveSchedulerActivity.Activity = activity;
                         existingPreventiveScheduler.PreventiveSchedulerActivities.Add(preventiveSchedulerActivity);
                     }
 
@@ -640,14 +639,38 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
                     return existingPreventiveScheduler;
                 },
-                new {
-                PreventiveScheduleId = Id,
-                UnitId,
-                StatusCodes = statusCodes },
+                new
+                {
+                    PreventiveScheduleId = Id,
+                    UnitId,
+                    StatusCodes = statusCodes
+                },
                 splitOn: "Id,Id,Id,MachineName,GroupName,ActivityName"
                 );
 
             return PreventiveSchedulerResponse.FirstOrDefault()!;
+        }
+         public async Task<List<Core.Domain.Entities.MachineMaster>> GetUnMappedMachineIdByCode(int Id)
+        {
+            var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status, WorkOrderHold.Code };
+
+            const string query = @"
+                       SELECT M.Id, M.MachineCode,M.MachineName  
+                       FROM [Maintenance].[MachineMaster] M
+					   INNER JOIN [Maintenance].[MachineGroup] MG ON M.MachineGroupId=MG.Id
+					   INNER JOIN [Maintenance].[PreventiveSchedulerHeader] PSH ON PSH.Id = @Id AND MG.Id=PSH.MachineGroupId
+					   LEFT JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON M.Id=PSD.MachineId AND PSD.PreventiveSchedulerHeaderId = PSH.Id
+					   LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
+					   LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
+                       WHERE M.IsDeleted = 0  AND PSD.Id IS NULL  AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)";
+
+            var parameters = new
+            {
+                Id,
+                StatusCodes = statusCodes
+            };
+            var machines = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
+            return machines.ToList();
         }
     }
 }

@@ -38,7 +38,9 @@ namespace MaintenanceManagement.Infrastructure
                 x.AddConsumer<ScheduleDetailCreateTaskConsumer>(); 
                 x.AddConsumer<ScheduleWorkOrderTaskConsumer>();             
                 x.AddConsumer<RollbackPreventiveDetailConsumer>(); 
-                x.AddConsumer<RollBackScheduleWorkOrderConsumer>();                
+                x.AddConsumer<RollBackScheduleWorkOrderConsumer>(); 
+                x.AddConsumer<Core.Application.Consumers.PreventiveScheduler.Update.ScheduleWorkOrderConsumer>(); 
+                x.AddConsumer<Core.Application.Consumers.PreventiveScheduler.Update.RollBackScheduleWorkOrderConsumer>();                
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -56,24 +58,33 @@ namespace MaintenanceManagement.Infrastructure
                     cfg.ReceiveEndpoint("rollback-workorder-queue", e =>
                     {
                         e.ConfigureConsumer<RollbackWorkOrderConsumer>(context);
-                    });   
-                     cfg.ReceiveEndpoint("schedule-detail-task-queue", e =>
-                    {
-                        e.ConfigureConsumer<ScheduleDetailCreateTaskConsumer>(context);                     
-                    });   
-                         cfg.ReceiveEndpoint("schedule-workorder-queue", e =>
-                    {
-                        e.ConfigureConsumer<ScheduleWorkOrderTaskConsumer>(context);                     
-                    });   
-                         cfg.ReceiveEndpoint("rollback-scheduleHeader-queue", e =>
-                    {
-                        e.ConfigureConsumer<RollbackPreventiveDetailConsumer>(context);                     
-                    });     
+                    });
+                    cfg.ReceiveEndpoint("schedule-detail-task-queue", e =>
+                   {
+                       e.ConfigureConsumer<ScheduleDetailCreateTaskConsumer>(context);
+                   });
+                    cfg.ReceiveEndpoint("schedule-workorder-queue", e =>
+               {
+                   e.ConfigureConsumer<ScheduleWorkOrderTaskConsumer>(context);
+               });
+                    cfg.ReceiveEndpoint("rollback-scheduleHeader-queue", e =>
+               {
+                   e.ConfigureConsumer<RollbackPreventiveDetailConsumer>(context);
+               });
 
-                         cfg.ReceiveEndpoint("rollback-ScheduleWorkOrder-queue", e =>
-                    {
-                        e.ConfigureConsumer<RollBackScheduleWorkOrderConsumer>(context);                     
-                    });               
+                    cfg.ReceiveEndpoint("rollback-ScheduleWorkOrder-queue", e =>
+               {
+                   e.ConfigureConsumer<RollBackScheduleWorkOrderConsumer>(context);
+               });
+                    cfg.ReceiveEndpoint("update-rollback-scheduleWorkOrder-queue", e =>
+                  {
+                      e.ConfigureConsumer<Core.Application.Consumers.PreventiveScheduler.Update.RollBackScheduleWorkOrderConsumer>(context);
+                  }); 
+
+                  cfg.ReceiveEndpoint("update-scheduleWorkOrder-task-queue", e =>
+               {
+                   e.ConfigureConsumer<Core.Application.Consumers.PreventiveScheduler.Update.ScheduleWorkOrderConsumer>(context);
+               });              
                 });
             });
 

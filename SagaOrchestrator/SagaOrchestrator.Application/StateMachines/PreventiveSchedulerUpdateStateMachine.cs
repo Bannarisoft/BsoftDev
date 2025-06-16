@@ -65,7 +65,7 @@ namespace SagaOrchestrator.Application.StateMachines
                 .ThenAsync(async ctx =>
                 {
                     
-                    await ctx.Send(new Uri("queue:rollback-scheduleWorkOrder-queue"), new RollBackScheduleWorkOrderCommand
+                    await ctx.Send(new Uri("queue:update-rollback-scheduleWorkOrder-queue"), new RollBackScheduleWorkOrderCommand
                     {
                         CorrelationId = ctx.Data.CorrelationId,
                         PreventiveSchedulerHeaderId = ctx.Instance.PreventiveSchedulerHeaderId,
