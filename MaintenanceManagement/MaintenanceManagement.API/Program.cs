@@ -4,8 +4,6 @@ using MaintenanceManagement.API.Configurations;
 using MaintenanceManagement.API.Validation.Common;
 using MaintenanceManagement.API.Middleware;
 using Core.Application.Common.RealTimeNotificationHub;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using MaintenanceManagement.API.GrpcServices;
 
 var builder = WebApplication.CreateBuilder(args);
