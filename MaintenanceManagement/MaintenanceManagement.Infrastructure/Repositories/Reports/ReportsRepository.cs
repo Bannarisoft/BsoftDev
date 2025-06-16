@@ -19,17 +19,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
 
     public class ReportsRepository : BaseQueryRepository, IReportRepository
     {
-
         private readonly IDbConnection _dbConnection;
         public ReportsRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
-
             : base(ipAddressService)
         {
-
             _dbConnection = dbConnection;
         }
-
-
         public async Task<List<RequestReportDto>> MaintenanceReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? requestType, int? requestStatus, int? departmentId)
          {
             var parameters = new DynamicParameters();

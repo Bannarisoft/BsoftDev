@@ -20,3 +20,5 @@
 /BackgroundService/BackgroundService.Infrastructure/obj
 /Shared/Shared.Infrastructure/obj
 /Shared/Shared.Infrastructure/bin
+
+.fake

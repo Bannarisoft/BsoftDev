@@ -327,7 +327,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 AW.ServiceClaimStatus AS ServiceClaimStatusId,AW.ServiceCountryId,AW.ServiceStateId,AW.ServiceCityId 
                 FROM [FixedAsset].[AssetWarranty] AW
                 INNER JOIN [FixedAsset].[MiscMaster] MMWaranty ON MMWaranty.Id=AW.WarrantyType
-                INNER JOIN [FixedAsset].[MiscMaster] MMClaim ON MMClaim.Id=AW.ServiceClaimStatus
+                LEFT JOIN [FixedAsset].[MiscMaster] MMClaim ON MMClaim.Id=AW.ServiceClaimStatus
                 INNER JOIN [Bannari].[AppData].[Country] C ON C.Id=AW.ServiceCountryId
                 INNER JOIN [Bannari].[AppData].[State] S ON S.Id=AW.ServiceStateId
                 INNER JOIN [Bannari].[AppData].[City] City ON City.Id=AW.ServiceCityId
@@ -348,10 +348,11 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 INNER JOIN [FixedAsset].[MiscMaster] MMDisposal ON MMDisposal.Id=AD.DisposalType
                 WHERE AD.AssetId=@AssetId  and AD.IsDeleted=0
 
-                SELECT Id, PolicyNo,CAST(StartDate AS DATE) AS StartDate,CAST(EndDate AS DATE) AS EndDate,InsurancePeriod,PolicyAmount,
-                VendorCode,RenewalStatus,CAST(RenewedDate AS DATE) AS RenewedDate,IsActive
-                FROM [FixedAsset].[AssetInsurance]
-                WHERE AssetId=@AssetId and IsDeleted=0
+                SELECT AI.Id, PolicyNo,CAST(StartDate AS DATE) AS StartDate,CAST(EndDate AS DATE) AS EndDate,Insuranceperiod,PolicyAmount,
+                VendorCode,MM.Code RenewalStatus,CAST(RenewedDate AS DATE) AS RenewedDate,AI.IsActive
+                FROM [FixedAsset].[AssetInsurance] AI
+                INNER JOIN [FixedAsset].[MiscMaster] MM ON MM.Id=AI.RenewalStatus
+                WHERE AssetId=@AssetId and  AI.IsDeleted=0
 
                 SELECT AC.Id,AssetSourceId,Amount,JournalNo,CostType,MM.Code CostTypeDesc
                 FROM [FixedAsset].[AssetAdditionalCost]AC

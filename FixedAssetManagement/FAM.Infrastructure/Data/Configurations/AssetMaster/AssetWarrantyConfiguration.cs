@@ -93,7 +93,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
 
                 builder.Property(dg => dg.ServiceAddressLine1)
                 .HasColumnType("varchar(250)")   
-                .IsRequired();             
+                .IsRequired(false);             
 
                  builder.Property(dg => dg.ServiceAddressLine2)
                 .HasColumnType("varchar(250)");                
@@ -103,7 +103,7 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
 
                 builder.Property(dg => dg.ServiceContactPerson)
                 .HasColumnType("varchar(50)")
-                .IsRequired();                
+                .IsRequired(false);                
 
                  builder.Property(dg => dg.ServiceMobileNumber)
                 .HasColumnType("varchar(10)")
