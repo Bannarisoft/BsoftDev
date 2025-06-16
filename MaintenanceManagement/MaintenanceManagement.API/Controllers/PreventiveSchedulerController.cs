@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventive;
 using Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.DeletePreventiveScheduler;
+using Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpdate;
+using Core.Application.PreventiveSchedulers.Commands.MapMachine;
 using Core.Application.PreventiveSchedulers.Commands.RescheduleBulkImport;
 using Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive;
 using Core.Application.PreventiveSchedulers.Commands.ScheduleWorkOrder;
@@ -14,6 +16,7 @@ using Core.Application.PreventiveSchedulers.Queries.GetMachineDetailById;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerById;
 using Core.Application.PreventiveSchedulers.Queries.GetSchedulerByDate;
+using Core.Application.PreventiveSchedulers.Queries.GetUnMappedMachine;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -317,13 +320,49 @@ namespace MaintenanceManagement.API.Controllers
             var result = await Mediator.Send(command);
             return Ok(result);
         }
-            [HttpGet("MachineDetailBySchedule")]
+        [HttpGet("MachineDetailBySchedule")]
         public async Task<IActionResult> GetMachineDetail([FromQuery] int Id)
         {
             var response = await Mediator.Send(new GetMachineDetailByIdQuery
-             {
-                 Id = Id
-             });
+            {
+                Id = Id
+            });
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = response.Data
+            });
+        }
+        [HttpGet("UnMappedMachines")]
+        public async Task<IActionResult> GetUnMappedMachines([FromQuery] int Id)
+        {
+            var response = await Mediator.Send(new GetUnMappedMachineQuery
+            {
+                Id = Id
+            });
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = response.Data
+            });
+        }
+        [HttpPost("MapMachines")]
+        public async Task<IActionResult> MapMachines(MapMachineCommand command)
+        {
+            var response = await Mediator.Send(command);
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = response.Data
+            });
+        }
+          [HttpPost("MachineFrequencyUpdate")]
+        public async Task<IActionResult> MachineFrequencyUpdate(MachineWiseFrequencyUpdateCommand command)
+        {
+            var response = await Mediator.Send(command);
 
             return Ok(new
             {

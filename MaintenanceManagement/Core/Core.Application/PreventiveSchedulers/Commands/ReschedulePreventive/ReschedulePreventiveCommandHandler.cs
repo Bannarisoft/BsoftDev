@@ -29,47 +29,48 @@ namespace Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive
         public async Task<ApiResponseDTO<bool>> Handle(ReshedulePreventiveCommand request, CancellationToken cancellationToken)
         {
             var result = await _preventiveSchedulerQuery.ExistWorkOrderBySchedulerDetailId(request.PreventiveScheduleDetailId);
-            bool  DetailResult;
+
             if (result == true)
             {
-                 await AuditLogPublisher.PublishAuditLogAsync(
-                     _mediator,
-                     actionDetail: $"Reschedule Update DueDate",
-                     actionCode: "Update DueDate",
-                     actionName: "Update DueDate",
-                     module: "Preventive",
-                     requestData: request,
-                     cancellationToken
-                    );
-                 DetailResult = await _preventiveSchedulerCommand.UpdateRescheduleDate(request.PreventiveScheduleDetailId, request.RescheduleDate);
+                await AuditLogPublisher.PublishAuditLogAsync(
+                    _mediator,
+                    actionDetail: $"Reschedule Update DueDate",
+                    actionCode: "Update DueDate",
+                    actionName: "Update DueDate",
+                    module: "Preventive",
+                    requestData: request,
+                    cancellationToken
+                   );
+                var DetailResult = await _preventiveSchedulerCommand.UpdateRescheduleDate(request.PreventiveScheduleDetailId, request.RescheduleDate);
             }
             else
             {
-                 await AuditLogPublisher.PublishAuditLogAsync(
-                     _mediator,
-                     actionDetail: $"Reschedule",
-                     actionCode: "Reschedule",
-                     actionName: "Reschedule",
-                     module: "Preventive",
-                     requestData: request,
-                     cancellationToken
-                    );
-                 DetailResult = await _preventiveSchedulerCommand.AddReScheduleDetailAsync(request.PreventiveScheduleDetailId, request.RescheduleDate,cancellationToken);
+                await AuditLogPublisher.PublishAuditLogAsync(
+                    _mediator,
+                    actionDetail: $"Reschedule",
+                    actionCode: "Reschedule",
+                    actionName: "Reschedule",
+                    module: "Preventive",
+                    requestData: request,
+                    cancellationToken
+                   );
+                var Result = await _preventiveSchedulerCommand.AddReScheduleDetailAsync(request.PreventiveScheduleDetailId, request.RescheduleDate, cancellationToken);
+
+                if (Result != null)
+                {
+                    await _preventiveSchedulerCommand.UpdateDetailAsync(Result.Id, Result.HangfireJobId);
+                }
+                 
             }
 
-            if (DetailResult)
-            {
+          
                 return new ApiResponseDTO<bool>()
                 {
                     IsSuccess = true,
                     Message = "Preventive Scheduler Rescheduled successfully."
                 };
-            }
-            return new ApiResponseDTO<bool>()
-            {
-                    IsSuccess = false,    
-                    Message = "Preventive Scheduler Reschedule failed."
-            };
+            
+            
         }
     }
 }
