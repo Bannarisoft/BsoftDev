@@ -40,6 +40,10 @@ namespace Core.Domain.Entities
         public ICollection<Feeder>? Feeders { get; set; }
         public ICollection<PowerConsumption>? FeedersPower { get; set; }
 
+        public ICollection<PreventiveSchedulerDetail>? PreventiveDetailSchedule { get; set; }
+        public ICollection<PreventiveSchedulerDetail>? PreventiveDetailFrequencyType { get; set; }
+        public ICollection<PreventiveSchedulerDetail>? PreventiveDetailFrequencyUnit { get; set; }
+
 
 
         

@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Dtos.Maintenance.Preventive;
 using Core.Application.Common.Interfaces;
 using Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventive;
 using Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Commands.DeletePreventiveScheduler;
+using Core.Application.PreventiveSchedulers.Commands.MapMachine;
 using Core.Application.PreventiveSchedulers.Commands.RescheduleBulkImport;
 using Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveScheduler;
 using Core.Application.PreventiveSchedulers.Queries.GetMachineDetailById;
 using Core.Application.PreventiveSchedulers.Queries.GetPreventiveSchedulerById;
+using Core.Application.PreventiveSchedulers.Queries.GetUnMappedMachine;
 using Core.Domain.Entities;
 using Core.Domain.Entities.WorkOrderMaster;
 using static Core.Domain.Common.BaseEntity;
@@ -133,7 +136,27 @@ namespace Core.Application.Common.Mappings
 
             CreateMap<PreventiveSchedulerDetail, MachineDetailBySchedulerIdDto>()
             .ForMember(dest => dest.MachineCode, opt => opt.MapFrom(src => src.Machine.MachineCode))
-            .ForMember(dest => dest.MachineName, opt => opt.MapFrom(src => src.Machine.MachineName));
+            .ForMember(dest => dest.MachineName, opt => opt.MapFrom(src => src.Machine.MachineName))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0));
+
+            CreateMap<PreventiveSchedulerHeader, RollbackHeaderDto>()
+            .ForMember(dest => dest.rollbackActivities, opt => opt.MapFrom(src => src.PreventiveSchedulerActivities))
+           .ForMember(dest => dest.rollbackItems, opt => opt.MapFrom(src => src.PreventiveSchedulerItems));
+
+            CreateMap<PreventiveSchedulerActivity, RollbackActivityDto>();
+            CreateMap<PreventiveSchedulerItems, RollbackItemsDto>();
+
+            CreateMap<RollbackHeaderDto, PreventiveSchedulerHeader>()
+          .ForMember(dest => dest.PreventiveSchedulerActivities, opt => opt.MapFrom(src => src.rollbackActivities))
+         .ForMember(dest => dest.PreventiveSchedulerItems, opt => opt.MapFrom(src => src.rollbackItems));
+
+            CreateMap<RollbackActivityDto, PreventiveSchedulerActivity>();
+            CreateMap<RollbackItemsDto, PreventiveSchedulerItems>();
+            CreateMap<Core.Domain.Entities.MachineMaster, UnMappedMachineDto>();
+
+            CreateMap<MapPreventiveScheduleDetailDto, PreventiveSchedulerDetail>()
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
         }
     }
 }

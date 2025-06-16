@@ -44,7 +44,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
         {
             var Scheduledetail = await _preventiveSchedulerQuery.GetByIdAsync(request.Id);
             Scheduledetail.Id = 0;
-            Scheduledetail.EffectiveDate = DateOnly.FromDateTime(DateTime.Now);
+            Scheduledetail.EffectiveDate = DateOnly.FromDateTime(DateTime.Today);
 
             
             foreach (var activity in Scheduledetail.PreventiveSchedulerActivities ?? new List<PreventiveSchedulerActivity>())

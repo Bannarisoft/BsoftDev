@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Dtos.Maintenance.Preventive;
+using Contracts.Events.Maintenance.PreventiveScheduler.PreventiveSchedulerUpdate;
 using Contracts.Interfaces.External.IMaintenance;
 using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
@@ -25,37 +27,70 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
         private readonly IPreventiveSchedulerCommand _preventiveSchedulerCommand;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
+        
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IWorkOrderCommandRepository _workOrderRepository;
         private readonly IIPAddressService _ipAddressService;
         private readonly ITimeZoneService _timeZoneService;
-        private readonly IBackgroundServiceClient  _backgroundServiceClient;
+        
+        private readonly IEventPublisher _eventPublisher;
         public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator,
-        IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderCommandRepository workOrderRepository,
-        IIPAddressService ipAddressService, ITimeZoneService timeZoneService,IBackgroundServiceClient backgroundServiceClient)
+         IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderCommandRepository workOrderRepository,
+        IIPAddressService ipAddressService, ITimeZoneService timeZoneService,  IEventPublisher eventPublisher)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
             _mediator = mediator;
-            _miscMasterQueryRepository = miscMasterQueryRepository;
+            
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _workOrderRepository = workOrderRepository;
             _ipAddressService = ipAddressService;
             _timeZoneService = timeZoneService;
-            _backgroundServiceClient = backgroundServiceClient;
+            
+            _eventPublisher = eventPublisher;
         }
         public async Task<ApiResponseDTO<bool>> Handle(UpdatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
         {
            
             var preventiveScheduler  = _mapper.Map<PreventiveSchedulerHeader>(request);
 
-              var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(request.FrequencyUnitId);
-                
-                
-                var DetailResult = await _preventiveSchedulerQuery.GetPreventiveSchedulerDetail(request.Id);
-                
-                  await AuditLogPublisher.PublishAuditLogAsync(
+            var existingPreventiveScheduler = await _preventiveSchedulerQuery.GetByIdAsync(request.Id);
+
+            var rollbackHeader = _mapper.Map<RollbackHeaderDto>(existingPreventiveScheduler);
+            
+            bool isFrequencyChanged =
+            request.FrequencyInterval != existingPreventiveScheduler.FrequencyInterval ||
+            request.FrequencyTypeId != existingPreventiveScheduler.FrequencyTypeId ||
+            request.FrequencyUnitId != existingPreventiveScheduler.FrequencyUnitId;
+
+            var metaDataResponse = await _preventiveSchedulerCommand.UpdateScheduleMetadata(preventiveScheduler);
+
+            if (metaDataResponse != null && metaDataResponse.Id > 0)
+            {
+                if (isFrequencyChanged)
+                {
+
+                var UnitId = _ipAddressService.GetUnitId();
+               
+                    var correlationId = Guid.NewGuid();
+                    var @event = new HeaderUpdateEvent
+                    {
+                        CorrelationId = correlationId,
+                        PreventiveSchedulerHeaderId = metaDataResponse.Id,
+                        UnitId = UnitId,
+                        FrequencyUnitId = metaDataResponse.FrequencyUnitId,
+                        FrequencyInterval = metaDataResponse.FrequencyInterval,
+                        ReminderWorkOrderDays = metaDataResponse.ReminderWorkOrderDays,
+                        ReminderMaterialReqDays = metaDataResponse.ReminderMaterialReqDays,
+                        rollbackHeaders = rollbackHeader
+                    };
+
+                    await _eventPublisher.SaveEventAsync(@event);
+                    await _eventPublisher.PublishPendingEventsAsync();
+                }
+            }
+
+              await AuditLogPublisher.PublishAuditLogAsync(
                      _mediator,
                      actionDetail: $"Schedule Update request",
                      actionCode: "Schedule Update",
@@ -64,105 +99,9 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
                      requestData: request,
                      cancellationToken
                     );
-                 foreach (var detail in DetailResult)
-            {
-
-                var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderWorkOrderDays);
-                var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.EffectiveDate.ToDateTime(TimeOnly.MinValue), request.FrequencyInterval, frequencyUnit.Code ?? "", request.ReminderMaterialReqDays);
-
-                detail.PreventiveSchedulerHeaderId = request.Id;
-                detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
-                detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
-                detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
-                detail.IsActive = preventiveScheduler.IsActive;
-
-                if (!string.IsNullOrEmpty(detail.HangfireJobId))
-                {
-                    _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId);
-                }
-
-
-            }
-                 preventiveScheduler.PreventiveSchedulerDetails = DetailResult;
-
-                  await AuditLogPublisher.PublishAuditLogAsync(
-                     _mediator,
-                     actionDetail: $"Schedule Update DetailResult",
-                     actionCode: "Schedule Update",
-                     actionName: "Schedule Update",
-                     module: "Preventive",
-                     requestData: DetailResult,
-                     cancellationToken
-                    );
-         
-                var response  = await _preventiveSchedulerCommand.UpdateAsync(preventiveScheduler);
-                var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode,StatusOpen.Code);
-
-                foreach (var detail in response.PreventiveSchedulerDetails)
-                {
-                    //   var workorderDocno =await _workOrderQueryRepository.GetLatestWorkOrderDocNo(preventiveScheduler.MaintenanceCategoryId);
-                        var workOrderRequest =  _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(preventiveScheduler, opt =>
-                        {
-                            opt.Items["StatusId"] = miscdetail.Id;
-                            // opt.Items["WorkOrderDocNo"] = workorderDocno;
-                            opt.Items["PreventiveSchedulerDetailId"] = detail.Id;
-                        });
-               
-                       string currentIp = _ipAddressService.GetSystemIPAddress();
-                     int userId = _ipAddressService.GetUserId(); 
-                     string username = _ipAddressService.GetUserName();
-                     var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
-                     var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
-                     
-                     workOrderRequest.CreatedIP = currentIp;
-                     workOrderRequest.CreatedDate = currentTime;
-                     workOrderRequest.CreatedBy = userId;
-                     workOrderRequest.CreatedByName = username;
                  
-                       var delay = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
-
-                         string newJobId;
-                         var delayInMinutes = (int)delay.TotalMinutes;
-                        if (delay.TotalSeconds > 0)
-                        {
-                            
-                            // newJobId =  BackgroundJob.Schedule(() => 
-                            // _workOrderRepository.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId, cancellationToken),
-                            //  delay);
-                            newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(detail.Id,delayInMinutes);
-                        }
-                        else
-                        {
-                            
-                            // newJobId =  BackgroundJob.Schedule(() => 
-                            // _workOrderRepository.CreateAsync(workOrderRequest,preventiveScheduler.MaintenanceCategoryId, cancellationToken),
-                            //  TimeSpan.FromMinutes(15));
-                            newJobId =  await _backgroundServiceClient.ScheduleWorkOrder(detail.Id,5);
-                        }
-                        
-                         await AuditLogPublisher.PublishAuditLogAsync(
-                     _mediator,
-                     actionDetail: $"Schedule work order delayInMinutes: {delayInMinutes} newJobId:{newJobId}",
-                     actionCode: "Schedule Update",
-                     actionName: "Schedule Update",
-                     module: "Preventive",
-                     requestData: detail,
-                     cancellationToken
-                    );
-                        await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id, newJobId);
-                }
-
-                
-                    // var domainEvent = new AuditLogsDomainEvent(
-                    //     actionDetail: "Update",
-                    //     actionCode: "update",
-                    //     actionName: "Update Preventive Scheduler",
-                    //     details: $"Update Preventive Scheduler",
-                    //     module:"Preventive Scheduler"
-                    // );               
-                    // await _mediator.Publish(domainEvent, cancellationToken); 
               
-                if(response.Id > 0)
+                if(metaDataResponse.Id > 0)
                 {
                     return new ApiResponseDTO<bool>
                     {

@@ -47,6 +47,11 @@ namespace SagaOrchestrator.Application.StateMachines
                         context.Instance.ReminderWorkOrderDays = context.Data.ReminderWorkOrderDays;
                         context.Instance.ReminderMaterialReqDays = context.Data.ReminderMaterialReqDays;
                         context.Instance.UnitId = context.Data.UnitId;
+                        context.Instance.ScheduleId = context.Data.ScheduleId;
+                        context.Instance.FrequencyTypeId = context.Data.FrequencyTypeId;
+                        context.Instance.GraceDays = context.Data.GraceDays;
+                        context.Instance.IsDownTimeRequired = context.Data.IsDownTimeRequired;
+                        context.Instance.DownTimeEstimateHrs = context.Data.DownTimeEstimateHrs;
                     })
                     .Send(new Uri("queue:schedule-detail-task-queue"), context => new CreateShedulerDetailsCommand
                     {
@@ -58,7 +63,12 @@ namespace SagaOrchestrator.Application.StateMachines
                         FrequencyInterval = context.Data.FrequencyInterval,
                         ReminderWorkOrderDays = context.Data.ReminderWorkOrderDays,
                         ReminderMaterialReqDays = context.Data.ReminderMaterialReqDays,
-                        UnitId = context.Data.UnitId
+                        UnitId = context.Data.UnitId,
+                        ScheduleId = context.Data.ScheduleId,
+                        FrequencyTypeId = context.Data.FrequencyTypeId,
+                        GraceDays = context.Data.GraceDays,
+                        IsDownTimeRequired = context.Data.IsDownTimeRequired,
+                        DownTimeEstimateHrs = context.Data.DownTimeEstimateHrs
                     })
                     .TransitionTo(CreatingPreventiveSchedulerDetail)
 

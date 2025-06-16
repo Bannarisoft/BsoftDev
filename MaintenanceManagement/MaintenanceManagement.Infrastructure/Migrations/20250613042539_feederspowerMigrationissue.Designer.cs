@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250613042539_feederspowerMigrationissue")]
+    partial class feederspowerMigrationissue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1202,25 +1205,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<decimal>("DownTimeEstimateHrs")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("FrequencyInterval")
-                        .HasColumnType("int")
-                        .HasColumnName("FrequencyInterval");
-
-                    b.Property<int?>("FrequencyTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("FrequencyTypeId");
-
-                    b.Property<int?>("FrequencyUnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("FrequencyUnitId");
-
-                    b.Property<int>("GraceDays")
-                        .HasColumnType("int")
-                        .HasColumnName("GraceDays");
-
                     b.Property<string>("HangfireJobId")
                         .HasColumnType("nvarchar(max)");
 
@@ -1231,10 +1215,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
-
-                    b.Property<bool>("IsDownTimeRequired")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsDownTimeRequired");
 
                     b.Property<DateOnly?>("LastMaintenanceActivityDate")
                         .HasColumnType("date")
@@ -1264,21 +1244,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("PreventiveSchedulerHeaderId");
 
-                    b.Property<int>("ReminderMaterialReqDays")
-                        .HasColumnType("int")
-                        .HasColumnName("ReminderMaterialReqDays");
-
-                    b.Property<int>("ReminderWorkOrderDays")
-                        .HasColumnType("int")
-                        .HasColumnName("ReminderWorkOrderDays");
-
                     b.Property<string>("RescheduleReason")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("RescheduleReason");
-
-                    b.Property<int?>("ScheduleId")
-                        .HasColumnType("int")
-                        .HasColumnName("ScheduleId");
 
                     b.Property<DateOnly>("WorkOrderCreationStartDate")
                         .HasColumnType("date")
@@ -1286,15 +1254,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FrequencyTypeId");
-
-                    b.HasIndex("FrequencyUnitId");
-
                     b.HasIndex("MachineId");
 
                     b.HasIndex("PreventiveSchedulerHeaderId");
-
-                    b.HasIndex("ScheduleId");
 
                     b.ToTable("PreventiveSchedulerDetail", "Maintenance");
                 });
@@ -2271,16 +2233,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerDetail", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscFrequencyType")
-                        .WithMany("PreventiveDetailFrequencyType")
-                        .HasForeignKey("FrequencyTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscFrequencyUnit")
-                        .WithMany("PreventiveDetailFrequencyUnit")
-                        .HasForeignKey("FrequencyUnitId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Core.Domain.Entities.MachineMaster", "Machine")
                         .WithMany("PreventiveSchedulerDetail")
                         .HasForeignKey("MachineId")
@@ -2293,18 +2245,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscSchedule")
-                        .WithMany("PreventiveDetailSchedule")
-                        .HasForeignKey("ScheduleId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Machine");
-
-                    b.Navigation("MiscFrequencyType");
-
-                    b.Navigation("MiscFrequencyUnit");
-
-                    b.Navigation("MiscSchedule");
 
                     b.Navigation("PreventiveScheduler");
                 });
@@ -2563,12 +2504,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("MaintenanceType");
 
                     b.Navigation("ModeOfDispatchType");
-
-                    b.Navigation("PreventiveDetailFrequencyType");
-
-                    b.Navigation("PreventiveDetailFrequencyUnit");
-
-                    b.Navigation("PreventiveDetailSchedule");
 
                     b.Navigation("RequestStatus");
 
