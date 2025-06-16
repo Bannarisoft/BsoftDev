@@ -790,7 +790,6 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ServiceAddressLine1")
-                        .IsRequired()
                         .HasColumnType("varchar(250)");
 
                     b.Property<string>("ServiceAddressLine2")
@@ -806,7 +805,6 @@ namespace FAM.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ServiceContactPerson")
-                        .IsRequired()
                         .HasColumnType("varchar(50)");
 
                     b.Property<int>("ServiceCountryId")

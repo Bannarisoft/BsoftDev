@@ -1,0 +1,9 @@
+namespace Core.Application.Dashboard.Common
+{
+    public class ChartDto
+    {
+        public string? Name { get; set; } 
+        public List<string>? Categories { get; set; }
+        public List<ChartSeriesDto>? Series { get; set; }
+    }
+}

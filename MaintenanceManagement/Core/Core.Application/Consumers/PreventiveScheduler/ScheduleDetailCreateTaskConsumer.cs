@@ -58,6 +58,15 @@ namespace Core.Application.Consumers.PreventiveScheduler
                          detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate); 
                          detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
                          detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
+                         detail.ScheduleId = context.Message.ScheduleId;
+                         detail.FrequencyTypeId = context.Message.FrequencyTypeId;
+                         detail.FrequencyInterval = context.Message.FrequencyInterval;
+                         detail.FrequencyUnitId = context.Message.FrequencyUnitId;
+                         detail.GraceDays = context.Message.GraceDays;
+                         detail.ReminderWorkOrderDays = context.Message.ReminderWorkOrderDays;
+                         detail.ReminderMaterialReqDays = context.Message.ReminderMaterialReqDays;
+                         detail.IsDownTimeRequired = context.Message.IsDownTimeRequired;
+                         detail.DownTimeEstimateHrs = context.Message.DownTimeEstimateHrs;
 
                              var detailsResponse = await _nextScheduleService.CreateDetailAsync(detail);
                         // list.Add(detail);
