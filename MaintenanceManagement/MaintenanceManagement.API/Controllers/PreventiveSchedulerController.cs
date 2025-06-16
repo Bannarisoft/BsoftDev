@@ -356,7 +356,7 @@ namespace MaintenanceManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data = response.Data
+                message = response.Message
             });
         }
           [HttpPost("MachineFrequencyUpdate")]
@@ -367,7 +367,7 @@ namespace MaintenanceManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data = response.Data
+                message = response.Message
             });
         }
     }
