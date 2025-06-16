@@ -27,22 +27,23 @@ namespace MaintenanceManagement.API.Controllers
         }
         [HttpGet("current-stock")]
         [ActionName(nameof(GetSubStoresCurrentStock))]
-        public async Task<IActionResult> GetSubStoresCurrentStock([FromQuery] string oldUnitcode, [FromQuery] string itemcode)
+        public async Task<IActionResult> GetSubStoresCurrentStock([FromQuery] string oldUnitcode, [FromQuery] string itemcode, [FromQuery] int departmentId)
         {
             // Manual null/empty check for mandatory parameters
-            if (string.IsNullOrWhiteSpace(oldUnitcode) || string.IsNullOrWhiteSpace(itemcode))
+            if (string.IsNullOrWhiteSpace(oldUnitcode) || string.IsNullOrWhiteSpace(itemcode) || departmentId == 0)
             {
                 return BadRequest(new
                 {
                     statusCode = StatusCodes.Status400BadRequest,
-                    message = "Both 'oldUnitcode' and 'itemcode' query parameters are required."
+                    message = "Both 'oldUnitcode' and 'itemcode' and 'departmentId' query parameters are required."
                 });
             }
 
             var stock = await _mediator.Send(new GetCurrentStockQuery
             {
                 OldUnitId = oldUnitcode,
-                ItemCode = itemcode
+                ItemCode = itemcode,
+                DepartmentId = departmentId
             });
 
             if (stock.IsSuccess && stock.Data != null)
@@ -62,11 +63,11 @@ namespace MaintenanceManagement.API.Controllers
             });
         }
 
-         [HttpGet("item-codes/{oldUnitCode}")]
+         [HttpGet("item-codes/{oldUnitCode}/{departmentId}")]
         [ActionName(nameof(GetStockItemCodesAsync))]
-        public async Task<IActionResult> GetStockItemCodesAsync(string oldUnitCode)
+        public async Task<IActionResult> GetStockItemCodesAsync(string oldUnitCode, int departmentId)
         {
-            var result = await Mediator.Send(new GetCurrentStockItemsByIdQuery { OldUnitcode = oldUnitCode });
+            var result = await Mediator.Send(new GetCurrentStockItemsByIdQuery { OldUnitcode = oldUnitCode, DepartmentId = departmentId });
 
             if (result.IsSuccess)
             {
