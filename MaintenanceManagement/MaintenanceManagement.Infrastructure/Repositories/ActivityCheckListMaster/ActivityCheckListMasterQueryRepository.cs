@@ -10,23 +10,23 @@ using Dapper;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMaster
 {
-    public class ActivityCheckListMasterQueryRepository  : IActivityCheckListMasterQueryRepository
+    public class ActivityCheckListMasterQueryRepository : IActivityCheckListMasterQueryRepository
     {
-      private readonly IDbConnection _dbConnection;
+        private readonly IDbConnection _dbConnection;
 
 
-      public  ActivityCheckListMasterQueryRepository(IDbConnection dbConnection)
-      {
-       
-           _dbConnection = dbConnection;
-          
-      }
+        public ActivityCheckListMasterQueryRepository(IDbConnection dbConnection)
+        {
 
-   
+            _dbConnection = dbConnection;
+
+        }
+
+
 
         public async Task<(List<GetAllActivityCheckListMasterDto>, int)> GetAllActivityCheckListMasterAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-                var query = $$"""
+            var query = $$"""
                     DECLARE @TotalCount INT;
                     SELECT @TotalCount = COUNT(DISTINCT aclm.Id)
                     FROM Maintenance.Maintenance.ActivityCheckListMaster aclm
@@ -61,22 +61,22 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                     SELECT @TotalCount AS TotalCount;
                 """;
 
-                var parameters = new
-                {
-                    Search = $"%{SearchTerm}%",
-                    Offset = (PageNumber - 1) * PageSize,
-                    PageSize
-                };
+            var parameters = new
+            {
+                Search = $"%{SearchTerm}%",
+                Offset = (PageNumber - 1) * PageSize,
+                PageSize
+            };
 
-                var result = await _dbConnection.QueryMultipleAsync(query, parameters);
-                var checkListMasters = (await result.ReadAsync<GetAllActivityCheckListMasterDto>()).ToList();
-                int totalCount = await result.ReadFirstAsync<int>();
+            var result = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var checkListMasters = (await result.ReadAsync<GetAllActivityCheckListMasterDto>()).ToList();
+            int totalCount = await result.ReadFirstAsync<int>();
 
-                return (checkListMasters, totalCount);
-         }
+            return (checkListMasters, totalCount);
+        }
 
-         public async Task<GetAllActivityCheckListMasterDto> GetByIdAsync(int id)
-        {            
+        public async Task<GetAllActivityCheckListMasterDto> GetByIdAsync(int id)
+        {
             const string query = @"
                 SELECT 
                     aclm.Id AS ChecklistId,
@@ -97,45 +97,45 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                 INNER JOIN Maintenance.ActivityMaster am 
                     ON aclm.ActivityID = am.Id
                 WHERE aclm.Id = @id AND aclm.IsDeleted = 0";
-                                
+
             return await _dbConnection.QueryFirstOrDefaultAsync<GetAllActivityCheckListMasterDto>(query, new { id });
         }
 
 
-          public async Task<bool> GetByActivityCheckListAsync(string activityCheckList ,int activityId)
+        public async Task<bool> GetByActivityCheckListAsync(string activityCheckList, int activityId)
         {
             var query = """
             SELECT COUNT(1) FROM Maintenance.ActivityCheckListMaster
             WHERE ActivityCheckList = @activityCheckList AND ActivityID = @activityId  AND IsDeleted = 0 
             """;
 
-            var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { ActivityCheckList = activityCheckList ,ActivityID= activityId });
+            var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { ActivityCheckList = activityCheckList, ActivityID = activityId });
 
             return result > 0;
         }
-          
-              public async Task<bool> AlreadyExistsCheckListAsync(string activityCheckList , int activityId, int? id = null)
-        {   
 
-              var query = "SELECT COUNT(1) FROM Maintenance.ActivityCheckListMaster WHERE ActivityCheckList = @activityCheckList AND ActivityID = @activityId AND IsDeleted = 0";
-                var parameters = new DynamicParameters(new { ActivityCheckList = activityCheckList ,ActivityID=activityId });
+        public async Task<bool> AlreadyExistsCheckListAsync(string activityCheckList, int activityId, int? id = null)
+        {
 
-             if (id is not null)
-             {
-                 query += " AND Id != @Id";
-                 parameters.Add("Id", id);
-             }
-                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
-                return count > 0;
-        }            
-            public async Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdsAsync(List<int> ids, int? workOrderId = null)
+            var query = "SELECT COUNT(1) FROM Maintenance.ActivityCheckListMaster WHERE ActivityCheckList = @activityCheckList AND ActivityID = @activityId AND IsDeleted = 0";
+            var parameters = new DynamicParameters(new { ActivityCheckList = activityCheckList, ActivityID = activityId });
+
+            if (id is not null)
             {
-                if (ids == null || !ids.Any())
-                {
-                    return new List<GetActivityCheckListByActivityIdDto>();
-                }
+                query += " AND Id != @Id";
+                parameters.Add("Id", id);
+            }
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+            return count > 0;
+        }
+        public async Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdsAsync(List<int> ids, int? workOrderId = null)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return new List<GetActivityCheckListByActivityIdDto>();
+            }
 
-                const string query = @"
+            const string query = @"
                     SELECT 
                         aclm.Id AS ChecklistId,
                         aclm.ActivityID,
@@ -163,15 +163,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                         aclm.IsDeleted, aclm.CreatedBy, aclm.CreatedDate, aclm.CreatedByName, aclm.CreatedIP,
                         aclm.ModifiedBy, aclm.ModifiedDate, aclm.ModifiedByName, aclm.ModifiedIP";
 
-                var parameters = new
-                {
-                    Ids = ids,
-                    WorkOrderId = workOrderId
-                };
+            var parameters = new
+            {
+                Ids = ids,
+                WorkOrderId = workOrderId
+            };
 
-                var result = await _dbConnection.QueryAsync<GetActivityCheckListByActivityIdDto>(query, parameters);
-                return result.ToList();
-            }
+            var result = await _dbConnection.QueryAsync<GetActivityCheckListByActivityIdDto>(query, parameters);
+            return result.ToList();
+        }
+            
+            
 
         //    public async Task<List<GetActivityCheckListByActivityIdDto>> GetCheckListByActivityIdsAsync(List<int> ids)
         //     {
@@ -205,6 +207,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
         //     }
 
 
-        
+
     }
 }

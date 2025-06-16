@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroup
 {
-    public class GetDepreciationGroupQueryHandler : IRequestHandler<GetDepreciationGroupQuery, ApiResponseDTO<List<DepreciationGroupDTO>>>
+    public class GetDepreciationGroupQueryHandler : IRequestHandler<GetDepreciationGroupQuery, (List<DepreciationGroupDTO>, int)>
     {
         private readonly IDepreciationGroupQueryRepository _depreciationGroupRepository;
         private readonly IMapper _mapper;
@@ -17,8 +17,8 @@ namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroup
             _depreciationGroupRepository = depreciationGroupRepository;
             _mapper = mapper;
             _mediator = mediator;
-        }
-        public async Task<ApiResponseDTO<List<DepreciationGroupDTO>>> Handle(GetDepreciationGroupQuery request, CancellationToken cancellationToken)
+        }        
+        public async Task<(List<DepreciationGroupDTO>, int)> Handle(GetDepreciationGroupQuery request, CancellationToken cancellationToken)
         {
             var (depreciationGroup, totalCount) = await _depreciationGroupRepository.GetAllDepreciationGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var depreciationGroupList = _mapper.Map<List<DepreciationGroupDTO>>(depreciationGroup);
@@ -32,15 +32,7 @@ namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroup
                 module:"DepreciationGroup"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<DepreciationGroupDTO>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = depreciationGroupList,
-                TotalCount = totalCount,
-                PageNumber = request.PageNumber,
-                PageSize = request.PageSize
-            };            
+           return (depreciationGroupList, totalCount);
         }
     }
 }

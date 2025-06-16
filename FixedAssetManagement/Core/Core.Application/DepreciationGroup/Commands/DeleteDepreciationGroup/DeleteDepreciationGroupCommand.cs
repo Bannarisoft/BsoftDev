@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Commands.DeleteDepreciationGroup
 {
-    public class DeleteDepreciationGroupCommand :  IRequest<ApiResponseDTO<DepreciationGroupDTO>>  
+    public class DeleteDepreciationGroupCommand :  IRequest<DepreciationGroupDTO>
     {
           public int Id { get; set; }         
     }

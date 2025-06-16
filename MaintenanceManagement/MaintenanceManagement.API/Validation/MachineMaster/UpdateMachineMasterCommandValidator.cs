@@ -98,12 +98,13 @@ namespace MaintenanceManagement.API.Validation.MachineMaster
                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
                             .WithMessage($"{nameof(UpdateMachineMasterCommand.MachineName)} {rule.Error}");
                         break;
-                     case "AlreadyExists":
+                    case "AlreadyExists":
                         RuleFor(x => x.MachineName)
-                            .MustAsync(async (x, MachineName, cancellation) => 
-                                !await _iMachineMasterCommandRepository.IsNameDuplicateAsync(MachineName, x.Id))
+                            .MustAsync(async (model, machineName, cancellation) =>
+                                !await _iMachineMasterCommandRepository
+                                    .IsNameDuplicateAsync(machineName, model.MachineGroupId, model.Id))
                             .WithName("MachineName")
-                            .WithMessage($"{rule.Error}");
+                            .WithMessage("MachineName with the same name already exists in this Machinegroup.");
                             
                         RuleFor(x => x.MachineCode)
                             .MustAsync(async (x, machineCode, cancellation) =>

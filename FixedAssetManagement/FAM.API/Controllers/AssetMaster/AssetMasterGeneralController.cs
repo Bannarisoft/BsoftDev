@@ -13,6 +13,8 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGene
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralAutoComplete;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetParentMaster;
+using Core.Application.Common.Exceptions;
+using Core.Application.Common.HttpResponse;
 using Core.Application.DepreciationGroup.Queries.GetAssetTypeQuery;
 using Core.Application.DepreciationGroup.Queries.GetWorkingStatusQuery;
 using Core.Application.ExcelImport;
@@ -137,52 +139,23 @@ namespace FAM.API.Controllers.AssetMaster
                 data = result.Data
 
             });
-        }
-        // POST: api/AssetMasterGeneral
-
+        }        
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateAssetMasterGeneralCommand command)
-
         {
-            var validationResult = await _createAssetMasterGeneralCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-
-            }
+            var validationResult = await _createAssetMasterGeneralCommandValidator.ValidateAsync(command);            
+            if (!validationResult.IsValid)                                            
+                throw new ExceptionRules(string.Join(" | ", validationResult.Errors.Select(e => e.ErrorMessage)) ?? "Validation failed" );
             
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
+            return StatusCode(StatusCodes.Status201Created, new ApiResponseDTO<AssetMasterDto>
             {
-
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status201Created,
-
-                    message = result.Message,
-                    data = result.Data
-                });
-
-            }
-            else
-
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = result.Message
-                });
-
-            }
+                StatusCode = StatusCodes.Status201Created,
+                IsSuccess = true,
+                Message = "AssetMasterGeneral created successfully.",
+                Data = result
+            });
         }
-        // PUT: api/AssetMasterGeneral
-
         [HttpPut]
         public async Task<IActionResult> UpdateAsync(UpdateAssetMasterGeneralCommand command)
 
@@ -216,45 +189,22 @@ namespace FAM.API.Controllers.AssetMaster
                 message = result.Message
             });
         }
-
-        // DELETE: api/AssetMasterGeneral/5
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
-
         {       
             var command = new DeleteAssetMasterGeneralCommand { Id = id };
             var validationResult = await  _deleteAssetMasterGeneralCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
-                {
-                    return BadRequest(new
-                    {
-                        message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
-                        statusCode = StatusCodes.Status400BadRequest
-                    });
-                }
-           var deleteCompany = await Mediator.Send(command);
-
-            if(deleteCompany.IsSuccess)
             {
-
-                return Ok(new 
-                {
-
-                    StatusCode=StatusCodes.Status200OK,
-                    message = deleteCompany.Message,
-                    errors = ""
-                });
-
-            }
-
-            
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest, 
-                message = deleteCompany.Message, 
-                errors = "" 
-            });
+            var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new ExceptionRules(string.Join(" | ", validationResult.Errors.Select(e => e.ErrorMessage)) ?? "Validation failed" );
+            }               
+            var result = await Mediator.Send(command);
+            return Ok(new 
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = $"AssetMasterGeneral ID {id} deleted successfully."
+            });         
         }
 
         // GET: api/AssetMasterGeneral/by-name?name=...

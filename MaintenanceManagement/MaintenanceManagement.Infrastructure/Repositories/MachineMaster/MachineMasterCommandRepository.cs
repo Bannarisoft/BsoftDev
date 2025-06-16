@@ -54,10 +54,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
              return await _applicationDbContext.MachineMaster.AnyAsync(c => c.MachineCode == MachineCode);
         }
 
-        public async Task<bool> IsNameDuplicateAsync(string? name, int excludeId)
+        public async Task<bool> IsNameDuplicateAsync(string? name,int machineGroupId, int excludeId)
         {
-            return await _applicationDbContext.MachineMaster
-                .AnyAsync(cc => cc.MachineName == name && cc.Id != excludeId);
+             return await _applicationDbContext.MachineMaster
+                .AnyAsync(cc =>
+                    cc.MachineName == name &&
+                    cc.MachineGroupId == machineGroupId &&
+                    cc.Id != excludeId);
         }
         public async Task<bool> IsCodeDuplicateAsync(string? code, int excludeId)
         {

@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationDetail.Commands.CreateDepreciationDetail
 {
-    public class CreateDepreciationDetailCommand  : IRequest<ApiResponseDTO<string>>  
+    public class CreateDepreciationDetailCommand  : IRequest<string> 
     {
         public int companyId { get; set; } 
         public int unitId { get; set; } 

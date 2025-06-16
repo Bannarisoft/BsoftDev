@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Queries.GetBookTypeQuery
 {
-    public class GetBookTypeQueryHandler : IRequestHandler<GetBookTypeQuery, ApiResponseDTO<List<GetMiscMasterDto>>>
+    public class GetBookTypeQueryHandler : IRequestHandler<GetBookTypeQuery, List<GetMiscMasterDto>>
     {
         private readonly IDepreciationGroupQueryRepository _repository;
         private readonly IMapper _mapper;
@@ -17,18 +17,11 @@ namespace Core.Application.DepreciationGroup.Queries.GetBookTypeQuery
             _mapper = mapper;
         }
 
-        public async Task<ApiResponseDTO<List<GetMiscMasterDto>>> Handle(GetBookTypeQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetMiscMasterDto>> Handle(GetBookTypeQuery request, CancellationToken cancellationToken)
         {
             var bookTypes = await _repository.GetBookTypeAsync();
-            var bookTypeDtoList = _mapper.Map<List<GetMiscMasterDto>>(bookTypes);
-
-            return new ApiResponseDTO<List<GetMiscMasterDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = bookTypeDtoList,
-                TotalCount = bookTypeDtoList.Count
-            };
+            var bookTypeDtoList = _mapper.Map<List<GetMiscMasterDto>>(bookTypes);           
+            return bookTypeDtoList;
         }
     }
 }
