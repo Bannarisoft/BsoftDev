@@ -32,15 +32,16 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
             var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(DetailResult.FrequencyUnitId ?? 0);
             if (request.IsActive == 1)
             {
-                var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((DetailResult.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue),
+                var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.LastMaintenanceActivityDate.ToDateTime(TimeOnly.MinValue),
                                 request.FrequencyInterval, frequencyUnit.Code ?? "", DetailResult.ReminderWorkOrderDays);
-                var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((DetailResult.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue),
+                var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.LastMaintenanceActivityDate.ToDateTime(TimeOnly.MinValue),
                          request.FrequencyInterval, frequencyUnit.Code ?? "", DetailResult.ReminderMaterialReqDays);
 
 
 
                 DetailResult.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
                 DetailResult.FrequencyInterval = request.FrequencyInterval;
+                DetailResult.LastMaintenanceActivityDate = request.LastMaintenanceActivityDate;
 
 
                 var result = await _preventiveSchedulerQuery.ExistWorkOrderBySchedulerDetailId(DetailResult.Id);
@@ -89,7 +90,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
              return new ApiResponseDTO<bool>
              {
                  IsSuccess = true, 
-                 Message = "Preventive frequency updated successfully"
+                 Message = "Preventive updated successfully"
              };
         }
     }

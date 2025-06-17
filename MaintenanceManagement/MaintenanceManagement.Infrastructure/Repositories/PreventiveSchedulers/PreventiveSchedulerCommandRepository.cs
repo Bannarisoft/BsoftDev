@@ -377,6 +377,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 existingPreventiveScheduler.FrequencyInterval = preventiveSchedulerDetail.FrequencyInterval;
                 existingPreventiveScheduler.IsActive = preventiveSchedulerDetail.IsActive;
                 existingPreventiveScheduler.HangfireJobId = preventiveSchedulerDetail.HangfireJobId;
+                existingPreventiveScheduler.LastMaintenanceActivityDate = preventiveSchedulerDetail.LastMaintenanceActivityDate;
             
             await _applicationDbContext.SaveChangesAsync();
            

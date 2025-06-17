@@ -22,6 +22,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.MapMachine
         public int ReminderMaterialReqDays { get; set; }
         public byte IsDownTimeRequired { get; set; }
         public decimal DownTimeEstimateHrs { get; set; }
+        public DateOnly LastMaintenanceActivityDate { get; set; }
 
        
     }
