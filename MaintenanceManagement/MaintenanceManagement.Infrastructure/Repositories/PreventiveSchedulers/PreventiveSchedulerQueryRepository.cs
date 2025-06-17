@@ -235,6 +235,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return count > 0;
         }
 
+          public async Task<bool> NotFoundDetailAsync(int id)
+        {
+            var query = "SELECT COUNT(1) FROM [Maintenance].[PreventiveSchedulerDetail] WHERE Id = @Id AND IsDeleted = 0";
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+            return count > 0;
+        }
+
         public Task<bool> SoftDeleteValidation(int Id)
         {
             throw new NotImplementedException();

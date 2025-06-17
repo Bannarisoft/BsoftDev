@@ -33,8 +33,8 @@ namespace Core.Application.PreventiveSchedulers.Commands.MapMachine
             var PreventiveSchedule = await _preventiveSchedulerQuery.GetByIdAsync(request.Id);
             var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(PreventiveSchedule.FrequencyUnitId);
 
-            var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(DateOnly.FromDateTime(DateTime.Today).ToDateTime(TimeOnly.MinValue), PreventiveSchedule.FrequencyInterval, frequencyUnit.Code ?? "", PreventiveSchedule.ReminderWorkOrderDays);
-            var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(DateOnly.FromDateTime(DateTime.Today).ToDateTime(TimeOnly.MinValue), PreventiveSchedule.FrequencyInterval, frequencyUnit.Code ?? "", PreventiveSchedule.ReminderMaterialReqDays);
+            var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.LastMaintenanceActivityDate.ToDateTime(TimeOnly.MinValue), PreventiveSchedule.FrequencyInterval, frequencyUnit.Code ?? "", PreventiveSchedule.ReminderWorkOrderDays);
+            var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate(request.LastMaintenanceActivityDate.ToDateTime(TimeOnly.MinValue), PreventiveSchedule.FrequencyInterval, frequencyUnit.Code ?? "", PreventiveSchedule.ReminderMaterialReqDays);
 
             var dto = new MapPreventiveScheduleDetailDto
             {
@@ -51,7 +51,8 @@ namespace Core.Application.PreventiveSchedulers.Commands.MapMachine
                 ReminderWorkOrderDays = PreventiveSchedule.ReminderWorkOrderDays,
                 ReminderMaterialReqDays = PreventiveSchedule.ReminderMaterialReqDays,
                 IsDownTimeRequired = PreventiveSchedule.IsDownTimeRequired,
-                DownTimeEstimateHrs = PreventiveSchedule.DownTimeEstimateHrs
+                DownTimeEstimateHrs = PreventiveSchedule.DownTimeEstimateHrs,
+                LastMaintenanceActivityDate = request.LastMaintenanceActivityDate
             };
             var preventiveScheduler = _mapper.Map<PreventiveSchedulerDetail>(dto);
             var Preventiveresult = await _preventiveSchedulerCommand.CreateDetailAsync(preventiveScheduler);
