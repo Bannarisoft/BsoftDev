@@ -12,5 +12,6 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
         public int Id { get; set; }
         public int FrequencyInterval { get; set; }
         public byte IsActive { get; set; }
+        public DateOnly LastMaintenanceActivityDate { get; set; }
     }
 }
