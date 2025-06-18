@@ -2,6 +2,7 @@ using AutoMapper;
 using Core.Application.Common.Exceptions;
 using Core.Application.Common.Interfaces.IDepreciationGroup;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationGroup;
+using Core.Domain.Common;
 using Core.Domain.Entities;
 using Core.Domain.Events;
 using MediatR;
@@ -27,8 +28,16 @@ namespace Core.Application.DepreciationGroup.Commands.CreateDepreciationGroup
             if (await _depreciationGroupRepository.ExistsByCodeAsync(request.Code ?? string.Empty))
              throw new EntityAlreadyExistsException("DepreciationGroup", "Code", request.Code ?? "");
 
-            if (!await _depreciationGroupRepository.ExistsByAssetGroupIdAsync(request.AssetGroupId))
-             throw new EntityNotFoundException("AssetGroup", request.AssetGroupId);
+            var isDuplicate = await _depreciationGroupRepository.CheckForDuplicatesAsync(
+            request.AssetGroupId, request.DepreciationMethod, request.BookType, 0);
+
+            if (isDuplicate != null)
+            {
+                if (isDuplicate.IsActive == BaseEntity.Status.Active)
+                    throw new EntityAlreadyExistsException("DepreciationGroup", "Combination", "Already exists.");
+                else
+                    throw new EntityAlreadyExistsException("DepreciationGroup", "Combination", "Already exists but status is inactive.");
+            }
 
             var depreciationGroupEntity = _mapper.Map<DepreciationGroups>(request);            
             var result = await _depreciationGroupRepository.CreateAsync(depreciationGroupEntity);

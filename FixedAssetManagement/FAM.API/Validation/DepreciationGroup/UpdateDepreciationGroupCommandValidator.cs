@@ -80,7 +80,7 @@ namespace FAM.API.Validation.DepreciationGroup
                             return !await _applicationDbContext.DepreciationGroups.AnyAsync(x =>
                                 x.AssetGroupId == command.AssetGroupId &&
                                 x.DepreciationMethod == command.DepreciationMethod &&
-                                x.BookType == command.BookType &&  x.UsefulLife == command.UsefulLife && x.ResidualValue == command.ResidualValue &&
+                                x.BookType == command.BookType && x.IsDeleted==IsDelete.NotDeleted &&
                                 x.IsActive == Status.Active && x.Id != command.Id, token);
                         })
                         .WithMessage(rule.Error);

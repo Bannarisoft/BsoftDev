@@ -106,8 +106,12 @@ namespace FAM.API.Controllers
             var validationResult = await _updateDepreciationGroupCommandValidator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                throw new ExceptionRules("Validation failed.") { HelpLink = string.Join(", ", errors) };
+               return BadRequest(new  ApiResponseDTO<object>
+                {
+                    IsSuccess = false,
+                    Message = "Validation failed",
+                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                });
             }     
             var result = await Mediator.Send(command);
             return Ok(new ApiResponseDTO<string>
