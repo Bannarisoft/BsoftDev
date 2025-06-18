@@ -51,7 +51,7 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
         }
         public async Task<bool> ExistsByCodeAsync(string code)
         {
-            return await _applicationDbContext.DepreciationGroups.AnyAsync(c => c.Code == code);
+            return await _applicationDbContext.DepreciationGroups.AnyAsync(c => c.Code == code && c.IsDeleted == BaseEntity.IsDelete.NotDeleted);
         }
         public async Task<bool> ExistsByAssetGroupIdAsync(int assetGroupId)
         {
@@ -62,21 +62,18 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
         {
             return await _applicationDbContext.DepreciationGroups.MaxAsync(ac => (int?)ac.SortOrder) ?? -1;
         }       
-       public async Task<bool> CheckForDuplicatesAsync(
-        int groupId, int depMethodId, int bookTypeId, BaseEntity.Status isActive,
-        string code, string name, int excludeId)
-        {
-            var isDuplicate = await _applicationDbContext.DepreciationGroups
-                .AnyAsync(ag =>
-                    ag.AssetGroupId == groupId &&
-                    ag.DepreciationMethod == depMethodId &&
-                    ag.BookType == bookTypeId &&
-                    ag.IsActive == isActive &&
-                    ag.Id != excludeId &&
-                    (ag.DepreciationGroupName == name || ag.Code == code)
-                );
 
-            return isDuplicate;
+       public async Task<DepreciationGroups> CheckForDuplicatesAsync(
+        int groupId, int depMethodId, int bookTypeId,int excludeId)
+        {
+           return await _applicationDbContext.DepreciationGroups
+            .FirstOrDefaultAsync(ag =>
+            ag.AssetGroupId == groupId &&
+            ag.DepreciationMethod == depMethodId &&
+            ag.BookType == bookTypeId &&
+            ag.IsDeleted == BaseEntity.IsDelete.NotDeleted &&
+            ag.Id != excludeId
+        );
         }
     }
 }

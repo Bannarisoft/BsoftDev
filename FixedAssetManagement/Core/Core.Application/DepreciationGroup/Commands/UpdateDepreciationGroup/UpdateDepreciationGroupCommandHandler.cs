@@ -35,17 +35,15 @@ namespace Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup
             var isDuplicate = await _depreciationGroupRepository.CheckForDuplicatesAsync(
                 request.AssetGroupId,
                 request.DepreciationMethod,
-                request.BookType,
-                request.IsActive,
-                request.Code,
-                request.DepreciationGroupName,
+                request.BookType,                                           
                 request.Id);
 
-            if (isDuplicate)
+             if (isDuplicate != null)
             {
-                var message = "A DepreciationGroup with the same Name or Code already exists " +
-                            $"under the same AssetGroup, Method, and BookType.";
-                throw new EntityAlreadyExistsException("DepreciationGroup", "DuplicateCheck", message);
+                if (isDuplicate.IsActive == BaseEntity.Status.Active)
+                    throw new EntityAlreadyExistsException("DepreciationGroup", "Combination", "Already exists.");
+                else
+                    throw new EntityAlreadyExistsException("DepreciationGroup", "Combination", "Already exists but status is inactive.");
             }
             
             var oldDepreciationName = depreciationGroups.DepreciationGroupName;            

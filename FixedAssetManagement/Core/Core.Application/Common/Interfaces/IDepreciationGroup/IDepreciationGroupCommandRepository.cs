@@ -13,6 +13,6 @@ namespace Core.Application.Common.Interfaces.IDepreciationGroup
         Task<bool> ExistsByAssetGroupIdAsync(int assetGroupId); // ✅ New method           
         Task<bool> ExistsByCodeAsync(string code );
         Task<int> GetMaxSortOrderAsync();        
-        Task<bool> CheckForDuplicatesAsync(int groupId, int depMethodId,int bookTypeId,BaseEntity.Status isActive,string Code,string name,int excludeId);        
+        Task<DepreciationGroups> CheckForDuplicatesAsync(int groupId, int depMethodId,int bookTypeId,int excludeId);        
     }
 }
