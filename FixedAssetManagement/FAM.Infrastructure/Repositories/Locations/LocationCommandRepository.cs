@@ -51,7 +51,6 @@ namespace FAM.Infrastructure.Repositories.Locations
         public async Task<int> GetMaxSortOrderAsync()
         {
             return await _applicationDbContext.Locations.MaxAsync(ac => (int?)ac.SortOrder) ?? -1;
-
         }
 
         public async Task<bool> UpdateAsync(Location location)

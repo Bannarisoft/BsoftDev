@@ -15,17 +15,31 @@ namespace MaintenanceManagement.API.Controllers.Dashboard
             _mediator = mediator;
         }
 
-        [HttpGet("workOrder-summary")]
-        public async Task<IActionResult> GetWorkOrderSummary([FromQuery] DateTime fromDate, [FromQuery] DateTime toDate, [FromQuery] string type)
+        [HttpGet("workorder-summary")]
+        public async Task<IActionResult> GetWorkOrderSummary([FromQuery] DashboardQuery request)
         {
-            var query = new DashboardQuery
-            {
-                FromDate = fromDate,
-                ToDate = toDate,
-                Type = type
-            };
-            var result = await _mediator.Send(query);
-            return Ok(result);
+            request.Type = "workordersummary";
+            var data = await _mediator.Send(request);
+            return Ok(data);
+        }
+
+        [HttpGet("item-consumption")]
+        public async Task<IActionResult> GetItemConsumption([FromQuery] DashboardQuery request)
+        {
+            request.Type = "itemconsumption";           
+            var data = await _mediator.Send(request);
+            return Ok(data);
+        }
+
+        [HttpGet("maintenance-hours")]
+        public async Task<IActionResult> GetMaintenanceHours([FromQuery] DashboardQuery request)
+        {
+            request.Type = request.MachineGroupId != null ? "maintenancehrs-machine" :
+                        request.DepartmentId != null ? "maintenancehrs-machinegroup" :
+                        "maintenancehrs-dept";
+
+            var data = await _mediator.Send(request);
+            return Ok(data);
         }
     }
 

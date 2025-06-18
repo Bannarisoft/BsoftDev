@@ -6,9 +6,9 @@ namespace Core.Application.Common.Interfaces.IDashboard
 {
     public interface IDashboardQueryRepository
     {
-        Task<List<ChartDto>> WorkOrderDepartmentSummaryAsync(DateTime fromDate, DateTime toDate, string type);
-        Task<List<ChartDto>> WorkOrderMachineGroupSummaryAsync(DateTime fromDate, DateTime toDate, string type);
-        Task<List<ChartDto>> ItemConsumptionMachineGroupSummaryAsync(DateTime fromDate, DateTime toDate, string type);
-        Task<List<ChartDto>> ItemConsumptionDepartmentSummaryAsync(DateTime fromDate, DateTime toDate, string type); 
+        Task<ChartDto> WorkOrderSummaryAsync(DateTime fromDate, DateTime toDate, string? departmentId=null, string? machineGroupId=null);        
+        Task<ChartDto> ItemConsumptionSummaryAsync(DateTime fromDate, DateTime toDate,string? departmentId=null, string? machineGroupId = null);           
+        Task<ChartDto> MaintenanceHoursAsync(DateTime fromDate, DateTime toDate,string type, string? departmentId = null, string? machineGroupId = null);
+
     }
 }
