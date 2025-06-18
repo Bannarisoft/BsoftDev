@@ -47,9 +47,9 @@
 
         public class ValidationRule
         {
-            public string Pattern { get; set; }
-            public string Rule { get; set; }
-            public string Error { get; set; }
-            public List<string> allowedExtensions { get; set; }
+            public string? Pattern { get; set; }
+            public string? Rule { get; set; }
+            public string? Error { get; set; }
+            public List<string>? allowedExtensions { get; set; }
         }
     }

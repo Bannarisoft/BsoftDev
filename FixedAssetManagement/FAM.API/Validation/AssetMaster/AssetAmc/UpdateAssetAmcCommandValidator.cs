@@ -6,6 +6,7 @@ using Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
 using FAM.API.Validation.Common;
 using FluentValidation;
+using Serilog;
 
 namespace FAM.API.Validation.AssetMaster.AssetAmc
 {
@@ -59,11 +60,6 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
                          RuleFor(x => x.RenewalStatus)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateAssetAmcCommand.RenewalStatus)} {rule.Error}");
-                         RuleFor(x => x.IsActive)
-                            .NotNull()
-                            .WithMessage($"{nameof(UpdateAssetAmcCommand.IsActive)} {rule.Error}")
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateAssetAmcCommand.IsActive)} {rule.Error}");  
                         break;
                      case "MaxLength":
                         RuleFor(x => x.Period.ToString())
@@ -112,7 +108,7 @@ namespace FAM.API.Validation.AssetMaster.AssetAmc
                             break;
                         default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information("Warning: Unknown rule '{Rule}' encountered.", rule.Rule);
                         break;
                 }
             }

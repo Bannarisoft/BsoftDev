@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.StockLedger.Queries.GetCurrentStock
 {
-    public class CurrentStockDto 
+    public class CurrentStockDto
     {
         public string? OldUnitId { get; set; }
 
@@ -18,6 +18,8 @@ namespace Core.Application.StockLedger.Queries.GetCurrentStock
         public decimal StockQty { get; set; }
         public decimal StockValue { get; set; }
         public decimal Rate { get; set; }
+        public int DepartmentId { get; set; }
+        public string? DepartmentName { get; set; }
 
     }
 }

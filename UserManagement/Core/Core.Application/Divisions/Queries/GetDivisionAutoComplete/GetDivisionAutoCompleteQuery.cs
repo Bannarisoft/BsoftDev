@@ -12,7 +12,7 @@ namespace Core.Application.Divisions.Queries.GetDivisionAutoComplete
     public class GetDivisionAutoCompleteQuery : IRequest<ApiResponseDTO<List<DivisionAutoCompleteDTO>>>
     {
         
-        public string SearchPattern { get; set; }
-        public string Companies { get; set; }
+        public string? SearchPattern { get; set; }
+        public string? Companies { get; set; }
     }
 }

@@ -54,10 +54,16 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                     CorrelationId = correlationId,
                     PreventiveSchedulerHeaderId = response,
                     MachineGroupId = preventiveScheduler.MachineGroupId,
+                    ScheduleId = preventiveScheduler.ScheduleId,
+                    FrequencyTypeId = preventiveScheduler.FrequencyTypeId,
                     FrequencyUnitId = preventiveScheduler.FrequencyUnitId,
+                    GraceDays = preventiveScheduler.GraceDays,
+                    ReminderWorkOrderDays = preventiveScheduler.ReminderWorkOrderDays,
+                    ReminderMaterialReqDays = preventiveScheduler.ReminderMaterialReqDays,
+                    IsDownTimeRequired = preventiveScheduler.IsDownTimeRequired,
+                    DownTimeEstimateHrs = preventiveScheduler.DownTimeEstimateHrs,
                     EffectiveDate = preventiveScheduler.EffectiveDate,
                     FrequencyInterval = preventiveScheduler.FrequencyInterval,
-                    ReminderWorkOrderDays = preventiveScheduler.ReminderWorkOrderDays,
                     UnitId =UnitId
                 };
                 // Save and publish event (RabbitMQ/Saga)
@@ -75,14 +81,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                      cancellationToken
                     );
                
-                //     var domainEvent = new AuditLogsDomainEvent(
-                //      actionDetail: "Create",
-                //      actionCode: "Create preventive scheduler",
-                //      actionName: "Create",
-                //      details: $"Preventive scheduler created",
-                //      module:"Preventive scheduler"
-                //  );
-                //  await _mediator.Publish(domainEvent, cancellationToken);
+              
                  
                     return new ApiResponseDTO<int>
                     {

@@ -32,6 +32,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.FeederGroup
             {
                 existingFeederGroup.FeederGroupCode = feederGroup.FeederGroupCode;
                 existingFeederGroup.FeederGroupName = feederGroup.FeederGroupName;
+                existingFeederGroup.UnitId = feederGroup.UnitId;
                 existingFeederGroup.IsActive = feederGroup.IsActive;
                 _dbContext.FeederGroup.Update(existingFeederGroup);
                 return await _dbContext.SaveChangesAsync() > 0;

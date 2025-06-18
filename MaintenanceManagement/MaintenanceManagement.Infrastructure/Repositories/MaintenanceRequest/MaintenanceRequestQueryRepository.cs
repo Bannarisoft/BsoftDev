@@ -14,6 +14,7 @@ using Core.Domain.Common;
 using Core.Domain.Entities;
 using Dapper;
 using MaintenanceManagement.Infrastructure.Services;
+using Serilog;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
 {
@@ -416,7 +417,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
 
                 if (!vendorDetailsList.Any())
                 {
-                    Console.WriteLine("No data returned from stored procedure!");
+                    Log.Information("No data returned from stored procedure!");
                 }
 
                     return vendorDetailsList?.ToList() ?? new List<Core.Domain.Entities.ExistingVendorDetails>();

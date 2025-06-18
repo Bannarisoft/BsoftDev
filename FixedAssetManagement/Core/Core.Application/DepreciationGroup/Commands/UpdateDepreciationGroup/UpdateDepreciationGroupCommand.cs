@@ -5,7 +5,7 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup
 {
-    public class UpdateDepreciationGroupCommand : IRequest<ApiResponseDTO<bool>> 
+    public class UpdateDepreciationGroupCommand : IRequest<bool>
     {
         public int Id { get; set; }       
         public string? Code { get; set; }

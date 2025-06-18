@@ -13,6 +13,8 @@ namespace Core.Domain.Entities.Power
 
         public string? FeederGroupName { get; set; }
 
+        public int  UnitId { get; set; }
+
         public ICollection<Feeder>? Feeders { get; set; }
         
         

@@ -10,8 +10,8 @@ namespace Core.Application.EntityLevelAdmin.Commands.ResetPassword
     public class ResetPasswordCommand : IRequest<ApiResponseDTO<bool>>
     {
         public int UserId { get; set; }
-        public string VerificationCode { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public string? VerificationCode { get; set; }
+        public string? Email { get; set; }
+        public string? Password { get; set; }
     }
 }

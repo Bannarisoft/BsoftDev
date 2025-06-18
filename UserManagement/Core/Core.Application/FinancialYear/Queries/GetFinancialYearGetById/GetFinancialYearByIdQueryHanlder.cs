@@ -47,7 +47,7 @@ namespace Core.Application.FinancialYear.Queries.GetFinancialYearGetById
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetById",
                     actionCode: "Getfinancialyear",        
-                    actionName: financialyearDto.StartYear,                
+                    actionName: "Getfinancialyear",                
                     details: $"FinancialYear '{financialyearDto.StartYear}' was created. FinancialYearCode: {financialyearDto.Id}",
                     module:"FinancialYear"
                 );

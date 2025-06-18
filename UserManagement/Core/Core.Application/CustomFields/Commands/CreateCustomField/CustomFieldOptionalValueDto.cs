@@ -7,6 +7,6 @@ namespace Core.Application.CustomFields.Commands.CreateCustomField
 {
     public class CustomFieldOptionalValueDto
     {
-        public string OptionFieldValue { get; set; }
+        public string? OptionFieldValue { get; set; }
     }
 }

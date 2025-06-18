@@ -154,10 +154,7 @@ namespace MaintenanceManagement.Infrastructure
             })
             .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
-
             services.AddScoped<IDepartmentAllGrpcClient, DepartmentAllGrpcClient>();
-
-
             return services;
         }
     }

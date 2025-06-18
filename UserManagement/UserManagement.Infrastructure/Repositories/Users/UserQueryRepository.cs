@@ -68,6 +68,15 @@ namespace UserManagement.Infrastructure.Repositories.Users
                                 ur.EmailId,
                                 ur.IsFirstTimeUser,
                                 ur.IsDeleted,UG.Id AS UserGroupId
+                                ,ur.createdAt, 
+                                ur.createdBy,
+                                ur.CreatedByName,
+                                ur.createdIp,
+                                ur.ModifiedAt,
+                                ur.ModifiedBy,
+                                ur.ModifiedByName,
+                                ur.ModifiedIp
+
                 FROM AppSecurity.Users ur
                 left join AppSecurity.UserGroup UG on UG.Id=ur.UserGroupId and UG.IsActive=1
                 LEFT JOIN [AppSecurity].[UserUnit] UU ON UU.UserId=ur.UserId AND UU.IsActive=1
@@ -285,7 +294,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
           public async Task<User?> GetByUserByUnit(int UserId,int UnitId)
           {
             const string query = @"
-                SELECT U.UserId, U.UserName,U.Mobile,U.EmailId,U.IsFirstTimeUser,U.EntityId,U.UserGroupId
+                SELECT U.UserId, U.UserName,U.Mobile,U.EmailId,U.IsFirstTimeUser,U.EntityId,U.UserGroupId,FirstName,LastName
                 FROM AppSecurity.Users U
                 Inner join [AppSecurity].[UserUnit] UU on UU.UserId = U.UserId
                 Inner join [AppData].[Unit] U1 on U1.Id = UU.UnitId

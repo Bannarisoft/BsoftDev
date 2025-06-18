@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Core.Application.Reports.MRS;
 using Core.Application.Reports.ScheduleReport;
 using Core.Application.Reports.MaterialPlanningReport;
+using Core.Application.Reports.PowerConsumption;
 
 namespace MaintenanceManagement.API.Controllers.Reports
 {
@@ -97,13 +98,13 @@ namespace MaintenanceManagement.API.Controllers.Reports
                 parsedToDate = toParsed;
             }
 
-           
+
 
             var workOrder = await Mediator.Send(new WorkOrderIssueQuery
             {
                 IssueFrom = parsedFromDate,
                 IssueTo = parsedToDate
-               
+
             });
 
             return Ok(new
@@ -120,7 +121,9 @@ namespace MaintenanceManagement.API.Controllers.Reports
             [FromQuery] string oldUnitcode,
             [FromQuery] DateTime fromDate,
             [FromQuery] DateTime toDate,
-            [FromQuery] string? itemcode = null)
+            [FromQuery] int DepartmentId,
+            [FromQuery] string? itemcode = null
+            )
         {
             // Manual validation
             if (string.IsNullOrWhiteSpace(oldUnitcode))
@@ -150,7 +153,7 @@ namespace MaintenanceManagement.API.Controllers.Reports
                 });
             }
 
-            var result = await Mediator.Send(new GetStockLegerReportQuery { OldUnitcode = oldUnitcode, FromDate = fromDate, ToDate = toDate, ItemCode = itemcode });
+            var result = await Mediator.Send(new GetStockLegerReportQuery { OldUnitcode = oldUnitcode, FromDate = fromDate, ToDate = toDate, ItemCode = itemcode, DepartmentId = DepartmentId });
 
             if (result.IsSuccess && result.Data != null)
             {
@@ -176,11 +179,11 @@ namespace MaintenanceManagement.API.Controllers.Reports
             int fyStartYear2 = date2.Month >= 4 ? date2.Year : date2.Year - 1;
             return fyStartYear1 == fyStartYear2;
         }
-        [HttpGet("CurrentStock/{oldUnitCode}")]
+        [HttpGet("CurrentStock/{oldUnitCode}/{departmentId}")]
         [ActionName(nameof(GetAllStockItemDetails))]
-        public async Task<IActionResult> GetAllStockItemDetails(string oldUnitCode)
+        public async Task<IActionResult> GetAllStockItemDetails(string oldUnitCode,int departmentId)
         {
-            var result = await Mediator.Send(new GetCurrentAllStockItemsQuery { OldUnitcode = oldUnitCode });
+            var result = await Mediator.Send(new GetCurrentAllStockItemsQuery { OldUnitcode = oldUnitCode, DepartmentId = departmentId });
 
             if (result.IsSuccess)
             {
@@ -236,61 +239,61 @@ namespace MaintenanceManagement.API.Controllers.Reports
         //         Data = result?.Data?.ToList()
         //     });
         // }
-                [HttpGet("RequestReport")]
-            public async Task<IActionResult> MaintenanceReportAsync(
-                [FromQuery] DateTimeOffset? requestFromDate,
-                [FromQuery] DateTimeOffset? requestToDate,
-                [FromQuery] int? RequestType,
-                [FromQuery] int? requestStatus,
-                [FromQuery] int? departmentId)
+        [HttpGet("RequestReport")]
+        public async Task<IActionResult> MaintenanceReportAsync(
+        [FromQuery] DateTimeOffset? requestFromDate,
+        [FromQuery] DateTimeOffset? requestToDate,
+        [FromQuery] int? RequestType,
+        [FromQuery] int? requestStatus,
+        [FromQuery] int? departmentId)
+        {
+            var query = new RequestReportQuery
             {
-                var query = new RequestReportQuery
-                {
-                    RequestFromDate = requestFromDate,
-                    RequestToDate = requestToDate,
-                    RequestType = RequestType,
-                    RequestStatus = requestStatus,
-                    DepartmentId = departmentId
-                };
+                RequestFromDate = requestFromDate,
+                RequestToDate = requestToDate,
+                RequestType = RequestType,
+                RequestStatus = requestStatus,
+                DepartmentId = departmentId
+            };
 
-                var result = await Mediator.Send(query);
+            var result = await Mediator.Send(query);
 
-                // Always return 200 OK, even if IsSuccess is false
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = result.Message,
-                    Data = result.Data ?? new List<RequestReportDto>()
-                   
-                });
-            }
-            [HttpGet("WorkOrderChecklistReport")]
-            public async Task<IActionResult> WorkOrderChecklistReportAsync(
-                [FromQuery] DateTimeOffset? WorkOrderFromDate,
-                [FromQuery] DateTimeOffset? WorkOrderToDate,
-                [FromQuery] int? MachineGroupId,
-                [FromQuery] int? machineId,
-                [FromQuery] int? ActivityId)
+            // Always return 200 OK, even if IsSuccess is false
+            return Ok(new
             {
-                var query = new WorkOderCheckListReportQuery
-                {
-                    WorkOrderFromDate = WorkOrderFromDate,
-                    WorkOrderToDate = WorkOrderToDate,
-                    MachineGroupId = MachineGroupId,
-                    MachineId = machineId,
-                    ActivityId = ActivityId
-                };
+                StatusCode = StatusCodes.Status200OK,
+                Message = result.Message,
+                Data = result.Data ?? new List<RequestReportDto>()
 
-                var result = await Mediator.Send(query);
+            });
+        }
+        [HttpGet("WorkOrderChecklistReport")]
+        public async Task<IActionResult> WorkOrderChecklistReportAsync(
+            [FromQuery] DateTimeOffset? WorkOrderFromDate,
+            [FromQuery] DateTimeOffset? WorkOrderToDate,
+            [FromQuery] int? MachineGroupId,
+            [FromQuery] int? machineId,
+            [FromQuery] int? ActivityId)
+        {
+            var query = new WorkOderCheckListReportQuery
+            {
+                WorkOrderFromDate = WorkOrderFromDate,
+                WorkOrderToDate = WorkOrderToDate,
+                MachineGroupId = MachineGroupId,
+                MachineId = machineId,
+                ActivityId = ActivityId
+            };
 
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = result?.Message ?? "No Work Order Checklist records found.",
-                    Data = result?.Data ?? new List<WorkOderCheckListReportDto>()
-                    
-                });
-            }
+            var result = await Mediator.Send(query);
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = result?.Message ?? "No Work Order Checklist records found.",
+                Data = result?.Data ?? new List<WorkOderCheckListReportDto>()
+
+            });
+        }
 
 
 
@@ -394,8 +397,8 @@ namespace MaintenanceManagement.API.Controllers.Reports
 
             var result = await Mediator.Send(query);
 
-         
-  
+
+
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
@@ -403,11 +406,11 @@ namespace MaintenanceManagement.API.Controllers.Reports
                 Data = result?.Data ?? new List<ScheduleReportDto>()
             });
         }
-           [HttpGet("MaterialPlanningReport")]
+        [HttpGet("MaterialPlanningReport")]
         public async Task<IActionResult> MaterialPlanningReportAsync(
-                [FromQuery] DateTime? FromDueDate,
-                [FromQuery] DateTime? ToDueDate
-                )
+             [FromQuery] DateTime? FromDueDate,
+             [FromQuery] DateTime? ToDueDate
+             )
         {
             var query = new MaterialPlanningReportQuery
             {
@@ -417,12 +420,41 @@ namespace MaintenanceManagement.API.Controllers.Reports
 
             var result = await Mediator.Send(query);
 
-          
+
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = result.Message,                
+                Message = result.Message,
                 Data = result?.Data ?? new List<MaterialPlanningReportDto>()
+            });
+        }
+        [HttpGet("PowerConsumptionReport")]
+        public async Task<IActionResult> AssetTransferReportAsync(
+            [FromQuery] DateTimeOffset? FromDate = null,
+            [FromQuery] DateTimeOffset? ToDate = null)
+        {
+            var result = await Mediator.Send(new PowerConsumptionReportQuery
+            {
+                FromDate = FromDate,
+                ToDate = ToDate
+            });
+
+            if (result?.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = result?.Message ?? "Power Transactions not found.",
+                    Data = new List<PowerReportDto>()
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = result.Message,
+                Data = result.Data?.ToList() ?? new List<PowerReportDto>()
+               
             });
         }
     }

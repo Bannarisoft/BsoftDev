@@ -6,6 +6,7 @@ using Core.Application.ActivityCheckListMaster.Command.CreateActivityCheckListMa
 using Core.Application.Common.Interfaces.IActivityCheckListMaster;
 using FluentValidation;
 using MaintenanceManagement.API.Validation.Common;
+using Serilog;
 
 namespace MaintenanceManagement.API.Validation.ActivityCheckListMaster
 {
@@ -37,14 +38,7 @@ namespace MaintenanceManagement.API.Validation.ActivityCheckListMaster
                         RuleFor(x => x.ActivityCheckList)
                             .MaximumLength(maxLength)
                             .WithMessage($"{nameof(CreateActivityCheckListMasterCommand.ActivityCheckList)} {rule.Error}"); 
-                            break;
-
-                    // case "AlreadyExists":
-                    //     RuleFor(x => x.ActivityCheckList )
-                    //         .MustAsync(async (activityCheckList, cancellation) =>
-                    //             !await _activityCheckListMasterQueryRepository.GetByActivityCheckListAsync(activityCheckList.ActivityCheckList,activityCheckList.ActivityID))
-                    //         .WithMessage("ActivityCheckList  already exists.");
-                    //     break;   
+                            break;                   
                     case "AlreadyExists":
                         RuleFor(x => x)
                             .MustAsync(async (command, cancellation) =>
@@ -54,7 +48,7 @@ namespace MaintenanceManagement.API.Validation.ActivityCheckListMaster
                         break;   
                   default:
                         // Handle unknown rule (log or throw)
-                        Console.WriteLine($"Warning: Unknown rule '{rule.Rule}' encountered.");
+                        Log.Information("Warning: Unknown rule '{Rule}' encountered.", rule.Rule);
                         break;          
 
 

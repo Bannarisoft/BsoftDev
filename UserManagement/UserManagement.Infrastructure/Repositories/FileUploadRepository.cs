@@ -29,8 +29,8 @@ namespace UserManagement.Infrastructure.Repositories
         //     {
         //         var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value; 
         //         var key = $"Companylogo-{userId}";
-        //         Console.WriteLine("GetFileSession");
-        //         Console.WriteLine(key);
+        //         Log.Information("GetFileSession");
+        //         Log.Information(key);
         //         return Task.FromResult(context.Session.GetString(key) ?? "Not Found");
         //     }
         //     return Task.FromResult("Not Found");
@@ -43,8 +43,8 @@ namespace UserManagement.Infrastructure.Repositories
         //      {
         //         var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         //         var key = $"Companylogo-{userId}";
-        //         Console.WriteLine("SetFileSession");
-        //         Console.WriteLine(key);
+        //         Log.Information("SetFileSession");
+        //         Log.Information(key);
         //          context.Session.SetString(key, value);
 
         //          return Task.FromResult(true);

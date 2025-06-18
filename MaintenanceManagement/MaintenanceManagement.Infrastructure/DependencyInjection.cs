@@ -64,6 +64,13 @@ using MaintenanceManagement.Infrastructure.Repositories.Reports;
 using Core.Application.Common.Interfaces.IReports;
 using Core.Application.Common.Interfaces.Power.IFeederGroup;
 using MaintenanceManagement.Infrastructure.Repositories.Power.FeederGroup;
+using Core.Application.Common.Interfaces.Power.IPowerConsumption;
+using MaintenanceManagement.Infrastructure.Repositories.Power.PowerConsumption;
+using Core.Application.Common.Interfaces.Power.IFeeder;
+using MaintenanceManagement.Infrastructure.Repositories.Power.Feeder;
+using Core.Application.Common.Mappings.Power;
+using Core.Application.Common.Interfaces.IDashboard;
+using MaintenanceManagement.Infrastructure.Repositories.Dashboard;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -71,30 +78,15 @@ namespace MaintenanceManagement.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
         {
-
-
               var connectionString = configuration.GetConnectionString("DefaultConnection")
                                                 .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
                                                 .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
-                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
-            // var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
-            //                                     .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
-            //                                     .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
-            //                                     .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");    
-            
-
-
+                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");      
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new InvalidOperationException("Connection string 'DefaultConnection' not found or is empty.");
             }
-            // if (string.IsNullOrWhiteSpace(HangfireConnectionString))
-            // {
-            //     throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
-            // }
-
             // Register ApplicationDbContext with SQL Server
-
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString, sqlOptions =>
             {
@@ -106,7 +98,6 @@ namespace MaintenanceManagement.Infrastructure
 
             // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
-
 
             // MongoDB Context
             services.AddSingleton<IMongoClient>(sp =>
@@ -136,26 +127,6 @@ namespace MaintenanceManagement.Infrastructure
                 var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
                 return mongoDbContext.GetDatabase();
             });
-
-            // Register Hangfire services
-            // services.AddHangfire(config =>
-            // {
-            //     config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-            //           .UseSimpleAssemblyNameTypeSerializer()
-            //           .UseDefaultTypeSerializer()
-            //           .UseSqlServerStorage(HangfireConnectionString, new SqlServerStorageOptions
-            //           {
-            //               CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-            //               SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-            //               QueuePollInterval = TimeSpan.Zero,
-            //               UseRecommendedIsolationLevel = true,
-            //               UsePageLocksOnDequeue = true,
-            //               DisableGlobalLocks = true
-            //           });
-            // });
-            // // Add the Hangfire server
-            // services.AddHangfireServer();
-
             // Register ILogger<T>
             services.AddLogging(builder =>
             {
@@ -172,7 +143,6 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<ICostCenterCommandRepository, CostCenterCommandRepository>();
             services.AddScoped<IWorkCenterQueryRepository, WorkCenterQueryRepository>();
             services.AddScoped<IWorkCenterCommandRepository, WorkCenterCommandRepository>();
-
             services.AddScoped<IMachineGroupCommandRepository, MachineGroupCommandRepository>();
             services.AddScoped<IMachineGroupQueryRepository, MachineGroupQueryRepository>();
             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
@@ -187,26 +157,18 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMaintenanceTypeQueryRepository, MaintenanceTypeQueryRepository>();
             services.AddScoped<IMaintenanceCategoryCommandRepository, MaintenanceCategoryCommandRepository>();
             services.AddScoped<IMaintenanceCategoryQueryRepository, MaintenanceCategoryQueryRepository>();
-
             services.AddScoped<IActivityMasterQueryRepository, ActivityMasterQueryRepository>();
-
-
             services.AddScoped<IActivityMasterCommandRepository, ActivityMasterCommandRepository>();
-
             services.AddScoped<IMachineGroupUserQueryRepository, MachineGroupUserQueryRepository>();
             services.AddScoped<IMachineGroupUserCommandRepository, MachineGroupUserCommandRepository>();
-
             services.AddScoped<IMachineMasterCommandRepository, MachineMasterCommandRepository>();
             services.AddScoped<IMachineMasterQueryRepository, MachineMasterQueryRepository>();
-
-             services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
-             services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
-
+            services.AddScoped<IWorkOrderCommandRepository, WorkOrderCommandRepository>();
+            services.AddScoped<IWorkOrderQueryRepository, WorkOrderQueryRepository>();
             services.AddScoped<IActivityCheckListMasterQueryRepository, ActivityCheckListMasterQueryRepository>();
             services.AddScoped<IActivityCheckListMasterCommandRepository, ActivityCheckListMasterCommandRepository>();
             services.AddScoped<IMaintenanceRequestQueryRepository, MaintenanceRequestQueryRepository>();
             services.AddScoped<IMaintenanceRequestCommandRepository, MaintenanceRequestCommandRepository>();
-            
             services.AddScoped<IPreventiveSchedulerCommand, PreventiveSchedulerCommandRepository>();
             services.AddScoped<IPreventiveSchedulerQuery, PreventiveSchedulerQueryRepository>();
             services.AddScoped<IItemQueryRepository, ItemQueryRepository>();
@@ -214,23 +176,20 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMainStoreStockQueryRepository, MainStoreStockQueryRepository>();
             services.AddScoped<IMRSQueryRepository, MRSQueryRepository>();
             services.AddScoped<IMRSCommandRepository, MRSCommandRepository>();
-
              services.AddScoped<IFeederGroupQueryRepository, FeederGroupQueryRepository>();  
              services.AddScoped<IFeederGroupCommandRepository, FeederGroupCommandRepository>();
-            // services.AddScoped<IBackgroundServiceClient, BackgroundServiceClient>();  
-            services.AddScoped<IReportRepository, ReportsRepository>();  
-            
-            
+             services.AddScoped<IPowerConsumptionQueryRepository, PowerConsumptionQueryRepository>();
+            services.AddScoped<IPowerConsumptionCommandRepository, PowerConsumptionCommandRepository>();
+             services.AddScoped<IFeederQueryRepository, FeederQueryRepository>();
+             services.AddScoped<IFeederCommandRepository, FeederCommandRepository>();            
+            services.AddScoped<IReportRepository, ReportsRepository>();              
+            services.AddScoped<IDashboardQueryRepository, DashboardQueryRepository>();        
             // Miscellaneous services
-
             services.AddScoped<IIPAddressService, IPAddressService>();
-            services.AddTransient<IFileUploadService, FileUploadRepository>();
-            
+            services.AddTransient<IFileUploadService, FileUploadRepository>();            
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
-
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();                     
-            services.AddScoped<ILogQueryService, LogQueryService>();
-            
+            services.AddScoped<ILogQueryService, LogQueryService>();            
             
             // AutoMapper profiles
             services.AddAutoMapper(
@@ -238,23 +197,19 @@ namespace MaintenanceManagement.Infrastructure
             typeof(MiscTypeMasterProfile),
             typeof(MiscMasterProfile),
             typeof(CostCenterProfile),
-
             typeof(WorkCenterProfile),
             typeof(MaintenanceTypeProfile),
             typeof(MaintenanceCategoryProfile),
             typeof(ShiftMasterProfile),
             typeof(ShiftMasterDetailProfile),
-
             typeof(ActivityMasterProfile),
-
-
             typeof(MachineGroupUserProfile),
             typeof(WorkOrderProfile),            
             typeof(ActivityCheckListMasterProfile),
-            typeof(ItemProfile)
-
-
-
+            typeof(PowerConsumptionProfile),
+            typeof(ItemProfile),
+            typeof(FeederGroupProfile),
+            typeof(FeederProfile)
          );
             return services;
         }

@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral
 {
-    public class CreateAssetMasterGeneralCommand : IRequest<ApiResponseDTO<AssetMasterDto>>  
+    public class CreateAssetMasterGeneralCommand : IRequest<AssetMasterDto>
     {
        public AssetMasterDto? AssetMaster { get; set; }       
     }

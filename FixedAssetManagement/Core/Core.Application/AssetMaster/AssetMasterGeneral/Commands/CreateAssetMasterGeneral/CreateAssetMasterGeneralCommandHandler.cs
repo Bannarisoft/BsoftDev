@@ -8,31 +8,30 @@ using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Domain.Entities;
 using Core.Domain.Events;
 using MediatR;
+using Serilog;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral
 {
-    public class CreateAssetMasterGeneralCommandHandler : IRequestHandler<CreateAssetMasterGeneralCommand, ApiResponseDTO<AssetMasterDto>>
+    public class CreateAssetMasterGeneralCommandHandler : IRequestHandler<CreateAssetMasterGeneralCommand, AssetMasterDto>
     {
         private readonly IMapper _mapper;
         private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
-        private readonly IMediator _mediator;
-        private readonly IEventPublisher _eventPublisher;  
+        private readonly IMediator _mediator;        
         private readonly IUnitGrpcClient _unitGrpcClient;
         private readonly ICompanyGrpcClient _companyGrpcClient;
 
-        public CreateAssetMasterGeneralCommandHandler(IMapper mapper,IAssetMasterGeneralCommandRepository  assetMasterGeneralRepository, IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository, IMediator mediator, IEventPublisher eventPublisher,IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient)
+        public CreateAssetMasterGeneralCommandHandler(IMapper mapper,IAssetMasterGeneralCommandRepository  assetMasterGeneralRepository, IAssetMasterGeneralQueryRepository assetMasterGeneralQueryRepository, IMediator mediator, IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient)
         {
             _mapper = mapper;
             _assetMasterGeneralRepository = assetMasterGeneralRepository;
             _assetMasterGeneralQueryRepository = assetMasterGeneralQueryRepository;
-            _mediator = mediator;
-            _eventPublisher = eventPublisher;
+            _mediator = mediator;            
             _unitGrpcClient = unitGrpcClient;
             _companyGrpcClient = companyGrpcClient;
         }
 
-        public async Task<ApiResponseDTO<AssetMasterDto>> Handle(CreateAssetMasterGeneralCommand request, CancellationToken cancellationToken)
+        public async Task<AssetMasterDto> Handle(CreateAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         {
             // Get latest AssetCode
             var latestAssetCode = await _assetMasterGeneralQueryRepository.GetLatestAssetCode( request.AssetMaster.AssetGroupId, request.AssetMaster.AssetCategoryId, request.AssetMaster.AssetLocation.DepartmentId, request.AssetMaster.AssetLocation.LocationId);
@@ -50,25 +49,6 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
                 module: "AssetMasterGeneral"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-
-
-            // Use the ID generated from the database
-            var assetId = result.Id;
-            var assetCreatedEvent = new AssetCreatedEvent
-            {
-                CorrelationId = Guid.NewGuid(),
-                AssetId = assetId,
-                AssetName = assetEntity.AssetName
-                // UserId = assetEntity.UserId
-            };
-
-            // Save event to Outbox 
-            await _eventPublisher.SaveEventAsync(assetCreatedEvent);
-
-            // Triggering the publishing of pending events
-            await _eventPublisher.PublishPendingEventsAsync();
-
-
             var assetMasterDTO = _mapper.Map<AssetMasterDto>(result);
             if (result.Id > 0)
             {             
@@ -94,31 +74,19 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMa
                         string directory = Path.GetDirectoryName(filePath) ?? string.Empty;
                         string newFileName = $"{result.AssetCode}{Path.GetExtension(tempFilePath)}";
                         string newFilePath = Path.Combine(directory, newFileName);
-
                         try
                         {
-                            File.Move(filePath, newFilePath);
-                            //assetEntity.AssetImage = newFileName;
+                            File.Move(filePath, newFilePath);                            
                             await _assetMasterGeneralRepository.UpdateAssetImageAsync(assetEntity.Id, newFileName);
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Failed to rename file: {ex.Message}");
+                            Log.Information(ex, "Failed to rename file.");
                         }
                     }
-                }
-                return new ApiResponseDTO<AssetMasterDto>
-                {
-                    IsSuccess = true,
-                    Message = "AssetMasterGeneral created successfully.",
-                    Data = assetMasterDTO
-                };
+                }                 
             }
-            return new ApiResponseDTO<AssetMasterDto>
-            {
-                IsSuccess = false,
-                Message = "AssetMasterGeneral not created."
-            };
+            return assetMasterDTO;            
         }
           private void EnsureDirectoryExists(string path)
         {

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroupById
 {
-    public class GetDepreciationGroupByIdQuery : IRequest<ApiResponseDTO<DepreciationGroupDTO>>
+    public class GetDepreciationGroupByIdQuery : IRequest<DepreciationGroupDTO>
     {
         public int Id { get; set; }
     }

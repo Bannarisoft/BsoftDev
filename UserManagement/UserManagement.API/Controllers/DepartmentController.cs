@@ -9,6 +9,7 @@ using Core.Application.Departments.Queries.GetDepartmentAutoCompleteSearch;
 using UserManagement.Infrastructure.Data;
 using FluentValidation;
 using Core.Application.Departments.Queries.GetDepartmentByDepartmentGroupId;
+using Core.Application.Departments.Queries.GetDepartmentByGroupWithControl;
 
 namespace UserManagement.API.Controllers
 {
@@ -327,7 +328,33 @@ namespace UserManagement.API.Controllers
      
         }
      
-    
+        [HttpGet("maintenance-by-group-user-based/{departmentGroupName}")]
+            public async Task<IActionResult> GetDepartmentsByDepartmentGroupWithControl(string departmentGroupName)
+            {
+                if (string.IsNullOrEmpty(departmentGroupName))
+                    {
+                        return BadRequest(new
+                        {
+                            StatusCode = StatusCodes.Status400BadRequest,
+                            Message = "Invalid Department Group."
+                        });
+                    }
+                var result = await Mediator.Send(new GetDepartmentByGroupWithControlQuery
+                {
+                    DepartmentGroupName = departmentGroupName
+                });
+
+                var dataList = result.Data ?? new List<DepartmentWithControlByGroupDto>();
+
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = dataList.Any()
+                                ? "Departments retrieved successfully."
+                                : "No departments found for this group.",
+                    Data = dataList
+                });
+            }
       
    
 

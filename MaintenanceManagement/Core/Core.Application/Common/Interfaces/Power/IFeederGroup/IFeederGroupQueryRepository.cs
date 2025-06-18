@@ -17,7 +17,10 @@ namespace Core.Application.Common.Interfaces.Power.IFeederGroup
         Task<bool> AlreadyExistsAsync(string feederGroupCode, int? id = null);
 
         Task<bool> NotFoundAsync(int id);
-        
+
         Task<List<FeederGroup>> GetFeederGroupAutoComplete(string searchPattern);
+        
+         Task<bool> SoftDeleteValidation(int id); 
+   
     }
 }

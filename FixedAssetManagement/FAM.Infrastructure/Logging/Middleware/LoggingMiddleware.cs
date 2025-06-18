@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Core.Application.Common.Exceptions;
+using Core.Application.Common.HttpResponse;
 
 namespace FAM.Infrastructure.Logging.Middleware
 {
@@ -21,105 +23,68 @@ namespace FAM.Infrastructure.Logging.Middleware
         {
             var traceId = context.TraceIdentifier;  // Generate a unique trace ID for each request            
             context.Request.EnableBuffering();
-
             try
             {
-                // Log request details for POST, PUT, and GET requests
-                if (context.Request.Method == HttpMethods.Post || 
-                    context.Request.Method == HttpMethods.Put || 
-                    context.Request.Method == HttpMethods.Get) // Include GET requests
+            // Log request details for POST, PUT, and GET requests
+            if (context.Request.Method == HttpMethods.Post || 
+                context.Request.Method == HttpMethods.Put || 
+                context.Request.Method == HttpMethods.Get) // Include GET requests
                 {
-                    // For GET requests, there's no body, but you can log the request path and other details
-                    if (context.Request.Method == HttpMethods.Get)
-                    {
-                        _logger.LogInformation("TraceId: {TraceId}, Request Path: {Path}, Method: {Method}", 
-                            traceId, context.Request.Path, context.Request.Method);
-                    }
-                    else
-                    {
-                        // For POST and PUT requests, we log the body along with path and method
-                        context.Request.Body.Position = 0;  // Reset position before reading
-                        var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
-                        _logger.LogInformation("TraceId: {TraceId}, Request Path: {Path}, Method: {Method}, Body: {Body}", 
-                            traceId, context.Request.Path, context.Request.Method, requestBody);
-                        context.Request.Body.Position = 0;  // Reset position after reading
-                    }
+                var method = context.Request.Method;
+                var path = context.Request.Path;
+
+                if (method == HttpMethods.Get)
+                {
+                    _logger.LogInformation("TraceId: {TraceId}, Method: {Method}, Path: {Path}", traceId, method, path);
                 }
+                else
+                {
+                    context.Request.Body.Position = 0;
+                    using var reader = new StreamReader(context.Request.Body, leaveOpen: true);
+                    var body = await reader.ReadToEndAsync();
+                    context.Request.Body.Position = 0;
 
-                // Call the next middleware in the pipeline
-                await _next(context);
+                    _logger.LogInformation("TraceId: {TraceId}, Method: {Method}, Path: {Path}, Body: {Body}", traceId, method, path, body);
+                }
             }
-            catch (Exception ex)
-            {
-                // Handle any exceptions that occur
-                await HandleExceptionAsync(context, ex);
-            }
+            await _next(context);                    
         }
-
-        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
-        {
-            int statusCode;
-            string title;
-            string detail;
-
-            // Determine error details based on exception type
-            switch (exception)
+        catch (Exception ex)
             {
-                case KeyNotFoundException keyNotFoundException:
-                    statusCode = StatusCodes.Status404NotFound; // Use 404 for resource not found
-                    title = "The requested resource could not be found.";
-                    detail = exception.Message;
-                    _logger.LogError(keyNotFoundException, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
-                        statusCode, title, context.Request.Path);
-                    break;
+                // 🛑 Log and return standardized error
+                _logger.LogError(ex, "Unhandled exception occurred. TraceId: {TraceId}", traceId);
 
-                case DbUpdateException dbUpdateException:
-                    statusCode = StatusCodes.Status500InternalServerError;
-                    title = "A database update error occurred.";
-                    detail = exception.Message;
-                    _logger.LogError(dbUpdateException, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
-                        statusCode, title, context.Request.Path);
-                    break;
+                context.Response.ContentType = "application/json";
+                context.Response.StatusCode = ex switch
+                {
+                    EntityAlreadyExistsException => StatusCodes.Status409Conflict,
+                    EntityNotFoundException => StatusCodes.Status404NotFound,
+                    ExceptionRules => StatusCodes.Status400BadRequest,
+                    SqlException => StatusCodes.Status503ServiceUnavailable,
+                    DbUpdateException => StatusCodes.Status500InternalServerError,
+                    NullReferenceException => StatusCodes.Status500InternalServerError,
+                    _ => StatusCodes.Status500InternalServerError
+                };
 
-                case SqlException sqlException:
-                    statusCode = StatusCodes.Status503ServiceUnavailable; // Indicate service unavailability
-                    title = "Unable to connect to the database. Please try again later.";
-                    detail = exception.Message;
-                    _logger.LogError(sqlException, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
-                        statusCode, title, context.Request.Path);
-                    break;
-
-                case NullReferenceException nullReferenceException:
-                    statusCode = StatusCodes.Status500InternalServerError;
-                    title = "A null reference occurred.";
-                    detail = exception.Message;
-                    _logger.LogError(nullReferenceException, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
-                        statusCode, title, context.Request.Path);
-                    break;
-
-                default:
-                    statusCode = StatusCodes.Status500InternalServerError;
-                    title = "An unexpected error occurred.";
-                    detail = exception.Message;
-                    _logger.LogError(exception, "Error Code: {ErrorCode}, Message: {Message}, Path: {Path}",
-                        statusCode, title, context.Request.Path);
-                    break;
+                var response =  new ApiResponseDTO<object>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,                    
+                   /*  Data = ex switch
+                    {
+                        EntityAlreadyExistsException => "Already exists.",
+                        EntityNotFoundException => "Id not found.",
+                        ExceptionRules => "Validation error.",
+                        SqlException => "Database connection error.",
+                        DbUpdateException => "Database update failed.",
+                        NullReferenceException => "Null reference exception.",
+                        _ => "An unexpected error occurred."
+                    }, */
+                    Errors = new List<string> { ex.Message },
+                    StatusCode = context.Response.StatusCode
+                };
+                await context.Response.WriteAsJsonAsync(response);
             }
-
-            // Set the response
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = statusCode;
-
-            // Generate the error response
-            var errorResponse = new
-            {
-                TraceId = context.TraceIdentifier,
-                StatusCode = statusCode,
-                Title = title,
-                Detail = detail
-            };
-
-            await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
         }
     }
 }

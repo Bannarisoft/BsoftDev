@@ -9,6 +9,6 @@ namespace Core.Application.Menu.Queries.GetMenuByModule
 {
     public class GetMenuByModuleQuery : IRequest<ApiResponseDTO<List<MenuDTO>>>
     {
-        public List<int> ModuleId { get; set; }
+        public List<int>? ModuleId { get; set; }
     }
 }

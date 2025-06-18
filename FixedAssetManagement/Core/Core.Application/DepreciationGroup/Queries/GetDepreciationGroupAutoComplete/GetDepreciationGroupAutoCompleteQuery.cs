@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationGroup.Queries.GetDepreciationGroupAutoComplete
 {
-    public class GetDepreciationGroupAutoCompleteQuery  : IRequest<ApiResponseDTO<List<DepreciationGroupAutoCompleteDTO>>>
+    public class GetDepreciationGroupAutoCompleteQuery  : IRequest<List<DepreciationGroupAutoCompleteDTO>>
     {
         public string? SearchPattern { get; set; }
     }

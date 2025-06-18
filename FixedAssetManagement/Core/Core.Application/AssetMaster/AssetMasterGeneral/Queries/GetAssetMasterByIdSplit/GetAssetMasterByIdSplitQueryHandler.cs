@@ -25,8 +25,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
           var (assetResult, locationResult, purchaseDetails,additionalCost) = await _assetMasterRepository.GetAssetMasterSplitByIdAsync(request.Id);
           var asset = _mapper.Map<AssetMasterSplitDto>(assetResult);
             if (assetResult == null)
-            {
-                
+            {                
                 return null;                  
             }
             if (assetResult?.AssetName != null)

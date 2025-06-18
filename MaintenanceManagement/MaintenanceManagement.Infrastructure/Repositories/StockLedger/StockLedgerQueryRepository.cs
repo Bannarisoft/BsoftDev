@@ -20,7 +20,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
         }
 
 
-        public async Task<List<StockItemCodeDto>> GetStockItemCodes(string OldUnitcode)
+        public async Task<List<StockItemCodeDto>> GetStockItemCodes(string OldUnitcode,int DepartmentId)
         {
             OldUnitcode = OldUnitcode ?? string.Empty; // Prevent null issues
 
@@ -32,22 +32,24 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
                     Maintenance.StockLedger
                 WHERE
                     Oldunitcode = @OldUnitcode
-                    AND TransactionType not in('SRP') 
+                    AND TransactionType not in('SRP','REU') 
+                    AND DepartmentId = @DepartmentId
                 GROUP BY 
-                    ItemCode, ItemName, Oldunitcode
+                    ItemCode, ItemName, Oldunitcode,DepartmentId
                 HAVING
                     SUM(ReceivedQty) - SUM(IssueQty) > 0";
 
-            var parameters = new 
-            { 
-                OldUnitcode // match exactly, no wildcards
+            var parameters = new
+            {
+                OldUnitcode,
+                DepartmentId // match exactly, no wildcards
             };
 
             var itemcodes = await _dbConnection.QueryAsync<StockItemCodeDto>(query, parameters);
             return itemcodes.ToList();
         }
 
-        public async Task<CurrentStockDto?> GetSubStoresCurrentStock(string OldUnitcode, string Itemcode)
+        public async Task<CurrentStockDto?> GetSubStoresCurrentStock(string OldUnitcode, string Itemcode,int DepartmentId)
         {
             const string query = @"
                 SELECT 
@@ -63,13 +65,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
                 WHERE
                     Oldunitcode = @OldUnitcode AND
                     ItemCode = @Itemcode AND
-                    TransactionType not in('SRP')
+                    DepartmentId = @DepartmentId AND
+                    TransactionType not in('SRP','REU')
                 GROUP BY 
-                    ItemCode, ItemName, Oldunitcode,Uom
+                    ItemCode, ItemName, Oldunitcode,Uom,DepartmentId
                 HAVING
                     SUM(ReceivedQty) - SUM(IssueQty) > 0";
 
-            var parameters = new { OldUnitcode = OldUnitcode, Itemcode = Itemcode };
+            var parameters = new { OldUnitcode = OldUnitcode, Itemcode = Itemcode, DepartmentId = DepartmentId };
 
             var stocklist = await _dbConnection.QueryFirstOrDefaultAsync<CurrentStockDto>(query, parameters);
 
