@@ -39,12 +39,9 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                                 .NotEmpty()
                                 .WithMessage($"{nameof(MachineWiseFrequencyUpdateCommand.FrequencyInterval)} {rule.Error}");
                         RuleFor(x => x.LastMaintenanceActivityDate)
-                                .NotNull()
-                                .WithMessage($"{nameof(MachineWiseFrequencyUpdateCommand.LastMaintenanceActivityDate)} {rule.Error}")
-                                .NotEmpty()
-                                .WithMessage($"{nameof(MachineWiseFrequencyUpdateCommand.LastMaintenanceActivityDate)} {rule.Error}")
                                 .Must(date => date != DateOnly.MinValue)
-                                .WithMessage($"{nameof(MachineWiseFrequencyUpdateCommand.LastMaintenanceActivityDate)} {rule.Error}");
+                                .WithMessage($"{nameof(MachineWiseFrequencyUpdateCommand.LastMaintenanceActivityDate)} {rule.Error}")
+                                .When(x => x.IsActive ==1);
 
                         break;
 

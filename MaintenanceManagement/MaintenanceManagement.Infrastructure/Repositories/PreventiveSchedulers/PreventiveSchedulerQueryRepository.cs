@@ -670,7 +670,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 					   LEFT JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON M.Id=PSD.MachineId AND PSD.PreventiveSchedulerHeaderId = PSH.Id
 					   LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
 					   LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
-                       WHERE M.IsDeleted = 0  AND PSD.Id IS NULL  AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)";
+                       WHERE M.IsDeleted = 0  AND (PSD.Id IS NULL OR PSD.IsActive = 0 OR PSD.IsDeleted = 1)  AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)";
 
             var parameters = new
             {
