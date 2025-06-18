@@ -664,13 +664,28 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 
             const string query = @"
                        SELECT M.Id, M.MachineCode,M.MachineName  
-                       FROM [Maintenance].[MachineMaster] M
+                      INTO #UnMappedMachines FROM [Maintenance].[MachineMaster] M
 					   INNER JOIN [Maintenance].[MachineGroup] MG ON M.MachineGroupId=MG.Id
 					   INNER JOIN [Maintenance].[PreventiveSchedulerHeader] PSH ON PSH.Id = @Id AND MG.Id=PSH.MachineGroupId
 					   LEFT JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON M.Id=PSD.MachineId AND PSD.PreventiveSchedulerHeaderId = PSH.Id
 					   LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
 					   LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
-                       WHERE M.IsDeleted = 0  AND (PSD.Id IS NULL OR PSD.IsActive = 0 OR PSD.IsDeleted = 1)  AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)";
+                       WHERE M.IsDeleted = 0  AND (PSD.Id IS NULL OR PSD.IsActive = 0 OR PSD.IsDeleted = 1)  AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)
+                       GROUP BY  M.Id, M.MachineCode,M.MachineName 
+                       
+                       SELECT M.Id, M.MachineCode,M.MachineName  
+                       INTO #MappedMachines FROM 
+					    [Maintenance].[PreventiveSchedulerHeader] PSH
+					   INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON  PSD.PreventiveSchedulerHeaderId = PSH.Id
+					   INNER JOIN [Maintenance].[MachineGroup] MG ON MG.Id=PSH.MachineGroupId
+					   INNER JOIN [Maintenance].[MachineMaster] M ON M.Id=PSD.MachineId AND M.MachineGroupId=MG.Id
+					   WHERE PSH.Id=@Id AND  PSD.IsActive = 1 AND PSD.IsDeleted = 0
+					   GROUP BY  M.Id, M.MachineCode,M.MachineName 
+                       
+                       DELETE A FROM #UnMappedMachines A 
+					   INNER JOIN #MappedMachines B ON A.Id=B.Id
+                       
+                       SELECT * FROM #UnMappedMachines";
 
             var parameters = new
             {
