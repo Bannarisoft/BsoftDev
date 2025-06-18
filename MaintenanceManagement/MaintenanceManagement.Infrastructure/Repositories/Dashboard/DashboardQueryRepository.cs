@@ -31,9 +31,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
         {
             var data = await _connection.QueryAsync<WorkOrderDashboardDto>(
                 "Dashboard_Maintenance",
-                new { FromDate = fromDate, ToDate = toDate, UnitId = UnitId,  Type = "WorkOrderSummary",DeptId=departmentId,MachineGroupId=machineGroupId },
+                new { FromDate = fromDate, ToDate = toDate, UnitId = UnitId, Type = "WorkOrderSummary", DeptId = departmentId, MachineGroupId = machineGroupId },
                 commandType: CommandType.StoredProcedure);
-            
+
             var months = data.Select(x => x.Month).Distinct().OrderBy(m => m).ToList();
             var series = data
                 .GroupBy(d => d.StatusName)
@@ -50,13 +50,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
             };
         }
 
-        public async Task<ChartDto> ItemConsumptionSummaryAsync(DateTime fromDate, DateTime toDate,  string? departmentId, string? machineGroupId)
+        public async Task<ChartDto> ItemConsumptionSummaryAsync(DateTime fromDate, DateTime toDate, string? departmentId, string? machineGroupId)
         {
             var data = await _connection.QueryAsync<ItemConsumptionDto>(
                 "Dashboard_Maintenance",
-                new { FromDate = fromDate, ToDate = toDate, UnitId = UnitId, Type = "ItemConsumption",DeptId=departmentId,MachineGroupId=machineGroupId },
+                new { FromDate = fromDate, ToDate = toDate, UnitId = UnitId, Type = "ItemConsumption", DeptId = departmentId, MachineGroupId = machineGroupId },
                 commandType: CommandType.StoredProcedure);
-            
+
             var series = data
                 .GroupBy(x => x.Item ?? "Unnamed Item")
                 .Select(g => new ChartSeriesDto
@@ -71,35 +71,29 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
                 Series = series
             };
         }
-        public async Task<ChartDto> MaintenanceHoursAsync(DateTime fromDate, DateTime toDate, string type, string? departmentId = null, string? machineGroupId = null)
+        public async Task<ChartDto> MaintenanceHoursDeptAsync(DateTime fromDate, DateTime toDate,string? type)
         {
             var parameters = new DynamicParameters();
             parameters.Add("FromDate", fromDate);
             parameters.Add("ToDate", toDate);
-            parameters.Add("UnitId", UnitId);                  
-            parameters.Add("DeptId", departmentId);
-            parameters.Add("Type", type);
-            parameters.Add("MachineGroupId", machineGroupId);
-
+            parameters.Add("UnitId", UnitId);
+            parameters.Add("Type", type);     
             var data = await _connection.QueryAsync<MaintenanceHrsDto>(
                 "Dashboard_Maintenance",
                 parameters,
                 commandType: CommandType.StoredProcedure
             );
 
-             // Fill names via GRPC for dept-wise data
-            if (departmentId == null && machineGroupId == null)
-            {
-                var departments = await _departmentGrpcClient.GetDepartmentAllAsync();
-                var deptLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+            // Fill names via GRPC for dept-wise data
+            var departments = await _departmentGrpcClient.GetDepartmentAllAsync();
+            var deptLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-                foreach (var item in data)
-                    item.Name = deptLookup.TryGetValue(item.Id, out var name) ? name : item.Name;
-            }
+            foreach (var item in data)
+                item.Name = deptLookup.TryGetValue(item.Id, out var name) ? name : item.Name;
+            
 
             // Build categories
             var categories = data.Select(x => x.Name ?? "Unknown").Distinct().ToList();
-
             // Series: MaintenanceHrs
             var maintenanceSeries = new ChartSeriesDto
             {
@@ -119,6 +113,142 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
                 Categories = categories,
                 Series = new List<ChartSeriesDto> { maintenanceSeries, downtimeSeries }
             };
-        }       
+        }
+
+        public async Task<ChartDto> MaintenanceHoursMachineGroupAsync(DateTime fromDate, DateTime toDate,string? type,string? departmentId = null)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("FromDate", fromDate);
+            parameters.Add("ToDate", toDate);
+            parameters.Add("UnitId", UnitId);
+            parameters.Add("Type", type);     
+            parameters.Add("DeptId", departmentId);            
+
+            var data = await _connection.QueryAsync<MaintenanceHrsDto>(
+                "Dashboard_Maintenance",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+            // Build categories
+            var categories = data.Select(x => x.Name ?? "Unknown").Distinct().ToList();
+            // Series: MaintenanceHrs
+            var maintenanceSeries = new ChartSeriesDto
+            {
+                Name = "Maintenance Hrs",
+                Data = categories.Select(c => data.FirstOrDefault(d => d.Name == c)?.MaintenanceHrs ?? 0).ToList()
+            };
+
+            // Series: DowntimeHrs
+            var downtimeSeries = new ChartSeriesDto
+            {
+                Name = "Downtime Hrs",
+                Data = categories.Select(c => data.FirstOrDefault(d => d.Name == c)?.DowntimeHrs ?? 0).ToList()
+            };
+
+            return new ChartDto
+            {
+                Categories = categories,
+                Series = new List<ChartSeriesDto> { maintenanceSeries, downtimeSeries }
+            };
+        }
+         public async Task<ChartDto> MaintenanceHoursMachineAsync(DateTime fromDate, DateTime toDate,string? type, string? departmentId = null, string? machineGroupId = null)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("FromDate", fromDate);
+            parameters.Add("ToDate", toDate);
+            parameters.Add("UnitId", UnitId);
+            parameters.Add("Type", type);     
+            parameters.Add("DeptId", departmentId);            
+            parameters.Add("MachineGroupId", machineGroupId);
+
+            var data = await _connection.QueryAsync<MaintenanceHrsDto>(
+                "Dashboard_Maintenance",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+            // Build categories
+            var categories = data.Select(x => x.Name ?? "Unknown").Distinct().ToList();
+            // Series: MaintenanceHrs
+            var maintenanceSeries = new ChartSeriesDto
+            {
+                Name = "Maintenance Hrs",
+                Data = categories.Select(c => data.FirstOrDefault(d => d.Name == c)?.MaintenanceHrs ?? 0).ToList()
+            };
+
+            // Series: DowntimeHrs
+            var downtimeSeries = new ChartSeriesDto
+            {
+                Name = "Downtime Hrs",
+                Data = categories.Select(c => data.FirstOrDefault(d => d.Name == c)?.DowntimeHrs ?? 0).ToList()
+            };
+
+            return new ChartDto
+            {
+                Categories = categories,
+                Series = new List<ChartSeriesDto> { maintenanceSeries, downtimeSeries }
+            };
+        }
+        public async Task<ChartDto> ItemConsumptionDeptSummaryAsync(DateTime fromDate, DateTime toDate, string? type,string? itemCode = null)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("FromDate", fromDate);
+            parameters.Add("ToDate", toDate);
+            parameters.Add("UnitId", UnitId);
+            parameters.Add("Type", type);             
+            parameters.Add("ItemCode", itemCode);
+
+            var data = await _connection.QueryAsync<ItemConsumptionDto>(
+                "Dashboard_Maintenance",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            var departments = await _departmentGrpcClient.GetDepartmentAllAsync();
+            var deptLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            foreach (var item in data)
+                item.Name = deptLookup.TryGetValue(item.Id, out var name) ? name : item.Name;
+
+            return new ChartDto
+            {
+                Categories = data.Select(d => d.Name ?? "Unknown").ToList(),
+                Series = new List<ChartSeriesDto>
+                {
+                    new ChartSeriesDto
+                    {
+                        Name = "Consumption",
+                        Data = data.Select(d => d.IssueQty).ToList()
+                    }
+                }
+            };
+        }
+        public async Task<ChartDto> ItemConsumptionMachineSummaryAsync(DateTime fromDate, DateTime toDate,string? type,string? departmentId,  string? itemCode = null)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("FromDate", fromDate);
+            parameters.Add("ToDate", toDate);
+            parameters.Add("UnitId", UnitId);         
+            parameters.Add("Type", type);                         
+            parameters.Add("DeptId", departmentId);        
+            parameters.Add("ItemCode", itemCode);
+
+            var data = await _connection.QueryAsync<ItemConsumptionDto>(
+                "Dashboard_Maintenance",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );           
+            return new ChartDto
+            {
+                Categories = data.Select(d => d.Name ?? "Unknown").ToList(),
+                Series = new List<ChartSeriesDto>
+                {
+                    new ChartSeriesDto
+                    {
+                        Name = "Consumption",
+                        Data = data.Select(d => d.IssueQty).ToList()
+                    }
+                }
+            };
+        }
     }
 }

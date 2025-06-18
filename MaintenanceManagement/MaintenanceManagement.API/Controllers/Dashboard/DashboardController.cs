@@ -26,7 +26,7 @@ namespace MaintenanceManagement.API.Controllers.Dashboard
         [HttpGet("item-consumption")]
         public async Task<IActionResult> GetItemConsumption([FromQuery] DashboardQuery request)
         {
-            request.Type = "itemconsumption";           
+            request.Type = "itemconsumption";
             var data = await _mediator.Send(request);
             return Ok(data);
         }
@@ -37,6 +37,15 @@ namespace MaintenanceManagement.API.Controllers.Dashboard
             request.Type = request.MachineGroupId != null ? "maintenancehrs-machine" :
                         request.DepartmentId != null ? "maintenancehrs-machinegroup" :
                         "maintenancehrs-dept";
+
+            var data = await _mediator.Send(request);
+            return Ok(data);
+        }
+        [HttpGet("itemconsumption-dept")]
+        public async Task<IActionResult> GetItemConsumptionDept([FromQuery] DashboardQuery request)
+        {
+            request.Type = request.DepartmentId == null ? "itemconsumption-dept" :                        
+                        "itemconsumption-machinegroup";
 
             var data = await _mediator.Send(request);
             return Ok(data);

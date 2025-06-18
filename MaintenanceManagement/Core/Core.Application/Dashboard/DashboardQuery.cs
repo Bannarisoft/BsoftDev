@@ -9,8 +9,9 @@ namespace Core.Application.Dashboard.DashboardQuery
     {
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
-        public string? Type { get; set; } 
+        public string? Type { get; set; }
         public string? DepartmentId { get; set; }
         public string? MachineGroupId { get; set; }
+        public string? ItemCode { get; set; }
     }
 }
