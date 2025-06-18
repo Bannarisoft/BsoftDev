@@ -66,7 +66,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
                 WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId
-                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")};
+                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (PS.PreventiveSchedulerName LIKE @Search OR MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")};
 
                 SELECT  
                     PS.Id,
@@ -105,7 +105,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
                 WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId
-                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")}
+                {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (PS.PreventiveSchedulerName LIKE @Search OR MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")}
                 ORDER BY PS.Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
@@ -303,7 +303,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 							LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
 							LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
                             WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PS.UnitId=@UnitId AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)
-                            AND PSD.IsActive=1 AND PS.DepartmentId=@DepartmentId
+                             AND PS.DepartmentId=@DepartmentId
                             GROUP BY PSD.ActualWorkOrderDate,PS.DepartmentId
                             ORDER BY PSD.ActualWorkOrderDate ASC
                         ";
@@ -326,7 +326,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
 							LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
                             WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PSD.ActualWorkOrderDate=@ActualWorkOrderDate AND PS.UnitId=@UnitId 
-                            AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL) AND PSD.IsActive=1 AND PS.DepartmentId=@DepartmentId
+                            AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)  AND PS.DepartmentId=@DepartmentId
                             ORDER BY PS.Id ASC
                         ";
             var parameters = new

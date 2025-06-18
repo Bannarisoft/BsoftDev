@@ -195,7 +195,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             }
 
 
-            return false;
+            return true;
         }
 
         public async Task<bool> ScheduleInActive(PreventiveSchedulerHeader preventiveSchedulerHdr)
