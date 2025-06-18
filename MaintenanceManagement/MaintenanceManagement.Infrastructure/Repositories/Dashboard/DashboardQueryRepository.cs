@@ -71,13 +71,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
                 Series = series
             };
         }
-        public async Task<ChartDto> MaintenanceHoursDeptAsync(DateTime fromDate, DateTime toDate,string? type)
+        public async Task<ChartDto> MaintenanceHoursDeptAsync(DateTime fromDate, DateTime toDate,string? type, string? departmentId)
         {
             var parameters = new DynamicParameters();
             parameters.Add("FromDate", fromDate);
             parameters.Add("ToDate", toDate);
             parameters.Add("UnitId", UnitId);
-            parameters.Add("Type", type);     
+            parameters.Add("Type", type);    
+            parameters.Add("DeptId", departmentId); 
             var data = await _connection.QueryAsync<MaintenanceHrsDto>(
                 "Dashboard_Maintenance",
                 parameters,
@@ -188,13 +189,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
                 Series = new List<ChartSeriesDto> { maintenanceSeries, downtimeSeries }
             };
         }
-        public async Task<ChartDto> ItemConsumptionDeptSummaryAsync(DateTime fromDate, DateTime toDate, string? type,string? itemCode = null)
+        public async Task<ChartDto> ItemConsumptionDeptSummaryAsync(DateTime fromDate, DateTime toDate, string? type, string? departmentId,string? itemCode = null)
         {
             var parameters = new DynamicParameters();
             parameters.Add("FromDate", fromDate);
             parameters.Add("ToDate", toDate);
             parameters.Add("UnitId", UnitId);
-            parameters.Add("Type", type);             
+            parameters.Add("Type", type);    
+            parameters.Add("DeptId", departmentId);         
             parameters.Add("ItemCode", itemCode);
 
             var data = await _connection.QueryAsync<ItemConsumptionDto>(

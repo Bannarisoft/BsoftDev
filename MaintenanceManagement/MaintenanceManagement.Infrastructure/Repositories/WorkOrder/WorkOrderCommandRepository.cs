@@ -140,6 +140,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                     parameters.Add("@SubStoreQty", item.ToSubStoreQty);
                     parameters.Add("@ScrapQty", item.ScarpQty);
                     parameters.Add("@Rate", item.Rate);
+                    parameters.Add("@DepartmentId", item.DepartmentId);
 
                     await _dbConnection.ExecuteAsync(
                         "usp_InsertStockLedger",  // your stored procedure name
