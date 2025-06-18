@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Core.Application.Users.Commands.CreateUser;
 using Core.Application.Common.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using UserManagement.API.Validation.Users;
 using Core.Application.Common.Interfaces.IUser;
 using Core.Application.Common.Interfaces.ICompany;
@@ -14,8 +13,9 @@ using Core.Application.Common.Interfaces.IUnit;
 using UserManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using UserManagement.API.Validation.Common;
+using Moq;
 
-namespace UserManagement.Tests.SecurityTest.Validation
+namespace UserManagement.SecurityTest.Validation
 {
     [TestClass]
     public class InputSanitizationTests

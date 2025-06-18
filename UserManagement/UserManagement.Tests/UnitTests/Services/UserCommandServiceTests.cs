@@ -1,10 +1,7 @@
 using Core.Application.Common.Interfaces.IUser;
 using Core.Domain.Entities;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
-using System.Threading.Tasks;
 
 namespace UserManagement.Tests.UnitTests.Services
 {
@@ -37,8 +34,8 @@ namespace UserManagement.Tests.UnitTests.Services
                 UserType = 1,
                 EntityId = 1,
                 UserGroupId = 1,
-                userDivisions = new List<UserDivision>(),
-                userDepartments = new List<UserDepartment>(),
+                UserDivisions = new List<UserDivision>(),
+                UserDepartments = new List<UserDepartment>(),
                 UserRoleAllocations = new List<UserRoleAllocation>(),
                 UserCompanies = new List<UserCompany>(),
                 UserUnits = new List<UserUnit>(),

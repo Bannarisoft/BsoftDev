@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Users.Queries.GetUsers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace UserManagement.Tests.SecurityTest.DataExposure
+namespace UserManagement.SecurityTest.DataExposure
 {
     [TestClass]
     public class SensitiveDataLeakTests

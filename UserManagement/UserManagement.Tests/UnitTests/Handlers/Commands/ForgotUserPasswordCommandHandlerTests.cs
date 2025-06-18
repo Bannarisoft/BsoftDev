@@ -72,19 +72,19 @@ namespace Core.Application.Tests.Users.Commands
                 Mobile = "1234567890"
             };
 
-            _mockUserQueryRepository
+            _mockUserQueryRepository!
                 .Setup(r => r.GetByUsernameAsync(command.UserName))
                 .ReturnsAsync(user);
 
-            _mockChangePasswordService
+            _mockChangePasswordService!
                 .Setup(c => c.GenerateVerificationCode(It.IsAny<int>()))
                 .ReturnsAsync("ABC123");
 
-            _mockNotificationsQueryRepository
+            _mockNotificationsQueryRepository!
                 .Setup(n => n.GetResetCodeExpiryMinutes())
                 .ReturnsAsync(15);
 
-            _mockTimeZoneService
+            _mockTimeZoneService!
                 .Setup(tz => tz.GetSystemTimeZone())
                 .Returns("UTC");
 
@@ -92,19 +92,19 @@ namespace Core.Application.Tests.Users.Commands
                 .Setup(tz => tz.GetCurrentTime("UTC"))
                 .Returns(DateTime.UtcNow);
 
-            _mockEmailService
+            _mockEmailService!
                 .Setup(e => e.SendEmailAsync(It.IsAny<SendEmailCommand>()))
                 .ReturnsAsync(true);
 
-            _mockSmsService
+            _mockSmsService!
                 .Setup(s => s.SendSmsAsync(It.IsAny<SendSmsCommand>()))
                 .ReturnsAsync(true);
 
-            _mockBackgroundServiceClient
+            _mockBackgroundServiceClient!
                 .Setup(b => b.ScheduleVerificationCodeCleanupAsync(command.UserName, 15))
                 .Returns(Task.CompletedTask);
 
-            _mockMediator
+            _mockMediator!
                 .Setup(m => m.Publish(It.IsAny<AuditLogsDomainEvent>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -115,12 +115,12 @@ namespace Core.Application.Tests.Users.Commands
                 Mobile = user.Mobile
             };
 
-            _mockMapper
+            _mockMapper!
                 .Setup(m => m.Map<Core.Application.Users.Queries.GetUsers.UserDto>(user))
                 .Returns(userDto);
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
+            var result = await _handler!.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.IsTrue(result.IsSuccess);

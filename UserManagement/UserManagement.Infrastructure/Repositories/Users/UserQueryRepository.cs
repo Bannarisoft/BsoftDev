@@ -147,8 +147,8 @@ namespace UserManagement.Infrastructure.Repositories.Users
                 existingUser.UserRoleAllocations = new List<Core.Domain.Entities.UserRoleAllocation>();
                 existingUser.UserCompanies = new List<UserCompany>();
                 existingUser.UserUnits = new List<UserUnit>();
-                existingUser.userDivisions = new List<UserDivision>();
-                existingUser.userDepartments = new List<UserDepartment>();
+                existingUser.UserDivisions = new List<UserDivision>();
+                existingUser.UserDepartments = new List<UserDepartment>();
                 userDictionary[user.UserId] = existingUser;
             }
 
@@ -171,14 +171,14 @@ namespace UserManagement.Infrastructure.Repositories.Users
             }
 
             // ✅ Append user divisions
-            if (userDivision != null && !existingUser.userDivisions.Any(ud => ud.DivisionId == userDivision.DivisionId))
+            if (userDivision != null && !existingUser.UserDivisions.Any(ud => ud.DivisionId == userDivision.DivisionId))
             {
-                existingUser.userDivisions.Add(userDivision);
+                existingUser.UserDivisions.Add(userDivision);
             }
 
-             if (userDepartment != null && !existingUser.userDepartments.Any(ud => ud.DepartmentId == userDepartment.DepartmentId))
+             if (userDepartment != null && !existingUser.UserDepartments.Any(ud => ud.DepartmentId == userDepartment.DepartmentId))
             {
-                existingUser.userDepartments.Add(userDepartment);
+                existingUser.UserDepartments.Add(userDepartment);
             }
 
             // ✅ Assign UserGroupId

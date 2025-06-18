@@ -89,7 +89,7 @@ namespace UserManagement.Tests.UnitTests.Controllers
 
             _mediatorMock
                 .Setup(m => m.Send(It.Is<GetUserByIdQuery>(q => q.UserId == 99), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((UserByIdDTO?)null);
+                .ReturnsAsync((UserByIdDTO?)null!);
 
             var controller = SetupController(updateValidator: validator.Object);
 

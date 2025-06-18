@@ -105,7 +105,7 @@ namespace UserManagement.Tests.UnitTests.Handlers
             var userEntity = new User { UserName = command.UserName };
 
             _mockMapper!.Setup(m => m.Map<User>(command)).Returns(userEntity);
-            _mockUserRepository.Setup(r => r.CreateAsync(It.IsAny<User>())).ReturnsAsync((User?)null);
+            _mockUserRepository!.Setup(r => r.CreateAsync(It.IsAny<User>())).ReturnsAsync((User?)null!);
 
             // Act
             var result = await _handler!.Handle(command, CancellationToken.None);

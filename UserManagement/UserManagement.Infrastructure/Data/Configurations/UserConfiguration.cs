@@ -31,6 +31,7 @@ namespace UserManagement.Infrastructure.Data.Configurations
             builder.ToTable("Users", "AppSecurity");
 
             builder.HasKey(u => u.UserId);
+            builder.HasAlternateKey(u => u.Id); // ✅ Enable Guid-based FK from other tables
 
             builder.Property(u => u.Id)
                 .HasColumnName("Id")
@@ -127,7 +128,7 @@ namespace UserManagement.Infrastructure.Data.Configurations
             .HasColumnType("varchar(255)");
 
 
-                builder.HasOne(ug => ug.UserGroup)
+            builder.HasOne(ug => ug.UserGroup)
             .WithMany(ug => ug.Users)
             .HasForeignKey(ug => ug.UserGroupId)
             .OnDelete(DeleteBehavior.Restrict);

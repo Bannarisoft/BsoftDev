@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Application", "Core\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserManagement.Tests", "UserManagement.Tests\UserManagement.Tests.csproj", "{F9C92E54-DDD3-4A3E-B893-13DDC97CADC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserManagement.SecurityTests", "UserManagement.SecurityTests\UserManagement.SecurityTests.csproj", "{B4D94D7B-B0A4-42DB-9A8B-C0E3FEEE1EC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserManagement.IntegrationTests", "UserManagement.IntegrationTests\UserManagement.IntegrationTests.csproj", "{DBCBE908-E8F2-4D7A-BC1D-D110C3225FF5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +48,14 @@ Global
 		{F9C92E54-DDD3-4A3E-B893-13DDC97CADC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9C92E54-DDD3-4A3E-B893-13DDC97CADC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9C92E54-DDD3-4A3E-B893-13DDC97CADC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4D94D7B-B0A4-42DB-9A8B-C0E3FEEE1EC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4D94D7B-B0A4-42DB-9A8B-C0E3FEEE1EC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4D94D7B-B0A4-42DB-9A8B-C0E3FEEE1EC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4D94D7B-B0A4-42DB-9A8B-C0E3FEEE1EC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBCBE908-E8F2-4D7A-BC1D-D110C3225FF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBCBE908-E8F2-4D7A-BC1D-D110C3225FF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBCBE908-E8F2-4D7A-BC1D-D110C3225FF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBCBE908-E8F2-4D7A-BC1D-D110C3225FF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9A1ACE0C-D667-44F2-8B23-9934502E2AAA} = {3CB9F6E2-9390-4B34-B403-69214A33593C}

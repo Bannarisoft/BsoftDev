@@ -12,7 +12,7 @@ namespace UserManagement.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<UserDivision> builder)
         {
-             builder.ToTable("UserDivision", "AppSecurity");
+            builder.ToTable("UserDivision", "AppSecurity");
 
             builder.HasKey(ura => ura.Id);
 
@@ -36,16 +36,17 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
                 .HasConversion(
-                    v => v == 1, 
-                    v => v ? (byte)1 : (byte)0 
+                    v => v == 1,
+                    v => v ? (byte)1 : (byte)0
                 )
                 .IsRequired();
 
-            builder.HasOne(ura => ura.user)
-                .WithMany(ur => ur.userDivisions)
-                .HasForeignKey(ura => ura.UserId);
+            builder.HasOne(ura => ura.User)
+                .WithMany(ur => ur.UserDivisions)
+                .HasForeignKey(ura => ura.UserId)
+                .HasPrincipalKey(ur => ur.UserId); // ✅ Added to avoid Guid mismatch
 
-            builder.HasOne(ura => ura.division)
+            builder.HasOne(ura => ura.Division)
                 .WithMany(u => u.UserDivisions)
                 .HasForeignKey(ura => ura.DivisionId);
         }

@@ -6,11 +6,13 @@ using UserManagement.API.Configurations;
 using UserManagement.Infrastructure.PollyResilience;
 using UserManagement.API.GrpcServices;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Security.Claims;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+// var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
 builder.Configuration
 
@@ -37,7 +39,7 @@ builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
 builder.Services.AddGrpcClients(builder.Configuration);
 builder.Services.AddSagaInfrastructure(builder.Configuration);
-builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
+builder.Services.AddInfrastructureServices(builder.Configuration, builder.Environment);
 builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
@@ -64,10 +66,33 @@ app.UseDeveloperExceptionPage();
 //}
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
+// if (app.Environment.IsEnvironment("Testing"))
+// {
+//     Console.WriteLine("🔥 Using fake identity for testing");
+
+//     app.Use(async (context, next) =>
+//     {
+//         var identity = new ClaimsIdentity(new[]
+//         {
+//             new Claim(ClaimTypes.Name, "testuser"),
+//             new Claim(ClaimTypes.Role, "Admin"),
+//             new Claim("unit_id", "1"),
+//         }, "Test");
+
+//         context.User = new ClaimsPrincipal(identity);
+//         await next();
+//     });
+// }
+
 app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
 app.UseCors("AllowAll");
 app.UseAuthentication();
-app.UseMiddleware<TokenValidationMiddleware>();
+// app.UseMiddleware<TokenValidationMiddleware>();
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    app.UseMiddleware<TokenValidationMiddleware>();
+}
+
 
 app.UseMiddleware<UserManagement.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
@@ -85,3 +110,4 @@ app.UseEndpoints(endpoints =>
 });
 
 app.Run();
+public partial class Program { }
