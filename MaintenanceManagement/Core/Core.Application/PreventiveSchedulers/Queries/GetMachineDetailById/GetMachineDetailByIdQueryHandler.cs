@@ -24,6 +24,7 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetMachineDetailById
         public async Task<ApiResponseDTO<PreventiveSchedulerDto>> Handle(GetMachineDetailByIdQuery request, CancellationToken cancellationToken)
         {
                var preventiveScheduler = await _preventiveSchedulerQuery.GetDetailSchedulerByPreventiveScheduleId(request.Id);
+               
             var preventiveSchedulerList = _mapper.Map<PreventiveSchedulerDto>(preventiveScheduler);
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);

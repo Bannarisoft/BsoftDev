@@ -11,5 +11,6 @@ namespace Core.Application.PreventiveSchedulers.Commands.MapMachine
     {
         public int Id { get; set; }
         public int MachineId { get; set; }
+        public DateOnly LastMaintenanceActivityDate { get; set; }
     }
 }

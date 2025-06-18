@@ -24,7 +24,7 @@ namespace Core.Application.StockLedger.Queries.GetCurrentStock
         }
         public async Task<ApiResponseDTO<CurrentStockDto>> Handle(GetCurrentStockQuery request, CancellationToken cancellationToken)
         {
-            var result = await _stockLedgerQueryRepository.GetSubStoresCurrentStock(request.OldUnitId, request.ItemCode);
+            var result = await _stockLedgerQueryRepository.GetSubStoresCurrentStock(request.OldUnitId, request.ItemCode,request.DepartmentId);
 
             if (result is null)
             {

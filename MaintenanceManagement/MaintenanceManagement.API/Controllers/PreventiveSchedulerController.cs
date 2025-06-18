@@ -33,9 +33,12 @@ namespace MaintenanceManagement.API.Controllers
         private readonly IValidator<DeletePreventiveSchedulerCommand> _deletePreventiveSchedulerCommand;
         private readonly IValidator<ActiveInActivePreventiveCommand> _activeInActivePreventiveCommand;
         private readonly IValidator<RescheduleBulkImportCommand> _rescheduleBulkImportCommand;
+        private readonly IValidator<MapMachineCommand> _mapMachineCommandValidator;
+        private readonly IValidator<MachineWiseFrequencyUpdateCommand> _machineWiseFrequencyUpdateCommandValidator;
         public PreventiveSchedulerController(ISender mediator, IValidator<CreatePreventiveSchedulerCommand> createPreventiveSchedulerCommand,
         IValidator<UpdatePreventiveSchedulerCommand> updatePreventiveSchedulerCommand, IValidator<DeletePreventiveSchedulerCommand> deletePreventiveSchedulerCommand,
-        IValidator<ActiveInActivePreventiveCommand> activeInActivePreventiveCommand, IValidator<RescheduleBulkImportCommand> rescheduleBulkImportCommand)
+        IValidator<ActiveInActivePreventiveCommand> activeInActivePreventiveCommand, IValidator<RescheduleBulkImportCommand> rescheduleBulkImportCommand,
+        IValidator<MapMachineCommand> mapMachineCommandValidator, IValidator<MachineWiseFrequencyUpdateCommand> machineWiseFrequencyUpdateCommandValidator)
         : base(mediator)
         {
             _createPreventiveSchedulerCommand = createPreventiveSchedulerCommand;
@@ -43,6 +46,8 @@ namespace MaintenanceManagement.API.Controllers
             _deletePreventiveSchedulerCommand = deletePreventiveSchedulerCommand;
             _activeInActivePreventiveCommand = activeInActivePreventiveCommand;
             _rescheduleBulkImportCommand = rescheduleBulkImportCommand;
+            _mapMachineCommandValidator = mapMachineCommandValidator;
+            _machineWiseFrequencyUpdateCommandValidator = machineWiseFrequencyUpdateCommandValidator;
         }
         [Route("[action]")]
         [HttpGet]
@@ -351,23 +356,45 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPost("MapMachines")]
         public async Task<IActionResult> MapMachines(MapMachineCommand command)
         {
+            var validationResult = await _mapMachineCommandValidator.ValidateAsync(command);
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                });
+            }
             var response = await Mediator.Send(command);
 
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data = response.Data
+                message = response.Message
             });
         }
           [HttpPost("MachineFrequencyUpdate")]
         public async Task<IActionResult> MachineFrequencyUpdate(MachineWiseFrequencyUpdateCommand command)
         {
+            var validationResult = await _machineWiseFrequencyUpdateCommandValidator.ValidateAsync(command);
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = "Validation failed",
+                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+                });
+            }
             var response = await Mediator.Send(command);
 
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data = response.Data
+                message = response.Message
             });
         }
     }
