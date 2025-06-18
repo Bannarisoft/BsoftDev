@@ -3,7 +3,7 @@ using Core.Application.Dashboard.Common;
 using Core.Application.Dashboard.DashboardQuery;
 using MediatR;
 
-public class DashboardQueryHandler : IRequestHandler<DashboardQuery, List<ChartDto>>
+public class DashboardQueryHandler : IRequestHandler<DashboardQuery, ChartDto>
 {
     private readonly IDashboardQueryRepository _repository;
 
@@ -12,18 +12,21 @@ public class DashboardQueryHandler : IRequestHandler<DashboardQuery, List<ChartD
         _repository = repository;
     }
 
-    public async Task<List<ChartDto>> Handle(DashboardQuery request, CancellationToken cancellationToken)
+    public async Task<ChartDto> Handle(DashboardQuery request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Type))
-            throw new ArgumentException("Type is required. Valid values: 'department', 'machinegroup', 'itemconsumption-dept', 'itemconsumption-machine'");
+            throw new ArgumentException("Type is required. Valid values: 'workordersummary', 'itemconsumption', 'maintenancehrs-dept', 'maintenancehrs-machinegroup', 'maintenancehrs-machine'");
 
         return request.Type.ToLower() switch
         {
-            "department" => await _repository.WorkOrderDepartmentSummaryAsync(request.FromDate, request.ToDate, request.Type),
-            "machinegroup" => await _repository.WorkOrderMachineGroupSummaryAsync(request.FromDate, request.ToDate, request.Type),
-            "itemconsumption-dept" => await _repository.ItemConsumptionDepartmentSummaryAsync(request.FromDate, request.ToDate, request.Type),
-            "itemconsumption-machine" => await _repository.ItemConsumptionMachineGroupSummaryAsync(request.FromDate, request.ToDate, request.Type),
-            _ => throw new ArgumentException("Invalid type. Must be one of: 'department', 'machinegroup', 'itemconsumption-dept', 'itemconsumption-machine'")
+            "workordersummary" => await _repository.WorkOrderSummaryAsync(request.FromDate, request.ToDate, request.DepartmentId, request.MachineGroupId),
+            "itemconsumption" => await _repository.ItemConsumptionSummaryAsync(request.FromDate, request.ToDate, request.DepartmentId, request.MachineGroupId),
+            "itemconsumption-dept" => await _repository.ItemConsumptionDeptSummaryAsync(request.FromDate, request.ToDate,request.Type,request.ItemCode),
+            "itemconsumption-machinegroup" => await _repository.ItemConsumptionMachineSummaryAsync(request.FromDate, request.ToDate,request.Type,request.DepartmentId,request.ItemCode),
+            "maintenancehrs-dept" => await _repository.MaintenanceHoursDeptAsync(request.FromDate, request.ToDate,request.Type),
+            "maintenancehrs-machinegroup" => await _repository.MaintenanceHoursMachineGroupAsync(request.FromDate, request.ToDate,request.Type,request.DepartmentId),
+            "maintenancehrs-machine" => await _repository.MaintenanceHoursMachineAsync(request.FromDate, request.ToDate,request.Type, request.DepartmentId, request.MachineGroupId),
+            _ => throw new ArgumentException("Invalid type.")
         };
     }
 }

@@ -16,7 +16,7 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5293",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
+       "ASPNETCORE_ENVIRONMENT": "Development",
         "DATABASE_SERVER":"192.168.1.126",
         "DATABASE_USERID":"developer",
         "DATABASE_PASSWORD":"Dev@#$456"
