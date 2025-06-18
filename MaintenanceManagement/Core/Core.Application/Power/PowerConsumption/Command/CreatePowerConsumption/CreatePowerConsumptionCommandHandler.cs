@@ -26,7 +26,7 @@ namespace Core.Application.Power.PowerConsumption.Command.CreatePowerConsumption
         public async Task<ApiResponseDTO<int>> Handle(CreatePowerConsumptionCommand request, CancellationToken cancellationToken)
         {
               // Calculate TotalUnits
-            var totalUnits = request.ClosingReading - request.OpeningReading;
+            var totalUnits = (request.ClosingReading - request.OpeningReading) * 1000; //For Kw Conversion 
             var powerConsumption = _imapper.Map<Core.Domain.Entities.Power.PowerConsumption>(request);
             powerConsumption.TotalUnits = totalUnits;
             

@@ -31,20 +31,21 @@ namespace Core.Application.DepreciationGroup.Commands.UpdateDepreciationGroup
             if (depreciationGroups is null)
                 throw new EntityNotFoundException("DepreciationGroup", request.Id);
             
-              // Check for duplicate GroupName or SortOrder
-            var (isNameDuplicate, isCodeDuplicate,isSortOrderDuplicate) = await _depreciationGroupRepository
-                                    .CheckForDuplicatesAsync(request.DepreciationGroupName ?? string.Empty,request.Code ?? string.Empty, request.SortOrder, request.Id,request.IsActive);
+            // Step 2: Check for duplicates
+            var isDuplicate = await _depreciationGroupRepository.CheckForDuplicatesAsync(
+                request.AssetGroupId,
+                request.DepreciationMethod,
+                request.BookType,
+                request.IsActive,
+                request.Code,
+                request.DepreciationGroupName,
+                request.Id);
 
-            if (isNameDuplicate || isCodeDuplicate || isSortOrderDuplicate)
+            if (isDuplicate)
             {
-                var message = isNameDuplicate && isCodeDuplicate && isSortOrderDuplicate
-                ? "Both Name, Code, and Sort Order already exist."
-                : isNameDuplicate
-                    ? "DepreciationGroup with the same Name already exists."
-                    : isCodeDuplicate
-                        ? "DepreciationGroup with the same Code already exists."
-                        : "DepreciationGroup with the same Sort Order already exists.";
-                throw new EntityAlreadyExistsException("DepreciationGroup", "Validation", message);        
+                var message = "A DepreciationGroup with the same Name or Code already exists " +
+                            $"under the same AssetGroup, Method, and BookType.";
+                throw new EntityAlreadyExistsException("DepreciationGroup", "DuplicateCheck", message);
             }
             
             var oldDepreciationName = depreciationGroups.DepreciationGroupName;            

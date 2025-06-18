@@ -100,6 +100,22 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
             existingWorkOrder.ModifiedIP =  _ipAddressService.GetSystemIPAddress();
             existingWorkOrder.ModifiedDate = DateTime.UtcNow;
 
+
+           /*   // ✅ Update TotalManPower and TotalSpentHours if status is "Closed"
+            var closedStatusId = await _applicationDbContext.MiscMaster
+                .Where(x => x.Code == MiscEnumEntity.MaintenanceStatusUpdate.Code)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            if (workOrder.StatusId == closedStatusId)
+            {
+                var technicianCount = workOrder.WorkOrderTechnicians?.Count ?? 0;
+                var totalHours = workOrder.WorkOrderTechnicians?.Sum(t => t.HoursSpent + (t.MinutesSpent / 60.0)) ?? 0;
+
+                existingWorkOrder.TotalManPower = technicianCount;
+                existingWorkOrder.TotalSpentHours = (decimal?)Math.Round(totalHours, 2);              
+            } */            
+
             _applicationDbContext.WorkOrder.Update(existingWorkOrder);
 
             await _applicationDbContext.AddRangeAsync(workOrder.WorkOrderActivities ?? []);
@@ -169,33 +185,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 }
                 docSerialNumber++;
             }
-            // ✅ Update TotalManPower and TotalSpentHours if status is "Closed"
-            var closedStatusId = await _applicationDbContext.MiscMaster
-                .Where(x => x.Code == MiscEnumEntity.MaintenanceStatusUpdate.Code)
-                .Select(x => x.Id)
-                .FirstOrDefaultAsync();
-
-            if (workOrder.StatusId == closedStatusId)
-            {
-                var technicianCount = workOrder.WorkOrderTechnicians?.Count ?? 0;
-                var totalHours = workOrder.WorkOrderTechnicians?.Sum(t => t.HoursSpent + (t.MinutesSpent / 60.0)) ?? 0;
-
-                existingWorkOrder.TotalManPower = technicianCount;
-                existingWorkOrder.TotalSpentHours = (decimal?)Math.Round(totalHours, 2);
-
-                // 🔥 Publish event for next scheduler creation
-                /*  if (workOrder.PreventiveScheduleId.HasValue)
-                 {
-                     var correlationId = Guid.NewGuid();
-                     await  _publishEndpoint.Publish (new WorkOrderClosedEvent
-                     {
-                         CorrelationId = correlationId, 
-                         PreventiveSchedulerDetailId =workOrder.PreventiveScheduleId.Value,
-                         WorkOrderId = workOrder.Id
-                     });
-                 }                 */
-            }
-
+           
             return result > 0;
         }
         private void EnsureDirectoryExists(string path)
