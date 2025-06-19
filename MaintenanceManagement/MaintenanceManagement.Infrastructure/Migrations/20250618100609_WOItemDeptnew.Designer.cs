@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250618100609_WOItemDeptnew")]
+    partial class WOItemDeptnew
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1443,10 +1446,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("OldItemId")
                         .HasColumnType("varchar(50)")
                         .HasColumnName("OldItemId");
-
-                    b.Property<string>("OldItemName")
-                        .HasColumnType("varchar(max)")
-                        .HasColumnName("OldItemName");
 
                     b.Property<int>("PreventiveSchedulerHeaderId")
                         .HasColumnType("int")

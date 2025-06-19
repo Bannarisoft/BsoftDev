@@ -31,12 +31,19 @@ namespace MaintenanceManagement.API.Controllers.Dashboard
             return Ok(data);
         }
 
+        [HttpGet("maintenance-hoursDept")]
+        public async Task<IActionResult> GetMaintenanceHoursDept([FromQuery] DashboardQuery request)
+        {
+            request.Type = "maintenancehrs-dept";
+
+            var data = await _mediator.Send(request);
+            return Ok(data);
+        }
         [HttpGet("maintenance-hours")]
         public async Task<IActionResult> GetMaintenanceHours([FromQuery] DashboardQuery request)
         {
             request.Type = request.MachineGroupId != null ? "maintenancehrs-machine" :
-                        request.DepartmentId != null ? "maintenancehrs-machinegroup" :
-                        "maintenancehrs-dept";
+                        "maintenancehrs-machinegroup";                        
 
             var data = await _mediator.Send(request);
             return Ok(data);
@@ -44,8 +51,15 @@ namespace MaintenanceManagement.API.Controllers.Dashboard
         [HttpGet("itemconsumption-dept")]
         public async Task<IActionResult> GetItemConsumptionDept([FromQuery] DashboardQuery request)
         {
-            request.Type = request.DepartmentId == null ? "itemconsumption-dept" :                        
-                        "itemconsumption-machinegroup";
+            request.Type = "itemconsumption-dept";                        
+
+            var data = await _mediator.Send(request);
+            return Ok(data);
+        }
+         [HttpGet("itemconsumption-machinegroup")]
+        public async Task<IActionResult> GetItemConsumptionMachineGroup([FromQuery] DashboardQuery request)
+        {
+            request.Type = "itemconsumption-machinegroup";
 
             var data = await _mediator.Send(request);
             return Ok(data);
