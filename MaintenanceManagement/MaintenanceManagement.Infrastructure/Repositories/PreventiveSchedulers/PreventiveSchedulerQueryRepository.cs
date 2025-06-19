@@ -155,7 +155,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PSI.OldItemId,
                     PSI.RequiredQty,
                     PSI.OldCategoryDescription,
-                    PSI.OldGroupName
+                    PSI.OldGroupName,
+                    PSI.OldItemName
                 FROM [Maintenance].[PreventiveSchedulerHeader] PS
                 INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId = PS.Id
                 LEFT JOIN [Maintenance].[PreventiveSchedulerItems] PSI ON PSI.PreventiveSchedulerHeaderId = PS.Id
@@ -592,6 +593,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PSI.RequiredQty,
                     PSI.OldCategoryDescription,
                     PSI.OldGroupName,
+                    PSI.OldItemName,
                     M.MachineName,
                     M.MachineCode,
                     MG.GroupName,
@@ -681,7 +683,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
 					   INNER JOIN [Maintenance].[MachineMaster] M ON M.Id=PSD.MachineId AND M.MachineGroupId=MG.Id
 					   WHERE PSH.Id=@Id AND  PSD.IsActive = 1 AND PSD.IsDeleted = 0
 					   GROUP BY  M.Id, M.MachineCode,M.MachineName 
+
+                       SELECT WO.PreventiveScheduleId,PSD.MachineId INTO #WorkOrderDone FROM [Maintenance].[WorkOrder] WO
+                        INNER JOIN  [Maintenance].[PreventiveSchedulerDetail] PSD ON  PSD.Id = WO.PreventiveScheduleId
+                        INNER JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
+                        WHERE PSD.PreventiveSchedulerHeaderId=@Id AND MISC.Code=@DoneStatus
                        
+                       DELETE A FROM #MappedMachines A 
+					   INNER JOIN #WorkOrderDone B ON A.Id=B.MachineId
+
                        DELETE A FROM #UnMappedMachines A 
 					   INNER JOIN #MappedMachines B ON A.Id=B.Id
                        
@@ -690,7 +700,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             var parameters = new
             {
                 Id,
-                StatusCodes = statusCodes
+                StatusCodes = statusCodes,
+                DoneStatus = MaintenanceStatusUpdate.Code
             };
             var machines = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
             return machines.ToList();
