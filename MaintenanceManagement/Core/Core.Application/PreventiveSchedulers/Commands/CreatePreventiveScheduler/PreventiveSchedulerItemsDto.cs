@@ -11,6 +11,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
         public int RequiredQty { get; set; }
         // public int? SourceId { get; set; }
         public string? OldCategoryDescription { get; set; }
-        public string? OldGroupName{ get; set; }
+        public string? OldGroupName { get; set; } 
+        public string? OldItemName{ get; set; }
     }
 }
