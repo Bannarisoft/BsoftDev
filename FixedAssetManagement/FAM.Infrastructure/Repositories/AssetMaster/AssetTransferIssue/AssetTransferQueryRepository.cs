@@ -22,22 +22,22 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
     public class AssetTransferQueryRepository : IAssetTransferQueryRepository
     {
         private readonly IDbConnection _dbConnection;
-        private  readonly IIPAddressService _iPAddressService;
-        
+        private readonly IIPAddressService _iPAddressService;
 
-         public AssetTransferQueryRepository(IDbConnection dbConnection, IIPAddressService iPAddressService)
+
+        public AssetTransferQueryRepository(IDbConnection dbConnection, IIPAddressService iPAddressService)
         {
             _dbConnection = dbConnection;
             _iPAddressService = iPAddressService;
         }
-        
 
 
-         public async Task<(List<AssetTransferDto>, int)> GetAllAsync(int PageNumber, int PageSize ,string? SearchTerm, DateTimeOffset? FromDate , DateTimeOffset? ToDate )        
-        { 
-                var CompanyId = _iPAddressService.GetCompanyId();
-                var UnitId = _iPAddressService.GetUnitId();           
-                        var query = $$"""
+
+        public async Task<(List<AssetTransferDto>, int)> GetAllAsync(int PageNumber, int PageSize, string? SearchTerm, DateTimeOffset? FromDate, DateTimeOffset? ToDate)
+        {
+            var CompanyId = _iPAddressService.GetCompanyId();
+            var UnitId = _iPAddressService.GetUnitId();
+            var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
                 FROM FixedAsset.AssetTransferIssueHdr A
@@ -49,7 +49,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                 WHERE 1 = 1 AND A.FromUnitId = @UnitId
                 {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
                 {{(ToDate.HasValue ? "AND A.DocDate <= @ToDate" : "")}}
-                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search)") }};
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search)")}};
 
 
                 SELECT 
@@ -93,7 +93,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                 WHERE 1 = 1      AND A.FromUnitId = @UnitId    
                 {{(FromDate.HasValue ? "AND A.DocDate >= @FromDate" : "")}}
                 {{(ToDate.HasValue ? "AND A.DocDate < @ToDate" : "")}}
-                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search)") }}        
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CAST(A.Id AS NVARCHAR) LIKE @Search)")}}        
                 ORDER BY A.Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
@@ -103,13 +103,13 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
 
 
             var parameters = new
-            {  
+            {
                 UnitId,
                 FromDate,
-                ToDate  = ToDate?.Date.AddDays(1),
+                ToDate = ToDate?.Date.AddDays(1),
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize               
+                PageSize
             };
 
 
@@ -119,12 +119,12 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
 
 
             return (assetTransferList, totalCount);
-   }
-      public async Task<AssetTransferJsonDto> GetAssetTransferByIdAsync(int assetTransferId)
-    {
-        var CompanyId = _iPAddressService.GetCompanyId();
-        var UnitId = _iPAddressService.GetUnitId();
-        const string query = @"
+        }
+        public async Task<AssetTransferJsonDto> GetAssetTransferByIdAsync(int assetTransferId)
+        {
+            var CompanyId = _iPAddressService.GetCompanyId();
+            var UnitId = _iPAddressService.GetUnitId();
+            const string query = @"
             SELECT Id as AssetTransferId , DocDate, TransferType, FromUnitId, ToUnitId, FromDepartmentId, ToDepartmentId, 
                    FromCustodianId, ToCustodianId, Status, FromCustodianName, ToCustodianName,GatePassNo
           
@@ -138,66 +138,66 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
             FOR JSON PATH, INCLUDE_NULL_VALUES;
         ";
 
-        using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { AssetTransferId=assetTransferId,UnitId });
+            using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { AssetTransferId = assetTransferId, UnitId });
 
-        string headerJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
-        string detailsJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+            string headerJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+            string detailsJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
 
-        if (string.IsNullOrWhiteSpace(headerJson))
-        {
-            return null;
+            if (string.IsNullOrWhiteSpace(headerJson))
+            {
+                return null;
+            }
+
+
+
+            var header = JsonSerializer.Deserialize<List<AssetTransferJsonDto>>(headerJson, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })?.FirstOrDefault();
+
+            var details = JsonSerializer.Deserialize<List<AssetTransferDetailJsonDto>>(detailsJson ?? "[]", new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (header != null)
+            {
+                header.AssetTransferDetails = details ?? new List<AssetTransferDetailJsonDto>();
+            }
+
+            return header;
         }
 
-    
-
-        var header = JsonSerializer.Deserialize<List<AssetTransferJsonDto>>(headerJson, new JsonSerializerOptions
+        public async Task<List<GetCategoryByDeptIdDto>> GetCategoriesByDepartmentAsync(int departmentId)
         {
-            PropertyNameCaseInsensitive = true
-        })?.FirstOrDefault();
-
-        var details = JsonSerializer.Deserialize<List<AssetTransferDetailJsonDto>>(detailsJson ?? "[]", new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
-
-        if (header != null)
-        {
-            header.AssetTransferDetails = details ?? new List<AssetTransferDetailJsonDto>();
-        }
-
-        return header;
-    }
-    
-    public async Task<List<GetCategoryByDeptIdDto>> GetCategoriesByDepartmentAsync(int departmentId)
-    {        
-        var CompanyId = _iPAddressService.GetCompanyId();
-           var UnitId = _iPAddressService.GetUnitId();    
+            var CompanyId = _iPAddressService.GetCompanyId();
+            var UnitId = _iPAddressService.GetUnitId();
             const string query = @"SELECT DISTINCT 
             A.Id AS CategoryID,  A.CategoryName  FROM FixedAsset.AssetCategories A 
             INNER JOIN FixedAsset.AssetMaster   B   ON A.Id = B.AssetCategoryId 
             INNER JOIN FixedAsset.AssetLocation C   ON B.Id = C.AssetId 
-            WHERE C.DepartmentId = @departmentId AND B.CompanyId = @CompanyId AND B.UnitId = @UnitId";                          
-            var result = await _dbConnection.QueryAsync<GetCategoryByDeptIdDto>(query, new { departmentId,CompanyId,UnitId });         
-            return result.ToList();      
-    }   
+            WHERE C.DepartmentId = @departmentId AND B.CompanyId = @CompanyId AND B.UnitId = @UnitId";
+            var result = await _dbConnection.QueryAsync<GetCategoryByDeptIdDto>(query, new { departmentId, CompanyId, UnitId });
+            return result.ToList();
+        }
 
-    public async Task<List<GetAssetMasterDto>> GetAssetsByCategoryAsync(int assetCategoryId , int assetDepartmentId)
-    {         
-           // const string query = @"SELECT Id as AssetId, AssetName FROM FixedAsset.AssetMaster WHERE AssetCategoryId = @assetCategoryId"; 
-           var CompanyId = _iPAddressService.GetCompanyId();
-           var UnitId = _iPAddressService.GetUnitId();   
+        public async Task<List<GetAssetMasterDto>> GetAssetsByCategoryAsync(int assetCategoryId, int assetDepartmentId)
+        {
+            // const string query = @"SELECT Id as AssetId, AssetName FROM FixedAsset.AssetMaster WHERE AssetCategoryId = @assetCategoryId"; 
+            var CompanyId = _iPAddressService.GetCompanyId();
+            var UnitId = _iPAddressService.GetUnitId();
             const string query = @"	SELECT  A.Id AS AssetId,A.AssetName,A.AssetCategoryId FROM FixedAsset.AssetMaster A 
                                     INNER JOIN FixedAsset.AssetLocation B  ON A.Id = B.AssetId  
-                                    WHERE      A.AssetCategoryId = @assetCategoryId   AND B.DepartmentId =  @assetDepartmentId  AND A.CompanyId = @CompanyId AND A.UnitId = @UnitId";                      
-            var result = await _dbConnection.QueryAsync<GetAssetMasterDto>(query, new { assetCategoryId, assetDepartmentId,CompanyId,UnitId });         
-            return result.ToList();      
-    }   
-    
-     public async Task<GetAssetDetailsToTransferHdrDto>  GetAssetDetailsToTransferByIdAsync(int assetId)
-    {
-                    var CompanyId = _iPAddressService.GetCompanyId();
-                    var UnitId = _iPAddressService.GetUnitId();   
-                    const string query = @"
+                                    WHERE      A.AssetCategoryId = @assetCategoryId   AND B.DepartmentId =  @assetDepartmentId  AND A.CompanyId = @CompanyId AND A.UnitId = @UnitId";
+            var result = await _dbConnection.QueryAsync<GetAssetMasterDto>(query, new { assetCategoryId, assetDepartmentId, CompanyId, UnitId });
+            return result.ToList();
+        }
+
+        public async Task<GetAssetDetailsToTransferHdrDto> GetAssetDetailsToTransferByIdAsync(int assetId)
+        {
+            var CompanyId = _iPAddressService.GetCompanyId();
+            var UnitId = _iPAddressService.GetUnitId();
+            const string query = @"
                     -- Get Asset Master Details
                     SELECT 
                         A.Id AS AssetId, A.CreatedDate as DocDate,  H.CategoryName, A.AssetCode, A.AssetName, 
@@ -230,112 +230,110 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
 
                 ";
 
-                using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { AssetId = assetId,CompanyId,UnitId });
+            using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { AssetId = assetId, CompanyId, UnitId });
 
-                string assetJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
-                string transferJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
-                var location = await multiQuery.ReadFirstOrDefaultAsync<dynamic>();
+            string assetJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+            string transferJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
+            var location = await multiQuery.ReadFirstOrDefaultAsync<dynamic>();
 
 
-                
+            if (string.IsNullOrWhiteSpace(assetJson))
+            {
+                return null; // Asset not found
+            }
 
-                if (string.IsNullOrWhiteSpace(assetJson))
+
+            var assetDetails = JsonSerializer.Deserialize<List<GetAssetDetailsToTransferHdrDto>>(assetJson, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })?.FirstOrDefault();
+
+            // Deserialize Transfer Issue Details
+            var transferDetails = JsonSerializer.Deserialize<List<GetAssetDetailsToTransferDto>>(transferJson ?? "[]", new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (assetDetails != null)
+            {
+                assetDetails.GetAssetDetailToTransfer = transferDetails ?? new List<GetAssetDetailsToTransferDto>();
+
+                if (location != null)
                 {
-                    return null; // Asset not found
-                }
+                    assetDetails.UnitName = location.UnitName;
+                    assetDetails.DepartmentName = location.DeptName;
+                    assetDetails.LocationName = location.LocationName;
+                    assetDetails.SubLocationName = location.SubLocationName;
+                    assetDetails.FromCustodianId = location.CustodianId;
+                    assetDetails.OldUnitId = location.OldUnitId;
+                    assetDetails.ToCustodianId = location.ToCustodianId;
 
-          
-                var assetDetails = JsonSerializer.Deserialize<List<GetAssetDetailsToTransferHdrDto>>(assetJson, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                })?.FirstOrDefault();
-
-                // Deserialize Transfer Issue Details
-                var transferDetails = JsonSerializer.Deserialize<List<GetAssetDetailsToTransferDto>>(transferJson ?? "[]", new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-                if (assetDetails != null)
-                {
-                    assetDetails.GetAssetDetailToTransfer = transferDetails ?? new List<GetAssetDetailsToTransferDto>();
-
-                     if (location != null)
+                    // Fetch Custodian Name if CustodianId is valid;
+                    if (location.CustodianId > 0 && !string.IsNullOrEmpty(location.OldUnitId))
                     {
-                        assetDetails.UnitName = location.UnitName;
-                        assetDetails.DepartmentName = location.DeptName;
-                        assetDetails.LocationName = location.LocationName;
-                        assetDetails.SubLocationName = location.SubLocationName;
-                        assetDetails.FromCustodianId = location.CustodianId;
-                        assetDetails.OldUnitId = location.OldUnitId;
-                        assetDetails.ToCustodianId=location.ToCustodianId;
-
-                        // Fetch Custodian Name if CustodianId is valid;
-                        if (location.CustodianId > 0 && !string.IsNullOrEmpty(location.OldUnitId))
+                        var custodianParams = new
                         {
-                            var custodianParams = new
-                            {
-                                DivCode = location.OldUnitId,
-                                EmpNo = location.CustodianId
-                            };
+                            DivCode = location.OldUnitId,
+                            EmpNo = location.CustodianId
+                        };
 
-                            var custodianEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
-                                "dbo.GetEmployeeByDivision",
-                                custodianParams,
-                                commandType: CommandType.StoredProcedure
-                            );
+                        var custodianEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
+                            "dbo.GetEmployeeByDivision",
+                            custodianParams,
+                            commandType: CommandType.StoredProcedure
+                        );
 
-                            assetDetails.FromCustodianName = custodianEmployee?.Empname;
-                        }
-                         // Fetch User
-                        if (assetDetails.ToCustodianId > 0)
+                        assetDetails.FromCustodianName = custodianEmployee?.Empname;
+                    }
+                    // Fetch User
+                    if (assetDetails.ToCustodianId > 0)
+                    {
+                        var userParams = new
                         {
-                            var userParams = new
-                            {
-                                DivCode = assetDetails.OldUnitId,
-                                EmpNo = assetDetails.ToCustodianId
-                            };
+                            DivCode = assetDetails.OldUnitId,
+                            EmpNo = assetDetails.ToCustodianId
+                        };
 
-                            var userEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
-                                "dbo.GetEmployeeByDivision",
-                                userParams,
-                                commandType: CommandType.StoredProcedure
-                            );
+                        var userEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
+                            "dbo.GetEmployeeByDivision",
+                            userParams,
+                            commandType: CommandType.StoredProcedure
+                        );
 
-                            if (userEmployee != null)
-                                assetDetails.ToCustodianName = userEmployee.Empname;
-                        }
+                        if (userEmployee != null)
+                            assetDetails.ToCustodianName = userEmployee.Empname;
                     }
                 }
-                return assetDetails;                
-                }
-                public async Task<bool> IsAssetPendingOrApprovedAsync(int assetId)
-                {
-                       var UnitId = _iPAddressService.GetUnitId();   
-                    const string query = @"
+            }
+            return assetDetails;
+        }
+        public async Task<bool> IsAssetPendingOrApprovedAsync(int assetId)
+        {
+            var UnitId = _iPAddressService.GetUnitId();
+            const string query = @"
                         SELECT 1 FROM FixedAsset.AssetTransferIssueHdr A
                         INNER JOIN FixedAsset.AssetTransferIssueDtl B ON A.Id = B.AssetTransferId
                         WHERE B.AssetId = @assetId  
                         AND (A.Status = 'Pending' OR (A.Status = 'Approved' AND A.AckStatus <> 1))";
 
-                    var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { assetId });
-                    return result.HasValue; // If record exists, return true (restricted)
-                }
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { assetId });
+            return result.HasValue; // If record exists, return true (restricted)
+        }
 
-               public async Task<List<GetAllTransferDtlDto>> GetAssetTransferByIDAsync(int assetTransferId)
-                {         
-                    var CompanyId = _iPAddressService.GetCompanyId();
-                    var UnitId = _iPAddressService.GetUnitId();
-                        const string query = @"SELECT  A.Id,A.AssetTransferId,A.AssetId,B.AssetCode,B.AssetName,A.AssetValue  FROM FixedAsset.AssetTransferIssueDtl A 
-			                                 INNER JOIN  FixedAsset.AssetMaster B on  A.AssetId=B.ID WHERE AssetTransferId = @assetTransferId AND B.CompanyId = @CompanyId AND B.UnitId = @UnitId";                           
-                        var result = await _dbConnection.QueryAsync<GetAllTransferDtlDto>(query, new { assetTransferId,CompanyId,UnitId });         
-                        return result.ToList();      
-                }                                
-               
+        public async Task<List<GetAllTransferDtlDto>> GetAssetTransferByIDAsync(int assetTransferId)
+        {
+            var CompanyId = _iPAddressService.GetCompanyId();
+            var UnitId = _iPAddressService.GetUnitId();
+            const string query = @"SELECT  A.Id,A.AssetTransferId,A.AssetId,B.AssetCode,B.AssetName,A.AssetValue  FROM FixedAsset.AssetTransferIssueDtl A 
+			                                 INNER JOIN  FixedAsset.AssetMaster B on  A.AssetId=B.ID WHERE AssetTransferId = @assetTransferId AND B.CompanyId = @CompanyId AND B.UnitId = @UnitId";
+            var result = await _dbConnection.QueryAsync<GetAllTransferDtlDto>(query, new { assetTransferId, CompanyId, UnitId });
+            return result.ToList();
+        }
+
 
         public async Task<List<Core.Domain.Entities.MiscMaster>> GetTransferTypeAsync()
-        { 
-             
+        {
+
             const string query = @"
                     SELECT M.Id,MiscTypeId,Code,M.Description,SortOrder, M.IsActive
                     ,M.CreatedBy,M.CreatedDate,M.CreatedByName,M.CreatedIP,M.ModifiedBy,M.ModifiedDate,M.ModifiedByName,M.ModifiedIP
@@ -344,10 +342,32 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                     WHERE (MiscTypeCode = @MiscTypeCode)
                     AND M.IsDeleted=0 and M.IsActive=1 
                     ORDER BY M.ID DESC";
-                    var parameters = new { MiscTypeCode = MiscEnumEntity.AssetTransferType.MiscCode};
-                    var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
-                    return result.ToList();
+            var parameters = new { MiscTypeCode = MiscEnumEntity.AssetTransferType.MiscCode };
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query, parameters);
+            return result.ToList();
         }
+
+
+            public async Task<bool> DepartmentSoftDeleteValidation(int Id)
+        {
+            const string query = @"
+                SELECT COUNT(*) FROM (
+                    SELECT 1 FROM FixedAsset.AssetTransferIssueHdr WHERE FromDepartmentId = @Id
+                    UNION ALL
+                    SELECT 1 FROM FixedAsset.AssetTransferIssueHdr WHERE ToDepartmentId = @Id
+                    UNION ALL
+                    SELECT 1 FROM FixedAsset.AssetLocation WHERE DepartmentId = @Id
+                    UNION ALL
+                    SELECT 1 FROM FixedAsset.SubLocation WHERE DepartmentId = @Id
+                    UNION ALL
+                    SELECT 1 FROM FixedAsset.Location WHERE DepartmentId = @Id AND IsDeleted = 0
+                ) AS AllReferences;
+            ";
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id });
+            return count > 0;
+        }
+
     }
 
 }

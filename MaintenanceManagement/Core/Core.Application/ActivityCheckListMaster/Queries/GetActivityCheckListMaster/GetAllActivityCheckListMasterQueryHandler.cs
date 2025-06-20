@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IActivityCheckListMaster;
 using Core.Domain.Events;
@@ -18,12 +19,15 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListM
          private readonly IActivityCheckListMasterQueryRepository _activityCheckListMasterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
+           private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        
 
-        public GetAllActivityCheckListMasterQueryHandler(IActivityCheckListMasterQueryRepository activityCheckListMasterQueryRepository, IMapper mapper, IMediator mediator)        
+        public GetAllActivityCheckListMasterQueryHandler(IActivityCheckListMasterQueryRepository activityCheckListMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
         {
             _activityCheckListMasterQueryRepository = activityCheckListMasterQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
+            _departmentGrpcClient = departmentGrpcClient;
         }
 
 
@@ -34,7 +38,31 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListM
             var (checkLists, totalCount) = await _activityCheckListMasterQueryRepository.GetAllActivityCheckListMasterAsync(request.PageNumber, request.PageSize, request.SearchTerm);
 
             // Map domain entities to DTOs
-            var checkListDto = _mapper.Map<List<GetAllActivityCheckListMasterDto>>(checkLists);
+            var checkListDto = _mapper.Map<List<GetAllActivityCheckListMasterDto>>(checkLists); 
+
+
+              // 🔥 Fetch departments using gRPC
+            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+            var activityMasterDictionary = new Dictionary<int, GetAllActivityCheckListMasterDto>(); 
+                       
+            
+            
+            // foreach (var data in checkListDto)
+            // {
+
+            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+            //     {
+
+            //         data.DepartmentName = departmentName;
+            //     }
+            //     activityMasterDictionary[data.DepartmentId] = data;
+            // }
+
+             var filteredActivities = checkListDto
+            .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            .ToList();          
 
             // Publish domain event for auditing
             var domainEvent = new AuditLogsDomainEvent(
@@ -51,8 +79,8 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListM
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = checkListDto,
-                TotalCount = totalCount,
+                Data = filteredActivities,
+                TotalCount = filteredActivities.Count,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
             };

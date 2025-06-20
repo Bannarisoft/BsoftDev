@@ -40,5 +40,7 @@ namespace UserManagement.Infrastructure.GrpcClients
             var response = await _client.IsDepartmentUsedInCostCenterAsync(request, new CallOptions(metadata));
             return response.IsUsed;
         }
+
+        
     }
 }
