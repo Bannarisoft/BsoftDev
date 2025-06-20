@@ -191,9 +191,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
         {
             var query = $$"""
 
-                Select PSH.DepartmentId,PSH.PreventiveSchedulerName,MG.GroupName,MM.MachineName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
+                Select PSH.DepartmentId,PSH.PreventiveSchedulerName,MG.DepartmentId AS ProductionDepartmentId,MG.GroupName,MM.MachineName,MISC.description AS MaintenanceCategory,A.ActivityName,ActivityType.Code AS ActivityType,
                 Cast(PSD.ActualWorkOrderDate as varchar) AS DueDate,Cast(PSD.LastMaintenanceActivityDate AS varchar) AS LastCompletionDate,MM.MachineCode,
-                WOStatus.Code AS WorkOrderStatus,WO.WorkOrderDocNo 
+                WOStatus.Code AS WorkOrderStatus,WO.WorkOrderDocNo,CASE 
+                WHEN DATEDIFF(DAY, PSD.ActualWorkOrderDate,GETDATE()) < 1 THEN 'NA'
+                ELSE CAST(DATEDIFF(DAY, PSD.ActualWorkOrderDate,GETDATE()) AS VARCHAR)
+                END AS PendingDays
                 from [Maintenance].[PreventiveSchedulerHeader] PSH
                 Inner Join [Maintenance].[MachineGroup] MG ON PSH.MachineGroupId=MG.Id
                 Inner Join [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId=PSH.Id
@@ -208,7 +211,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                 {{(FromDueDate.HasValue ? "AND PSD.ActualWorkOrderDate >= @FromDueDate" : "")}}
                 {{(ToDueDate.HasValue ? "AND PSD.ActualWorkOrderDate <= @ToDueDate" : "")}}
                 group by PSH.Id,PSH.DepartmentId,MG.GroupName,MISC.description,A.ActivityName,ActivityType.Code,PSD.ActualWorkOrderDate,PSD.LastMaintenanceActivityDate,
-                MM.MachineName,PSH.PreventiveSchedulerName,MM.MachineCode,WOStatus.Code,WO.WorkOrderDocNo 
+                MM.MachineName,PSH.PreventiveSchedulerName,MM.MachineCode,WOStatus.Code,WO.WorkOrderDocNo,MG.DepartmentId 
                 
                 ORDER BY PSH.Id desc
             """;

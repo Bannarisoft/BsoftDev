@@ -38,6 +38,10 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                   builder.Property(t => t.OldGroupName)
                 .HasColumnName("OldGroupName")
                 .HasColumnType("varchar(50)");
+                
+                builder.Property(t => t.OldItemName)
+                .HasColumnName("OldItemName")
+                .HasColumnType("varchar(max)");
 
                 builder.HasOne(t => t.PreventiveScheduler)
                 .WithMany(t => t.PreventiveSchedulerItems)

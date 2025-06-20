@@ -1444,6 +1444,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("OldItemId");
 
+                    b.Property<string>("OldItemName")
+                        .HasColumnType("varchar(max)")
+                        .HasColumnName("OldItemName");
+
                     b.Property<int>("PreventiveSchedulerHeaderId")
                         .HasColumnType("int")
                         .HasColumnName("PreventiveSchedulerHeaderId");
@@ -1904,6 +1908,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<int>("AvailableQty")
                         .HasColumnType("int")
                         .HasColumnName("AvailableQty");
+
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
 
                     b.Property<string>("Image")
                         .HasColumnType("varchar(250)")

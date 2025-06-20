@@ -1467,12 +1467,11 @@ namespace FAM.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssetGroupId");
+
                     b.HasIndex("BookType");
 
                     b.HasIndex("DepreciationMethod");
-
-                    b.HasIndex("AssetGroupId", "DepreciationMethod", "BookType", "IsActive")
-                        .IsUnique();
 
                     b.ToTable("DepreciationGroups", "FixedAsset");
                 });

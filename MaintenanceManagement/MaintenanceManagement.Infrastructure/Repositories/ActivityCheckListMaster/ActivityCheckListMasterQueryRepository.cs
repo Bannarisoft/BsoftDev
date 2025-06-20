@@ -21,9 +21,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
             _dbConnection = dbConnection;
 
         }
-
-
-
         public async Task<(List<GetAllActivityCheckListMasterDto>, int)> GetAllActivityCheckListMasterAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             var query = $$"""
@@ -40,6 +37,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                         aclm.ActivityID,
                         am.ActivityName,
                         aclm.ActivityChecklist ,
+                        am.DepartmentId,
                         aclm.IsActive,
                         aclm.IsDeleted,
                         aclm.CreatedBy,

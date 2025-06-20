@@ -7,6 +7,7 @@ using Contracts.Events;
 using FAM.API.Middleware;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using FAM.Infrastructure.Logging.Middleware;
+using FAM.API.GrpcServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +66,7 @@ app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapGrpcService<AssetSpecificationGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<FixedAssetDepartmentValidationGrpcService>().EnableGrpcWeb();    
     endpoints.MapControllers();
 });
 app.Run();

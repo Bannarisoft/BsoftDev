@@ -51,7 +51,7 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
         }
         public async Task<bool> ExistsByCodeAsync(string code)
         {
-            return await _applicationDbContext.DepreciationGroups.AnyAsync(c => c.Code == code);
+            return await _applicationDbContext.DepreciationGroups.AnyAsync(c => c.Code == code && c.IsDeleted == BaseEntity.IsDelete.NotDeleted);
         }
         public async Task<bool> ExistsByAssetGroupIdAsync(int assetGroupId)
         {
@@ -62,20 +62,18 @@ namespace FAM.Infrastructure.Repositories.DepreciationGroup
         {
             return await _applicationDbContext.DepreciationGroups.MaxAsync(ac => (int?)ac.SortOrder) ?? -1;
         }       
-        public async Task<(bool IsNameDuplicate,bool IsCodeDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name,string code, int sortOrder, int excludeId,BaseEntity.Status isActive)
-        {            
 
-            var isNameDuplicate = await _applicationDbContext.DepreciationGroups
-                .AnyAsync(ag => ag.DepreciationGroupName == name && ag.Id != excludeId && ag.IsActive==isActive);
-
-            var IsCodeDuplicate = await _applicationDbContext.DepreciationGroups
-                .AnyAsync(ag => ag.Code == code && ag.Id != excludeId  && ag.IsActive==isActive);
-
-            var isSortOrderDuplicate = await _applicationDbContext.DepreciationGroups
-                .AnyAsync(ag => ag.SortOrder == sortOrder && ag.Id != excludeId  && ag.IsActive==isActive);
-
-            return (isNameDuplicate, IsCodeDuplicate,isSortOrderDuplicate);
-       }
-
+       public async Task<DepreciationGroups> CheckForDuplicatesAsync(
+        int groupId, int depMethodId, int bookTypeId,int excludeId)
+        {
+           return await _applicationDbContext.DepreciationGroups
+            .FirstOrDefaultAsync(ag =>
+            ag.AssetGroupId == groupId &&
+            ag.DepreciationMethod == depMethodId &&
+            ag.BookType == bookTypeId &&
+            ag.IsDeleted == BaseEntity.IsDelete.NotDeleted &&
+            ag.Id != excludeId
+        );
+        }
     }
 }

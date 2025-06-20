@@ -36,5 +36,6 @@
   </ItemGroup>
   <ItemGroup>
     <Protobuf Include="..\..\Shared\Contracts\Protos\AssetSpecification.proto" GrpcServices="Server" />
+    <Protobuf Include="..\..\Shared\Contracts\Protos\department_fixedasset.proto" GrpcServices="Server" />
   </ItemGroup>
 </Project>

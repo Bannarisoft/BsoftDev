@@ -23,6 +23,9 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
     <PackageReference Include="Grpc.Tools" Version="2.72.0" PrivateAssets="All" /> -->
   </ItemGroup>
+  <ItemGroup>
+  <Protobuf Include="Protos\department_fixedasset.proto" GrpcServices="Server" />
+</ItemGroup>
   <!-- <ItemGroup>
     <Protobuf Include="Protos\department.proto" GrpcServices="Both" />
     <Protobuf Include="Protos\department_maintenance.proto" GrpcServices="Client" />
