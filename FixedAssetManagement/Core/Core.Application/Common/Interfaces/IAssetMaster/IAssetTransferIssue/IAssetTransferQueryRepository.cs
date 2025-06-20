@@ -13,19 +13,21 @@ using Core.Domain.Entities.AssetMaster;
 
 namespace Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue
 {
-    public interface IAssetTransferQueryRepository 
-    {
-          Task<(List<AssetTransferDto>,int)> GetAllAsync(int PageNumber, int PageSize,string? SearchTerm, DateTimeOffset? FromDate = null, DateTimeOffset? ToDate = null);
-           Task<List<GetAllTransferDtlDto>> GetAssetTransferByIDAsync(int assetTransferId);           
-           Task<AssetTransferJsonDto?> GetAssetTransferByIdAsync(int assetTransferId);
-           Task<List<GetCategoryByDeptIdDto>> GetCategoriesByDepartmentAsync(int departmentId);            
-           Task<List<GetAssetMasterDto>> GetAssetsByCategoryAsync(int assetCategoryId , int assetDepartmentId);             
-           Task<GetAssetDetailsToTransferHdrDto?> GetAssetDetailsToTransferByIdAsync(int assetId); 
-           Task<bool> IsAssetPendingOrApprovedAsync(int assetId);
+  public interface IAssetTransferQueryRepository
+  {
+    Task<(List<AssetTransferDto>, int)> GetAllAsync(int PageNumber, int PageSize, string? SearchTerm, DateTimeOffset? FromDate = null, DateTimeOffset? ToDate = null);
+    Task<List<GetAllTransferDtlDto>> GetAssetTransferByIDAsync(int assetTransferId);
+    Task<AssetTransferJsonDto?> GetAssetTransferByIdAsync(int assetTransferId);
+    Task<List<GetCategoryByDeptIdDto>> GetCategoriesByDepartmentAsync(int departmentId);
+    Task<List<GetAssetMasterDto>> GetAssetsByCategoryAsync(int assetCategoryId, int assetDepartmentId);
+    Task<GetAssetDetailsToTransferHdrDto?> GetAssetDetailsToTransferByIdAsync(int assetId);
+    Task<bool> IsAssetPendingOrApprovedAsync(int assetId);
 
-          // Task<List<GetTransferTypeDto>> GetTransferTypeAsync() ;
+    // Task<List<GetTransferTypeDto>> GetTransferTypeAsync() ;
 
-            Task<List<Core.Domain.Entities.MiscMaster>> GetTransferTypeAsync();
+    Task<List<Core.Domain.Entities.MiscMaster>> GetTransferTypeAsync();
+            
+    Task<bool> DepartmentSoftDeleteValidation (int departmentId);
 
          
          

@@ -45,17 +45,12 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
                     data.DepartmentName = departmentName;
                 }
                 activityMasterDictionary[data.DepartmentId] = data;
-
             }
 
-            // var filteredactivitiesDtos = activityList
-            //     .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-            //     .Select(p => new GetAllActivityMasterDto
-            //     {
-            //         DepartmentId = p.DepartmentId,
-            //         DepartmentName = departmentLookup[p.DepartmentId],
-            //     })
-            //     .ToList();
+             var filteredActivities = activityList
+            .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
+            .ToList();
+
 
             // Publish domain event for auditing
             var domainEvent = new AuditLogsDomainEvent(
@@ -72,8 +67,8 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = activityList,
-                TotalCount = totalCount,
+                Data = filteredActivities,
+                TotalCount = filteredActivities.Count(),
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
             };

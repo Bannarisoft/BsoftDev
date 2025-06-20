@@ -6,6 +6,7 @@ using Core.Application.Common.HttpResponse;
 using Core.Domain.Events;
 using Microsoft.Extensions.Logging;
 using Contracts.Interfaces.External.IMaintenance;
+using Contracts.Interfaces.External.IFixedAssetManagement;
 
 namespace Core.Application.Departments.Commands.DeleteDepartment
 {
@@ -19,8 +20,9 @@ namespace Core.Application.Departments.Commands.DeleteDepartment
         private readonly IMediator _mediator;
         private readonly ILogger<DeleteDepartmentCommandHandler> _logger;
         private readonly IDepartmentValidationGrpcClient _departmentValidationGrpcClient;
+        private readonly IFixedAssetDepartmentValidationGrpcClient _fixedAssetDepartmentValidationGrpcClient;
 
-        public DeleteDepartmentCommandHandler(IDepartmentCommandRepository departmentRepository, IDepartmentQueryRepository departmentQueryRepository, IMediator mediator, IMapper mapper, ILogger<DeleteDepartmentCommandHandler> logger, IDepartmentValidationGrpcClient departmentValidationGrpcClient)
+        public DeleteDepartmentCommandHandler(IDepartmentCommandRepository departmentRepository, IDepartmentQueryRepository departmentQueryRepository, IMediator mediator, IMapper mapper, ILogger<DeleteDepartmentCommandHandler> logger, IDepartmentValidationGrpcClient departmentValidationGrpcClient, IFixedAssetDepartmentValidationGrpcClient fixedAssetDepartmentValidationGrpcClient)
         {
 
             _IdepartmentCommandRepository = departmentRepository;
@@ -29,6 +31,7 @@ namespace Core.Application.Departments.Commands.DeleteDepartment
             _mediator = mediator;
             _logger = logger;
             _departmentValidationGrpcClient = departmentValidationGrpcClient;
+            _fixedAssetDepartmentValidationGrpcClient = fixedAssetDepartmentValidationGrpcClient;
         }
 
 
@@ -37,15 +40,19 @@ namespace Core.Application.Departments.Commands.DeleteDepartment
 
             _logger.LogInformation("DeleteDepartmentCommandHandler started for Department ID: {DepartmentId}", request.Id);
             // ✅Call MaintenanceService via gRPC to check usage
-            bool isUsed = await _departmentValidationGrpcClient.CheckIfDepartmentIsUsedAsync(request.Id);
+           // bool isUsed = await _departmentValidationGrpcClient.CheckIfDepartmentIsUsedAsync(request.Id);
+            bool isUsedInMaintenance = await _departmentValidationGrpcClient.CheckIfDepartmentIsUsedAsync(request.Id);
+            bool isUsedInFixedAsset = await _fixedAssetDepartmentValidationGrpcClient.CheckIfDepartmentIsUsedForFixedAssetAsync(request.Id);
 
-            if (isUsed)
+
+
+            if (isUsedInMaintenance || isUsedInFixedAsset)
             {
                 _logger.LogWarning("Cannot delete Department ID {DepartmentId} - it is in use by CostCenters.", request.Id);
                 return new ApiResponseDTO<int>
                 {
                     IsSuccess = false,
-                    Message = "Cannot delete department. It is still in use in Maintenance system.",
+                    Message = "Cannot delete department. It is still in use in Maintenance or FixedAsset systems.",
                     Data = 0
                 };
             }
