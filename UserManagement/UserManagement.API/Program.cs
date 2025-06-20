@@ -66,24 +66,6 @@ app.UseDeveloperExceptionPage();
 //}
 app.UseHttpsRedirection();
 app.UseRouting(); // Enable routing
-// if (app.Environment.IsEnvironment("Testing"))
-// {
-//     Console.WriteLine("🔥 Using fake identity for testing");
-
-//     app.Use(async (context, next) =>
-//     {
-//         var identity = new ClaimsIdentity(new[]
-//         {
-//             new Claim(ClaimTypes.Name, "testuser"),
-//             new Claim(ClaimTypes.Role, "Admin"),
-//             new Claim("unit_id", "1"),
-//         }, "Test");
-
-//         context.User = new ClaimsPrincipal(identity);
-//         await next();
-//     });
-// }
-
 app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
 app.UseCors("AllowAll");
 app.UseAuthentication();
