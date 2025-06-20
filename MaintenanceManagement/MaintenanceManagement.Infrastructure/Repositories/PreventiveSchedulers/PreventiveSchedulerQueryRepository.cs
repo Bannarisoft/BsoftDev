@@ -663,46 +663,43 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         }
          public async Task<List<Core.Domain.Entities.MachineMaster>> GetUnMappedMachineIdByCode(int Id)
         {
-            var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status, WorkOrderHold.Code };
+            // var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status, WorkOrderHold.Code };
 
             const string query = @"
-                       SELECT M.Id, M.MachineCode,M.MachineName  
-                      INTO #UnMappedMachines FROM [Maintenance].[MachineMaster] M
-					   INNER JOIN [Maintenance].[MachineGroup] MG ON M.MachineGroupId=MG.Id
-					   INNER JOIN [Maintenance].[PreventiveSchedulerHeader] PSH ON PSH.Id = @Id AND MG.Id=PSH.MachineGroupId
-					   LEFT JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON M.Id=PSD.MachineId AND PSD.PreventiveSchedulerHeaderId = PSH.Id
-					   LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
-					   LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
-                       WHERE M.IsDeleted = 0  AND (PSD.Id IS NULL OR PSD.IsActive = 0 OR PSD.IsDeleted = 1)  AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)
-                       GROUP BY  M.Id, M.MachineCode,M.MachineName 
-                       
-                       SELECT M.Id, M.MachineCode,M.MachineName  
-                       INTO #MappedMachines FROM 
-					    [Maintenance].[PreventiveSchedulerHeader] PSH
-					   INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON  PSD.PreventiveSchedulerHeaderId = PSH.Id
-					   INNER JOIN [Maintenance].[MachineGroup] MG ON MG.Id=PSH.MachineGroupId
-					   INNER JOIN [Maintenance].[MachineMaster] M ON M.Id=PSD.MachineId AND M.MachineGroupId=MG.Id
-					   WHERE PSH.Id=@Id AND  PSD.IsActive = 1 AND PSD.IsDeleted = 0
-					   GROUP BY  M.Id, M.MachineCode,M.MachineName 
+                                   WITH LatestMachineStatus AS (
+                SELECT *,
+                       ROW_NUMBER() OVER (PARTITION BY MachineId ORDER BY Id DESC) AS rn
+                FROM [Maintenance].[PreventiveSchedulerDetail]
+                WHERE PreventiveSchedulerHeaderId = @Id
+            )
+            SELECT MachineId, IsActive
+            INTO #notActiveMachine
+            FROM LatestMachineStatus
+            WHERE rn = 1 AND IsActive = 0 or IsDeleted=1;
 
-                       SELECT WO.PreventiveScheduleId,PSD.MachineId INTO #WorkOrderDone FROM [Maintenance].[WorkOrder] WO
-                        INNER JOIN  [Maintenance].[PreventiveSchedulerDetail] PSD ON  PSD.Id = WO.PreventiveScheduleId
-                        INNER JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
-                        WHERE PSD.PreventiveSchedulerHeaderId=@Id AND MISC.Code=@DoneStatus
-                       
-                       DELETE A FROM #MappedMachines A 
-					   INNER JOIN #WorkOrderDone B ON A.Id=B.MachineId
+            -- Step 2: Get machines not in PreventiveSchedulerDetail (unmapped)
+            SELECT M.Id, M.MachineCode, M.MachineName  
+            FROM [Maintenance].[MachineMaster] M
+            INNER JOIN [Maintenance].[MachineGroup] MG ON M.MachineGroupId = MG.Id
+            INNER JOIN [Maintenance].[PreventiveSchedulerHeader] PSH ON PSH.Id = @Id AND MG.Id = PSH.MachineGroupId
+            LEFT JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON M.Id = PSD.MachineId AND PSD.PreventiveSchedulerHeaderId = PSH.Id
+            WHERE M.IsDeleted = 0 AND PSD.Id IS NULL
 
-                       DELETE A FROM #UnMappedMachines A 
-					   INNER JOIN #MappedMachines B ON A.Id=B.Id
-                       
-                       SELECT * FROM #UnMappedMachines";
+            UNION
+
+            -- Step 3: Get machines with latest status as inactive
+            SELECT M.Id, M.MachineCode, M.MachineName  
+            FROM [Maintenance].[MachineMaster] M
+            INNER JOIN #notActiveMachine A ON M.Id = A.MachineId;
+
+            -- Step 4: Cleanup
+            DROP TABLE #notActiveMachine;";
 
             var parameters = new
             {
-                Id,
-                StatusCodes = statusCodes,
-                DoneStatus = MaintenanceStatusUpdate.Code
+                Id
+                // StatusCodes = statusCodes,
+              //  DoneStatus = MaintenanceStatusUpdate.Code
             };
             var machines = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
             return machines.ToList();
