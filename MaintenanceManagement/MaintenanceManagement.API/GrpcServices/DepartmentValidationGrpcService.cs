@@ -22,9 +22,7 @@ namespace MaintenanceManagement.API.GrpcServices
             DepartmentUsageRequest request,
             ServerCallContext context)
         {
-            var (costCenters, _) = await _costCenterQueryRepository.GetAllCostCenterGroupAsync(1, 10000, null);
-
-            bool isUsed = costCenters.Any(cc => cc.DepartmentId == request.DepartmentId);
+            var isUsed = await _costCenterQueryRepository.DepartmentSoftDeleteValidation(request.DepartmentId);      
 
             return new DepartmentUsageResponse
             {

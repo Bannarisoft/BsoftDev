@@ -31,19 +31,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
             var query = $$"""
                  DECLARE @TotalCount INT;
                     SELECT @TotalCount = COUNT(DISTINCT A.Id)
-                    FROM [Maintenance].[ActivityMaster] A
-                    INNER JOIN [Bannari].[AppData].[Department] B ON A.DepartmentId = B.Id            
+                    FROM [Maintenance].[ActivityMaster] A                               
                     INNER JOIN [Maintenance].[MiscMaster] C ON A.ActivityType = C.Id
                     WHERE A.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (A.ActivityName LIKE @Search OR A.Description LIKE @Search)")}}; 
 
-                  SELECT  A.Id, A.ActivityName, A.Description, A.DepartmentId, B.DeptName AS Department,                    
+                  SELECT  A.Id, A.ActivityName, A.Description, A.DepartmentId,                    
                     A.EstimatedDuration, A.ActivityType, C.Code AS ActivityTypeDescription, 
                     A.IsActive, A.IsDeleted, 
                     A.CreatedBy, A.CreatedDate, A.CreatedByName, A.CreatedIP, 
                     A.ModifiedBy, A.ModifiedDate, A.ModifiedByName, A.ModifiedIP
-                FROM [Maintenance].[ActivityMaster] A  
-                INNER JOIN [Bannari].[AppData].[Department] B ON A.DepartmentId = B.Id                           
+                FROM [Maintenance].[ActivityMaster] A                                    
                 INNER JOIN [Maintenance].[MiscMaster] C ON A.ActivityType = C.Id
                 WHERE A.IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (A.ActivityName LIKE @Search OR A.Description LIKE @Search)")}}
