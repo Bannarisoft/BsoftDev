@@ -20,5 +20,8 @@ namespace Core.Application.Reports.ScheduleReport
         public string MachineCode { get; set; }
         public string WorkOrderStatus { get; set; }
         public string WorkOrderDocNo { get; set; }
+        public int ProductionDepartmentId { get; set; }
+        public string ProductionDepartmentName { get; set; }
+        public string PendingDays { get; set; }
     }
 }
