@@ -53,7 +53,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return (nextDate, reminderDate);
         }
 
-        public async Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm,List<int> departmentIds)
         {
             var UnitId = _ipAddressService.GetUnitId();
             var query = $@"
@@ -65,7 +65,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
-                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId
+                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId AND PS.DepartmentId IN @DepartmentIds
                 {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (PS.PreventiveSchedulerName LIKE @Search OR MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")};
 
                 SELECT  
@@ -104,7 +104,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
-                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId
+                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId AND PS.DepartmentId IN @DepartmentIds
                 {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (PS.PreventiveSchedulerName LIKE @Search OR MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")}
                 ORDER BY PS.Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -117,7 +117,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
                 PageSize = PageSize,
-                UnitId
+                UnitId,
+                departmentIds
             };
 
             using var multi = await _dbConnection.QueryMultipleAsync(query, parameters);

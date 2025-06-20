@@ -8,7 +8,7 @@ namespace Core.Application.Common.Interfaces.IPreventiveScheduler
 {
     public interface IPreventiveSchedulerQuery
     {
-        Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm,List<int> departmentIds);
         Task<PreventiveSchedulerHeader> GetByIdAsync(int id);
 
         Task<bool> SoftDeleteValidation(int Id);
