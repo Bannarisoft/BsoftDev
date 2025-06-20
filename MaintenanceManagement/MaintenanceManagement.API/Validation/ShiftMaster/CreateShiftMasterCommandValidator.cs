@@ -54,6 +54,11 @@ namespace MaintenanceManagement.API.Validation.ShiftMaster
                            .MustAsync(async (ShiftName, cancellation) => !await _shiftMasterQuery.AlreadyExistsAsync(ShiftName))
                            .WithName("Shift Name")
                             .WithMessage($"{rule.Error}");
+
+                             RuleFor(x => x.ShiftCode)
+                           .MustAsync(async (ShiftCode, cancellation) => !await _shiftMasterQuery.AlreadyExistsShiftCodeAsync(ShiftCode))
+                           .WithName("Shift Code")
+                            .WithMessage($"{rule.Error}");
                             break;
                     
                       default:

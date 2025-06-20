@@ -82,6 +82,8 @@ using MaintenanceManagement.API.Validation.Power.Feeder;
 using Core.Application.Power.Feeder.Command.UpdateFeeder;
 using Core.Application.Power.Feeder.Command.DeleteFeeder;
 using Core.Application.ActivityCheckListMaster.Command.DeleteActivityCheckListMaster;
+using Core.Application.PreventiveSchedulers.Commands.MapMachine;
+using Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpdate;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -160,8 +162,10 @@ namespace MaintenanceManagement.API.Validation.Common
             services.AddScoped<IValidator<CreateFeederCommand>, CreateFeederCommandValidator>();
             services.AddScoped<IValidator<UpdateFeederCommand>, UpdateFeederCommandValidator>();
             services.AddScoped<IValidator<DeleteFeederCommand>, DeleteFeederCommandValidator>();
-           
+
             services.AddScoped<IValidator<CreatePowerConsumptionCommand>, CreatePowerConsumptionCommandValidator>();
+            services.AddScoped<IValidator<MapMachineCommand>, MapMachineCommandValidator>(); 
+            services.AddScoped<IValidator<MachineWiseFrequencyUpdateCommand>, MachineWiseFrequencyUpdateCommandValidator>();
         }  
     }
 }

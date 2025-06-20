@@ -1077,6 +1077,80 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("FeederGroup", "Maintenance");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Power.PowerConsumption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("ClosingReading")
+                        .HasColumnType("Decimal(18,3)")
+                        .HasColumnName("ClosingReading");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("FeederId")
+                        .HasColumnType("int")
+                        .HasColumnName("FeederId");
+
+                    b.Property<int>("FeederTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("FeederTypeId");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal>("OpeningReading")
+                        .HasColumnType("Decimal(18,3)")
+                        .HasColumnName("OpeningReading");
+
+                    b.Property<decimal>("TotalUnits")
+                        .HasColumnType("Decimal(18,3)")
+                        .HasColumnName("TotalUnits");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeederId");
+
+                    b.HasIndex("FeederTypeId");
+
+                    b.ToTable("PowerConsumption", "Maintenance");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerActivity", b =>
                 {
                     b.Property<int>("Id")
@@ -1128,6 +1202,25 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
+                    b.Property<decimal>("DownTimeEstimateHrs")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("FrequencyInterval")
+                        .HasColumnType("int")
+                        .HasColumnName("FrequencyInterval");
+
+                    b.Property<int?>("FrequencyTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("FrequencyTypeId");
+
+                    b.Property<int?>("FrequencyUnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("FrequencyUnitId");
+
+                    b.Property<int>("GraceDays")
+                        .HasColumnType("int")
+                        .HasColumnName("GraceDays");
+
                     b.Property<string>("HangfireJobId")
                         .HasColumnType("nvarchar(max)");
 
@@ -1138,6 +1231,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
+
+                    b.Property<bool>("IsDownTimeRequired")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDownTimeRequired");
 
                     b.Property<DateOnly?>("LastMaintenanceActivityDate")
                         .HasColumnType("date")
@@ -1167,9 +1264,21 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("PreventiveSchedulerHeaderId");
 
+                    b.Property<int>("ReminderMaterialReqDays")
+                        .HasColumnType("int")
+                        .HasColumnName("ReminderMaterialReqDays");
+
+                    b.Property<int>("ReminderWorkOrderDays")
+                        .HasColumnType("int")
+                        .HasColumnName("ReminderWorkOrderDays");
+
                     b.Property<string>("RescheduleReason")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("RescheduleReason");
+
+                    b.Property<int?>("ScheduleId")
+                        .HasColumnType("int")
+                        .HasColumnName("ScheduleId");
 
                     b.Property<DateOnly>("WorkOrderCreationStartDate")
                         .HasColumnType("date")
@@ -1177,9 +1286,15 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FrequencyTypeId");
+
+                    b.HasIndex("FrequencyUnitId");
+
                     b.HasIndex("MachineId");
 
                     b.HasIndex("PreventiveSchedulerHeaderId");
+
+                    b.HasIndex("ScheduleId");
 
                     b.ToTable("PreventiveSchedulerDetail", "Maintenance");
                 });
@@ -1328,6 +1443,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("OldItemId")
                         .HasColumnType("varchar(50)")
                         .HasColumnName("OldItemId");
+
+                    b.Property<string>("OldItemName")
+                        .HasColumnType("varchar(max)")
+                        .HasColumnName("OldItemName");
 
                     b.Property<int>("PreventiveSchedulerHeaderId")
                         .HasColumnType("int")
@@ -1790,6 +1909,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("AvailableQty");
 
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
+
                     b.Property<string>("Image")
                         .HasColumnType("varchar(250)")
                         .HasColumnName("Image");
@@ -2116,6 +2239,25 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("ParentFeeder");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Power.PowerConsumption", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Power.Feeder", "FeederPower")
+                        .WithMany("FeederConsumptions")
+                        .HasForeignKey("FeederId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "FeederTypePower")
+                        .WithMany("FeedersPower")
+                        .HasForeignKey("FeederTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FeederPower");
+
+                    b.Navigation("FeederTypePower");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerActivity", b =>
                 {
                     b.HasOne("Core.Domain.Entities.ActivityMaster", "Activity")
@@ -2137,6 +2279,16 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerDetail", b =>
                 {
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscFrequencyType")
+                        .WithMany("PreventiveDetailFrequencyType")
+                        .HasForeignKey("FrequencyTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscFrequencyUnit")
+                        .WithMany("PreventiveDetailFrequencyUnit")
+                        .HasForeignKey("FrequencyUnitId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Core.Domain.Entities.MachineMaster", "Machine")
                         .WithMany("PreventiveSchedulerDetail")
                         .HasForeignKey("MachineId")
@@ -2149,7 +2301,18 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "MiscSchedule")
+                        .WithMany("PreventiveDetailSchedule")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Machine");
+
+                    b.Navigation("MiscFrequencyType");
+
+                    b.Navigation("MiscFrequencyUnit");
+
+                    b.Navigation("MiscSchedule");
 
                     b.Navigation("PreventiveScheduler");
                 });
@@ -2394,7 +2557,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("ActivityType");
 
                     b.Navigation("Feeders");
-					b.Navigation("FeedersPower");
+
+                    b.Navigation("FeedersPower");
 
                     b.Navigation("FrequencyType");
 
@@ -2407,6 +2571,12 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("MaintenanceType");
 
                     b.Navigation("ModeOfDispatchType");
+
+                    b.Navigation("PreventiveDetailFrequencyType");
+
+                    b.Navigation("PreventiveDetailFrequencyUnit");
+
+                    b.Navigation("PreventiveDetailSchedule");
 
                     b.Navigation("RequestStatus");
 
@@ -2435,13 +2605,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                 {
                     b.Navigation("MiscMaster");
                 });
-			modelBuilder.Entity("Core.Domain.Entities.Power.Feeder", b =>
-                {
-                    b.Navigation("FeederConsumptions");
-                });
 
             modelBuilder.Entity("Core.Domain.Entities.Power.Feeder", b =>
                 {
+                    b.Navigation("FeederConsumptions");
+
                     b.Navigation("SubFeeders");
                 });
 
@@ -2488,100 +2656,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Navigation("WorkOrderTechnicians");
                 });
-
-modelBuilder.Entity("Core.Domain.Entities.Power.PowerConsumption", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("ClosingReading")
-                        .HasColumnType("Decimal(18,3)")
-                        .HasColumnName("ClosingReading");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(max)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<int>("FeederId")
-                        .HasColumnType("int")
-                        .HasColumnName("FeederId");
-
-                    b.Property<int>("FeederTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("FeederTypeId");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(max)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<decimal>("OpeningReading")
-                        .HasColumnType("Decimal(18,3)")
-                        .HasColumnName("OpeningReading");
-
-                    b.Property<decimal>("TotalUnits")
-                        .HasColumnType("Decimal(18,3)")
-                        .HasColumnName("TotalUnits");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("UnitId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FeederId");
-
-                    b.HasIndex("FeederTypeId");
-
-                    b.ToTable("PowerConsumption", "Maintenance");
-                });
- modelBuilder.Entity("Core.Domain.Entities.Power.PowerConsumption", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.Power.Feeder", "FeederPower")
-                        .WithMany("FeederConsumptions")
-                        .HasForeignKey("FeederId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "FeederTypePower")
-                        .WithMany("FeedersPower")
-                        .HasForeignKey("FeederTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FeederPower");
-
-                    b.Navigation("FeederTypePower");
-                });
 #pragma warning restore 612, 618
         }
     }
 }
-

@@ -30,8 +30,8 @@ namespace FAM.Infrastructure.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-                builder.HasIndex(x => new { x.AssetGroupId, x.DepreciationMethod,x.BookType,x.IsActive })
-               .IsUnique();
+            //     builder.HasIndex(x => new { x.AssetGroupId, x.DepreciationMethod,x.BookType,x.IsActive })
+            //    .IsUnique();
 
                 builder.Property(dg => dg.Code)                
                 .HasColumnType("varchar(10)")

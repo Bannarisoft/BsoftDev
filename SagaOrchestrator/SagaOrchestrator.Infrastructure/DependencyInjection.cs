@@ -56,6 +56,8 @@ namespace SagaOrchestrator.Infrastructure
                     .InMemoryRepository(); // You can replace with MongoDbRepository or EF if needed
                     x.AddSagaStateMachine<PreventiveSchedulerStateMachine, PreventiveSchedulerState>()
                     .InMemoryRepository();
+                    x.AddSagaStateMachine<PreventiveSchedulerUpdateStateMachine, PreventiveUpdateState>()
+                    .InMemoryRepository();
 
                 // Register Event Consumers (for other workflows if any)
                 x.AddConsumer<UserCreatedEventConsumer>();

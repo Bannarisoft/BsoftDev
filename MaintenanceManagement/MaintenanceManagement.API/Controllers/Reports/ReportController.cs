@@ -121,7 +121,9 @@ namespace MaintenanceManagement.API.Controllers.Reports
             [FromQuery] string oldUnitcode,
             [FromQuery] DateTime fromDate,
             [FromQuery] DateTime toDate,
-            [FromQuery] string? itemcode = null)
+            [FromQuery] int DepartmentId,
+            [FromQuery] string? itemcode = null
+            )
         {
             // Manual validation
             if (string.IsNullOrWhiteSpace(oldUnitcode))
@@ -151,7 +153,7 @@ namespace MaintenanceManagement.API.Controllers.Reports
                 });
             }
 
-            var result = await Mediator.Send(new GetStockLegerReportQuery { OldUnitcode = oldUnitcode, FromDate = fromDate, ToDate = toDate, ItemCode = itemcode });
+            var result = await Mediator.Send(new GetStockLegerReportQuery { OldUnitcode = oldUnitcode, FromDate = fromDate, ToDate = toDate, ItemCode = itemcode, DepartmentId = DepartmentId });
 
             if (result.IsSuccess && result.Data != null)
             {
@@ -177,11 +179,11 @@ namespace MaintenanceManagement.API.Controllers.Reports
             int fyStartYear2 = date2.Month >= 4 ? date2.Year : date2.Year - 1;
             return fyStartYear1 == fyStartYear2;
         }
-        [HttpGet("CurrentStock/{oldUnitCode}")]
+        [HttpGet("CurrentStock/{oldUnitCode}/{departmentId}")]
         [ActionName(nameof(GetAllStockItemDetails))]
-        public async Task<IActionResult> GetAllStockItemDetails(string oldUnitCode)
+        public async Task<IActionResult> GetAllStockItemDetails(string oldUnitCode,int departmentId)
         {
-            var result = await Mediator.Send(new GetCurrentAllStockItemsQuery { OldUnitcode = oldUnitCode });
+            var result = await Mediator.Send(new GetCurrentAllStockItemsQuery { OldUnitcode = oldUnitCode, DepartmentId = departmentId });
 
             if (result.IsSuccess)
             {

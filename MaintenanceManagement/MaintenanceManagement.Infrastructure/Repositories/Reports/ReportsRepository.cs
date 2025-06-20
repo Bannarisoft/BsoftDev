@@ -19,17 +19,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
 
     public class ReportsRepository : BaseQueryRepository, IReportRepository
     {
-
         private readonly IDbConnection _dbConnection;
         public ReportsRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
-
             : base(ipAddressService)
         {
-
             _dbConnection = dbConnection;
         }
-
-
         public async Task<List<RequestReportDto>> MaintenanceReportAsync(DateTimeOffset? requestFromDate, DateTimeOffset? requestToDate, int? requestType, int? requestStatus, int? departmentId)
          {
             var parameters = new DynamicParameters();
@@ -91,13 +86,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             return result.ToList();
         }
 
-        public async Task<List<StockLedgerReportDto>> GetSubStoresStockLedger(string OldUnitcode, DateTime FromDate, DateTime ToDate, string? Itemcode)
+        public async Task<List<StockLedgerReportDto>> GetSubStoresStockLedger(string OldUnitcode, DateTime FromDate, DateTime ToDate, string? Itemcode,int DepartmentId)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@FromDate", FromDate);
             parameters.Add("@ToDate", ToDate);
             parameters.Add("@ItemCode", Itemcode);
             parameters.Add("@OldUnitCode", OldUnitcode);
+            parameters.Add("@DepartmentId", DepartmentId);
 
             var result = await _dbConnection.QueryAsync<StockLedgerReportDto>(
                 "GetSubStoreStockLedgerSummary",
@@ -107,7 +103,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             return result.ToList();
         }
         
-         public async Task<List<CurrentStockDto>> GetStockDetails(string OldUnitcode)
+         public async Task<List<CurrentStockDto>> GetStockDetails(string OldUnitcode,int DepartmentId)
         {
              OldUnitcode = OldUnitcode ?? string.Empty; // Prevent null issues
 
@@ -117,6 +113,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                     ItemCode,
                     ItemName,
 					Uom,
+                    DepartmentId,
                     SUM(ReceivedQty) - SUM(IssueQty) AS StockQty,
                     SUM(ReceivedValue) - SUM(IssueValue) AS StockValue,
                     ((SUM(ReceivedValue) - SUM(IssueValue)) / (SUM(ReceivedQty) - SUM(IssueQty))) AS Rate
@@ -124,15 +121,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
                     Maintenance.StockLedger
                 WHERE
                     Oldunitcode = @OldUnitcode 
-                    AND TransactionType not in('SRP')
+                    AND TransactionType not in('SRP','REU')
+                    AND DepartmentId = @DepartmentId
                 GROUP BY 
-                    ItemCode, ItemName, Oldunitcode,Uom
+                    ItemCode, ItemName, Oldunitcode,Uom,DepartmentId
                 HAVING
                     SUM(ReceivedQty) - SUM(IssueQty) > 0";
 
-            var parameters = new 
-            { 
-                OldUnitcode // match exactly, no wildcards
+            var parameters = new
+            {
+                OldUnitcode,
+                DepartmentId // match exactly, no wildcards
             };
 
             var itemcodes = await _dbConnection.QueryAsync<CurrentStockDto>(query, parameters);

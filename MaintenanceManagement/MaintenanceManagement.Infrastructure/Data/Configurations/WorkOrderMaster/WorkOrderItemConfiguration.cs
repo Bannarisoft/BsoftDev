@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMaster
 {
     public class WorkOrderItemConfiguration  : IEntityTypeConfiguration<WorkOrderItem>
-    {       
-       public void Configure(EntityTypeBuilder<WorkOrderItem> builder)
-        {            
+    {
+        public void Configure(EntityTypeBuilder<WorkOrderItem> builder)
+        {
             builder.ToTable("WorkOrderItem", "Maintenance");
 
             builder.HasKey(t => t.Id);
@@ -24,7 +24,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .WithMany(am => am.WorkOrderItems)
                 .HasForeignKey(amg => amg.WorkOrderId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
             builder.Property(t => t.StoreTypeId)
                 .HasColumnName("StoreTypeId")
                 .HasColumnType("int")
@@ -38,7 +38,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasColumnName("ItemCode")
                 .HasColumnType("nvarchar(100)")
                 .IsRequired(false);
-            
+
             builder.Property(t => t.OldItemCode)
                 .HasColumnName("OldItemCode")
                 .HasColumnType("nvarchar(100)")
@@ -48,7 +48,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
                 .HasColumnName("ItemName")
                 .HasColumnType("varchar(250)")
                 .IsRequired(false);
-            
+
             builder.Property(t => t.AvailableQty)
                 .HasColumnName("AvailableQty")
                 .HasColumnType("int")
@@ -57,22 +57,27 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.WorkOrderMast
             builder.Property(t => t.UsedQty)
                 .HasColumnName("UsedQty")
                 .HasColumnType("int")
-                .IsRequired();  
+                .IsRequired();
 
             builder.Property(t => t.ScarpQty)
                 .HasColumnName("ScarpQty")
                 .HasColumnType("int")
-                .IsRequired(false);   
+                .IsRequired(false);
 
             builder.Property(t => t.ToSubStoreQty)
                 .HasColumnName("ToSubStoreQty")
                 .HasColumnType("int")
-                .IsRequired(false);        
-            
+                .IsRequired(false);
+
             builder.Property(t => t.Image)
                 .HasColumnName("Image")
                 .HasColumnType("varchar(250)")
-                .IsRequired(false);                    
+                .IsRequired(false);  
+                
+            builder.Property(t => t.DepartmentId)
+                .HasColumnName("DepartmentId")
+                .HasColumnType("int")
+                .IsRequired(false);                  
         }
     }
 }

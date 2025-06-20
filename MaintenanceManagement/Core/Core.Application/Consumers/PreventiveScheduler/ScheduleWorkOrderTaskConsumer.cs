@@ -41,24 +41,17 @@ namespace Core.Application.Consumers.PreventiveScheduler
             try{
             CancellationToken cancellationToken = context.CancellationToken;
             var getMachineWiseDetail = await _preventiveSchedulerQuery.GetPreventiveSchedulerDetail(context.Message.PreventiveSchedulerHeaderId);
-            var getWorkOrderDetail = await _preventiveSchedulerQuery.GetByIdAsync(context.Message.PreventiveSchedulerHeaderId);
             
-            var miscdetail = await _miscMasterQueryRepository.GetMiscMasterByName(WOStatus.MiscCode,StatusOpen.Code);
-
                 int jobDelayMin = 0;
                      foreach (var detail in getMachineWiseDetail)
                 {
 
 
                     var startDateTime = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue);
-                    var delay = startDateTime - DateTime.Now;
+                    var delay = startDateTime - DateTime.Today;
                     string newJobId;
                     var delayInMinutes = (int)delay.TotalMinutes;
-                    var workOrderRequest = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(getWorkOrderDetail, opt =>
-                     {
-                         opt.Items["StatusId"] = miscdetail.Id;
-                         opt.Items["PreventiveSchedulerDetailId"] = detail.Id;
-                     });
+                    
                     if (delay.TotalSeconds > 0)
                     {
                         newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, delayInMinutes);

@@ -7,6 +7,8 @@ namespace Core.Application.ShiftMasterDetails.Queries.GetShiftMasterDetail
 {
     public class ShiftMasterDetailDto
     {
+        
+        public int ShiftMasterId { get; set; }
         public int Id { get; set; }
         public string ShiftCode { get; set; }
         public string ShiftName { get; set; }

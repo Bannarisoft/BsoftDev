@@ -10,5 +10,6 @@ namespace Core.Application.PreventiveSchedulers.Queries.GetMachineDetailById
         public string OldItemId { get; set; }
         public string OldCategoryDescription { get; set; }
         public string OldGroupName { get; set; }
+        public string? OldItemName { get; set; }
     }
 }

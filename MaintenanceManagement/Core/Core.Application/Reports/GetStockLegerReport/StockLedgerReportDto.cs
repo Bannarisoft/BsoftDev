@@ -10,6 +10,8 @@ namespace Core.Application.Reports.GetStockLegerReport
     public string? ItemCode { get; set; }
     public string? ItemName { get; set; }
     public string? UOM { get; set; }
+    public int DepartmentId { get; set; }
+    public string? DepartmentName { get; set; }
 
     public decimal OpeningQty { get; set; }
     public decimal OpeningValue { get; set; }
@@ -23,6 +25,9 @@ namespace Core.Application.Reports.GetStockLegerReport
     public decimal ReturnQty { get; set; }
     public decimal ReturnValue { get; set; }
 
+    public decimal ReusableReceiptQty { get; set; }
+    public decimal ReusableReceiptValue { get; set; }
+    
     public decimal ScrapReceiptQty { get; set; }
     public decimal ScrapReceiptValue { get; set; }
 

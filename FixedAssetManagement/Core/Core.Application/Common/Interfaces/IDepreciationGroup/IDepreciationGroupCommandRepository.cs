@@ -1,6 +1,7 @@
 
 using Core.Domain.Common;
 using Core.Domain.Entities;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace Core.Application.Common.Interfaces.IDepreciationGroup
 {
@@ -12,6 +13,6 @@ namespace Core.Application.Common.Interfaces.IDepreciationGroup
         Task<bool> ExistsByAssetGroupIdAsync(int assetGroupId); // ✅ New method           
         Task<bool> ExistsByCodeAsync(string code );
         Task<int> GetMaxSortOrderAsync();        
-        Task<(bool IsNameDuplicate,bool IsCodeDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name, string code, int sortOrder, int excludeId,BaseEntity.Status isActive);        
+        Task<DepreciationGroups> CheckForDuplicatesAsync(int groupId, int depMethodId,int bookTypeId,int excludeId);        
     }
 }
