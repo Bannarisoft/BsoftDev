@@ -4,6 +4,7 @@ using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FAM.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250619082044_AssetAuditTableMigration")]
+    partial class AssetAuditTableMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,19 +261,43 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<string>("AssetCode")
                         .HasColumnType("varchar(100)");
 
+                    b.Property<string>("AssetCondition")
+                        .HasColumnType("varchar(100)");
+
                     b.Property<string>("AssetName")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("AuditAssetCode")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("AuditCustodian")
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateTimeOffset>("AuditDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("AuditFinancialYear")
+                    b.Property<string>("AuditDepartment")
                         .HasColumnType("varchar(100)");
 
-                    b.Property<int>("AuditTypeId")
-                        .HasColumnType("int");
+                    b.Property<string>("AuditLocation")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("AuditPeriod")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("AuditSubLocation")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("AuditUnitName")
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("AuditorName")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("CompanyName")
                         .HasColumnType("varchar(100)");
 
                     b.Property<int?>("CreatedBy")
@@ -287,30 +314,31 @@ namespace FAM.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
+                    b.Property<string>("Custodian")
+                        .HasColumnType("varchar(100)");
+
                     b.Property<string>("Department")
                         .HasColumnType("varchar(100)");
 
-                    b.Property<string>("ScanType")
-                        .HasColumnType("varchar(10)");
+                    b.Property<string>("GroupName")
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("SourceFileName")
                         .HasColumnType("varchar(100)");
 
-                    b.Property<string>("Status")
-                        .HasColumnType("varchar(10)");
+                    b.Property<string>("SubCategoryName")
+                        .HasColumnType("varchar(100)");
 
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int");
+                    b.Property<string>("SubLocation")
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("UnitName")
                         .HasColumnType("varchar(100)");
 
-                    b.Property<int?>("UploadedFileId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("AuditTypeId");
 
                     b.ToTable("AssetAudit", "FixedAsset");
                 });
@@ -2137,17 +2165,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("RenewalStatusMiscType");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetAudit", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "AuditTypeMiscType")
-                        .WithMany("AssetAuditType")
-                        .HasForeignKey("AuditTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AuditTypeMiscType");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.AssetMaster.AssetDisposal", b =>
                 {
                     b.HasOne("Core.Domain.Entities.AssetMasterGenerals", "AssetMasterDisposal")
@@ -2660,8 +2677,6 @@ namespace FAM.Infrastructure.Migrations
                     b.Navigation("AssetAmcCoverageType");
 
                     b.Navigation("AssetAmcRenewStatus");
-
-                    b.Navigation("AssetAuditType");
 
                     b.Navigation("AssetMiscDisposalType");
 

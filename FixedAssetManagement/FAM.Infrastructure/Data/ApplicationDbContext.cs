@@ -49,6 +49,7 @@ namespace FAM.Infrastructure.Data
         public DbSet<AssetTransferIssueDtl> AssetTransferIssueDtl { get; set; }
         public DbSet<AssetTransferReceiptHdr> AssetTransferReceiptHdr { get; set; }
         public DbSet<AssetTransferReceiptDtl> AssetTransferReceiptDtl { get; set; }
+        public DbSet<AssetAudit> AssetAudit { get; set; }
 
 
 
@@ -58,30 +59,31 @@ namespace FAM.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new AssetCategoriesConfiguration());
             modelBuilder.ApplyConfiguration(new LocationConfiguration());
             modelBuilder.ApplyConfiguration(new SubLocationConfiguration());
-			modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new DepreciationGroupConfiguration());
             modelBuilder.ApplyConfiguration(new AssetSubCategoriesConfiguration());
-            modelBuilder.ApplyConfiguration(new ManufactureConfiguration());   
- 			modelBuilder.ApplyConfiguration(new AssetMasterGeneralConfiguration()); 
             modelBuilder.ApplyConfiguration(new ManufactureConfiguration());
-            modelBuilder.ApplyConfiguration(new UOMConfiguration());   
-			modelBuilder.ApplyConfiguration(new AssetLocationConfiguration());
-			modelBuilder.ApplyConfiguration(new AssetSourceConfiguration());
-            modelBuilder.ApplyConfiguration(new SpecificationMasterConfiguration());   
- 			modelBuilder.ApplyConfiguration(new AssetPurchaseDetailsConfiguration());
-            modelBuilder.ApplyConfiguration(new AssetSpecificationConfiguration());   
-			modelBuilder.ApplyConfiguration(new AssetWarrantyConfiguration());
-            modelBuilder.ApplyConfiguration(new AssetAdditionalCostConfiguration());   
-			modelBuilder.ApplyConfiguration(new AssetInsuranceConfiguration());
-            modelBuilder.ApplyConfiguration(new AssetAmcConfiguration()); 
+            modelBuilder.ApplyConfiguration(new AssetMasterGeneralConfiguration());
+            modelBuilder.ApplyConfiguration(new ManufactureConfiguration());
+            modelBuilder.ApplyConfiguration(new UOMConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetLocationConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetSourceConfiguration());
+            modelBuilder.ApplyConfiguration(new SpecificationMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetPurchaseDetailsConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetSpecificationConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetWarrantyConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetAdditionalCostConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetInsuranceConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetAmcConfiguration());
             modelBuilder.ApplyConfiguration(new AssetDisposalConfiguration());
- 			modelBuilder.ApplyConfiguration(new DepreciationDetailConfiguration()); 
+            modelBuilder.ApplyConfiguration(new DepreciationDetailConfiguration());
             modelBuilder.ApplyConfiguration(new AssetTransferIssueHdrConfiguration());
             modelBuilder.ApplyConfiguration(new AssetTransferIssueDtlConfiguration());
             modelBuilder.ApplyConfiguration(new AssetTransferReceiptHdrConfiguration());
             modelBuilder.ApplyConfiguration(new AssetTransferReceiptDtlConfiguration());
-			modelBuilder.ApplyConfiguration(new FormulaTableConfiguration()); 
+            modelBuilder.ApplyConfiguration(new FormulaTableConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetAuditConfiguration());
 
 
             base.OnModelCreating(modelBuilder);
