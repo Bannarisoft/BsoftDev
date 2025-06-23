@@ -265,7 +265,8 @@ namespace FAM.Infrastructure
                 typeof(AssetDisposalProfile),
                  typeof(DepreciationDetailProfile),
                 typeof(AssetIssueTransferApproval),
-                typeof(AssetTransferReceiptProfile)
+                typeof(AssetTransferReceiptProfile),
+                typeof(AssetAuditProfile)
             );
             return services;
         }
