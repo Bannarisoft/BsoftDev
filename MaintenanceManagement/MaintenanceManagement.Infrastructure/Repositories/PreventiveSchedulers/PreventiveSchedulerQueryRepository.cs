@@ -53,7 +53,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return (nextDate, reminderDate);
         }
 
-        public async Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(IEnumerable<dynamic> PreventiveSchedulerList, int)> GetAllPreventiveSchedulerAsync(int PageNumber, int PageSize, string? SearchTerm,List<int> departmentIds)
         {
             var UnitId = _ipAddressService.GetUnitId();
             var query = $@"
@@ -65,7 +65,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
-                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId
+                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId AND PS.DepartmentId IN @DepartmentIds
                 {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (PS.PreventiveSchedulerName LIKE @Search OR MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")};
 
                 SELECT  
@@ -104,7 +104,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 INNER JOIN [Maintenance].[MiscMaster] Schedule ON Schedule.Id = PS.ScheduleId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyType ON FrequencyType.Id = PS.FrequencyTypeId
                 INNER JOIN [Maintenance].[MiscMaster] FrequencyUnit ON FrequencyUnit.Id = PS.FrequencyUnitId
-                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId
+                WHERE PS.IsDeleted = 0 AND PS.UnitId=@UnitId AND PS.DepartmentId IN @DepartmentIds
                 {(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (PS.PreventiveSchedulerName LIKE @Search OR MG.GroupName LIKE @Search OR MC.Code LIKE @Search OR Schedule.Code LIKE @Search OR FrequencyType.Code LIKE @Search OR FrequencyUnit.Code LIKE @Search)")}
                 ORDER BY PS.Id DESC
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -117,7 +117,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
                 PageSize = PageSize,
-                UnitId
+                UnitId,
+                departmentIds
             };
 
             using var multi = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -155,7 +156,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PSI.OldItemId,
                     PSI.RequiredQty,
                     PSI.OldCategoryDescription,
-                    PSI.OldGroupName
+                    PSI.OldGroupName,
+                    PSI.OldItemName
                 FROM [Maintenance].[PreventiveSchedulerHeader] PS
                 INNER JOIN [Maintenance].[PreventiveSchedulerActivity] PSA ON PSA.PreventiveSchedulerHeaderId = PS.Id
                 LEFT JOIN [Maintenance].[PreventiveSchedulerItems] PSI ON PSI.PreventiveSchedulerHeaderId = PS.Id
@@ -592,6 +594,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                     PSI.RequiredQty,
                     PSI.OldCategoryDescription,
                     PSI.OldGroupName,
+                    PSI.OldItemName,
                     M.MachineName,
                     M.MachineCode,
                     MG.GroupName,
@@ -660,37 +663,43 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         }
          public async Task<List<Core.Domain.Entities.MachineMaster>> GetUnMappedMachineIdByCode(int Id)
         {
-            var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status, WorkOrderHold.Code };
+            // var statusCodes = new[] { StatusOpen.Code, GetStatusId.Status, WorkOrderHold.Code };
 
             const string query = @"
-                       SELECT M.Id, M.MachineCode,M.MachineName  
-                      INTO #UnMappedMachines FROM [Maintenance].[MachineMaster] M
-					   INNER JOIN [Maintenance].[MachineGroup] MG ON M.MachineGroupId=MG.Id
-					   INNER JOIN [Maintenance].[PreventiveSchedulerHeader] PSH ON PSH.Id = @Id AND MG.Id=PSH.MachineGroupId
-					   LEFT JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON M.Id=PSD.MachineId AND PSD.PreventiveSchedulerHeaderId = PSH.Id
-					   LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
-					   LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
-                       WHERE M.IsDeleted = 0  AND (PSD.Id IS NULL OR PSD.IsActive = 0 OR PSD.IsDeleted = 1)  AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)
-                       GROUP BY  M.Id, M.MachineCode,M.MachineName 
-                       
-                       SELECT M.Id, M.MachineCode,M.MachineName  
-                       INTO #MappedMachines FROM 
-					    [Maintenance].[PreventiveSchedulerHeader] PSH
-					   INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON  PSD.PreventiveSchedulerHeaderId = PSH.Id
-					   INNER JOIN [Maintenance].[MachineGroup] MG ON MG.Id=PSH.MachineGroupId
-					   INNER JOIN [Maintenance].[MachineMaster] M ON M.Id=PSD.MachineId AND M.MachineGroupId=MG.Id
-					   WHERE PSH.Id=@Id AND  PSD.IsActive = 1 AND PSD.IsDeleted = 0
-					   GROUP BY  M.Id, M.MachineCode,M.MachineName 
-                       
-                       DELETE A FROM #UnMappedMachines A 
-					   INNER JOIN #MappedMachines B ON A.Id=B.Id
-                       
-                       SELECT * FROM #UnMappedMachines";
+                                   WITH LatestMachineStatus AS (
+                SELECT *,
+                       ROW_NUMBER() OVER (PARTITION BY MachineId ORDER BY Id DESC) AS rn
+                FROM [Maintenance].[PreventiveSchedulerDetail]
+                WHERE PreventiveSchedulerHeaderId = @Id
+            )
+            SELECT MachineId, IsActive
+            INTO #notActiveMachine
+            FROM LatestMachineStatus
+            WHERE rn = 1 AND IsActive = 0 or IsDeleted=1;
+
+            -- Step 2: Get machines not in PreventiveSchedulerDetail (unmapped)
+            SELECT M.Id, M.MachineCode, M.MachineName  
+            FROM [Maintenance].[MachineMaster] M
+            INNER JOIN [Maintenance].[MachineGroup] MG ON M.MachineGroupId = MG.Id
+            INNER JOIN [Maintenance].[PreventiveSchedulerHeader] PSH ON PSH.Id = @Id AND MG.Id = PSH.MachineGroupId
+            LEFT JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON M.Id = PSD.MachineId AND PSD.PreventiveSchedulerHeaderId = PSH.Id
+            WHERE M.IsDeleted = 0 AND PSD.Id IS NULL
+
+            UNION
+
+            -- Step 3: Get machines with latest status as inactive
+            SELECT M.Id, M.MachineCode, M.MachineName  
+            FROM [Maintenance].[MachineMaster] M
+            INNER JOIN #notActiveMachine A ON M.Id = A.MachineId;
+
+            -- Step 4: Cleanup
+            DROP TABLE #notActiveMachine;";
 
             var parameters = new
             {
-                Id,
-                StatusCodes = statusCodes
+                Id
+                // StatusCodes = statusCodes,
+              //  DoneStatus = MaintenanceStatusUpdate.Code
             };
             var machines = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineMaster>(query, parameters);
             return machines.ToList();

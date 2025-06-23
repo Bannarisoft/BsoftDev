@@ -1,11 +1,9 @@
-
-
-using Core.Application.Dashboard.Common;
+using Core.Application.Dashboard.CardView;
 using MediatR;
 
 namespace Core.Application.Dashboard.DashboardQuery
 {
-    public class DashboardQuery : IRequest<ChartDto>
+    public class CardViewQuery : IRequest<CardViewDto>
     {
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
