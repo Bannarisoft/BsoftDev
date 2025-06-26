@@ -106,10 +106,10 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
             return assetCategory == 0 ? null : assetCategory;
         }
 
-        public async Task<int?> GetAssetSubCategoryIdByNameAsync(string assetSubCategoryName)
+        public async Task<int?> GetAssetSubCategoryIdByNameAsync(int assetCategoryId,string assetSubCategoryName)
         {
             var assetSubCategory = await _applicationDbContext.AssetSubCategories
-            .Where(a => a.SubCategoryName == assetSubCategoryName  && a.IsDeleted == 0) 
+            .Where(a => a.SubCategoryName == assetSubCategoryName  && a.IsDeleted == 0 && a.AssetCategoriesId==assetCategoryId) 
             .Select(a => a.Id)
             .FirstOrDefaultAsync();        
             return assetSubCategory == 0 ? null : assetSubCategory; 
