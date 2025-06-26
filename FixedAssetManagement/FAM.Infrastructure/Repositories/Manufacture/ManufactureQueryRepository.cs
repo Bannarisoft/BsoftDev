@@ -10,11 +10,11 @@ namespace FAM.Infrastructure.Repositories.Manufacture
 {
     public class ManufactureQueryRepository : IManufactureQueryRepository
     {
-        private readonly IDbConnection _dbConnection;                
+        private readonly IDbConnection _dbConnection;
         public ManufactureQueryRepository(IDbConnection dbConnection)
         {
-            _dbConnection = dbConnection;            
-        }     
+            _dbConnection = dbConnection;
+        }
         public async Task<(List<ManufactureDTO>, int)> GetAllManufactureAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             var query = $$"""
@@ -36,16 +36,16 @@ namespace FAM.Infrastructure.Repositories.Manufacture
                 SELECT @TotalCount AS TotalCount;
                 """;
             var parameters = new
-                       {
-                           Search = $"%{SearchTerm}%",
-                           Offset = (PageNumber - 1) * PageSize,
-                           PageSize
-                       };
+            {
+                Search = $"%{SearchTerm}%",
+                Offset = (PageNumber - 1) * PageSize,
+                PageSize
+            };
 
             var manufacture = await _dbConnection.QueryMultipleAsync(query, parameters);
             var manufactureList = (await manufacture.ReadAsync<ManufactureDTO>()).ToList();
-            int totalCount = (await manufacture.ReadFirstAsync<int>());              
-            return (manufactureList, totalCount);             
+            int totalCount = (await manufacture.ReadFirstAsync<int>());
+            return (manufactureList, totalCount);
         }
 
         public async Task<List<ManufactureDTO>> GetByManufactureNameAsync(string searchPattern)
@@ -58,7 +58,7 @@ namespace FAM.Infrastructure.Repositories.Manufacture
             INNER JOIN FixedAsset.MiscMaster MM on MM.Id =M.ManufactureType            
             WHERE (M.ManufactureName LIKE @SearchPattern OR M.Code LIKE @SearchPattern) 
             AND  M.IsDeleted=0 and M.IsActive=1
-            ORDER BY M.ID DESC";            
+            ORDER BY M.ID DESC";
             var result = await _dbConnection.QueryAsync<ManufactureDTO>(query, new { SearchPattern = $"%{searchPattern}%" });
             return result.ToList();
         }
@@ -72,7 +72,7 @@ namespace FAM.Infrastructure.Repositories.Manufacture
             FROM FixedAsset.Manufacture M
             INNER JOIN FixedAsset.MiscMaster MM on MM.Id =M.ManufactureType          
             WHERE M.Id = @Id AND M.IsDeleted=0";
-            var manufacture = await _dbConnection.QueryFirstOrDefaultAsync<ManufactureDTO>(query, new { Id });           
+            var manufacture = await _dbConnection.QueryFirstOrDefaultAsync<ManufactureDTO>(query, new { Id });
             if (manufacture is null)
             {
                 throw new KeyNotFoundException($"Manufacture with ID {Id} not found.");
@@ -89,10 +89,60 @@ namespace FAM.Infrastructure.Repositories.Manufacture
             INNER JOIN FixedAsset.MiscTypeMaster T on T.ID=M.MiscTypeId
             WHERE (MiscTypeCode = @MiscTypeCode) 
             AND  M.IsDeleted=0 and M.IsActive=1
-            ORDER BY M.ID DESC";          
-            var parameters = new { MiscTypeCode = MiscEnumEntity.Manufacture_ManufactureType.MiscCode };     
-            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
+            ORDER BY M.ID DESC";
+            var parameters = new { MiscTypeCode = MiscEnumEntity.Manufacture_ManufactureType.MiscCode };
+            var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query, parameters);
             return result.ToList();
         }
+
+        public async Task<bool> CountrySoftDeleteValidation(int countryId)
+        {
+            const string query = @"
+                SELECT 1 
+                FROM FixedAsset.Manufacture 
+                WHERE CountryId = @CountryId AND IsDeleted = 0";
+
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { CountryId = countryId });
+
+            return result.HasValue;
+        }
+
+        public async Task<bool> CitySoftDeleteValidation(int cityId)
+        {
+            const string query = @"
+                SELECT 1 
+                FROM FixedAsset.Manufacture 
+                WHERE CityId = @CityId AND IsDeleted = 0";
+
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { CityId = cityId });
+
+            return result.HasValue;
+        }
+        
+        public async Task<bool> StateSoftDeleteValidation(int stateId)
+        {
+            const string query = @"
+                SELECT 1 
+                FROM FixedAsset.Manufacture 
+                WHERE StateId = @stateId AND IsDeleted = 0";
+
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(query, new { StateId = stateId });
+
+            return result.HasValue;
+        }
+
+        // public async Task<bool> CountrySoftDeleteValidation(int countryId)
+        // {
+        //     const string query = @"
+        //     SELECT 1 FROM  FixedAsset.Manufacture WHERE CountryId = @CountryId AND IsDeleted = 0";
+
+        //     using var multi = await _dbConnection.QueryMultipleAsync(query, new { CountryId = countryId });
+
+        //     var manufactureExists = await multi.ReadFirstOrDefaultAsync<int?>();
+        //     return manufactureExists.HasValue;
+
+        // }
+
+
     }
 }

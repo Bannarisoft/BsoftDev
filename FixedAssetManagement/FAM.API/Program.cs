@@ -65,8 +65,11 @@ app.UseMiddleware<LoggingMiddleware>();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapGrpcService<AssetSpecificationGrpcService>().EnableGrpcWeb();
-    endpoints.MapGrpcService<FixedAssetDepartmentValidationGrpcService>().EnableGrpcWeb();    
+        endpoints.MapGrpcService<AssetSpecificationGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<FixedAssetDepartmentValidationGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<FixedAssetCountryValidationGrpcService>().EnableGrpcWeb(); 
+    endpoints.MapGrpcService<FixedAssetCityValidationGrpcService>().EnableGrpcWeb();    
+    endpoints.MapGrpcService<FixedAssetStateValidationGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
 app.Run();
