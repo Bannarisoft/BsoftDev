@@ -52,7 +52,16 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 builder.HasOne(dg => dg.AssetGroup)
                 .WithMany(ag => ag.AssetMasterGeneral)
                 .HasForeignKey(dg => dg.AssetGroupId)                
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
+
+                builder.Property(dg => dg.AssetSubGroupId)
+                    .HasColumnType("int")       
+                    .IsRequired(false);         
+                    // Configure Foreign Key Relationship
+                builder.HasOne(dg => dg.AssetSubGroup)
+                    .WithMany(ag => ag.AssetMasterGeneral)
+                    .HasForeignKey(dg => dg.AssetSubGroupId)                
+                    .OnDelete(DeleteBehavior.Restrict); 
 
                 builder.Property(dg => dg.AssetCategoryId)
                 .HasColumnType("int")
@@ -143,6 +152,11 @@ namespace FAM.Infrastructure.Data.Configurations.AssetMaster
                 builder.Property(ca => ca.AssetDocument)
                 .HasColumnName("AssetDocument")
                 .HasColumnType("nvarchar(255)");
+
+                 builder.Property(b => b.PutToUseDate)
+                .HasColumnName("PutToUseDate")
+                .HasColumnType("datetimeoffset")
+                .IsRequired(false);
                 
                 builder.Property(b => b.IsActive)                
                 .HasColumnType("bit")

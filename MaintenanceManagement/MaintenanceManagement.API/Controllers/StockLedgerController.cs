@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.StockLedger.Queries.GetCurrentAllItemsById;
 using Core.Application.StockLedger.Queries.GetCurrentStock;
 using Core.Application.StockLedger.Queries.GetCurrentStockItemsById;
 using Core.Application.StockLedger.Queries.GetStockLegerReport;
@@ -15,8 +16,8 @@ namespace MaintenanceManagement.API.Controllers
     [Route("api/[controller]")]
     public class StockLedgerController : ApiControllerBase
     {
-         private readonly ILogger<StockLedgerController> _logger;
-         private readonly IMediator _mediator;
+        private readonly ILogger<StockLedgerController> _logger;
+        private readonly IMediator _mediator;
 
 
         public StockLedgerController(ILogger<StockLedgerController> logger, IMediator mediator)
@@ -63,11 +64,33 @@ namespace MaintenanceManagement.API.Controllers
             });
         }
 
-         [HttpGet("item-codes/{oldUnitCode}/{departmentId}")]
+        [HttpGet("item-codes/{oldUnitCode}/{departmentId}")]
         [ActionName(nameof(GetStockItemCodesAsync))]
         public async Task<IActionResult> GetStockItemCodesAsync(string oldUnitCode, int departmentId)
         {
             var result = await Mediator.Send(new GetCurrentStockItemsByIdQuery { OldUnitcode = oldUnitCode, DepartmentId = departmentId });
+
+            if (result.IsSuccess)
+            {
+                return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    data = result.Data,
+                    message = result.Message
+                });
+            }
+
+            return NotFound(new
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                message = result.Message
+            });
+        }
+        [HttpGet("AllitemCodes")]
+        [ActionName(nameof(GetStockItemCodesAsync))]
+        public async Task<IActionResult> GetAllItemCodesAsync(string oldUnitCode, int departmentId)
+        {
+            var result = await Mediator.Send(new GetCurrentAllItemsByIdQuery { OldUnitcode = oldUnitCode, DepartmentId = departmentId });
 
             if (result.IsSuccess)
             {

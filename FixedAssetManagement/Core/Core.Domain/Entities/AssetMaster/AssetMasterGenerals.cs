@@ -13,7 +13,9 @@ namespace Core.Domain.Entities
         public string? AssetName { get; set; }        
         // Foreign Key
         public int AssetGroupId { get; set; }
-        public AssetGroup AssetGroup { get; set; } = null!;        
+        public AssetGroup AssetGroup { get; set; } = null!;     
+        public int? AssetSubGroupId { get; set; }
+        public AssetSubGroup? AssetSubGroup { get; set; } = null!;       
         public int AssetCategoryId { get; set; }
         public AssetCategories AssetCategories { get; set; } = null!;
         public int AssetSubCategoryId { get; set; }
@@ -35,6 +37,7 @@ namespace Core.Domain.Entities
         public byte ISDepreciated { get; set; }
         public byte IsTangible { get; set; }    
         public string? AssetDocument { get; set; }
+        public DateTimeOffset? PutToUseDate { get; set; }
         public ICollection<AssetPurchaseDetails>? AssetPurchase { get; set; }     
 		public ICollection<AssetSpecifications>? AssetSpecification { get; set; }
 		public ICollection<AssetWarranties>? AssetWarranty { get; set; }

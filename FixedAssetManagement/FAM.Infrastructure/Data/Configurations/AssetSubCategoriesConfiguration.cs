@@ -61,10 +61,10 @@ namespace FAM.Infrastructure.Data.Configurations
                 .IsRequired();
 
                 // **One-to-Many Relationship Configuration**
-                builder.HasOne(asc => asc.AssetCategories) // Correct reference
-                .WithMany(ac => ac.AssetSubCategories) // One AssetCategories -> Many AssetSubCategories
-                .HasForeignKey(asc => asc.AssetCategoriesId) // Correct FK naming
-                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete if needed
+                builder.HasOne(asc => asc.AssetCategories) 
+                .WithMany(ac => ac.AssetSubCategories) 
+                .HasForeignKey(asc => asc.AssetCategoriesId) 
+                .OnDelete(DeleteBehavior.Restrict); 
 
                   builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")
