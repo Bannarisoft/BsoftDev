@@ -25,6 +25,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? AssetImageName { get; set; }     
         public string? AssetDocument { get; set; }
         public string? AssetDocumentName { get; set; }
+        public DateTimeOffset? PutToUseDate { get; set; }
 
         public AssetParentDTO? AssetParent { get; set; }
         public AssetLocationDTO? AssetLocation { get; set; }

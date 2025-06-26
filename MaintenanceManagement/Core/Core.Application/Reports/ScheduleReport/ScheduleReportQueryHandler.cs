@@ -15,17 +15,22 @@ namespace Core.Application.Reports.ScheduleReport
         private readonly IReportRepository _reportQueryRepository;
         private readonly IMapper _mapper;
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        public ScheduleReportQueryHandler(IReportRepository reportQueryRepository, IMapper mapper, IDepartmentGrpcClient departmentGrpcClient)
+        private readonly IDepartmentAllGrpcClient _departmentAllGrpcClient;
+        public ScheduleReportQueryHandler(IReportRepository reportQueryRepository, IMapper mapper, IDepartmentGrpcClient departmentGrpcClient, IDepartmentAllGrpcClient departmentAllGrpcClient)
         {
             _reportQueryRepository = reportQueryRepository;
             _mapper = mapper;
             _departmentGrpcClient = departmentGrpcClient;
+            _departmentAllGrpcClient = departmentAllGrpcClient;
         }
         public async Task<ApiResponseDTO<List<ScheduleReportDto>>> Handle(ScheduleReportQuery request, CancellationToken cancellationToken)
         {
             var reportEntities = await _reportQueryRepository.ScheduleReportAsync(request.FromDueDate, request.ToDueDate) ?? new List<ScheduleReportDto>();
 
             var preventiveSchedulerList = _mapper.Map<List<ScheduleReportDto>>(reportEntities) ?? new List<ScheduleReportDto>();
+
+            var productionDepartmentList = await _departmentAllGrpcClient.GetDepartmentAllAsync();
+            var ProductiondepartmentLookup = productionDepartmentList.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
@@ -44,12 +49,16 @@ namespace Core.Application.Reports.ScheduleReport
 
             // }
 
-              foreach (var dto in preventiveSchedulerList)
-        {
-            if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
+            foreach (var dto in preventiveSchedulerList)
             {
-                dto.DepartmentName = departmentName;
-            }
+                if (departmentLookup.TryGetValue(dto.DepartmentId, out var departmentName))
+                {
+                    dto.DepartmentName = departmentName;
+                }
+               if (ProductiondepartmentLookup.TryGetValue(dto.ProductionDepartmentId, out var ProductiondepartmentName))
+               {
+                   dto.ProductionDepartmentName = ProductiondepartmentName;
+               }
         }
 
                 var filteredPreventiveSchedulers = preventiveSchedulerList

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -48,6 +44,11 @@ namespace FAM.Infrastructure.Data.Configurations
                 builder.Property(ag => ag.SortOrder)
                 .HasColumnName("SortOrder")
                 .HasColumnType("int")
+                .IsRequired(); 
+
+                builder.Property(ag => ag.GroupPercentage)
+                .HasColumnName("GroupPercentage")
+                .HasColumnType("decimal(5,2)")
                 .IsRequired(); 
 
                 builder.Property(b => b.IsActive)

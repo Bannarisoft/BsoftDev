@@ -39,7 +39,7 @@ namespace Core.Application.ExcelImport
 
             // AssetSubCategory
             string assetSubCategory = worksheet.Cells[row, 4].Value?.ToString() ?? string.Empty;
-            int? assetSubCategoryId = await _assetRepository.GetAssetSubCategoryIdByNameAsync(assetSubCategory);
+            int? assetSubCategoryId = await _assetRepository.GetAssetSubCategoryIdByNameAsync(assetDto.AssetCategoryId ,assetSubCategory);
             if (assetSubCategoryId == null)
             {
                 throw new Exception($"Invalid Asset Sub Category Name '{assetSubCategory}' at Excel Row {row}");

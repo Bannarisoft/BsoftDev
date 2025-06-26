@@ -27,27 +27,7 @@ namespace Core.Application.ExcelImport
             var companyId = _ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
             assetDto.UnitId= unitId;
-            assetDto.CompanyId = companyId;
-           /*  // Extract Unit Details
-            int unitId = request.ImportDto.UnitId;
-            
-            var unitDetails = await _assetQueryRepository.GetUnitByNameAsync(unitId);
-            if (unitDetails == null)
-            {
-                throw new Exception($"Invalid Unit ID '{unitId}' at Excel Row {row}");
-            }
-            assetDto.UnitName = unitDetails.ShortName;
-            assetDto.UnitId = request.ImportDto.UnitId;
-
-            // Extract Company Details
-            int companyId = request.ImportDto.CompanyId;
-            var companyName = await _assetQueryRepository.GetCompanyByNameAsync(companyId);
-            if (string.IsNullOrEmpty(companyName))
-            {
-                throw new Exception($"Invalid Company ID '{companyId}' at Excel Row {row}");
-            }
-            assetDto.CompanyName = companyName;
-            assetDto.CompanyId = request.ImportDto.CompanyId; */
+            assetDto.CompanyId = companyId;    
             
             // Extract Location Details
             int? locationId = await _assetRepository.GetAssetLocationIdByNameAsync(worksheet.Cells[row, 13].Value?.ToString() ?? "");
