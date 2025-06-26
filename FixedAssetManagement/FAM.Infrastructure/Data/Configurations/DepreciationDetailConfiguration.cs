@@ -122,8 +122,7 @@ namespace FAM.Infrastructure.Data.Configurations
                 .OnDelete(DeleteBehavior.Restrict); 
 
                 builder.Property(dg => dg.DisposedDate)                
-                .HasColumnType("datetimeoffset");
-                
+                .HasColumnType("datetimeoffset");                
 
                 builder.Property(dg => dg.DisposalAmount)                
                 .HasColumnType("decimal(18,3)")

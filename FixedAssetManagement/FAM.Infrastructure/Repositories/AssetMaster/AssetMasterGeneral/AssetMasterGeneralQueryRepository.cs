@@ -60,7 +60,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
             SELECT AM.Id,AM.CompanyId,AM.UnitId,AM.AssetCode,AM.AssetName,AM.AssetGroupId,AM.AssetCategoryId,AM.AssetSubCategoryId,AM.AssetParentId,AM.AssetType,AM.MachineCode,AM.Quantity
             ,AM.UOMId,AM.AssetDescription,AM.WorkingStatus,AM.AssetImage,AM.ISDepreciated,AM.IsTangible,AM.IsActive
             ,AM.CreatedBy,AM.CreatedDate,AM.CreatedByName,AM.CreatedIP,AM.ModifiedBy,AM.ModifiedDate,AM.ModifiedByName,AM.ModifiedIP
-            ,AG.GroupName AssetGroupName,AC.CategoryName AssetCategoryDesc,A.Description AssetSubCategoryDesc,U.UOMName,MM.description WorkingStatusDesc,M.description AssetTypeDesc,isnull(AM1.AssetDescription,'') ParentAssetDesc
+            ,AG.GroupName AssetGroupName,AC.CategoryName AssetCategoryDesc,A.Description AssetSubCategoryDesc,U.UOMName,MM.description WorkingStatusDesc,
+            M.description AssetTypeDesc,isnull(AM1.AssetDescription,'') ParentAssetDesc,AM.PutToUseDate
             FROM FixedAsset.AssetMaster AM
             INNER JOIN FixedAsset.AssetGroup AG on AG.Id=AM.AssetGroupId
             INNER JOIN FixedAsset.AssetCategories AC on AC.Id=AM.AssetCategoryId
@@ -94,7 +95,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                     FROM FixedAsset.AssetSpecifications AS A
                     INNER JOIN FixedAsset.SpecificationMaster SM ON SM.Id = A.SpecificationId    
                     WHERE A.AssetId = AM.Id AND A.IsDeleted = 0 
-                    FOR JSON PATH) AS SpecificationsJson   
+                    FOR JSON PATH) AS SpecificationsJson   ,AM.PutToUseDate
             FROM FixedAsset.AssetMaster AM
             INNER JOIN FixedAsset.AssetGroup AG ON AG.Id = AM.AssetGroupId
             INNER JOIN FixedAsset.AssetCategories AC ON AC.Id = AM.AssetCategoryId
@@ -287,7 +288,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 AM.AssetCategoryId,AM.AssetSubCategoryId,
                 AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName,
                 case when (isnull(AM.AssetDocument,'') <> '') then MM.Description+''+MM2.Description+'/'+ @companyName + '/' + @unitName +'/'+AM.AssetDocument  else 
-                '' end AssetDocument ,  AM.AssetDocument AssetDocumentName
+                '' end AssetDocument ,  AM.AssetDocument AssetDocumentName,AM.PutToUseDate
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
                 INNER JOIN [FixedAsset].[AssetGroup] AG ON AM.AssetGroupId = AG.Id
@@ -445,7 +446,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 AM.AssetCategoryId,AM.AssetSubCategoryId,
                 AM.AssetParentId,AM.AssetType,AM.UOMId,AM.WorkingStatus,AM.AssetImage AssetImageName,
                 case when (isnull(AM.AssetDocument,'') <> '') then MM.Description+''+MM2.Description+'/'+@companyName+'/'+@unitName  +'/'+AM.AssetDocument  else 
-                '' end AssetDocument ,  AM.AssetDocument AssetDocumentName
+                '' end AssetDocument ,  AM.AssetDocument AssetDocumentName,AM.PutToUseDate
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
                 INNER JOIN [FixedAsset].[AssetGroup] AG ON AM.AssetGroupId = AG.Id
