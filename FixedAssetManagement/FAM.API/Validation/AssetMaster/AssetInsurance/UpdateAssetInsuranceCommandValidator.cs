@@ -44,25 +44,25 @@ namespace FAM.API.Validation.AssetMaster.AssetInsurance
                         RuleFor(x => x.PolicyAmount)
                             .Must(value => value >= 0) // Ensure it's a valid decimal value
                             .WithMessage("PolicyAmount must be a positive number.");
-
+                            
                         RuleFor(x => x.PolicyAmount)
-                            .ScalePrecision(2, 18) // Allows up to 2 decimal places
-                            .WithMessage("PolicyAmount must have up to 2 decimal places.");    
+                        .NotNull().WithMessage("Policy amount is required.")
+                        .PrecisionScale(18, 2, true) // precision: 18, scale: 2, ignoreTrailingZeros: true
+                        .WithMessage("Policy amount must have up to 2 decimal places and a maximum of 18 digits.");   
 
                         RuleFor(x => x.VendorCode)
                             .NotEmpty().WithMessage("Vendor code is required.");
 
                         RuleFor(x => x.RenewedDate)
-                            .GreaterThanOrEqualTo(x => x.StartDate).WithMessage("Renewed date must be after or equal to the start date.");
+                             .NotEmpty().WithMessage("Renewed date is required.");
 
                         RuleFor(x => x.RenewalStatus)
                             .NotEmpty().WithMessage("Renewal status is required.");
-
                        
                         break;
                         case "AlreadyExists":
                            RuleFor(x => new { x.PolicyNo, x.Id })
-                           .MustAsync(async (insurance, cancellation) => !await _assetInsuranceQueryRepository.AlreadyExistsAsync(insurance.PolicyNo, insurance.Id))
+                           .MustAsync(async (insurance, cancellation) => !await _assetInsuranceQueryRepository.AlreadyExistsAsync(insurance.PolicyNo , insurance.Id))
                            .WithName("PolicyNo")
                             .WithMessage($"{rule.Error}");
                             break;

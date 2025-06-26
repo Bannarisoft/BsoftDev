@@ -22,12 +22,25 @@ namespace MaintenanceManagement.API.GrpcServices
             DepartmentUsageRequest request,
             ServerCallContext context)
         {
-            var isUsed = await _costCenterQueryRepository.DepartmentSoftDeleteValidation(request.DepartmentId);      
-
-            return new DepartmentUsageResponse
+            try
             {
-                IsUsed = isUsed
-            };
+                var isUsed = await _costCenterQueryRepository.DepartmentSoftDeleteValidation(request.DepartmentId);
+
+                return new DepartmentUsageResponse
+                {
+                    IsUsed = isUsed
+                };
+            }
+            catch (Exception ex)
+            {
+                // Optional: log the exception
+                Console.WriteLine($"[gRPC] Error in IsDepartmentUsedInCostCenter: {ex.Message}");
+
+                // Properly return gRPC-level error
+                throw new RpcException(new Status(StatusCode.Internal, "Failed to validate department usage."));
+            }
         }
+
+       
     }
 }
