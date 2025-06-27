@@ -8,6 +8,9 @@
   <ItemGroup>
   <Protobuf Include="..\..\Shared\Contracts\Protos\department_maintenance.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\department_fixedasset.proto" GrpcServices="Client"  />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\Country_FixedAsset.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\FixedAsset_City.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\FixedAsset_State.proto" GrpcServices="Client" />
 </ItemGroup>
 
   <ItemGroup>

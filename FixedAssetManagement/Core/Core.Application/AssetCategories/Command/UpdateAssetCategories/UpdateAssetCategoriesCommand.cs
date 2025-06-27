@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetCategories.Command.UpdateAssetCategories
 {
-    public class UpdateAssetCategoriesCommand :IRequest<ApiResponseDTO<int>> 
+    public class UpdateAssetCategoriesCommand : IRequest<ApiResponseDTO<int>>
     {
         public int Id { get; set; }
         public string? CategoryName { get; set; }
@@ -15,5 +15,6 @@ namespace Core.Application.AssetCategories.Command.UpdateAssetCategories
         public int SortOrder { get; set; }
         public int AssetGroupId { get; set; }
         public byte IsActive { get; set; }
+        public decimal GroupPercentage { get; set; }       
     }
 }

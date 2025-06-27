@@ -1,4 +1,5 @@
 using AutoMapper;
+using Contracts.Interfaces.External.IFixedAssetManagement;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICountry;
 using Core.Application.Country.Queries.GetCountries;
@@ -14,17 +15,31 @@ namespace Core.Application.Country.Commands.DeleteCountry
         private readonly ICountryCommandRepository _countryRepository;
         private readonly ICountryQueryRepository _countryQueryRepository;
         private readonly IMapper _mapper;
-        private readonly IMediator _mediator; 
-        
-        public DeleteCountryCommandHandler(ICountryCommandRepository countryRepository, IMapper mapper, ICountryQueryRepository countryQueryRepository, IMediator mediator)
+        private readonly IMediator _mediator;    
+        private readonly IFixedAssetCountryValidationGrpcClient _fixedAssetCountryValidationGrpcClient;
+
+        public DeleteCountryCommandHandler(ICountryCommandRepository countryRepository, IMapper mapper, ICountryQueryRepository countryQueryRepository, IMediator mediator, IFixedAssetCountryValidationGrpcClient fixedAssetCountry)
         {
             _countryRepository = countryRepository;
             _mapper = mapper;
             _countryQueryRepository = countryQueryRepository;
             _mediator = mediator;
+            _fixedAssetCountryValidationGrpcClient = fixedAssetCountry;
         }       
         public async Task<ApiResponseDTO<CountryDto>> Handle(DeleteCountryCommand request, CancellationToken cancellationToken)
         {
+            bool iscountryUsedInFixedAsset = await _fixedAssetCountryValidationGrpcClient.CheckIfCountryIsUsedForFixedAssetAsync(request.Id);
+
+            if (iscountryUsedInFixedAsset)
+            {
+                return new ApiResponseDTO<CountryDto>
+                {
+                    IsSuccess = false,
+                    Message = "Cannot delete Country. It is still in use in FixedAsset system."
+                   
+                };
+            }
+
             var country = await _countryQueryRepository.GetByIdAsync(request.Id);
             if (country is null || country.IsDeleted is Enums.IsDelete.Deleted)
             {

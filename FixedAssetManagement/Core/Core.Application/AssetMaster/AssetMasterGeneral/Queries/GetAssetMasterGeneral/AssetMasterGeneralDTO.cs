@@ -48,6 +48,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public Decimal CompletedPercentage { get; set; }  
         public string? SpecificationsJson { get; set; }
         public string? AssetDocument { get; set; }
+        public DateTimeOffset? PutToUseDate { get; set; }
         public List<AssetSpecificationDTO>? Specifications { get; set; }
     }
     public class AssetSpecificationDTO

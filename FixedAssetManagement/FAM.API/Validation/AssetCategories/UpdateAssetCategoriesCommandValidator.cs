@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Core.Application.AssetCategories.Command.UpdateAssetCategories;
 using FAM.API.Validation.Common;
@@ -73,6 +74,11 @@ namespace FAM.API.Validation.AssetCategories
                         RuleFor(x => x.SortOrder.ToString())
                              .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
                             .WithMessage($"{nameof(UpdateAssetCategoriesCommand.SortOrder)} {rule.Error}");
+                        break;
+                    case "Percentage":
+                        RuleFor(x => x.GroupPercentage.ToString())
+                            .Matches(new Regex(rule.Pattern))
+                            .WithMessage($"GroupPercentage {rule.Error}");
                         break;
                     default:
                           // Handle unknown rule (log or throw)

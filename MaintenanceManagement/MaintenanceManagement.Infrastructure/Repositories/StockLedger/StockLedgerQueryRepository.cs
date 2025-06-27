@@ -48,7 +48,30 @@ namespace MaintenanceManagement.Infrastructure.Repositories.StockLedger
             var itemcodes = await _dbConnection.QueryAsync<StockItemCodeDto>(query, parameters);
             return itemcodes.ToList();
         }
+        public async Task<List<StockItemCodeDto>> GetAllItemCodes(string OldUnitcode,int DepartmentId)
+        {
+            OldUnitcode = OldUnitcode ?? string.Empty; // Prevent null issues
 
+            const string query = @"
+                SELECT 
+                    ItemCode,
+                    ItemName
+                FROM 
+                    Maintenance.StockLedger
+                WHERE
+                    Oldunitcode = @OldUnitcode
+                    AND TransactionType not in('SRP','REU') 
+                    AND DepartmentId = @DepartmentId      ";
+
+            var parameters = new
+            {
+                OldUnitcode,
+                DepartmentId // match exactly, no wildcards
+            };
+
+            var itemcodes = await _dbConnection.QueryAsync<StockItemCodeDto>(query, parameters);
+            return itemcodes.ToList();
+        }
         public async Task<CurrentStockDto?> GetSubStoresCurrentStock(string OldUnitcode, string Itemcode,int DepartmentId)
         {
             const string query = @"
