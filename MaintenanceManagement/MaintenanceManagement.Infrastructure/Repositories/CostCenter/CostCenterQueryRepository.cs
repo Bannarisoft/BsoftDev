@@ -111,94 +111,66 @@ namespace MaintenanceManagement.Infrastructure.Repositories.CostCenter
 
             return costcentermasterDetailExists.HasValue;
         }
-                public async Task<bool> DepartmentSoftDeleteValidation(int id)
+      
+
+         public async Task<bool> DepartmentSoftDeleteValidation(int Id)
         {
-            const string query = @"
-                SELECT COUNT(*) FROM (
-                    SELECT 1 FROM [Maintenance].[CostCenter] WHERE DepartmentId = @Id AND IsDeleted = 0
-                    UNION ALL
-                    SELECT 1 FROM [Maintenance].[MachineGroup] WHERE DepartmentId = @Id AND IsDeleted = 0
-                    UNION ALL
-                    SELECT 1 FROM [Maintenance].[Feeder] WHERE DepartmentId = @Id AND IsDeleted = 0
-                    UNION ALL
-                    SELECT 1 FROM [Maintenance].[MachineGroupUser] WHERE DepartmentId = @Id AND IsDeleted = 0
-                    UNION ALL
-                    SELECT 1 FROM [Maintenance].[MaintenanceRequest] WHERE MaintenanceDepartmentId = @Id AND IsDeleted = 0
-                    UNION ALL
-                    SELECT 1 FROM [Maintenance].[MaintenanceRequest] WHERE ProductionDepartmentId = @Id AND IsDeleted = 0
-                    UNION ALL
-                    SELECT 1 FROM [Maintenance].[WorkCenter] WHERE DepartmentId = @Id AND IsDeleted = 0
-                    UNION ALL
-                    SELECT 1 FROM [Maintenance].[PreventiveSchedulerHeader] WHERE DepartmentId = @Id AND IsDeleted = 0
-                    UNION ALL
-                    SELECT 1 FROM [Maintenance].[ActivityMaster] WHERE DepartmentId = @Id AND IsDeleted = 0
-                    UNION ALL
-                    SELECT 1 FROM [Maintenance].[StockLedger] WHERE DepartmentId = @Id
-                ) AS T;
-            ";
+            const string query = @"                        
+                              SELECT 1 
+                           FROM [Maintenance].[CostCenter]
+                           WHERE DepartmentId = @Id AND IsDeleted = 0;
 
-            var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
-            return count > 0;
+                           SELECT 1
+                           FROM [Maintenance].[MachineGroup]
+                           WHERE DepartmentId = @Id AND IsDeleted = 0;
+
+                           SELECT 1 
+                           FROM [Maintenance].[Feeder]
+                           WHERE DepartmentId = @Id AND IsDeleted = 0;
+
+                           SELECT 1 
+                           FROM [Maintenance].[MachineGroupUser]
+                           WHERE DepartmentId = @Id AND IsDeleted = 0;
+
+                           SELECT 1 
+                           FROM [Maintenance].[MaintenanceRequest]
+                           WHERE MaintenanceDepartmentId = @Id AND IsDeleted = 0;
+
+                           SELECT 1 
+                           FROM [Maintenance].[MaintenanceRequest]
+                           WHERE ProductionDepartmentId = @Id AND IsDeleted = 0;
+
+                           SELECT 1
+                           from [Maintenance].[WorkCenter]
+                           where DepartmentId = @Id and IsDeleted = 0;
+
+                           SELECT 1
+                           from [Maintenance].[PreventiveSchedulerHeader]
+                           where DepartmentId = @Id and IsDeleted = 0;
+
+                           SELECT 1
+                           from [Maintenance].[ActivityMaster]
+                           where DepartmentId = @Id and IsDeleted = 0;
+
+                           SELECT 1
+                           from [Maintenance].[StockLedger]
+                           where DepartmentId = @Id ;                           
+                           ";
+
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+
+            var costcentermasterDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var machineGroupDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var feederDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var machineGroupUserDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var maintenanceRequestDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var workCenterDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var preventiveSchedulerHeaderDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var activityMasterDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            var stockLedgerDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
+
+            return costcentermasterDetailExists.HasValue || machineGroupDetailExists.HasValue || feederDetailExists.HasValue || machineGroupUserDetailExists.HasValue || maintenanceRequestDetailExists.HasValue || workCenterDetailExists.HasValue || preventiveSchedulerHeaderDetailExists.HasValue || activityMasterDetailExists.HasValue || stockLedgerDetailExists.HasValue;
         }
-
-        //  public async Task<bool> DepartmentSoftDeleteValidation(int Id)
-        // {
-        //     const string query = @"                        
-        //                       SELECT 1 
-        //                    FROM [Maintenance].[CostCenter]
-        //                    WHERE DepartmentId = @Id AND IsDeleted = 0;
-
-        //                    SELECT 1
-        //                    FROM [Maintenance].[MachineGroup]
-        //                    WHERE DepartmentId = @Id AND IsDeleted = 0;
-
-        //                    SELECT 1 
-        //                    FROM [Maintenance].[Feeder]
-        //                    WHERE DepartmentId = @Id AND IsDeleted = 0;
-
-        //                    SELECT 1 
-        //                    FROM [Maintenance].[MachineGroupUser]
-        //                    WHERE DepartmentId = @Id AND IsDeleted = 0;
-
-        //                    SELECT 1 
-        //                    FROM [Maintenance].[MaintenanceRequest]
-        //                    WHERE MaintenanceDepartmentId = @Id AND IsDeleted = 0;
-
-        //                    SELECT 1 
-        //                    FROM [Maintenance].[MaintenanceRequest]
-        //                    WHERE ProductionDepartmentId = @Id AND IsDeleted = 0;
-
-        //                    SELECT 1
-        //                    from [Maintenance].[WorkCenter]
-        //                    where DepartmentId = @Id and IsDeleted = 0;
-
-        //                    SELECT 1
-        //                    from [Maintenance].[PreventiveSchedulerHeader]
-        //                    where DepartmentId = @Id and IsDeleted = 0;
-
-        //                    SELECT 1
-        //                    from [Maintenance].[ActivityMaster]
-        //                    where DepartmentId = @Id and IsDeleted = 0;
-
-        //                    SELECT 1
-        //                    from [Maintenance].[StockLedger]
-        //                    where DepartmentId = @Id ;                           
-        //                    ";
-
-        //     using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
-
-        //     var costcentermasterDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
-        //     var machineGroupDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
-        //     var feederDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
-        //     var machineGroupUserDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
-        //     var maintenanceRequestDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
-        //     var workCenterDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
-        //     var preventiveSchedulerHeaderDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
-        //     var activityMasterDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
-        //     var stockLedgerDetailExists = await multi.ReadFirstOrDefaultAsync<int?>();
-
-        //     return costcentermasterDetailExists.HasValue || machineGroupDetailExists.HasValue || feederDetailExists.HasValue || machineGroupUserDetailExists.HasValue || maintenanceRequestDetailExists.HasValue || workCenterDetailExists.HasValue || preventiveSchedulerHeaderDetailExists.HasValue || activityMasterDetailExists.HasValue || stockLedgerDetailExists.HasValue;
-        // }
 
 
 

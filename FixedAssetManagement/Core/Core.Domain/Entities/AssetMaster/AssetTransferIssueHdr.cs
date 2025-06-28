@@ -37,7 +37,7 @@ namespace Core.Domain.Entities.AssetMaster
         public string? AuthorizedIP { get; set; }
 
     
-     public ICollection<AssetTransferIssueDtl>? AssetTransferIssueDtl { get; set; } 
+        public ICollection<AssetTransferIssueDtl>? AssetTransferIssueDtl { get; set; } 
     
 
          public AssetTransferReceiptHdr? AssetTransferReceiptHdr { get; set; } 

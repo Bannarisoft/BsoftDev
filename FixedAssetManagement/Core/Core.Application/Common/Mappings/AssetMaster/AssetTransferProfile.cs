@@ -20,20 +20,20 @@ namespace Core.Application.Common.Mappings.AssetMaster
         public AssetTransferProfile()
         {
 
-            CreateMap<Core.Domain.Entities.AssetMaster.AssetTransferIssue, AssetTransferDto>(); 
+            CreateMap<Core.Domain.Entities.AssetMaster.AssetTransferIssue, AssetTransferDto>();
 
-            CreateMap<AssetTransferIssueHdrDto, Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr>()            
+            CreateMap<AssetTransferIssueHdrDto, Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr>()
              .ForMember(dest => dest.AssetTransferIssueDtl, opt => opt.MapFrom(src => src.AssetTransferIssueDtls))
              .ForMember(dest => dest.Status, opt => opt.MapFrom(src => "Pending"));
             CreateMap<AssetTransferIssueDtlDto, Core.Domain.Entities.AssetMaster.AssetTransferIssueDtl>();
-            
 
 
 
-             // ✅ Ensure mapping from AssetTransferJsonDto -> AssetTransferIssueHdr
+
+            // ✅ Ensure mapping from AssetTransferJsonDto -> AssetTransferIssueHdr
             CreateMap<AssetTransferJsonDto, Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore()) ;// Ignore ID if not required
-               // .ForMember(dest => dest.SomeOtherField, opt => opt.MapFrom(src => src.SomeSourceField)); // Customize field mappings as needed
+                .ForMember(dest => dest.Id, opt => opt.Ignore());// Ignore ID if not required
+                                                                 // .ForMember(dest => dest.SomeOtherField, opt => opt.MapFrom(src => src.SomeSourceField)); // Customize field mappings as needed
 
             // ✅ Ensure mapping from UpdateAssetTransferIssueCommand -> AssetTransferIssueHdr
             CreateMap<UpdateAssetTransferHdrDto, Core.Domain.Entities.AssetMaster.AssetTransferIssueHdr>()
@@ -43,9 +43,11 @@ namespace Core.Application.Common.Mappings.AssetMaster
 
             CreateMap<UpdateAssetTransferDtlDto, Core.Domain.Entities.AssetMaster.AssetTransferIssueDtl>();
 
-            CreateMap< AssetMasterDto , GetAssetMasterDto>();
+            CreateMap<AssetMasterDto, GetAssetMasterDto>();
 
             CreateMap<GetAssetMasterDto, GetCategoryByDeptIdDto>(); 
+            
+            
 
           
 

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Contracts.Interfaces.External.IFixedAssetManagement;
 using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IState;
@@ -16,17 +17,31 @@ namespace Core.Application.State.Commands.DeleteState
         private readonly IStateQueryRepository _stateQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
+         private readonly IFixedAssetStateValidationGrpcClient _fixedAssetStateValidationGrpcClient;
 
-        public DeleteStateCommandHandler(IStateCommandRepository stateRepository, IMapper mapper,IStateQueryRepository stateQueryRepository, IMediator mediator)
+
+        public DeleteStateCommandHandler(IStateCommandRepository stateRepository, IMapper mapper, IStateQueryRepository stateQueryRepository, IMediator mediator, IFixedAssetStateValidationGrpcClient fixedAssetState)
         {
             _stateRepository = stateRepository;
             _mapper = mapper;
             _stateQueryRepository = stateQueryRepository;
             _mediator = mediator;
+            _fixedAssetStateValidationGrpcClient = fixedAssetState;
         }
 
         public async Task<ApiResponseDTO<StateDto>> Handle(DeleteStateCommand request, CancellationToken cancellationToken)
         {
+
+             bool iscountryUsedInFixedAsset = await _fixedAssetStateValidationGrpcClient.CheckIfStateIsUsedForFixedAssetAsync(request.Id);  
+             if (iscountryUsedInFixedAsset)
+            {
+                return new ApiResponseDTO<StateDto>
+                {
+                    IsSuccess = false,
+                    Message = "Cannot delete State. It is still in use in FixedAsset system."
+                };
+            }
+
             var state = await _stateQueryRepository.GetByIdAsync(request.Id);
             if (state is null || state.IsDeleted is  Enums.IsDelete.Deleted)
             {

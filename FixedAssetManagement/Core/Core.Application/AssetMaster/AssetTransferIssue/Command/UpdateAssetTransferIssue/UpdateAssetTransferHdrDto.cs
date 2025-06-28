@@ -20,10 +20,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Command.UpdateAssetTra
     public int ToCustodianId { get; set; }
     public string? ToCustodianName { get; set; }
     public string? GatePassNo { get; set; }
-    public string? Status { get; set; }
+    public string? Status { get; set; }   
 
-    
-
-    public List<UpdateAssetTransferDtlDto>? AssetTransferIssueDtl { get; set; }
-    }
+    public List<UpdateAssetTransferDtlDto>? AssetTransferIssueDtl { get; set; }    }
 }
