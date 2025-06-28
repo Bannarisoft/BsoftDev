@@ -1,4 +1,5 @@
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
+using Core.Application.Common.Interfaces;
 using OfficeOpenXml;
 
 namespace Core.Application.ExcelImport
@@ -7,15 +8,18 @@ namespace Core.Application.ExcelImport
     {
         private readonly ExcelWorksheet _worksheet;
         private readonly int _row;
+        private readonly IIPAddressService _ipAddressService;
 
-        public AssetPurchaseHandler(ExcelWorksheet worksheet, int row)
+        public AssetPurchaseHandler(ExcelWorksheet worksheet, int row, IIPAddressService ipAddressService)
         {
             _worksheet = worksheet;
             _row = row;
+            _ipAddressService = ipAddressService;
         }
 
         public List<AssetPurchaseCombineDto>? ProcessAssetPurchase()
         {
+            var oldUnitId = _ipAddressService.GetOldUnitId();
             string vendorCode = _worksheet.Cells[_row, 36].Value?.ToString()?.Trim();
             string vendorName = _worksheet.Cells[_row, 37].Value?.ToString()?.Trim();
             int poNo = int.TryParse(_worksheet.Cells[_row, 38].Value?.ToString(), out int parsedPoNo) ? parsedPoNo : 0;
@@ -50,7 +54,8 @@ namespace Core.Application.ExcelImport
                     QcCompleted = 'Y',
                     AssetSourceId = 2,
                     AcceptedQty = 0,
-                    BudgetType = "CAPIT"
+                    BudgetType = "CAPIT",
+                    OldUnitId=oldUnitId,PjDocId=string.Empty
                 }
             };
         }
