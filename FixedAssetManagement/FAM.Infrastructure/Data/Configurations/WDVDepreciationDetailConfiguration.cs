@@ -22,10 +22,6 @@ namespace FAM.Infrastructure.Data.Configurations
               .HasColumnType("int")
               .IsRequired(); 
 
-            builder.Property(dg => dg.UnitId)                
-              .HasColumnType("int")
-              .IsRequired(); 
-
             builder.Property(dg => dg.FinYear )                
               .HasColumnType("int")
               .IsRequired(); 
@@ -49,7 +45,7 @@ namespace FAM.Infrastructure.Data.Configurations
 
             builder.Property(dg => dg.AssetSubGroupId)                
               .HasColumnType("int")
-              .IsRequired(); 
+              .IsRequired(false); 
                 // Configure Foreign Key Relationship
             builder.HasOne(dg => dg.AssetSubGroup)
               .WithMany(ag => ag.WDVDepreciationDetail)
@@ -61,6 +57,10 @@ namespace FAM.Infrastructure.Data.Configurations
               .IsRequired(); 
             
             builder.Property(dg => dg.OpeningValue)                
+              .HasColumnType("decimal(18,3)")
+              .IsRequired(); 
+            
+            builder.Property(dg => dg.LastYearAdditionalDepreciation)                
               .HasColumnType("decimal(18,3)")
               .IsRequired(); 
 
@@ -89,6 +89,10 @@ namespace FAM.Infrastructure.Data.Configurations
               .IsRequired(); 
 
             builder.Property(dg => dg.WDVDepreciationValue)                
+              .HasColumnType("decimal(18,3)")
+              .IsRequired(); 
+
+            builder.Property(dg => dg.AdditionalCarryForward)                
               .HasColumnType("decimal(18,3)")
               .IsRequired(); 
 

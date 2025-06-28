@@ -55,7 +55,10 @@ namespace Core.Application.ExcelImport
             assetDto.AssetDescription = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty;
             assetDto.MachineCode = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty;
             assetDto.UOMId = await _assetRepository.GetAssetUOMIdByNameAsync(worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty);
-
+            if (assetDto.UOMId == null)
+            {
+                throw new Exception($"Invalid Asset UOM '{worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty}' at Excel Row {row}");
+            }
             return assetDto;
         }
     }
