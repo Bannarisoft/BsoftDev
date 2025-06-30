@@ -40,6 +40,12 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnName("Description")
                 .HasColumnType("varchar(500)")
                 .IsRequired();
+
+                 builder.Property(t => t.UnitId)
+                .HasColumnName("UnitId")
+                .HasColumnType("int")
+                .IsRequired();
+                
                 builder.Property(t => t.DepartmentId)
                 .HasColumnName("DepartmentId")
                 .HasColumnType("int")

@@ -40,9 +40,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
                 existingRecord.ActivityName = activityMaster.ActivityName;
                 existingRecord.Description = activityMaster.Description;
                 existingRecord.DepartmentId = activityMaster.DepartmentId;
+                existingRecord.UnitId = activityMaster.UnitId;
                 existingRecord.EstimatedDuration = activityMaster.EstimatedDuration;
                 existingRecord.ActivityType = activityMaster.ActivityType;
-            existingRecord.IsActive = activityMaster.IsActive;
+                existingRecord.IsActive = activityMaster.IsActive;
                 
                 
 
