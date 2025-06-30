@@ -55,8 +55,8 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                        
                 existingAssetGroup.AssetName = assetMaster.AssetName;                
                 existingAssetGroup.AssetGroupId = assetMaster.AssetGroupId;
-                existingAssetGroup.IsActive = assetMaster.IsActive;
-                existingAssetGroup.AssetGroupId = assetMaster.AssetGroupId;
+                existingAssetGroup.IsActive = assetMaster.IsActive;                
+                existingAssetGroup.AssetSubGroupId = assetMaster.AssetSubGroupId;
                 existingAssetGroup.AssetCategoryId = assetMaster.AssetCategoryId;
                 existingAssetGroup.AssetSubCategoryId = assetMaster.AssetSubCategoryId;
                 existingAssetGroup.AssetParentId = assetMaster.AssetParentId;
