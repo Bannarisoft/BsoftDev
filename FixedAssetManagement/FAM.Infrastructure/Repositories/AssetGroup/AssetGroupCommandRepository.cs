@@ -49,9 +49,10 @@ namespace FAM.Infrastructure.Repositories.AssetGroup
         existingassetGroup.GroupName = assetGroup.GroupName;
         existingassetGroup.SortOrder = assetGroup.SortOrder;
         existingassetGroup.IsActive = assetGroup.IsActive;
+        existingassetGroup.GroupPercentage = assetGroup.GroupPercentage;
 
         // Mark the entity as modified
-        _applicationDbContext.AssetGroup.Update(existingassetGroup);
+            _applicationDbContext.AssetGroup.Update(existingassetGroup);
 
         // Save changes to the database
         await _applicationDbContext.SaveChangesAsync();
