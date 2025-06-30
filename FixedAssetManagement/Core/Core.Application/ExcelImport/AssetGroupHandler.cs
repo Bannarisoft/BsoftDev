@@ -39,7 +39,7 @@ namespace Core.Application.ExcelImport
 
             // AssetSubCategory
             string assetSubCategory = worksheet.Cells[row, 4].Value?.ToString() ?? string.Empty;
-            int? assetSubCategoryId = await _assetRepository.GetAssetSubCategoryIdByNameAsync(assetSubCategory);
+            int? assetSubCategoryId = await _assetRepository.GetAssetSubCategoryIdByNameAsync(assetDto.AssetCategoryId ,assetSubCategory);
             if (assetSubCategoryId == null)
             {
                 throw new Exception($"Invalid Asset Sub Category Name '{assetSubCategory}' at Excel Row {row}");
@@ -55,7 +55,10 @@ namespace Core.Application.ExcelImport
             assetDto.AssetDescription = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty;
             assetDto.MachineCode = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty;
             assetDto.UOMId = await _assetRepository.GetAssetUOMIdByNameAsync(worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty);
-
+            if (assetDto.UOMId == null)
+            {
+                throw new Exception($"Invalid Asset UOM '{worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty}' at Excel Row {row}");
+            }
             return assetDto;
         }
     }

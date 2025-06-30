@@ -13,7 +13,7 @@ namespace Core.Application.Common.Interfaces.IExcelImport
         Task<bool> ImportAssetsAsync(List<AssetMasterDto> assets, CancellationToken cancellationToken);
         Task<int?> GetAssetGroupIdByNameAsync(string assetGroupName);
         Task<int?> GetAssetCategoryIdByNameAsync(string assetGroupName);
-        Task<int?> GetAssetSubCategoryIdByNameAsync(string assetGroupName);
+        Task<int?> GetAssetSubCategoryIdByNameAsync(int assetCategoryId,string assetSubGroupName);
         Task<int?> GetAssetUOMIdByNameAsync(string assetGroupName);
         Task<int?> GetAssetLocationIdByNameAsync(string locationName);
         Task<int?> GetAssetSubLocationIdByNameAsync(string subLocationName, string locationName);

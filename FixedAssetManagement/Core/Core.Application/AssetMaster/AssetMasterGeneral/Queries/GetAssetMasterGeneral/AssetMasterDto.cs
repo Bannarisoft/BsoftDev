@@ -28,8 +28,9 @@
             public bool? NonDepreciated { get; set; }
             public bool? Tangible { get; set; }        
             public bool? Active { get; set; }  
-            public string? AssetDocument { get; set; }      
-            public AssetLocationCombineDto?  AssetLocation  { get; set; }
+            public string? AssetDocument { get; set; }  
+            public DateTimeOffset? PutToUseDate { get; set; }
+            public AssetLocationCombineDto? AssetLocation { get; set; }
             public ICollection<AssetPurchaseCombineDto>? AssetPurchaseDetails{ get; set; }       
             public ICollection<AssetAdditionalCostCombineDto>? AssetAdditionalCost{ get; set; }       
             public ICollection<AssetSpecificationCombineDto>? AssetSpecification{ get; set; } 

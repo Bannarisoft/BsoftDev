@@ -76,76 +76,81 @@ using Core.Application.AssetMaster.AssetAmc.Command.CreateAssetAmc;
 using Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc;
 using FAM.API.Validation.AssetMaster.AssetAmc;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadDocumentAssetMaster;
+using Core.Application.AssetSubGroup.Command.CreateAssetSubGroup;
+using FAM.API.Validation.AssetSubGroup;
+using Core.Application.AssetSubGroup.Command.UpdateAssetSubGroup;
 
 
 namespace FAM.API.Validation.Common
 {
     public class ValidationService
     {
-    public void AddValidationServices(IServiceCollection services)
-    {
-        services.AddScoped<MaxLengthProvider>();
-         services.AddScoped<IValidator<CreateAssetGroupCommand>, CreateAssetGroupCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetGroupCommand>, UpdateAssetGroupCommandValidator>();
-        services.AddScoped<IValidator<CreateAssetCategoriesCommand>, CreateAssetCategoriesCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetCategoriesCommand >, UpdateAssetCategoriesCommandValidator>();
-        services.AddScoped<IValidator<CreateLocationCommand>, CreateLocationCommandValidator>();
-        services.AddScoped<IValidator<UpdateLocationCommand>, UpdateLocationCommandValidator>();
-        services.AddScoped<IValidator<CreateSubLocationCommand>, CreateSubLocationCommandValidator>();
-        services.AddScoped<IValidator<UpdateSubLocationCommand>, UpdateSubLocationCommandValidator>();
-		services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
-        services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>(); 
-		services.AddScoped<IValidator<CreateDepreciationGroupCommand>, CreateDepreciationGroupCommandValidator>();        
-        services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
-        services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>(); 
-        services.AddScoped<IValidator<CreateDepreciationGroupCommand>, CreateDepreciationGroupCommandValidator>();
-        services.AddScoped<IValidator<UpdateDepreciationGroupCommand>, UpdateDepreciationGroupCommandValidator>();
-  		services.AddScoped<IValidator<CreateAssetSubCategoriesCommand>, CreateAssetSubCategoriesCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetSubCategoriesCommand >, UpdateAssetSubCategoriesCommandValidator>(); 
-        services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
-        services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>();        
-		services.AddScoped<IValidator<UpdateManufactureCommand>, UpdateManufactureCommandValidator>();
-        services.AddScoped<IValidator<UpdateManufactureCommand>, UpdateManufactureCommandValidator>();
-        services.AddScoped<IValidator<CreateManufactureCommand>, CreateManufactureCommandValidator>();
-		services.AddScoped<IValidator<CreateAssetMasterGeneralCommand>, CreateAssetMasterGeneralCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetMasterGeneralCommand>, UpdateAssetMasterGeneralCommandValidator>();
-        services.AddScoped<IValidator<DeleteAssetMasterGeneralCommand>, DeleteAssetMasterGeneralCommandValidator>();
-        services.AddScoped<IValidator<UploadFileAssetMasterGeneralCommand>, UploadAssetMasterGeneralCommandValidator>();
-        services.AddScoped<IValidator<CreateUOMCommand>, CreateUOMCommandValidator>();
-        services.AddScoped<IValidator<UpdateUOMCommand>, UpdateUOMCommandValidator>();
-        services.AddScoped<IValidator<UpdateSpecificationMasterCommand>, UpdateSpecificationMasterCommandValidator>();
-        services.AddScoped<IValidator<CreateSpecificationMasterCommand>, CreateSpecificationMasterCommandValidator>();
-		services.AddScoped<IValidator<CreateAssetLocationCommand>, CreateAssetLocationCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetLocationCommand>, UpdateAssetLocationCommandValidator>();		
-        services.AddScoped<IValidator<CreateAssetPurchaseDetailCommand>, CreateAssetPurchaseDetailCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetPurchaseDetailCommand>, UpdateAssetPurchaseDetailCommandValidator>();        
-		services.AddScoped<IValidator<CreateAssetSpecificationCommand>, CreateAssetSpecificationCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetSpecificationCommand>, UpdateAssetSpecificationCommandValidator>();
-		services.AddScoped<IValidator<CreateAssetAdditionalCostCommand>, CreateAssetAdditionalCostCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetAdditionalCostCommand>, UpdateAssetAdditionalCostCommandValidator>();
-        services.AddScoped<IValidator<CreateAssetWarrantyCommand>, CreateAssetWarrantyCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetWarrantyCommand>, UpdateAssetWarrantyCommandValidator>();
-        services.AddScoped<IValidator<UploadFileAssetWarrantyCommand>, UploadAssetWarrantyCommandValidator>();
-        services.AddScoped<IValidator<CreateAssetInsuranceCommand>, CreateAssetInsuranceCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetInsuranceCommand>, UpdateAssetInsuranceCommandValidator>();
-        services.AddScoped<IValidator<CreateAssetDisposalCommand>, CreateAssetDisposalCommandValidator>();
-        services.AddScoped<IValidator<DeleteDepreciationGroupCommand>,DeleteDepreciationGroupCommandValidator>();
-        services.AddScoped<IValidator<DeleteAssetWarrantyCommand>,DeleteAssetWarrantyCommandValidator>();
-        services.AddScoped<IValidator<DeleteAssetSpecificationCommand>,DeleteAssetSpecificationCommandValidator>();
-        services.AddScoped<IValidator<DeleteSpecificationMasterCommand>,DeleteSpecificationMasterCommandValidator>();
+        public void AddValidationServices(IServiceCollection services)
+        {
+            services.AddScoped<MaxLengthProvider>();
+            services.AddScoped<IValidator<CreateAssetGroupCommand>, CreateAssetGroupCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetGroupCommand>, UpdateAssetGroupCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetCategoriesCommand>, CreateAssetCategoriesCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetCategoriesCommand>, UpdateAssetCategoriesCommandValidator>();
+            services.AddScoped<IValidator<CreateLocationCommand>, CreateLocationCommandValidator>();
+            services.AddScoped<IValidator<UpdateLocationCommand>, UpdateLocationCommandValidator>();
+            services.AddScoped<IValidator<CreateSubLocationCommand>, CreateSubLocationCommandValidator>();
+            services.AddScoped<IValidator<UpdateSubLocationCommand>, UpdateSubLocationCommandValidator>();
+            services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateDepreciationGroupCommand>, CreateDepreciationGroupCommandValidator>();
+            services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateDepreciationGroupCommand>, CreateDepreciationGroupCommandValidator>();
+            services.AddScoped<IValidator<UpdateDepreciationGroupCommand>, UpdateDepreciationGroupCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetSubCategoriesCommand>, CreateAssetSubCategoriesCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetSubCategoriesCommand>, UpdateAssetSubCategoriesCommandValidator>();
+            services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateManufactureCommand>, UpdateManufactureCommandValidator>();
+            services.AddScoped<IValidator<UpdateManufactureCommand>, UpdateManufactureCommandValidator>();
+            services.AddScoped<IValidator<CreateManufactureCommand>, CreateManufactureCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetMasterGeneralCommand>, CreateAssetMasterGeneralCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetMasterGeneralCommand>, UpdateAssetMasterGeneralCommandValidator>();
+            services.AddScoped<IValidator<DeleteAssetMasterGeneralCommand>, DeleteAssetMasterGeneralCommandValidator>();
+            services.AddScoped<IValidator<UploadFileAssetMasterGeneralCommand>, UploadAssetMasterGeneralCommandValidator>();
+            services.AddScoped<IValidator<CreateUOMCommand>, CreateUOMCommandValidator>();
+            services.AddScoped<IValidator<UpdateUOMCommand>, UpdateUOMCommandValidator>();
+            services.AddScoped<IValidator<UpdateSpecificationMasterCommand>, UpdateSpecificationMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateSpecificationMasterCommand>, CreateSpecificationMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetLocationCommand>, CreateAssetLocationCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetLocationCommand>, UpdateAssetLocationCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetPurchaseDetailCommand>, CreateAssetPurchaseDetailCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetPurchaseDetailCommand>, UpdateAssetPurchaseDetailCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetSpecificationCommand>, CreateAssetSpecificationCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetSpecificationCommand>, UpdateAssetSpecificationCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetAdditionalCostCommand>, CreateAssetAdditionalCostCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetAdditionalCostCommand>, UpdateAssetAdditionalCostCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetWarrantyCommand>, CreateAssetWarrantyCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetWarrantyCommand>, UpdateAssetWarrantyCommandValidator>();
+            services.AddScoped<IValidator<UploadFileAssetWarrantyCommand>, UploadAssetWarrantyCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetInsuranceCommand>, CreateAssetInsuranceCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetInsuranceCommand>, UpdateAssetInsuranceCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetDisposalCommand>, CreateAssetDisposalCommandValidator>();
+            services.AddScoped<IValidator<DeleteDepreciationGroupCommand>, DeleteDepreciationGroupCommandValidator>();
+            services.AddScoped<IValidator<DeleteAssetWarrantyCommand>, DeleteAssetWarrantyCommandValidator>();
+            services.AddScoped<IValidator<DeleteAssetSpecificationCommand>, DeleteAssetSpecificationCommandValidator>();
+            services.AddScoped<IValidator<DeleteSpecificationMasterCommand>, DeleteSpecificationMasterCommandValidator>();
 
-        
-        
 
-        services.AddScoped<IValidator<UpdateAssetDisposalCommand>, UpdateAssetDisposalCommandValidator>();  
-        services.AddScoped<IValidator<UpdateAssetTranferIssueApprovalCommand>, UpdateAssetTransferIssueApprovalValidator>();                
-        services.AddScoped<IValidator<CreateAssetTransferIssueCommand>, CreateAssetTransferIssueCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetTransferIssueCommand>, UpdateAssetTransferIssueCommandValidator>();
-        services.AddScoped<IValidator<CreateAssetTransferReceiptCommand>, CreateAssetTransferReceiptCommandValidator>();
-        services.AddScoped<IValidator<CreateAssetAmcCommand>, CreateAssetAmcCommandValidator>();
-        services.AddScoped<IValidator<UpdateAssetAmcCommand>, UpdateAssetAmcCommandValidator>();
 
-        services.AddScoped<IValidator<UploadDocumentAssetMasterGeneralCommand>, UploadDocumentAssetMasterGeneralCommandValidator>();
+
+            services.AddScoped<IValidator<UpdateAssetDisposalCommand>, UpdateAssetDisposalCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetTranferIssueApprovalCommand>, UpdateAssetTransferIssueApprovalValidator>();
+            services.AddScoped<IValidator<CreateAssetTransferIssueCommand>, CreateAssetTransferIssueCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetTransferIssueCommand>, UpdateAssetTransferIssueCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetTransferReceiptCommand>, CreateAssetTransferReceiptCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetAmcCommand>, CreateAssetAmcCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetAmcCommand>, UpdateAssetAmcCommandValidator>();
+
+            services.AddScoped<IValidator<UploadDocumentAssetMasterGeneralCommand>, UploadDocumentAssetMasterGeneralCommandValidator>();
+            services.AddScoped<IValidator<CreateAssetSubGroupCommand>, CreateAssetSubGroupCommandValidator>();
+            services.AddScoped<IValidator<UpdateAssetSubGroupCommand>, UpdateAssetSubGroupCommandValidator>();
 
 
     }  

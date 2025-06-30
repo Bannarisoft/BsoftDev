@@ -10,8 +10,9 @@ namespace Core.Application.Common.Interfaces.IStcokLedger
 {
     public interface IStockLedgerQueryRepository
     {
-         Task<CurrentStockDto?> GetSubStoresCurrentStock(string OldUnitcode,string Itemcode,int DepartmentId);
-         Task<List<StockItemCodeDto>> GetStockItemCodes(string OldUnitcode,int DepartmentId);
+        Task<CurrentStockDto?> GetSubStoresCurrentStock(string OldUnitcode, string Itemcode, int DepartmentId);
+        Task<List<StockItemCodeDto>> GetStockItemCodes(string OldUnitcode, int DepartmentId);
+         Task<List<StockItemCodeDto>> GetAllItemCodes(string OldUnitcode,int DepartmentId);
      
          
          

@@ -26,6 +26,7 @@ namespace UserManagement.Infrastructure.Repositories.Departments
 
     public async Task<(List<DepartmentDto>, int)> GetAllDepartmentAsync(int PageNumber, int PageSize, string? SearchTerm)
     {
+      
       var query = $$"""
             DECLARE @TotalCount INT;
 

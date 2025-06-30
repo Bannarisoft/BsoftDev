@@ -25,6 +25,9 @@
   </ItemGroup>
   <ItemGroup>
   <Protobuf Include="Protos\department_fixedasset.proto" GrpcServices="Server" />
+  <Protobuf Include="Protos\Country_FixedAsset.proto"  GrpcServices="Server"   />
+  <Protobuf Include="Protos\FixedAsset_City.proto"  GrpcServices="Server"   />
+  <Protobuf Include="Protos\FixedAsset_State.proto"  GrpcServices="Server"   />
 </ItemGroup>
   <!-- <ItemGroup>
     <Protobuf Include="Protos\department.proto" GrpcServices="Both" />

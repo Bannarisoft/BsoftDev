@@ -50,6 +50,8 @@ namespace FAM.Infrastructure.Data
         public DbSet<AssetTransferReceiptHdr> AssetTransferReceiptHdr { get; set; }
         public DbSet<AssetTransferReceiptDtl> AssetTransferReceiptDtl { get; set; }
         public DbSet<AssetAudit> AssetAudit { get; set; }
+        public DbSet<AssetSubGroup> AssetSubGroup { get; set; }
+        public DbSet<WDVDepreciationDetail> WDVDepreciationDetail { get; set; }
 
 
 
@@ -84,6 +86,8 @@ namespace FAM.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new AssetTransferReceiptDtlConfiguration());
             modelBuilder.ApplyConfiguration(new FormulaTableConfiguration());
             modelBuilder.ApplyConfiguration(new AssetAuditConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetSubGroupConfiguration());
+            modelBuilder.ApplyConfiguration(new WDVDepreciationDetailConfiguration());
 
 
             base.OnModelCreating(modelBuilder);

@@ -74,6 +74,10 @@ using FAM.Infrastructure.Repositories.ExcelImport;
 using FAM.Infrastructure.Helpers;
 using Core.Application.Common.Interfaces.IReports;
 using FAM.Infrastructure.Repositories.Reports;
+using FAM.Infrastructure.Repositories.AssetSubGroup;
+using Core.Application.Common.Interfaces.IAssetSubGroup;
+using Core.Application.Common.Interfaces.IWdvDepreciation;
+using FAM.Infrastructure.Repositories.WDVDepreciation;
 
 namespace FAM.Infrastructure
 {
@@ -231,6 +235,10 @@ namespace FAM.Infrastructure
             services.AddScoped<IExcelImportCommandRepository, ExcelImportCommandRepository>();
             services.AddScoped<IExcelImportQueryRepository, ExcelImportCommandQueryRepository>();
             services.AddScoped<IReportRepository, ReportsRepository>();
+            services.AddScoped<IAssetSubGroupCommandRepository, AssetSubGroupCommandRepository>();
+            services.AddScoped<IAssetSubGroupQueryRepository, AssetSubGroupQueryRepository>();
+            services.AddScoped<IWdvDepreciationQueryRepository, WdvDepreciationQueryRepository>();            
+            services.AddScoped<IWdvDepreciationCommandRepository, WdvDepreciationCommandRepository>(); 
 
 
             // Miscellaneous services
@@ -266,7 +274,9 @@ namespace FAM.Infrastructure
                  typeof(DepreciationDetailProfile),
                 typeof(AssetIssueTransferApproval),
                 typeof(AssetTransferReceiptProfile),
-                typeof(AssetAuditProfile)
+                typeof(AssetAuditProfile),
+                typeof(AssetSubGroupProfile),
+                typeof(WDVDepreciationDetailProfile)
             );
             return services;
         }

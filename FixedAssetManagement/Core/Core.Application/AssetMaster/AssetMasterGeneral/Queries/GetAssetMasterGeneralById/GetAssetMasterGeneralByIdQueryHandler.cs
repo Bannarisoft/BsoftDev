@@ -25,20 +25,19 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
            var (assetResult, locationResult, purchaseDetails, spec, warranty, amc, disposal, insurance,additionalCost) = await _assetMasterRepository.GetAssetMasterByIdAsync(request.Id);
            var asset = _mapper.Map<AssetMasterDTO>(assetResult);
             if (assetResult == null)
-            {
-                
+            {                
                 return null;                  
             }
 
             if (assetResult?.AssetName != null)
-             {
-                 asset.AssetParent = _mapper.Map<AssetParentDTO>(assetResult);
-             }
-
+            {
+                asset.AssetParent = _mapper.Map<AssetParentDTO>(assetResult);
+            }
+             
              if (locationResult != null)
-             {
-                 asset.AssetLocation = _mapper.Map<AssetLocationDTO>(locationResult);
-             }
+            {
+                asset.AssetLocation = _mapper.Map<AssetLocationDTO>(locationResult);
+            }
              if (purchaseDetails != null)
              {
              asset.AssetPurchaseDetails = _mapper.Map<List<AssetPurchaseDetailDTO>>(purchaseDetails);
