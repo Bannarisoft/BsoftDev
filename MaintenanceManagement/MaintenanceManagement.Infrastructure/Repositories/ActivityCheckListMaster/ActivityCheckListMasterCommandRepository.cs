@@ -34,6 +34,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
             {
                 existingActivityCheckListr.ActivityId = activityCheckListMaster.ActivityId;
                 existingActivityCheckListr.ActivityCheckList = activityCheckListMaster.ActivityCheckList;
+                existingActivityCheckListr.UnitId   = activityCheckListMaster.UnitId;
                 existingActivityCheckListr.IsActive = activityCheckListMaster.IsActive;
 
                 _dbContext.ActivityCheckListMaster.Update(existingActivityCheckListr);

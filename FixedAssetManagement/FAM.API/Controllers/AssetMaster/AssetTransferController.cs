@@ -279,8 +279,8 @@ namespace FAM.API.Controllers.AssetMaster
             return Ok(response);
         }
 
-        [HttpGet("GetCustodiansByCustodian")]
-        //  public async Task<IActionResult> GetCustodiansByDepartment(, [FromQuery] string oldUnitId)
+        [HttpGet("GetCategoriesByCustodian")]
+       
         public async Task<IActionResult> GetCategoriesByCustodianAsync([FromQuery] int departmentId, [FromQuery] string custodianId)
         {
             var assetCategoryList = await Mediator.Send(
@@ -298,17 +298,7 @@ namespace FAM.API.Controllers.AssetMaster
 
             });
         }
-        // [HttpGet("GetBulkAssetsToTransfer")]
-        // public async Task<IActionResult> GetBulkAssetsToTransfer(int departmentId, string custodianId, string categoryId)
-        // {
-        //     var query = new GetBulkAssetToTransferQuery { DepartmentId = departmentId, CustodianId = custodianId, CategoryID = categoryId };
-        //     var result = await Mediator.Send(query);
-        //     if (result == null)
-        //     {
-        //         return NotFound($"Asset Transfer with ID {departmentId} not found.");
-        //     }
-        //     return Ok(result);
-        // }
+   
         [HttpGet("GetBulkAssetsToTransfer")]
         public async Task<IActionResult> GetBulkAssetsToTransfer(int departmentId, string custodianId, string categoryId)
         {

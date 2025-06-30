@@ -12,7 +12,10 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListM
         public int ActivityID { get; set; }
         public string? ActivityName { get; set; }
         public string? ActivityChecklist { get; set; }
-        public int DepartmentId { get; set; }       
+        public int UnitId { get; set; }
+        public string? UnitName { get; set; }
+        public int DepartmentId { get; set; }    
+        public string? DepartmentName { get; set; }   
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
         public int? CreatedBy { get; set; }

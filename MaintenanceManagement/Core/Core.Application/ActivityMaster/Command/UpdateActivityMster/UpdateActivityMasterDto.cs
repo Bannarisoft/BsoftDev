@@ -12,6 +12,7 @@ namespace Core.Application.ActivityMaster.Command.UpdateActivityMster
         public string? ActivityName { get; set;}
         public string? Description { get; set; }
         public int DepartmentId { get; set; }
+        public int UnitId { get; set; }
         public int EstimatedDuration { get; set; }
         public int ActivityType { get; set; }
         public Status  IsActive { get; set; }
