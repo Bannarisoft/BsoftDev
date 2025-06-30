@@ -44,7 +44,8 @@ namespace FAM.Infrastructure.Repositories.AssetGroup
                 SortOrder,
                 IsActive,
                 CreatedDate,
-                CreatedByName
+                CreatedByName,
+                GroupPercentage
             FROM FixedAsset.AssetGroup 
             WHERE 
             IsDeleted = 0

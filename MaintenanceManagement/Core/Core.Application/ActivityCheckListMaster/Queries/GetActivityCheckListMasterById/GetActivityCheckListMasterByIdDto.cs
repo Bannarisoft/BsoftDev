@@ -10,8 +10,9 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListM
     {
         
       public int ChecklistId { get; set; }
-      public int ActivityID { get; set; }
+      public int ActivityID { get; set; }      
       public string? ActivityChecklist { get; set; }
+      public int UnitId { get; set; }
       public Status IsActive { get; set; } 
     }
 }

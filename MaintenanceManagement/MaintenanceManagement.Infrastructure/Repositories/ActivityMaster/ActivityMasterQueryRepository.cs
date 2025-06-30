@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Core.Application.ActivityMaster.Queries.GetActivityByMachinGroupId;
 using Core.Application.ActivityMaster.Queries.GetAllActivityMaster;
 using Core.Application.ActivityMaster.Queries.GetMachineGroupById;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using Core.Application.MachineGroup.Queries.GetMachineGroupById;
 using Core.Domain.Common;
@@ -18,32 +19,35 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
     public class ActivityMasterQueryRepository : IActivityMasterQueryRepository
     {
         private readonly IDbConnection _dbConnection;
+        private readonly IIPAddressService _ipAddressService;
 
-        public ActivityMasterQueryRepository(IDbConnection dbConnection)
+        public ActivityMasterQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
 
         }
 
 
         public async Task<(List<GetAllActivityMasterDto>, int)> GetAllActivityMasterAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+              var UnitId = _ipAddressService.GetUnitId();     
             var query = $$"""
                  DECLARE @TotalCount INT;
                     SELECT @TotalCount = COUNT(DISTINCT A.Id)
                     FROM [Maintenance].[ActivityMaster] A                               
-                    INNER JOIN [Maintenance].[MiscMaster] C ON A.ActivityType = C.Id
-                    WHERE A.IsDeleted = 0
+                    INNER JOIN [Maintenance].[MiscMaster] C ON A.ActivityType = C.Id 
+                    WHERE A.IsDeleted = 0 AND A.UnitId = @UnitId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (A.ActivityName LIKE @Search OR A.Description LIKE @Search)")}}; 
 
-                  SELECT  A.Id, A.ActivityName, A.Description, A.DepartmentId,                    
+                  SELECT  A.Id, A.ActivityName, A.Description, A.DepartmentId,   A.UnitId    ,             
                     A.EstimatedDuration, A.ActivityType, C.Code AS ActivityTypeDescription, 
                     A.IsActive, A.IsDeleted, 
                     A.CreatedBy, A.CreatedDate, A.CreatedByName, A.CreatedIP, 
                     A.ModifiedBy, A.ModifiedDate, A.ModifiedByName, A.ModifiedIP
                 FROM [Maintenance].[ActivityMaster] A                                    
                 INNER JOIN [Maintenance].[MiscMaster] C ON A.ActivityType = C.Id
-                WHERE A.IsDeleted = 0
+                WHERE A.IsDeleted = 0 AND A.UnitId = @UnitId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (A.ActivityName LIKE @Search OR A.Description LIKE @Search)")}}
                 ORDER BY A.Id DESC 
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -54,7 +58,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
             {
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize
+                PageSize,
+                UnitId
             };
 
             var assetTransfers = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -68,15 +73,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
         }
         public async Task<GetActivityMasterByIdDto> GetByIdAsync(int activityMasterId)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             const string query = @"
                    
-                    SELECT A.Id, A.ActivityName, A.Description, DepartmentId, 
+                    SELECT A.Id, A.ActivityName, A.Description, A.DepartmentId, A.UnitId,
                         B.DeptName AS Department, A.EstimatedDuration, A.ActivityType, 
                         C.Code AS ActivityTypeDescription, A.IsActive, A.IsDeleted
                     FROM [Maintenance].[ActivityMaster] A
                     INNER JOIN [Bannari].[AppData].[Department] B ON A.DepartmentId = B.Id
                     INNER JOIN [Maintenance].[MiscMaster] C ON A.ActivityType = C.Id
-                    WHERE A.Id = @ActivityMasterId AND A.IsDeleted = 0
+                    WHERE A.Id = @ActivityMasterId AND A.IsDeleted = 0 AND A.UnitId = @UnitId
                     FOR JSON PATH, INCLUDE_NULL_VALUES;
              -- Fetch Related Machine Groups
                     SELECT  D.MachineGroupId, F.GroupName AS MachineGroupName
@@ -85,7 +91,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
                     WHERE D.ActivityMasterId = @ActivityMasterId
                     FOR JSON PATH, INCLUDE_NULL_VALUES;
                 ";
-            using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { activityMasterId });
+            using var multiQuery = await _dbConnection.QueryMultipleAsync(query, new { activityMasterId , UnitId });
             string activityJson = await multiQuery.ReadFirstOrDefaultAsync<string>() ?? "[]";
             string machineGroupsJson = await multiQuery.ReadFirstOrDefaultAsync<string>() ?? "[]";
             if (string.IsNullOrWhiteSpace(activityJson))
@@ -124,14 +130,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
 
         public async Task<List<Core.Domain.Entities.ActivityMaster>> GetActivityMasterAutoComplete(string searchPattern)
         {
+
+            var UnitId = _ipAddressService.GetUnitId();
             const string query = @"
                        SELECT Id, ActivityName  
                        FROM Maintenance.ActivityMaster
-                       WHERE IsDeleted = 0 AND IsActive = 1 AND ActivityName LIKE @SearchPattern";
+                       WHERE IsDeleted = 0 AND IsActive = 1 AND ActivityName LIKE @SearchPattern AND UnitId = @UnitId";
 
             var parameters = new
             {
-                SearchPattern = $"%{searchPattern ?? string.Empty}%"
+                SearchPattern = $"%{searchPattern ?? string.Empty}%",
+                UnitId
             };
             var machineGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.ActivityMaster>(query, parameters);
             return machineGroups.ToList();
@@ -139,12 +148,13 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
 
         public async Task<bool> GetByActivityNameAsync(string activityname)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             var query = """
                     SELECT COUNT(1) FROM Maintenance.ActivityMaster
-                    WHERE ActivityName = @activityname AND IsDeleted = 0 AND IsActive = 1
+                    WHERE ActivityName = @activityname AND IsDeleted = 0 AND IsActive = 1 AND UnitId = @UnitId
                     """;
 
-            var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { ActivityName = activityname });
+            var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { ActivityName = activityname  , UnitId });
 
             return result > 0;
         }
@@ -170,15 +180,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
         } 
         public async Task<List<GetActivityByMachineGroupDto>> GetActivityByMachinGroupId(int machineGroupById)
         {
+            var UnitId = _ipAddressService.GetUnitId();
                     const string query = @"
                 SELECT a.Id , a.ActivityName
                 FROM Maintenance.ActivityMaster a
                 INNER JOIN Maintenance.ActivityMachineGroup b ON a.Id = b.ActivityMasterId
                 INNER JOIN Maintenance.MachineGroup c ON b.MachineGroupId = c.Id
-                WHERE c.Id = @MachineGroupId
+                WHERE c.Id = @MachineGroupId AND a.IsDeleted = 0 AND a.UnitId = @UnitId
             ";
 
-            var activityList = await _dbConnection.QueryAsync<GetActivityByMachineGroupDto>(query, new { MachineGroupId = machineGroupById });
+            var activityList = await _dbConnection.QueryAsync<GetActivityByMachineGroupDto>(query, new { MachineGroupId = machineGroupById  , UnitId});
             return activityList.ToList();
 
         }

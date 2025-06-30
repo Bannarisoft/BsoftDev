@@ -1,6 +1,7 @@
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using Core.Domain.Events;
 using MediatR;
@@ -13,15 +14,21 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        public GetAllActivityMasterQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
+         private readonly IUnitGrpcClient _unitGrpcClient;
+          private readonly IIPAddressService _ipAddressService;
+        public GetAllActivityMasterQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient, IUnitGrpcClient unitGrpcClient, IIPAddressService ipAddressService)
         {
             _activityMasterQueryRepository = activityMasterQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
             _departmentGrpcClient = departmentGrpcClient;
+            _unitGrpcClient = unitGrpcClient;
+            _ipAddressService = ipAddressService;
         }
         public async Task<ApiResponseDTO<List<GetAllActivityMasterDto>>> Handle(GetAllActivityMasterQuery request, CancellationToken cancellationToken)
         {
+
+            var unitId = _ipAddressService.GetUnitId();
             // Fetch data from repository
             var (activities, totalCount) = await _activityMasterQueryRepository.GetAllActivityMasterAsync(request.PageNumber, request.PageSize, request.SearchTerm);
 
@@ -32,11 +39,14 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            var activityMasterDictionary = new Dictionary<int, GetAllActivityMasterDto>();
+             var units = await _unitGrpcClient.GetAllUnitAsync();
+              var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
 
-            
+          //  var activityMasterDictionary = new Dictionary<int, GetAllActivityMasterDto>();
+
+
             //    🔥 Map department names with DataControl
-                 foreach (var data in activityList)
+            foreach (var data in activityList)
             {
 
                 if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
@@ -44,7 +54,13 @@ namespace Core.Application.ActivityMaster.Queries.GetAllActivityMaster
 
                     data.DepartmentName = departmentName;
                 }
-                activityMasterDictionary[data.DepartmentId] = data;
+              
+                if (unitLookup.TryGetValue(data.UnitId, out var unitName) && unitName != null)
+                {
+                    data.UnitName = unitName;
+                }
+               //   activityMasterDictionary[data.DepartmentId] = data;
+               
             }
 
              var filteredActivities = activityList

@@ -28,7 +28,7 @@ namespace Core.Application.AssetSubGroup.Command.UpdateAssetSubGroup
         {
         _logger.LogInformation($"Starting UpdateAssetSubGroupCommandHandler for request: {request}");
         // 🔹 First, check if the ID exists in the database
-        var existingAssetSubGroup = await _iAssetSubGroupQueryRepository.GetByIdAsync(request.Id);
+        var existingAssetSubGroup = await _iAssetSubGroupQueryRepository.GetByIdAsync( request.Id);
         if (existingAssetSubGroup is null)
         {
         _logger.LogWarning($"AssetSubGroup ID {request.Id} not found.");

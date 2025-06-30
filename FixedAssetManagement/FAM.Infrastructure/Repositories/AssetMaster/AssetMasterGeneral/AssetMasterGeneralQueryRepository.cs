@@ -57,13 +57,14 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
         public async Task<List<AssetMasterGeneralDTO>> GetByAssetNameAsync(string searchPattern)
         {
             const string query = @"            
-            SELECT AM.Id,AM.CompanyId,AM.UnitId,AM.AssetCode,AM.AssetName,AM.AssetGroupId,AM.AssetCategoryId,AM.AssetSubCategoryId,AM.AssetParentId,AM.AssetType,AM.MachineCode,AM.Quantity
+            SELECT AM.Id,AM.CompanyId,AM.UnitId,AM.AssetCode,AM.AssetName,AM.AssetGroupId,AM.AssetSubGroupId,AM.AssetCategoryId,AM.AssetSubCategoryId,AM.AssetParentId,AM.AssetType,AM.MachineCode,AM.Quantity
             ,AM.UOMId,AM.AssetDescription,AM.WorkingStatus,AM.AssetImage,AM.ISDepreciated,AM.IsTangible,AM.IsActive
             ,AM.CreatedBy,AM.CreatedDate,AM.CreatedByName,AM.CreatedIP,AM.ModifiedBy,AM.ModifiedDate,AM.ModifiedByName,AM.ModifiedIP
-            ,AG.GroupName AssetGroupName,AC.CategoryName AssetCategoryDesc,A.Description AssetSubCategoryDesc,U.UOMName,MM.description WorkingStatusDesc,
+            ,AG.GroupName AssetGroupName,ASG.SubGroupName,AC.CategoryName AssetCategoryDesc,A.Description AssetSubCategoryDesc,U.UOMName,MM.description WorkingStatusDesc,
             M.description AssetTypeDesc,isnull(AM1.AssetDescription,'') ParentAssetDesc,AM.PutToUseDate
             FROM FixedAsset.AssetMaster AM
             INNER JOIN FixedAsset.AssetGroup AG on AG.Id=AM.AssetGroupId
+            LEFT JOIN [FixedAsset].[AssetSubGroup] ASG ON AM.AssetSubGroupId = ASG.Id
             INNER JOIN FixedAsset.AssetCategories AC on AC.Id=AM.AssetCategoryId
             INNER JOIN FixedAsset.AssetSubCategories A on A.Id=AM.AssetSubCategoryId
             INNER JOIN FixedAsset.UOM U on U.Id=AM.UOMId
@@ -86,10 +87,10 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
        public async Task<AssetMasterGeneralDTO> GetByIdAsync(int assetId)
         {
             const string query = @"            
-            SELECT AM.Id, AM.CompanyId, AM.UnitId, AM.AssetCode, AM.AssetName, AM.AssetGroupId, AM.AssetCategoryId, AM.AssetSubCategoryId, AM.AssetParentId, 
+            SELECT AM.Id, AM.CompanyId, AM.UnitId, AM.AssetCode, AM.AssetName, AM.AssetGroupId, AM.AssetSubGroupId, AM.AssetCategoryId, AM.AssetSubCategoryId, AM.AssetParentId, 
                 AM.AssetType, AM.MachineCode, AM.Quantity, AM.UOMId, AM.AssetDescription, AM.WorkingStatus, AM.AssetImage, AM.ISDepreciated, AM.IsTangible, 
                 AM.IsActive, AM.CreatedBy, AM.CreatedDate, AM.CreatedByName, AM.CreatedIP, AM.ModifiedBy, AM.ModifiedDate, AM.ModifiedByName, AM.ModifiedIP,
-                AG.GroupName AS AssetGroupName, AC.CategoryName AS AssetCategoryDesc, A.Description AS AssetSubCategoryDesc, U.UOMName, 
+                AG.GroupName AS AssetGroupName,ASG.SubGroupName, AC.CategoryName AS AssetCategoryDesc, A.Description AS AssetSubCategoryDesc, U.UOMName, 
                 MM.Description AS WorkingStatusDesc, M.Description AS AssetTypeDesc, ISNULL(AM1.AssetDescription, '') AS ParentAssetDesc,
                 (SELECT A.Id AS SpecificationId, A.SpecificationValue, SM.SpecificationName 
                     FROM FixedAsset.AssetSpecifications AS A
@@ -98,6 +99,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                     FOR JSON PATH) AS SpecificationsJson   ,AM.PutToUseDate
             FROM FixedAsset.AssetMaster AM
             INNER JOIN FixedAsset.AssetGroup AG ON AG.Id = AM.AssetGroupId
+            LEFT JOIN [FixedAsset].[AssetSubGroup] ASG ON AM.AssetSubGroupId = ASG.Id
             INNER JOIN FixedAsset.AssetCategories AC ON AC.Id = AM.AssetCategoryId
             INNER JOIN FixedAsset.AssetSubCategories A ON A.Id = AM.AssetSubCategoryId
             INNER JOIN FixedAsset.UOM U ON U.Id = AM.UOMId
@@ -282,7 +284,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 
             var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
-                SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName ParentName,AM.AssetGroupId ,                
+                SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,ASG.SubGroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName ParentName,AM.AssetGroupId ,AM.AssetSubGroupId ,                
                 case when (isnull(AM.AssetImage,'') <> '') then MM.Description+''+MM1.Description+'/'+ @companyName + '/' + @unitName +'/'+AM.AssetImage  else 
                 '' end AssetImage ,  
                 AM.AssetCategoryId,AM.AssetSubCategoryId,
@@ -292,6 +294,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 FROM [FixedAsset].[AssetMaster] AM
                 INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
                 INNER JOIN [FixedAsset].[AssetGroup] AG ON AM.AssetGroupId = AG.Id
+                LEFT JOIN [FixedAsset].[AssetSubGroup] ASG ON AM.AssetSubGroupId = ASG.Id
                 INNER JOIN [FixedAsset].[AssetCategories] AC ON AM.AssetCategoryId = AC.Id
                 INNER JOIN [FixedAsset].[AssetSubCategories] ASUBC ON AM.AssetSubCategoryId = ASUBC.Id
                 LEFT JOIN [FixedAsset].[AssetMaster] AssetParent ON AM.AssetParentId = AssetParent.Id
@@ -440,7 +443,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
 
            var sqlQuery = @"
                 -- First Query: AssetMaster (One-to-One)
-                SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,                
+                SELECT AM.AssetName, AM.AssetCode, AM.Quantity, U.UOMName, AG.GroupName,ASG.SubGroupName,AC.CategoryName, ASUBC.SubCategoryName, AssetParent.AssetName,AM.AssetGroupId ,AM.AssetSubGroupId,                
                 case when (isnull(AM.AssetImage,'') <> '') then MM.Description+''+MM1.Description+'/'+@companyName+'/'+@unitName +'/'+AM.AssetImage  else 
                 '' end AssetImage ,  
                 AM.AssetCategoryId,AM.AssetSubCategoryId,
@@ -448,8 +451,9 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 case when (isnull(AM.AssetDocument,'') <> '') then MM.Description+''+MM2.Description+'/'+@companyName+'/'+@unitName  +'/'+AM.AssetDocument  else 
                 '' end AssetDocument ,  AM.AssetDocument AssetDocumentName,AM.PutToUseDate
                 FROM [FixedAsset].[AssetMaster] AM
-                INNER JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
+                LEFT JOIN [FixedAsset].[UOM] U ON U.Id = AM.UOMId
                 INNER JOIN [FixedAsset].[AssetGroup] AG ON AM.AssetGroupId = AG.Id
+                LEFT JOIN [FixedAsset].[AssetSubGroup] ASG ON AM.AssetSubGroupId = ASG.Id
                 INNER JOIN [FixedAsset].[AssetCategories] AC ON AM.AssetCategoryId = AC.Id
                 INNER JOIN [FixedAsset].[AssetSubCategories] ASUBC ON AM.AssetSubCategoryId = ASUBC.Id
                 LEFT JOIN [FixedAsset].[AssetMaster] AssetParent ON AM.AssetParentId = AssetParent.Id                

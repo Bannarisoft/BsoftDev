@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMachineGroup;
 using Dapper;
 
@@ -12,31 +13,35 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
     {
        
        private readonly IDbConnection _dbConnection;
-       
-       public MachineGroupQueryRepository(IDbConnection dbConnection)
+        private readonly IIPAddressService _ipAddressService;
+
+        public MachineGroupQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
         {
             _dbConnection = dbConnection;
+            _ipAddressService = ipAddressService;
 
         }
        
        public async Task<Core.Domain.Entities.MachineGroup?>GetByIdAsync(int id)
-        {            
+        { 
+              var UnitId = _ipAddressService.GetUnitId();           
             const string query = @"
                 SELECT 
-                    Id,  GroupName,DepartmentId,Manufacturer, IsActive, IsDeleted,CreatedBy, CreatedDate, CreatedByName,CreatedIP
+                    Id,  GroupName,DepartmentId,Manufacturer,UnitId, IsActive, IsDeleted,CreatedBy, CreatedDate, CreatedByName,CreatedIP
                 FROM Maintenance.MachineGroup          
-                WHERE Id = @id AND IsDeleted = 0";
+                WHERE Id = @id AND UnitId = @UnitId AND IsDeleted = 0";
                                 
-            return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineGroup>(query, new { id });
+            return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineGroup>(query, new { id , UnitId });
         }
         public async Task<bool> GetByMachineGroupCodeAsync(string groupName, int id)
         {
+            var UnitId = _ipAddressService.GetUnitId();    
             var query = """
             SELECT COUNT(1) FROM Maintenance.MachineGroup
-            WHERE GroupName = @GroupName AND IsDeleted = 0 AND Id <> @Id
+            WHERE GroupName = @GroupName AND UnitId = @UnitId AND IsDeleted = 0 AND Id <> @Id
             """;
 
-            var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { GroupName = groupName, Id = id });
+            var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { GroupName = groupName, Id = id , UnitId });
 
             return result > 0;
         }
@@ -44,36 +49,39 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
 
         public async Task<bool> GetByMachineGroupnameAsync(string groupName)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             var query = """
             SELECT COUNT(1) FROM Maintenance.MachineGroup
-            WHERE GroupName = @GroupName AND IsDeleted = 0 
+            WHERE GroupName = @GroupName  AND UnitId = @UnitId  AND IsDeleted = 0  
             """;
 
-            var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { GroupName = groupName });
+            var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { GroupName = groupName  , UnitId });
 
             return result > 0;
         }
          public async Task<bool> NotFoundAsync(int id)
         {
-             var query = "SELECT COUNT(1) FROM Maintenance.MachineGroup WHERE Id = @Id AND IsDeleted = 0";
+            var UnitId = _ipAddressService.GetUnitId();
+             var query = "SELECT COUNT(1) FROM Maintenance.MachineGroup WHERE Id = @Id AND IsDeleted = 0 AND UnitId = @UnitId";
              
-                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id , UnitId });
                 return count > 0;
         }   
         public async Task<(List<Core.Domain.Entities.MachineGroup>, int)> GetAllMachineGroupsAsync(int PageNumber, int PageSize, string? SearchTerm)
             {
+               var UnitId = _ipAddressService.GetUnitId();
                 var query = $$"""
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
                 FROM [Maintenance].[MachineGroup] M
-                WHERE M.IsDeleted = 0
+                WHERE M.IsDeleted = 0 AND M.UnitId = @UnitId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (M.GroupName LIKE @Search)")}}; 
 
-                SELECT M.Id, M.GroupName, M.Manufacturer,M.DepartmentId,M.IsActive, M.IsDeleted, 
+                SELECT M.Id, M.GroupName, M.Manufacturer,M.DepartmentId,M.UnitId,M.IsActive, M.IsDeleted, 
                     M.CreatedBy, M.CreatedDate, M.CreatedByName, M.CreatedIP, 
                     M.ModifiedBy, M.ModifiedDate, M.ModifiedByName, M.ModifiedIP
                 FROM [Maintenance].[MachineGroup] M
-                WHERE M.IsDeleted = 0
+                WHERE M.IsDeleted = 0 AND M.UnitId = @UnitId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (M.GroupName LIKE @Search)")}}
                 ORDER BY M.Id DESC 
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -85,7 +93,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
                 {
                     Search = $"%{SearchTerm}%",
                     Offset = (PageNumber - 1) * PageSize,
-                    PageSize
+                    PageSize,
+                    UnitId
                 };
 
                 var result = await _dbConnection.QueryMultipleAsync(query, parameters);
@@ -100,14 +109,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
             }
              public async Task<List<Core.Domain.Entities.MachineGroup>> GetMachineGroupAutoComplete(string searchPattern)
                {
+
+                var UnitId = _ipAddressService.GetUnitId();
                    const string query = @"
                        SELECT Id, GroupName  
                        FROM Maintenance.MachineGroup
-                       WHERE IsDeleted = 0 AND GroupName LIKE @SearchPattern";
+                       WHERE IsDeleted = 0 AND GroupName LIKE @SearchPattern AND UnitId = @UnitId";
 
-                   var parameters = new 
-                   { 
-                       SearchPattern = $"%{searchPattern ?? string.Empty}%"
+                   var parameters = new
+                   {
+                       SearchPattern = $"%{searchPattern ?? string.Empty}%",
+                       UnitId
                    };
                var machineGroups = await _dbConnection.QueryAsync<Core.Domain.Entities.MachineGroup>(query, parameters);
                    return machineGroups.ToList();
