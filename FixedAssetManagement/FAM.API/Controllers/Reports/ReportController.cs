@@ -1,3 +1,4 @@
+using Core.Application.Reports.AssetAudit;
 using Core.Application.Reports.AssetReport;
 using Core.Application.Reports.AssetTransferReport;
 using MediatR;
@@ -17,29 +18,29 @@ namespace FAM.API.Controllers.Reports
         }
 
         [HttpGet("AssetReport")]
-        public async Task<IActionResult> AssetReportAsync( [FromQuery] DateTimeOffset? fromDate = null,
+        public async Task<IActionResult> AssetReportAsync([FromQuery] DateTimeOffset? fromDate = null,
             [FromQuery] DateTimeOffset? toDate = null)
         {
-         /*   DateTimeOffset? parsedFromDate = null;
-            DateTimeOffset? parsedToDate = null;
+            /*   DateTimeOffset? parsedFromDate = null;
+               DateTimeOffset? parsedToDate = null;
 
-             if (!string.IsNullOrWhiteSpace(fromDate))  // Allow null or empty values
-            {
-                if (!DateTimeOffset.TryParse(fromDate, out var parsedDate))
-                {
-                    return BadRequest(new { message = "Invalid fromDate format. Use yyyy-MM-dd." });
-                }
-                parsedFromDate = parsedDate;
-            }
+                if (!string.IsNullOrWhiteSpace(fromDate))  // Allow null or empty values
+               {
+                   if (!DateTimeOffset.TryParse(fromDate, out var parsedDate))
+                   {
+                       return BadRequest(new { message = "Invalid fromDate format. Use yyyy-MM-dd." });
+                   }
+                   parsedFromDate = parsedDate;
+               }
 
-            if (!string.IsNullOrWhiteSpace(toDate))  // Allow null or empty values
-            {
-                if (!DateTimeOffset.TryParse(toDate, out var parsedDate))
-                {
-                    return BadRequest(new { message = "Invalid toDate format. Use yyyy-MM-dd." });
-                }
-                parsedToDate = parsedDate;
-            } */
+               if (!string.IsNullOrWhiteSpace(toDate))  // Allow null or empty values
+               {
+                   if (!DateTimeOffset.TryParse(toDate, out var parsedDate))
+                   {
+                       return BadRequest(new { message = "Invalid toDate format. Use yyyy-MM-dd." });
+                   }
+                   parsedToDate = parsedDate;
+               } */
 
             var query = new AssetReportQuery
             {
@@ -55,7 +56,7 @@ namespace FAM.API.Controllers.Reports
                 Data = result?.Data ?? new List<AssetReportDto>()
             });
         }
-        
+
         [HttpGet("AssetTransferReport")]
         public async Task<IActionResult> AssetTransferReportAsync(
             [FromQuery] DateTimeOffset? FromDate = null,
@@ -82,8 +83,36 @@ namespace FAM.API.Controllers.Reports
                 StatusCode = StatusCodes.Status200OK,
                 Message = result.Message,
                 Data = result.Data?.ToList() ?? new List<AssetTransferDetailsDto>()
-               
+
             });
         }
+         [HttpGet("AssetAuditReport")]
+        public async Task<IActionResult> AssetAuditReportAsync(
+            [FromQuery] int auditTypeId)
+        {
+            var result = await Mediator.Send(new AssetAuditReportQuery
+            {
+                AuditCycle = auditTypeId
+           
+            });
+
+            if (result?.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = result?.Message ?? "No Asset Audit Report found.",
+                    Data = new List<AssetAuditReportDto>()
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = result.Message,
+                Data = result.Data
+            });
+        }
+
     }
 }

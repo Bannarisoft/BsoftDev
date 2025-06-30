@@ -26,9 +26,10 @@ namespace Core.Domain.Entities
         public int AssetId { get; set; }
         public ICollection<PreventiveSchedulerDetail>? PreventiveSchedulerDetail { get; set; }
 
-        public ICollection<MaintenanceRequest> MaintenanceRequest { get; set; } = null!;  
-        public int LineNo { get; set; }        
+        public ICollection<MaintenanceRequest> MaintenanceRequest { get; set; } = null!;
+        public int LineNo { get; set; }
         public MiscMaster LineNoMachine { get; set; } = null!;  
+        public bool IsProductionMachine { get; set; }
                     
 
 

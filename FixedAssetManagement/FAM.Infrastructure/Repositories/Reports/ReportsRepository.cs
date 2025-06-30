@@ -3,10 +3,12 @@ using System.Data;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IReports;
+using Core.Application.Reports.AssetAudit;
 using Core.Application.Reports.AssetReport;
 using Core.Application.Reports.AssetTransferReport;
 using Dapper;
 using FAM.Infrastructure.Repositories.Common;
+using Microsoft.Data.SqlClient;
 
 namespace FAM.Infrastructure.Repositories.Reports
 {
@@ -18,6 +20,30 @@ namespace FAM.Infrastructure.Repositories.Reports
         {
             _dbConnection = dbConnection;            
         }
+
+        public async Task<List<AssetAuditReportDto>> AssetAuditReportAsync(int auditTypeId)
+        {
+            var sql = @"SELECT * 
+                        FROM FixedAsset.fn_GetAuditComparison(@AuditTypeId, @UnitId)
+                        ORDER BY ComparisonStatus, Audit_AssetCode";
+
+            var parameters = new
+            {
+                AuditTypeId = auditTypeId,
+                UnitId = UnitId
+            };
+
+           
+                var result = await _dbConnection.QueryAsync<AssetAuditReportDto>(
+                    sql,
+                    parameters,
+                    commandType: CommandType.Text, // ✅ Must be 'Text' for SELECT
+                    commandTimeout: 120);
+
+                return result.ToList();
+            
+        }
+
 
         public async Task<List<AssetReportDto>> AssetReportAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate)
         {
