@@ -96,6 +96,15 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
                 .FirstOrDefaultAsync();
             return assetGroup == 0 ? null : assetGroup; 
         }
+        public async Task<int?> GetAssetSubGroupIdByNameAsync(string assetSubGroupName)
+        {
+            var trimmedAssetSubGroupName = assetSubGroupName?.Trim(); // ✅ Trim input
+            var assetSubGroup = await _applicationDbContext.AssetSubGroup
+                .Where(a => a.SubGroupName.Trim() == trimmedAssetSubGroupName && a.IsDeleted == 0) // ✅ Trim from DB column for safety
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+            return assetSubGroup == 0 ? null : assetSubGroup; 
+        }
 
         public async Task<int?> GetAssetCategoryIdByNameAsync(string assetCategoryName)
         {

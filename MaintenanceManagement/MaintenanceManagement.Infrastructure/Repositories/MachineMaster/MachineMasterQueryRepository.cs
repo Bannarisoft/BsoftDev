@@ -51,7 +51,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                             mm.InstallationDate,
                             mm.AssetId,
                             mm.[LineNo],
-                            mm.IsActive
+                            mm.IsActive,
+                            mm.IsProductionMachine
                         FROM Maintenance.MachineMaster mm
                         LEFT JOIN Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
                         WHERE 

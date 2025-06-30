@@ -24,6 +24,7 @@ namespace Core.Application.MachineMaster.Command.UpdateMachineMaster
         public int AssetId { get; set; }
         public int LineNo { get; set; }
         public byte IsActive { get; set; }
+        public byte IsProductionMachine { get; set; }
         
     }
 }

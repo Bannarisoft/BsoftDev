@@ -38,7 +38,7 @@ namespace FAM.Infrastructure.Repositories.AssetSubGroup
                 Code,
                 SubGroupName,
                 SortOrder,
-                GroupId,
+                GroupId,AdditionalDepreciation,SubGroupPercentage,
                 IsActive,
                 CreatedDate,
                 CreatedByName

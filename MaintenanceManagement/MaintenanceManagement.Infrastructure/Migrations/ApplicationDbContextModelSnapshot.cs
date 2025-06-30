@@ -507,6 +507,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsProductionMachine")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsProductionMachine");
+
                     b.Property<int>("LineNo")
                         .HasColumnType("int");
 
