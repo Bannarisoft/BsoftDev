@@ -11,7 +11,7 @@ namespace Core.Application.Common.Interfaces.IMachineMaster
     public interface IMachineMasterQueryRepository
     {
         Task<MachineMasterDto?> GetByIdAsync(int Id);
-        Task<(List<MachineMasterDto>, int)> GetAllMachineAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<List<MachineMasterDto>> GetAllMachineAsync(string? SearchTerm);
         Task<List<Core.Domain.Entities.MachineMaster>> GetMachineAsync(string searchPattern);
         Task<List<GetMachineNoDepartmentbyIdDto>> GetMachineNoDepartmentAsync(int DepartmentId);
         Task<List<Core.Domain.Entities.MachineMaster>> GetMachineByGroupAsync(int MachineGroupId);
