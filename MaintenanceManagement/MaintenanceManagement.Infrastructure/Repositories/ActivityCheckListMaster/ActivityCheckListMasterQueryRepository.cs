@@ -175,7 +175,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                     GROUP BY 
                         aclm.Id, aclm.ActivityID, am.ActivityName, aclm.ActivityChecklist, aclm.IsActive, 
                         aclm.IsDeleted, aclm.CreatedBy, aclm.CreatedDate, aclm.CreatedByName, aclm.CreatedIP,
-                        aclm.ModifiedBy, aclm.ModifiedDate, aclm.ModifiedByName, aclm.ModifiedIP";
+                        aclm.ModifiedBy, aclm.ModifiedDate, aclm.ModifiedByName, aclm.ModifiedIP,
+                        am.DepartmentId, aclm.UnitId";
 
             var parameters = new
             {
