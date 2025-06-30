@@ -33,6 +33,13 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(250)")
                 .IsRequired();
 
+                builder.Property(t => t.UnitId)
+                .HasColumnName("UnitId")
+                .HasColumnType("int")
+                .IsRequired();
+
+               
+
                 builder.HasOne(ac => ac.ActivityMaster)  
                 .WithMany(am => am.ActivityCheckLists)  // Ensure property name in ActivityMaster
                 .HasForeignKey(ac => ac.ActivityId)  // ✅ Correct Foreign Key Reference

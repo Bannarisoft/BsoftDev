@@ -44,6 +44,11 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
             .HasColumnType("int")
             .IsRequired();
 
+            builder.Property(mg=>mg.UnitId)
+            .HasColumnName("UnitId")
+            .HasColumnType("int")
+            .IsRequired();
+
             builder.Property(mg => mg.DepartmentId)
            .HasColumnName("DepartmentId")
            .HasColumnType("int")

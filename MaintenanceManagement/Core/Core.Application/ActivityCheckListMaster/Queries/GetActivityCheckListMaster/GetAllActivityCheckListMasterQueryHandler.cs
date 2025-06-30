@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IActivityCheckListMaster;
 using Core.Domain.Events;
 using MassTransit;
@@ -19,15 +20,19 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListM
          private readonly IActivityCheckListMasterQueryRepository _activityCheckListMasterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-           private readonly IDepartmentGrpcClient _departmentGrpcClient;
-        
+        private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        private readonly  IUnitGrpcClient _unitGrpcClient;
+        private readonly IIPAddressService _ipAddressService;
 
-        public GetAllActivityCheckListMasterQueryHandler(IActivityCheckListMasterQueryRepository activityCheckListMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
+
+        public GetAllActivityCheckListMasterQueryHandler(IActivityCheckListMasterQueryRepository activityCheckListMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient, IUnitGrpcClient unitGrpcClient, IIPAddressService ipAddressService)
         {
             _activityCheckListMasterQueryRepository = activityCheckListMasterQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
             _departmentGrpcClient = departmentGrpcClient;
+            _unitGrpcClient = unitGrpcClient;
+            _ipAddressService = ipAddressService;
         }
 
 
@@ -45,22 +50,30 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListM
             var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            var activityMasterDictionary = new Dictionary<int, GetAllActivityCheckListMasterDto>(); 
-                       
-            
-            
-            // foreach (var data in checkListDto)
-            // {
 
-            //     if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
-            //     {
+            var activityMasterDictionary = new Dictionary<int, GetAllActivityCheckListMasterDto>();
 
-            //         data.DepartmentName = departmentName;
-            //     }
-            //     activityMasterDictionary[data.DepartmentId] = data;
-            // }
+            var units = await _unitGrpcClient.GetAllUnitAsync();
+            var unitslookup = units.ToDictionary(d => d.UnitId, d => d.UnitName);                                               
+           
+             foreach (var data in checkListDto)
+            {
 
-             var filteredActivities = checkListDto
+                if (departmentLookup.TryGetValue(data.DepartmentId, out var departmentName) && departmentName != null)
+                {
+
+                    data.DepartmentName = departmentName;
+                }
+              
+                if (unitslookup.TryGetValue(data.UnitId, out var unitName) && unitName != null)
+                {
+                    data.UnitName = unitName;
+                }
+             
+               
+            }
+
+            var filteredActivities = checkListDto
             .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
             .ToList();          
 
