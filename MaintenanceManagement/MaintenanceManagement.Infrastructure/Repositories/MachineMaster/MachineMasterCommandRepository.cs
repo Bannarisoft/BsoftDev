@@ -92,6 +92,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             existingmachinemaster.AssetId = machineMaster.AssetId;
             existingmachinemaster.LineNo = machineMaster.LineNo;
             existingmachinemaster.IsActive = machineMaster.IsActive;
+            existingmachinemaster.IsProductionMachine = machineMaster.IsProductionMachine;
 
 
             // Mark the entity as modified
