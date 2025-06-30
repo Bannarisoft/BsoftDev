@@ -65,10 +65,10 @@ namespace FAM.Infrastructure.Repositories.AssetGroup
             return await _applicationDbContext.AssetGroup.MaxAsync(ac => (int?)ac.SortOrder) ?? -1;
         }
        
-       public async Task<(bool IsNameDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name, int sortOrder, int excludeId)
+       public async Task<(bool IsNameDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name, int sortOrder, int excludeId,decimal groupPercentage)
        {
         var isNameDuplicate = await _applicationDbContext.AssetGroup
-            .AnyAsync(ag => ag.GroupName == name && ag.Id != excludeId);
+            .AnyAsync(ag => ag.GroupName == name && ag.Id != excludeId && ag.GroupPercentage == groupPercentage);
 
         var isSortOrderDuplicate = await _applicationDbContext.AssetGroup
             .AnyAsync(ag => ag.SortOrder == sortOrder && ag.Id != excludeId);

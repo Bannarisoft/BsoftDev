@@ -15,6 +15,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? AssetCode { get; set; }        
         public string? AssetName { get; set; }                
         public int AssetGroupId { get; set; }        
+        public int AssetSubGroupId { get; set; }   
         public int AssetCategoryId { get; set; }        
         public int AssetSubCategoryId { get; set; }        
         public int? AssetParentId { get; set; }        
@@ -38,6 +39,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? ModifiedByName { get; set; }
         public string? ModifiedIP { get; set; }
         public string? AssetGroupName { get; set; }
+        public string? SubGroupName { get; set; }
         public string? AssetCategoryDesc { get; set; }
         public string? AssetSubCategoryDesc { get; set; }
         public string? UOMName { get; set; }

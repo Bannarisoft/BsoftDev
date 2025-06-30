@@ -12,10 +12,12 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public int Quantity { get; set; }
         public string? UOMName { get; set; }
         public string? GroupName { get; set; }
+        public string? SubGroupName { get; set; }
         public string? CategoryName { get; set; }
         public string? SubCategoryName { get; set; }
         public string? ParentName { get; set; }        
         public string? AssetGroupId { get; set; }
+        public int? AssetSubGroupId { get; set; }  
         public string? AssetImage { get; set; }            
         public int AssetCategoryId { get; set; }        
         public int AssetSubCategoryId { get; set; }        
