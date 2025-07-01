@@ -274,8 +274,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
             };
 
             var mt = await multi.ReadFirstAsync();
-            dto.MaintenanceHrs = mt.MaintenanceHrs;
-            dto.DowntimeHrs = mt.DowntimeHrs;
+            dto.MaintenanceHrs = mt.MaintenanceHrs ?? 0m;
+            dto.DowntimeHrs = mt.DowntimeHrs  ?? 0m;
 
             dto.ConsumptionValue = await multi.ReadFirstAsync<decimal>();
             dto.OpenWorkOrder = await multi.ReadFirstAsync<int>();
