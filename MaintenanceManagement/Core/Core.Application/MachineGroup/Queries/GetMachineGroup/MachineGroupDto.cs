@@ -11,6 +11,8 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroup
         public int Id { get; set; }
         public string? GroupName { get; set; }  
         public int Manufacturer  { get; set;}
+        public int UnitId { get; set; }
+        public string? UnitName { get; set; }
         public int DepartmentId { get; set; }
         public string? DepartmentName { get; set; }
         public Status IsActive { get; set; }

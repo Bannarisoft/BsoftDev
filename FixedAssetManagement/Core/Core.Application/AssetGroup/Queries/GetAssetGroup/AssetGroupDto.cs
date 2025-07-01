@@ -15,8 +15,7 @@ namespace Core.Application.AssetGroup.Queries.GetAssetGroup
         public Status IsActive { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public string? CreatedByName { get; set; }
-
-
+        public decimal? GroupPercentage { get; set; }
 
 
     }

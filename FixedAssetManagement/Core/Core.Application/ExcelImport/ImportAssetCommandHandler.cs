@@ -57,7 +57,7 @@ namespace Core.Application.ExcelImport
                             currentRow = row;
                             var assetGroupHandler = new AssetGroupHandler(_assetRepository, _assetQueryRepository);
                             var assetDetailsHandler = new AssetDetailsHandler(_assetRepository, _assetQueryRepository,_ipAddressService);
-                            var assetPurchaseHandler = new AssetPurchaseHandler(worksheet, row);
+                            var assetPurchaseHandler = new AssetPurchaseHandler(worksheet, row,_ipAddressService);
                             var assetInsuranceHandler = new AssetInsuranceHandler(worksheet, row);
                             var assetAdditionalCostHandler = new AssetAdditionalCostHandler(worksheet, row);
                             var assetSpecificationHandler = new AssetSpecificationHandler(worksheet, row);

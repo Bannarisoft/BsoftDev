@@ -12,7 +12,7 @@ namespace Core.Application.Common.Interfaces.IAssetGroup
          Task<bool> ExistsByCodeAsync(string code );
          Task<int> GetMaxSortOrderAsync();
          Task<int> UpdateAsync(int Id,Core.Domain.Entities.AssetGroup assetGroup);
-         Task<(bool IsNameDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name, int sortOrder, int excludeId);   
+         Task<(bool IsNameDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name, int sortOrder, int excludeId,decimal groupPercentage);   
          Task<int> DeleteAsync(int Id,Core.Domain.Entities.AssetGroup assetGroup);
    
     }

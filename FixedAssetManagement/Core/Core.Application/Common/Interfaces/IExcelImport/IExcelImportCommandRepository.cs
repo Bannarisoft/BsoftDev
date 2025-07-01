@@ -1,6 +1,5 @@
 
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
-using Core.Application.ExcelImport.PhysicalStockVerification;
 using Core.Domain.Entities;
 using Core.Domain.Entities.AssetMaster;
 
@@ -12,6 +11,7 @@ namespace Core.Application.Common.Interfaces.IExcelImport
         Task SaveChangesAsync();
         Task<bool> ImportAssetsAsync(List<AssetMasterDto> assets, CancellationToken cancellationToken);
         Task<int?> GetAssetGroupIdByNameAsync(string assetGroupName);
+        Task<int?> GetAssetSubGroupIdByNameAsync(string assetGroupName);
         Task<int?> GetAssetCategoryIdByNameAsync(string assetGroupName);
         Task<int?> GetAssetSubCategoryIdByNameAsync(int assetCategoryId,string assetSubGroupName);
         Task<int?> GetAssetUOMIdByNameAsync(string assetGroupName);

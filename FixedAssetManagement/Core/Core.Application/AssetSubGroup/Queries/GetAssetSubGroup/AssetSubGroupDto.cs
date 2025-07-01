@@ -12,5 +12,7 @@ namespace Core.Application.AssetSubGroup.Queries.GetAssetSubGroup
         public Status IsActive { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public string? CreatedByName { get; set; }
+        public decimal SubGroupPercentage { get; set; }       
+        public byte AdditionalDepreciation { get; set; }    
     }
 }

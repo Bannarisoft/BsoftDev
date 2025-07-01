@@ -2196,13 +2196,16 @@ namespace FAM.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("AdditionalCarryForward")
+                        .HasColumnType("decimal(18,3)");
+
                     b.Property<decimal>("AdditionalDepreciationValue")
                         .HasColumnType("decimal(18,3)");
 
                     b.Property<int>("AssetGroupId")
                         .HasColumnType("int");
 
-                    b.Property<int>("AssetSubGroupId")
+                    b.Property<int?>("AssetSubGroupId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("CapitalGainLossValue")
@@ -2246,6 +2249,9 @@ namespace FAM.Infrastructure.Migrations
                     b.Property<bool>("IsLocked")
                         .HasColumnType("bit");
 
+                    b.Property<decimal>("LastYearAdditionalDepreciation")
+                        .HasColumnType("decimal(18,3)");
+
                     b.Property<decimal>("LessThan180DaysValue")
                         .HasColumnType("decimal(18,3)");
 
@@ -2269,9 +2275,6 @@ namespace FAM.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("StartDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("WDVDepreciationValue")
                         .HasColumnType("decimal(18,3)");
@@ -2783,8 +2786,7 @@ namespace FAM.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.AssetSubGroup", "AssetSubGroup")
                         .WithMany("WDVDepreciationDetail")
                         .HasForeignKey("AssetSubGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("AssetGroup");
 

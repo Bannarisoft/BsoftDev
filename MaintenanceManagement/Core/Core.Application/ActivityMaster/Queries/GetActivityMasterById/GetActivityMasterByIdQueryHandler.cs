@@ -1,5 +1,7 @@
 using AutoMapper;
+using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using Core.Domain.Events;
 using MediatR;
@@ -12,15 +14,24 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        public GetActivityMasterByIdQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator)
+          private readonly IDepartmentGrpcClient _departmentGrpcClient;
+         private readonly IUnitGrpcClient _unitGrpcClient;
+          private readonly IIPAddressService _ipAddressService;
+        public GetActivityMasterByIdQueryHandler(IActivityMasterQueryRepository activityMasterQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient, IUnitGrpcClient unitGrpcClient, IIPAddressService ipAddressService)
         {
             _activityMasterQueryRepository = activityMasterQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
+            _departmentGrpcClient = departmentGrpcClient;
+            _unitGrpcClient = unitGrpcClient;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<ApiResponseDTO<GetActivityMasterByIdDto>> Handle(GetActivityMasterByIdQuery request, CancellationToken cancellationToken)
         {
+
+               var unitId = _ipAddressService.GetUnitId();
+
             var result = await _activityMasterQueryRepository.GetByIdAsync(request.Id);
 
             if (result is null)
@@ -32,14 +43,26 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
                     Data = null
                 };
             }
+            var activityDto  = _mapper.Map<GetActivityMasterByIdDto>(result);
 
-            var machineGroup = _mapper.Map<GetActivityMasterByIdDto>(result);
+              var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
+            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+             var units = await _unitGrpcClient.GetAllUnitAsync();
+              var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
+
+            // Assign department and unit names
+            if (departmentLookup.TryGetValue(activityDto.DepartmentId, out var departmentName))
+                activityDto.Department = departmentName;
+
+            if (unitLookup.TryGetValue(activityDto.UnitId, out var unitName))
+                activityDto.UnitName = unitName;
             // Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetById",
                 actionCode: "",
                 actionName: "",
-                details: $"ActivityMaster details {machineGroup.Id} were fetched.",
+                details: $"ActivityMaster details {activityDto.Id} were fetched.",
                 module: "ActivityMaster"
             );
 
@@ -49,7 +72,7 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = machineGroup
+                Data = activityDto
             };
         }
 

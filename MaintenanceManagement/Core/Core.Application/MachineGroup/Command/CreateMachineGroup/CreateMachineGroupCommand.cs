@@ -12,6 +12,7 @@ namespace Core.Application.MachineGroup.Command.CreateMachineGroup
     {
         public string? GroupName { get; set; }
         public int Manufacturer { get; set; } 
+        public int UnitId { get; set; }
         public int DepartmentId { get; set; }
     }
 }

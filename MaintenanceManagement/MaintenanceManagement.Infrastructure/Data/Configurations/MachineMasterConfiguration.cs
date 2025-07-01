@@ -144,6 +144,11 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
              .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Property(t => t.IsProductionMachine)
+                .HasColumnName("IsProductionMachine")
+                .HasColumnType("bit")
+                .IsRequired();
+
         }
     }
 }
