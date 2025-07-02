@@ -417,101 +417,119 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
         
         public async Task<List<GetAssetDetailsToTransferHdrDto>> GetAssetDetailsToTransferByFiltersAsync( string custodianIdsCsv, int departmentId, string categoryIdsCsv)
         {
-            var companyId = _iPAddressService.GetCompanyId();
-            var unitId = _iPAddressService.GetUnitId();
+                     var companyId = _iPAddressService.GetCompanyId();
+                     var unitId = _iPAddressService.GetUnitId();
 
-            // Call the stored procedure
-            using var multiQuery = await _dbConnection.QueryMultipleAsync(
-                "[dbo].[GetFilteredAssetsForTransfer]",
-                new
-                {
-                    UnitId = unitId,
-                    DepartmentId = departmentId,
-                    AssetCategoryIds = categoryIdsCsv,
-                    CustodianIds = custodianIdsCsv
-                },
-                commandType: CommandType.StoredProcedure
-            );
+                     var sql = @"
+                 DECLARE @PendingStatus VARCHAR(50) = 'Pending';
+                 DECLARE @ApprovedStatus VARCHAR(50) = 'Approved';
 
-            // Read the results in the same order as the SP returns them
+                 DECLARE @AssetIds TABLE (AssetId INT);
 
-            string assetJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
-            string transferJson = await multiQuery.ReadFirstOrDefaultAsync<string>();
-            var locations = (await multiQuery.ReadAsync<dynamic>()).ToList();
+                 INSERT INTO @AssetIds (AssetId)
+                 SELECT A.Id
+                 FROM FixedAsset.AssetMaster A
+                 INNER JOIN FixedAsset.AssetLocation B ON A.ID = B.AssetId
+                 WHERE A.UnitId = @UnitId
+                   AND B.DepartmentId = @DepartmentId
+                   AND A.AssetCategoryId IN (SELECT CAST(value AS INT) FROM STRING_SPLIT(@AssetCategoryIds, ','))
+                   AND B.CustodianId IN (SELECT CAST(value AS INT) FROM STRING_SPLIT(@CustodianIds, ','))
+                   AND NOT EXISTS (
+                       SELECT 1
+                       FROM FixedAsset.AssetTransferIssueHdr h
+                       INNER JOIN FixedAsset.AssetTransferIssueDtl d ON h.Id = d.AssetTransferId
+                       WHERE d.AssetId = A.Id
+                         AND h.Status = @PendingStatus
+                   )
+                   AND NOT EXISTS (
+                       SELECT 1
+                       FROM FixedAsset.AssetTransferIssueHdr h
+                       INNER JOIN FixedAsset.AssetTransferIssueDtl d ON h.Id = d.AssetTransferId
+                       LEFT JOIN FixedAsset.AssetTransferReceiptDtl r ON d.AssetId = r.AssetId
+                       WHERE d.AssetId = A.Id
+                         AND h.Status = @ApprovedStatus
+                         AND (r.AckStatus = 0 OR r.AckStatus IS NULL)
+                   );
 
-            if (string.IsNullOrWhiteSpace(assetJson))
-                return new List<GetAssetDetailsToTransferHdrDto>();
+                 SELECT  
+                     A.Id AS AssetId, 
+                     A.CreatedDate as DocDate,  
+                     H.CategoryName, 
+                     A.AssetCode, 
+                     A.AssetName, 
+                     A.UnitId, 
+                     G.UnitName, 
+                     B.LocationId, 
+                     C.LocationName, 
+                     B.SubLocationId, 
+                     D.SubLocationName, 
+                     B.DepartmentId, 
+                     F.DeptName AS DepartmentName
+                 FROM FixedAsset.AssetMaster A
+                 INNER JOIN FixedAsset.AssetLocation B ON A.ID = B.AssetId
+                 INNER JOIN FixedAsset.Location C ON B.LocationId = C.Id
+                 INNER JOIN FixedAsset.SubLocation D ON B.SubLocationId = D.Id
+                 INNER JOIN Bannari.AppData.Department F ON B.DepartmentId = F.Id
+                 INNER JOIN Bannari.AppData.Unit G ON A.UnitId = G.Id
+                 INNER JOIN FixedAsset.AssetCategories H ON A.AssetCategoryId = H.Id
+                 WHERE A.Id IN (SELECT AssetId FROM @AssetIds);
 
-            var assetDetailsList = JsonSerializer.Deserialize<List<GetAssetDetailsToTransferHdrDto>>(assetJson, new JsonSerializerOptions
+                 SELECT  AssetId, GrnValue AS AssetValue
+                 FROM FixedAsset.AssetPurchaseDetails 
+                 WHERE AssetId IN (SELECT AssetId FROM @AssetIds);
+             ";
+
+             using var multi = await _dbConnection.QueryMultipleAsync(sql, new
+             {
+                 UnitId = unitId,
+                 DepartmentId = departmentId,
+                 AssetCategoryIds = categoryIdsCsv,
+                 CustodianIds = custodianIdsCsv
+             });
+
+             var assetDynamics  = (await multi.ReadAsync<dynamic>()).ToList();
+             var purchaseDynamics = (await multi.ReadAsync<dynamic>()).ToList();
+
+              var assets = assetDynamics.Select(a => new GetAssetDetailsToTransferHdrDto
             {
-                PropertyNameCaseInsensitive = true
-            }) ?? new List<GetAssetDetailsToTransferHdrDto>();
+                AssetID = a.AssetId,
+                DocDate = a.DocDate,
+                CategoryName = a.CategoryName,
+                AssetCode = a.AssetCode,
+                AssetName = a.AssetName,
+                UnitId = a.UnitId,
+                UnitName = a.UnitName,
+                LocationId = a.LocationId,
+                LocationName = a.LocationName,
+                SubLocationId = a.SubLocationId,
+                SubLocationName = a.SubLocationName,
+                DepartmentId = a.DepartmentId,
+                DepartmentName = a.DepartmentName,
+                GetAssetDetailToTransfer = new List<GetAssetDetailsToTransferDto>()
+            }).ToList();
 
-            var transferDetails = JsonSerializer.Deserialize<List<GetAssetDetailsToTransferDto>>(transferJson ?? "[]", new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            }) ?? new List<GetAssetDetailsToTransferDto>();
+                 var purchaseDetails = purchaseDynamics.Select(p => new GetAssetDetailsToTransferDto
+                 {
+                     AssetId = p.AssetId,
+                     AssetValue = p.AssetValue
+                 }).ToList();
 
-            // Assign transfer details grouped by AssetId
-            foreach (var assetDetails in assetDetailsList)
-            {
-                assetDetails.GetAssetDetailToTransfer = transferDetails
-                    .Where(t => t.AssetId == assetDetails.AssetID)
-                    .ToList();
+                 
+                 var purchaseDict = purchaseDetails.GroupBy(p => p.AssetId)
+                                                   .ToDictionary(g => g.Key, g => g.ToList());
 
-                // Assign location and custodian info
-                var location = locations.FirstOrDefault(l => l.AssetId == assetDetails.AssetID);
-                if (location != null)
-                {
-                    assetDetails.UnitName = location.UnitName;
-                    assetDetails.DepartmentName = location.DeptName;
-                    assetDetails.LocationName = location.LocationName;
-                    assetDetails.SubLocationName = location.SubLocationName;
-                    assetDetails.FromCustodianId = location.CustodianId;
-                    assetDetails.OldUnitId = location.OldUnitId;
-                    assetDetails.ToCustodianId = location.ToCustodianId;
+                 
+                 foreach (var asset in assets)
+                 {
+                     if (purchaseDict.TryGetValue(asset.AssetID, out var purchases))
+                     {
+                         asset.GetAssetDetailToTransfer = purchases;
+                     }
+                 }
+             
 
-                    // Fetch Custodian Name if CustodianId is valid
-                    if (location.CustodianId > 0 && !string.IsNullOrEmpty(location.OldUnitId))
-                    {
-                        var custodianParams = new
-                        {
-                            DivCode = location.OldUnitId,
-                            EmpNo = location.CustodianId
-                        };
-
-                        var custodianEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
-                            "dbo.GetEmployeeByDivision",
-                            custodianParams,
-                            commandType: CommandType.StoredProcedure
-                        );
-
-                        assetDetails.FromCustodianName = custodianEmployee?.Empname;
-                    }
-
-                    // Fetch User Name if ToCustodianId is valid
-                    if (assetDetails.ToCustodianId > 0)
-                    {
-                        var userParams = new
-                        {
-                            DivCode = assetDetails.OldUnitId,
-                            EmpNo = assetDetails.ToCustodianId
-                        };
-
-                        var userEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
-                            "dbo.GetEmployeeByDivision",
-                            userParams,
-                            commandType: CommandType.StoredProcedure
-                        );
-
-                        if (userEmployee != null)
-                            assetDetails.ToCustodianName = userEmployee.Empname;
-                    }
-                }
-            }
-
-            return assetDetailsList;
-        }
+             return assets;
+         }
 
     }
 

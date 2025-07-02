@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetDtlToTransfer;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
@@ -13,10 +14,13 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetBulkAssetTo
     {
 
         private readonly IAssetTransferQueryRepository _assetTransferQueryRepository;
-        public GetBulkAssetToTransferQueryHandler(IAssetTransferQueryRepository assetTransferQueryRepository)
+        private readonly IMapper _mapper;
+        public GetBulkAssetToTransferQueryHandler(IAssetTransferQueryRepository assetTransferQueryRepository, IMapper mapper)
         {
             _assetTransferQueryRepository = assetTransferQueryRepository;
+            _mapper = mapper;
         }
+
 
             public async Task<ApiResponseDTO<List<GetAssetDetailsToTransferHdrDto>>> Handle(GetBulkAssetToTransferQuery request, CancellationToken cancellationToken)
         {
@@ -30,13 +34,18 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetBulkAssetTo
                 };
             }
 
-            var result = await _assetTransferQueryRepository.GetAssetDetailsToTransferByFiltersAsync(request.CustodianId, request.DepartmentId, request.CategoryID);
+            var asset = await _assetTransferQueryRepository.GetAssetDetailsToTransferByFiltersAsync(request.CustodianId, request.DepartmentId, request.CategoryID);
+
+            var assetList = _mapper.Map<List<GetAssetDetailsToTransferHdrDto>>(asset);
+            
+
+            
 
             return new ApiResponseDTO<List<GetAssetDetailsToTransferHdrDto>>
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = result
+                Data = assetList
             };
         }
 
