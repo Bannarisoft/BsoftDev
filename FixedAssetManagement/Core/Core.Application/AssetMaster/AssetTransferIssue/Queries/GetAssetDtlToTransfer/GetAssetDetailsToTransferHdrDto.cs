@@ -30,6 +30,6 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetDtlToT
     public string? OldUnitId { get; set; }
 
 
-    public List<GetAssetDetailsToTransferDto>? GetAssetDetailToTransfer { get; set; } 
+     public List<GetAssetDetailsToTransferDto>? GetAssetDetailToTransfer { get; set; } 
     }
 }
