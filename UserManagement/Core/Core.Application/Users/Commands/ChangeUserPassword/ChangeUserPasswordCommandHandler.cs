@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.Users.Commands.ChangeUserPassword
 {
-    public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswordCommand,ApiResponseDTO<string>>
+    public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswordCommand, ApiResponseDTO<string>>
     {
         private readonly IMapper _imapper;
         private readonly IUserQueryRepository _userQueryRepository;
@@ -26,18 +26,24 @@ namespace Core.Application.Users.Commands.ChangeUserPassword
 
         public async Task<ApiResponseDTO<string>> Handle(ChangeUserPasswordCommand request, CancellationToken cancellationToken)
         {
-            
-            var passwordLog = _imapper.Map<PasswordLog>(request);
-            
-                passwordLog.PasswordHash = await _ichangePassword.PasswordEncode(request.NewPassword);
-                var changedPassword = await _ichangePassword.ChangePassword(request.UserId,request.NewPassword,passwordLog);
-
-                if (!changedPassword)
+            if (string.IsNullOrEmpty(request.NewPassword))
+                return new ApiResponseDTO<string>
                 {
-                    return new ApiResponseDTO<string> { IsSuccess = false, Message = "Try a different Password" };
-                }
-                return new ApiResponseDTO<string> { IsSuccess = true, Message = "Password changed successfully."};
-            
+                    IsSuccess = false,
+                    Message = "Invalid input parameters."
+                };
+
+            var passwordLog = _imapper.Map<PasswordLog>(request);
+
+            passwordLog.PasswordHash = await _ichangePassword.PasswordEncode(request.NewPassword);
+            var changedPassword = await _ichangePassword.ChangePassword(request.UserId, request.NewPassword, passwordLog);
+
+            if (!changedPassword)
+            {
+                return new ApiResponseDTO<string> { IsSuccess = false, Message = "Try a different Password" };
+            }
+            return new ApiResponseDTO<string> { IsSuccess = true, Message = "Password changed successfully." };
+
         }
     }
 }

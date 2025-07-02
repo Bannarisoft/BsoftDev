@@ -39,11 +39,12 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 );
 
             builder.HasOne(ud => ud.User)
-            .WithMany(u => u.userDepartments)
-            .HasForeignKey(ud => ud.UserId);
+            .WithMany(u => u.UserDepartments)
+            .HasForeignKey(ud => ud.UserId)
+            .HasPrincipalKey(u => u.UserId); // ✅ Required to avoid Guid mismatch;
 
             builder.HasOne(ud => ud.Department)
-            .WithMany(d => d.userDepartments)
+            .WithMany(d => d.UserDepartments)
             .HasForeignKey(ud => ud.DepartmentId);
         }
     }

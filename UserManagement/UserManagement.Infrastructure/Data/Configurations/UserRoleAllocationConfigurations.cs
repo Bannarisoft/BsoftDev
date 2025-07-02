@@ -45,7 +45,8 @@ namespace UserManagement.Infrastructure.Data.Configurations
 
             builder.HasOne(ura => ura.User)
                 .WithMany(u => u.UserRoleAllocations)
-                .HasForeignKey(ura => ura.UserId);
+                .HasForeignKey(ura => ura.UserId)
+                .HasPrincipalKey(u => u.UserId); // ✅ Required to avoid Guid mismatch;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Core.Domain.Entities
         public int CompanyId { get; set; }
         public int DepartmentGroupId { get; set; }
         
-        public IList<UserDepartment>? userDepartments { get; set; }
+        public IList<UserDepartment>? UserDepartments { get; set; }
         
           [ForeignKey("DepartmentGroupId")]
         public DepartmentGroup? DepartmentGroup { get; set; }

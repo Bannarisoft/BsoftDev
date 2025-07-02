@@ -1,19 +1,13 @@
-using System.Security.Cryptography;
-using BCrypt.Net;
 using Core.Domain.Common;
-using System.ComponentModel.DataAnnotations.Schema;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Core.Domain.Enums.Common.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Domain.Entities
 {
     public class User : BaseEntity
     {
     public Guid Id { get; set; }
+    [Key]
     public int UserId { get; set; }// Identity column
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
@@ -23,7 +17,7 @@ namespace Core.Domain.Entities
     public int? UserType { get; set; }
     public string? Mobile { get; set; }
     public string? EmailId { get; set; } 
-    public byte IsLocked  { get; set; }       
+    public byte IsLocked  { get; set; }   
     
     public IList<UserRoleAllocation>? UserRoleAllocations { get; set; }
 
@@ -35,8 +29,8 @@ namespace Core.Domain.Entities
      public Entity? Entity { get; set; }
      public int? UserGroupId { get; set; }
      public UserGroup? UserGroup { get; set; }
-     public IList<UserDivision>? userDivisions { get; set; }
-     public IList<UserDepartment>? userDepartments { get; set; }
+     public IList<UserDivision>? UserDivisions { get; set; }
+     public IList<UserDepartment>? UserDepartments { get; set; }
 
     public void SetPassword(string password)
     {

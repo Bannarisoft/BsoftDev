@@ -46,7 +46,8 @@ namespace UserManagement.Infrastructure.Data.Configurations
 
             builder.HasOne(uu => uu.User)
                 .WithMany(u => u.UserUnits)
-                .HasForeignKey(uu => uu.UserId);
+                .HasForeignKey(uu => uu.UserId)
+                .HasPrincipalKey(u => u.UserId); // ✅ Required to avoid Guid mismatch;
 
 
         }

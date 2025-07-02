@@ -161,8 +161,8 @@ namespace UserManagement.Infrastructure.Repositories
                     .Include(uc => uc.UserCompanies)
                     .Include(ur => ur.UserRoleAllocations)
                     .Include(uu => uu.UserUnits)
-                    .Include(ud => ud.userDivisions)
-                    .Include(ug => ug.userDepartments)
+                    .Include(ud => ud.UserDivisions)
+                    .Include(ug => ug.UserDepartments)
                     .FirstOrDefaultAsync(u => u.UserId == userId);
                     if (existingUser != null)
                     {
@@ -236,19 +236,19 @@ namespace UserManagement.Infrastructure.Repositories
                               });
                           }
 
-                           var updatedDivisionIds = user.userDivisions.Select(ur => ur.DivisionId).ToList();
-                          foreach (var existingDivision in existingUser.userDivisions)
+                           var updatedDivisionIds = user.UserDivisions.Select(ur => ur.DivisionId).ToList();
+                          foreach (var existingDivision in existingUser.UserDivisions)
                           {
                               existingDivision.IsActive = updatedDivisionIds.Contains(existingDivision.DivisionId) ? (byte)1 : (byte)0;
                           }
 
                           var newDivisionIds = updatedDivisionIds
-                              .Where(id => !existingUser.userDivisions.Any(ur => ur.DivisionId == id))
+                              .Where(id => !existingUser.UserDivisions.Any(ur => ur.DivisionId == id))
                               .ToList();
 
                           foreach (var newDivisionId in newDivisionIds)
                           {
-                              existingUser.userDivisions.Add(new Core.Domain.Entities.UserDivision
+                              existingUser.UserDivisions.Add(new Core.Domain.Entities.UserDivision
                               {
                                   UserId = existingUser.UserId,
                                   DivisionId = newDivisionId,
@@ -256,19 +256,19 @@ namespace UserManagement.Infrastructure.Repositories
                               });
                           }
 
-                           var updatedDepartmentIds = user.userDepartments.Select(ur => ur.DepartmentId).ToList();
-                          foreach (var existingDepartment in existingUser.userDepartments)
+                           var updatedDepartmentIds = user.UserDepartments.Select(ur => ur.DepartmentId).ToList();
+                          foreach (var existingDepartment in existingUser.UserDepartments)
                           {
                               existingDepartment.IsActive = updatedDepartmentIds.Contains(existingDepartment.DepartmentId) ? (byte)1 : (byte)0;
                           }
 
                           var newDepartmentIds = updatedDepartmentIds
-                              .Where(id => !existingUser.userDepartments.Any(ur => ur.DepartmentId == id))
+                              .Where(id => !existingUser.UserDepartments.Any(ur => ur.DepartmentId == id))
                               .ToList();
 
                           foreach (var newDepartmentId in newDepartmentIds)
                           {
-                              existingUser.userDepartments.Add(new Core.Domain.Entities.UserDepartment
+                              existingUser.UserDepartments.Add(new Core.Domain.Entities.UserDepartment
                               {
                                   UserId = existingUser.UserId,
                                   DepartmentId = newDepartmentId,
