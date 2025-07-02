@@ -21,5 +21,6 @@ namespace Core.Application.MachineMaster.Command.CreateMachineMaster
         public DateTimeOffset? InstallationDate { get; set; }
         public int AssetId { get; set; }
         public int LineNo { get; set; }
+        public byte IsProductionMachine { get; set; } 
     }
 }

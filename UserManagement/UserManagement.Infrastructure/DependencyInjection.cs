@@ -266,6 +266,7 @@ namespace UserManagement.Infrastructure
             services.AddScoped<ILanguageCommand, LanguageCommandRepository>();
             services.AddScoped<ILanguageQuery, LanguageQueryRepository>();
             services.AddScoped<IMenuQuery, MenuQueryRepository>();
+            services.AddScoped<IMenuCommand, MenuCommandRepository>();
             services.AddScoped<IProfileQuery, ProfileQueryRepository>();
             services.AddScoped<IProfileCommand, ProfileCommandRepository>();
             services.AddScoped<IUserGroupQueryRepository, UserGroupQueryRepository>();

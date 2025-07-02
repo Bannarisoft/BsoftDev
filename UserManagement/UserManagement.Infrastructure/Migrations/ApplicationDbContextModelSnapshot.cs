@@ -1169,9 +1169,6 @@ namespace UserManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -1195,7 +1192,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("IsDeleted");
 
                     b.Property<string>("MenuIcon")
-                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("MenuName")

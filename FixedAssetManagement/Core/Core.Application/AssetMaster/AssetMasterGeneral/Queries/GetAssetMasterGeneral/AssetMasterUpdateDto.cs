@@ -13,6 +13,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public string? UnitName { get; set; } 
         public string? AssetName { get; set; }                
         public int AssetGroupId { get; set; }        
+        public int? AssetSubGroupId { get; set; }   
         public int AssetCategoryId { get; set; }        
         public int AssetSubCategoryId { get; set; }        
         public int? AssetParentId { get; set; }        
@@ -27,7 +28,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
         public bool? Tangible { get; set; }      
         public byte IsActive { get; set; }  
         public string? AssetDocument { get; set; }
-        public AssetLocationUpdateDto?  AssetLocation  { get; set; }
+        public DateTimeOffset? PutToUseDate { get; set; }
+        public AssetLocationUpdateDto? AssetLocation { get; set; }
         public ICollection<AssetPurchaseUpdateDto>? AssetPurchaseDetails{ get; set; }    
         public ICollection<AssetAdditionalCostUpdateDto>? AssetAdditionalCost{ get; set; }     
     }

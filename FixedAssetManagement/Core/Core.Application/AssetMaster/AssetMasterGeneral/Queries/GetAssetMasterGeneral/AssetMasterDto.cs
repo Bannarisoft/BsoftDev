@@ -15,6 +15,7 @@
             public string? UnitName { get; set; } 
             public string? AssetName { get; set; }                
             public int AssetGroupId { get; set; }        
+            public int? AssetSubGroupId { get; set; }  
             public int AssetCategoryId { get; set; }        
             public int AssetSubCategoryId { get; set; }        
             public int? AssetParentId { get; set; }        
@@ -28,8 +29,9 @@
             public bool? NonDepreciated { get; set; }
             public bool? Tangible { get; set; }        
             public bool? Active { get; set; }  
-            public string? AssetDocument { get; set; }      
-            public AssetLocationCombineDto?  AssetLocation  { get; set; }
+            public string? AssetDocument { get; set; }  
+            public DateTimeOffset? PutToUseDate { get; set; }
+            public AssetLocationCombineDto? AssetLocation { get; set; }
             public ICollection<AssetPurchaseCombineDto>? AssetPurchaseDetails{ get; set; }       
             public ICollection<AssetAdditionalCostCombineDto>? AssetAdditionalCost{ get; set; }       
             public ICollection<AssetSpecificationCombineDto>? AssetSpecification{ get; set; } 

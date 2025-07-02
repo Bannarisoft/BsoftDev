@@ -87,7 +87,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
                 _applicationDbContext.WorkOrderTechnician.Where(x => x.WorkOrderId == workOrderId));
             
             _applicationDbContext.StockLedger.RemoveRange(
-                _applicationDbContext.StockLedger.Where(x => x.DocNo == workOrderId));
+                _applicationDbContext.StockLedger.Where(x => x.DocNo == workOrderId && new[] { "ISS", "REU", "SRP" }.Contains(x.TransactionType)));
 
             existingWorkOrder.DowntimeStart = workOrder.DowntimeStart;
             existingWorkOrder.DowntimeEnd = workOrder.DowntimeEnd;

@@ -1,12 +1,15 @@
 using System.Data;
 using System.Net;
+using AutoMapper;
 using Core.Application.AssetMaster.AssetMasterGeneral.Commands.CreateAssetMasterGeneral;
 using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneral;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IExcelImport;
 using Core.Application.Common.Interfaces.ILocation;
 using Core.Application.Common.Interfaces.ISubLocation;
+using Core.Application.ExcelImport.PhysicalStockVerification;
 using Core.Domain.Entities;
+using Core.Domain.Entities.AssetMaster;
 using FAM.Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +23,14 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
         private readonly ILocationCommandRepository _locationCommandRepository;
         private readonly IIPAddressService _ipAddressService;
         private readonly ISubLocationCommandRepository _subLocationCommandRepository;
-        public ExcelImportCommandRepository(ApplicationDbContext applicationDbContext, IMediator mediator,ILocationCommandRepository locationCommandRepository, IIPAddressService ipAddressService,ISubLocationCommandRepository subLocationCommandRepository)
+        
+        public ExcelImportCommandRepository(ApplicationDbContext applicationDbContext, IMediator mediator, ILocationCommandRepository locationCommandRepository, IIPAddressService ipAddressService, ISubLocationCommandRepository subLocationCommandRepository)
         {
             _applicationDbContext = applicationDbContext;
-            _mediator = mediator;   
-            _locationCommandRepository = locationCommandRepository; 
-            _ipAddressService = ipAddressService;   
-            _subLocationCommandRepository = subLocationCommandRepository;    
+            _mediator = mediator;
+            _locationCommandRepository = locationCommandRepository;
+            _ipAddressService = ipAddressService;
+            _subLocationCommandRepository = subLocationCommandRepository;
         }
 
         public async Task AddRangeAsync(IEnumerable<AssetMasterGenerals> assets)
@@ -41,7 +45,6 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
         public async Task<bool> ImportAssetsAsync(List<AssetMasterDto> assetDto, CancellationToken cancellationToken)
         {
             var strategy = _applicationDbContext.Database.CreateExecutionStrategy();
-
             return await strategy.ExecuteAsync(async () =>
             {
                 using (var transaction = await _applicationDbContext.Database.BeginTransactionAsync(cancellationToken))
@@ -87,25 +90,34 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
         {
             var trimmedAssetGroupName = assetGroupName?.Trim(); // ✅ Trim input
             var assetGroup = await _applicationDbContext.AssetGroup
-                .Where(a => a.GroupName.Trim() == trimmedAssetGroupName && a.IsDeleted == 0) // ✅ Trim from DB column for safety
+                .Where(a => a.GroupName != null && a.GroupName.Trim() == trimmedAssetGroupName && a.IsDeleted == 0) 
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
             return assetGroup == 0 ? null : assetGroup; 
         }
+        public async Task<int?> GetAssetSubGroupIdByNameAsync(string assetSubGroupName)
+        {
+            var trimmedAssetSubGroupName = assetSubGroupName?.Trim(); // ✅ Trim input
+            var assetSubGroup = await _applicationDbContext.AssetSubGroup
+                .Where(a => a.SubGroupName != null && a.SubGroupName.Trim() == trimmedAssetSubGroupName && a.IsDeleted == 0) 
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+            return assetSubGroup == 0 ? null : assetSubGroup; 
+        }
 
         public async Task<int?> GetAssetCategoryIdByNameAsync(string assetCategoryName)
         {
-           var assetCategory = await _applicationDbContext.AssetCategories
+            var assetCategory = await _applicationDbContext.AssetCategories
             .Where(a => a.CategoryName == assetCategoryName  && a.IsDeleted == 0)
             .Select(a => a.Id)
             .FirstOrDefaultAsync();        
             return assetCategory == 0 ? null : assetCategory;
         }
 
-        public async Task<int?> GetAssetSubCategoryIdByNameAsync(string assetSubCategoryName)
+        public async Task<int?> GetAssetSubCategoryIdByNameAsync(int assetCategoryId,string assetSubCategoryName)
         {
             var assetSubCategory = await _applicationDbContext.AssetSubCategories
-            .Where(a => a.SubCategoryName == assetSubCategoryName  && a.IsDeleted == 0) 
+            .Where(a => a.SubCategoryName == assetSubCategoryName  && a.IsDeleted == 0 && a.AssetCategoriesId==assetCategoryId) 
             .Select(a => a.Id)
             .FirstOrDefaultAsync();        
             return assetSubCategory == 0 ? null : assetSubCategory; 
@@ -183,7 +195,7 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
                 .FirstOrDefaultAsync();
 
 
-            // Check if sublocation already exists (case-insensitive match)
+            // Check if subLocation already exists (case-insensitive match)
             var subLocationId = await _applicationDbContext.SubLocations
                 .Where(s => s.SubLocationName == subLocationName && s.IsDeleted == 0)
                 .Select(s => s.Id)
@@ -223,7 +235,6 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
             .FirstOrDefaultAsync();        
             return assetMaster == 0 ? null : assetMaster;
         }
-
         public async Task<int?> GetManufacturerIdByNameAsync(string manufacture)
         {
             var assetManufacturer = await _applicationDbContext.Manufactures
@@ -231,6 +242,76 @@ namespace FAM.Infrastructure.Repositories.ExcelImport
             .Select(a => a.Id)
             .FirstOrDefaultAsync();        
             return assetManufacturer == 0 ? null : assetManufacturer; 
+        }
+
+        public async Task<bool> BulkInsertAsync(List<AssetAudit> audits, CancellationToken cancellationToken)
+        {
+            var strategy = _applicationDbContext.Database.CreateExecutionStrategy();
+            return await strategy.ExecuteAsync(async () =>
+            {
+                await using var transaction = await _applicationDbContext.Database.BeginTransactionAsync(cancellationToken);
+                try
+                {
+                    var unitId = _ipAddressService.GetUnitId();
+                    // Get the current max for that unit
+                    var maxUploadId = (await _applicationDbContext.AssetAudit
+                        .Where(x => x.UnitId == unitId)
+                        .MaxAsync(x => (int?)x.UploadedFileId)) ?? 0;
+
+                    var newUploadId = maxUploadId + 1;
+
+                    // Assign UnitId and UploadedFileId to all items
+                    audits.ForEach(a =>
+                    {
+                        a.UnitId = unitId;
+                        a.UploadedFileId = newUploadId;
+                    });
+
+                    await _applicationDbContext.AssetAudit.AddRangeAsync(audits, cancellationToken);
+                    await _applicationDbContext.SaveChangesAsync(cancellationToken);
+                    await transaction.CommitAsync(cancellationToken);
+
+                    return true;
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    throw new Exception($"Database error: {dbEx.InnerException?.Message ?? dbEx.Message}");
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    throw new Exception($"Unexpected error: {ex.Message}");
+                }
+            });
+        }
+
+        public async Task<bool> CheckFileExistsAsync(string fileName, CancellationToken cancellationToken)
+        {
+            return await _applicationDbContext.AssetAudit
+            .AnyAsync(x => x.SourceFileName.ToLower() == fileName.ToLower(), cancellationToken);
+        }
+
+        public async Task<bool> InsertScannedAssetAsync(AssetAudit entity, CancellationToken cancellationToken)
+        {
+             var unitId = _ipAddressService.GetUnitId();
+            // Assign UnitId to the entity
+             entity.UnitId = unitId;
+             await _applicationDbContext.AssetAudit.AddAsync(entity, cancellationToken);
+             return await _applicationDbContext.SaveChangesAsync(cancellationToken) > 0;
+        }
+
+        public async Task<bool> IsAssetAlreadyScannedAsync(string assetCode, int auditCycle, string auditFinancialYear, string department,string unitName ,CancellationToken cancellationToken)
+        {
+            var unitId = _ipAddressService.GetUnitId();
+            return await _applicationDbContext.AssetAudit.AnyAsync(x =>
+                            x.AssetCode == assetCode.Trim() &&
+                            x.AuditTypeId == auditCycle &&
+                            x.AuditFinancialYear == auditFinancialYear &&
+                            x.Department == department.Trim() &&
+                            x.UnitName == unitName.Trim() &&
+                            x.UnitId == unitId,
+                            cancellationToken);
         }
     }
 }

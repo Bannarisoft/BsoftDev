@@ -42,13 +42,12 @@ namespace MaintenanceManagement.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllMachineMasterAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
+        public async Task<IActionResult> GetAllMachineMasterAsync([FromQuery] string? SearchTerm = null)
         {
             var MachineMaster = await Mediator.Send(
              new GetMachineMasterQuery
              {
-                 PageNumber = PageNumber,
-                 PageSize = PageSize,
+               
                  SearchTerm = SearchTerm
              });
             return Ok(new
@@ -56,8 +55,7 @@ namespace MaintenanceManagement.API.Controllers
                 StatusCode = StatusCodes.Status200OK,
                 data = MachineMaster.Data,
                 TotalCount = MachineMaster.TotalCount,
-                PageNumber = MachineMaster.PageNumber,
-                PageSize = MachineMaster.PageSize
+              
             });
         }
 

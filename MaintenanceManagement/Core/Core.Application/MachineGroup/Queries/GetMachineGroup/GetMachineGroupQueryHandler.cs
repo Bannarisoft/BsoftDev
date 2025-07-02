@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Domain.Events;
 using MediatR;
@@ -18,18 +19,25 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroup
         private readonly IMediator _mediator;
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
         private readonly IDepartmentAllGrpcClient _departmentAllGrpcClient; // 👈 gRPC Inject here
+        private readonly IIPAddressService _ipAddressService;
+          private readonly IUnitGrpcClient _unitGrpcClient;
 
 
-        public GetMachineGroupQueryHandler(IMachineGroupQueryRepository machineGroupQueryRepository, IMapper mapper, IMediator mediator, IDepartmentAllGrpcClient departmentAllGrpcClient)
+        public GetMachineGroupQueryHandler(IMachineGroupQueryRepository machineGroupQueryRepository, IMapper mapper, IMediator mediator, IDepartmentAllGrpcClient departmentAllGrpcClient, IIPAddressService iPAddressService, IUnitGrpcClient unitGrpcClient)
         {
             _machineGroupQueryRepository = machineGroupQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
             _departmentAllGrpcClient = departmentAllGrpcClient;
+            _ipAddressService = iPAddressService;
+            _unitGrpcClient = unitGrpcClient;
+
         }
 
         public async Task<ApiResponseDTO<List<MachineGroupDto>>> Handle(GetMachineGroupQuery request, CancellationToken cancellationToken)
         {
+
+             var unitId = _ipAddressService.GetUnitId();
             // Fetch data from repository
             var (machineGroups, totalCount) = await _machineGroupQueryRepository.GetAllMachineGroupsAsync(request.PageNumber, request.PageSize, request.SearchTerm);
 
@@ -39,24 +47,18 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroup
             // 🔥 Fetch departments using gRPC
             var departments = await _departmentAllGrpcClient.GetDepartmentAllAsync();
             var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+             var units = await _unitGrpcClient.GetAllUnitAsync();
+              var unitLookup = units.ToDictionary(u => u.UnitId, u => u.UnitName);
             // 🔥 Map department & unit names with DataControl to costCenters
             foreach (var dto in machineGroupList)
             {
                 if (departmentLookup.TryGetValue(dto.DepartmentId, out var deptName))
                     dto.DepartmentName = deptName;
 
-            }
+                    if (unitLookup.TryGetValue(dto. UnitId, out var unitName))
+                    dto.UnitName = unitName;
 
-            //     // 🔥 Map department names with DataControl to location
-            //     var filteredMachineGroupDtos = machineGroupList
-            //    .Where(p => departmentLookup.ContainsKey(p.DepartmentId))
-            //    .Select(p => new MachineGroupDto
-            //    {
-            //        DepartmentId = p.DepartmentId,
-            //        DepartmentName = departmentLookup[p.DepartmentId],
-            //    })
-            //    .ToList();
-
+            }                      
             // Publish domain event for auditing
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetAll",

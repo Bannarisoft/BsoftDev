@@ -1,4 +1,5 @@
 using AutoMapper;
+using Contracts.Interfaces.External.IFixedAssetManagement;
 using Core.Application.City.Queries.GetCities;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICity;
@@ -15,16 +16,30 @@ namespace Core.Application.City.Commands.DeleteCity
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
         private readonly ICityQueryRepository _cityQueryRepository;
-        public DeleteCityCommandHandler(ICityCommandRepository cityRepository, IMapper mapper, ICityQueryRepository cityQueryRepository, IMediator mediator)
+        private readonly IFixedAssetCityValidationGrpcClient _fixedAssetCityValidationGrpcClient;
+        public DeleteCityCommandHandler(ICityCommandRepository cityRepository, IMapper mapper, ICityQueryRepository cityQueryRepository, IMediator mediator, IFixedAssetCityValidationGrpcClient fixedAssetCityValidationGrpcClient)
         {
             _cityRepository = cityRepository;
-             _mapper = mapper;
+            _mapper = mapper;
             _cityQueryRepository = cityQueryRepository;
             _mediator = mediator;
+            _fixedAssetCityValidationGrpcClient = fixedAssetCityValidationGrpcClient;
         }
 
         public async Task<ApiResponseDTO<CityDto>> Handle(DeleteCityCommand request, CancellationToken cancellationToken)
         {
+            bool iscountryUsedInFixedAsset = await _fixedAssetCityValidationGrpcClient.CheckIfCityIsUsedForFixedAssetAsync(request.Id);  
+
+            if (iscountryUsedInFixedAsset)
+            {
+                return new ApiResponseDTO<CityDto>
+                {
+                    IsSuccess = false,
+                    Message = "Cannot delete Country. It is still in use in FixedAsset system."
+                   
+                };
+            }
+
             // Fetch the city to be deleted
             var city = await _cityQueryRepository.GetByIdAsync(request.Id);
             if (city is null || city.IsDeleted is Enums.IsDelete.Deleted )

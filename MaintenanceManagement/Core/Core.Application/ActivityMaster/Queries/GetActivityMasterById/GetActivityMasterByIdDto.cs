@@ -25,6 +25,8 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
         public int Id { get; set;}
         public string? ActivityName { get; set;}
         public string? Description { get; set; }
+        public int UnitId { get; set; }
+        public string? UnitName { get; set; }
         public int DepartmentId { get; set; }
         public string? Department { get; set; }        
         public int EstimatedDuration { get; set; }

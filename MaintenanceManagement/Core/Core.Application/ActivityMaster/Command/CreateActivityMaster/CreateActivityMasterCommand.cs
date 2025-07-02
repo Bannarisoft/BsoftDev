@@ -13,12 +13,7 @@ namespace Core.Application.ActivityMaster.Command.CreateActivityMaster
     {
 
         public CreateActivityMasterDto? CreateActivityMasterDto { get; set; }
-        // public string? ActivityName { get; set;}
-        // public string? Description { get; set; }
-        // public int DepartmentId { get; set; }       
-        // public int MachineGroupId { get; set; }        
-        // public int EstimatedDuration { get; set; }
-        // public int ActivityType { get; set; }
+        
 
 
     }

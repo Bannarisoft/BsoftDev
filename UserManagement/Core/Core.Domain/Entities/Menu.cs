@@ -17,7 +17,6 @@ namespace Core.Domain.Entities
     public string? MenuUrl { get; set; }
     public string? MenuIcon { get; set; }
     public int SortOrder  { get; set; }
-    public int CompanyId  { get; set; }
     public Modules? Module { get; set; }
     public IList<RoleMenuPrivileges>? RoleMenus { get; set; }
     public IList<RoleParent>? RoleParents { get; set; }

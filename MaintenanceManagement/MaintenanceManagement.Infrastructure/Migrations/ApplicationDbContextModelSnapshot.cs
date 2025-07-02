@@ -70,6 +70,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ActivityId");
@@ -163,6 +167,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
 
                     b.HasKey("Id");
 
@@ -393,6 +401,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(50)");
 
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
                     b.HasKey("Id");
 
                     b.ToTable("MachineGroup", "Maintenance");
@@ -494,6 +506,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<bool>("IsProductionMachine")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsProductionMachine");
 
                     b.Property<int>("LineNo")
                         .HasColumnType("int");

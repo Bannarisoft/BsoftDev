@@ -44,13 +44,10 @@ namespace UserManagement.Infrastructure.Data.Configurations
             .HasColumnType("varchar(255)");
 
             builder.Property(m => m.MenuIcon)
-            .IsRequired()
+            .IsRequired(false)
             .HasColumnType("varchar(255)");
 
             builder.Property(d => d.SortOrder)
-            .HasColumnType("int");
-
-            builder.Property(d => d.CompanyId)
             .HasColumnType("int");
 
         builder.HasOne(m => m.Module)
