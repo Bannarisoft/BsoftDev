@@ -32,9 +32,13 @@ namespace Core.Application.ExcelImport
             int? assetSubGroupId = await _assetRepository.GetAssetSubGroupIdByNameAsync(assetSubGroupName);
             if (assetSubGroupId == null)
             {
-                throw new Exception($"Invalid Asset Sub Group Name '{assetSubGroupName}' at Excel Row {row}");
+                //throw new Exception($"Invalid Asset Sub Group Name '{assetSubGroupName}' at Excel Row {row}");
+                assetDto.AssetSubGroupId = null; // Allow null for AssetSubGroupId if not found
             }
-            assetDto.AssetSubGroupId = assetSubGroupId.Value;
+            else
+            {
+                assetDto.AssetSubGroupId = assetSubGroupId.Value;
+            }
             // AssetCategory
             string assetCategory = worksheet.Cells[row, 3].Value?.ToString() ?? string.Empty;
             int? assetCategoryId = await _assetRepository.GetAssetCategoryIdByNameAsync(assetCategory);

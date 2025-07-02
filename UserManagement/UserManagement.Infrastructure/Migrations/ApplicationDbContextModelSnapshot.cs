@@ -198,7 +198,6 @@ namespace UserManagement.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CSTNo")
-                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("CSTNo");
 
@@ -244,7 +243,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("LegalName");
 
                     b.Property<string>("Logo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("Logo");
 
@@ -261,12 +259,10 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("TAN")
-                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("TAN");
 
                     b.Property<string>("TIN")
-                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("TIN");
 
@@ -299,12 +295,10 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("AddressLine1");
 
                     b.Property<string>("AddressLine2")
-                        .IsRequired()
                         .HasColumnType("varchar(100)")
                         .HasColumnName("AddressLine2");
 
                     b.Property<string>("AlternatePhone")
-                        .IsRequired()
                         .HasColumnType("varchar(20)")
                         .HasColumnName("AlternatePhone");
 
@@ -321,7 +315,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("CountryId");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasColumnType("varchar(20)")
                         .HasColumnName("Phone");
 
@@ -376,7 +369,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("Phone");
 
                     b.Property<string>("Remarks")
-                        .IsRequired()
                         .HasColumnType("varchar(100)")
                         .HasColumnName("Remark");
 
@@ -1177,9 +1169,6 @@ namespace UserManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -1203,7 +1192,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("IsDeleted");
 
                     b.Property<string>("MenuIcon")
-                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("MenuName")
@@ -2895,14 +2883,11 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Company", b =>
                 {
-                    b.Navigation("CompanyAddress")
-                        .IsRequired();
+                    b.Navigation("CompanyAddress");
 
-                    b.Navigation("CompanyContact")
-                        .IsRequired();
+                    b.Navigation("CompanyContact");
 
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
+                    b.Navigation("CompanySettings");
 
                     b.Navigation("Divisions");
 
@@ -2918,8 +2903,7 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Currency", b =>
                 {
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
+                    b.Navigation("CompanySettings");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.CustomField", b =>
@@ -2950,20 +2934,17 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Entity", b =>
                 {
-                    b.Navigation("AdminSecuritySettings")
-                        .IsRequired();
+                    b.Navigation("AdminSecuritySettings");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.FinancialYear", b =>
                 {
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
+                    b.Navigation("CompanySettings");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Language", b =>
                 {
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
+                    b.Navigation("CompanySettings");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>

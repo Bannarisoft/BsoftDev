@@ -13,7 +13,7 @@ namespace FAM.Infrastructure.Repositories.AssetSubGroup
             _dbConnection = dbConnection;
         }
 
-        public async Task<Core.Domain.Entities.AssetSubGroup?> GetByIdAsync(int id)
+        public async Task<Core.Domain.Entities.AssetSubGroup?> GetByIdAsync( int id)
         {
                 const string query = @"
                     SELECT * 
@@ -23,8 +23,18 @@ namespace FAM.Infrastructure.Repositories.AssetSubGroup
                     var assetSubGroup = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.AssetSubGroup>(query, new { id });
                     return assetSubGroup;
         }
+        public async Task<List<Core.Domain.Entities.AssetSubGroup?>> GetByGroupIdAsync(int groupId)
+        {
+            const string query = @"
+                    SELECT * 
+                    FROM FixedAsset.AssetSubGroup 
+                    WHERE GroupId = @groupId AND IsDeleted = 0";
 
-         public async Task<(List<Core.Domain.Entities.AssetSubGroup>,int)> GetAllAssetSubGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
+            var assetSubGroup = await _dbConnection.QueryAsync<Core.Domain.Entities.AssetSubGroup>(query, new { groupId });
+            return assetSubGroup.ToList();             
+        }
+
+         public async Task<(List<Core.Domain.Entities.AssetSubGroup>, int)> GetAllAssetSubGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             var query = $$"""
             DECLARE @TotalCount INT;
@@ -52,18 +62,18 @@ namespace FAM.Infrastructure.Repositories.AssetSubGroup
                 SELECT @TotalCount AS TotalCount;
             """;
 
-            
-             var parameters = new
-                       {
-                           Search = $"%{SearchTerm}%",
-                           Offset = (PageNumber - 1) * PageSize,
-                           PageSize
-                       };
 
-             var assetSubGroup = await _dbConnection.QueryMultipleAsync(query, parameters);
-             var assetSubGroupList = (await assetSubGroup.ReadAsync<Core.Domain.Entities.AssetSubGroup>()).ToList();
-             int totalCount = (await assetSubGroup.ReadFirstAsync<int>());
-             return (assetSubGroupList, totalCount);
+            var parameters = new
+            {
+                Search = $"%{SearchTerm}%",
+                Offset = (PageNumber - 1) * PageSize,
+                PageSize
+            };
+
+            var assetSubGroup = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var assetSubGroupList = (await assetSubGroup.ReadAsync<Core.Domain.Entities.AssetSubGroup>()).ToList();
+            int totalCount = (await assetSubGroup.ReadFirstAsync<int>());
+            return (assetSubGroupList, totalCount);
         }
 
         public async Task<List<Core.Domain.Entities.AssetSubGroup>> GetAssetSubGroups(string searchPattern)

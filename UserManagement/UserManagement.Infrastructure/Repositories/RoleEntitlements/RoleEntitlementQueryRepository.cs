@@ -133,7 +133,7 @@ namespace UserManagement.Infrastructure.Repositories.RoleEntitlements
 	INNER JOIN #MENUPERMISSION PM ON PM.MenuId=Menu.Id AND PM.RoleId=URA.UserRoleId
     LEFT JOIN [AppSecurity].[RoleMenuPrivilege] RMP ON RMP.MenuId = Menu.Id AND RMP.RoleId=URA.UserRoleId
     WHERE URA.UserId = @UserId AND M.IsDeleted = 0 AND Menu.IsDeleted=0
-    ORDER BY Menu.ParentId, Menu.Id;"; 
+    ORDER BY Menu.ParentId, Menu.SortOrder;"; 
 
     var result = await _dbConnection.QueryAsync<Modules, Core.Domain.Entities.Menu, RoleMenuPrivileges, Modules>(
         sql,

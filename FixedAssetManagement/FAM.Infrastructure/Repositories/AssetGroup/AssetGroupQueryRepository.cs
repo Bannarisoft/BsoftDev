@@ -44,8 +44,8 @@ namespace FAM.Infrastructure.Repositories.AssetGroup
                 SortOrder,
                 IsActive,
                 CreatedDate,
-                CreatedByName
-            FROM FixedAsset.AssetGroup 
+                CreatedByName,
+                GroupPercentage     FROM FixedAsset.AssetGroup 
             WHERE 
             IsDeleted = 0
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (GroupName LIKE @Search OR Code LIKE @Search )")}}

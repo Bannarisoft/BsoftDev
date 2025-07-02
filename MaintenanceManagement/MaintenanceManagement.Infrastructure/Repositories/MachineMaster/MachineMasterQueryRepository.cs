@@ -22,61 +22,44 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             _dbConnection = dbConnection;
             _ipAddressService = ipAddressService;
         }
-        public async Task<(List<MachineMasterDto>, int)> GetAllMachineAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<List<MachineMasterDto>> GetAllMachineAsync(string? SearchTerm)
         {
             var UnitId = _ipAddressService.GetUnitId();
+
             var query = $$"""
-                        DECLARE @TotalCount INT;
-
-                        -- Count total records
-                        SELECT @TotalCount = COUNT(*) 
-                        FROM Maintenance.MachineMaster mm
-                        LEFT JOIN Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
-                        WHERE mm.IsDeleted = 0 AND mm.UnitId = @UnitId
-                        {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (mm.MachineCode LIKE @Search OR mm.MachineName LIKE @Search OR mg.GroupName LIKE @Search)")}};
-
-                        -- Fetch paged records with MachineGroupName
-                        SELECT 
-                            mm.Id, 
-                            mm.MachineCode,
-                            mm.MachineName,
-                            mm.MachineGroupId,
-                            mg.GroupName AS MachineGroupName, -- <- correct mapping
-                            mm.UnitId,
-                            mm.ProductionCapacity,
-                            mm.UomId,
-                            mm.ShiftMasterId,
-                            mm.CostCenterId,
-                            mm.WorkCenterId,
-                            mm.InstallationDate,
-                            mm.AssetId,
-                            mm.[LineNo],
-                            mm.IsActive,
-                            mm.IsProductionMachine
-                        FROM Maintenance.MachineMaster mm
-                        LEFT JOIN Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
-                        WHERE 
-                            mm.IsDeleted = 0 AND mm.UnitId = @UnitId
-                            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (mm.MachineCode LIKE @Search OR mm.MachineName LIKE @Search OR mg.GroupName LIKE @Search)")}}
-                        ORDER BY mm.Id DESC
-                        OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
-
-                        -- Return total count
-                        SELECT @TotalCount AS TotalCount;
-                        """;
+                SELECT 
+                    mm.Id, 
+                    mm.MachineCode,
+                    mm.MachineName,
+                    mm.MachineGroupId,
+                    mg.GroupName AS MachineGroupName,
+                    mm.UnitId,
+                    mm.ProductionCapacity,
+                    mm.UomId,
+                    mm.ShiftMasterId,
+                    mm.CostCenterId,
+                    mm.WorkCenterId,
+                    mm.InstallationDate,
+                    mm.AssetId,
+                    mm.[LineNo],
+                    mm.IsActive,
+                    mm.IsProductionMachine
+                FROM Maintenance.MachineMaster mm
+                LEFT JOIN Maintenance.MachineGroup mg ON mm.MachineGroupId = mg.Id
+                WHERE 
+                    mm.IsDeleted = 0 AND mm.UnitId = @UnitId
+                    {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (mm.MachineCode LIKE @Search OR mm.MachineName LIKE @Search OR mg.GroupName LIKE @Search)")}}
+                ORDER BY mm.Id DESC
+                """;
 
             var parameters = new
             {
                 Search = $"%{SearchTerm}%",
-                Offset = (PageNumber - 1) * PageSize,
-                PageSize,
                 UnitId
             };
 
-            var maintenanceCategory = await _dbConnection.QueryMultipleAsync(query, parameters);
-            var maintenanceCategorylist = (await maintenanceCategory.ReadAsync<MachineMasterDto>()).ToList();
-            int totalCount = (await maintenanceCategory.ReadFirstAsync<int>());
-            return (maintenanceCategorylist, totalCount);
+            var maintenanceCategorylist = (await _dbConnection.QueryAsync<MachineMasterDto>(query, parameters)).ToList();
+            return maintenanceCategorylist;
         }
 
         public async Task<MachineMasterDto?> GetByIdAsync(int Id)

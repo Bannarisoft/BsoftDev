@@ -10,6 +10,8 @@ namespace Core.Application.Common.Interfaces.IMenu
     {
         Task<List<Domain.Entities.Menu>> GetParentMenus(List<int> moduleId);
         Task<List<Domain.Entities.Menu>> GetChildMenus(List<int> ParentId);
-        Task<bool> FKColumnExistValidation(int Id); 
+        Task<bool> FKColumnExistValidation(int Id);
+        Task<(IEnumerable<dynamic>, int)> GetAllMenuAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<Core.Domain.Entities.Menu> GetMenuByNameAsync(string MenuName);
     }
 }
