@@ -198,7 +198,6 @@ namespace UserManagement.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CSTNo")
-                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("CSTNo");
 
@@ -244,7 +243,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("LegalName");
 
                     b.Property<string>("Logo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("Logo");
 
@@ -261,12 +259,10 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("TAN")
-                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("TAN");
 
                     b.Property<string>("TIN")
-                        .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("TIN");
 
@@ -299,12 +295,10 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("AddressLine1");
 
                     b.Property<string>("AddressLine2")
-                        .IsRequired()
                         .HasColumnType("varchar(100)")
                         .HasColumnName("AddressLine2");
 
                     b.Property<string>("AlternatePhone")
-                        .IsRequired()
                         .HasColumnType("varchar(20)")
                         .HasColumnName("AlternatePhone");
 
@@ -321,7 +315,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("CountryId");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasColumnType("varchar(20)")
                         .HasColumnName("Phone");
 
@@ -376,7 +369,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("Phone");
 
                     b.Property<string>("Remarks")
-                        .IsRequired()
                         .HasColumnType("varchar(100)")
                         .HasColumnName("Remark");
 
@@ -1177,9 +1169,6 @@ namespace UserManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -1203,7 +1192,6 @@ namespace UserManagement.Infrastructure.Migrations
                         .HasColumnName("IsDeleted");
 
                     b.Property<string>("MenuIcon")
-                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("MenuName")
@@ -2094,6 +2082,8 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.HasKey("UserId");
 
+                    b.HasAlternateKey("Id");
+
                     b.HasIndex("EntityId");
 
                     b.HasIndex("UserGroupId");
@@ -2635,7 +2625,7 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.UserRole", "Role")
-                        .WithMany("roleChildren")
+                        .WithMany("RoleChildren")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2673,7 +2663,7 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.UserRole", "UserRole")
-                        .WithMany("roleMenuPrivileges")
+                        .WithMany("RoleMenuPrivileges")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -2692,7 +2682,7 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.UserRole", "Role")
-                        .WithMany("roleModules")
+                        .WithMany("RoleModules")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2711,7 +2701,7 @@ namespace UserManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.UserRole", "Role")
-                        .WithMany("roleParents")
+                        .WithMany("RoleParents")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2791,33 +2781,33 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.UserCompany", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.Company", "company")
+                    b.HasOne("Core.Domain.Entities.Company", "Company")
                         .WithMany("UserCompanies")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.User", "user")
+                    b.HasOne("Core.Domain.Entities.User", "User")
                         .WithMany("UserCompanies")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("company");
+                    b.Navigation("Company");
 
-                    b.Navigation("user");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserDepartment", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Department", "Department")
-                        .WithMany("userDepartments")
+                        .WithMany("UserDepartments")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.User", "User")
-                        .WithMany("userDepartments")
+                        .WithMany("UserDepartments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2829,21 +2819,21 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.UserDivision", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.Division", "division")
+                    b.HasOne("Core.Domain.Entities.Division", "Division")
                         .WithMany("UserDivisions")
                         .HasForeignKey("DivisionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.User", "user")
-                        .WithMany("userDivisions")
+                    b.HasOne("Core.Domain.Entities.User", "User")
+                        .WithMany("UserDivisions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("division");
+                    b.Navigation("Division");
 
-                    b.Navigation("user");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserRoleAllocation", b =>
@@ -2895,14 +2885,11 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Company", b =>
                 {
-                    b.Navigation("CompanyAddress")
-                        .IsRequired();
+                    b.Navigation("CompanyAddress");
 
-                    b.Navigation("CompanyContact")
-                        .IsRequired();
+                    b.Navigation("CompanyContact");
 
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
+                    b.Navigation("CompanySettings");
 
                     b.Navigation("Divisions");
 
@@ -2918,8 +2905,7 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Currency", b =>
                 {
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
+                    b.Navigation("CompanySettings");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.CustomField", b =>
@@ -2933,7 +2919,7 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Department", b =>
                 {
-                    b.Navigation("userDepartments");
+                    b.Navigation("UserDepartments");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.DepartmentGroup", b =>
@@ -2950,20 +2936,17 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Entity", b =>
                 {
-                    b.Navigation("AdminSecuritySettings")
-                        .IsRequired();
+                    b.Navigation("AdminSecuritySettings");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.FinancialYear", b =>
                 {
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
+                    b.Navigation("CompanySettings");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Language", b =>
                 {
-                    b.Navigation("CompanySettings")
-                        .IsRequired();
+                    b.Navigation("CompanySettings");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Menu", b =>
@@ -3020,13 +3003,13 @@ namespace UserManagement.Infrastructure.Migrations
 
                     b.Navigation("UserCompanies");
 
+                    b.Navigation("UserDepartments");
+
+                    b.Navigation("UserDivisions");
+
                     b.Navigation("UserRoleAllocations");
 
                     b.Navigation("UserUnits");
-
-                    b.Navigation("userDepartments");
-
-                    b.Navigation("userDivisions");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.UserGroup", b =>
@@ -3036,15 +3019,15 @@ namespace UserManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.UserRole", b =>
                 {
+                    b.Navigation("RoleChildren");
+
+                    b.Navigation("RoleMenuPrivileges");
+
+                    b.Navigation("RoleModules");
+
+                    b.Navigation("RoleParents");
+
                     b.Navigation("UserRoleAllocations");
-
-                    b.Navigation("roleChildren");
-
-                    b.Navigation("roleMenuPrivileges");
-
-                    b.Navigation("roleModules");
-
-                    b.Navigation("roleParents");
                 });
 #pragma warning restore 612, 618
         }

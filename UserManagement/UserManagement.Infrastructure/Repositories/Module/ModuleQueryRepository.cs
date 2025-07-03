@@ -8,17 +8,17 @@ namespace UserManagement.Infrastructure.Repositories.Module
 {
     public class ModuleQueryRepository : IModuleQueryRepository
     {
-    private readonly IDbConnection _dbConnection;
+        private readonly IDbConnection _dbConnection;
 
 
-    public ModuleQueryRepository(IDbConnection dbConnection)
-    {
-        _dbConnection = dbConnection;
+        public ModuleQueryRepository(IDbConnection dbConnection)
+        {
+            _dbConnection = dbConnection;
 
-    }
-     public async Task<Modules> GetModuleByIdAsync(int id)
-    {
-              var sql = @"
+        }
+        public async Task<Modules> GetModuleByIdAsync(int id)
+        {
+            var sql = @"
                 SELECT 
                     m.Id, m.ModuleName,mn.Id AS MenuId, mn.MenuName, mn.ModuleId 
                 FROM [AppData].[Modules] m
@@ -49,12 +49,12 @@ namespace UserManagement.Infrastructure.Repositories.Module
             );
 
             return moduleDictionary.Values.FirstOrDefault();
-        // return await _applicationDbContext.Modules.Include(m => m.Menus).FirstOrDefaultAsync(m => m.Id == id);
-    }
+            // return await _applicationDbContext.Modules.Include(m => m.Menus).FirstOrDefaultAsync(m => m.Id == id);
+        }
 
-    public async Task<(List<Modules>,int)> GetAllModulesAsync(int PageNumber, int PageSize, string? SearchTerm)
-    {
-        var query = $$"""
+        public async Task<(List<Modules>, int)> GetAllModulesAsync(int PageNumber, int PageSize, string? SearchTerm)
+        {
+            var query = $$"""
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
                FROM [AppData].[Modules] 
@@ -72,53 +72,65 @@ namespace UserManagement.Infrastructure.Repositories.Module
                 SELECT @TotalCount AS TotalCount;
             """;
 
-            
-             var parameters = new
-                       {
-                           Search = $"%{SearchTerm}%",
-                           Offset = (PageNumber - 1) * PageSize,
-                           PageSize
-                       };
 
-               var modules = await _dbConnection.QueryMultipleAsync(query, parameters);
-             var moduleslist = (await modules.ReadAsync<Modules>()).ToList();
-             int totalCount = (await modules.ReadFirstAsync<int>());
+            var parameters = new
+            {
+                Search = $"%{SearchTerm}%",
+                Offset = (PageNumber - 1) * PageSize,
+                PageSize
+            };
+
+            var modules = await _dbConnection.QueryMultipleAsync(query, parameters);
+            var moduleslist = (await modules.ReadAsync<Modules>()).ToList();
+            int totalCount = (await modules.ReadFirstAsync<int>());
             return (moduleslist, totalCount);
 
-         } 
-          public async Task<List<Modules>>  GetModule(string searchPattern)
+        }
+        public async Task<List<Modules>> GetModule(string searchPattern)
         {
-           
+
 
             var query = $@"
         SELECT Id, ModuleName 
         FROM AppData.Modules 
         WHERE IsDeleted = 0 
         AND ModuleName LIKE @SearchPattern";
-                
-            
-            var parameters = new 
-              { 
-                  SearchPattern = $"%{searchPattern ?? string.Empty}%"
-              };
+
+
+            var parameters = new
+            {
+                SearchPattern = $"%{searchPattern ?? string.Empty}%"
+            };
 
             var modules = await _dbConnection.QueryAsync<Modules>(query, parameters);
             return modules.ToList();
         }
 
-        
-          public async Task<bool>SoftDeleteValidation(int Id)
-            {
-                                const string query = @"
+
+        public async Task<bool> SoftDeleteValidation(int Id)
+        {
+            const string query = @"
                            SELECT 1 
                            FROM [AppData].[Menus] 
                     WHERE ModuleId = @Id AND  AND IsDeleted = 0;";
-                    
-                       using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
-                    
-                       var MenuExists = await multi.ReadFirstOrDefaultAsync<int?>();  
-                    
-                       return MenuExists.HasValue ;
-            }
+
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+
+            var MenuExists = await multi.ReadFirstOrDefaultAsync<int?>();
+
+            return MenuExists.HasValue;
+        }
+
+        public async Task<Modules> GetModuleByNameAsync(string ModuleName)
+        {
+              var query = $@"
+               SELECT Id, ModuleName 
+               FROM AppData.Modules 
+               WHERE IsDeleted = 0 
+               AND ModuleName = @ModuleName";
+
+            var modules = await _dbConnection.QueryAsync<Modules>(query, new { ModuleName });
+            return modules.FirstOrDefault();
+        }
     }
 }

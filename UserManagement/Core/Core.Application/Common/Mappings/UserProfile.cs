@@ -19,8 +19,8 @@ public class UserProfile : Profile
         .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)))
         .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
         .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations))
-        .ForMember(dest => dest.userDivisions, opt => opt.MapFrom(src => src.userDivisions))
-        .ForMember(dest => dest.userDepartments, opt => opt.MapFrom(src => src.userDepartments))
+        .ForMember(dest => dest.UserDivisions, opt => opt.MapFrom(src => src.userDivisions))
+        .ForMember(dest => dest.UserDepartments, opt => opt.MapFrom(src => src.userDepartments))
         .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
         .ForMember(dest => dest.IsFirstTimeUser, opt => opt.MapFrom(src => FirstTimeUserStatus.Yes))
         .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
@@ -67,9 +67,9 @@ public class UserProfile : Profile
         .ForMember(dest => dest.PasswordHash, opt =>  opt.Ignore())
         .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
         .ForMember(dest => dest.UserRoleAllocations, opt => opt.MapFrom(src => src.userRoleAllocations))
-        .ForMember(dest => dest.userDivisions, opt => opt.MapFrom(src => src.userDivisions))
+        .ForMember(dest => dest.UserDivisions, opt => opt.MapFrom(src => src.userDivisions))
         .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.userUnits))
-        .ForMember(dest => dest.userDepartments, opt => opt.MapFrom(src => src.userDepartments))
+        .ForMember(dest => dest.UserDepartments, opt => opt.MapFrom(src => src.userDepartments))
         .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
         .ForMember(dest => dest.IsFirstTimeUser, opt => opt.Ignore())
         .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive))
@@ -100,8 +100,8 @@ public class UserProfile : Profile
             .ForMember(dest => dest.UserCompanies, opt => opt.MapFrom(src => src.UserCompanies))
             .ForMember(dest => dest.userRoleAllocations, opt => opt.MapFrom(src => src.UserRoleAllocations))
             .ForMember(dest => dest.UserUnits, opt => opt.MapFrom(src => src.UserUnits))
-            .ForMember(dest => dest.userDivisions, opt => opt.MapFrom(src => src.userDivisions))
-            .ForMember(dest => dest.userDepartments, opt => opt.MapFrom(src => src.userDepartments));
+            .ForMember(dest => dest.userDivisions, opt => opt.MapFrom(src => src.UserDivisions))
+            .ForMember(dest => dest.userDepartments, opt => opt.MapFrom(src => src.UserDepartments));
             CreateMap<User, UserAutoCompleteDto>();
 
             CreateMap<PasswordLogDTO, PasswordLog>();

@@ -75,12 +75,14 @@ using Shared.Infrastructure.HttpClientPolly;
 using Polly;
 using Core.Application.Common.Interfaces.IDepartmentGroup;
 using UserManagement.Infrastructure.Repositories.DepartmentGroup;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 namespace UserManagement.Infrastructure
 {
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices
-            (this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
+            (this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
         {
 
             // var connectionString = ConnectionStringHelper.GetDefaultConnectionString(configuration);
@@ -93,7 +95,7 @@ namespace UserManagement.Infrastructure
             //                                     .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
             //                                     .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
             //                                     .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");    
-            
+
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
@@ -107,14 +109,26 @@ namespace UserManagement.Infrastructure
             // Register ApplicationDbContext with SQL Server
             /*  services.AddDbContext<ApplicationDbContext>(options =>
                  options.UseSqlServer(connectionString)); */
-            services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString, sqlOptions =>
+            // services.AddDbContext<ApplicationDbContext>(options =>
+            // options.UseSqlServer(connectionString, sqlOptions =>
+            // {
+            //     sqlOptions.EnableRetryOnFailure(
+            //         maxRetryCount: 5, // Number of retry attempts
+            //         maxRetryDelay: TimeSpan.FromSeconds(30), // Delay between retries
+            //         errorNumbersToAdd: null); // Add specific SQL error numbers to retry on (optional)
+            // }));
+            if (!environment.IsEnvironment("Testing"))
             {
-                sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 5, // Number of retry attempts
-                    maxRetryDelay: TimeSpan.FromSeconds(30), // Delay between retries
-                    errorNumbersToAdd: null); // Add specific SQL error numbers to retry on (optional)
-            }));
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(connectionString, sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null);
+                    }));
+            }
+
 
             // Register IDbConnection for Dapper
             services.AddTransient<IDbConnection>(sp => new SqlConnection(connectionString));
@@ -179,20 +193,20 @@ namespace UserManagement.Infrastructure
 
 
             });
-                    services.AddScoped<IBackgroundServiceClient, BackgroundServiceClient>();
+            services.AddScoped<IBackgroundServiceClient, BackgroundServiceClient>();
             services.AddHttpClient("BackgroundServiceClient", client =>
             {
                 client.BaseAddress = new Uri(configuration["HttpClientSettings:BackgroundService"]);
                 //client.BaseAddress = new Uri("http://localhost:5011"); 
-            })  
+            })
             .AddTransientHttpErrorPolicy(policyBuilder =>
                 policyBuilder.CircuitBreakerAsync(
                     handledEventsAllowedBeforeBreaking: 3,
                     durationOfBreak: TimeSpan.FromSeconds(30)))
             .AddTransientHttpErrorPolicy(policyBuilder =>
                 policyBuilder.WaitAndRetryAsync(3, retryAttempt =>
-                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));  
-            
+                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
+
 
             // services.AddDistributedMemoryCache();
             // services.AddSession(options =>
@@ -252,6 +266,7 @@ namespace UserManagement.Infrastructure
             services.AddScoped<ILanguageCommand, LanguageCommandRepository>();
             services.AddScoped<ILanguageQuery, LanguageQueryRepository>();
             services.AddScoped<IMenuQuery, MenuQueryRepository>();
+            services.AddScoped<IMenuCommand, MenuCommandRepository>();
             services.AddScoped<IProfileQuery, ProfileQueryRepository>();
             services.AddScoped<IProfileCommand, ProfileCommandRepository>();
             services.AddScoped<IUserGroupQueryRepository, UserGroupQueryRepository>();
@@ -267,7 +282,7 @@ namespace UserManagement.Infrastructure
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddScoped<IChangePassword, PasswordChangeRepository>();
 
-            services.AddHttpClient();                                
+            services.AddHttpClient();
             services.AddScoped<IEmailService, EmailSenderService>();
             services.AddScoped<ISmsService, SmsSenderService>();
             services.AddScoped<IDepartmentGroupCommandRepository, DepartmentGroupCommandRepository>();
