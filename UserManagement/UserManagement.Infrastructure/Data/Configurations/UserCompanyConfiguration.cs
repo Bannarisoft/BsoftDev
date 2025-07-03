@@ -35,16 +35,17 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
                 .HasConversion(
-                    v => v == 1, 
-                    v => v ? (byte)1 : (byte)0 
+                    v => v == 1,
+                    v => v ? (byte)1 : (byte)0
                 )
                 .IsRequired();
 
-            builder.HasOne(uc => uc.user)
+            builder.HasOne(uc => uc.User)
                 .WithMany(u => u.UserCompanies)
-                .HasForeignKey(uc => uc.UserId);
+                .HasForeignKey(uc => uc.UserId)
+                .HasPrincipalKey(u => u.UserId); // ✅ Required to avoid Guid mismatch;
 
-            builder.HasOne(uc => uc.company)
+            builder.HasOne(uc => uc.Company)
                 .WithMany(c => c.UserCompanies)
                 .HasForeignKey(uc => uc.CompanyId);
         }

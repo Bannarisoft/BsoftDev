@@ -26,7 +26,7 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .HasColumnType("int");
 
             builder.HasOne(rc => rc.Role)
-                .WithMany(ur => ur.roleChildren)
+                .WithMany(ur => ur.RoleChildren)
                 .HasForeignKey(rc => rc.RoleId);
 
             builder.HasOne(rc => rc.Menu)

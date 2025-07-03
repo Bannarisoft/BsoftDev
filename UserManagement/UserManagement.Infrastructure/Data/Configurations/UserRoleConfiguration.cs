@@ -76,7 +76,7 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .WithOne(ura => ura.UserRole)
                 .HasForeignKey(ura => ura.UserRoleId);
 
-                builder.HasMany(ur => ur.roleModules)
+                builder.HasMany(ur => ur.RoleModules)
                 .WithOne(rm => rm.Role)
                 .HasForeignKey(ura => ura.RoleId);
 

@@ -3,6 +3,7 @@ using Core.Application.WDVDepreciation.Commands.CreateDepreciation;
 using Core.Application.WDVDepreciation.Commands.DeleteDepreciation;
 using Core.Application.WDVDepreciation.Commands.LockDepreciation;
 using Core.Application.WDVDepreciation.Queries.CalculateDepreciation;
+using Core.Application.WDVDepreciation.Queries.GetDepreciation;
 using Core.Domain.Entities;
 
 

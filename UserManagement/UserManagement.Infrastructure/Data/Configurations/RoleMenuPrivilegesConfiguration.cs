@@ -48,7 +48,7 @@ namespace UserManagement.Infrastructure.Data.Configurations
                 .HasForeignKey(rm => rm.MenuId);
 
                 builder.HasOne(rm => rm.UserRole)
-                .WithMany(ur => ur.roleMenuPrivileges)
+                .WithMany(ur => ur.RoleMenuPrivileges)
                 .HasForeignKey(rm => rm.RoleId)
                 .OnDelete(DeleteBehavior.NoAction);
         }

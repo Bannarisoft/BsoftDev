@@ -52,7 +52,6 @@ namespace UserManagement.API.Controllers
             _createUserCommandValidator = createUserCommandValidator;
             _dbContext = dbContext;
             _updateUserCommandValidator = updateUserCommandValidator;
-            _dbContext = dbContext;
             _firstTimeUserPasswordCommandValidator = firstTimeUserPasswordCommandValidator;
             _changeUserPasswordCommandValidator = changeUserPasswordCommandValidator;
             _logger = logger;

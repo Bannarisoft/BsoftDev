@@ -3,6 +3,7 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IDepreciationDetail;
 using Core.Application.Common.Interfaces.IWdvDepreciation;
 using Core.Application.WDVDepreciation.Queries.CalculateDepreciation;
+using Core.Application.WDVDepreciation.Queries.GetDepreciation;
 using Core.Domain.Events;
 using MediatR;
 

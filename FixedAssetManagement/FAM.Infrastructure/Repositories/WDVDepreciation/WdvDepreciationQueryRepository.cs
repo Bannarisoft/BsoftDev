@@ -1,9 +1,8 @@
 
 using System.Data;
 using Core.Application.Common.Interfaces;
-using Core.Application.Common.Interfaces.IDepreciationDetail;
 using Core.Application.Common.Interfaces.IWdvDepreciation;
-using Core.Application.WDVDepreciation.Queries.CalculateDepreciation;
+using Core.Application.WDVDepreciation.Queries.GetDepreciation;
 using Dapper;
 using FAM.Infrastructure.Data;
 using FAM.Infrastructure.Repositories.Common;
@@ -21,17 +20,6 @@ namespace FAM.Infrastructure.Repositories.WDVDepreciation
         {
             _dbConnection = dbConnection;
             _applicationDbContext = applicationDbContext;
-        }
-
-        public async Task<List<CalculationDepreciationDto>> CalculateWDVAsync(int finYearId)
-        {
-            var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", CompanyId);            
-            parameters.Add("@FinYear", finYearId);    
-            parameters.Add("@Flag", 3);         
-
-            var result = await _dbConnection.QueryAsync<CalculationDepreciationDto>("dbo.FAM_WDVDepreciation", parameters, commandType: CommandType.StoredProcedure);
-            return result.ToList();
         }
 
         public async Task<List<CalculationDepreciationDto>> CreateAsync(int finYearId)
