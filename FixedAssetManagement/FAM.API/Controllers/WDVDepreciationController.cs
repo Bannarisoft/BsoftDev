@@ -1,13 +1,9 @@
 
 
-using System.Globalization;
-using Core.Application.Common.HttpResponse;
 using Core.Application.WDVDepreciation.Commands.CreateDepreciation;
 using Core.Application.WDVDepreciation.Commands.DeleteDepreciation;
 using Core.Application.WDVDepreciation.Commands.LockDepreciation;
-using Core.Application.WDVDepreciation.Queries.CalculateDepreciation;
 using Core.Application.WDVDepreciation.Queries.GetDepreciation;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,13 +14,7 @@ namespace FAM.API.Controllers
     public class WDVDepreciationController  : ApiControllerBase
     {
          public WDVDepreciationController(ISender mediator) 
-        : base(mediator) { }
-        [HttpGet("CalculateWDV")]
-        public async Task<IActionResult> DepreciationCalculateAsync( [FromQuery] CalculateDepreciationQuery request)
-        { 
-            var data = await Mediator.Send(request);
-            return Ok(data);            
-        }
+        : base(mediator) { }    
         [HttpGet("GetWDV")]
         public async Task<IActionResult> GetDepreciationAsync([FromQuery] GetDepreciationQuery request)
         {

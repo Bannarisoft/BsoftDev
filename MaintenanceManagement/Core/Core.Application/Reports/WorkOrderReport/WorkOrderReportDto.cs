@@ -10,11 +10,11 @@ namespace Core.Application.Reports.WorkOrderReport
         public string? Machine { get; set; } 
         public string? MachineName { get; set; } 
         public int RequestId { get; set; } 
-        public string? DowntimeStart { get; set; } 
-        public string? DowntimeEnd { get; set; } 
+        public DateTimeOffset? DowntimeStart { get; set; } 
+        public DateTimeOffset? DowntimeEnd { get; set; } 
         public string? TotalDownTime { get; set; } 
-        public string? MaintenanceStartTime { get; set; } 
-        public string? MaintenanceEndTime { get; set; } 
+        public DateTimeOffset? MaintenanceStartTime { get; set; } 
+        public DateTimeOffset? MaintenanceEndTime { get; set; } 
         public string? TotalMaintenanceTime { get; set; } 
         public string? Department { get; set; } 
         public int DepartmentId { get; set; }         

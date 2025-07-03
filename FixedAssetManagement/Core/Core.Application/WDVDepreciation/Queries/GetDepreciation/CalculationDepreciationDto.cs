@@ -1,5 +1,5 @@
 
-namespace Core.Application.WDVDepreciation.Queries.CalculateDepreciation
+namespace Core.Application.WDVDepreciation.Queries.GetDepreciation
 {
     public class CalculationDepreciationDto
     {
