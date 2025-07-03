@@ -252,8 +252,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         public async Task<DateTimeOffset?> GetLastMaintenanceDateAsync(int machineId, int PreventiveDetailId, string miscType, string misccode)
         {
             const string query = @"
-                 SELECT DowntimeEnd AS EndTime   FROM [Maintenance].[WorkOrder] 
-            where  PreventiveScheduleId=@PreventiveSchedulerId
+                 SELECT MAX(WS.EndTime) AS EndTime   FROM [Maintenance].[WorkOrder] W
+            INNER JOIN [Maintenance].[WorkOrderSchedule] WS ON W.Id=WS.WorkOrderId
+            where W.PreventiveScheduleId=@PreventiveSchedulerId
             ";
 
             var parameters = new

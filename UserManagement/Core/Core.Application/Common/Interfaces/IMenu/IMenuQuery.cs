@@ -13,5 +13,6 @@ namespace Core.Application.Common.Interfaces.IMenu
         Task<bool> FKColumnExistValidation(int Id);
         Task<(IEnumerable<dynamic>, int)> GetAllMenuAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<Core.Domain.Entities.Menu> GetMenuByNameAsync(string MenuName);
+        Task<List<Core.Domain.Entities.Menu>> GetParentMenuAutoComplete(string searchPattern);
     }
 }

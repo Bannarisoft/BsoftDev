@@ -9,6 +9,7 @@ using Core.Application.Menu.Commands.UpdateMenu;
 using Core.Application.Menu.Commands.UploadMenu;
 using Core.Application.Menu.Queries.GetChildMenuByModule;
 using Core.Application.Menu.Queries.GetMenuByModule;
+using Core.Application.Menu.Queries.GetParentMenu;
 using static Core.Domain.Enums.Common.Enums;
 
 namespace Core.Application.Common.Mappings
@@ -30,9 +31,11 @@ namespace Core.Application.Common.Mappings
             CreateMap<DeleteMenuCommand, Core.Domain.Entities.Menu>()
            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
 
-           CreateMap<UploadMenuDto, Core.Domain.Entities.Menu>()
-           .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
-            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+            CreateMap<UploadMenuDto, Core.Domain.Entities.Menu>()
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+            
+            CreateMap<Core.Domain.Entities.Menu, ParentMenuDto>();
             
         }
     }
