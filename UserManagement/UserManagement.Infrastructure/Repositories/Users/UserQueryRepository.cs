@@ -361,7 +361,7 @@ namespace UserManagement.Infrastructure.Repositories.Users
                  SELECT U.Id,U.FirstName,U.LastName,U.UserName,U.UserType,U.Mobile,U.EmailId,U.UserId,U.IsFirstTimeUser,U.EntityId,U.PasswordHash,UG.GroupCode 
                  FROM AppSecurity.Users U
                  LEFT JOIN AppSecurity.UserGroup UG ON UG.Id = U.UserGroupId 
-                 INNER JOIN AppSecurity.UserUnit uu ON uu.UserId = U.UserId AND uu.IsActive = 1
+                 LEFT JOIN AppSecurity.UserUnit uu ON uu.UserId = U.UserId AND uu.IsActive = 1
                  WHERE U.UserName = @Username AND U.IsDeleted = 0 
                  """;
 

@@ -19,7 +19,7 @@ namespace Core.Application.UserLogin.Commands.UserLogin
 {
     public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, ApiResponseDTO<LoginResponse>>
     {
-        private readonly IUserCommandRepository _userRepository;
+        
         private readonly IUserQueryRepository _userQueryRepository;
         private readonly IJwtTokenHelper  _jwtTokenHelper;
         private readonly IUserSessionRepository _userSessionRepository;
@@ -30,23 +30,24 @@ namespace Core.Application.UserLogin.Commands.UserLogin
         private readonly IMediator _mediator;
         private readonly ITimeZoneService _timeZoneService;
         private static readonly ConcurrentDictionary<string, UserLockoutInfo> _userLockoutInfo = new();
-        private readonly ICompanyQuerySettings _companyQuerySettings;
-        private readonly IBackgroundServiceClient  _backgroundServiceClient;
+        private readonly ILoginPolicyFactory _loginPolicyFactory;
 
-        public UserLoginCommandHandler(IUserCommandRepository userRepository,  IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository, IMediator mediator,ILogger<UserLoginCommandHandler> logger,IUserSessionRepository userSessionRepository, IHttpContextAccessor httpContextAccessor, IIPAddressService ipAddressService, IOptions<JwtSettings> jwtSettings, ITimeZoneService timeZoneService, ICompanyQuerySettings companyQuerySettings,IBackgroundServiceClient backgroundServiceClient)
+        public UserLoginCommandHandler( IJwtTokenHelper jwtTokenHelper, IUserQueryRepository userQueryRepository,
+        IMediator mediator, ILogger<UserLoginCommandHandler> logger, IUserSessionRepository userSessionRepository,
+        IHttpContextAccessor httpContextAccessor, IIPAddressService ipAddressService, IOptions<JwtSettings> jwtSettings, ITimeZoneService timeZoneService,
+         ILoginPolicyFactory loginPolicyFactory)
         {
-            _userRepository = userRepository;
+            
             _userQueryRepository = userQueryRepository;
             _jwtTokenHelper = jwtTokenHelper;
             _userSessionRepository = userSessionRepository;
             _httpContextAccessor = httpContextAccessor;
             _ipAddressService = ipAddressService;
             _jwtSettings = jwtSettings.Value;
-             _mediator = mediator; 
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));   
-            _timeZoneService = timeZoneService;  
-            _companyQuerySettings = companyQuerySettings;      
-            _backgroundServiceClient=backgroundServiceClient;     
+            _mediator = mediator;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _timeZoneService = timeZoneService;
+            _loginPolicyFactory = loginPolicyFactory;
         }
 
        public async Task<ApiResponseDTO<LoginResponse>> Handle(UserLoginCommand request, CancellationToken cancellationToken)
@@ -62,23 +63,25 @@ namespace Core.Application.UserLogin.Commands.UserLogin
 
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
-              
-                _logger.LogWarning("Invalid login attempt for Username: {Username}", request.Username);
 
-              var (remainingAttempts, lockoutTime) = await loginAttemptSession(user.UserName, currentTime);
+                //     _logger.LogWarning("Invalid login attempt for Username: {Username}", request.Username);
 
-                if (lockoutTime > 0)
-                {
-                    return new ApiResponseDTO<LoginResponse>
-                    {
-                        IsSuccess = false,
-                        Message = $"User is locked. Try again after {lockoutTime:G}."
-                    };
-                }                
+                //   var (remainingAttempts, lockoutTime) = await loginAttemptSession(user.UserName, currentTime);
+
+                //     if (lockoutTime > 0)
+                //     {
+                //         return new ApiResponseDTO<LoginResponse>
+                //         {
+                //             IsSuccess = false,
+                //             Message = $"User is locked. Try again after {lockoutTime:G}."
+                //         };
+                //     }     
+            var policy = await _loginPolicyFactory.GetPolicyAsync(user);
+            var message = await policy.CanAttemptLogin(user.UserName, DateTime.UtcNow);           
                 return new ApiResponseDTO<LoginResponse>
                 {
                     IsSuccess = false,
-                    Message = $"Invalid username or password.You have {remainingAttempts} attempts remaining."
+                    Message = message
                 };
             }
 
@@ -134,44 +137,6 @@ namespace Core.Application.UserLogin.Commands.UserLogin
             };
         } 
       
-        public async Task<(int,int)> loginAttemptSession(string username, DateTime currentTime)
-        {
-              
-                if (!_userLockoutInfo.ContainsKey(username))
-                {
-                    _userLockoutInfo[username] = new UserLockoutInfo { Attempts = 0, IsLocked = false };
-                }
-                var userInfo = _userLockoutInfo[username];
-                userInfo.Attempts++;
-      
-                       
-                var companySettings = await _companyQuerySettings.BeforeLoginGetUserCompanySettings(username);
-                
-                
-                int remainingAttempts = companySettings.FailedLoginAttempts - userInfo.Attempts;
-
-                if (remainingAttempts > 0)
-                {
-                    return (remainingAttempts,0);
-                }
-                if (userInfo.Attempts >= companySettings.FailedLoginAttempts)
-                {
-                    // Lock the user
-                    userInfo.IsLocked = true; 
-                    userInfo.UnlockTime = currentTime.AddMinutes(companySettings.AutoReleaseTime);
-                    var locked = await _userRepository.lockUser(username);
-                    if (locked)
-                    {
-                        // Schedule Hangfire job to unlock user
-                        await _backgroundServiceClient.UserUnlock(username, companySettings.AutoReleaseTime);
-                        //BackgroundJob.Schedule<IUserCommandRepository>(service =>service.UnlockUser(username), TimeSpan.FromMinutes(companySettings.AutoReleaseTime));
-                        _logger.LogWarning("User {Username} is locked due to too many invalid login attempts.", username);
-                        return (0, companySettings.AutoReleaseTime);
-                    }
-                     _logger.LogError("Failed to lock user {Username}.", username);    
-                    return (0,companySettings.AutoReleaseTime);
-                }
-                 return (0,0);
-        }        
+            
     }
 }
