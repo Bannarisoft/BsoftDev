@@ -81,11 +81,6 @@ namespace UserManagement.Infrastructure.Repositories
             {
                 return "Username not found.";
             }
-            // Check if the user is a first-time user
-            if (existingUser.IsFirstTimeUser == FirstTimeUserStatus.Yes)
-            {
-                return "User is a first-time user. Please complete the initial setup.";
-            }
                 existingUser.PasswordHash = passwordLog.PasswordHash;
                 _applicationDbContext.User.Update(existingUser);
                  await _applicationDbContext.SaveChangesAsync();

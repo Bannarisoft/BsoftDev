@@ -273,6 +273,9 @@ namespace UserManagement.Infrastructure
             services.AddScoped<IUserGroupCommandRepository, UserGroupCommandRepository>();
             services.AddScoped<ICustomFieldQuery, CustomFieldQuery>();
             services.AddScoped<ICustomFieldCommand, CustomFieldCommand>();
+            services.AddScoped<ILoginPolicyFactory, LoginPolicyFactory>();
+            services.AddScoped<ILoginPolicy, SuperAdminLoginPolicy>();
+            services.AddScoped<ILoginPolicy, UserLoginPolicy>();
 
 
             // Miscellaneous services
