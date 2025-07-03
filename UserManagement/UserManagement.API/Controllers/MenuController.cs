@@ -9,6 +9,7 @@ using Core.Application.Menu.Commands.UploadMenu;
 using Core.Application.Menu.Queries.GetChildMenuByModule;
 using Core.Application.Menu.Queries.GetMenu;
 using Core.Application.Menu.Queries.GetMenuByModule;
+using Core.Application.Menu.Queries.GetParentMenu;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -151,15 +152,7 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteMenuCommand { Id = id };
-            //  var validationResult = await  _deleteDivisionCommandValidator.ValidateAsync(command);
-            //    if (!validationResult.IsValid)
-            //     {
-            //         return BadRequest(new
-            //         {
-            //             message = validationResult.Errors.Select(e => e.ErrorMessage).FirstOrDefault(),
-            //             statusCode = StatusCodes.Status400BadRequest
-            //         });
-            //     }
+
             var updatedDivision = await Mediator.Send(command);
 
             if (updatedDivision.IsSuccess)
@@ -171,13 +164,20 @@ namespace UserManagement.API.Controllers
             return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = updatedDivision.Message, errors = "" });
 
         }
-        
+
         [HttpPost("bulk-upload-menu")]
         public async Task<IActionResult> UploadPreventiveSchedule(UploadMenuCommand command)
         {
-           
+
             var result = await Mediator.Send(command);
             return Ok(result);
+        }
+            [HttpGet("by-name")]
+        public async Task<IActionResult> GetMenu([FromQuery] string? name)
+        {
+           
+            var MenuList = await Mediator.Send(new GetParentMenuQuery {SearchPattern = name});
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = MenuList.Data });
         }
     }
 }
