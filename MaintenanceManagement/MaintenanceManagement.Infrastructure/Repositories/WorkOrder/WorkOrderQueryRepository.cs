@@ -21,7 +21,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkOrder
         public async Task<List<WorkOrderWithScheduleDto>> GetAllWOAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate,int? requestTypeId, int? departmentId,int? machineId)
         {         
             var parameters = new DynamicParameters();
-            parameters.Add("@CompanyId", CompanyId);
+            parameters.Add("@CompanyId", CompanyId); 
             parameters.Add("@UnitId", UnitId);
             parameters.Add("@FromDate", fromDate);
             parameters.Add("@ToDate", toDate);

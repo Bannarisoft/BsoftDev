@@ -88,6 +88,15 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
                     detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
                     detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
                     detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
+                    detail.ScheduleId = Scheduledetail.ScheduleId;
+                     detail.FrequencyTypeId = Scheduledetail.FrequencyTypeId;
+                     detail.FrequencyInterval = Scheduledetail.FrequencyInterval;
+                     detail.FrequencyUnitId = Scheduledetail.FrequencyUnitId;
+                     detail.GraceDays = Scheduledetail.GraceDays;
+                     detail.ReminderWorkOrderDays = Scheduledetail.ReminderWorkOrderDays;
+                     detail.ReminderMaterialReqDays = Scheduledetail.ReminderMaterialReqDays;
+                     detail.IsDownTimeRequired = Scheduledetail.IsDownTimeRequired;
+                     detail.DownTimeEstimateHrs = Scheduledetail.DownTimeEstimateHrs;
 
                     await AuditLogPublisher.PublishAuditLogAsync(
                      _mediator,
@@ -107,7 +116,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
                     //      opt.Items["PreventiveSchedulerDetailId"] = detailsResponse.Id;
                     //  });
 
-                    var delay = reminderDate - DateTime.Now;
+                    var delay = reminderDate - DateTime.Today;
 
                     string newJobId;
                     var delayInMinutes = (int)delay.TotalMinutes;

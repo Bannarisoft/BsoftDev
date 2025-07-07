@@ -28,12 +28,10 @@ namespace Core.Domain.Entities
 
         public ICollection<MaintenanceRequest> MaintenanceRequest { get; set; } = null!;
         public int LineNo { get; set; }
-        public MiscMaster LineNoMachine { get; set; } = null!;  
+        public MiscMaster LineNoMachine { get; set; } = null!;
         public bool IsProductionMachine { get; set; }
+        public ICollection<MachineSpecification> MachineSpecification { get; set; } = null!;
                     
-
-
-        
 
     }
 }
