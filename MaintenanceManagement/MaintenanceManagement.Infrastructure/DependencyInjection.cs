@@ -71,6 +71,9 @@ using MaintenanceManagement.Infrastructure.Repositories.Power.Feeder;
 using Core.Application.Common.Mappings.Power;
 using Core.Application.Common.Interfaces.IDashboard;
 using MaintenanceManagement.Infrastructure.Repositories.Dashboard;
+using Core.Application.Common.IMachineSpecification;
+using MaintenanceManagement.Infrastructure.Repositories.MachineSpecification;
+using Core.Application.Common.Interfaces.IMachineSpecification;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -183,7 +186,9 @@ namespace MaintenanceManagement.Infrastructure
              services.AddScoped<IFeederQueryRepository, FeederQueryRepository>();
              services.AddScoped<IFeederCommandRepository, FeederCommandRepository>();            
             services.AddScoped<IReportRepository, ReportsRepository>();              
-            services.AddScoped<IDashboardQueryRepository, DashboardQueryRepository>();        
+            services.AddScoped<IDashboardQueryRepository, DashboardQueryRepository>();    
+            services.AddScoped<IMachineSpecificationCommandRepository, MachineSpecificationCommandRepository>();  
+            services.AddScoped<IMachineSpecificationQueryRepository, MachineSpecificationQueryRepository>();     
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddTransient<IFileUploadService, FileUploadRepository>();            
@@ -209,7 +214,8 @@ namespace MaintenanceManagement.Infrastructure
             typeof(PowerConsumptionProfile),
             typeof(ItemProfile),
             typeof(FeederGroupProfile),
-            typeof(FeederProfile)
+            typeof(FeederProfile),
+            typeof(MachineSpecificationProfile)
          );
             return services;
         }
