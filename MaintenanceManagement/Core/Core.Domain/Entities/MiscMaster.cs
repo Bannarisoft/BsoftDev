@@ -43,6 +43,7 @@ namespace Core.Domain.Entities
         public ICollection<PreventiveSchedulerDetail>? PreventiveDetailSchedule { get; set; }
         public ICollection<PreventiveSchedulerDetail>? PreventiveDetailFrequencyType { get; set; }
         public ICollection<PreventiveSchedulerDetail>? PreventiveDetailFrequencyUnit { get; set; }
+        public ICollection<MachineSpecification>? MachineSpecificationsName { get; set; }
 
 
 
