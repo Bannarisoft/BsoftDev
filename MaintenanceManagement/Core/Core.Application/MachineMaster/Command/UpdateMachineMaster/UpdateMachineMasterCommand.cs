@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MachineMaster.Command.UpdateMachineMaster
 {
-    public class UpdateMachineMasterCommand : IRequest<ApiResponseDTO<int>>
+    public class UpdateMachineMasterCommand : IRequest<bool>
     {
         public int Id { get; set; }
         public string? MachineCode { get; set; }

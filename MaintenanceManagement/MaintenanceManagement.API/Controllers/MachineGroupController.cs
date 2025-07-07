@@ -20,21 +20,13 @@ namespace MaintenanceManagement.API.Controllers
     [Route("api/[controller]")]
     public class MachineGroupController : ApiControllerBase
     {
-          private readonly IMachineGroupCommandRepository _machineGroupCommandRepository;
-
-         private  readonly IValidator<CreateMachineGroupCommand>  _createMachineGroupCommandValidator;
-         private readonly IValidator<UpdateMachineGroupCommand> _updateMachineGroupCommandValidator;
-        private readonly IValidator<DeleteMachineGroupCommand> _deleteMachineGroupCommandValidator;
+          
 
         
 
-        public MachineGroupController(ISender mediator, IMachineGroupCommandRepository machineGroupCommandRepository,IValidator<CreateMachineGroupCommand>  createMachineGroupCommandValidator, IValidator<UpdateMachineGroupCommand> updateMachineGroupCommandValidator,
-        IValidator<DeleteMachineGroupCommand> deleteMachineGroupCommandValidator   ):base(mediator)
+        public MachineGroupController(ISender mediator   ):base(mediator)
         {
-            _machineGroupCommandRepository = machineGroupCommandRepository;
-            _createMachineGroupCommandValidator = createMachineGroupCommandValidator;
-            _updateMachineGroupCommandValidator = updateMachineGroupCommandValidator;
-            _deleteMachineGroupCommandValidator = deleteMachineGroupCommandValidator;
+            
           
         }
 
@@ -67,12 +59,7 @@ namespace MaintenanceManagement.API.Controllers
            
             var machinegroup = await Mediator.Send(new GetMachineGroupByIdQuery() { Id = id});
           
-             if(machinegroup.IsSuccess)
-            {
-                 return Ok(new { StatusCode=StatusCodes.Status200OK, data = machinegroup.Data,message=machinegroup.Message});
-            }
-
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"MachineGroup ID {id} not found.", errors = "" });
+            return Ok(new { StatusCode=StatusCodes.Status200OK, data = machinegroup,message=machinegroup});
            
         }
 
@@ -80,93 +67,43 @@ namespace MaintenanceManagement.API.Controllers
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateMachineGroupCommand command)
         {
-             var validationResult = await _createMachineGroupCommandValidator.ValidateAsync(command);
             
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
           
             var response = await Mediator.Send(command);
-            if(response.IsSuccess)
-            {                             
+                                       
                 return Ok(new 
                 {
                      StatusCode=StatusCodes.Status201Created,
-                 message = response.Message,
+                 message = response,
                   errors = "",
-                  data = response.Data 
+                  data = response 
                   });
-            }
-             
-            
-            return BadRequest( new {
-                 StatusCode=StatusCodes.Status400BadRequest,
-                  message = response.Message, 
-                  errors = "" 
-                  });             
+                        
         } 
 
          [HttpPut]        
         public async Task<IActionResult> UpdateAsync(UpdateMachineGroupCommand command)
         {         
-            var validationResult = await _updateMachineGroupCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(
-                    new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "Validation failed",
-                        errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                    }
-                );
-            }            
+          
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
+           
                 return Ok(new 
                 {   StatusCode=StatusCodes.Status200OK,
-                    message = result.Message, 
-                    asset = result.Data
+                    message = result, 
+                    asset = result
                 });
-            }
-                
-                return BadRequest( new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = result.Message
-                });
+            
                 
         }
 
        [ HttpDelete("{id}")]
           public async Task<IActionResult> Delete(int id)
         {
-            var command = new DeleteMachineGroupCommand { Id = id };
-           var validationResult = await  _deleteMachineGroupCommandValidator.ValidateAsync(command);
-               if (!validationResult.IsValid)
-                {
-                    return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-                }
-
+           
            var updatedMiscMaster = await Mediator.Send(new DeleteMachineGroupCommand { Id = id });
 
-           if(updatedMiscMaster.IsSuccess)
-           {
-            return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedMiscMaster.Message, errors = "" });
+            return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedMiscMaster, errors = "" });
               
-           }
-
-            return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedMiscMaster.Message, errors = "" });
             
         }
          [HttpGet("by-name")]
@@ -174,11 +111,9 @@ namespace MaintenanceManagement.API.Controllers
         {
           
             var miscmaster = await Mediator.Send(new GetMachineGroupAutoCompleteQuery {SearchPattern = name});
-            if(miscmaster.IsSuccess)
-            {
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = miscmaster.Data });
-            }
-            return NotFound( new { StatusCode=miscmaster.Message}) ;
+          
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = miscmaster });
+            
         }
         
 

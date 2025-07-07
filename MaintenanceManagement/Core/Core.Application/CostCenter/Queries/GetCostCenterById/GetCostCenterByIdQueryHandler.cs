@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.CostCenter.Queries.GetCostCenterById
 {
-    public class GetCostCenterByIdQueryHandler : IRequestHandler<GetCostCenterByIdQuery, ApiResponseDTO<CostCenterDto>>
+    public class GetCostCenterByIdQueryHandler : IRequestHandler<GetCostCenterByIdQuery, CostCenterDto>
     {
 
         private readonly ICostCenterQueryRepository _iCostCenterQueryRepository;
@@ -31,15 +31,10 @@ namespace Core.Application.CostCenter.Queries.GetCostCenterById
             _unitGrpcClient = unitGrpcClient;
         }
 
-        public async Task<ApiResponseDTO<CostCenterDto>> Handle(GetCostCenterByIdQuery request, CancellationToken cancellationToken)
+        public async Task<CostCenterDto> Handle(GetCostCenterByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _iCostCenterQueryRepository.GetByIdAsync(request.Id);
-            // Check if the entity exists
-            if (result is null)
-            {
-                return new ApiResponseDTO<CostCenterDto> { IsSuccess = false, Message = $"CostCenter ID {request.Id} not found." };
-            }
-            // Map a single entity
+           
             var costCenter = _mapper.Map<CostCenterDto>(result);
 
 
@@ -64,7 +59,7 @@ namespace Core.Application.CostCenter.Queries.GetCostCenterById
                 module: "CostCenter"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<CostCenterDto> { IsSuccess = true, Message = "Success", Data = costCenter };
+            return costCenter;
         }
 
     }

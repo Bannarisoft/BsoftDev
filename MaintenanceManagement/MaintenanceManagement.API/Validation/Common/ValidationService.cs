@@ -164,8 +164,11 @@ namespace MaintenanceManagement.API.Validation.Common
             services.AddScoped<IValidator<DeleteFeederCommand>, DeleteFeederCommandValidator>();
 
             services.AddScoped<IValidator<CreatePowerConsumptionCommand>, CreatePowerConsumptionCommandValidator>();
-            services.AddScoped<IValidator<MapMachineCommand>, MapMachineCommandValidator>(); 
+            services.AddScoped<IValidator<MapMachineCommand>, MapMachineCommandValidator>();
             services.AddScoped<IValidator<MachineWiseFrequencyUpdateCommand>, MachineWiseFrequencyUpdateCommandValidator>();
+            
+            
+
         }  
     }
 }

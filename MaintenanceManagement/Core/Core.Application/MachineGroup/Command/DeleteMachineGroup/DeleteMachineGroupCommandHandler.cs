@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Application.MachineGroup.Queries.GetMachineGroup;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroup.Command.DeleteMachineGroup
 {
-    public class DeleteMachineGroupCommandHandler  : IRequestHandler<DeleteMachineGroupCommand, ApiResponseDTO<MachineGroupDto>>
+    public class DeleteMachineGroupCommandHandler  : IRequestHandler<DeleteMachineGroupCommand, bool>
     {
         
          private readonly IMachineGroupCommandRepository  _machineGroupRepository;
@@ -26,7 +27,7 @@ namespace Core.Application.MachineGroup.Command.DeleteMachineGroup
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<MachineGroupDto>> Handle(DeleteMachineGroupCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteMachineGroupCommand request, CancellationToken cancellationToken)
         {
 
              // Map the request to the entity
@@ -45,21 +46,8 @@ namespace Core.Application.MachineGroup.Command.DeleteMachineGroup
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            // Return the response based on the result
-            if (isDeleted)
-            {
-                return new ApiResponseDTO<MachineGroupDto>
-                {
-                    IsSuccess = true,
-                    Message = "MachineGroup deleted successfully."
-                };
-            }
 
-            return new ApiResponseDTO<MachineGroupDto>
-            {
-                IsSuccess = false,
-                Message = "MachineGroup not deleted."
-            };
+            return isDeleted==true ? isDeleted : throw new ExceptionRules("Machine Group deletion Failed.");
         }
     }
 }

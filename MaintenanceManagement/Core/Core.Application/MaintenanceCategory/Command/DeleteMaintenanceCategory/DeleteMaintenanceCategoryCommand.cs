@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceCategory.Command.DeleteMaintenanceCategory
 {
-    public class DeleteMaintenanceCategoryCommand : IRequest<ApiResponseDTO<int>> 
+    public class DeleteMaintenanceCategoryCommand : IRequest<int> 
     {
         public int Id { get; set; }
     }

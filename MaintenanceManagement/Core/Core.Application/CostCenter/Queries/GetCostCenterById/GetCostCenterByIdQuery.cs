@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.CostCenter.Queries.GetCostCenterById
 {
-    public class GetCostCenterByIdQuery : IRequest<ApiResponseDTO<CostCenterDto>>
+    public class GetCostCenterByIdQuery : IRequest<CostCenterDto>
     {
            public int Id { get; set; }
     }

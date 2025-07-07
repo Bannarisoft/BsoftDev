@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MiscMaster.Queries.GetMiscMasterById
 {
-    public class GetMiscMasterByIdQueryHandler : IRequestHandler<GetMiscMasterByIdQuery, ApiResponseDTO<GetMiscMasterDto>>
+    public class GetMiscMasterByIdQueryHandler : IRequestHandler<GetMiscMasterByIdQuery, GetMiscMasterDto>
     {
 
         private readonly IMiscMasterQueryRepository  _miscMasterQueryRepository;
@@ -25,19 +25,11 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterById
             _mediator = mediator;
         } 
 
-          public async  Task<ApiResponseDTO<GetMiscMasterDto>> Handle(GetMiscMasterByIdQuery request, CancellationToken cancellationToken)
+          public async  Task<GetMiscMasterDto> Handle(GetMiscMasterByIdQuery request, CancellationToken cancellationToken)
         {
                   
             var result = await _miscMasterQueryRepository.GetByIdAsync(request.Id);
-            if (result is null )
-            {
-                  return new ApiResponseDTO<GetMiscMasterDto>
-                    {
-                        IsSuccess = false,
-                        Message = $"MiscTypeMaster with Id {request.Id} not found.",
-                        Data = null
-                    };
-            }
+          
            
             var misctypemaster = _mapper.Map<GetMiscMasterDto>(result);
 
@@ -50,12 +42,7 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterById
                         module:"MiscTypeMaster"
                     );
                     await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<GetMiscMasterDto> 
-            {
-                 IsSuccess = true, 
-                Message = "Success", 
-                Data = misctypemaster
-             };
+            return  misctypemaster;
         }
 
         

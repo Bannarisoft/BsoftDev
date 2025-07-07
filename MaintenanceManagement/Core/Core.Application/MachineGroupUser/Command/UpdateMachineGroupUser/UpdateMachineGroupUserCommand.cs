@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroupUser.Command.UpdateMachineGroupUser
 {
-    public class UpdateMachineGroupUserCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateMachineGroupUserCommand : IRequest<bool>
     {
         public int Id { get; set; }
         public int MachineGroupId { get; set; }

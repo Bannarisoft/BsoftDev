@@ -1,6 +1,7 @@
 
 
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMachineGroupUser;
 using Core.Domain.Events;
@@ -8,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroupUser.Command.UpdateMachineGroupUser
 {
-    public class UpdateMachineGroupUserCommandHandler  : IRequestHandler<UpdateMachineGroupUserCommand, ApiResponseDTO<bool>>
+    public class UpdateMachineGroupUserCommandHandler  : IRequestHandler<UpdateMachineGroupUserCommand, bool>
     {
         private readonly IMachineGroupUserCommandRepository _machineGroupUserCommand;
          private readonly IMapper _mapper;
@@ -20,7 +21,7 @@ namespace Core.Application.MachineGroupUser.Command.UpdateMachineGroupUser
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<bool>> Handle(UpdateMachineGroupUserCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateMachineGroupUserCommand request, CancellationToken cancellationToken)
         {
             var machineGroupUser  = _mapper.Map<Core.Domain.Entities.MachineGroupUser>(request);
          
@@ -36,20 +37,9 @@ namespace Core.Application.MachineGroupUser.Command.UpdateMachineGroupUser
                 );               
                 await _mediator.Publish(domainEvent, cancellationToken); 
             
-            if(machineGroupUserResult)
-            {
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = true, 
-                    Message = "MachineGroup User updated successfully."
-                };
-            }
-
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = false, 
-                Message = "MachineGroup User  not updated."
-            };
+           
+            return machineGroupUserResult == true ? machineGroupUserResult : throw new ExceptionRules("MachineGroup User updated Failed.");
+            
         }
     }
 }

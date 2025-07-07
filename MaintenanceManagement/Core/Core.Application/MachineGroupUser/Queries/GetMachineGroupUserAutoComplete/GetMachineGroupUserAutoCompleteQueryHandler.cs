@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroupUser.Queries.GetMachineGroupUserAutoComplete
 {
-    public class GetMachineGroupUserAutoCompleteQueryHandler : IRequestHandler<GetMachineGroupUserAutoCompleteQuery, ApiResponseDTO<List<MachineGroupUserAutoCompleteDto>>>
+    public class GetMachineGroupUserAutoCompleteQueryHandler : IRequestHandler<GetMachineGroupUserAutoCompleteQuery, List<MachineGroupUserAutoCompleteDto>>
     {
         private readonly IMachineGroupUserQueryRepository _machineGroupQuery;
         private readonly IMapper _mapper;
@@ -21,7 +21,7 @@ namespace Core.Application.MachineGroupUser.Queries.GetMachineGroupUserAutoCompl
             _mediator = mediator;
             _departmentAllGrpcClient = departmentAllGrpcClient;
         }
-        public async Task<ApiResponseDTO<List<MachineGroupUserAutoCompleteDto>>> Handle(GetMachineGroupUserAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<MachineGroupUserAutoCompleteDto>> Handle(GetMachineGroupUserAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _machineGroupQuery.GetMachineGroupUserByName(request.SearchPattern ?? string.Empty);
             var machineGroupResult = _mapper.Map<List<MachineGroupUserAutoCompleteDto>>(result);
@@ -54,12 +54,7 @@ namespace Core.Application.MachineGroupUser.Queries.GetMachineGroupUserAutoCompl
                     module:"MachineGroup User"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<MachineGroupUserAutoCompleteDto>> 
-            { 
-                IsSuccess = true, 
-                Message = "Success", 
-                Data = machineGroupResult 
-             };   
+            return machineGroupResult;
         }
     }
 }

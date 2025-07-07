@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.ActivityCheckListMaster.Command.DeleteActivityCheckListMaster
 {
-    public class DeleteActivityCheckListMasterCommand : IRequest<ApiResponseDTO<int>> 
+    public class DeleteActivityCheckListMasterCommand : IRequest<bool> 
     {
           public int Id { get; set; }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using FluentValidation;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.ActivityMaster.Command.UpdateActivityMster
 {
-    public class UpdateActivityMasterCommandHandler  : IRequestHandler<UpdateActivityMasterCommand, ApiResponseDTO<int>>
+    public class UpdateActivityMasterCommandHandler  : IRequestHandler<UpdateActivityMasterCommand, int>
     {
          private readonly IActivityMasterQueryRepository _activityMasterQueryRepository ;
 
@@ -29,7 +30,7 @@ namespace Core.Application.ActivityMaster.Command.UpdateActivityMster
             _mediator = mediator;
             _validator = validator;
         }
-         public async Task<ApiResponseDTO<int>> Handle(UpdateActivityMasterCommand request, CancellationToken cancellationToken)
+         public async Task<int> Handle(UpdateActivityMasterCommand request, CancellationToken cancellationToken)
         { 
                         // 🔹 Retrieve Existing Record from Query Repository
                  // 🔹 Retrieve Existing Record from Query Repository
@@ -49,22 +50,9 @@ namespace Core.Application.ActivityMaster.Command.UpdateActivityMster
             // 🔹 Save Changes
         //    var result = await _activityMasterCommandRepository.UpdateAsync(activityMasterEntity);
             var result = await _activityMasterCommandRepository.UpdateAsync(request.UpdateActivityMaster);
-
-
-            if (result>0)
-            {
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = true,
-                    Message = "Activity Master updated successfully"
-                };
-            }
-
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = false,
-                Message = "Activity Master update failed"
-            };
+            
+                return result > 0 ? result : throw new ExceptionRules("ActivityMaster update Failed.");
+            
         }
 
         

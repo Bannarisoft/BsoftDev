@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete
 {
-    public class GetActivityMasterAutoCompleteQueryHandler : IRequestHandler<GetActivityMasterAutoCompleteQuery,ApiResponseDTO<List<GetActivityMasterAutoCompleteDto>>>
+    public class GetActivityMasterAutoCompleteQueryHandler : IRequestHandler<GetActivityMasterAutoCompleteQuery,List<GetActivityMasterAutoCompleteDto>>
     {
 
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository  ;
@@ -28,19 +28,19 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete
             _mediator = mediator;
          }
 
-           public  async Task<ApiResponseDTO<List<GetActivityMasterAutoCompleteDto>>> Handle(GetActivityMasterAutoCompleteQuery request, CancellationToken cancellationToken)
+           public  async Task<List<GetActivityMasterAutoCompleteDto>> Handle(GetActivityMasterAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var machineGroup  = await _activityMasterQueryRepository.GetActivityMasterAutoComplete(request.SearchPattern);
 
-                    if (machineGroup == null || !machineGroup.Any())
-            {
-                return new ApiResponseDTO<List<GetActivityMasterAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"No Activity Master found matching '{request.SearchPattern}'.",
-                    Data = new List<GetActivityMasterAutoCompleteDto>()
-                };
-            }
+            //         if (machineGroup == null || !machineGroup.Any())
+            // {
+            //     return new ApiResponseDTO<List<GetActivityMasterAutoCompleteDto>>
+            //     {
+            //         IsSuccess = false,
+            //         Message = $"No Activity Master found matching '{request.SearchPattern}'.",
+            //         Data = new List<GetActivityMasterAutoCompleteDto>()
+            //     };
+            // }
 
             var division = _mapper.Map<List<GetActivityMasterAutoCompleteDto>>(machineGroup);
              //Domain Event
@@ -52,7 +52,7 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete
                     module:"Activity Master"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetActivityMasterAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = division }; 
+            return division;
         }
 
         

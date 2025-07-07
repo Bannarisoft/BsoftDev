@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.ActivityMaster.Queries.GetActivityByMachinGroupId
 {
-    public class GetActivityByMachinGroupIdQueryHandler : IRequestHandler<GetActivityByMachinGroupIdQuery, ApiResponseDTO<List<GetActivityByMachineGroupDto>>>
+    public class GetActivityByMachinGroupIdQueryHandler : IRequestHandler<GetActivityByMachinGroupIdQuery, List<GetActivityByMachineGroupDto>>
     {
 
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
@@ -24,19 +24,19 @@ namespace Core.Application.ActivityMaster.Queries.GetActivityByMachinGroupId
             _mediator = mediator;
         }
         
-        public async Task<ApiResponseDTO<List<GetActivityByMachineGroupDto>>> Handle(GetActivityByMachinGroupIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetActivityByMachineGroupDto>> Handle(GetActivityByMachinGroupIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _activityMasterQueryRepository.GetActivityByMachinGroupId(request.MachineGroupId);
 
-            if (result == null || !result.Any()) // Check if the list is empty
-            {
-                return new ApiResponseDTO<List<GetActivityByMachineGroupDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"Activity Name  for MachineGroup with Id {request.MachineGroupId} not found.",
-                    Data = null
-                };
-            }
+            // if (result == null || !result.Any()) // Check if the list is empty
+            // {
+            //     return new ApiResponseDTO<List<GetActivityByMachineGroupDto>>
+            //     {
+            //         IsSuccess = false,
+            //         Message = $"Activity Name  for MachineGroup with Id {request.MachineGroupId} not found.",
+            //         Data = null
+            //     };
+            // }
 
             var ActivityList = _mapper.Map<List<GetActivityByMachineGroupDto>>(result); // Map the list
 
@@ -53,12 +53,7 @@ namespace Core.Application.ActivityMaster.Queries.GetActivityByMachinGroupId
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<List<GetActivityByMachineGroupDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = ActivityList
-            };
+            return ActivityList;
         }
 
 

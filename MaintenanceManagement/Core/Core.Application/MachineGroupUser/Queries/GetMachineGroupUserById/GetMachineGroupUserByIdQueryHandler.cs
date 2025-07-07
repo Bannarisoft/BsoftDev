@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroupUser.Queries.GetMachineGroupUserById
 {
-    public class GetMachineGroupUserByIdQueryHandler : IRequestHandler<GetMachineGroupUserByIdQuery, ApiResponseDTO<MachineGroupUserDto>>
+    public class GetMachineGroupUserByIdQueryHandler : IRequestHandler<GetMachineGroupUserByIdQuery, MachineGroupUserDto>
     {
         private readonly IMachineGroupUserQueryRepository _machineGroupQuery;
         private readonly IMapper _mapper;
@@ -23,7 +23,7 @@ namespace Core.Application.MachineGroupUser.Queries.GetMachineGroupUserById
             _mediator = mediator;
             _departmentAllGrpcClient = departmentAllGrpcClient;
         }
-        public async Task<ApiResponseDTO<MachineGroupUserDto>> Handle(GetMachineGroupUserByIdQuery request, CancellationToken cancellationToken)
+        public async Task<MachineGroupUserDto> Handle(GetMachineGroupUserByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _machineGroupQuery.GetByIdAsync(request.Id);
             var machineGroupResult = _mapper.Map<MachineGroupUserDto>(result);
@@ -47,12 +47,7 @@ namespace Core.Application.MachineGroupUser.Queries.GetMachineGroupUserById
                     module:"MachineGroup User "
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<MachineGroupUserDto> 
-          { 
-            IsSuccess = true, 
-            Message = "Success", 
-            Data = machineGroupResult 
-            };
+            return machineGroupResult;
         }
     }
 }

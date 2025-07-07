@@ -24,16 +24,10 @@ namespace MaintenanceManagement.API.Controllers
      [Route("api/[controller]")]
     public class ActivityMasterController : ApiControllerBase
     {
-        private readonly IActivityMasterCommandRepository _activityMasterCommandRepository;
-
-         private  readonly IValidator<CreateActivityMasterCommand>  _createactivityMasterCommandValidator;
-         private readonly IValidator<UpdateActivityMasterCommand>  _updateActivityMasterCommandValidator;
-
-        public ActivityMasterController(ISender mediator ,IActivityMasterCommandRepository activityMasterCommandRepository ,IValidator<CreateActivityMasterCommand> createactivityMasterCommandValidator ,IValidator<UpdateActivityMasterCommand> updateActivityMasterCommandValidator   ):base(mediator)
+        
+        public ActivityMasterController(ISender mediator ):base(mediator)
         {
-            _activityMasterCommandRepository = activityMasterCommandRepository;
-            _createactivityMasterCommandValidator = createactivityMasterCommandValidator;
-            _updateActivityMasterCommandValidator = updateActivityMasterCommandValidator;
+            
           
         }
 
@@ -68,12 +62,9 @@ namespace MaintenanceManagement.API.Controllers
            
             var activitymaster = await Mediator.Send(new GetActivityMasterByIdQuery() { Id = id});
           
-             if(activitymaster.IsSuccess)
-            {
-                 return Ok(new { StatusCode=StatusCodes.Status200OK, data = activitymaster.Data,message=activitymaster.Message});
-            }
-
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"Activity Group master ID {id} not found.", errors = "" });
+           
+                 return Ok(new { StatusCode=StatusCodes.Status200OK, data = activitymaster,message="" });
+            
            
         }
          [HttpGet("MachineGroup/{activityId}")]
@@ -82,12 +73,9 @@ namespace MaintenanceManagement.API.Controllers
          {
              var MachineGroup = await Mediator.Send(new GetMachineGroupNameByIdQuery() { ActivityId = activityId});
           
-             if(MachineGroup.IsSuccess)
-            {
-                 return Ok(new { StatusCode=StatusCodes.Status200OK, data = MachineGroup.Data,message=MachineGroup.Message});
-            }
+            
+                 return Ok(new { StatusCode=StatusCodes.Status200OK, data = MachineGroup,message="" });
 
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"Activity Machine Group master ID {activityId} not found.", errors = "" });
 
          }
 
@@ -96,77 +84,67 @@ namespace MaintenanceManagement.API.Controllers
         {
           
             var activitymaster = await Mediator.Send(new GetActivityMasterAutoCompleteQuery {SearchPattern = name});
-            if(activitymaster.IsSuccess)
-            {
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = activitymaster.Data });
-            }
-            return NotFound( new { StatusCode=activitymaster.Message}) ;
+          
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = activitymaster });
+        
         }
         
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateActivityMasterCommand command)
         {
-             var validationResult = await _createactivityMasterCommandValidator.ValidateAsync(command);
+            //  var validationResult = await _createactivityMasterCommandValidator.ValidateAsync(command);
             
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+            // if (!validationResult.IsValid)
+            // {
+            //     return BadRequest(new 
+            //     {
+            //         StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
+            //         errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
+            //     });
+            // }
           
             var response = await Mediator.Send(command);
-            if(response.IsSuccess)
-            {                             
+                                       
                 return Ok(new 
                 {
                      StatusCode=StatusCodes.Status201Created,
-                 message = response.Message,
+                 message = response,
                   errors = "",
-                  data = response.Data 
+                  data = response 
                   });
-            }
-             
-            
-            return BadRequest( new {
-                 StatusCode=StatusCodes.Status400BadRequest,
-                  message = response.Message, 
-                  errors = "" 
-                  });             
+                        
         } 
 
         [HttpPut("update")]
         public async Task<IActionResult> UpdateActivityMaster([FromBody] UpdateActivityMasterCommand command)
         {
 
-              var validationResult = await _updateActivityMasterCommandValidator.ValidateAsync(command);
-            if (command == null)
-            {
-                return BadRequest(new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid request data."
-                });
-            }
+            //   var validationResult = await _updateActivityMasterCommandValidator.ValidateAsync(command);
+            // if (command == null)
+            // {
+            //     return BadRequest(new ApiResponseDTO<int>
+            //     {
+            //         IsSuccess = false,
+            //         Message = "Invalid request data."
+            //     });
+            // }
 
             var result = await Mediator.Send(command);
 
-                        if (!result.IsSuccess)
-                {
-                    return BadRequest(new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = result.Message,
-                        errors = "" 
-                    });
-                }
+                //         if (!result.IsSuccess)
+                // {
+                //     return BadRequest(new
+                //     {
+                //         StatusCode = StatusCodes.Status400BadRequest,
+                //         Message = result.Message,
+                //         errors = "" 
+                //     });
+                // }
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    Message = result.Message,
+                    Message = result,
                     errors = "" 
                 });
           }
@@ -201,21 +179,21 @@ namespace MaintenanceManagement.API.Controllers
                 MachineGroupId = machineGroupId
             });
 
-            if (!response.IsSuccess || response.Data == null || !response.Data.Any())
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = $"No activities found for Machine Group ID {machineGroupId}.",
-                    Errors = string.Empty
-                });
-            }
+            // if (!response.IsSuccess || response.Data == null || !response.Data.Any())
+            // {
+            //     return NotFound(new
+            //     {
+            //         StatusCode = StatusCodes.Status404NotFound,
+            //         Message = $"No activities found for Machine Group ID {machineGroupId}.",
+            //         Errors = string.Empty
+            //     });
+            // }
 
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = response.Message ?? "Activities retrieved successfully.",
-                Data = response.Data
+                Message = response,
+                Data = response
             });
         }
 

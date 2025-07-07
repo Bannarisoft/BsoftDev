@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Domain.Events;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MachineMaster.Command.UpdateMachineMaster
 {
-    public class UpdateMachineMasterCommandHandler : IRequestHandler<UpdateMachineMasterCommand, ApiResponseDTO<int>>
+    public class UpdateMachineMasterCommandHandler : IRequestHandler<UpdateMachineMasterCommand, bool>
     {
         private readonly IMachineMasterCommandRepository _iMachineMasterCommandRepository;
         private readonly IMediator _imediator;
@@ -23,15 +24,11 @@ namespace Core.Application.MachineMaster.Command.UpdateMachineMaster
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(UpdateMachineMasterCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateMachineMasterCommand request, CancellationToken cancellationToken)
         {
              var machineMaster = _imapper.Map<Core.Domain.Entities.MachineMaster>(request);
             var result = await _iMachineMasterCommandRepository.UpdateAsync(request.Id, machineMaster);
-            if (result <= 0) // CostCenter not found
-            {
-               
-                return new ApiResponseDTO<int> { IsSuccess = false, Message = "MachineMaster  not found." };
-            }
+          
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Update",
@@ -41,7 +38,7 @@ namespace Core.Application.MachineMaster.Command.UpdateMachineMaster
                 module: "MachineMaster");
             await _imediator.Publish(domainEvent, cancellationToken);
            
-            return new ApiResponseDTO<int> { IsSuccess = true, Message = "MachineMaster Updated Successfully.", Data = result }; 
+            return result == true ? result : throw new ExceptionRules("MachineMaster Updation Failed.");
         }
     }
 }

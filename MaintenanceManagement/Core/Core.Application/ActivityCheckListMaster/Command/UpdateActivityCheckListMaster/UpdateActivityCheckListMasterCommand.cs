@@ -9,7 +9,7 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.ActivityCheckListMaster.Command.UpdateActivityCheckListMaster
 {
-    public class UpdateActivityCheckListMasterCommand : IRequest<ApiResponseDTO<int>>
+    public class UpdateActivityCheckListMasterCommand : IRequest<bool>
     {
        public int Id { get; set; }
        public int ActivityID { get; set; }       

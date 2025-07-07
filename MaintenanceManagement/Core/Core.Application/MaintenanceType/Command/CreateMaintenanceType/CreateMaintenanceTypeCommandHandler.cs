@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMaintenanceType;
 using Core.Application.MaintenanceType.Queries.GetMaintenanceType;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceType.Command.CreateMaintenanceType
 {
-    public class CreateMaintenanceTypeCommandHandler : IRequestHandler<CreateMaintenanceTypeCommand, ApiResponseDTO<int>>
+    public class CreateMaintenanceTypeCommandHandler : IRequestHandler<CreateMaintenanceTypeCommand, int>
     {
         private readonly IMaintenanceTypeCommandRepository _iMaintenanceTypeCommandRepository;
         private readonly IMediator _imediator;
@@ -23,7 +24,7 @@ namespace Core.Application.MaintenanceType.Command.CreateMaintenanceType
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateMaintenanceTypeCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateMaintenanceTypeCommand request, CancellationToken cancellationToken)
         {
              var maintenanceType = _imapper.Map<Core.Domain.Entities.MaintenanceType>(request);
             
@@ -38,23 +39,8 @@ namespace Core.Application.MaintenanceType.Command.CreateMaintenanceType
                 module: "MaintenanceType");
             await _imediator.Publish(domainEvent, cancellationToken);
           
-            var costcenterGroupDtoDto = _imapper.Map<MaintenanceTypeDto>(maintenanceType);
-            if (result > 0)
-                  {
-                    
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "MaintenanceType created successfully",
-                           Data = result
-                      };
-                 }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "MaintenanceType Creation Failed",
-                Data = result
-            };
+                 return  result > 0 ? result : throw new ExceptionRules("MaintenanceType Creation Failed.");   
+                
         }
     }
 }

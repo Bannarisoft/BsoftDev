@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MachineMaster.Command.CreateMachineMaster
 {
-    public class CreateMachineMasterCommand : IRequest<ApiResponseDTO<int>>
+    public class CreateMachineMasterCommand : IRequest<int>
     {
         public string? MachineCode { get; set; }
         public string? MachineName { get; set; }

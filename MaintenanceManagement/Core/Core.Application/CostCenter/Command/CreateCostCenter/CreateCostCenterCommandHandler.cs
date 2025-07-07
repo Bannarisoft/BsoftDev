@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICostCenter;
 using Core.Application.CostCenter.Queries.GetCostCenter;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.CostCenter.Command.CreateCostCenter
 {
-    public class CreateCostCenterCommandHandler : IRequestHandler<CreateCostCenterCommand, ApiResponseDTO<int>>
+    public class CreateCostCenterCommandHandler : IRequestHandler<CreateCostCenterCommand, int>
     {
         private readonly ICostCenterCommandRepository _iCostCenterCommandRepository;
         private readonly IMediator _imediator;
@@ -24,7 +25,7 @@ namespace Core.Application.CostCenter.Command.CreateCostCenter
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateCostCenterCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateCostCenterCommand request, CancellationToken cancellationToken)
         {
             var costCenter = _imapper.Map<Core.Domain.Entities.CostCenter>(request);
             
@@ -38,24 +39,8 @@ namespace Core.Application.CostCenter.Command.CreateCostCenter
                 details: $"CostCenter details was created",
                 module: "CostCenter");
             await _imediator.Publish(domainEvent, cancellationToken);
-          
-            var costcenterGroupDtoDto = _imapper.Map<CostCenterDto>(costCenter);
-            if (result > 0)
-                  {
-                    
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "CostCenter created successfully",
-                           Data = result
-                      };
-                 }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "CostCenter Creation Failed",
-                Data = result
-            };
+            
+            return result > 0 ? result : throw new ExceptionRules("CostCenter Creation Failed.");
         }
     }
 }

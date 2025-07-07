@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceCategory.Command.CreateMaintenanceCategory
 {
-    public class CreateMaintenanceCategoryCommand :IRequest<ApiResponseDTO<int>> 
+    public class CreateMaintenanceCategoryCommand :IRequest<int>
     {
         public string? CategoryName { get; set; }
         public string? Description { get; set; }

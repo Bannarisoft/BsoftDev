@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.MachineMaster.Queries.GetMachineNoDepartmentbyId
 {
-    public class GetMachineNoDepartmentbyIdQueryHandler : IRequestHandler<GetMachineNoDepartmentbyIdQuery, ApiResponseDTO<List<GetMachineNoDepartmentbyIdDto>>>
+    public class GetMachineNoDepartmentbyIdQueryHandler : IRequestHandler<GetMachineNoDepartmentbyIdQuery, List<GetMachineNoDepartmentbyIdDto>>
     {
         private readonly IMachineMasterQueryRepository _imachineMasterQueryRepository;        
         private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ namespace Core.Application.MachineMaster.Queries.GetMachineNoDepartmentbyId
             _mediator = mediator;
           
         }
-        public async Task<ApiResponseDTO<List<GetMachineNoDepartmentbyIdDto>>> Handle(GetMachineNoDepartmentbyIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetMachineNoDepartmentbyIdDto>> Handle(GetMachineNoDepartmentbyIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _imachineMasterQueryRepository.GetMachineNoDepartmentAsync(request.DepartmentId);
             var machineMasters = _mapper.Map<List<GetMachineNoDepartmentbyIdDto>>(result);
@@ -35,7 +35,7 @@ namespace Core.Application.MachineMaster.Queries.GetMachineNoDepartmentbyId
                     module:"MachineMaster"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetMachineNoDepartmentbyIdDto>> { IsSuccess = true, Message = "Success", Data = machineMasters };
+            return machineMasters;
         }
     }
 }

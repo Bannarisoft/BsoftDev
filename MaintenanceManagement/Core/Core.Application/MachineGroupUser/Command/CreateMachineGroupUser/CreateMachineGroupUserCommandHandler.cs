@@ -8,10 +8,11 @@ using Core.Application.Common.Interfaces.IMachineGroupUser;
 using MediatR;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using Core.Application.Common.Exceptions;
 
 namespace Core.Application.MachineGroupUsers.Command.CreateMachineGroupUser
 {
-    public class CreateMachineGroupUsersCommandHandler  : IRequestHandler<CreateMachineGroupUserCommand, ApiResponseDTO<int>>
+    public class CreateMachineGroupUsersCommandHandler  : IRequestHandler<CreateMachineGroupUserCommand, int>
     {
         private readonly IMachineGroupUserCommandRepository _machineGroupUsersCommand;
         private readonly IMediator _mediator;
@@ -23,36 +24,26 @@ namespace Core.Application.MachineGroupUsers.Command.CreateMachineGroupUser
             _mediator = mediator;
             _mapper = mapper;
         }
-        public async Task<ApiResponseDTO<int>> Handle(CreateMachineGroupUserCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateMachineGroupUserCommand request, CancellationToken cancellationToken)
         {
-                var machineGroupUsers  = _mapper.Map<Core.Domain.Entities.MachineGroupUser>(request);
+            var machineGroupUsers = _mapper.Map<Core.Domain.Entities.MachineGroupUser>(request);
 
-                var machineGroupUsersResult = await _machineGroupUsersCommand.CreateAsync(machineGroupUsers);                
-                
-                if (machineGroupUsersResult > 0)
-                {
-                    var domainEvent = new AuditLogsDomainEvent(
-                     actionDetail: "Create",
-                     actionCode: "NewData",
-                     actionName: "MachineGroup Users Creation",
-                     details: $"MachineGroup Users Creation",
-                     module:"MachineGroupUsers Master"
-                 );
-                 await _mediator.Publish(domainEvent, cancellationToken);
-                 
-                    return new ApiResponseDTO<int>
-                    {
-                        IsSuccess = true, 
-                        Message = "MachineGroup Users successfully created", 
-                        Data = machineGroupUsersResult
-                    };
-                }
+            var machineGroupUsersResult = await _machineGroupUsersCommand.CreateAsync(machineGroupUsers);
+
+            if (machineGroupUsersResult > 0)
+            {
+                var domainEvent = new AuditLogsDomainEvent(
+                 actionDetail: "Create",
+                 actionCode: "NewData",
+                 actionName: "MachineGroup Users Creation",
+                 details: $"MachineGroup Users Creation",
+                 module: "MachineGroupUsers Master"
+             );
+                await _mediator.Publish(domainEvent, cancellationToken);
+
+            }
+            return machineGroupUsersResult > 0 ? machineGroupUsersResult : throw new ExceptionRules("MachineGroup Users Creation Failed.");
                
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false, 
-                    Message = "MachineGroup Users not created"
-                };
         }
     }
 }

@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroup.Command.CreateMachineGroup
 {
-    public class CreateMachineGroupCommand : IRequest<ApiResponseDTO<MachineGroupDto>>
+    public class CreateMachineGroupCommand : IRequest<int>
     {
         public string? GroupName { get; set; }
         public int Manufacturer { get; set; } 

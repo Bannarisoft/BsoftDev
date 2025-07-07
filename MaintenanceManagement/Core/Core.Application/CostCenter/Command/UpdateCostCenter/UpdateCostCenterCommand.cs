@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.CostCenter.Command.UpdateCostCenter
 {
-    public class UpdateCostCenterCommand :IRequest<ApiResponseDTO<int>>
+    public class UpdateCostCenterCommand :IRequest<int>
     {
         public int Id { get; set; }
         public string? CostCenterName { get; set; }

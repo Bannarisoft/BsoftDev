@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
 {
-    public class GetMiscMasterAutoCompleteQueryHandler : IRequestHandler<GetMiscMasterAutoCompleteQuery,ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>>>
+    public class GetMiscMasterAutoCompleteQueryHandler : IRequestHandler<GetMiscMasterAutoCompleteQuery,List<GetMiscMasterAutoCompleteDto>>
     {
          private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IMapper _mapper;
@@ -25,19 +25,11 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
          }
 
 
-          public  async Task<ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>>> Handle(GetMiscMasterAutoCompleteQuery request, CancellationToken cancellationToken)
+          public  async Task<List<GetMiscMasterAutoCompleteDto>> Handle(GetMiscMasterAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var miscTypeMasters  = await _miscMasterQueryRepository.GetMiscMaster(request.SearchPattern,request.MiscTypeCode);
 
-                    if (miscTypeMasters == null || !miscTypeMasters.Any())
-            {
-                return new ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"No Misc Type Masters found matching '{request.SearchPattern}'.",
-                    Data = new List<GetMiscMasterAutoCompleteDto>()
-                };
-            }
+           
 
             var division = _mapper.Map<List<GetMiscMasterAutoCompleteDto>>(miscTypeMasters);
              //Domain Event
@@ -49,7 +41,7 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
                     module:"Division"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = division }; 
+            return  division; 
         }
         
     }

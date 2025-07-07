@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.CostCenter.Queries.GetCostCenterAutoComplete
 {
-    public class GetCostCenterAutoCompleteQuery : IRequest<ApiResponseDTO<List<CostCenterAutoCompleteDto>>>
+    public class GetCostCenterAutoCompleteQuery : IRequest<List<CostCenterAutoCompleteDto>>
     {
          public string? SearchPattern { get; set; }
     }

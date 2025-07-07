@@ -8,7 +8,7 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.MachineGroup.Command.UpdateMachineGroup
 {
-    public class UpdateMachineGroupCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateMachineGroupCommand : IRequest<bool>
     {
         public int Id { get; set; }
         public string? GroupName { get; set; }  

@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Item.ItemGroup.Queries
 {
-    public class GetItemGroupQuery : IRequest<ApiResponseDTO<List<GetItemGroupDto>>>
+    public class GetItemGroupQuery : IRequest<List<GetItemGroupDto>>
     {
         public string? OldUnitId { get; set; } 
     }

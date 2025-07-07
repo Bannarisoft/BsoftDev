@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IActivityCheckListMaster;
 using Core.Domain.Events;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.ActivityCheckListMaster.Command.DeleteActivityCheckListMaster
 {
-    public class DeleteActivityCheckListMasterCommandHandler : IRequestHandler<DeleteActivityCheckListMasterCommand, ApiResponseDTO<int>>
+    public class DeleteActivityCheckListMasterCommandHandler : IRequestHandler<DeleteActivityCheckListMasterCommand, bool>
     {
         private readonly IActivityCheckListMasterCommandRepository _activityCheckListMasterCommandRepository;
          private readonly IMediator _mediator; 
@@ -24,17 +25,13 @@ namespace Core.Application.ActivityCheckListMaster.Command.DeleteActivityCheckLi
             _imapper = imapper;
         }
         
-           public async Task<ApiResponseDTO<int>> Handle(DeleteActivityCheckListMasterCommand request, CancellationToken cancellationToken)
+           public async Task<bool> Handle(DeleteActivityCheckListMasterCommand request, CancellationToken cancellationToken)
         {
           
 
             var activityCheckListMaster = _imapper.Map<Core.Domain.Entities.ActivityCheckListMaster>(request);
-            var result = await _activityCheckListMasterCommandRepository.DeleteAsync(request.Id,activityCheckListMaster);
-            if (result == -1) 
-            {
-         
-             return new ApiResponseDTO<int> { IsSuccess = false, Message = "ActivityChecklist not found."};
-            }
+             var result = await _activityCheckListMasterCommandRepository.DeleteAsync(request.Id,activityCheckListMaster);
+            
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -46,13 +43,8 @@ namespace Core.Application.ActivityCheckListMaster.Command.DeleteActivityCheckLi
             await _mediator.Publish(domainEvent);
           
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,   
-                Data = result,
-                Message = "ActivityChecklist deleted successfully."
-    
-            };
+            return  result== true ? result : throw new ExceptionRules("ActivityChecklist deletion Failed.");
+                
         }
         
     }

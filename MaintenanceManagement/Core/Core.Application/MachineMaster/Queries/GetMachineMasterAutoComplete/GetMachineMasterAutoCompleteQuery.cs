@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MachineMaster.Queries.GetMachineMasterAutoComplete
 {
-    public class GetMachineMasterAutoCompleteQuery : IRequest<ApiResponseDTO<List<MachineMasterAutoCompleteDto>>>
+    public class GetMachineMasterAutoCompleteQuery : IRequest<List<MachineMasterAutoCompleteDto>>
     {
          public string? SearchPattern { get; set; }
     }
