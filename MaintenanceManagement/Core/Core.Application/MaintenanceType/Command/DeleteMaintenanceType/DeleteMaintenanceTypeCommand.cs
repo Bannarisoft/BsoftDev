@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceType.Command.DeleteMaintenanceType
 {
-    public class DeleteMaintenanceTypeCommand : IRequest<ApiResponseDTO<int>> 
+    public class DeleteMaintenanceTypeCommand : IRequest<int>
     {
         public int Id { get; set; } 
     }

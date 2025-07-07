@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceCategory.Queries.GetMaintenanceCategoryAutoComplete
 {
-    public class GetMaintenanceCategoryAutoCompleteQueryHandler : IRequestHandler<GetMaintenanceCategoryAutoCompleteQuery,ApiResponseDTO<List<MaintenanceCategoryAutoCompleteDto>>>
+    public class GetMaintenanceCategoryAutoCompleteQueryHandler : IRequestHandler<GetMaintenanceCategoryAutoCompleteQuery,List<MaintenanceCategoryAutoCompleteDto>>
     {
          private readonly IMaintenanceCategoryQueryRepository _iMaintenanceCategoryQueryRepository;        
         private readonly IMapper _mapper;
@@ -24,7 +24,7 @@ namespace Core.Application.MaintenanceCategory.Queries.GetMaintenanceCategoryAut
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<MaintenanceCategoryAutoCompleteDto>>> Handle(GetMaintenanceCategoryAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<MaintenanceCategoryAutoCompleteDto>> Handle(GetMaintenanceCategoryAutoCompleteQuery request, CancellationToken cancellationToken)
         {
              var result = await _iMaintenanceCategoryQueryRepository.GetMaintenanceCategoryAsync(request.SearchPattern);
             var maintenanceCategories = _mapper.Map<List<MaintenanceCategoryAutoCompleteDto>>(result);
@@ -37,7 +37,7 @@ namespace Core.Application.MaintenanceCategory.Queries.GetMaintenanceCategoryAut
                     module:"MaintenanceCategory"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<MaintenanceCategoryAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = maintenanceCategories };
+            return  maintenanceCategories;
         }
     }
 }

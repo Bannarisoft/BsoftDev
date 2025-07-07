@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.CostCenter.Queries.GetCostCenterAutoComplete
 {
-    public class GetCostCenterAutoCompleteQueryHandler : IRequestHandler<GetCostCenterAutoCompleteQuery,ApiResponseDTO<List<CostCenterAutoCompleteDto>>>
+    public class GetCostCenterAutoCompleteQueryHandler : IRequestHandler<GetCostCenterAutoCompleteQuery,List<CostCenterAutoCompleteDto>>
     {
         private readonly ICostCenterQueryRepository _iCostCenterQueryRepository;        
         private readonly IMapper _mapper;
@@ -23,7 +23,7 @@ namespace Core.Application.CostCenter.Queries.GetCostCenterAutoComplete
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<CostCenterAutoCompleteDto>>> Handle(GetCostCenterAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<CostCenterAutoCompleteDto>> Handle(GetCostCenterAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _iCostCenterQueryRepository.GetCostCenterGroups(request.SearchPattern);
             var costCenters = _mapper.Map<List<CostCenterAutoCompleteDto>>(result);
@@ -36,7 +36,7 @@ namespace Core.Application.CostCenter.Queries.GetCostCenterAutoComplete
                     module:"CostCenter"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<CostCenterAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = costCenters };
+            return costCenters;
         }
     }
 }

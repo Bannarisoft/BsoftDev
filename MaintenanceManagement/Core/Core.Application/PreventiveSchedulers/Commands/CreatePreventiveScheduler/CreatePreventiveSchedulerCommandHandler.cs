@@ -21,7 +21,7 @@ using Core.Application.Common;
 
 namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler
 {
-    public class CreatePreventiveSchedulerCommandHandler : IRequestHandler<CreatePreventiveSchedulerCommand, ApiResponseDTO<int>>
+    public class CreatePreventiveSchedulerCommandHandler : IRequestHandler<CreatePreventiveSchedulerCommand, int>
     {
         private readonly IPreventiveSchedulerCommand _preventiveSchedulerCommand;
         private readonly IMapper _mapper;
@@ -39,7 +39,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
             _ipAddressService = iPAddressService;
 
         }
-        public async Task<ApiResponseDTO<int>> Handle(CreatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
         {
             
             var preventiveScheduler  = _mapper.Map<PreventiveSchedulerHeader>(request);
@@ -83,12 +83,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                
               
                  
-                    return new ApiResponseDTO<int>
-                    {
-                        IsSuccess = true, 
-                        Message = "Preventive scheduler created successfully",
-                         Data = response
-                    };
+                    return  response;
             
                 
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.Power.IPowerConsumption;
 using Core.Domain.Events;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.Power.PowerConsumption.Command.CreatePowerConsumption
 {
-    public class CreatePowerConsumptionCommandHandler : IRequestHandler<CreatePowerConsumptionCommand, ApiResponseDTO<int>>
+    public class CreatePowerConsumptionCommandHandler : IRequestHandler<CreatePowerConsumptionCommand, int>
     {
         private readonly IPowerConsumptionCommandRepository _powerConsumptionCommandRepository;
         private readonly IMediator _imediator;
@@ -23,7 +24,7 @@ namespace Core.Application.Power.PowerConsumption.Command.CreatePowerConsumption
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreatePowerConsumptionCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreatePowerConsumptionCommand request, CancellationToken cancellationToken)
         {
               // Calculate TotalUnits
             var totalUnits = (request.ClosingReading - request.OpeningReading) * 1000; //For Kw Conversion 
@@ -41,23 +42,9 @@ namespace Core.Application.Power.PowerConsumption.Command.CreatePowerConsumption
                 module: "Power");
             await _imediator.Publish(domainEvent, cancellationToken);
           
-            var powerConsumptionDto = _imapper.Map<PowerConsumptionDto>(powerConsumption);
-            if (result > 0)
-                  {
                     
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "PowerConsumption created successfully",
-                           Data = result
-                      };
-                 }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "PowerConsumption Creation Failed",
-                Data = result
-            };
+             return result > 0 ? result : throw new ExceptionRules("PowerConsumption Creation Failed.");
+                 
         }
     }
 }

@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Item.ItemGroup.Queries
 {
-    public class GetItemGroupQueryHandler :  IRequestHandler<GetItemGroupQuery,ApiResponseDTO<List<GetItemGroupDto>>>
+    public class GetItemGroupQueryHandler :  IRequestHandler<GetItemGroupQuery,List<GetItemGroupDto>>
     {
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
@@ -23,7 +23,7 @@ namespace Core.Application.Item.ItemGroup.Queries
             _itemQueryRepository = itemQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<List<GetItemGroupDto>>> Handle(GetItemGroupQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetItemGroupDto>> Handle(GetItemGroupQuery request, CancellationToken cancellationToken)
         {
              var result = await _itemQueryRepository.GetGroupCodes(request.OldUnitId);
             var itemgroupcode  = _mapper.Map<List<GetItemGroupDto>>(result);
@@ -36,7 +36,7 @@ namespace Core.Application.Item.ItemGroup.Queries
                     module:"ItemGroupCode"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetItemGroupDto>> { IsSuccess = true, Message = "Success", Data = itemgroupcode };
+            return itemgroupcode;
         }
       
     }

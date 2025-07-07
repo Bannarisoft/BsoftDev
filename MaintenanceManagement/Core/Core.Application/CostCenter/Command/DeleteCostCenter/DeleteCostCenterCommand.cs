@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.CostCenter.Command.DeleteCostCenter
 {
-    public class DeleteCostCenterCommand : IRequest<ApiResponseDTO<int>> 
+    public class DeleteCostCenterCommand : IRequest<int> 
     {
         public int Id { get; set; }
     }

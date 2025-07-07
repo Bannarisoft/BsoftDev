@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MRS.Queries
 {
-    public class GetDepartmentbyIdQueryHandler : IRequestHandler<GetDepartmentbyIdQuery, ApiResponseDTO<List<MDepartmentDto>>>
+    public class GetDepartmentbyIdQueryHandler : IRequestHandler<GetDepartmentbyIdQuery, List<MDepartmentDto>>
 {
     private readonly IMRSQueryRepository _imRSQueryRepository;        
     private readonly IMapper _mapper;
@@ -24,14 +24,10 @@ namespace Core.Application.MRS.Queries
         _mediator = mediator;
     }
 
-    public async Task<ApiResponseDTO<List<MDepartmentDto>>> Handle(GetDepartmentbyIdQuery request, CancellationToken cancellationToken)
+    public async Task<List<MDepartmentDto>> Handle(GetDepartmentbyIdQuery request, CancellationToken cancellationToken)
     {
         var result = await _imRSQueryRepository.GetMDepartment(request.OldUnitcode);
 
-        if (result == null || !result.Any())
-        {
-            return new ApiResponseDTO<List<MDepartmentDto>> { IsSuccess = false, Message = $"Department {request.OldUnitcode} not found." };
-        }
 
         var departmentDtos = _mapper.Map<List<MDepartmentDto>>(result);
 
@@ -45,7 +41,7 @@ namespace Core.Application.MRS.Queries
 
         await _mediator.Publish(domainEvent, cancellationToken);
 
-        return new ApiResponseDTO<List<MDepartmentDto>> { IsSuccess = true, Message = "Success", Data = departmentDtos };
+        return  departmentDtos;
     }
 }
 }

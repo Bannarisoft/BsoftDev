@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceType.Queries.GetMaintenanceTypeById
 {
-    public class GetMaintenanceTypeByIdQueryHandler : IRequestHandler<GetMaintenanceTypeByIdQuery, ApiResponseDTO<MaintenanceTypeDto>>
+    public class GetMaintenanceTypeByIdQueryHandler : IRequestHandler<GetMaintenanceTypeByIdQuery, MaintenanceTypeDto>
     {
          private readonly IMaintenanceTypeQueryRepository _imaintenanceTypeQueryRepository;        
         private readonly IMapper _mapper;
@@ -23,14 +23,10 @@ namespace Core.Application.MaintenanceType.Queries.GetMaintenanceTypeById
             _mediator = mediator;   
         }
 
-        public async Task<ApiResponseDTO<MaintenanceTypeDto>> Handle(GetMaintenanceTypeByIdQuery request, CancellationToken cancellationToken)
+        public async Task<MaintenanceTypeDto> Handle(GetMaintenanceTypeByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _imaintenanceTypeQueryRepository.GetByIdAsync(request.Id);
-            // Check if the entity exists
-            if (result is null)
-            {
-                return new ApiResponseDTO<MaintenanceTypeDto> { IsSuccess = false, Message =$"MaintenanceType ID {request.Id} not found." };
-            }
+         
             // Map a single entity
             var maintenanceCategory = _mapper.Map<MaintenanceTypeDto>(result);
 
@@ -43,7 +39,7 @@ namespace Core.Application.MaintenanceType.Queries.GetMaintenanceTypeById
                     module:"MaintenanceType"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<MaintenanceTypeDto> { IsSuccess = true, Message = "Success", Data = maintenanceCategory };
+          return maintenanceCategory;
         }
     }
 }

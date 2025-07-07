@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroup.Command.DeleteMachineGroup
 {
-    public class DeleteMachineGroupCommand : IRequest<ApiResponseDTO<MachineGroupDto>>
+    public class DeleteMachineGroupCommand : IRequest<bool>
     {
          public int Id { get; set; }
     }

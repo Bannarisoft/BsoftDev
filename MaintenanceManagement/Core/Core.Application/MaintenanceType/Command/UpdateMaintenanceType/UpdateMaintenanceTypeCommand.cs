@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceType.Command.UpdateMaintenanceType
 {
-    public class UpdateMaintenanceTypeCommand :IRequest<ApiResponseDTO<int>>
+    public class UpdateMaintenanceTypeCommand :IRequest<int>
     {
         public int Id {get;set;}
         public string? TypeName { get; set; }

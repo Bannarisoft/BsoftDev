@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Application.MachineGroup.Queries.GetMachineGroup;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroup.Command.CreateMachineGroup
 {
-    public class CreateMachineGroupCommandHandler : IRequestHandler<CreateMachineGroupCommand, ApiResponseDTO<MachineGroupDto>>
+    public class CreateMachineGroupCommandHandler : IRequestHandler<CreateMachineGroupCommand, int>
     {
 
          private readonly IMachineGroupCommandRepository _machineGroupCommandRepository;
@@ -31,30 +32,16 @@ namespace Core.Application.MachineGroup.Command.CreateMachineGroup
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<MachineGroupDto>> Handle(CreateMachineGroupCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateMachineGroupCommand request, CancellationToken cancellationToken)
         {
            
-            // 🔹 Map request to domain entity
+            
             var machineGroup = _mapper.Map<Core.Domain.Entities.MachineGroup>(request);
 
-            // 🔹 Insert into the database
+            
             var result = await _machineGroupCommandRepository.CreateAsync(machineGroup);
 
-            if (result.Id <= 0)
-            {
-                return new ApiResponseDTO<MachineGroupDto>
-                {
-                    IsSuccess = false,
-                    Message = "Failed to create Machine Group",
-                    Data = null
-                };
-            }
-
-            // 🔹 Fetch newly created record
-            var createdMachineGroup = await _machineGroupQueryRepository.GetByIdAsync(result.Id);
-            var mappedResult = _mapper.Map<MachineGroupDto>(createdMachineGroup);
-
-            // 🔹 Publish domain event for auditing/logging
+            
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
                 actionCode: machineGroup.GroupName,
@@ -66,12 +53,7 @@ namespace Core.Application.MachineGroup.Command.CreateMachineGroup
             await _mediator.Publish(domainEvent, cancellationToken);
 
             // 🔹 Return success response
-            return new ApiResponseDTO<MachineGroupDto>
-            {
-                IsSuccess = true,
-                Message = "Machine Group created successfully",
-                Data = mappedResult
-            };
+            return result.Id > 0 ? result.Id : throw new ExceptionRules("Machine Group Creation Failed.");
         }
        
     }

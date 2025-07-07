@@ -86,24 +86,15 @@ namespace MaintenanceManagement.API.Controllers
                 });
             }
             var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
+          
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = response.Message,
+                    message = response,
                     errors = "",
-                    data = response.Data
+                    data = response
                 });
-            }
-
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = response.Message,
-                errors = ""
-            });
+           
 
         }
         [Route("[action]/{id}")]
@@ -182,23 +173,15 @@ namespace MaintenanceManagement.API.Controllers
             }
             var updatedPreventiveScheduler = await Mediator.Send(command);
 
-            if (updatedPreventiveScheduler.IsSuccess)
-            {
+           
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    message = updatedPreventiveScheduler.Message,
+                    message = updatedPreventiveScheduler,
                     errors = ""
                 });
 
-            }
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = updatedPreventiveScheduler.Message,
-                errors = ""
-            });
+           
 
         }
         [HttpPut("reschedule")]
@@ -249,24 +232,14 @@ namespace MaintenanceManagement.API.Controllers
             }
 
             var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
+           
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    message = response.Message,
+                    message = response,
                     errors = ""
                 });
-            }
-
-
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = response.Message,
-                errors = ""
-            });
+          
         }
         [HttpGet("SchedulerAbstractByDate")]
         public async Task<IActionResult> GetScheduler([FromQuery] int DepartmentId)

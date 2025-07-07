@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.MachineMaster.Queries.GetMachineMaster;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.MachineMaster.Command.CreateMachineMaster
 {
-    public class CreateMachineMasterCommandHandler : IRequestHandler<CreateMachineMasterCommand, ApiResponseDTO<int>>
+    public class CreateMachineMasterCommandHandler : IRequestHandler<CreateMachineMasterCommand, int>
     {
         private readonly IMachineMasterCommandRepository _iMachineMasterCommandRepository;
         private readonly IMediator _imediator;
@@ -24,7 +25,7 @@ namespace Core.Application.MachineMaster.Command.CreateMachineMaster
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateMachineMasterCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateMachineMasterCommand request, CancellationToken cancellationToken)
         {
             var machineMaster = _imapper.Map<Core.Domain.Entities.MachineMaster>(request);
             
@@ -38,24 +39,8 @@ namespace Core.Application.MachineMaster.Command.CreateMachineMaster
                 details: $"MachineMaster details was created",
                 module: "MachineMaster");
             await _imediator.Publish(domainEvent, cancellationToken);
-          
-            var costcenterGroupDtoDto = _imapper.Map<MachineMasterDto>(machineMaster);
-            if (result > 0)
-                  {
-                    
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "MachineMaster created successfully",
-                           Data = result
-                      };
-                 }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "MachineMaster Creation Failed",
-                Data = result
-            };
+         
+            return result > 0 ? result : throw new ExceptionRules("MachineMaster Creation Failed.");
         }
     }
 }

@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.MRS.Queries.GetCategory
 {
-    public class GetCategoryQueryHandler : IRequestHandler<GetCategoryQuery, ApiResponseDTO<List<MCategoryDto>>>
+    public class GetCategoryQueryHandler : IRequestHandler<GetCategoryQuery, List<MCategoryDto>>
     {
         private readonly IMRSQueryRepository _imRSQueryRepository;        
         private readonly IMapper _mapper;
@@ -22,14 +22,10 @@ namespace Core.Application.MRS.Queries.GetCategory
         _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<MCategoryDto>>> Handle(GetCategoryQuery request, CancellationToken cancellationToken)
+        public async Task<List<MCategoryDto>> Handle(GetCategoryQuery request, CancellationToken cancellationToken)
         {
             var result = await _imRSQueryRepository.GetCategory(request.OldUnitcode);
 
-        if (result == null || !result.Any())
-        {
-            return new ApiResponseDTO<List<MCategoryDto>> { IsSuccess = false, Message = $"Category {request.OldUnitcode} not found." };
-        }
 
         var departmentDtos = _mapper.Map<List<MCategoryDto>>(result);
 
@@ -43,7 +39,7 @@ namespace Core.Application.MRS.Queries.GetCategory
 
         await _mediator.Publish(domainEvent, cancellationToken);
 
-        return new ApiResponseDTO<List<MCategoryDto>> { IsSuccess = true, Message = "Success", Data = departmentDtos };
+        return  departmentDtos;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.Power.IFeederGroup;
 using Core.Domain.Events;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.Power.FeederGroup.Command.UpdateFeederGroup
 {
-    public class UpdateFeederGroupCommandHandler : IRequestHandler<UpdateFeederGroupCommand, ApiResponseDTO<bool>>
+    public class UpdateFeederGroupCommandHandler : IRequestHandler<UpdateFeederGroupCommand, bool>
     {
 
         private readonly IFeederGroupCommandRepository _feederGroupCommandRepository;
@@ -24,20 +25,11 @@ namespace Core.Application.Power.FeederGroup.Command.UpdateFeederGroup
             _imapper = imapper;
         }
 
-      public async Task<ApiResponseDTO<bool>> Handle(UpdateFeederGroupCommand request, CancellationToken cancellationToken)
+      public async Task<bool> Handle(UpdateFeederGroupCommand request, CancellationToken cancellationToken)
         {
             var feederGroup = _imapper.Map<Core.Domain.Entities.Power.FeederGroup>(request);
 
             var result = await _feederGroupCommandRepository.UpdateAsync(request.Id, feederGroup);
-
-            if (!result)
-            {
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "FeederGroup not found."
-                };
-            }
 
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Update",
@@ -48,12 +40,7 @@ namespace Core.Application.Power.FeederGroup.Command.UpdateFeederGroup
 
             await _imediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = true,
-                Message = "FeederGroup updated successfully.",
-                Data = true
-            };
+            return result == true ? result : throw new ExceptionRules("FeederGroup Updation Failed.");
         }
 
     }

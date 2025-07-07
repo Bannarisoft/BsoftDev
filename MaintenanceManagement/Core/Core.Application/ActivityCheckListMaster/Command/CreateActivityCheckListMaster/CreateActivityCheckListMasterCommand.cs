@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.ActivityCheckListMaster.Command.CreateActivityCheckListMaster
 {
-    public class CreateActivityCheckListMasterCommand : IRequest<ApiResponseDTO<int>>
+    public class CreateActivityCheckListMasterCommand : IRequest<int>
     {
 
         public int ActivityID { get; set; }

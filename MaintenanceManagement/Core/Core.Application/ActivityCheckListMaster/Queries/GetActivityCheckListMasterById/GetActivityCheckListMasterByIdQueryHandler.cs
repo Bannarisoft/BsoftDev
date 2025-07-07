@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListMasterById
 {
-    public class GetActivityCheckListMasterByIdQueryHandler : IRequestHandler<GetActivityCheckListMasterByIdQuery, ApiResponseDTO<GetAllActivityCheckListMasterDto>>
+    public class GetActivityCheckListMasterByIdQueryHandler : IRequestHandler<GetActivityCheckListMasterByIdQuery, GetAllActivityCheckListMasterDto>
     {
 
           private readonly IActivityCheckListMasterQueryRepository _activityCheckListMasterQueryRepository;
@@ -25,19 +25,19 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListM
             _mediator = mediator;  
         }
 
-       public async Task<ApiResponseDTO<GetAllActivityCheckListMasterDto>> Handle(GetActivityCheckListMasterByIdQuery request, CancellationToken cancellationToken)
+       public async Task<GetAllActivityCheckListMasterDto> Handle(GetActivityCheckListMasterByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _activityCheckListMasterQueryRepository.GetByIdAsync(request.Id);
             
-            if (result is null)
-            {
-                return new ApiResponseDTO<GetAllActivityCheckListMasterDto>
-                {
-                    IsSuccess = false,
-                    Message = $"Activity Checklist with Id {request.Id} not found.",
-                    Data = null
-                };
-            }
+            // if (result is null)
+            // {
+            //     return new ApiResponseDTO<GetAllActivityCheckListMasterDto>
+            //     {
+            //         IsSuccess = false,
+            //         Message = $"Activity Checklist with Id {request.Id} not found.",
+            //         Data = null
+            //     };
+            // }
             
             var activityChecklist = _mapper.Map<GetAllActivityCheckListMasterDto>(result);
 
@@ -52,12 +52,7 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListM
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<GetAllActivityCheckListMasterDto>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = activityChecklist
-            };
+            return activityChecklist;
         }
 
     }

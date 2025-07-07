@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceCategory.Command.UpdateMaintenanceCategory
 {
-    public class UpdateMaintenanceCategoryCommand  :IRequest<ApiResponseDTO<int>>
+    public class UpdateMaintenanceCategoryCommand  :IRequest<int>
     {
         public int Id {get;set;}
         public string? CategoryName { get; set; }

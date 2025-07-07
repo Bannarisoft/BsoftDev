@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Power.PowerConsumption.Queries.GetClosingReaderValueById
 {
-    public class GetClosingReaderValueByIdQueryHandler : IRequestHandler<GetClosingReaderValueByIdQuery, ApiResponseDTO<GetClosingReaderValueDto>>
+    public class GetClosingReaderValueByIdQueryHandler : IRequestHandler<GetClosingReaderValueByIdQuery, GetClosingReaderValueDto>
     {
         private readonly IPowerConsumptionQueryRepository _powerConsumptionQueryRepository;
         private readonly IMapper _mapper;
@@ -23,19 +23,10 @@ namespace Core.Application.Power.PowerConsumption.Queries.GetClosingReaderValueB
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<GetClosingReaderValueDto>> Handle(GetClosingReaderValueByIdQuery request, CancellationToken cancellationToken)
+        public async Task<GetClosingReaderValueDto> Handle(GetClosingReaderValueByIdQuery request, CancellationToken cancellationToken)
         {
              var result = await _powerConsumptionQueryRepository.GetOpeningReaderValueById(request.FeederId);
 
-            if (result == null)
-            {
-                return new ApiResponseDTO<GetClosingReaderValueDto>
-                {
-                    IsSuccess = false,
-                    Message = $"No Feeder found with ID '{request.FeederId}'.",
-                    Data = null
-                };
-            }
 
             // Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -48,12 +39,7 @@ namespace Core.Application.Power.PowerConsumption.Queries.GetClosingReaderValueB
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<GetClosingReaderValueDto>
-            {
-                IsSuccess = true,
-                Message = "Feeder retrieved successfully.",
-                Data = result
-            };
+            return  result;
         }
     }
 }

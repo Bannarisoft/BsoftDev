@@ -43,21 +43,17 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
             return false;
         }
         
-        public async Task<int> DeleteAsync(int Id, Core.Domain.Entities.ActivityCheckListMaster  activityCheckListMaster)
+        public async Task<bool> DeleteAsync(int Id, Core.Domain.Entities.ActivityCheckListMaster  activityCheckListMaster)
         {
         
             var activityCheckListToDelete = await _dbContext.ActivityCheckListMaster.FirstOrDefaultAsync(u => u.Id == Id);
            
-            if (activityCheckListToDelete is null)
-            {
-                return -1; //indicate failure
-            }
       
             activityCheckListToDelete.IsDeleted = activityCheckListMaster.IsDeleted;
             
-            await _dbContext.SaveChangesAsync();
+           return await _dbContext.SaveChangesAsync() > 0;
 
-            return 1; // Indicate success
+            
         }
 
 

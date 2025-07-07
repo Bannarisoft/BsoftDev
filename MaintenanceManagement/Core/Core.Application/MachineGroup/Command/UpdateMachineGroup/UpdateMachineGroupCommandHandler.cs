@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Domain.Events;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroup.Command.UpdateMachineGroup
 {
-    public class UpdateMachineGroupCommandHandler : IRequestHandler<UpdateMachineGroupCommand, ApiResponseDTO<bool>>
+    public class UpdateMachineGroupCommandHandler : IRequestHandler<UpdateMachineGroupCommand, bool>
     {
           private readonly IMachineGroupCommandRepository _machineGroupCommandRepository;
         private readonly IMachineGroupQueryRepository _machineGroupQueryRepository;
@@ -31,7 +32,7 @@ namespace Core.Application.MachineGroup.Command.UpdateMachineGroup
         }
 
 
-         public async Task<ApiResponseDTO<bool>> Handle(UpdateMachineGroupCommand request, CancellationToken cancellationToken)
+         public async Task<bool> Handle(UpdateMachineGroupCommand request, CancellationToken cancellationToken)
         {
          
             // Map request to domain entity
@@ -50,13 +51,7 @@ namespace Core.Application.MachineGroup.Command.UpdateMachineGroup
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            // Return appropriate response based on update result
-            if (updateResult)
-            {
-                return new ApiResponseDTO<bool> { IsSuccess = true, Message = "MachineGroup updated successfully." };
-            }
-
-            return new ApiResponseDTO<bool> { IsSuccess = false, Message = "MachineGroup update failed." };
+            return updateResult== true ? updateResult : throw new ExceptionRules("Machine Group updated Failed.");
         }
 
     }

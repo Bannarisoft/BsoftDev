@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
 {
-    public class GetMachineGroupByIdQuery   :  IRequest<ApiResponseDTO<GetMachineGroupByIdDto>>
+    public class GetMachineGroupByIdQuery   :  IRequest<GetMachineGroupByIdDto>
     {
         public int Id { get; set; }
     }

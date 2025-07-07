@@ -5,6 +5,8 @@ using MaintenanceManagement.API.Validation.Common;
 using MaintenanceManagement.API.Middleware;
 using Core.Application.Common.RealTimeNotificationHub;
 using MaintenanceManagement.API.GrpcServices;
+using MediatR;
+using Core.Application.Common.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +38,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddMemoryCache();
 // ✅ Add gRPC
 builder.Services.AddGrpc();
-
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 var app = builder.Build();
 

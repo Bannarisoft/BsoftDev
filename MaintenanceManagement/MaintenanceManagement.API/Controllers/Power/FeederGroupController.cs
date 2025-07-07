@@ -72,92 +72,46 @@ namespace MaintenanceManagement.API.Controllers.Power
         {
             var result = await Mediator.Send(new GetFeederGroupByIdQuery { Id = id });
 
-            if (result.IsSuccess && result.Data != null)
-            {
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    data = result.Data,
-                    message = result.Message
+                    data = result,
+                    message = result
                 });
-            }
-
-            return NotFound(new
-            {
-                StatusCode = StatusCodes.Status404NotFound,
-                message = $"FeederGroup ID {id} not found.",
-                errors = ""
-            });
+           
         }
 
         [HttpPost("create")]
         public async Task<ActionResult<ApiResponseDTO<int>>> Create([FromBody] CreateFeederGroupCommand command)
         {
-            // Optionally validate input
-            var validationResult = await _feederGroupCommandRepository.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+
 
             var response = await Mediator.Send(command);
 
-            if (response.IsSuccess)
-            {
-                return CreatedAtAction(nameof(GetFeederById), new { id = response.Data }, new
+                return CreatedAtAction(nameof(GetFeederById), new { id = response }, new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = response.Message,
+                    message = response,
                     errors = "",
-                    data = response.Data
+                    data = response
                 });
-            }
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = response.Message,
-                errors = ""
-            });
+            
         }
 
 
         [HttpPut]
         public async Task<IActionResult> UpdateAsync(UpdateFeederGroupCommand command)
         {
-            var validationResult = await _updateFeederGroupCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(
-                    new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "Validation failed",
-                        errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                    }
-                );
-            }
+          
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
+           
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    message = result.Message,
-                    asset = result.Data
+                    message = result,
+                    asset = result
                 });
-            }
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = result.Message
-            });
+           
 
         }
 
@@ -165,27 +119,11 @@ namespace MaintenanceManagement.API.Controllers.Power
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var command = new DeleteFeederGroupCommand { Id = id };
-            var validationResult = await _deletefeederGroupCommandDelegateRepository.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
-
+            
             var updatefeederGroup = await Mediator.Send(new DeleteFeederGroupCommand { Id = id });
 
-            if (updatefeederGroup.IsSuccess)
-            {
-                return Ok(new { StatusCode = StatusCodes.Status200OK, message = updatefeederGroup.Message, errors = "" });
-
-            }
-
-            return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = updatefeederGroup.Message, errors = "" });
+          
+            return Ok(new { StatusCode = StatusCodes.Status200OK, message = updatefeederGroup, errors = "" });
 
         }
 
@@ -194,11 +132,9 @@ namespace MaintenanceManagement.API.Controllers.Power
         {
           
             var feederGroup = await Mediator.Send(new GetFeederGroupAutoCompleteQuery {SearchPattern = name});
-            if(feederGroup.IsSuccess)
-            {
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = feederGroup.Data });
-            }
-            return NotFound( new { StatusCode=feederGroup.Message}) ;
+            
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = feederGroup });
+            
         }
             
 

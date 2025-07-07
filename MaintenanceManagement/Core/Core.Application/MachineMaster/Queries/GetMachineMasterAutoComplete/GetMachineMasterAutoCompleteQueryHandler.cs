@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.MachineMaster.Queries.GetMachineMasterAutoComplete
 {
-    public class GetMachineMasterAutoCompleteQueryHandler : IRequestHandler<GetMachineMasterAutoCompleteQuery,ApiResponseDTO<List<MachineMasterAutoCompleteDto>>>
+    public class GetMachineMasterAutoCompleteQueryHandler : IRequestHandler<GetMachineMasterAutoCompleteQuery,List<MachineMasterAutoCompleteDto>>
     {
         private readonly IMachineMasterQueryRepository _imachineMasterQueryRepository;        
         private readonly IMapper _mapper;
@@ -27,7 +27,7 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMasterAutoComplete
             _departmentGrpcClient = departmentGrpcClient;
         }
 
-        public async Task<ApiResponseDTO<List<MachineMasterAutoCompleteDto>>> Handle(GetMachineMasterAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<MachineMasterAutoCompleteDto>> Handle(GetMachineMasterAutoCompleteQuery request, CancellationToken cancellationToken)
         {
              var result = await _imachineMasterQueryRepository.GetMachineAsync(request.SearchPattern);
             var machineMasters = _mapper.Map<List<MachineMasterAutoCompleteDto>>(result);
@@ -54,7 +54,7 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMasterAutoComplete
                     module:"MachineMaster"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<MachineMasterAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = filteredMachines };
+            return filteredMachines;
         }
     }
 }

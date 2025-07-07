@@ -13,7 +13,7 @@ using MediatR;
 namespace Core.Application.ActivityCheckListMaster.Queries.GetCheckListByActivityId
 {
   
-     public class GetActivityCheckListByActivityIdQueryHandler : IRequestHandler<GetActivityCheckListByActivityIdQuery, ApiResponseDTO<List<GetActivityCheckListByActivityIdDto>>>
+     public class GetActivityCheckListByActivityIdQueryHandler : IRequestHandler<GetActivityCheckListByActivityIdQuery, List<GetActivityCheckListByActivityIdDto>>
     {
         private readonly IActivityCheckListMasterQueryRepository _activityCheckListMasterQueryRepository;
         private readonly IMapper _mapper;
@@ -39,19 +39,19 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetCheckListByActivit
             _ipAddressService = ipAddressService;
         }
 
-        public async Task<ApiResponseDTO<List<GetActivityCheckListByActivityIdDto>>> Handle(GetActivityCheckListByActivityIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetActivityCheckListByActivityIdDto>> Handle(GetActivityCheckListByActivityIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _activityCheckListMasterQueryRepository.GetCheckListByActivityIdsAsync(request.Ids);
 
-            if (result == null || !result.Any())
-            {
-                return new ApiResponseDTO<List<GetActivityCheckListByActivityIdDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"No activity checklists found for ActivityIds: {string.Join(", ", request.Ids)}.",
-                    Data = null
-                };
-            }
+            // if (result == null || !result.Any())
+            // {
+            //     return new ApiResponseDTO<List<GetActivityCheckListByActivityIdDto>>
+            //     {
+            //         IsSuccess = false,
+            //         Message = $"No activity checklists found for ActivityIds: {string.Join(", ", request.Ids)}.",
+            //         Data = null
+            //     };
+            // }
 
             var checklistDtos = _mapper.Map<List<GetActivityCheckListByActivityIdDto>>(result);
              
@@ -91,12 +91,7 @@ namespace Core.Application.ActivityCheckListMaster.Queries.GetCheckListByActivit
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<List<GetActivityCheckListByActivityIdDto>>
-            {
-                IsSuccess = true,
-                Message = "Activity checklist(s) fetched successfully.",
-                Data = checklistDtos
-            };
+            return checklistDtos;
         }
     }
 }

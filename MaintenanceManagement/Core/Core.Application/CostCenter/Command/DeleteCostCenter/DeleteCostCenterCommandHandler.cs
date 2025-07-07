@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ICostCenter;
 using Core.Domain.Events;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.CostCenter.Command.DeleteCostCenter
 {
-    public class DeleteCostCenterCommandHandler : IRequestHandler<DeleteCostCenterCommand, ApiResponseDTO<int>>
+    public class DeleteCostCenterCommandHandler : IRequestHandler<DeleteCostCenterCommand, int>
     {
         private readonly ICostCenterCommandRepository _iCostCenterCommandRepository;
         private readonly ICostCenterQueryRepository _iCostCenterQueryRepository;
@@ -25,27 +26,12 @@ namespace Core.Application.CostCenter.Command.DeleteCostCenter
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(DeleteCostCenterCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(DeleteCostCenterCommand request, CancellationToken cancellationToken)
         {
-            // 🔹 First, check if the ID exists in the database
-            // var existingcostcenter = await _iCostCenterQueryRepository.GetByIdAsync(request.Id);
-            // if (existingcostcenter is null)
-            // {
-              
-            //     return new ApiResponseDTO<int>
-            //     {
-            //         IsSuccess = false,
-            //         Message = "CostCenter Id not found / CostCenter is deleted ."
-            //     };
-            // }
-
+            
             var costCenterGroup = _Imapper.Map<Core.Domain.Entities.CostCenter>(request);
             var result = await _iCostCenterCommandRepository.DeleteAsync(request.Id,costCenterGroup);
-            if (result == -1) 
-            {
-         
-             return new ApiResponseDTO<int> { IsSuccess = false, Message = "CostCenter not found."};
-            }
+          
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -57,13 +43,7 @@ namespace Core.Application.CostCenter.Command.DeleteCostCenter
             await _mediator.Publish(domainEvent);
           
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,   
-                Data = result,
-                Message = "CostCenter deleted successfully."
-    
-            };
+            return result > 0 ? result : throw new ExceptionRules("CostCenter not found.");
         }
 
 

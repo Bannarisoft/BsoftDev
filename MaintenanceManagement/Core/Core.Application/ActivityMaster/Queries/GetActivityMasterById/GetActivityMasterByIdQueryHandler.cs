@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
 {
-    public class GetActivityMasterByIdQueryHandler : IRequestHandler<GetActivityMasterByIdQuery, ApiResponseDTO<GetActivityMasterByIdDto>>
+    public class GetActivityMasterByIdQueryHandler : IRequestHandler<GetActivityMasterByIdQuery, GetActivityMasterByIdDto>
     {
 
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
@@ -27,22 +27,22 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
             _ipAddressService = ipAddressService;
         }
 
-        public async Task<ApiResponseDTO<GetActivityMasterByIdDto>> Handle(GetActivityMasterByIdQuery request, CancellationToken cancellationToken)
+        public async Task<GetActivityMasterByIdDto> Handle(GetActivityMasterByIdQuery request, CancellationToken cancellationToken)
         {
 
                var unitId = _ipAddressService.GetUnitId();
 
             var result = await _activityMasterQueryRepository.GetByIdAsync(request.Id);
 
-            if (result is null)
-            {
-                return new ApiResponseDTO<GetActivityMasterByIdDto>
-                {
-                    IsSuccess = false,
-                    Message = $"ActivityMaster with Id {request.Id} not found.",
-                    Data = null
-                };
-            }
+            // if (result is null)
+            // {
+            //     return new ApiResponseDTO<GetActivityMasterByIdDto>
+            //     {
+            //         IsSuccess = false,
+            //         Message = $"ActivityMaster with Id {request.Id} not found.",
+            //         Data = null
+            //     };
+            // }
             var activityDto  = _mapper.Map<GetActivityMasterByIdDto>(result);
 
               var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
@@ -68,12 +68,7 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<GetActivityMasterByIdDto>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = activityDto
-            };
+            return activityDto;
         }
 
 

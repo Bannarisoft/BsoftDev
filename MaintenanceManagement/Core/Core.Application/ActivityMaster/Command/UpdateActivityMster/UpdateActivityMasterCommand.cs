@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.ActivityMaster.Command.UpdateActivityMster
 {
-    public class UpdateActivityMasterCommand  : IRequest<ApiResponseDTO<int>> 
+    public class UpdateActivityMasterCommand  : IRequest<int>
     {
 
      public UpdateActivityMasterDto? UpdateActivityMaster  { get; set; }

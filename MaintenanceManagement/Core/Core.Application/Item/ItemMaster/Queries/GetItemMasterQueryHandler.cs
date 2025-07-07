@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Item.ItemMaster.Queries
 {
-    public class GetItemMasterQueryHandler :  IRequestHandler<GetItemMasterQuery,ApiResponseDTO<List<GetItemMasterDto>>>
+    public class GetItemMasterQueryHandler :  IRequestHandler<GetItemMasterQuery,List<GetItemMasterDto>>
     {
          private readonly IMapper _mapper;
         private readonly IMediator _mediator;
@@ -23,7 +23,7 @@ namespace Core.Application.Item.ItemMaster.Queries
             _itemQueryRepository = itemQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<List<GetItemMasterDto>>> Handle(GetItemMasterQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetItemMasterDto>> Handle(GetItemMasterQuery request, CancellationToken cancellationToken)
         {
             var result = await _itemQueryRepository.GetItemMasters(request.OldUnitId, request.Grpcode, request.ItemCode, request.ItemName);
             var itemmaster  = _mapper.Map<List<GetItemMasterDto>>(result);
@@ -36,7 +36,7 @@ namespace Core.Application.Item.ItemMaster.Queries
                     module:"ItemMaster"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetItemMasterDto>> { IsSuccess = true, Message = "Success", Data = itemmaster };
+            return itemmaster;
         }
     }
 }

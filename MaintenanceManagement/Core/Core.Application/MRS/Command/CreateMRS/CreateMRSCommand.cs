@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MRS.Command.CreateMRS
 {
-    public class CreateMRSCommand :IRequest<ApiResponseDTO<int>> 
+    public class CreateMRSCommand :IRequest<int>
     {
          public HeaderRequest? Header { get; set; }
     }
