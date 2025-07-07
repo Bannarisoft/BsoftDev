@@ -414,8 +414,7 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                 subLocationExists.HasValue ||
                 locationExists.HasValue;
         }
-                public async Task<List<GetAssetDetailsToTransferHdrDto>> GetAssetDetailsToTransferByFiltersAsync(
-            string custodianIdsCsv, int departmentId, string categoryIdsCsv)
+         public async Task<List<GetAssetDetailsToTransferHdrDto>> GetAssetDetailsToTransferByFiltersAsync(string custodianIdsCsv, int departmentId, string categoryIdsCsv)
         {
             var companyId = _iPAddressService.GetCompanyId();
             var unitId = _iPAddressService.GetUnitId();
@@ -567,43 +566,54 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetTransferIssue
                     asset.FromCustodianId = location.FromCustodianId ?? 0;
                     asset.ToCustodianId = location.ToCustodianId ?? 0;
                 }
-
-                // Fetch FromCustodianName
-                if (asset.FromCustodianId > 0 && !string.IsNullOrEmpty(asset.OldUnitId))
-                {
-                    var custodianParams = new
-                    {
-                        DivCode = asset.OldUnitId,
-                        EmpNo = asset.FromCustodianId
-                    };
-
-                    var custodianEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
-                        "dbo.GetEmployeeByDivision",
-                        custodianParams,
-                        commandType: CommandType.StoredProcedure
-                    );
-
-                    asset.FromCustodianName = custodianEmployee?.Empname;
-                }
-
-                // Fetch ToCustodianName
-                if (asset.ToCustodianId > 0 && !string.IsNullOrEmpty(asset.OldUnitId))
-                {
-                    var userParams = new
-                    {
-                        DivCode = asset.OldUnitId,
-                        EmpNo = asset.ToCustodianId
-                    };
-
-                    var userEmployee = await _dbConnection.QueryFirstOrDefaultAsync<Employee>(
-                        "dbo.GetEmployeeByDivision",
-                        userParams,
-                        commandType: CommandType.StoredProcedure
-                    );
-
-                    asset.ToCustodianName = userEmployee?.Empname;
-                }
             }
+           // Prepare TVP for custodian employee lookup
+              var custodianKeys = assets
+                .SelectMany(a => new[]
+                {
+                    (DivCode: a.OldUnitId, EmpNo: a.FromCustodianId),
+                    (DivCode: a.OldUnitId, EmpNo: a.ToCustodianId)
+                })
+                .Where(k => !string.IsNullOrEmpty(k.DivCode) && k.EmpNo > 0)
+                .Distinct()
+                .ToList();
+
+                var tvp = new DataTable();
+                tvp.Columns.Add("DivCode", typeof(string));
+                tvp.Columns.Add("EmpNo", typeof(int));
+
+                foreach (var key in custodianKeys)
+                {
+                    tvp.Rows.Add(key.DivCode, key.EmpNo);
+                }
+
+                // Get employee names in one call using TVP
+                var employeeList = (await _dbConnection.QueryAsync<Employee>(
+                    "dbo.GetEmployeeByDivision_TVP",
+                    new { EmployeeKeys = tvp.AsTableValuedParameter("dbo.EmployeeKeyType") },
+                    commandType: CommandType.StoredProcedure)).ToList();
+
+                // Map employees for lookup
+                var employeeDict = employeeList.ToDictionary(
+                    e => e.Empcode,
+                    e => e.Empname);
+
+            // Assign custodian names back to assets
+            foreach (var asset in assets)
+            {
+                if (asset.FromCustodianId > 0)
+                {
+                    employeeDict.TryGetValue(asset.FromCustodianId, out var fromName);
+                    asset.FromCustodianName = fromName;
+                }
+               
+                        if (asset.ToCustodianId.HasValue && asset.ToCustodianId.Value > 0)
+                    {
+                        employeeDict.TryGetValue(asset.ToCustodianId.Value, out var toName);
+                        asset.ToCustodianName = toName;
+                    }
+                        
+                    }             
 
             return assets;
         }

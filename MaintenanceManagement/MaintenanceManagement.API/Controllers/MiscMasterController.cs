@@ -17,6 +17,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
+
 namespace MaintenanceManagement.API.Controllers
 {
     [Route("api/[controller]")]
@@ -28,15 +29,17 @@ namespace MaintenanceManagement.API.Controllers
 
         private readonly IValidator<DeleteMiscMasterCommand> _deleteMiscMasterCommand;
         private readonly IMiscMasterCommandRepository _miscMasterCommandRepository;
-       public MiscMasterController(ISender mediator, IValidator<CreateMiscMasterCommand>  miscMasterCommand, IValidator<UpdateMiscMasterCommand> updateMiscMasterCommand, IMiscMasterCommandRepository miscMasterCommandRepository,
-        IValidator<DeleteMiscMasterCommand> deleteMiscMasterCommand ):base(mediator)
-          {
+        
+        
+       public MiscMasterController(ISender mediator, IValidator<CreateMiscMasterCommand> miscMasterCommand, IValidator<UpdateMiscMasterCommand> updateMiscMasterCommand, IMiscMasterCommandRepository miscMasterCommandRepository,
+          IValidator<DeleteMiscMasterCommand> deleteMiscMasterCommand) : base(mediator)
+        {
 
-            _miscMasterCommand=miscMasterCommand;
-            _updateMiscMasterCommand=updateMiscMasterCommand;
-            _miscMasterCommandRepository=miscMasterCommandRepository;
+            _miscMasterCommand = miscMasterCommand;
+            _updateMiscMasterCommand = updateMiscMasterCommand;
+            _miscMasterCommandRepository = miscMasterCommandRepository;
             _deleteMiscMasterCommand = deleteMiscMasterCommand;
-          } 
+        } 
 
          [HttpGet] 
           public async Task<IActionResult> GetAllMiscMasterAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -125,6 +128,5 @@ namespace MaintenanceManagement.API.Controllers
             
         }
         
-      
     }
 }
