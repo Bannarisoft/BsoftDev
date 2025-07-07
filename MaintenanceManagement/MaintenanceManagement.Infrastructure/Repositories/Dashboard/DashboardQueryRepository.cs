@@ -18,7 +18,6 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
     {
         private readonly IDbConnection _connection;
         private readonly IDepartmentAllGrpcClient _departmentGrpcClient;
-
         public DashboardQueryRepository(
             IDbConnection connection,
             IDepartmentAllGrpcClient departmentGrpcClient,
