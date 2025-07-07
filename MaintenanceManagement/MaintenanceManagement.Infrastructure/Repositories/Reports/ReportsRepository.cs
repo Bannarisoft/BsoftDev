@@ -43,6 +43,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             if (departmentId.HasValue)
                 parameters.Add("DepartmentId", departmentId.Value);
 
+            parameters.Add("UnitId", UnitId);
+
             var result = await _dbConnection.QueryAsync<RequestReportDto>(
                 "[dbo].[Rpt_GetMaintenanceRequestReport]",
                 parameters,

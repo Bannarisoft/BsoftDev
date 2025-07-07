@@ -40,7 +40,6 @@ namespace Core.Application.Reports.WorkOderCheckListReport
             request.MachineGroupId,
             request.MachineId,
             request.ActivityId
-
            );
 
             var requestReportDtos = _mapper.Map<List<WorkOderCheckListReportDto>>(requestReportEntities);

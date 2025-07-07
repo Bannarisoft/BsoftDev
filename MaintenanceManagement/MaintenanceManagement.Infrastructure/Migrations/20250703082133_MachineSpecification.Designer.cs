@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250703082133_MachineSpecification")]
+    partial class MachineSpecification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -577,8 +580,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
@@ -603,6 +605,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<int>("MachineId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MachineMasterId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
@@ -618,13 +623,16 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<int>("SpecificationId")
                         .HasColumnType("int");
 
+                    b.Property<int>("SpecificationIdMachineSpecId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("MachineId");
+                    b.HasIndex("MachineMasterId");
 
-                    b.HasIndex("SpecificationId");
+                    b.HasIndex("SpecificationIdMachineSpecId");
 
-                    b.ToTable("MachineSpecification", "Maintenance");
+                    b.ToTable("MachineSpecification");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MaintenanceCategory", b =>
@@ -2214,14 +2222,12 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                 {
                     b.HasOne("Core.Domain.Entities.MachineMaster", "MachineMaster")
                         .WithMany("MachineSpecification")
-                        .HasForeignKey("MachineId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("MachineMasterId");
 
                     b.HasOne("Core.Domain.Entities.MiscMaster", "SpecificationIdMachineSpec")
                         .WithMany("MachineSpecificationsName")
-                        .HasForeignKey("SpecificationId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("SpecificationIdMachineSpecId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("MachineMaster");

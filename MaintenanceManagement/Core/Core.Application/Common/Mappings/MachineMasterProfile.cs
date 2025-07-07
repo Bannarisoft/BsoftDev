@@ -15,8 +15,7 @@ namespace Core.Application.Common.Mappings
     {
         public MachineMasterProfile()
         {
-            CreateMap<Core.Domain.Entities.MachineMaster, MachineMasterDto>()
-              ;
+            CreateMap<Core.Domain.Entities.MachineMaster, MachineMasterDto>();
 
             CreateMap<Core.Domain.Entities.MachineMaster, MachineMasterAutoCompleteDto>()
              .ForMember(dest => dest.DepartmentId, opt => opt.MapFrom(src => src.MachineGroup.DepartmentId));

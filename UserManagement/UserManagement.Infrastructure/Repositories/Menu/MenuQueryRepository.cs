@@ -109,9 +109,9 @@ namespace UserManagement.Infrastructure.Repositories.Menu
 
             return (MenuMasterList, TotalCount);
         }
-         public async Task<Core.Domain.Entities.Menu> GetMenuByNameAsync(string MenuName)
+        public async Task<Core.Domain.Entities.Menu> GetMenuByNameAsync(string MenuName)
         {
-              var query = $@"
+            var query = $@"
                SELECT Id, MenuName 
                FROM AppData.Menus 
                WHERE IsDeleted = 0 
@@ -119,6 +119,25 @@ namespace UserManagement.Infrastructure.Repositories.Menu
 
             var Menus = await _dbConnection.QueryAsync<Core.Domain.Entities.Menu>(query, new { MenuName });
             return Menus.FirstOrDefault();
+        }
+         public async Task<List<Core.Domain.Entities.Menu>> GetParentMenuAutoComplete(string searchPattern)
+        {
+
+
+                     var query = $@"
+                 SELECT Id, MenuName 
+                 FROM AppData.Menus 
+                 WHERE IsDeleted = 0 
+                 AND MenuName LIKE @SearchPattern";
+
+
+                  var parameters = new
+                  {
+                      SearchPattern = $"%{searchPattern ?? string.Empty}%"
+                  };
+        
+                  var modules = await _dbConnection.QueryAsync<Core.Domain.Entities.Menu>(query, parameters);
+                  return modules.ToList();
         }
     }
 }
