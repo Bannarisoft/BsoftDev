@@ -311,8 +311,10 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 WHERE AL.UnitId = @UnitId AND AL.AssetId = @AssetId;                
 
                 -- Third Query: AssetPurchaseDetails (One-to-Many)
-                SELECT distinct AP.Id,AP.VendorCode, AP.VendorName,@oldUnitName UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
-                AP.GrnSno,AP.GrnValue,AP.PoNo,Cast(AP.PoDate AS date) AS PoDate,AP.PurchaseValue,AP.AcceptedQty,AP.Uom,
+                SELECT distinct AP.Id,AP.VendorCode, AP.VendorName,@oldUnitName UnitName,ASource.SourceName,AP.GrnNo,
+                CASE  WHEN AP.GrnDate = '0001-01-01' THEN NULL  ELSE CAST(AP.GrnDate AS DATE)  END AS GrnDate ,
+                AP.GrnSno,AP.GrnValue,AP.PoNo, CASE  WHEN AP.PoDate = '0001-01-01' THEN NULL  ELSE CAST(AP.PoDate AS DATE)  END AS PoDate,
+                AP.PurchaseValue,AP.AcceptedQty,AP.Uom,
                 AP.PoSno,AP.ItemCode,AP.ItemName,AP.BillNo,Cast(AP.BillDate AS date) AS BillDate ,AP.BinLocation 
                 ,AP.PjYear,AP.PjDocId,AP.PjDocSr,AP.PjDocNo,AP.AssetSourceId ,cast(AP.CapitalizationDate as date)CapitalizationDate
                 FROM [FixedAsset].[AssetPurchaseDetails] AP                
@@ -471,8 +473,11 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 
 
                 -- Third Query: AssetPurchaseDetails (One-to-Many)
-                SELECT distinct AP.Id,AP.VendorCode, AP.VendorName,@oldUnitId UnitName,ASource.SourceName,AP.GrnNo,Cast(AP.GrnDate AS date) AS GrnDate ,
-                AP.GrnSno,AP.GrnValue,AP.PoNo,Cast(AP.PoDate AS date) AS PoDate,AP.PurchaseValue,AP.AcceptedQty,AP.Uom,
+                SELECT distinct AP.Id,AP.VendorCode, AP.VendorName,@oldUnitId UnitName,ASource.SourceName,AP.GrnNo,
+                CASE  WHEN AP.GrnDate = '0001-01-01' THEN NULL  ELSE CAST(AP.GrnDate AS DATE)  END AS GrnDate,                
+                AP.GrnSno,AP.GrnValue,AP.PoNo,
+                CASE  WHEN AP.PoDate = '0001-01-01' THEN NULL  ELSE CAST(AP.PoDate AS DATE)  END AS PoDate,
+                AP.PurchaseValue,AP.AcceptedQty,AP.Uom,
                 AP.PoSno,AP.ItemCode,AP.ItemName,AP.BillNo,Cast(AP.BillDate AS date) AS BillDate ,AP.BinLocation 
                 ,AP.PjYear,AP.PjDocId,AP.PjDocSr,AP.PjDocNo,AP.AssetSourceId ,cast(AP.CapitalizationDate as varchar)CapitalizationDate
                 FROM [FixedAsset].[AssetPurchaseDetails] AP                
