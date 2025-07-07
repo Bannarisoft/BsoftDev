@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Power.FeederGroup.Queries.GetFeederGroupById
 {
-    public class GetFeederGroupByIdQuery :IRequest<ApiResponseDTO<GetFeederGroupByIdDto>>
+    public class GetFeederGroupByIdQuery :IRequest<GetFeederGroupByIdDto>
     {
 
      public int  Id { get; set; }

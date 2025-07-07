@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Power.PowerConsumption.Command.CreatePowerConsumption
 {
-    public class CreatePowerConsumptionCommand : IRequest<ApiResponseDTO<int>>
+    public class CreatePowerConsumptionCommand : IRequest<int>
     {
         public int FeederTypeId { get; set; }
         public int FeederId { get; set; }

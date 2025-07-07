@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MRS.Queries
 {
-     public class GetDepartmentbyIdQuery : IRequest<ApiResponseDTO<List<MDepartmentDto>>>
+     public class GetDepartmentbyIdQuery : IRequest<List<MDepartmentDto>>
     {
         public string? OldUnitcode { get; set; }
     }

@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler
 {
-    public class CreatePreventiveSchedulerCommand : IRequest<ApiResponseDTO<int>>
+    public class CreatePreventiveSchedulerCommand : IRequest<int>
     {
         public string PreventiveSchedulerName { get; set; }
         public int MachineGroupId { get; set; }

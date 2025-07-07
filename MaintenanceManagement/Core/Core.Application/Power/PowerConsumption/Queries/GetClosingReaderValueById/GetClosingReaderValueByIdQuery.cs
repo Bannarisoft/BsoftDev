@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Power.PowerConsumption.Queries.GetClosingReaderValueById
 {
-    public class GetClosingReaderValueByIdQuery :  IRequest<ApiResponseDTO<GetClosingReaderValueDto>>
+    public class GetClosingReaderValueByIdQuery :  IRequest<GetClosingReaderValueDto>
     {
         public int FeederId { get; set; }
     }

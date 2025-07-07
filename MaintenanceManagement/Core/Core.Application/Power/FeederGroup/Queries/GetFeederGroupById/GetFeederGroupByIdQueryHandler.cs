@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.Power.FeederGroup.Queries.GetFeederGroupById
 {
-    public class GetFeederGroupByIdQueryHandler  : IRequestHandler<GetFeederGroupByIdQuery, ApiResponseDTO<GetFeederGroupByIdDto>>
+    public class GetFeederGroupByIdQueryHandler  : IRequestHandler<GetFeederGroupByIdQuery, GetFeederGroupByIdDto>
     { 
 
          private readonly IFeederGroupQueryRepository _feederGroupQueryRepository;        
@@ -26,19 +26,11 @@ namespace Core.Application.Power.FeederGroup.Queries.GetFeederGroupById
             
         }
 
-       public async Task<ApiResponseDTO<GetFeederGroupByIdDto>> Handle(GetFeederGroupByIdQuery request, CancellationToken cancellationToken)
+       public async Task<GetFeederGroupByIdDto> Handle(GetFeederGroupByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _feederGroupQueryRepository.GetFeederGroupByIdAsync(request.Id);
 
-            if (result == null)
-            {
-                return new ApiResponseDTO<GetFeederGroupByIdDto>
-                {
-                    IsSuccess = false,
-                    Message = "FeederGroup not found.",
-                    Data = null
-                };
-            }
+           
 
             var feederGroupDto = _mapper.Map<GetFeederGroupByIdDto>(result);
 
@@ -52,12 +44,7 @@ namespace Core.Application.Power.FeederGroup.Queries.GetFeederGroupById
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<GetFeederGroupByIdDto>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = feederGroupDto
-            };
+            return  feederGroupDto;
         }
     }
 }

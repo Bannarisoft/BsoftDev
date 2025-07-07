@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Power.FeederGroup.Queries.GetFeederGroupAutoComplete
 {
-    public class GetFeederGroupAutoCompleteQueryHandler : IRequestHandler<GetFeederGroupAutoCompleteQuery, ApiResponseDTO<List<GetFeederGroupAutoCompleteDto>>>
+    public class GetFeederGroupAutoCompleteQueryHandler : IRequestHandler<GetFeederGroupAutoCompleteQuery, List<GetFeederGroupAutoCompleteDto>>
     {
         private readonly IFeederGroupQueryRepository _feederGroupQueryRepository;
         private readonly IMapper _mapper;
@@ -21,19 +21,9 @@ namespace Core.Application.Power.FeederGroup.Queries.GetFeederGroupAutoComplete
             _mapper = mapper;
             _mediator = mediator;
         }
-          public  async Task<ApiResponseDTO<List<GetFeederGroupAutoCompleteDto>>> Handle(GetFeederGroupAutoCompleteQuery request, CancellationToken cancellationToken)
+          public  async Task<List<GetFeederGroupAutoCompleteDto>> Handle(GetFeederGroupAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var machineGroup  = await _feederGroupQueryRepository.GetFeederGroupAutoComplete(request.SearchPattern);
-
-            if (machineGroup == null || !machineGroup.Any())
-            {
-                return new ApiResponseDTO<List<GetFeederGroupAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"No FeederGroup Masters found matching '{request.SearchPattern}'.",
-                    Data = new List<GetFeederGroupAutoCompleteDto>()
-                };
-            }
 
             var division = _mapper.Map<List<GetFeederGroupAutoCompleteDto>>(machineGroup);
              //Domain Event
@@ -45,7 +35,7 @@ namespace Core.Application.Power.FeederGroup.Queries.GetFeederGroupAutoComplete
                     module:"FeederGroup"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetFeederGroupAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = division }; 
+            return  division; 
         }
 
 

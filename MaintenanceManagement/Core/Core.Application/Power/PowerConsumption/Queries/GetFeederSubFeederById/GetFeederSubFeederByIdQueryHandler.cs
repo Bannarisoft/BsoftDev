@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.Power.PowerConsumption.Queries
 {
-    public class GetFeederSubFeederByIdQueryHandler : IRequestHandler<GetFeederSubFeederByIdQuery, ApiResponseDTO<List<GetFeederSubFeederDto>>>
+    public class GetFeederSubFeederByIdQueryHandler : IRequestHandler<GetFeederSubFeederByIdQuery, List<GetFeederSubFeederDto>>
     {
         private readonly IPowerConsumptionQueryRepository _powerConsumptionQueryRepository;
         private readonly IMapper _mapper;
@@ -25,18 +25,10 @@ namespace Core.Application.Power.PowerConsumption.Queries
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<GetFeederSubFeederDto>>> Handle(GetFeederSubFeederByIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetFeederSubFeederDto>> Handle(GetFeederSubFeederByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _powerConsumptionQueryRepository.GetFeederSubFeedersById(request.FeederTypeId);
-            if (result == null || !result.Any())
-            {
-                return new ApiResponseDTO<List<GetFeederSubFeederDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"No FeederGroup Masters found matching '{request.FeederTypeId}'.",
-                    Data = new List<GetFeederSubFeederDto>()
-                };
-            }
+          
             var FeederSubFeeder = _mapper.Map<List<GetFeederSubFeederDto>>(result);
             //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
@@ -47,7 +39,7 @@ namespace Core.Application.Power.PowerConsumption.Queries
                     module:"Feeder & SubFeeder"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetFeederSubFeederDto>> { IsSuccess = true, Message = "Success", Data = FeederSubFeeder };
+            return  FeederSubFeeder;
         }
     }
 }

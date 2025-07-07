@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MRS.Queries.GetSubCostCenter
 {
-    public class GetSubCostCenterQuery : IRequest<ApiResponseDTO<List<MSubCostCenterDto>>>
+    public class GetSubCostCenterQuery : IRequest<List<MSubCostCenterDto>>
     {
          public string? OldUnitcode { get; set; }
     }

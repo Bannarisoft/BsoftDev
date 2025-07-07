@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.Power.Feeder.Command.UpdateFeeder
 {
-    public class UpdateFeederCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateFeederCommand : IRequest<bool>
     {
         public int Id { get; set; }
         public string? FeederCode { get; set; }
