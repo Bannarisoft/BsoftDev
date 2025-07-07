@@ -16,7 +16,6 @@ using Core.Application.Reports.PowerConsumption;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.Reports
 {
-
     public class ReportsRepository : BaseQueryRepository, IReportRepository
     {
         private readonly IDbConnection _dbConnection;

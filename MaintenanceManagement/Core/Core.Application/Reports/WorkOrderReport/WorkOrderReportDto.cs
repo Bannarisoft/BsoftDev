@@ -2,7 +2,7 @@ namespace Core.Application.Reports.WorkOrderReport
 {
     public class WorkOrderReportDto
     {
-        public string? WODate { get; set; }
+        public DateTimeOffset? WODate { get; set; }
         public string? WorkOrderDocNo { get; set; } 
         public string? CreatedUser { get; set; } 
         public string? MaintenanceType { get; set; } 
