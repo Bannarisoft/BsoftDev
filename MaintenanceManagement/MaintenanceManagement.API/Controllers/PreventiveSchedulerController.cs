@@ -28,26 +28,11 @@ namespace MaintenanceManagement.API.Controllers
     [Route("api/[controller]")]
     public class PreventiveSchedulerController : ApiControllerBase
     {
-        private readonly IValidator<CreatePreventiveSchedulerCommand> _createPreventiveSchedulerCommand;
-        private readonly IValidator<UpdatePreventiveSchedulerCommand> _updatePreventiveSchedulerCommand;
-        private readonly IValidator<DeletePreventiveSchedulerCommand> _deletePreventiveSchedulerCommand;
-        private readonly IValidator<ActiveInActivePreventiveCommand> _activeInActivePreventiveCommand;
-        private readonly IValidator<RescheduleBulkImportCommand> _rescheduleBulkImportCommand;
-        private readonly IValidator<MapMachineCommand> _mapMachineCommandValidator;
-        private readonly IValidator<MachineWiseFrequencyUpdateCommand> _machineWiseFrequencyUpdateCommandValidator;
-        public PreventiveSchedulerController(ISender mediator, IValidator<CreatePreventiveSchedulerCommand> createPreventiveSchedulerCommand,
-        IValidator<UpdatePreventiveSchedulerCommand> updatePreventiveSchedulerCommand, IValidator<DeletePreventiveSchedulerCommand> deletePreventiveSchedulerCommand,
-        IValidator<ActiveInActivePreventiveCommand> activeInActivePreventiveCommand, IValidator<RescheduleBulkImportCommand> rescheduleBulkImportCommand,
-        IValidator<MapMachineCommand> mapMachineCommandValidator, IValidator<MachineWiseFrequencyUpdateCommand> machineWiseFrequencyUpdateCommandValidator)
+       
+        public PreventiveSchedulerController(ISender mediator)
         : base(mediator)
         {
-            _createPreventiveSchedulerCommand = createPreventiveSchedulerCommand;
-            _updatePreventiveSchedulerCommand = updatePreventiveSchedulerCommand;
-            _deletePreventiveSchedulerCommand = deletePreventiveSchedulerCommand;
-            _activeInActivePreventiveCommand = activeInActivePreventiveCommand;
-            _rescheduleBulkImportCommand = rescheduleBulkImportCommand;
-            _mapMachineCommandValidator = mapMachineCommandValidator;
-            _machineWiseFrequencyUpdateCommandValidator = machineWiseFrequencyUpdateCommandValidator;
+           
         }
         [Route("[action]")]
         [HttpGet]
@@ -74,23 +59,12 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> CreateAsync(CreatePreventiveSchedulerCommand command)
         {
 
-            var validationResult = await _createPreventiveSchedulerCommand.ValidateAsync(command);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
             var response = await Mediator.Send(command);
           
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = response,
+                    message = "Preventive scheduler created successfully",
                     errors = "",
                     data = response
                 });
@@ -123,17 +97,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPut]
         public async Task<IActionResult> Update(UpdatePreventiveSchedulerCommand command)
         {
-            var validationResult = await _updatePreventiveSchedulerCommand.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
-
+            
             var response = await Mediator.Send(command);
             if (response.IsSuccess)
             {
@@ -161,41 +125,22 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeletePreventiveSchedulerCommand { Id = id };
-            var validationResult = await _deletePreventiveSchedulerCommand.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
-            var updatedPreventiveScheduler = await Mediator.Send(command);
+          
+             await Mediator.Send(command);
 
            
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    message = updatedPreventiveScheduler,
+                    message = "Preventive Scheduler deleted successfully.",
                     errors = ""
                 });
-
-           
 
         }
         [HttpPut("reschedule")]
         public async Task<IActionResult> Reschedule(ReshedulePreventiveCommand command)
         {
-            // var validationResult = await _updateCustomFieldCommandValidator.ValidateAsync(command);
-            // if (!validationResult.IsValid)
-            // {
-            //      return BadRequest(new 
-            //     {
-            //         StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-            //         errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-            //     });
-            // }
+          
 
             var response = await Mediator.Send(command);
             if (response.IsSuccess)
@@ -220,16 +165,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPut("UpdateActiveStatus")]
         public async Task<IActionResult> UpdateActiveInActive(ActiveInActivePreventiveCommand command)
         {
-            var validationResult = await _activeInActivePreventiveCommand.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+           
 
             var response = await Mediator.Send(command);
            
@@ -282,18 +218,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPost("bulk-upload-schedule")]
         public async Task<IActionResult> UploadPreventiveSchedule(RescheduleBulkImportCommand command)
         {
-            // if (file == null || file.Length == 0)
-            //     return BadRequest("Invalid file.");
-            var validationResult = await _rescheduleBulkImportCommand.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+           
 
             var result = await Mediator.Send(command);
             return Ok(result);
@@ -329,17 +254,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPost("MapMachines")]
         public async Task<IActionResult> MapMachines(MapMachineCommand command)
         {
-            var validationResult = await _mapMachineCommandValidator.ValidateAsync(command);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+           
             var response = await Mediator.Send(command);
 
             return Ok(new
@@ -351,17 +266,7 @@ namespace MaintenanceManagement.API.Controllers
           [HttpPost("MachineFrequencyUpdate")]
         public async Task<IActionResult> MachineFrequencyUpdate(MachineWiseFrequencyUpdateCommand command)
         {
-            var validationResult = await _machineWiseFrequencyUpdateCommandValidator.ValidateAsync(command);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+            
             var response = await Mediator.Send(command);
 
             return Ok(new

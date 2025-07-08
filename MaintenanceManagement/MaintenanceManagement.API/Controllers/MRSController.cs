@@ -120,7 +120,7 @@ namespace MaintenanceManagement.API.Controllers
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = result,
+                    message = "MRS Created Successfully",
                     data = result
                 });
            

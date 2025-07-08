@@ -16,14 +16,14 @@ namespace MaintenanceManagement.API.Controllers
     [Route("api/[controller]")]
     public class StockLedgerController : ApiControllerBase
     {
-        private readonly ILogger<StockLedgerController> _logger;
+        
         private readonly IMediator _mediator;
 
 
-        public StockLedgerController(ILogger<StockLedgerController> logger, IMediator mediator)
+        public StockLedgerController( IMediator mediator)
         : base(mediator)
         {
-            _logger = logger;
+            
             _mediator = mediator;
         }
         [HttpGet("current-stock")]

@@ -22,20 +22,14 @@ namespace MaintenanceManagement.API.Controllers
     {
         private readonly ILogger<CostCenterController> _logger;
         private readonly IMediator _mediator;
-        private readonly IValidator<CreateWorkCenterCommand> _createworkcentercommandvalidator;
-        private readonly IValidator<UpdateWorkCenterCommand> _updateworkcentercommandvalidator;
-        private readonly IValidator<DeleteWorkCenterCommand> _deleteworkcentercommandvalidator;
 
 
         
-        public WorkCenterController(ILogger<CostCenterController> logger,IMediator mediator,IValidator<CreateWorkCenterCommand> createworkcentercommandvalidator,IValidator<UpdateWorkCenterCommand> updateworkcentercommandvalidator,IValidator<DeleteWorkCenterCommand> deleteworkcentercommandvalidator)
+        public WorkCenterController(ILogger<CostCenterController> logger,IMediator mediator)
         : base(mediator)
         {
             _logger = logger;
             _mediator=mediator;
-            _createworkcentercommandvalidator=createworkcentercommandvalidator;
-            _updateworkcentercommandvalidator=updateworkcentercommandvalidator;
-            _deleteworkcentercommandvalidator=deleteworkcentercommandvalidator;
         }
 
          [HttpGet]
@@ -84,20 +78,6 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateWorkCenterCommand createWorkCenterCommand)
         {
-            
-            // Validate the incoming command
-            var validationResult = await _createworkcentercommandvalidator.ValidateAsync(createWorkCenterCommand);
-            _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-            if (!validationResult.IsValid)
-            {
-                
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                });
-            }
 
             // Process the command
             var CreatedWorkCenterId = await _mediator.Send(createWorkCenterCommand);
@@ -123,20 +103,7 @@ namespace MaintenanceManagement.API.Controllers
             [HttpPut]
             public async Task<IActionResult> UpdateAsync(UpdateWorkCenterCommand updateWorkCenterCommand)
             {
-            
-                    // Validate the incoming command
-                    var validationResult = await _updateworkcentercommandvalidator.ValidateAsync(updateWorkCenterCommand);
-                    _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-                    if (!validationResult.IsValid)
-                    {
-                    
-                        return BadRequest(new
-                        {
-                            StatusCode = StatusCodes.Status400BadRequest,
-                            message = "Validation failed",
-                            errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                        });
-                    }
+    
 
                     var updatedworkcenter = await _mediator.Send(updateWorkCenterCommand);
 
@@ -159,19 +126,6 @@ namespace MaintenanceManagement.API.Controllers
             [HttpDelete]
             public async Task<IActionResult> DeleteWorkCenterAsync(int id)
             {
-                // Validate the incoming command
-                    var validationResult = await _deleteworkcentercommandvalidator.ValidateAsync(new DeleteWorkCenterCommand { Id = id });
-                    _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-                    if (!validationResult.IsValid)
-                    {
-                    
-                        return BadRequest(new
-                        {
-                            StatusCode = StatusCodes.Status400BadRequest,
-                            message = "Validation failed",
-                            errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                        });
-                    }
 
                     // Process the delete command
                     var result = await _mediator.Send(new DeleteWorkCenterCommand { Id = id });

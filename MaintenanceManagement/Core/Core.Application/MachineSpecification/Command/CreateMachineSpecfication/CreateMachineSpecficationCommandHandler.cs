@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.MachineSpecification.Command.CreateMachineSpecfication
 {
-    public class CreateMachineSpecficationCommandHandler : IRequestHandler<CreateMachineSpecficationCommand, ApiResponseDTO<int>>
+    public class CreateMachineSpecficationCommandHandler  : IRequestHandler<CreateMachineSpecficationCommand, ApiResponseDTO<List<int>>>
     {
         private readonly IMachineSpecificationCommandRepository _imachineSpecificationCommandRepository;
         private readonly IMediator _imediator;
@@ -23,38 +23,38 @@ namespace Core.Application.MachineSpecification.Command.CreateMachineSpecficatio
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateMachineSpecficationCommand request, CancellationToken cancellationToken)
+         public async Task<ApiResponseDTO<List<int>>> Handle(CreateMachineSpecficationCommand request, CancellationToken cancellationToken)
         {
-            var machineMaster = _imapper.Map<Core.Domain.Entities.MachineSpecification>(request);
-            
-            var result = await _imachineSpecificationCommandRepository.CreateAsync(machineMaster);
+            var ids = new List<int>();
 
-            //Domain Event
+          foreach (var item in request.Specifications)
+          {
+            var machineSpec = _imapper.Map<Core.Domain.Entities.MachineSpecification>(item);
+
+            var result = await _imachineSpecificationCommandRepository.CreateAsync(machineSpec);
+
+            // Raise domain event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Create",
-                actionCode: machineMaster.MachineId.ToString(),
-                actionName: machineMaster.SpecificationId.ToString(),
-                details: $"MachineSpecification details was created",
+                actionCode: machineSpec.MachineId.ToString(),
+                actionName: machineSpec.SpecificationId.ToString(),
+                details: $"MachineSpecification created",
                 module: "MachineSpecification");
+
             await _imediator.Publish(domainEvent, cancellationToken);
-          
-            var costcenterGroupDtoDto = _imapper.Map<MachineSpecificationDto>(machineMaster);
+
             if (result > 0)
-                  {
-                    
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "MachineSpecification created successfully",
-                           Data = result
-                      };
-                 }
-            return new ApiResponseDTO<int>
             {
-                IsSuccess = true,
-                Message = "MachineSpecification Creation Failed",
-                Data = result
-            };
+                ids.Add(result);
+            }
         }
+
+        return new ApiResponseDTO<List<int>>
+        {
+            IsSuccess = ids.Count > 0,
+            Message = ids.Count > 0 ? "MachineSpecifications created successfully" : "No records inserted",
+            Data = ids
+        };
+    }
     }
 }

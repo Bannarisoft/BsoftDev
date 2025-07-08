@@ -26,45 +26,19 @@ namespace MaintenanceManagement.API.Controllers
     [Route("api/[controller]")]
     public class WorkOrderController : ApiControllerBase
     {
-        private readonly IValidator<CreateWorkOrderCommand> _createWorkOrderCommandValidator;
-        private readonly IValidator<UpdateWorkOrderCommand> _updateWorkOrderCommandValidator;
-        private readonly IValidator<UpdateWOScheduleCommand> _updateWoScheduleCommandValidator;
-        private readonly IValidator<CreateWOScheduleCommand> _createWoScheduleCommandValidator;
-        private readonly IValidator<UploadFileWorkOrderCommand> _uploadFileCommandValidator;
-        private readonly IValidator<UploadFileItemCommand> _uploadItemCommandValidator;
+   
 
-        public WorkOrderController(ISender mediator,
-            IValidator<CreateWorkOrderCommand> createWorkOrderCommandValidator,
-            IValidator<UpdateWorkOrderCommand> updateWorkOrderCommandValidator,
-            IValidator<UpdateWOScheduleCommand> updateWoScheduleCommandValidator,
-            IValidator<CreateWOScheduleCommand> createWoScheduleCommandValidator,
-            IValidator<UploadFileWorkOrderCommand> uploadFileCommandValidator,
-            IValidator<UploadFileItemCommand> uploadItemCommandValidator
+        public WorkOrderController(ISender mediator
             )
             : base(mediator)
 
         {
-            _createWorkOrderCommandValidator = createWorkOrderCommandValidator;
-            _updateWorkOrderCommandValidator = updateWorkOrderCommandValidator;
-            _updateWoScheduleCommandValidator = updateWoScheduleCommandValidator;
-            _createWoScheduleCommandValidator = createWoScheduleCommandValidator;
-            _uploadFileCommandValidator = uploadFileCommandValidator;
-            _uploadItemCommandValidator = uploadItemCommandValidator;
+          
         }
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateWorkOrderCommand command)
         {
-            var validationResult = await _createWorkOrderCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+           
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
@@ -92,17 +66,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateAsync(UpdateWorkOrderCommand command)
         {
-            var validationResult = await _updateWorkOrderCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-
-            }
+          
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
@@ -124,17 +88,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPost("schedule/Create")]
         public async Task<IActionResult> CreateScheduleAsync(CreateWOScheduleCommand command)
         {
-            var validationResult = await _createWoScheduleCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-
-            }
+        
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
@@ -155,17 +109,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPut("schedule/Update")]
         public async Task<IActionResult> UpdateScheduleAsync(UpdateWOScheduleCommand command)
         {
-            var validationResult = await _updateWoScheduleCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-
-            }
+           
             var result = await Mediator.Send(command);
             if (result.IsSuccess)
             {
@@ -187,17 +131,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPost("upload-image")]
         public async Task<IActionResult> UploadLogo(UploadFileWorkOrderCommand uploadFileCommand)
         {
-            var validationResult = await _uploadFileCommandValidator.ValidateAsync(uploadFileCommand);
-            if (!validationResult.IsValid)
-            {
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+          
             var file = await Mediator.Send(uploadFileCommand);
             if (!file.IsSuccess)
             {
@@ -253,17 +187,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPost("upload-image/Item")]
         public async Task<IActionResult> UploadItemLogo(UploadFileItemCommand uploadFileCommand)
         {
-            var validationResult = await _uploadItemCommandValidator.ValidateAsync(uploadFileCommand);
-            if (!validationResult.IsValid)
-            {
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+           
             var file = await Mediator.Send(uploadFileCommand);
             if (!file.IsSuccess)
             {

@@ -86,7 +86,7 @@ namespace MaintenanceManagement.API.Controllers
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = CreateMachineId,
+                    message = "Created successfully.",
                     data = CreateMachineId
                 });
             
@@ -96,11 +96,11 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> UpdateAsync(UpdateMachineMasterCommand updateMachineMasterCommand)
         {
 
-            var updatemachinemaster = await _mediator.Send(updateMachineMasterCommand);
+             await _mediator.Send(updateMachineMasterCommand);
 
                 return Ok(new
                 {
-                    message = updatemachinemaster,
+                    message = "Updated successfully.",
                     statusCode = StatusCodes.Status200OK
                 });
             
@@ -111,11 +111,11 @@ namespace MaintenanceManagement.API.Controllers
         {
 
             // Process the delete command
-            var result = await _mediator.Send(new DeleteMachineMasterCommand { Id = id });
+             await _mediator.Send(new DeleteMachineMasterCommand { Id = id });
 
                 return Ok(new
                 {
-                    message = result,
+                    message = "Deleted successfully.",
                     statusCode = StatusCodes.Status200OK
                 });
 
@@ -157,14 +157,14 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> GetByAssetId(int assetId)
         {
             var result = await _mediator.Send(new GetAssetSpecificationByIdQuery { AssetId = assetId });
-            return Ok(result);
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = result, message = "Asset fetched successfully." });
         }
 
         [HttpGet("GetMachinesByDepartmentId/{departmentId}")]
         public async Task<IActionResult> GetMachinesByDepartmentId(int departmentId)
         {
             var result = await _mediator.Send(new GetMachineNoDepartmentbyIdQuery { DepartmentId = departmentId });
-            return Ok(result);
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = result, message = "Machines fetched successfully." });
         }
 
         

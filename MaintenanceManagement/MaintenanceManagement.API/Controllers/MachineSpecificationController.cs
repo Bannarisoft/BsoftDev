@@ -17,43 +17,24 @@ namespace MaintenanceManagement.API.Controllers
     public class MachineSpecificationController : ApiControllerBase
     {
         private readonly ILogger<MachineSpecificationController> _logger;
-        private readonly IValidator<CreateMachineSpecficationCommand> _createmachinemastercommand;
-        private readonly IValidator<DeleteMachineSpecficationCommand> _deletemachinemastercommand;
         private readonly IMediator _mediator;
 
-        public MachineSpecificationController(ILogger<MachineSpecificationController> logger, IMediator mediator, IValidator<CreateMachineSpecficationCommand> createmachinemastercommand, IValidator<DeleteMachineSpecficationCommand> deletemachinemastercommand)
+        public MachineSpecificationController(ILogger<MachineSpecificationController> logger, IMediator mediator)
         : base(mediator)
         {
             _logger = logger;
             _mediator = mediator;
-            _createmachinemastercommand = createmachinemastercommand;
-            _deletemachinemastercommand = deletemachinemastercommand;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateMachineSpecficationCommand createMachineSpecficationCommand)
         {
-
-            // Validate the incoming command
-            var validationResult = await _createmachinemastercommand.ValidateAsync(createMachineSpecficationCommand);
-            _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-            if (!validationResult.IsValid)
-            {
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                });
-            }
-
             // Process the command
             var CreateMachineId = await _mediator.Send(createMachineSpecficationCommand);
 
             if (CreateMachineId.IsSuccess)
             {
-                _logger.LogInformation($"MachineSpecification {createMachineSpecficationCommand.SpecificationId} created successfully.");
+                _logger.LogInformation($"MachineSpecification {createMachineSpecficationCommand.Specifications.FirstOrDefault().SpecificationId} created successfully.");
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
@@ -61,7 +42,7 @@ namespace MaintenanceManagement.API.Controllers
                     data = CreateMachineId.Data
                 });
             }
-            _logger.LogWarning($"MachineSpecification {createMachineSpecficationCommand.SpecificationId} Creation failed.");
+            _logger.LogWarning($"MachineSpecification {createMachineSpecficationCommand.Specifications.FirstOrDefault().SpecificationId} Creation failed.");
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,
@@ -73,19 +54,7 @@ namespace MaintenanceManagement.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteMachineSpecificationAsync(int id)
         {
-            // Validate the incoming command
-            var validationResult = await _deletemachinemastercommand.ValidateAsync(new DeleteMachineSpecficationCommand { Id = id });
-            _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-            if (!validationResult.IsValid)
-            {
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                });
-            }
+            
 
             // Process the delete command
             var result = await _mediator.Send(new DeleteMachineSpecficationCommand { Id = id });
