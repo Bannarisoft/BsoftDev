@@ -10,6 +10,7 @@ namespace Core.Domain.Entities
     {
         public int SpecificationId { get; set; }
         public MiscMaster SpecificationIdMachineSpec { get; set; } = null!;
+        public string? SpecificationValue { get; set; }
         public int MachineId { get; set; }
         public MachineMaster? MachineMaster { get; set; }
         

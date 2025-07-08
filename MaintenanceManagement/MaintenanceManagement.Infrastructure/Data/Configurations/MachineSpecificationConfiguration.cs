@@ -43,6 +43,12 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                    .IsRequired()
                     .OnDelete(DeleteBehavior.Restrict);
 
+
+            builder.Property(s => s.SpecificationValue)
+                .HasColumnType("nvarchar(100)")
+                .IsRequired(); 
+    
+ 
             builder.Property(s => s.MachineId)
             .IsRequired()
              .HasColumnType("int");
