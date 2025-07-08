@@ -77,8 +77,6 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateMaintenanceCategoryCommand createMaintenanceCategoryCommand)
         {
-            
-
             // Process the command
             var CreatedMaintenanceId = await _mediator.Send(createMaintenanceCategoryCommand);
 
@@ -86,51 +84,36 @@ namespace MaintenanceManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status201Created,
-                message =CreatedMaintenanceId,
+                message ="MaintenanceCategory Created Successfully",
                 data = CreatedMaintenanceId
             });
-            
-         
         
         }
             [HttpPut]
             public async Task<IActionResult> UpdateAsync(UpdateMaintenanceCategoryCommand updateMaintenanceCategoryCommand)
             {
             
-                   
-
-                    var updatedmaintenance = await _mediator.Send(updateMaintenanceCategoryCommand);
-
-                  
+                     await _mediator.Send(updateMaintenanceCategoryCommand);
                         
                     return Ok(new
                         {
-                            message = updatedmaintenance,
+                            message = "MaintenanceCategory Updated Successfully",
                             statusCode = StatusCodes.Status200OK
                         });
-                    
-                    
+                            
             }
 
             [HttpDelete]
             public async Task<IActionResult> DeleteMaintenanceTypeAsync(int id)
             {
                
-
-                    // Process the delete command
-                    var result = await _mediator.Send(new DeleteMaintenanceCategoryCommand { Id = id });
-
-                    
+                     await _mediator.Send(new DeleteMaintenanceCategoryCommand { Id = id });
                         
                         return Ok(new
                         {
-                            message = result,
+                            message = "MaintenanceCategory Deleted Successfully",
                             statusCode = StatusCodes.Status200OK
                         });
-                        
-                    
-                   
-            
             }
 
       

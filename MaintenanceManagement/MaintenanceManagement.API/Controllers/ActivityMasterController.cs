@@ -92,23 +92,13 @@ namespace MaintenanceManagement.API.Controllers
          [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateActivityMasterCommand command)
         {
-            //  var validationResult = await _createactivityMasterCommandValidator.ValidateAsync(command);
-            
-            // if (!validationResult.IsValid)
-            // {
-            //     return BadRequest(new 
-            //     {
-            //         StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-            //         errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-            //     });
-            // }
           
             var response = await Mediator.Send(command);
                                        
                 return Ok(new 
                 {
                      StatusCode=StatusCodes.Status201Created,
-                 message = response,
+                 message = "Created successfully.",
                   errors = "",
                   data = response 
                   });
@@ -119,32 +109,13 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> UpdateActivityMaster([FromBody] UpdateActivityMasterCommand command)
         {
 
-            //   var validationResult = await _updateActivityMasterCommandValidator.ValidateAsync(command);
-            // if (command == null)
-            // {
-            //     return BadRequest(new ApiResponseDTO<int>
-            //     {
-            //         IsSuccess = false,
-            //         Message = "Invalid request data."
-            //     });
-            // }
-
             var result = await Mediator.Send(command);
 
-                //         if (!result.IsSuccess)
-                // {
-                //     return BadRequest(new
-                //     {
-                //         StatusCode = StatusCodes.Status400BadRequest,
-                //         Message = result.Message,
-                //         errors = "" 
-                //     });
-                // }
 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    Message = result,
+                    Message = "Updated successfully.",
                     errors = "" 
                 });
           }
@@ -178,16 +149,6 @@ namespace MaintenanceManagement.API.Controllers
             {
                 MachineGroupId = machineGroupId
             });
-
-            // if (!response.IsSuccess || response.Data == null || !response.Data.Any())
-            // {
-            //     return NotFound(new
-            //     {
-            //         StatusCode = StatusCodes.Status404NotFound,
-            //         Message = $"No activities found for Machine Group ID {machineGroupId}.",
-            //         Errors = string.Empty
-            //     });
-            // }
 
             return Ok(new
             {

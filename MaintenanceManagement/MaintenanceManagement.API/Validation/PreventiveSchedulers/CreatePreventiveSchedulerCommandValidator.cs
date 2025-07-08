@@ -83,14 +83,10 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                                 .NotEmpty()
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.GraceDays)} {rule.Error}");
                         RuleFor(x => x.ReminderWorkOrderDays)
-                                .NotNull()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ReminderWorkOrderDays)} {rule.Error}")
-                                .NotEmpty()
+                                .GreaterThanOrEqualTo(0)
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ReminderWorkOrderDays)} {rule.Error}");
                         RuleFor(x => x.ReminderMaterialReqDays)
-                                .NotNull()
-                                .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ReminderMaterialReqDays)} {rule.Error}")
-                                .NotEmpty()
+                                .GreaterThanOrEqualTo(0)
                                 .WithMessage($"{nameof(CreatePreventiveSchedulerCommand.ReminderMaterialReqDays)} {rule.Error}");
                         RuleFor(x => x.IsDownTimeRequired)
                                 .NotNull()

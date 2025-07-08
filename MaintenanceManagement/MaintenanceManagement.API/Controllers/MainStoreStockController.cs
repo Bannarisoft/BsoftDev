@@ -16,13 +16,13 @@ namespace MaintenanceManagement.API.Controllers
     [Route("api/[controller]")]
     public class MainStoreStockController : ApiControllerBase
     {
-        private readonly ILogger<MainStoreStockController> _logger;
+        
         private readonly IMediator _mediator;
 
-        public MainStoreStockController(ILogger<MainStoreStockController> logger, IMediator mediator)
+        public MainStoreStockController( IMediator mediator)
          : base(mediator)
         {
-            _logger = logger;
+            
             _mediator = mediator;
         }
 
