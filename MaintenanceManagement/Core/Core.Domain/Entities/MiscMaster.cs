@@ -46,6 +46,7 @@ namespace Core.Domain.Entities
         public ICollection<MachineSpecification>? MachineSpecificationsName { get; set; }
 
         public ICollection<Generator>? Generators { get; set; }
+        public ICollection<GeneratorConsumption>? GeneratorConsumptions { get; set; }
 
 
 

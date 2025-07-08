@@ -25,6 +25,7 @@ namespace Core.Domain.Entities.Power
         public int GensetStatus { get; set; }     // working , under repair , not working
 
         public MiscMaster? GensetStatusType { get; set; }
+        public ICollection<GeneratorConsumption>? GeneratorConsumption { get; set; }  
         
         
 
