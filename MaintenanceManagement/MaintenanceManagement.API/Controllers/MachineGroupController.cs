@@ -74,7 +74,7 @@ namespace MaintenanceManagement.API.Controllers
                 return Ok(new 
                 {
                      StatusCode=StatusCodes.Status201Created,
-                 message = response,
+                 message = "Created successfully.",
                   errors = "",
                   data = response 
                   });
@@ -89,7 +89,7 @@ namespace MaintenanceManagement.API.Controllers
            
                 return Ok(new 
                 {   StatusCode=StatusCodes.Status200OK,
-                    message = result, 
+                    message = "Updated successfully.", 
                     asset = result
                 });
             
@@ -100,9 +100,9 @@ namespace MaintenanceManagement.API.Controllers
           public async Task<IActionResult> Delete(int id)
         {
            
-           var updatedMiscMaster = await Mediator.Send(new DeleteMachineGroupCommand { Id = id });
+            await Mediator.Send(new DeleteMachineGroupCommand { Id = id });
 
-            return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedMiscMaster, errors = "" });
+            return Ok(new { StatusCode=StatusCodes.Status200OK, message = "Deleted successfully.", errors = "" });
               
             
         }

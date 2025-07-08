@@ -305,7 +305,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             INNER JOIN [Maintenance].[PreventiveSchedulerDetail] PSD ON PSD.PreventiveSchedulerHeaderId = PS.Id
 							LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
 							LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
-                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PS.UnitId=@UnitId AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)
+                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PSD.IsActive=1 AND PS.UnitId=@UnitId AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)
                              AND PS.DepartmentId=@DepartmentId
                             GROUP BY PSD.ActualWorkOrderDate,PS.DepartmentId
                             ORDER BY PSD.ActualWorkOrderDate ASC
@@ -328,7 +328,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                             INNER JOIN [Maintenance].[MachineGroup] MG ON MG.Id = PS.MachineGroupId
                             LEFT JOIN Maintenance.WorkOrder WO ON WO.PreventiveScheduleId=PSD.Id
 							LEFT JOIN Maintenance.MiscMaster MISC ON MISC.Id=WO.StatusId
-                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PSD.ActualWorkOrderDate=@ActualWorkOrderDate AND PS.UnitId=@UnitId 
+                            WHERE PS.IsDeleted = 0 AND PSD.IsDeleted =0 AND PSD.IsActive=1 AND PSD.ActualWorkOrderDate=@ActualWorkOrderDate AND PS.UnitId=@UnitId 
                             AND (MISC.Code IN @StatusCodes OR WO.Id IS NULL)  AND PS.DepartmentId=@DepartmentId
                             ORDER BY PS.Id ASC
                         ";

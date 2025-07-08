@@ -64,7 +64,7 @@ namespace MaintenanceManagement.API.Controllers
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = response,
+                    message = "Preventive scheduler created successfully",
                     errors = "",
                     data = response
                 });
@@ -126,17 +126,15 @@ namespace MaintenanceManagement.API.Controllers
         {
             var command = new DeletePreventiveSchedulerCommand { Id = id };
           
-            var updatedPreventiveScheduler = await Mediator.Send(command);
+             await Mediator.Send(command);
 
            
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    message = updatedPreventiveScheduler,
+                    message = "Preventive Scheduler deleted successfully.",
                     errors = ""
                 });
-
-           
 
         }
         [HttpPut("reschedule")]

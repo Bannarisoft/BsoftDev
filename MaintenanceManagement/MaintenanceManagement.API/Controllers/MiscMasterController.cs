@@ -87,13 +87,12 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> CreateAsync(CreateMiscMasterCommand command)
         {
            
-          
             var response = await Mediator.Send(command);
                                       
                 return Ok(new 
                 {
                      StatusCode=StatusCodes.Status201Created,
-                 message = response,
+                 message = "Created Successfully",
                   errors = "",
                   data = response 
                   });
@@ -105,12 +104,12 @@ namespace MaintenanceManagement.API.Controllers
         {
            
 
-            var response = await Mediator.Send(command);
+             await Mediator.Send(command);
             
                 return Ok(new 
                 { 
                     StatusCode = StatusCodes.Status200OK, 
-                    Message = response, 
+                    Message = "Updated Successfully", 
                     Errors = "" 
                 });
             
@@ -121,9 +120,9 @@ namespace MaintenanceManagement.API.Controllers
         {
         
            
-           var updatedMiscMaster = await Mediator.Send(new DeleteMiscMasterCommand { Id = id });
+            await Mediator.Send(new DeleteMiscMasterCommand { Id = id });
 
-            return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedMiscMaster, errors = "" });
+            return Ok(new { StatusCode=StatusCodes.Status200OK, message = "Deleted successfully.", errors = "" });
               
             
         }
