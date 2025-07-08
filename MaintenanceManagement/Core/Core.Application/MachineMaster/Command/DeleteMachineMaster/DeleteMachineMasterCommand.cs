@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MachineMaster.Command.DeleteMachineMaster
 {
-    public class DeleteMachineMasterCommand : IRequest<ApiResponseDTO<int>> 
+    public class DeleteMachineMasterCommand : IRequest<bool>
     {
         public int Id { get; set; } 
     }

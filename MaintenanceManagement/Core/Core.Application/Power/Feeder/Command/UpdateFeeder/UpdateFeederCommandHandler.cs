@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.Power.IFeeder;
 using Core.Domain.Events;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.Power.Feeder.Command.UpdateFeeder
 {
-    public class UpdateFeederCommandHandler : IRequestHandler<UpdateFeederCommand, ApiResponseDTO<bool>>
+    public class UpdateFeederCommandHandler : IRequestHandler<UpdateFeederCommand, bool>
     {
         private readonly IFeederCommandRepository _feederCommandRepository;
         private readonly IMediator _imediator;
@@ -23,20 +24,12 @@ namespace Core.Application.Power.Feeder.Command.UpdateFeeder
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<bool>> Handle(UpdateFeederCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateFeederCommand request, CancellationToken cancellationToken)
         {
               var feeder = _imapper.Map<Core.Domain.Entities.Power.Feeder>(request);
 
             var result = await _feederCommandRepository.UpdateAsync(request.Id, feeder);
 
-            if (!result)
-            {
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "FeederGroup not found."
-                };
-            }
 
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Update",
@@ -47,12 +40,7 @@ namespace Core.Application.Power.Feeder.Command.UpdateFeeder
 
             await _imediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = true,
-                Message = "Feeder updated successfully.",
-                Data = true
-            };
+            return result == true ? result : throw new ExceptionRules("Feeder Updation Failed.");
         }
     }
 }

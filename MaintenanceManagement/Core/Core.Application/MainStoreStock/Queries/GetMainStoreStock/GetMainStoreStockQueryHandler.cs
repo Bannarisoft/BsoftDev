@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.MainStoreStock.Queries.GetMainStoreStock
 {
-    public class GetMainStoreStockQueryHandler : IRequestHandler<GetMainStoreStockQuery,ApiResponseDTO<List<MainStoresStockDto>>>
+    public class GetMainStoreStockQueryHandler : IRequestHandler<GetMainStoreStockQuery,List<MainStoresStockDto>>
     {
         private readonly IMainStoreStockQueryRepository _mainStoreStockQueryRepository;  
         private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ namespace Core.Application.MainStoreStock.Queries.GetMainStoreStock
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<MainStoresStockDto>>> Handle(GetMainStoreStockQuery request, CancellationToken cancellationToken)
+        public async Task<List<MainStoresStockDto>> Handle(GetMainStoreStockQuery request, CancellationToken cancellationToken)
         {
             var result = await _mainStoreStockQueryRepository.GetStockDetails(request.OldUnitcode,request.GroupCode);
             var substores = _mapper.Map<List<MainStoresStockDto>>(result);
@@ -35,7 +35,7 @@ namespace Core.Application.MainStoreStock.Queries.GetMainStoreStock
                     module:"MainStoresStock"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<MainStoresStockDto>> { IsSuccess = true, Message = "Success", Data = substores };
+            return substores;
         }
     }
 }

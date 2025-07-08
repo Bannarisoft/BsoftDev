@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.ActivityMaster.Command.CreateActivityMaster
 {
-    public class CreateActivityMasterCommand : IRequest<ApiResponseDTO<int>>
+    public class CreateActivityMasterCommand : IRequest<int>
     {
 
         public CreateActivityMasterDto? CreateActivityMasterDto { get; set; }

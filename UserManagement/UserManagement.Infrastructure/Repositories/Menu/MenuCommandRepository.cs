@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IMenu;
 using Microsoft.EntityFrameworkCore;
 using UserManagement.Infrastructure.Data;
+using static Core.Domain.Enums.Common.Enums;
 
 namespace UserManagement.Infrastructure.Repositories.Menu
 {
@@ -35,7 +36,7 @@ namespace UserManagement.Infrastructure.Repositories.Menu
             var existingMenu = await _applicationDbContext.Divisions.FirstOrDefaultAsync(u => u.Id == id);
             if (existingMenu != null)
             {
-                existingMenu.IsDeleted = menu.IsDeleted;
+                existingMenu.IsDeleted = IsDelete.Deleted;
                 return await _applicationDbContext.SaveChangesAsync() >0;
             }
             return false; 

@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Power.FeederGroup.Command.DeleteFeederGroup
 {
-    public class DeleteFeederGroupCommand  : IRequest<ApiResponseDTO<FeederGroupDto>>
+    public class DeleteFeederGroupCommand  : IRequest<bool>
     {
         
          public int Id { get; set; }

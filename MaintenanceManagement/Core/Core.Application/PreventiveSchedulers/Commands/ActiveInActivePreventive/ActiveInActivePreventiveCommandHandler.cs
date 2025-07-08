@@ -19,7 +19,7 @@ using static Core.Domain.Common.MiscEnumEntity;
 
 namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventive
 {
-    public class ActiveInActivePreventiveCommandHandler : IRequestHandler<ActiveInActivePreventiveCommand, ApiResponseDTO<bool>>
+    public class ActiveInActivePreventiveCommandHandler : IRequestHandler<ActiveInActivePreventiveCommand, bool>
     {
         private readonly IPreventiveSchedulerCommand _preventiveSchedulerCommand;
         private readonly IMediator _mediator;
@@ -40,7 +40,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
             _backgroundServiceClient = backgroundServiceClient;
         }
 
-        public async Task<ApiResponseDTO<bool>> Handle(ActiveInActivePreventiveCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ActiveInActivePreventiveCommand request, CancellationToken cancellationToken)
         {
             var Scheduledetail = await _preventiveSchedulerQuery.GetByIdAsync(request.Id);
             Scheduledetail.Id = 0;
@@ -142,11 +142,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
                     await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id, newJobId);
                 }
                 await _preventiveSchedulerCommand.DeleteAsync(request.Id, Scheduledetail);
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = true,
-                    Message = "Preventive scheduler old one inactive and new one created successfully"
-                };
+                return true;
             }
             else
             {
@@ -162,11 +158,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
                 var preventiveSchedulerHeader = _mapper.Map<PreventiveSchedulerHeader>(request);
                 await _preventiveSchedulerCommand.ScheduleInActive(preventiveSchedulerHeader);
 
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = true,
-                    Message = "Preventive scheduler inactive successfully"
-                };
+                return true;
             }
         }
     }

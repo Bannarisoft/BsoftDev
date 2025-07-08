@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.PreventiveSchedulers.Commands.DeletePreventiveScheduler
 {
-    public class DeletePreventiveSchedulerCommand : IRequest<ApiResponseDTO<bool>>
+    public class DeletePreventiveSchedulerCommand : IRequest<bool>
     {
         public int Id { get; set; }
     }

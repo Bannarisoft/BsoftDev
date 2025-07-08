@@ -46,21 +46,14 @@ namespace MaintenanceManagement.API.Controllers
                 GroupCode = GroupCode
             });
 
-            if (stock.IsSuccess && stock.Data != null)
-            {
+           
                 return Ok(new
                 {
                     statusCode = StatusCodes.Status200OK,
-                    data = stock.Data,
+                    data = stock,
                     message = "Success"
                 });
-            }
-
-            return NotFound(new
-            {
-                statusCode = StatusCodes.Status404NotFound,
-                message = stock.Message ?? "Stock not found"
-            });
+           
         }
 
          [HttpGet("MainStore-StockItems")]
@@ -83,21 +76,14 @@ namespace MaintenanceManagement.API.Controllers
                 GroupCode = GroupCode
             });
 
-            if (stock.IsSuccess && stock.Data != null)
-            {
+          
                 return Ok(new
                 {
                     statusCode = StatusCodes.Status200OK,
-                    data = stock.Data,
+                    data = stock,
                     message = "Success"
                 });
-            }
-
-            return NotFound(new
-            {
-                statusCode = StatusCodes.Status404NotFound,
-                message = stock.Message ?? "Stock not found"
-            });
+           
         }
 
         [HttpGet("{oldUnitcode}/{itemCode}")]
@@ -110,21 +96,14 @@ namespace MaintenanceManagement.API.Controllers
                 ItemCode = itemCode
             });
 
-            if (stockItem.IsSuccess)
-            {
+           
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    data = stockItem.Data,
-                    message = stockItem.Message
+                    data = stockItem,
+                    message = stockItem
                 });
-            }
-
-            return NotFound(new
-            {
-                StatusCode = StatusCodes.Status404NotFound,
-                message = stockItem.Message
-            });
+           
         }
 
       

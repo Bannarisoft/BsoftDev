@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.Power.PowerConsumption.Queries.GetPowerConsumptionById
 {
-    public class GetPowerConsumptionByIdQueryHandler : IRequestHandler<GetPowerConsumptionByIdQuery, ApiResponseDTO<GetPowerConsumptionDto>>
+    public class GetPowerConsumptionByIdQueryHandler : IRequestHandler<GetPowerConsumptionByIdQuery, GetPowerConsumptionDto>
     {
         private readonly IPowerConsumptionQueryRepository _powerConsumptionQueryRepository;
         private readonly IMapper _mapper;
@@ -24,19 +24,10 @@ namespace Core.Application.Power.PowerConsumption.Queries.GetPowerConsumptionByI
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<GetPowerConsumptionDto>> Handle(GetPowerConsumptionByIdQuery request, CancellationToken cancellationToken)
+        public async Task<GetPowerConsumptionDto> Handle(GetPowerConsumptionByIdQuery request, CancellationToken cancellationToken)
         {
               var result = await _powerConsumptionQueryRepository.GetPowerConsumptionById(request.Id);
 
-            if (result == null)
-            {
-                return new ApiResponseDTO<GetPowerConsumptionDto>
-                {
-                    IsSuccess = false,
-                    Message = "Id not found.",
-                    Data = null
-                };
-            }
 
             var feederGroupDto = _mapper.Map<GetPowerConsumptionDto>(result);
 
@@ -50,12 +41,7 @@ namespace Core.Application.Power.PowerConsumption.Queries.GetPowerConsumptionByI
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<GetPowerConsumptionDto>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = feederGroupDto
-            };
+            return  feederGroupDto;
         }
     }
 }

@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.MRS.Queries.GetPendingQty
 {
-    public class GetPendingQtyQueryHandler :  IRequestHandler<GetPendingQtyQuery,ApiResponseDTO<GetPendingQtyDto>>
+    public class GetPendingQtyQueryHandler :  IRequestHandler<GetPendingQtyQuery,GetPendingQtyDto>
     {
         
         private readonly IMapper _mapper;
@@ -24,19 +24,11 @@ namespace Core.Application.MRS.Queries.GetPendingQty
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<GetPendingQtyDto>> Handle(GetPendingQtyQuery request, CancellationToken cancellationToken)
+        public async Task<GetPendingQtyDto> Handle(GetPendingQtyQuery request, CancellationToken cancellationToken)
         {
             var result = await _imRSQueryRepository.GetPendingIssueAsync(request.OldUnitcode, request.ItemCode);
 
-            // if (result == null)
-            // {
-            //     return new ApiResponseDTO<GetPendingQtyDto>
-            //     {
-            //         IsSuccess = false,
-            //         Message = $"Pending issue not found for ItemCode: {request.ItemCode} in UnitCode: {request.OldUnitcode}."
-                    
-            //     };
-            // }
+          
 
             var pendingQtyDto = _mapper.Map<GetPendingQtyDto>(result);
 
@@ -50,12 +42,7 @@ namespace Core.Application.MRS.Queries.GetPendingQty
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<GetPendingQtyDto>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = pendingQtyDto
-            };
+            return  pendingQtyDto;
         }
     }
 }

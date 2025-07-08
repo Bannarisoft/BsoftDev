@@ -32,12 +32,7 @@ namespace MaintenanceManagement.API.Controllers
             }
             var result = await _mediator.Send(new GetItemGroupQuery { OldUnitId = oldUnitId });
 
-            if (result == null || !result.IsSuccess || result.Data == null)
-            {
-                return NotFound(new { StatusCode = StatusCodes.Status404NotFound, Message = "No ItemGroupCode details found" });
-            }
-
-            return Ok(new { StatusCode = StatusCodes.Status200OK, Data = result.Data });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, Data = result });
         }
         [HttpGet("GetItemMasters/{oldUnitId}/{grpcode}")]
         public async Task<IActionResult> GetItemMasters(
@@ -63,19 +58,11 @@ namespace MaintenanceManagement.API.Controllers
             ItemName = itemName 
         });
 
-        if (result == null || !result.IsSuccess || result.Data == null || result.Data.Count == 0)
-        {
-            return NotFound(new 
-            { 
-                StatusCode = StatusCodes.Status404NotFound, 
-                Message = "No ItemMasters found for the provided criteria." 
-            });
-        }
 
         return Ok(new 
         { 
             StatusCode = StatusCodes.Status200OK, 
-            Data = result.Data 
+            Data = result 
         });
     }
 

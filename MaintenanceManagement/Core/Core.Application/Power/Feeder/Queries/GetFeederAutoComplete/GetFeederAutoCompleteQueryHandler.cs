@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Power.Feeder.Queries.GetFeederAutoComplete
 {
-    public class GetFeederAutoCompleteQueryHandler : IRequestHandler<GetFeederAutoCompleteQuery, ApiResponseDTO<List<GetFeederAutoCompleteDto>>>
+    public class GetFeederAutoCompleteQueryHandler : IRequestHandler<GetFeederAutoCompleteQuery, List<GetFeederAutoCompleteDto>>
     {
         private readonly IFeederQueryRepository _feederQueryRepository;
         private readonly IMapper _mapper;
@@ -23,19 +23,10 @@ namespace Core.Application.Power.Feeder.Queries.GetFeederAutoComplete
             _mediator = mediator;
         }
         
-           public  async Task<ApiResponseDTO<List<GetFeederAutoCompleteDto>>> Handle(GetFeederAutoCompleteQuery request, CancellationToken cancellationToken)
+           public  async Task<List<GetFeederAutoCompleteDto>> Handle(GetFeederAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var machineGroup  = await _feederQueryRepository.GetFeederAutoComplete(request.SearchPattern);
 
-                    if (machineGroup == null || !machineGroup.Any())
-            {
-                return new ApiResponseDTO<List<GetFeederAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"No FeederGroup Masters found matching '{request.SearchPattern}'.",
-                    Data = new List<GetFeederAutoCompleteDto>()
-                };
-            }
 
             var division = _mapper.Map<List<GetFeederAutoCompleteDto>>(machineGroup);
              //Domain Event
@@ -47,7 +38,7 @@ namespace Core.Application.Power.Feeder.Queries.GetFeederAutoComplete
                     module:"FeederGroup"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetFeederAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = division }; 
+            return  division; 
         }
 
 

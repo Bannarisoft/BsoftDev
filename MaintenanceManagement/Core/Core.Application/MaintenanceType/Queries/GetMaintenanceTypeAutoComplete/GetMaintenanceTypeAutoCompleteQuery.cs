@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceType.Queries.GetMaintenanceTypeAutoComplete
 {
-    public class GetMaintenanceTypeAutoCompleteQuery : IRequest<ApiResponseDTO<List<MaintenanceTypeAutoCompleteDto>>>
+    public class GetMaintenanceTypeAutoCompleteQuery : IRequest<List<MaintenanceTypeAutoCompleteDto>>
     {
         public string? SearchPattern { get; set; }
     }

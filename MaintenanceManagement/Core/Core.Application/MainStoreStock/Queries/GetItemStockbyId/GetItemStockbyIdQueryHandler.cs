@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.MainStoreStock.Queries.GetItemStockbyId
 {
-    public class GetItemStockbyIdQueryHandler : IRequestHandler<GetItemStockbyIdQuery,ApiResponseDTO<MainStoreItemStockDto>>
+    public class GetItemStockbyIdQueryHandler : IRequestHandler<GetItemStockbyIdQuery,MainStoreItemStockDto>
     {
         private readonly IMainStoreStockQueryRepository _imainStoreStockQueryRepository;        
         private readonly IMapper _mapper;
@@ -23,14 +23,10 @@ namespace Core.Application.MainStoreStock.Queries.GetItemStockbyId
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<MainStoreItemStockDto>> Handle(GetItemStockbyIdQuery request, CancellationToken cancellationToken)
+        public async Task<MainStoreItemStockDto> Handle(GetItemStockbyIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _imainStoreStockQueryRepository.GetByItemCodeIdAsync(request.OldUnitcode, request.ItemCode);
-            // Check if the entity exists
-            if (result is null)
-            {
-                return new ApiResponseDTO<MainStoreItemStockDto> { IsSuccess = false, Message =$"Stock ItemCode {request.ItemCode} not found." };
-            }
+           
             // Map a single entity
             var itemStockDto = _mapper.Map<MainStoreItemStockDto>(result);
 
@@ -43,7 +39,7 @@ namespace Core.Application.MainStoreStock.Queries.GetItemStockbyId
                     module:"MainstoreStockItemsFetched"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return new ApiResponseDTO<MainStoreItemStockDto> { IsSuccess = true, Message = "Success", Data = itemStockDto };
+            return itemStockDto;
         }
     }
 }

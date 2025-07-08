@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMaintenanceCategory;
 using Core.Application.MaintenanceCategory.Queries.GetMaintenanceCategory;
@@ -12,7 +13,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceCategory.Command.CreateMaintenanceCategory
 {
-    public class CreateMaintenanceCategoryCommandHandler : IRequestHandler<CreateMaintenanceCategoryCommand, ApiResponseDTO<int>>
+    public class CreateMaintenanceCategoryCommandHandler : IRequestHandler<CreateMaintenanceCategoryCommand, int>
     {
         private readonly IMaintenanceCategoryCommandRepository _imaintenanceCategoryCommandRepository;
         private readonly IMediator _imediator;
@@ -25,7 +26,7 @@ namespace Core.Application.MaintenanceCategory.Command.CreateMaintenanceCategory
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateMaintenanceCategoryCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateMaintenanceCategoryCommand request, CancellationToken cancellationToken)
         {
               var maintenanceCategory = _imapper.Map<Core.Domain.Entities.MaintenanceCategory>(request);
             
@@ -40,23 +41,11 @@ namespace Core.Application.MaintenanceCategory.Command.CreateMaintenanceCategory
                 module: "MaintenanceCategory");
             await _imediator.Publish(domainEvent, cancellationToken);
           
-            var costcenterGroupDtoDto = _imapper.Map<MaintenanceCategoryDto>(maintenanceCategory);
-            if (result > 0)
-                  {
                     
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "MaintenanceCategory created successfully",
-                           Data = result
-                      };
-                 }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "MaintenanceCategory Creation Failed",
-                Data = result
-            };
+            return  result > 0 ? result : throw new ExceptionRules("MaintenanceCategory Creation Failed.");
+                      
+                
+           
         }
     }
 }

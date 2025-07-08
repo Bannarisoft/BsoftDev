@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.ActivityMaster.Queries.GetMachineGroupById
 {
-    public class GetMachineGroupNameByIdQueryHandler    : IRequestHandler<GetMachineGroupNameByIdQuery, ApiResponseDTO<List<GetMachineGroupNameByIdDto>>>
+    public class GetMachineGroupNameByIdQueryHandler    : IRequestHandler<GetMachineGroupNameByIdQuery, List<GetMachineGroupNameByIdDto>>
     {
 
          private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
@@ -25,19 +25,19 @@ namespace Core.Application.ActivityMaster.Queries.GetMachineGroupById
         }
 
 
-         public async Task<ApiResponseDTO<List<GetMachineGroupNameByIdDto>>> Handle(GetMachineGroupNameByIdQuery request, CancellationToken cancellationToken)
+         public async Task<List<GetMachineGroupNameByIdDto>> Handle(GetMachineGroupNameByIdQuery request, CancellationToken cancellationToken)
     {
         var result = await _activityMasterQueryRepository.GetMachineGroupById(request.ActivityId);
 
-        if (result == null || !result.Any()) // Check if the list is empty
-        {
-            return new ApiResponseDTO<List<GetMachineGroupNameByIdDto>>
-            {
-                IsSuccess = false,
-                Message = $"Machine groups for ActivityMaster with Id {request.ActivityId} not found.",
-                Data = null
-            };
-        }
+        // if (result == null || !result.Any()) // Check if the list is empty
+        // {
+        //     return new ApiResponseDTO<List<GetMachineGroupNameByIdDto>>
+        //     {
+        //         IsSuccess = false,
+        //         Message = $"Machine groups for ActivityMaster with Id {request.ActivityId} not found.",
+        //         Data = null
+        //     };
+        // }
 
         var machineGroups = _mapper.Map<List<GetMachineGroupNameByIdDto>>(result); // Map the list
 
@@ -54,12 +54,7 @@ namespace Core.Application.ActivityMaster.Queries.GetMachineGroupById
 
         await _mediator.Publish(domainEvent, cancellationToken);
 
-        return new ApiResponseDTO<List<GetMachineGroupNameByIdDto>>
-        {
-            IsSuccess = true,
-            Message = "Success",
-            Data = machineGroups
-        };
+            return machineGroups;
     }
 
         //  public async Task<ApiResponseDTO<GetMachineGroupNameByIdDto>> Handle(GetMachineGroupNameByIdQuery request, CancellationToken cancellationToken)

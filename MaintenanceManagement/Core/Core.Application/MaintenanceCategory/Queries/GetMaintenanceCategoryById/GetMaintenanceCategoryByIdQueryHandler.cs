@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceCategory.Queries.GetMaintenanceCategoryById
 {
-    public class GetMaintenanceCategoryByIdQueryHandler : IRequestHandler<GetMaintenanceCategoryByIdQuery, ApiResponseDTO<MaintenanceCategoryDto>>
+    public class GetMaintenanceCategoryByIdQueryHandler : IRequestHandler<GetMaintenanceCategoryByIdQuery, MaintenanceCategoryDto>
     {
         
          private readonly IMaintenanceCategoryQueryRepository _iMaintenanceCategoryQueryRepository;        
@@ -23,14 +23,10 @@ namespace Core.Application.MaintenanceCategory.Queries.GetMaintenanceCategoryByI
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<MaintenanceCategoryDto>> Handle(GetMaintenanceCategoryByIdQuery request, CancellationToken cancellationToken)
+        public async Task<MaintenanceCategoryDto> Handle(GetMaintenanceCategoryByIdQuery request, CancellationToken cancellationToken)
         {
            var result = await _iMaintenanceCategoryQueryRepository.GetByIdAsync(request.Id);
-            // Check if the entity exists
-            if (result is null)
-            {
-                return new ApiResponseDTO<MaintenanceCategoryDto> { IsSuccess = false, Message =$"MaintenanceCategory ID {request.Id} not found." };
-            }
+           
             // Map a single entity
             var maintenanceCategory = _mapper.Map<MaintenanceCategoryDto>(result);
 
@@ -43,7 +39,7 @@ namespace Core.Application.MaintenanceCategory.Queries.GetMaintenanceCategoryByI
                     module:"MaintenanceCategory"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<MaintenanceCategoryDto> { IsSuccess = true, Message = "Success", Data = maintenanceCategory };
+          return  maintenanceCategory;
         }
     }
 }

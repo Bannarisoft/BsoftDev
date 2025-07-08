@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.Power.IFeeder;
 using Core.Application.Power.Feeder.Queries.GetFeeder;
@@ -12,7 +13,7 @@ using MediatR;
 
 namespace Core.Application.Power.Feeder.Command.DeleteFeeder
 {
-    public class DeleteFeederCommandHandler : IRequestHandler<DeleteFeederCommand, ApiResponseDTO<GetFeederDto>>
+    public class DeleteFeederCommandHandler : IRequestHandler<DeleteFeederCommand, bool>
     {
 
         private readonly IFeederCommandRepository _feederCommandRepository;
@@ -26,7 +27,7 @@ namespace Core.Application.Power.Feeder.Command.DeleteFeeder
             _imapper = imapper;
             _mediator = imediator;
         }
-         public async Task<ApiResponseDTO<GetFeederDto>> Handle(DeleteFeederCommand request, CancellationToken cancellationToken)
+         public async Task<bool> Handle(DeleteFeederCommand request, CancellationToken cancellationToken)
         {
             var feeder = _imapper.Map<Core.Domain.Entities.Power.Feeder>(request);
 
@@ -43,21 +44,9 @@ namespace Core.Application.Power.Feeder.Command.DeleteFeeder
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            // Return the response based on the result
-            if (isDeleted)
-            {
-                return new ApiResponseDTO<GetFeederDto>
-                {
-                    IsSuccess = true,
-                    Message = "Feeder deleted successfully."
-                };
-            }
-
-            return new ApiResponseDTO<GetFeederDto>
-            {
-                IsSuccess = false,
-                Message = "Feeder not deleted."
-            };
+         
+            return isDeleted == true ? isDeleted : throw new ExceptionRules("Feeder deletion failed.");
+           
         }
         
     }

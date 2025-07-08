@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete
 {
-    public class GetMachineGroupAutoCompleteQueryHandler : IRequestHandler<GetMachineGroupAutoCompleteQuery,ApiResponseDTO<List<GetMachineGroupAutoCompleteDto>>>
+    public class GetMachineGroupAutoCompleteQueryHandler : IRequestHandler<GetMachineGroupAutoCompleteQuery,List<GetMachineGroupAutoCompleteDto>>
     {
 
         private readonly IMachineGroupQueryRepository  _machineGroupQueryRepository;
@@ -26,21 +26,12 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete
             _mediator = mediator;
          }
 
-           public  async Task<ApiResponseDTO<List<GetMachineGroupAutoCompleteDto>>> Handle(GetMachineGroupAutoCompleteQuery request, CancellationToken cancellationToken)
+           public  async Task<List<GetMachineGroupAutoCompleteDto>> Handle(GetMachineGroupAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var machineGroup  = await _machineGroupQueryRepository.GetMachineGroupAutoComplete(request.SearchPattern);
 
-                    if (machineGroup == null || !machineGroup.Any())
-            {
-                return new ApiResponseDTO<List<GetMachineGroupAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"No MachineGroup Masters found matching '{request.SearchPattern}'.",
-                    Data = new List<GetMachineGroupAutoCompleteDto>()
-                };
-            }
 
-            var division = _mapper.Map<List<GetMachineGroupAutoCompleteDto>>(machineGroup);
+            var machine = _mapper.Map<List<GetMachineGroupAutoCompleteDto>>(machineGroup);
              //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetAll",
@@ -50,7 +41,7 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupAutoComplete
                     module:"MachineGroup"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetMachineGroupAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = division }; 
+            return machine;
         }
 
         

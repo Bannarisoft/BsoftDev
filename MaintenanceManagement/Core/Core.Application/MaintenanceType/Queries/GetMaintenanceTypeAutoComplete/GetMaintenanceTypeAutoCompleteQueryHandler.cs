@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceType.Queries.GetMaintenanceTypeAutoComplete
 {
-    public class GetMaintenanceTypeAutoCompleteQueryHandler : IRequestHandler<GetMaintenanceTypeAutoCompleteQuery, ApiResponseDTO<List<MaintenanceTypeAutoCompleteDto>>>
+    public class GetMaintenanceTypeAutoCompleteQueryHandler : IRequestHandler<GetMaintenanceTypeAutoCompleteQuery, List<MaintenanceTypeAutoCompleteDto>>
     {
          private readonly IMaintenanceTypeQueryRepository _imaintenanceTypeQueryRepository;        
         private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ namespace Core.Application.MaintenanceType.Queries.GetMaintenanceTypeAutoComplet
             _mapper = mapper;
             _mediator = mediator;   
         }
-        public async Task<ApiResponseDTO<List<MaintenanceTypeAutoCompleteDto>>> Handle(GetMaintenanceTypeAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<MaintenanceTypeAutoCompleteDto>> Handle(GetMaintenanceTypeAutoCompleteQuery request, CancellationToken cancellationToken)
         {
              var result = await _imaintenanceTypeQueryRepository.GetMaintenanceTypeAsync(request.SearchPattern);
             var maintenanceCategories = _mapper.Map<List<MaintenanceTypeAutoCompleteDto>>(result);
@@ -35,7 +35,7 @@ namespace Core.Application.MaintenanceType.Queries.GetMaintenanceTypeAutoComplet
                     module:"MaintenanceCategory"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<MaintenanceTypeAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = maintenanceCategories };
+            return maintenanceCategories;
         }
     }
 }

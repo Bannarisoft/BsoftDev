@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMaintenanceType;
 using Core.Domain.Events;
@@ -10,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceType.Command.UpdateMaintenanceType
 {
-    public class UpdateMaintenanceTypeCommandHandler : IRequestHandler<UpdateMaintenanceTypeCommand, ApiResponseDTO<int>>
+    public class UpdateMaintenanceTypeCommandHandler : IRequestHandler<UpdateMaintenanceTypeCommand, int>
     {
         private readonly IMaintenanceTypeCommandRepository _iMaintenanceTypeCommandRepository;
         private readonly IMediator _imediator;
@@ -22,15 +23,11 @@ namespace Core.Application.MaintenanceType.Command.UpdateMaintenanceType
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(UpdateMaintenanceTypeCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(UpdateMaintenanceTypeCommand request, CancellationToken cancellationToken)
         {
             var maintenanceCategory = _imapper.Map<Core.Domain.Entities.MaintenanceType>(request);
             var result = await _iMaintenanceTypeCommandRepository.UpdateAsync(request.Id, maintenanceCategory);
-            if (result <= 0) // CostCenter not found
-            {
-               
-                return new ApiResponseDTO<int> { IsSuccess = false, Message = "MaintenanceType  not found." };
-            }
+         
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "Update",
@@ -39,8 +36,8 @@ namespace Core.Application.MaintenanceType.Command.UpdateMaintenanceType
                 details: $"MaintenanceType details was updated",
                 module: "MaintenanceType");
             await _imediator.Publish(domainEvent, cancellationToken);
-           
-            return new ApiResponseDTO<int> { IsSuccess = true, Message = "MaintenanceType Updated Successfully.", Data = result };  
+
+            return result <= 0 ? throw new ExceptionRules("MaintenanceType Update Failed.") : result;
         }
     }
 }

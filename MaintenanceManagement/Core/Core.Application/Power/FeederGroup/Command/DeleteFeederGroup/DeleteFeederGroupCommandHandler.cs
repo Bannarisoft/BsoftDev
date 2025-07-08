@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.Power.IFeederGroup;
 using Core.Application.Power.FeederGroup.Queries.GetFeederGroup;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.Power.FeederGroup.Command.DeleteFeederGroup
 {
-    public class DeleteFeederGroupCommandHandler : IRequestHandler<DeleteFeederGroupCommand, ApiResponseDTO<FeederGroupDto>>
+    public class DeleteFeederGroupCommandHandler : IRequestHandler<DeleteFeederGroupCommand, bool>
     {
 
         private readonly IFeederGroupCommandRepository _feederGroupCommandRepository;
@@ -25,7 +26,7 @@ namespace Core.Application.Power.FeederGroup.Command.DeleteFeederGroup
                 _mediator = imediator;
         }
 
-        public async Task<ApiResponseDTO<FeederGroupDto>> Handle(DeleteFeederGroupCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteFeederGroupCommand request, CancellationToken cancellationToken)
         {
             var feederGroup = _imapper.Map<Core.Domain.Entities.Power.FeederGroup>(request);
 
@@ -42,21 +43,9 @@ namespace Core.Application.Power.FeederGroup.Command.DeleteFeederGroup
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            // Return the response based on the result
-            if (isDeleted)
-            {
-                return new ApiResponseDTO<FeederGroupDto>
-                {
-                    IsSuccess = true,
-                    Message = "FeederGroup deleted successfully."
-                };
-            }
-
-            return new ApiResponseDTO<FeederGroupDto>
-            {
-                IsSuccess = false,
-                Message = "FeederGroup not deleted."
-            };
+          
+                return isDeleted == true ? isDeleted : throw new ExceptionRules("FeederGroup deletion failed.");
+            
         }
     }
 }

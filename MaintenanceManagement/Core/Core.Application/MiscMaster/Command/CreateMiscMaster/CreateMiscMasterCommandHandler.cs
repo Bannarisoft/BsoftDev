@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.MiscMaster.Queries.GetMiscMaster;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.MiscMaster.Command.CreateMiscMaster
 {
-    public class CreateMiscMasterCommandHandler  : IRequestHandler<CreateMiscMasterCommand, ApiResponseDTO<GetMiscMasterDto>>
+    public class CreateMiscMasterCommandHandler  : IRequestHandler<CreateMiscMasterCommand, GetMiscMasterDto>
     {
        
 
@@ -28,36 +29,15 @@ namespace Core.Application.MiscMaster.Command.CreateMiscMaster
             _mediator = mediator;
             _miscMasterQueryRepository = miscMasterQueryRepository;
         }
-        public  async Task<ApiResponseDTO<GetMiscMasterDto>> Handle(CreateMiscMasterCommand request, CancellationToken cancellationToken)
+        public  async Task<GetMiscMasterDto> Handle(CreateMiscMasterCommand request, CancellationToken cancellationToken)
         {
-                // 🔹 Check if a MiscTypeMaster with the same name already exists
-            // var existingMiscMaster = await _miscMasterQueryRepository.GetByMiscMasterCodeAsync(request.Code);
-
-            // if (existingMiscMaster != null)
-            // {
-            //     return new ApiResponseDTO<GetMiscMasterDto>
-            //     {
-            //         IsSuccess = false,
-            //         Message = "Misc  Master already exists",
-            //         Data = null
-            //     };
-            // }
-
-            // 🔹 Map request to domain entity
+            
             var miscMaster = _imapper.Map<Core.Domain.Entities.MiscMaster>(request);
 
             // 🔹 Insert into the database
 
              var result = await _miscMasterCommandRepository.CreateAsync(miscMaster);
-              if (result.Id <= 0)
-                {
-                return new ApiResponseDTO<GetMiscMasterDto>
-                {
-                    IsSuccess = false,
-                    Message = "Failed to create Misc  Master",
-                    Data = null
-                };
-            }
+            
 
             // 🔹 Fetch newly created record
             var createdMiscMaster = await _miscMasterQueryRepository.GetByIdAsync(result.Id);
@@ -75,12 +55,8 @@ namespace Core.Application.MiscMaster.Command.CreateMiscMaster
             await _mediator.Publish(domainEvent, cancellationToken);
 
             // 🔹 Return success response
-            return new ApiResponseDTO<GetMiscMasterDto>
-            {
-                IsSuccess = true,
-                Message = "Misc  Master created successfully",
-                Data = mappedResult
-            };
+            return  result.Id <= 0 ? throw new ExceptionRules("Failed to create Misc  Master") : mappedResult;
+            
 
 
 

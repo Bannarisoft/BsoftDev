@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MainStoreStock.Queries.GetMainStoreStock
 {
-    public class GetMainStoreStockQuery : IRequest<ApiResponseDTO<List<MainStoresStockDto>>>
+    public class GetMainStoreStockQuery : IRequest<List<MainStoresStockDto>>
     {
         public string? OldUnitcode { get; set; }
         public string? GroupCode { get; set; }

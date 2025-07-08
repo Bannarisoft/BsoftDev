@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.MRS.Queries.GetSubCostCenter
 {
-    public class GetSubCostCenterQueryHandler : IRequestHandler<GetSubCostCenterQuery, ApiResponseDTO<List<MSubCostCenterDto>>>
+    public class GetSubCostCenterQueryHandler : IRequestHandler<GetSubCostCenterQuery, List<MSubCostCenterDto>>
     {
          private readonly IMRSQueryRepository _imRSQueryRepository;        
          private readonly IMapper _mapper;
@@ -22,14 +22,10 @@ namespace Core.Application.MRS.Queries.GetSubCostCenter
                 _mediator = mediator;
          }
 
-        public async Task<ApiResponseDTO<List<MSubCostCenterDto>>> Handle(GetSubCostCenterQuery request, CancellationToken cancellationToken)
+        public async Task<List<MSubCostCenterDto>> Handle(GetSubCostCenterQuery request, CancellationToken cancellationToken)
         {
             var result = await _imRSQueryRepository.GetSubCostCenter(request.OldUnitcode);
 
-        if (result == null || !result.Any())
-        {
-            return new ApiResponseDTO<List<MSubCostCenterDto>> { IsSuccess = false, Message = $"Department {request.OldUnitcode} not found." };
-        }
 
         var departmentDtos = _mapper.Map<List<MSubCostCenterDto>>(result);
 
@@ -43,7 +39,7 @@ namespace Core.Application.MRS.Queries.GetSubCostCenter
 
         await _mediator.Publish(domainEvent, cancellationToken);
 
-        return new ApiResponseDTO<List<MSubCostCenterDto>> { IsSuccess = true, Message = "Success", Data = departmentDtos };
+        return departmentDtos;
         }
     }
 }

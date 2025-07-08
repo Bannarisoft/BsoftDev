@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.ActivityMaster.Queries.GetAllActivityMaster;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using Core.Domain.Events;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.ActivityMaster.Command.CreateActivityMaster
 {
-    public class CreateActivityMasterCommandHandler  : IRequestHandler<CreateActivityMasterCommand, ApiResponseDTO<int>>
+    public class CreateActivityMasterCommandHandler  : IRequestHandler<CreateActivityMasterCommand, int>
     {
         private readonly IActivityMasterCommandRepository _activityMasterCommandRepository;
         private readonly IActivityMasterQueryRepository _activityMasterQueryRepository;
@@ -29,7 +30,7 @@ namespace Core.Application.ActivityMaster.Command.CreateActivityMaster
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<int>> Handle(CreateActivityMasterCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateActivityMasterCommand request, CancellationToken cancellationToken)
             {
                 
 
@@ -39,15 +40,15 @@ namespace Core.Application.ActivityMaster.Command.CreateActivityMaster
                 // 🔹 Insert into the database
                var createdActivityMaster = await _activityMasterCommandRepository.CreateAsync(activityMaster);
 
-                if (createdActivityMaster.Id <= 0)
-                {
-                    return new ApiResponseDTO<int>
-                    {
-                        IsSuccess = false,
-                        Message = "Failed to create Activity",
-                        Data = 0
-                    };
-                }
+                // if (createdActivityMaster.Id <= 0)
+                // {
+                //     return new ApiResponseDTO<int>
+                //     {
+                //         IsSuccess = false,
+                //         Message = "Failed to create Activity",
+                //         Data = 0
+                //     };
+                // }
 
                 // 🔹 Publish domain event for auditing/logging
                 var domainEvent = new AuditLogsDomainEvent(
@@ -61,13 +62,7 @@ namespace Core.Application.ActivityMaster.Command.CreateActivityMaster
                 await _mediator.Publish(domainEvent, cancellationToken);
 
                 // 🔹 Return success response
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = true,
-                    Message = "Activity created successfully",
-                    Data = createdActivityMaster.Id
-                   
-                };
+                return createdActivityMaster.Id > 0 ? createdActivityMaster.Id : throw new ExceptionRules("ActivityMaster Creation Failed.");
             }
 
 

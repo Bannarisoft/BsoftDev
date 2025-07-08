@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MachineMaster.Queries.GetMachineNoDepartmentbyId
 {
-    public class GetMachineNoDepartmentbyIdQuery : IRequest<ApiResponseDTO<List<GetMachineNoDepartmentbyIdDto>>>
+    public class GetMachineNoDepartmentbyIdQuery : IRequest<List<GetMachineNoDepartmentbyIdDto>>
     {
         public int DepartmentId { get; set; }
     }

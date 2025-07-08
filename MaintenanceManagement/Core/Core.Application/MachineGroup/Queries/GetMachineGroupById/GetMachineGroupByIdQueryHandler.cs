@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
 {
-    public class GetMachineGroupByIdQueryHandler  : IRequestHandler<GetMachineGroupByIdQuery, ApiResponseDTO<GetMachineGroupByIdDto>>
+    public class GetMachineGroupByIdQueryHandler  : IRequestHandler<GetMachineGroupByIdQuery, GetMachineGroupByIdDto>
     {
 
         private readonly IMachineGroupQueryRepository  _machineGroupQueryRepository;
@@ -27,28 +27,14 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
            
         } 
 
-         public async Task<ApiResponseDTO<GetMachineGroupByIdDto>> Handle(GetMachineGroupByIdQuery request, CancellationToken cancellationToken)
+         public async Task<GetMachineGroupByIdDto> Handle(GetMachineGroupByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _machineGroupQueryRepository.GetByIdAsync(request.Id);
             
-            if (result is null)
-            {
-                return new ApiResponseDTO<GetMachineGroupByIdDto>
-                {
-                    IsSuccess = false,
-                    Message = $"MachineGroup with Id {request.Id} not found.",
-                    Data = null
-                };
-            }
+          
             
             var machineGroup = _mapper.Map<GetMachineGroupByIdDto>(result);
-              // 🔥 Fetch lookups
-        //     var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-        //     var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-        //  if (departmentLookup.TryGetValue(machineGroup.DepartmentId, out var departmentName))
-        //     {
-        //         machineGroup.DepartmentName = departmentName!;
-        //     }
+            
 
             // Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -61,12 +47,7 @@ namespace Core.Application.MachineGroup.Queries.GetMachineGroupById
 
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<GetMachineGroupByIdDto>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = machineGroup
-            };
+            return machineGroup;
         }
 
 

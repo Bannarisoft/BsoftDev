@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Power.PowerConsumption.Queries
 {
-    public class GetFeederSubFeederByIdQuery :  IRequest<ApiResponseDTO<List<GetFeederSubFeederDto>>>
+    public class GetFeederSubFeederByIdQuery :  IRequest<List<GetFeederSubFeederDto>>
     {
         public int FeederTypeId { get; set; }
     }

@@ -6,10 +6,9 @@ using Core.Application.WDVDepreciation.Queries.CalculateDepreciation;
 using Core.Application.WDVDepreciation.Queries.GetDepreciation;
 using Core.Domain.Entities;
 
-
 namespace Core.Application.Common.Mappings 
 {
-    public class WDVDepreciationDetailProfile : Profile
+    public class WDVDepreciationDetailProfile : Profile    
     {
         public WDVDepreciationDetailProfile()
         {             
@@ -20,7 +19,6 @@ namespace Core.Application.Common.Mappings
             CreateMap<CreateDepreciationCommand, WDVDepreciationDetail>();
             CreateMap<WDVDepreciationDetail, CalculationDepreciationDto>();                         
             CreateMap<WDVDepreciationDetail, CalculationDepreciationDto>();                            
-        }
-             
+        }             
     }
 }

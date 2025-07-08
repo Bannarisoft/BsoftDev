@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MaintenanceCategory.Queries.GetMaintenanceCategoryById
 {
-    public class GetMaintenanceCategoryByIdQuery : IRequest<ApiResponseDTO<MaintenanceCategoryDto>>
+    public class GetMaintenanceCategoryByIdQuery : IRequest<MaintenanceCategoryDto>
     {
         public int Id { get; set; }
     }

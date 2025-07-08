@@ -12,7 +12,7 @@ namespace Core.Application.Common.Interfaces.IActivityCheckListMaster
         Task<bool> UpdateAsync(int id, Core.Domain.Entities.ActivityCheckListMaster activityCheckListMaster);
            
 
-       Task<int> DeleteAsync(int Id,Core.Domain.Entities.ActivityCheckListMaster activityCheckListMaster);
+       Task<bool> DeleteAsync(int Id,Core.Domain.Entities.ActivityCheckListMaster activityCheckListMaster);
 
     }
 }

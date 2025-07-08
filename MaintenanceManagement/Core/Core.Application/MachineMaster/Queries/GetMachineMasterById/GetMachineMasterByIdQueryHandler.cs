@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MachineMaster.Queries.GetMachineMasterById
 {
-    public class GetMachineMasterByIdQueryHandler : IRequestHandler<GetMachineMasterByIdQuery, ApiResponseDTO<MachineMasterDto>>
+    public class GetMachineMasterByIdQueryHandler : IRequestHandler<GetMachineMasterByIdQuery, MachineMasterDto>
     {
         
         private readonly IMachineMasterQueryRepository _imachineMasterQueryRepository;        
@@ -23,27 +23,13 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMasterById
             _mediator = mediator;            
         }
 
-        public async Task<ApiResponseDTO<MachineMasterDto>> Handle(GetMachineMasterByIdQuery request, CancellationToken cancellationToken)
+        public async Task<MachineMasterDto> Handle(GetMachineMasterByIdQuery request, CancellationToken cancellationToken)
         {
              var result = await _imachineMasterQueryRepository.GetByIdAsync(request.Id);
-            // Check if the entity exists
-            if (result is null)
-            {
-                return new ApiResponseDTO<MachineMasterDto> { IsSuccess = false, Message =$"Machine ID {request.Id} not found." };
-            }
+          
             // Map a single entity
             var machineMaster = _mapper.Map<MachineMasterDto>(result);
-            //var departments = await _departmentGrpcClient.GetAllDepartmentsAsync();
-                // var dept = departments.FirstOrDefault(d => d.DepartmentId == machineMaster.DepartmentId);
-                // if (dept != null)
-                // {
-                //     machineMaster.DepartmentName = dept.DepartmentName;
-                // }
-                // else
-                // {
-                //     // Optional: handle missing department
-                //     machineMaster.DepartmentName = "Unknown";
-                // }
+       
           //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
                     actionDetail: "GetById",
@@ -53,7 +39,7 @@ namespace Core.Application.MachineMaster.Queries.GetMachineMasterById
                     module:"MachineMaster"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<MachineMasterDto> { IsSuccess = true, Message = "Success", Data = machineMaster };
+          return machineMaster;
         }
     }
 }

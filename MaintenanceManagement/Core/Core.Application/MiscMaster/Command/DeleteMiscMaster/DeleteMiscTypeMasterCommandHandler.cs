@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.Application.Common.Exceptions;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.MiscMaster.Queries.GetMiscMaster;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.MiscMaster.Command.DeleteMiscMaster
 {
-    public class DeleteMiscTypeMasterCommandHandler  : IRequestHandler<DeleteMiscMasterCommand, ApiResponseDTO<GetMiscMasterDto>>
+    public class DeleteMiscTypeMasterCommandHandler  : IRequestHandler<DeleteMiscMasterCommand, bool>
     {
 
          private readonly IMiscMasterCommandRepository _miscMasterCommandRepository;
@@ -27,7 +28,7 @@ namespace Core.Application.MiscMaster.Command.DeleteMiscMaster
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<GetMiscMasterDto>> Handle(DeleteMiscMasterCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteMiscMasterCommand request, CancellationToken cancellationToken)
         {
             // Map the request to the entity
             var miscMaster = _imapper.Map<Core.Domain.Entities.MiscMaster>(request);
@@ -44,22 +45,10 @@ namespace Core.Application.MiscMaster.Command.DeleteMiscMaster
                 module: "MiscMaster"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-
-            // Return the response based on the result
-            if (isDeleted)
-            {
-                return new ApiResponseDTO<GetMiscMasterDto>
-                {
-                    IsSuccess = true,
-                    Message = "MiscMaster deleted successfully."
-                };
-            }
-
-            return new ApiResponseDTO<GetMiscMasterDto>
-            {
-                IsSuccess = false,
-                Message = "MiscMaster not deleted."
-            };
+            
+             return isDeleted ? true : throw new ExceptionRules("MiscMaster deletion failed.");
+                
+            
         }
         
     }

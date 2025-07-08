@@ -9,6 +9,7 @@ using Core.Application.ActivityCheckListMaster.Command.UpdateActivityCheckListMa
 using Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListMaster;
 using Core.Application.ActivityCheckListMaster.Queries.GetActivityCheckListMasterById;
 using Core.Application.ActivityCheckListMaster.Queries.GetCheckListByActivityId;
+using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IActivityMaster;
 using FluentValidation;
 using MediatR;
@@ -20,21 +21,10 @@ namespace MaintenanceManagement.API.Controllers
     [Route("api/[controller]")]
     public class ActivityCheckListMasterController : ApiControllerBase
     {
-        private readonly IActivityMasterCommandRepository _activityMasterCommandRepository;
 
-
-        private readonly IValidator<CreateActivityCheckListMasterCommand> _createActivityCheckListCommand;
-        private readonly IValidator<UpdateActivityCheckListMasterCommand> _updateActivityCheckListCommand;
-
-        private readonly IValidator<DeleteActivityCheckListMasterCommand> _deleteActivityCheckListCommand;
-
-        public ActivityCheckListMasterController(ISender mediator, IActivityMasterCommandRepository activityMasterCommandRepository, IValidator<CreateActivityCheckListMasterCommand> createActivityCheckListCommand,
-        IValidator<UpdateActivityCheckListMasterCommand> updateActivityCheckListCommand, IValidator<DeleteActivityCheckListMasterCommand> deleteActivityCheckListCommand) : base(mediator)
+        public ActivityCheckListMasterController(ISender mediator) : base(mediator)
         {
-            _activityMasterCommandRepository = activityMasterCommandRepository;
-            _createActivityCheckListCommand = createActivityCheckListCommand;
-            _updateActivityCheckListCommand = updateActivityCheckListCommand;
-            _deleteActivityCheckListCommand = deleteActivityCheckListCommand;
+            
 
         }
 
@@ -67,48 +57,44 @@ namespace MaintenanceManagement.API.Controllers
         {
             var CheckListMaster = await Mediator.Send(new GetActivityCheckListMasterByIdQuery() { Id = id });
 
-            if (CheckListMaster.IsSuccess)
-            {
-
-                return Ok(new { StatusCode = StatusCodes.Status200OK, data = CheckListMaster.Data, message = CheckListMaster.Message });
-            }
-            return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = CheckListMaster.Message });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = CheckListMaster, message = "" });
+            
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateActivityCheckListMasterCommand command)
         {
-            var validationResult = await _createActivityCheckListCommand.ValidateAsync(command);
+            // var validationResult = await _createActivityCheckListCommand.ValidateAsync(command);
 
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+            // if (!validationResult.IsValid)
+            // {
+            //     return BadRequest(new
+            //     {
+            //         StatusCode = StatusCodes.Status400BadRequest,
+            //         message = "Validation failed",
+            //         errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+            //     });
+            // }
 
             var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
+            // if (response.IsSuccess)
+            // {
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = response.Message,
+                    message = "Created successfully.",
                     errors = "",
-                    data = response.Data
+                    data = response
                 });
-            }
+            // }
 
 
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = response.Message,
-                errors = ""
-            });
+            // return BadRequest(new
+            // {
+            //     StatusCode = StatusCodes.Status400BadRequest,
+            //     message = response.Message,
+            //     errors = ""
+            // });
 
         }
 
@@ -116,35 +102,27 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> Update(UpdateActivityCheckListMasterCommand command)
         {
             // Update the record
-            var validationResult = await _updateActivityCheckListCommand.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+            // var validationResult = await _updateActivityCheckListCommand.ValidateAsync(command);
+            // if (!validationResult.IsValid)
+            // {
+            //     return BadRequest(new
+            //     {
+            //         StatusCode = StatusCodes.Status400BadRequest,
+            //         message = "Validation failed",
+            //         errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
+            //     });
+            // }
 
-            var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
+             await Mediator.Send(command);
+           
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    Message = response.Message,
+                    Message = "Updated successfully.",
                     Errors = ""
                 });
-            }
-
-            // If update failed
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = response.Message,
-                Errors = ""
-            });
+            
+           
         }
         //  [HttpGet("ByActivityId")]        
         //  public async Task<IActionResult> GetCheckListByActivityIdAsync( List<int> ids)
@@ -174,49 +152,43 @@ namespace MaintenanceManagement.API.Controllers
 
             var activityCheckList = await Mediator.Send(command);
 
-            if (activityCheckList.IsSuccess)
-            {
-                return Ok(new { StatusCode = StatusCodes.Status200OK, data = activityCheckList.Data, message = activityCheckList.Message });
-            }
+           
+                return Ok(new { StatusCode = StatusCodes.Status200OK, data = activityCheckList, message = "" });
+            
 
-            return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"command" });
+            
         }
          [HttpDelete]
             public async Task<IActionResult> DeleteCostCenterAsync(int id)
             {
                 // Validate the incoming command
-                    var validationResult = await _deleteActivityCheckListCommand.ValidateAsync(new DeleteActivityCheckListMasterCommand { Id = id });
+                    // var validationResult = await _deleteActivityCheckListCommand.ValidateAsync(new DeleteActivityCheckListMasterCommand { Id = id });
                   
-                    if (!validationResult.IsValid)
-                    {
+                    // if (!validationResult.IsValid)
+                    // {
                     
-                        return BadRequest(new
-                        {
-                            StatusCode = StatusCodes.Status400BadRequest,
-                            message = "Validation failed",
-                            errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                        });
-                    }
+                    //     return BadRequest(new 
+                    //     {
+                    //         StatusCode = StatusCodes.Status400BadRequest,
+                    //         Message = "Validation failed",
+                    //         Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                    //     });
+                    // }
 
                     // Process the delete command
-                    var result = await Mediator.Send(new DeleteActivityCheckListMasterCommand { Id = id });
+                     await Mediator.Send(new DeleteActivityCheckListMasterCommand { Id = id });
 
-                    if (result.IsSuccess) 
+                    return Ok(new 
                     {
-                       
-                        return Ok(new
-                        {
-                            message = result.Message,
-                            statusCode = StatusCodes.Status200OK
-                        });
-                        
-                    }
-                
-                    return NotFound(new
-                    {
-                        message = result.Message,
-                        statusCode = StatusCodes.Status404NotFound
+                        StatusCode = StatusCodes.Status200OK,
+                        message = "Delete successfully."                
                     });
+                
+                    // return NotFound(new
+                    // {
+                    //     message = result.Message,
+                    //     statusCode = StatusCodes.Status404NotFound
+                    // });
             
             }
 

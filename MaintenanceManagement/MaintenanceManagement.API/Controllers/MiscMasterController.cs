@@ -17,6 +17,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
+
 namespace MaintenanceManagement.API.Controllers
 {
     [Route("api/[controller]")]
@@ -28,15 +29,17 @@ namespace MaintenanceManagement.API.Controllers
 
         private readonly IValidator<DeleteMiscMasterCommand> _deleteMiscMasterCommand;
         private readonly IMiscMasterCommandRepository _miscMasterCommandRepository;
-       public MiscMasterController(ISender mediator, IValidator<CreateMiscMasterCommand>  miscMasterCommand, IValidator<UpdateMiscMasterCommand> updateMiscMasterCommand, IMiscMasterCommandRepository miscMasterCommandRepository,
-        IValidator<DeleteMiscMasterCommand> deleteMiscMasterCommand ):base(mediator)
-          {
+        
+        
+       public MiscMasterController(ISender mediator, IValidator<CreateMiscMasterCommand> miscMasterCommand, IValidator<UpdateMiscMasterCommand> updateMiscMasterCommand, IMiscMasterCommandRepository miscMasterCommandRepository,
+          IValidator<DeleteMiscMasterCommand> deleteMiscMasterCommand) : base(mediator)
+        {
 
-            _miscMasterCommand=miscMasterCommand;
-            _updateMiscMasterCommand=updateMiscMasterCommand;
-            _miscMasterCommandRepository=miscMasterCommandRepository;
+            _miscMasterCommand = miscMasterCommand;
+            _updateMiscMasterCommand = updateMiscMasterCommand;
+            _miscMasterCommandRepository = miscMasterCommandRepository;
             _deleteMiscMasterCommand = deleteMiscMasterCommand;
-          } 
+        } 
 
          [HttpGet] 
           public async Task<IActionResult> GetAllMiscMasterAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -66,12 +69,8 @@ namespace MaintenanceManagement.API.Controllers
            
             var miscmaster = await Mediator.Send(new GetMiscMasterByIdQuery() { Id = id});
           
-             if(miscmaster.IsSuccess)
-            {
-                 return Ok(new { StatusCode=StatusCodes.Status200OK, data = miscmaster.Data,message=miscmaster.Message});
-            }
-
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = $"MiscMaster ID {id} not found.", errors = "" });
+            return Ok(new { StatusCode=StatusCodes.Status200OK, data = miscmaster,message=miscmaster});
+        
            
         }
             [HttpGet("by-name")]
@@ -79,109 +78,55 @@ namespace MaintenanceManagement.API.Controllers
         {
           
             var miscmaster = await Mediator.Send(new GetMiscMasterAutoCompleteQuery {SearchPattern = name,MiscTypeCode=MiscTypeCode});
-            if(miscmaster.IsSuccess)
-            {
-            return Ok( new { StatusCode=StatusCodes.Status200OK, data = miscmaster.Data });
-            }
-            return NotFound( new { StatusCode=miscmaster.Message}) ;
+            
+            return Ok( new { StatusCode=StatusCodes.Status200OK, data = miscmaster });
+            
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateMiscMasterCommand command)
         {
-             var validationResult = await _miscMasterCommand.ValidateAsync(command);
-            
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+           
           
             var response = await Mediator.Send(command);
-            if(response.IsSuccess)
-            {                             
+                                      
                 return Ok(new 
                 {
                      StatusCode=StatusCodes.Status201Created,
-                 message = response.Message,
+                 message = response,
                   errors = "",
-                  data = response.Data 
+                  data = response 
                   });
-            }
-             
             
-            return BadRequest( new {
-                 StatusCode=StatusCodes.Status400BadRequest,
-                  message = response.Message, 
-                  errors = "" 
-                  }); 
             
         } 
         [HttpPut] 
          public async Task<IActionResult> Update(UpdateMiscMasterCommand command)
         {
-            // Update the record
-              var validationResult = await _updateMiscMasterCommand.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                 return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+           
 
             var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
+            
                 return Ok(new 
                 { 
                     StatusCode = StatusCodes.Status200OK, 
-                    Message = response.Message, 
+                    Message = response, 
                     Errors = "" 
                 });
-            }
+            
 
-            // If update failed
-            return BadRequest(new 
-            { 
-                StatusCode = StatusCodes.Status400BadRequest, 
-                Message = response.Message, 
-                Errors = "" 
-            });
         }
         [ HttpDelete("{id}")]
           public async Task<IActionResult> Delete(int id)
         {
-            
-           var command = new DeleteMiscMasterCommand { Id = id };
-           var validationResult = await  _deleteMiscMasterCommand.ValidateAsync(command);
-               if (!validationResult.IsValid)
-                {
-                    return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-                }
-
-
+        
            
            var updatedMiscMaster = await Mediator.Send(new DeleteMiscMasterCommand { Id = id });
 
-           if(updatedMiscMaster.IsSuccess)
-           {
-            return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedMiscMaster.Message, errors = "" });
+            return Ok(new { StatusCode=StatusCodes.Status200OK, message = updatedMiscMaster, errors = "" });
               
-           }
-
-            return BadRequest(new { StatusCode=StatusCodes.Status400BadRequest, message = updatedMiscMaster.Message, errors = "" });
             
         }
         
-      
     }
 }

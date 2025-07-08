@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Power.PowerConsumption.Queries.GetPowerConsumptionById
 {
-    public class GetPowerConsumptionByIdQuery :IRequest<ApiResponseDTO<GetPowerConsumptionDto>>
+    public class GetPowerConsumptionByIdQuery :IRequest<GetPowerConsumptionDto>
     {
         public int Id { get; set; }
     }

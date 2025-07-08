@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.Power.Feeder.Queries.GetFeederById
 {
-    public class GetFeederByIdQueryHandler : IRequestHandler<GetFeederByIdQuery, ApiResponseDTO<GetFeederByIdDto>>
+    public class GetFeederByIdQueryHandler : IRequestHandler<GetFeederByIdQuery, GetFeederByIdDto>
     {
         private readonly IFeederQueryRepository _feederGroupRepository;
         private readonly IMapper _mapper;
@@ -23,19 +23,10 @@ namespace Core.Application.Power.Feeder.Queries.GetFeederById
             _mapper = mapper;
             _mediator = mediator;
         }
-         public async Task<ApiResponseDTO<GetFeederByIdDto>> Handle(GetFeederByIdQuery request, CancellationToken cancellationToken)
+         public async Task<GetFeederByIdDto> Handle(GetFeederByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _feederGroupRepository.GetFeederByIdAsync(request.Id);
 
-            if (result == null)
-            {
-                return new ApiResponseDTO<GetFeederByIdDto>
-                {
-                    IsSuccess = false,
-                    Message = "Feeder not found.",
-                    Data = null
-                };
-            }
 
             var feederDto = _mapper.Map<GetFeederByIdDto>(result);
 
@@ -49,12 +40,7 @@ namespace Core.Application.Power.Feeder.Queries.GetFeederById
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<GetFeederByIdDto>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = feederDto
-            };
+            return feederDto;
         }
             
         

@@ -27,7 +27,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
                 return machineMaster.Id;
         }
 
-        public async Task<int> DeleteAsync(int Id, Core.Domain.Entities.MachineMaster machineMaster)
+        public async Task<bool> DeleteAsync(int Id, Core.Domain.Entities.MachineMaster machineMaster)
         {
             // Fetch the MachineMaster to delete from the database
             var machinemasterToDelete = await _applicationDbContext.MachineMaster.FirstOrDefaultAsync(u => u.Id == Id);
@@ -35,16 +35,15 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             // If the MachineMaster does not exist
             if (machinemasterToDelete is null)
             {
-                return -1; //indicate failure
+                return false; //indicate failure
             }
 
             // Update the IsActive status to indicate deletion (or soft delete)
             machinemasterToDelete.IsDeleted = machineMaster.IsDeleted;
 
             // Save changes to the database 
-            await _applicationDbContext.SaveChangesAsync();
+           return await _applicationDbContext.SaveChangesAsync() > 0;
 
-            return 1; // Indicate success
         }
 
         public async Task<bool> ExistsByCodeAsync(string? MachineCode)
@@ -68,14 +67,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             .AnyAsync(cc => cc.MachineCode == code && cc.Id != excludeId);
         }
 
-        public async Task<int> UpdateAsync(int Id, Core.Domain.Entities.MachineMaster machineMaster)
+        public async Task<bool> UpdateAsync(int Id, Core.Domain.Entities.MachineMaster machineMaster)
         {
             var existingmachinemaster = await _applicationDbContext.MachineMaster.FirstOrDefaultAsync(u => u.Id == Id);
 
             // If the MaintenanceType does not exist
             if (existingmachinemaster is null)
             {
-                return -1; //indicate failure
+                return false; //indicate failure
             }
 
             // Update the existing MaintenanceType properties
@@ -99,9 +98,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineMaster
             _applicationDbContext.MachineMaster.Update(existingmachinemaster);
 
             // Save changes to the database
-            await _applicationDbContext.SaveChangesAsync();
+          return  await _applicationDbContext.SaveChangesAsync() > 0;
 
-            return 1; // Indicate success
         }
     }
 }
