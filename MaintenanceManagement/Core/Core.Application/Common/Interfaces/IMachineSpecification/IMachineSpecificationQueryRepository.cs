@@ -8,7 +8,7 @@ namespace Core.Application.Common.Interfaces.IMachineSpecification
 {
     public interface IMachineSpecificationQueryRepository
     {
-        Task<MachineSpecificationDto?> GetByIdAsync(int Id);
+        Task<List<MachineSpecificationDto>> GetByIdAsync(int Id);
         Task<MachineSpecificationDto?> GetBySpecificationIdAsync(int Id);
 
     }

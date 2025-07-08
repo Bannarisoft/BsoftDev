@@ -53,7 +53,7 @@ namespace MaintenanceManagement.API.Controllers
 
             if (CreateMachineId.IsSuccess)
             {
-                _logger.LogInformation($"MachineSpecification {createMachineSpecficationCommand.SpecificationId} created successfully.");
+                _logger.LogInformation($"MachineSpecification {createMachineSpecficationCommand.Specifications.FirstOrDefault().SpecificationId} created successfully.");
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
@@ -61,7 +61,7 @@ namespace MaintenanceManagement.API.Controllers
                     data = CreateMachineId.Data
                 });
             }
-            _logger.LogWarning($"MachineSpecification {createMachineSpecficationCommand.SpecificationId} Creation failed.");
+            _logger.LogWarning($"MachineSpecification {createMachineSpecficationCommand.Specifications.FirstOrDefault().SpecificationId} Creation failed.");
             return BadRequest(new
             {
                 StatusCode = StatusCodes.Status400BadRequest,

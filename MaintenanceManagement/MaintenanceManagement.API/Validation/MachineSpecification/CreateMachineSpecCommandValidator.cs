@@ -1,61 +1,37 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Application.Common.IMachineSpecification;
 using Core.Application.MachineSpecification.Command.CreateMachineSpecfication;
 using FluentValidation;
-using MaintenanceManagement.API.Validation.Common;
 
 namespace MaintenanceManagement.API.Validation.MachineSpecification
 {
     public class CreateMachineSpecCommandValidator : AbstractValidator<CreateMachineSpecficationCommand>
     {
-          private readonly List<ValidationRule> _validationRules;
-          private readonly IMachineSpecificationCommandRepository _iMachineSpecificationRepository;
-
-        public CreateMachineSpecCommandValidator(MaxLengthProvider maxLengthProvider, IMachineSpecificationCommandRepository iMachineSpecificationRepository)
+        public CreateMachineSpecCommandValidator(IMachineSpecificationCommandRepository repository)
         {
-            _iMachineSpecificationRepository = iMachineSpecificationRepository; 
-            _validationRules = ValidationRuleLoader.LoadValidationRules();
-            if (_validationRules == null || !_validationRules.Any())
-            {
-                throw new InvalidOperationException("Validation rules could not be loaded.");
-            }
-            foreach (var rule in _validationRules)
-            {
-                switch (rule.Rule)
-                {
-                    case "NotEmpty":
-                        RuleFor(x => x.SpecificationId)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(CreateMachineSpecficationCommand.SpecificationId)} {rule.Error}");
-                        RuleFor(x => x.MachineId)
-                           .NotEmpty()
-                           .WithMessage($"{nameof(CreateMachineSpecficationCommand.MachineId)} {rule.Error}");
-                        break;
+            RuleFor(x => x.Specifications)
+                .NotNull().WithMessage("Specification list is required.")
+                .NotEmpty().WithMessage("Specification list cannot be empty.");
 
-                    case "MinLength":
-                        RuleFor(x => x.SpecificationId)
-                            .GreaterThanOrEqualTo(1)
-                            .WithMessage($"{nameof(CreateMachineSpecficationCommand.SpecificationId)} {rule.Error} {0}");
-                        RuleFor(x => x.MachineId)
-                            .GreaterThanOrEqualTo(1)
-                            .WithMessage($"{nameof(CreateMachineSpecficationCommand.MachineId)} {rule.Error} {0}");
-                        break;
+            RuleForEach(x => x.Specifications).SetValidator(new MachineSpecificationCreateDtoValidator(repository));
+        }
+    }
 
-                    case "AlreadyExists":
-                        RuleFor(x => x)
-                            .MustAsync(async (model, cancellation) =>
-                                !await _iMachineSpecificationRepository
-                                    .IsDuplicateSpecificationAsync(model.MachineId, model.SpecificationId))
-                            .WithName("SpecificationId")
-                            .WithMessage($"{rule.Error}");
-                        break;
+    public class MachineSpecificationCreateDtoValidator : AbstractValidator<MachineSpecificationCreateDto>
+    {
+        public MachineSpecificationCreateDtoValidator(IMachineSpecificationCommandRepository repository)
+        {
+            RuleFor(x => x.SpecificationId)
+                .NotEmpty().WithMessage("SpecificationId is required.")
+                .GreaterThan(0).WithMessage("SpecificationId must be greater than 0.");
 
+            RuleFor(x => x.MachineId)
+                .NotEmpty().WithMessage("MachineId is required.")
+                .GreaterThan(0).WithMessage("MachineId must be greater than 0.");
 
-                }
-            }
+            RuleFor(x => x)
+                .MustAsync(async (dto, cancellation) =>
+                    !await repository.IsDuplicateSpecificationAsync(dto.MachineId, dto.SpecificationId))
+                .WithMessage("This SpecificationId already exists for the MachineId.");
         }
     }
 }
