@@ -11,39 +11,51 @@ using MediatR;
 
 namespace Core.Application.MachineSpecification.Queries.GetMachineSpecificationById
 {
-    public class GetMachineSpecificationByIdQueryHandler : IRequestHandler<GetMachineSpecificationByIdQuery, ApiResponseDTO<MachineSpecificationDto>>
+    public class GetMachineSpecificationByIdQueryHandler : IRequestHandler<GetMachineSpecificationByIdQuery, ApiResponseDTO<List<MachineSpecificationDto>>>
     {
         private readonly IMachineSpecificationQueryRepository _imachineSpecificationQueryRepository;
         private readonly IMapper _mapper;
-        private readonly IMediator _mediator;     
+        private readonly IMediator _mediator;
 
         public GetMachineSpecificationByIdQueryHandler(IMachineSpecificationQueryRepository imachineSpecificationQueryRepository, IMapper mapper, IMediator mediator)
         {
-            _imachineSpecificationQueryRepository = imachineSpecificationQueryRepository;            
+            _imachineSpecificationQueryRepository = imachineSpecificationQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<MachineSpecificationDto>> Handle(GetMachineSpecificationByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseDTO<List<MachineSpecificationDto>>> Handle(GetMachineSpecificationByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _imachineSpecificationQueryRepository.GetByIdAsync(request.Id);
-            // Check if the entity exists
-            if (result is null)
+
+            if (result == null || !result.Any())
             {
-                return new ApiResponseDTO<MachineSpecificationDto> { IsSuccess = false, Message = $"Machine ID {request.Id} not found." };
+                return new ApiResponseDTO<List<MachineSpecificationDto>>
+                {
+                    IsSuccess = false,
+                    Message = $"No MachineSpecifications found for Machine ID {request.Id}"
+                };
             }
-            // Map a single entity
-            var machineMaster = _mapper.Map<MachineSpecificationDto>(result);
-             var domainEvent = new AuditLogsDomainEvent(
-                    actionDetail: "GetById",
-                    actionCode: "GetMachineSpecificationByIdQuery",        
-                    actionName: machineMaster.Id.ToString(),
-                    details: $"MachineSpecification details {machineMaster.Id} was fetched.",
-                    module:"MachineSpecification"
-                );
-                await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<MachineSpecificationDto> { IsSuccess = true, Message = "Success", Data = machineMaster };
-            
+
+            // If needed: map again using AutoMapper (optional)
+             var mappedList = _mapper.Map<List<MachineSpecificationDto>>(result);
+
+            var domainEvent = new AuditLogsDomainEvent(
+                actionDetail: "GetById",
+                actionCode: "GetMachineSpecificationByIdQuery",
+                actionName: request.Id.ToString(),
+                details: $"Fetched {result.Count} MachineSpecifications for Machine ID {request.Id}.",
+                module: "MachineSpecification");
+
+            await _mediator.Publish(domainEvent, cancellationToken);
+
+            return new ApiResponseDTO<List<MachineSpecificationDto>>
+            {
+                IsSuccess = true,
+                Message = "Machine specifications fetched successfully.",
+                Data = result
+            };
         }
+    
     }
 }

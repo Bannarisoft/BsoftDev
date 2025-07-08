@@ -18,21 +18,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineSpecification
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<int> CreateAsync(Core.Domain.Entities.MachineSpecification machineSpecification)
+       public async Task<int> CreateAsync(Core.Domain.Entities.MachineSpecification machineSpecification)
         {
-            // Add the MachineSpecification to the DbContext
-                await _applicationDbContext.MachineSpecification.AddAsync(machineSpecification);
-
-                // Save changes to the database
-                await _applicationDbContext.SaveChangesAsync();
-
-                // Return the ID of the created MachineSpecification
-                return machineSpecification.Id;
+            await _applicationDbContext.MachineSpecification.AddAsync(machineSpecification);
+            await _applicationDbContext.SaveChangesAsync();
+            return machineSpecification.Id;
         }
 
         public async Task<int> DeleteAsync(int Id, Core.Domain.Entities.MachineSpecification machineSpecification)
         {
-             // Fetch the MachineMaster to delete from the database
+            // Fetch the MachineMaster to delete from the database
             var machinemasterToDelete = await _applicationDbContext.MachineSpecification.FirstOrDefaultAsync(u => u.Id == Id);
 
             // If the MachineMaster does not exist
