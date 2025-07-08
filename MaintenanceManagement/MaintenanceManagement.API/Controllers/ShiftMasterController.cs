@@ -18,15 +18,11 @@ namespace MaintenanceManagement.API.Controllers
     [Route("api/[controller]")]
     public class ShiftMasterController : ApiControllerBase
     {
-        private readonly IValidator<CreateShiftMasterCommand> _createShiftMasterCommandValidator;
-        private readonly IValidator<UpdateShiftMasterCommand> _updateShiftMasterCommandValidator;
-        private readonly IValidator<DeleteShiftMasterCommand> _deleteShiftMasterCommandValidator;
-        public ShiftMasterController(ISender mediator, IValidator<CreateShiftMasterCommand> createDivisionCommandValidator, IValidator<UpdateShiftMasterCommand> updateDivisionCommandValidator, IValidator<DeleteShiftMasterCommand> deleteDivisionCommandValidator)
+
+        public ShiftMasterController(ISender mediator)
         : base(mediator)
         {
-            _createShiftMasterCommandValidator = createDivisionCommandValidator;
-            _updateShiftMasterCommandValidator = updateDivisionCommandValidator;
-            _deleteShiftMasterCommandValidator = deleteDivisionCommandValidator;
+            
         }
            [HttpGet]
         public async Task<IActionResult> GetAllShiftMastersAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -52,16 +48,6 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> CreateAsync(CreateShiftMasterCommand command)
         {
             
-            var validationResult = await _createShiftMasterCommandValidator.ValidateAsync(command);
-            
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
             var response = await Mediator.Send(command);
             if(response.IsSuccess)
             {
@@ -109,15 +95,6 @@ namespace MaintenanceManagement.API.Controllers
         [HttpPut]
         public async Task<IActionResult> Update( UpdateShiftMasterCommand command )
         {
-            var validationResult = await _updateShiftMasterCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                 return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
 
              var response = await Mediator.Send(command);
              if(response.IsSuccess)
@@ -146,15 +123,7 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var command = new DeleteShiftMasterCommand { Id = id };
-             var validationResult = await  _deleteShiftMasterCommandValidator.ValidateAsync(command);
-               if (!validationResult.IsValid)
-                {
-                    return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-                }
+          
            var updatedShiftMaster = await Mediator.Send(command);
 
            if(updatedShiftMaster.IsSuccess)

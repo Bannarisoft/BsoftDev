@@ -64,11 +64,8 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             var maintenancetype = await Mediator.Send(new GetMaintenanceTypeByIdQuery() { Id = id});
-          
-           
                 
               return Ok(new { StatusCode=StatusCodes.Status200OK, data = maintenancetype,message = maintenancetype });
-            
             
         }
 
@@ -76,15 +73,12 @@ namespace MaintenanceManagement.API.Controllers
         public async Task<IActionResult> CreateAsync(CreateMaintenanceTypeCommand createMaintenanceTypeCommand)
         {
           
-
-            // Process the command
             var CreatedMaintenanceId = await _mediator.Send(createMaintenanceTypeCommand);
-
             
             return Ok(new
             {
                 StatusCode = StatusCodes.Status201Created,
-                message =CreatedMaintenanceId,
+                message ="MaintenanceType Created Successfully",
                 data = CreatedMaintenanceId
             });
            
@@ -94,16 +88,13 @@ namespace MaintenanceManagement.API.Controllers
             public async Task<IActionResult> UpdateAsync(UpdateMaintenanceTypeCommand updateMaintenanceTypeCommand)
             {
             
-
-                    var updatedmaintenance = await _mediator.Send(updateMaintenanceTypeCommand);
-
-                    
+                await _mediator.Send(updateMaintenanceTypeCommand);
+                     
                     return Ok(new
                         {
-                            message = updatedmaintenance,
+                            message = "MaintenanceType Updated Successfully",
                             statusCode = StatusCodes.Status200OK
-                        });
-                    
+                        });    
             }
 
             [HttpDelete]
@@ -114,7 +105,7 @@ namespace MaintenanceManagement.API.Controllers
 
                         return Ok(new
                         {
-                            message = result,
+                            message = "MaintenanceType Deleted Successfully",
                             statusCode = StatusCodes.Status200OK
                         });
                   

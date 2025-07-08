@@ -52,7 +52,7 @@ namespace MaintenanceManagement.API.Controllers
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created, 
-                    message = response, 
+                    message = "Created Successfully", 
                     errors = "", 
                     data = response 
                 });
@@ -77,12 +77,12 @@ namespace MaintenanceManagement.API.Controllers
         {
          
 
-             var response = await Mediator.Send(command);
+              await Mediator.Send(command);
              
                  return Ok(new 
                  { 
                     StatusCode=StatusCodes.Status200OK, 
-                    message = response, 
+                    message = "Updated Successfully", 
                     errors = "" 
                 });
              
@@ -96,16 +96,14 @@ namespace MaintenanceManagement.API.Controllers
         {
             var command = new DeleteMachineGroupUserCommand { Id = id };
           
-           var updatedShiftMaster = await Mediator.Send(command);
+            await Mediator.Send(command);
 
             return Ok(new 
             { 
                 StatusCode=StatusCodes.Status200OK, 
-                message = updatedShiftMaster, 
+                message = "Deleted Successfully", 
                 errors = "" 
             });
-              
-          
             
         }
 

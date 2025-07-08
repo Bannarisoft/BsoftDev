@@ -81,7 +81,7 @@ namespace MaintenanceManagement.API.Controllers
             return Ok(new
             {
                 StatusCode = StatusCodes.Status201Created,
-                message =CreatedCostCenterId,
+                message ="Created successfully.",
                 data = CreatedCostCenterId
             });
             
@@ -91,11 +91,11 @@ namespace MaintenanceManagement.API.Controllers
             public async Task<IActionResult> UpdateAsync(UpdateCostCenterCommand updateCostCenterCommand)
             {
 
-                var updatedcostcenter = await _mediator.Send(updateCostCenterCommand);
+                 await _mediator.Send(updateCostCenterCommand);
                 
                 return Ok(new
                     {
-                        message = updatedcostcenter,
+                        message = "Updated successfully.",
                         statusCode = StatusCodes.Status200OK
                     });
                     
@@ -105,10 +105,10 @@ namespace MaintenanceManagement.API.Controllers
             public async Task<IActionResult> DeleteCostCenterAsync(int id)
             {
 
-            var result = await _mediator.Send(new DeleteCostCenterCommand { Id = id });
+                 await _mediator.Send(new DeleteCostCenterCommand { Id = id });
                   return Ok(new
                   {
-                      message = result,
+                      message = "Deleted successfully.",
                       statusCode = StatusCodes.Status200OK
                   });
             
