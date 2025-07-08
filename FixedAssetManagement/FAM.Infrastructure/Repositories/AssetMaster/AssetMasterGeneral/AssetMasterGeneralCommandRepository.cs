@@ -70,9 +70,10 @@ namespace FAM.Infrastructure.Repositories.AssetMaster.AssetMasterGeneral
                 existingAssetGroup.ISDepreciated = assetMaster.ISDepreciated;
                 existingAssetGroup.IsTangible = assetMaster.IsTangible;            
                 existingAssetGroup.IsActive = BaseEntity.Status.Active;    
+                existingAssetGroup.PutToUseDate = assetMaster.PutToUseDate;    
                 
             if (assetMaster.AssetAdditionalCost?.Any() == true)
-                   await _applicationDbContext.AssetAdditionalCost.AddRangeAsync(assetMaster.AssetAdditionalCost);
+                await _applicationDbContext.AssetAdditionalCost.AddRangeAsync(assetMaster.AssetAdditionalCost);
 
               if (assetMaster.AssetPurchase?.Any() == true)
                 {
