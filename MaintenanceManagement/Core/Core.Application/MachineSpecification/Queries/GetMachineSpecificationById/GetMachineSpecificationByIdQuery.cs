@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MachineSpecification.Queries.GetMachineSpecificationById
 {
-    public class GetMachineSpecificationByIdQuery : IRequest<ApiResponseDTO<MachineSpecificationDto>>
+    public class GetMachineSpecificationByIdQuery : IRequest<ApiResponseDTO<List<MachineSpecificationDto>>>
     {
         public int Id { get; set; }
     }

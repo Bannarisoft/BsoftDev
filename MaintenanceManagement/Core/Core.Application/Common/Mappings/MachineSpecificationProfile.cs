@@ -16,10 +16,11 @@ namespace Core.Application.Common.Mappings
         {
             CreateMap<Core.Domain.Entities.MachineSpecification, MachineSpecificationDto>();
 
-            CreateMap<CreateMachineSpecficationCommand, Core.Domain.Entities.MachineSpecification>()
-               .ForMember(dest => dest.Id, opt => opt.Ignore())
-               .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
-               .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+            CreateMap<MachineSpecificationCreateDto, Core.Domain.Entities.MachineSpecification>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
+                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
+
 
             CreateMap<DeleteMachineSpecficationCommand, Core.Domain.Entities.MachineSpecification>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id)) 
