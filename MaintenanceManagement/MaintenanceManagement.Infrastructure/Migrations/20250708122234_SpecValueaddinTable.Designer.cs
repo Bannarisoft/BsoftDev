@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250708122234_SpecValueaddinTable")]
+    partial class SpecValueaddinTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -618,9 +621,8 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<int>("SpecificationId")
                         .HasColumnType("int");
 
-                    b.Property<string>("SpecificationValue")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int>("SpecificationValue")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -1178,13 +1180,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Current")
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<DateTimeOffset>("EffectiveDate")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Frequency")
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("FuelTankCapacity")
                         .HasColumnType("decimal(18,2)");
@@ -1194,7 +1193,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<int>("GensetStatusId")
+                    b.Property<int>("GensetStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GensetStatusTypeId")
                         .HasColumnType("int");
 
                     b.Property<int>("IsActive")
@@ -1221,14 +1223,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<int>("MultiplicationFactor")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("OpeningEnergyReading")
-                        .HasColumnType("decimal(18,3)");
-
                     b.Property<decimal>("Power")
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PowerFactor")
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RPM")
                         .HasColumnType("int");
@@ -1240,11 +1239,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Voltage")
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GensetStatusId");
+                    b.HasIndex("GensetStatusTypeId");
 
                     b.ToTable("Generator", "Maintenance");
                 });
@@ -2522,18 +2521,16 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Power.Generator", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "GensetStatus")
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "GensetStatusType")
                         .WithMany("Generators")
-                        .HasForeignKey("GensetStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GensetStatusTypeId");
 
-                    b.Navigation("GensetStatus");
+                    b.Navigation("GensetStatusType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Power.GeneratorConsumption", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.MachineMaster", "GeneratorTran")
+                    b.HasOne("Core.Domain.Entities.Power.Generator", "GeneratorTran")
                         .WithMany("GeneratorConsumption")
                         .HasForeignKey("GeneratorId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2852,8 +2849,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.MachineMaster", b =>
                 {
-                    b.Navigation("GeneratorConsumption");
-
                     b.Navigation("MachineSpecification");
 
                     b.Navigation("MaintenanceRequest");
@@ -2936,6 +2931,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.Power.FeederGroup", b =>
                 {
                     b.Navigation("Feeders");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Power.Generator", b =>
+                {
+                    b.Navigation("GeneratorConsumption");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerDetail", b =>

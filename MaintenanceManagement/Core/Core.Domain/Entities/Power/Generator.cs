@@ -23,7 +23,13 @@ namespace Core.Domain.Entities.Power
         public int MultiplicationFactor { get; set; }
         public decimal Frequency { get; set; }
         public decimal FuelTankCapacity { get; set; }
+
         public int GensetStatusId { get; set; }     // working , under repair , not working
         public MiscMaster? GensetStatus { get; set; }
+        public MiscMaster? GensetStatusType { get; set; }
+        
+        
+        
+
     }
 }

@@ -24,6 +24,9 @@ namespace MaintenanceManagement.API.Validation.MachineSpecification
                 .NotEmpty().WithMessage("SpecificationId is required.")
                 .GreaterThan(0).WithMessage("SpecificationId must be greater than 0.");
 
+            RuleFor(x => x.SpecificationValue)
+                .NotEmpty().WithMessage("SpecificationValue is required.");
+
             RuleFor(x => x.MachineId)
                 .NotEmpty().WithMessage("MachineId is required.")
                 .GreaterThan(0).WithMessage("MachineId must be greater than 0.");

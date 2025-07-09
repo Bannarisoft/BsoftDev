@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250709064648_GensetTableForignkeyChanges")]
+    partial class GensetTableForignkeyChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1178,13 +1181,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Current")
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<DateTimeOffset>("EffectiveDate")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Frequency")
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("FuelTankCapacity")
                         .HasColumnType("decimal(18,2)");
@@ -1194,7 +1194,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<int>("GensetStatusId")
+                    b.Property<int>("GensetStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GensetStatusTypeId")
                         .HasColumnType("int");
 
                     b.Property<int>("IsActive")
@@ -1221,14 +1224,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<int>("MultiplicationFactor")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("OpeningEnergyReading")
-                        .HasColumnType("decimal(18,3)");
-
                     b.Property<decimal>("Power")
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PowerFactor")
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RPM")
                         .HasColumnType("int");
@@ -1240,11 +1240,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Voltage")
-                        .HasColumnType("decimal(18,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GensetStatusId");
+                    b.HasIndex("GensetStatusTypeId");
 
                     b.ToTable("Generator", "Maintenance");
                 });
@@ -2522,13 +2522,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Power.Generator", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "GensetStatus")
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "GensetStatusType")
                         .WithMany("Generators")
-                        .HasForeignKey("GensetStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GensetStatusTypeId");
 
-                    b.Navigation("GensetStatus");
+                    b.Navigation("GensetStatusType");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Power.GeneratorConsumption", b =>
