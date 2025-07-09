@@ -8,7 +8,6 @@ namespace Core.Domain.Entities.Power
 {
     public class Generator : BaseEntity
     {
-
         public string? Code { get; set; }
         public string? GenSetName { get; set; }
         public int UnitId { get; set; }
@@ -17,16 +16,14 @@ namespace Core.Domain.Entities.Power
         public decimal Current { get; set; }
         public decimal Voltage { get; set; }
         public decimal Power { get; set; }
+        public decimal OpeningEnergyReading { get; set; }
+        public DateTimeOffset EffectiveDate { get; set; }
         public int RPM { get; set; }
         public decimal PowerFactor { get; set; }
         public int MultiplicationFactor { get; set; }
         public decimal Frequency { get; set; }
         public decimal FuelTankCapacity { get; set; }
-        public int GensetStatus { get; set; }     // working , under repair , not working
-
-        public MiscMaster? GensetStatusType { get; set; }
-        
-        
-
+        public int GensetStatusId { get; set; }     // working , under repair , not working
+        public MiscMaster? GensetStatus { get; set; }
     }
 }

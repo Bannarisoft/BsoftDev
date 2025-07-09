@@ -32,64 +32,68 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.Power
                  .HasColumnName("Id")
                  .HasColumnType("int")
                  .IsRequired();
-            
+
              builder.Property(x => x.Code)
                  .HasMaxLength(50)
                  .HasColumnType("varchar(50)")
                  .IsRequired();
-            
+
              builder.Property(x => x.GenSetName)
                  .HasMaxLength(100)
                  .HasColumnType("varchar(100)")
                  .IsRequired();
-            
+
              builder.Property(x => x.UnitId)
                  .HasColumnType("int")
                  .IsRequired();
-            
+
              builder.Property(x => x.Serialnumber)
                  .HasColumnType("int")
                  .IsRequired();
-            
+
              builder.Property(x => x.KVA)
                  .HasColumnType("decimal(18,2)")
                  .IsRequired();
-            
+
              builder.Property(x => x.Current)
-                 .HasColumnType("decimal(18,2)")
+                 .HasColumnType("decimal(18,3)")
                  .IsRequired();
-            
+
              builder.Property(x => x.Voltage)
-                 .HasColumnType("decimal(18,2)")
+                 .HasColumnType("decimal(18,3)")
                  .IsRequired();
-            
+
              builder.Property(x => x.Power)
-                 .HasColumnType("decimal(18,2)")
+                 .HasColumnType("decimal(18,3)")
                  .IsRequired();
-            
+
+             builder.Property(x => x.OpeningEnergyReading)
+                 .HasColumnType("decimal(18,3)")
+                 .IsRequired();
+
              builder.Property(x => x.RPM)
                  .HasColumnType("int")
                  .IsRequired();
-            
+
              builder.Property(x => x.PowerFactor)
-                 .HasColumnType("decimal(18,2)")
+                 .HasColumnType("decimal(18,3)")
                  .IsRequired();
-            
+
              builder.Property(x => x.MultiplicationFactor)
                  .HasColumnType("int") // Corrected type
                  .IsRequired();
-            
+
              builder.Property(x => x.Frequency)
-                 .HasColumnType("decimal(18,2)")
+                 .HasColumnType("decimal(18,3)")
                  .IsRequired();
-            
+
              builder.Property(x => x.FuelTankCapacity) // Corrected name
                  .HasColumnType("decimal(18,2)")
                  .IsRequired();
-            
-             builder.Property(x => x.GensetStatus)
-                 .HasColumnType("int")
-                 .IsRequired();
+
+             builder.Property(x => x.GensetStatusId)
+                .HasColumnType("int")
+                .IsRequired();         
     }
 
 

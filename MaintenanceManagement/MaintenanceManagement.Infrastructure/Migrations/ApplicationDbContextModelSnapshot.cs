@@ -1174,10 +1174,13 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Current")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<DateTimeOffset>("EffectiveDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<decimal>("Frequency")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,3)");
 
                     b.Property<decimal>("FuelTankCapacity")
                         .HasColumnType("decimal(18,2)");
@@ -1187,10 +1190,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<int>("GensetStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("GensetStatusTypeId")
+                    b.Property<int>("GensetStatusId")
                         .HasColumnType("int");
 
                     b.Property<int>("IsActive")
@@ -1217,11 +1217,14 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<int>("MultiplicationFactor")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("OpeningEnergyReading")
+                        .HasColumnType("decimal(18,3)");
+
                     b.Property<decimal>("Power")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,3)");
 
                     b.Property<decimal>("PowerFactor")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,3)");
 
                     b.Property<int>("RPM")
                         .HasColumnType("int");
@@ -1233,11 +1236,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Voltage")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,3)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GensetStatusTypeId");
+                    b.HasIndex("GensetStatusId");
 
                     b.ToTable("Generator", "Maintenance");
                 });
@@ -2425,11 +2428,13 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Power.Generator", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "GensetStatusType")
+                    b.HasOne("Core.Domain.Entities.MiscMaster", "GensetStatus")
                         .WithMany("Generators")
-                        .HasForeignKey("GensetStatusTypeId");
+                        .HasForeignKey("GensetStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("GensetStatusType");
+                    b.Navigation("GensetStatus");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Power.PowerConsumption", b =>
