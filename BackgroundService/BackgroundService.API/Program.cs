@@ -39,8 +39,9 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
-app.UseRouting(); 
+app.UseRouting();
 app.UseCors("AllowAll");
+app.UseMiddleware<BackgroundService.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {

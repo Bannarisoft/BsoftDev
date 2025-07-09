@@ -11,6 +11,11 @@ using BackgroundService.Infrastructure.Jobs;
 using Polly;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using BackgroundService.Infrastructure.Repositories.HangFire;
+using BackgroundService.Application.Interfaces.Notification;
+using BackgroundService.Infrastructure.Repositories.Notification;
+using BackgroundService.Infrastructure.Data.Notification;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace BackgroundService.Infrastructure
@@ -25,12 +30,22 @@ namespace BackgroundService.Infrastructure
                                                .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
                                                .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
 
+             var NotificationConnectionString = configuration.GetConnectionString("NotificationConnection")
+                                               .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
+                                               .Replace("{USER_ID}", Environment.GetEnvironmentVariable("DATABASE_USERID") ?? "")
+                                               .Replace("{ENC_PASSWORD}", Environment.GetEnvironmentVariable("DATABASE_PASSWORD") ?? "");
+
             if (string.IsNullOrWhiteSpace(HangfireConnectionString))
             {
                 throw new InvalidOperationException("Connection string 'HangfireConnectionString' not found or is empty.");
             }
+            else if (string.IsNullOrWhiteSpace(NotificationConnectionString))
+            {
+                throw new InvalidOperationException("Connection string 'NotificationConnectionString' not found or is empty.");
+            }
 
-            services.AddTransient<IDbConnection>(sp => new SqlConnection(HangfireConnectionString));
+            services.AddTransient<IHangfireDbConnectionFactory>(sp => new HangfireDbConnectionFactory(HangfireConnectionString));
+            services.AddTransient<INotificationDbConnectionFactory>(sp => new NotificationDbConnectionFactory(NotificationConnectionString));
 
             // Register Hangfire services
             services.AddHangfire(config =>
@@ -48,6 +63,9 @@ namespace BackgroundService.Infrastructure
                           DisableGlobalLocks = true
                       });
             });
+
+            services.AddDbContext<NotificationDbContext>(options =>
+    options.UseSqlServer(NotificationConnectionString));
 
             // Add the Hangfire server
             services.AddHangfireServer(options =>
