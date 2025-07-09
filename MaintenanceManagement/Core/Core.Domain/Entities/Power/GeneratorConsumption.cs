@@ -10,7 +10,7 @@ namespace Core.Domain.Entities.Power
     {
 
         public int GeneratorId { get; set; }
-        public Generator? GeneratorTran { get; set; }
+        public MachineMaster? GeneratorTran { get; set; }
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }
         public decimal RunningHours { get; set; }
