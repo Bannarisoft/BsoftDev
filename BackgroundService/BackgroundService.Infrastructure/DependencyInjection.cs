@@ -16,6 +16,8 @@ using BackgroundService.Application.Interfaces.Notification;
 using BackgroundService.Infrastructure.Repositories.Notification;
 using BackgroundService.Infrastructure.Data.Notification;
 using Microsoft.EntityFrameworkCore;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationConfig;
+using BackgroundService.Infrastructure.Repositories.Notification.NotificationConfig;
 
 
 namespace BackgroundService.Infrastructure
@@ -125,6 +127,8 @@ namespace BackgroundService.Infrastructure
             services.AddTransient<IVerificationCodeCleanupService, VerificationCodeCleanupService>();
             services.AddScoped<IUserUnlockBackgroundJob, UserUnlockBackgroundJob>();
             services.AddTransient<IMaintenance, MaintenanceService>();
+            services.AddScoped<INotificationConfigCommandRepository, NotificationConfigCommandRepository>();  
+            services.AddScoped<INotificationConfigQueryRepository, NotificationConfigQueryRepository>();  
 
             return services;
         }
