@@ -10,5 +10,6 @@ namespace Core.Application.Common.IMachineSpecification
         Task<int> CreateAsync(Core.Domain.Entities.MachineSpecification machineSpecification);
         Task<int> DeleteAsync(int Id, Core.Domain.Entities.MachineSpecification machineSpecification);
         Task<bool> IsDuplicateSpecificationAsync(int machineId, int specificationId);
+        Task<bool> UpdateAsync(List<Core.Domain.Entities.MachineSpecification> specifications);
     }
 }

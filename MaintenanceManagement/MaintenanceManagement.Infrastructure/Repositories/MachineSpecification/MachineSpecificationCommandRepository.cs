@@ -52,5 +52,24 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineSpecification
                             && x.SpecificationId == specificationId 
                             && x.IsDeleted == IsDelete.NotDeleted); // Only check active ones
         }
+
+        public async Task<bool> UpdateAsync(List<Core.Domain.Entities.MachineSpecification> specifications)
+        {
+             int machineId = specifications.First().MachineId;
+
+            // Remove all old records for this MachineId
+            var existingRecords = _applicationDbContext.MachineSpecification
+                .Where(x => x.MachineId == machineId)
+                .ToList();
+
+            _applicationDbContext.MachineSpecification.RemoveRange(existingRecords);
+            await _applicationDbContext.SaveChangesAsync();
+
+            // Insert new records
+            await _applicationDbContext.MachineSpecification.AddRangeAsync(specifications);
+            await _applicationDbContext.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
