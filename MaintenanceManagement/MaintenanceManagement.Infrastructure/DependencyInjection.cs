@@ -74,6 +74,8 @@ using MaintenanceManagement.Infrastructure.Repositories.Dashboard;
 using Core.Application.Common.IMachineSpecification;
 using MaintenanceManagement.Infrastructure.Repositories.MachineSpecification;
 using Core.Application.Common.Interfaces.IMachineSpecification;
+using Core.Application.Common.Interfaces.Power.IGeneratorConsumption;
+using MaintenanceManagement.Infrastructure.Repositories.Power.GeneratorConsumption;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -188,7 +190,10 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IReportRepository, ReportsRepository>();              
             services.AddScoped<IDashboardQueryRepository, DashboardQueryRepository>();    
             services.AddScoped<IMachineSpecificationCommandRepository, MachineSpecificationCommandRepository>();  
-            services.AddScoped<IMachineSpecificationQueryRepository, MachineSpecificationQueryRepository>();     
+            services.AddScoped<IMachineSpecificationQueryRepository, MachineSpecificationQueryRepository>(); 
+            services.AddScoped<IGeneratorConsumptionQueryRepository, GeneratorConsumptionQueryRepository>(); 
+            services.AddScoped<IGeneratorConsumptionCommandRepository, GeneratorConsumptionCommandRepository>();
+
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddTransient<IFileUploadService, FileUploadRepository>();            
@@ -215,7 +220,8 @@ namespace MaintenanceManagement.Infrastructure
             typeof(ItemProfile),
             typeof(FeederGroupProfile),
             typeof(FeederProfile),
-            typeof(MachineSpecificationProfile)
+            typeof(MachineSpecificationProfile),
+            typeof(GeneratorConsumptionProfile)
          );
             return services;
         }

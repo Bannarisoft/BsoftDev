@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.MachineSpecification.Command.CreateMachineSpecfication;
+using Core.Application.MachineSpecification.Command.UpdateMachineSpecfication;
 using Core.Application.MachineSpecification.DeleteMachineSpecfication;
 using Core.Application.MachineSpecification.Queries.GetMachineSpecificationById;
 using FluentValidation;
@@ -51,32 +52,57 @@ namespace MaintenanceManagement.API.Controllers
 
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteMachineSpecificationAsync(int id)
+        [HttpPut]
+        public async Task<IActionResult> UpdateAsync(UpdateMachineSpecficationCommand updateMachineSpecficationCommand)
         {
-            
+            var updateResult = await _mediator.Send(updateMachineSpecficationCommand);
 
-            // Process the delete command
-            var result = await _mediator.Send(new DeleteMachineSpecficationCommand { Id = id });
-
-            if (result.IsSuccess)
+            if (updateResult.IsSuccess)
             {
-                _logger.LogInformation($"MachineSpecification {id} deleted successfully.");
+                _logger.LogInformation($"MachineSpecification for MachineId {updateMachineSpecficationCommand.Specifications.FirstOrDefault()?.MachineId} updated successfully.");
                 return Ok(new
                 {
-                    message = result.Message,
-                    statusCode = StatusCodes.Status200OK
+                    StatusCode = StatusCodes.Status200OK,
+                    message = updateResult.Message,
+                    data = updateResult.Data
                 });
-
             }
-            _logger.LogWarning($"MachineSpecification {id} Not Found or Invalid MachineMasterId.");
-            return NotFound(new
-            {
-                message = result.Message,
-                statusCode = StatusCodes.Status404NotFound
-            });
 
+            _logger.LogWarning($"MachineSpecification for MachineId {updateMachineSpecficationCommand.Specifications.FirstOrDefault()?.MachineId} update failed.");
+            return BadRequest(new
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                message = updateResult.Message
+            });
         }
+
+
+        // [HttpDelete]
+        // public async Task<IActionResult> DeleteMachineSpecificationAsync(int id)
+        // {
+            
+
+        //     // Process the delete command
+        //     var result = await _mediator.Send(new DeleteMachineSpecficationCommand { Id = id });
+
+        //     if (result.IsSuccess)
+        //     {
+        //         _logger.LogInformation($"MachineSpecification {id} deleted successfully.");
+        //         return Ok(new
+        //         {
+        //             message = result.Message,
+        //             statusCode = StatusCodes.Status200OK
+        //         });
+
+        //     }
+        //     _logger.LogWarning($"MachineSpecification {id} Not Found or Invalid MachineMasterId.");
+        //     return NotFound(new
+        //     {
+        //         message = result.Message,
+        //         statusCode = StatusCodes.Status404NotFound
+        //     });
+
+        // }
         
          [HttpGet("{id}")]
         [ActionName(nameof(GetByIdAsync))]
