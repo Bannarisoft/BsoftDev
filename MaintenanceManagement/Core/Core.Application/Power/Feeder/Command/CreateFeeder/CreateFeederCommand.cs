@@ -16,6 +16,8 @@ namespace Core.Application.Power.Feeder.Command.CreateFeeder
         public int FeederGroupId { get; set; }
         public int FeederTypeId { get; set; }
         public int UnitId { get; set; }
+        public byte MeterAvailable { get; set; }
+        public int? MeterTypeId { get; set; } 
         public int DepartmentId { get; set; }
         public string? Description { get; set; }
         public decimal? MultiplicationFactor { get; set; }
