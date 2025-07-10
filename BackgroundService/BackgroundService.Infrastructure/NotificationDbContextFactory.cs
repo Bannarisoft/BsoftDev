@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackgroundService.Infrastructure.Data.Notification;
+using BackgroundService.Infrastructure.Services;
+using Core.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -31,6 +33,7 @@ namespace BackgroundService.Infrastructure
             optionsBuilder.UseSqlServer(connectionString);
 
             
+           
            
 
             return new NotificationDbContext(optionsBuilder.Options); 
