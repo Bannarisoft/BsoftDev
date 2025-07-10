@@ -60,6 +60,8 @@ namespace MaintenanceManagement.Infrastructure.Data
         public DbSet<Feeder> Feeder { get; set; }   
 		public DbSet<PowerConsumption> PowerConsumption { get; set; }   
         public DbSet<MachineSpecification> MachineSpecification { get; set; } 
+        public DbSet<Generator> Generator { get; set; }
+        public DbSet<GeneratorConsumption> GeneratorConsumption { get; set; }
        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -98,6 +100,8 @@ namespace MaintenanceManagement.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new FeederConfiguration());
             modelBuilder.ApplyConfiguration(new PowerConsumptionConfiguration());
             modelBuilder.ApplyConfiguration(new MachineSpecificationConfiguration());
+            modelBuilder.ApplyConfiguration(new GeneratorConfiguration());
+            modelBuilder.ApplyConfiguration(new GeneratorConsumptionConfiguration());
             base.OnModelCreating(modelBuilder);
 
 

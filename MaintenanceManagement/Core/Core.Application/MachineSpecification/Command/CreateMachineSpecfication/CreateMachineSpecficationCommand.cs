@@ -13,7 +13,9 @@ namespace Core.Application.MachineSpecification.Command.CreateMachineSpecficatio
     }
     public class MachineSpecificationCreateDto
     {
-    public int SpecificationId { get; set; }
-    public int MachineId { get; set; }
+        public int SpecificationId { get; set; }
+        public string? SpecificationValue { get; set; }
+        public int MachineId { get; set; }
+    
     }
 }

@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250708123251_SpecValuedatatypechange")]
+    partial class SpecValuedatatypechange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2528,7 +2531,7 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Power.GeneratorConsumption", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.MachineMaster", "GeneratorTran")
+                    b.HasOne("Core.Domain.Entities.Power.Generator", "GeneratorTran")
                         .WithMany("GeneratorConsumption")
                         .HasForeignKey("GeneratorId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2847,8 +2850,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.MachineMaster", b =>
                 {
-                    b.Navigation("GeneratorConsumption");
-
                     b.Navigation("MachineSpecification");
 
                     b.Navigation("MaintenanceRequest");
@@ -2931,6 +2932,11 @@ namespace MaintenanceManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.Power.FeederGroup", b =>
                 {
                     b.Navigation("Feeders");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Power.Generator", b =>
+                {
+                    b.Navigation("GeneratorConsumption");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerDetail", b =>

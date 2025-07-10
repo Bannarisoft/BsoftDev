@@ -30,6 +30,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineSpecification
                     MS.Id,
                     MS.SpecificationId,
                     MM.Code as SpecificationName,
+                    MS.SpecificationValue,
                     MC.Id as MachineId,
                     MS.IsActive 
                 FROM 

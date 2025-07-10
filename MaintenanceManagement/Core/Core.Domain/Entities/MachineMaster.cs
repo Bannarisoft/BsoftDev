@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Domain.Common;
+using Core.Domain.Entities.Power;
 
 namespace Core.Domain.Entities
 {
@@ -31,6 +32,7 @@ namespace Core.Domain.Entities
         public MiscMaster LineNoMachine { get; set; } = null!;
         public bool IsProductionMachine { get; set; }
         public ICollection<MachineSpecification> MachineSpecification { get; set; } = null!;
+        public ICollection<GeneratorConsumption>? GeneratorConsumption { get; set; }  
                     
 
     }

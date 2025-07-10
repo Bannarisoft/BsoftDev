@@ -11,6 +11,7 @@ namespace Core.Application.MachineSpecification.Command
         public int Id { get; set; }
         public int SpecificationId { get; set; }
         public string? SpecificationName { get; set; }
+        public string? SpecificationValue { get; set; }
         public int MachineId { get; set; }
         public Status IsActive { get; set; }
     }
