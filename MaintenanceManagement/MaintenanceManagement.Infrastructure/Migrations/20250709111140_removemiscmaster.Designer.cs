@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250709111140_removemiscmaster")]
+    partial class removemiscmaster
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1149,6 +1152,102 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("FeederGroup", "Maintenance");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Power.Generator", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Current")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<DateTimeOffset>("EffectiveDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("Frequency")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal>("FuelTankCapacity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("GenSetName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int>("GensetStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("KVA")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MultiplicationFactor")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("OpeningEnergyReading")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal>("Power")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal>("PowerFactor")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<int>("RPM")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Serialnumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Voltage")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Generator", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Power.GeneratorConsumption", b =>
