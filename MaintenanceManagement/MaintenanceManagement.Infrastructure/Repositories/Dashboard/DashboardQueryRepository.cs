@@ -213,9 +213,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
 
             var departments = await _departmentGrpcClient.GetDepartmentAllAsync();
             var deptLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-
+            
             foreach (var item in data)
-                item.Name = deptLookup.TryGetValue(item.Id, out var name) ? name : item.Name;
+            {
+                if (deptLookup.TryGetValue(item.Id, out var name))
+                    item.Name = $"{name}-{item.Id}";
+                else
+                    item.Name = $"Unknown-{item.Id}";
+            }
 
             return new ChartDto
             {
