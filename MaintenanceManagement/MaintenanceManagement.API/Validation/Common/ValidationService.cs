@@ -87,6 +87,9 @@ using Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpdate;
 using Core.Application.MachineSpecification.Command.CreateMachineSpecfication;
 using MaintenanceManagement.API.Validation.MachineSpecification;
 using Core.Application.MachineSpecification.DeleteMachineSpecfication;
+using MaintenanceManagement.API.Validation.Power.GeneratorConsumption;
+using Core.Application.Power.GeneratorConsumption.Command;
+using Core.Application.MachineSpecification.Command.UpdateMachineSpecfication;
 
 namespace MaintenanceManagement.API.Validation.Common
 {
@@ -167,11 +170,16 @@ namespace MaintenanceManagement.API.Validation.Common
             services.AddScoped<IValidator<DeleteFeederCommand>, DeleteFeederCommandValidator>();
 
             services.AddScoped<IValidator<CreatePowerConsumptionCommand>, CreatePowerConsumptionCommandValidator>();
+            services.AddScoped<IValidator<CreateGeneratorConsumptionCommand>, CreateGeneratorConsumptionCommandValidator>();
 
             services.AddScoped<IValidator<MapMachineCommand>, MapMachineCommandValidator>();
             services.AddScoped<IValidator<MachineWiseFrequencyUpdateCommand>, MachineWiseFrequencyUpdateCommandValidator>();
             services.AddScoped<IValidator<CreateMachineSpecficationCommand>, CreateMachineSpecCommandValidator>();
             services.AddScoped<IValidator<DeleteMachineSpecficationCommand>, DeleteMachineSpecCommandValidator>();
+            services.AddScoped<IValidator<UpdateMachineSpecficationCommand>, UpdateMachineSpecCommandValidator>();
+           
+
+
 
            
         }  

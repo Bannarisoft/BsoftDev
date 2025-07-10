@@ -13,7 +13,6 @@ namespace BackgroundService.Domain.Entities.Notification
         public string? Description { get; set; }
         public int SortOrder { get; set; }
         public MiscTypeMaster MiscType { get; set; }
-        public ICollection<NotificationConfig> NotificationConfigs { get; set; }
         public ICollection<NotificationLevelHierarchy> TargetType { get; set; } = new List<NotificationLevelHierarchy>();
         public ICollection<NotificationLevelHierarchy> ApprovalMode { get; set; } = new List<NotificationLevelHierarchy>();
         public ICollection<NotificationEventRule> NotificationType { get; set; } = new List<NotificationEventRule>();
