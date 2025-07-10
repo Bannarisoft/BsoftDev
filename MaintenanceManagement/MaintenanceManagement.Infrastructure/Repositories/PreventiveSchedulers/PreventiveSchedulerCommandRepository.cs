@@ -268,7 +268,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 await _applicationDbContext.SaveChangesAsync();
 
                 _backgroundServiceClient.RemoveHangFireJob(existingPreventiveScheduler.HangfireJobId);
-                var delay = newScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
+                var delay = newScheduler.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
                 string newJobId;
                 var delayInMinutes = (int)delay.TotalMinutes;
 
