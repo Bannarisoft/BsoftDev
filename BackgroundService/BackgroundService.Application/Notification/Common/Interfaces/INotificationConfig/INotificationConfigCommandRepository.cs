@@ -1,4 +1,3 @@
-
 namespace BackgroundService.Application.Notification.Common.Interfaces.INotificationConfig
 {
     public interface INotificationConfigCommandRepository

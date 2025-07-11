@@ -32,8 +32,6 @@ namespace BackgroundService.Application.Notification.NotificationConfig.Command.
                 details: $"Notification Config  details was deleted",
                 module: "NotificationConfig ");
             await _mediator.Publish(domainEvent);
-          
-
             return result > 0 ? result : throw new ExceptionRules("Notification Config was not found.");
         }
 
