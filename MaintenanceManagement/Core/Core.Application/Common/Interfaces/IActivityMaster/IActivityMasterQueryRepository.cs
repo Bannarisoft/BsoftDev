@@ -27,7 +27,8 @@ namespace Core.Application.Common.Interfaces.IActivityMaster
         Task<List<Core.Domain.Entities.ActivityMaster>> GetActivityMasterAutoComplete(string searchPattern);
 
 
-        Task<bool> GetByActivityNameAsync(string activityname);
+        //Task<bool> GetByActivityNameAsync(string activityname );
+        Task<bool> GetByActivityNameAsync(string activityName, int? activityId = null);
         Task<bool> FKColumnExistValidation(int activityId);
 
         Task<List<Core.Domain.Entities.MiscMaster>> GetActivityTypeAsync();

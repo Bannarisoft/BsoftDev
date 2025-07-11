@@ -40,6 +40,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.Feeder
                 existingFeeder.MultiplicationFactor = feeder.MultiplicationFactor;
                 existingFeeder.EffectiveDate = feeder.EffectiveDate;
                 existingFeeder.OpeningReading = feeder.OpeningReading;
+                existingFeeder.MeterAvailable = feeder.MeterAvailable;
+                existingFeeder.MeterTypeId = feeder.MeterTypeId;
                 existingFeeder.HighPriority = feeder.HighPriority; 
                 existingFeeder.Target = feeder.Target;                 
                 existingFeeder.IsActive = feeder.IsActive;
