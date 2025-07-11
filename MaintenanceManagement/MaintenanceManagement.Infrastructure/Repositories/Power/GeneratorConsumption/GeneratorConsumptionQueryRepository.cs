@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.Power.IGeneratorConsumption;
 using Core.Application.Power.GeneratorConsumption.Queries.GetClosingEnergyReaderValueById;
+using Core.Application.Power.GeneratorConsumption.Queries.GetUnitIdBasedOnMachineId;
 using Dapper;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.Power.GeneratorConsumption
@@ -18,6 +19,31 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.GeneratorConsu
         {
             _dbConnection = dbConnection;
             _ipAddressService = ipAddressService;
+        }
+
+        public async Task<List<GetMachineIdBasedonUnitDto>> GetMachineIdBasedonUnit()
+        {
+            var UnitId = _ipAddressService.GetUnitId();
+            const string query = @"
+                SELECT 
+                B.Id,
+                B.MachineCode,
+                B.MachineName
+            FROM 
+                Maintenance.MachineGroup A
+            INNER JOIN 
+                Maintenance.MachineMaster B 
+                ON A.Id = B.MachineGroupId 
+                AND A.UnitId = B.UnitId
+            WHERE 
+                A.PowerSource = 1
+                AND A.IsDeleted = 0
+                AND B.IsDeleted = 0
+                AND A.UnitId = @UnitId;";
+
+            var result = await _dbConnection.QueryAsync<GetMachineIdBasedonUnitDto>(query, new { UnitId = UnitId });
+
+            return result.ToList();
         }
 
         public async Task<GetClosingEnergyReaderValueDto> GetOpeningReaderValueById(int generatorId)
