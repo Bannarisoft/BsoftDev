@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using BackgroundService.Application.Interfaces.Notification.INotificationGroup;
 using BackgroundService.Application.Notification.Exceptions;
-using Core.Domain.Events;
 using MediatR;
 
 namespace BackgroundService.Application.Notification.NotificationGroup.Commands.CreateNotificationGroup

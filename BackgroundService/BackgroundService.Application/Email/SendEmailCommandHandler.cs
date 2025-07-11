@@ -1,6 +1,6 @@
+using BackgroundService.Application.Notification.Common.Interfaces;
 using Contracts.Events.Notifications;
 using MediatR;
-using Core.Application.Common.Interfaces;
 
 namespace BackgroundService.Application.Email
 {

@@ -1,12 +1,13 @@
 
 using AutoMapper;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationConfig;
-using Core.Domain.Events;
+using BackgroundService.Application.Notification.NotificationConfig.Queries.GetAllNotificationConfig;
+using BackgroundService.Domain.Events;
 using MediatR;
 
 namespace BackgroundService.Application.Notification.NotificationConfig.Queries.GetNotificationConfigAutoComplete
 {
-    public class GetNotificationConfigAutoCompleteQueryHandler : IRequestHandler<GetNotificationConfigAutoCompleteQuery,List<GetNotificationConfigAutoCompleteDto>>
+    public class GetNotificationConfigAutoCompleteQueryHandler : IRequestHandler<GetNotificationConfigAutoCompleteQuery,List<NotificationConfigAutoCompleteDto>>
     {
         private readonly INotificationConfigQueryRepository _notificationConfigQueryRepository;
         private readonly IMediator _mediator;
@@ -18,10 +19,10 @@ namespace BackgroundService.Application.Notification.NotificationConfig.Queries.
             _mapper = mapper;
         }
 
-        public async Task<List<GetNotificationConfigAutoCompleteDto>> Handle(GetNotificationConfigAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<NotificationConfigAutoCompleteDto>> Handle(GetNotificationConfigAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _notificationConfigQueryRepository.GetNotificationConfigAutoCompleteAsync(request.SearchPattern ?? string.Empty);
-            var notificationConfig = _mapper.Map<List<GetNotificationConfigAutoCompleteDto>>(result);
+            var notificationConfig = _mapper.Map<List<NotificationConfigAutoCompleteDto>>(result);
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
                 actionDetail: "GetAll",

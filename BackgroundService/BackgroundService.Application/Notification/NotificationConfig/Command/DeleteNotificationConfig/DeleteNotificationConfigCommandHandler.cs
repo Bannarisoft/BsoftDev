@@ -1,7 +1,7 @@
 using AutoMapper;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationConfig;
 using BackgroundService.Application.Notification.Exceptions;
-using Core.Domain.Events;
+using BackgroundService.Domain.Events;
 using MediatR;
 
 namespace BackgroundService.Application.Notification.NotificationConfig.Command.DeleteNotificationConfig

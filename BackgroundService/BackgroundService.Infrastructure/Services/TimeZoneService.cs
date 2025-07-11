@@ -1,56 +1,30 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using BackgroundService.Application.Notification.Common.Interfaces;
 
 namespace BackgroundService.Infrastructure.Services
 {
-    public static class TimeZoneService
+    public class TimeZoneService : ITimeZoneService
     {
-        private static readonly string _systemTimeZoneId;
-
-       
-
-        public static DateTimeOffset ConvertUtcToTimeZone(DateTimeOffset utcDateTime, string timeZoneId)
-        {   try
+        public DateTimeOffset ConvertUtcToTimeZone(DateTimeOffset utcDateTime, string timeZoneId)
         {
-            TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-            return TimeZoneInfo.ConvertTime(utcDateTime, timeZone);
+            try
+            {
+                TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                return TimeZoneInfo.ConvertTime(utcDateTime, timeZone);
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                throw new ArgumentException($"Invalid TimeZoneId: {timeZoneId}");
+            }
         }
-        catch (TimeZoneNotFoundException)    
+
+        public DateTimeOffset GetCurrentTime(string timeZoneId)
         {
-            throw new ArgumentException($"Invalid TimeZoneId: {timeZoneId}");
-        }
+            return ConvertUtcToTimeZone(DateTimeOffset.UtcNow, timeZoneId);
         }
 
-        public static DateTimeOffset GetCurrentTime(string timeZoneId)
+        public string GetSystemTimeZone()
         {
-             return ConvertUtcToTimeZone(DateTimeOffset.UtcNow, timeZoneId);
+            return TimeZoneInfo.Local.Id;
         }
-
-        // public DateTime ConvertUtcToTimeZone(DateTime utcDateTime, string timeZoneId)
-        // {
-        //     try
-        //     {
-        //         var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-        //         return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, timeZone);
-        //     }
-        //     catch (TimeZoneNotFoundException)
-        //     {
-        //         throw new ArgumentException($"Invalid TimeZoneId: {timeZoneId}");
-        //     }
-        // }
-        // public DateTime GetCurrentTime(string timeZoneId)
-        // {
-        //     return ConvertUtcToTimeZone(DateTime.UtcNow, timeZoneId);
-        // }
-
-
-
-        public static string GetSystemTimeZone()
-        {
-            return _systemTimeZoneId;
-        }
-
     }
 }

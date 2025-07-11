@@ -1,9 +1,9 @@
 
 using System.Net;
 using System.Net.Mail;
+using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Infrastructure.Configurations;
 using Contracts.Events.Notifications;
-using Core.Application.Common.Interfaces;
 using Serilog;
 
 namespace BackgroundService.Infrastructure.Services

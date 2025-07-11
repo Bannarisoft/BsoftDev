@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Domain.Common;
 using BackgroundService.Domain.Entities.Notification;
 using BackgroundService.Infrastructure.Data.Notification.Configurations;
-using BackgroundService.Infrastructure.Services;
-using Core.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -14,11 +9,13 @@ namespace BackgroundService.Infrastructure.Data.Notification
 {
     public class NotificationDbContext : DbContext
     {
-       
-        public NotificationDbContext(DbContextOptions<NotificationDbContext> options)
+        private readonly IIPAddressService _ipAddressService;
+        private readonly ITimeZoneService _timeZoneService; 
+        public NotificationDbContext(DbContextOptions<NotificationDbContext> options, IIPAddressService ipAddressService, ITimeZoneService timeZoneService)
         : base(options)
         {
-         
+            _ipAddressService = ipAddressService; 
+            _timeZoneService = timeZoneService;     
         }
 
         public DbSet<NotificationConfig> NotificationConfig { get; set; }
@@ -56,11 +53,11 @@ namespace BackgroundService.Infrastructure.Data.Notification
 
         private void UpdateIpFields()
         {
-            string currentIp = IPAddressService.GetSystemIPAddress();
-            int userId = IPAddressService.GetUserId(); 
-            string username = IPAddressService.GetUserName();
-            var systemTimeZoneId = TimeZoneService.GetSystemTimeZone();
-            var currentTime = TimeZoneService.GetCurrentTime(systemTimeZoneId);  
+            string currentIp = _ipAddressService.GetSystemIPAddress();
+            int userId = _ipAddressService.GetUserId(); 
+            string username = _ipAddressService.GetUserName();
+            var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+            var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);  
             
             foreach (EntityEntry entry in ChangeTracker.Entries<BaseEntity>())
             {

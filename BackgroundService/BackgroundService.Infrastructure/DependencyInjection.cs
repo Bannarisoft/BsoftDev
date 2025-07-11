@@ -1,16 +1,13 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using BackgroundService.Infrastructure.Configurations;
-using Core.Application.Common.Interfaces;
 using BackgroundService.Infrastructure.Services;
-using Shared.Infrastructure.HttpClientPolly;
 using BackgroundService.Application.Interfaces;
 using Hangfire;
 using Hangfire.SqlServer;
 using BackgroundService.Infrastructure.Jobs;
 using Polly;
 using System.Data;
-using Microsoft.Data.SqlClient;
 using BackgroundService.Infrastructure.Repositories.HangFire;
 using BackgroundService.Application.Interfaces.Notification;
 using BackgroundService.Infrastructure.Repositories.Notification;
@@ -18,6 +15,9 @@ using BackgroundService.Infrastructure.Data.Notification;
 using Microsoft.EntityFrameworkCore;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationConfig;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationConfig;
+using BackgroundService.Application.Interfaces.Notification.INotificationGroup;
+using BackgroundService.Infrastructure.Repositories.Notification.NotificationGroup;
+using BackgroundService.Application.Notification.Common.Interfaces;
 
 
 namespace BackgroundService.Infrastructure
@@ -48,7 +48,11 @@ namespace BackgroundService.Infrastructure
 
             services.AddTransient<IHangfireDbConnectionFactory>(sp => new HangfireDbConnectionFactory(HangfireConnectionString));
             services.AddTransient<INotificationDbConnectionFactory>(sp => new NotificationDbConnectionFactory(NotificationConnectionString));
-
+            services.AddScoped<IDbConnection>(sp =>
+            {
+                var factory = sp.GetRequiredService<INotificationDbConnectionFactory>();
+                return factory.CreateConnection();
+            });
             // Register Hangfire services
             services.AddHangfire(config =>
             {
@@ -129,7 +133,9 @@ namespace BackgroundService.Infrastructure
             services.AddTransient<IMaintenance, MaintenanceService>();
             services.AddScoped<INotificationConfigCommandRepository, NotificationConfigCommandRepository>();  
             services.AddScoped<INotificationConfigQueryRepository, NotificationConfigQueryRepository>();  
-
+            services.AddScoped<INotificationGroupCommand, NotificationGroupCommandRepository >();
+            services.AddScoped<IIPAddressService, IPAddressService>();
+            services.AddScoped<ITimeZoneService, TimeZoneService>();
             return services;
         }
     }

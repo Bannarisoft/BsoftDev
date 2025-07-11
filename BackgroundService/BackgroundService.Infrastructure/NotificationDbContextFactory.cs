@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Infrastructure.Data.Notification;
 using BackgroundService.Infrastructure.Services;
-using Core.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -31,12 +31,11 @@ namespace BackgroundService.Infrastructure
 
 
             optionsBuilder.UseSqlServer(connectionString);
+            IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
+            IIPAddressService ipAddressService = new IPAddressService(httpContextAccessor);
+            ITimeZoneService timeZoneService = new TimeZoneService();           
 
-            
-           
-           
-
-            return new NotificationDbContext(optionsBuilder.Options); 
+            return new NotificationDbContext(optionsBuilder.Options, ipAddressService,timeZoneService); 
         }
     }
 }

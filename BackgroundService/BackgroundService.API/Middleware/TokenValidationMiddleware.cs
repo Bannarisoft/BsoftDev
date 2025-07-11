@@ -1,9 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
+using BackgroundService.Application.Notification.Common.Interfaces;
+using BackgroundService.Domain.Entities.Notification;
 using Contracts.Interfaces.External.IUser;
-using Core.Application.Common.Interfaces;
-using Core.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 

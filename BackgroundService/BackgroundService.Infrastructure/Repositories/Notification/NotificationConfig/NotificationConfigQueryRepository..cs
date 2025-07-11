@@ -1,6 +1,8 @@
 using System.Data;
+using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationConfig;
-using Core.Application.Common.Interfaces;
+using BackgroundService.Application.Notification.NotificationConfig.Queries.GetAllNotificationConfig;
+using BackgroundService.Application.Notification.NotificationConfig.Queries.GetNotificationConfigAutoComplete;
 using Dapper;
 
 namespace  BackgroundService.Infrastructure.Repositories.Notification.NotificationConfig
@@ -16,30 +18,31 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
             _ipAddressService = ipAddressService;
         }
 
-        public async Task<Domain.Entities.Notification.NotificationConfig?> GetByIdAsync(int Id)
+        public async Task<NotificationConfigDto> GetByIdAsync(int Id)
         {
-            const string query = @"
-                    SELECT Id, ModuleName, NotificationEventTypeId,  IsActive, IsDeleted, CreatedBy, CreatedDate, CreatedByName, CreatedIP, ModifiedBy, ModifiedDate, ModifiedByName, ModifiedIP
-                    FROM  AppNotification.NotificationConfig
-                    WHERE Id = @Id AND IsDeleted = 0";
+            const string query = @" select 
+                    NC.Id, ModuleName, NotificationEventTypeId, NC.IsActive, NC.IsDeleted, NC.CreatedBy, NC.CreatedDate, NC.CreatedByName, NC.CreatedIP, NC.ModifiedBy, NC.ModifiedDate, NC.ModifiedByName, NC.ModifiedIP,MM.Code
+                    FROM  AppNotification.NotificationConfig NC
+                    INNER JOIN AppData.MiscMaster  MM on MM.id=NC.NotificationEventTypeId
+                    WHERE NC.Id = @Id AND NC.IsDeleted = 0";
 
-            var notificationConfig = await _dbConnection.QueryFirstOrDefaultAsync<Domain.Entities.Notification.NotificationConfig>(query, new { Id });
+            var notificationConfig = await _dbConnection.QueryFirstOrDefaultAsync<NotificationConfigDto>(query, new { Id });
             return notificationConfig;
         }
 
-        public async Task<List<Domain.Entities.Notification.NotificationConfig>> GetNotificationConfigAutoCompleteAsync(string searchPattern)
+        public async Task<List<NotificationConfigAutoCompleteDto>> GetNotificationConfigAutoCompleteAsync(string searchPattern)
         {
             searchPattern = searchPattern ?? string.Empty;
             const string query = @"
-             SELECT Id, ModuleName 
-            FROM AppNotification.NotificationConfig
-            WHERE IsDeleted = 0 
+             SELECT NC.Id, NC.ModuleName 
+            FROM AppNotification.NotificationConfig NC            
+            WHERE NC.IsDeleted = 0 
             AND ModuleName LIKE @SearchPattern";
             var parameters = new
             {
                 SearchPattern = $"%{searchPattern}%"
             };
-            var notificationConfig = await _dbConnection.QueryAsync<Domain.Entities.Notification.NotificationConfig>(query, parameters);
+            var notificationConfig = await _dbConnection.QueryAsync<NotificationConfigAutoCompleteDto>(query, parameters);
             return notificationConfig.ToList();
         }
 
@@ -54,10 +57,11 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search)")}};
 
             SELECT 
-            Id, ModuleName, NotificationEventTypeId,  IsActive, IsDeleted, CreatedBy, CreatedDate, CreatedByName, CreatedIP, ModifiedBy, ModifiedDate, ModifiedByName, ModifiedIP
-            FROM  AppNotification.NotificationConfig 
+            NC.Id, ModuleName, NotificationEventTypeId, NC.IsActive, NC.IsDeleted, NC.CreatedBy, NC.CreatedDate, NC.CreatedByName, NC.CreatedIP, NC.ModifiedBy, NC.ModifiedDate, NC.ModifiedByName, NC.ModifiedIP,MM.Code
+            FROM  AppNotification.NotificationConfig NC
+            INNER JOIN AppData.MiscMaster  MM on MM.id=NC.NotificationEventTypeId
             WHERE 
-            IsDeleted = 0
+            NC.IsDeleted = 0
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search )")}}
             ORDER BY Id desc
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -73,7 +77,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
             };
 
             var notificationConfig = await _dbConnection.QueryMultipleAsync(query, parameters);
-            var notificationConfigList = (await notificationConfig.ReadAsync<Domain.Entities.Notification.NotificationConfig>()).ToList();
+            var notificationConfigList = (await notificationConfig.ReadAsync<NotificationConfigDto>()).ToList();
             int totalCount = (await notificationConfig.ReadFirstAsync<int>());
             return (notificationConfigList, totalCount);
         }

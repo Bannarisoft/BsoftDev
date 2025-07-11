@@ -1,7 +1,7 @@
 using AutoMapper;
 using BackgroundService.Application.Notification.Common.HttpResponse;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationConfig;
-using Core.Domain.Events;
+using BackgroundService.Domain.Events;
 using MediatR;
 
 namespace BackgroundService.Application.Notification.NotificationConfig.Queries.GetAllNotificationConfig
