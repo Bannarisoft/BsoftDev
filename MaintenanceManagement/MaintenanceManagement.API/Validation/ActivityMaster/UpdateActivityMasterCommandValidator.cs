@@ -41,13 +41,19 @@ namespace MaintenanceManagement.API.Validation.ActivityMaster
                             .MaximumLength(maxLength)
                             .WithMessage($"{nameof(UpdateActivityMasterCommand.UpdateActivityMaster.ActivityName)} {rule.Error}"); 
                             break;
-                   case "AlreadyExists":
-                        RuleFor(x => x.UpdateActivityMaster.ActivityName)
-                            .MustAsync(async (activityname, cancellation) =>
-                                !await _activityMasterQueryRepository.GetByActivityNameAsync(activityname))
-                            .WithMessage("Activity name already exists.");
-                        break;    
-
+                //    case "AlreadyExists":
+                //         RuleFor(x => x.UpdateActivityMaster.ActivityName)
+                //             .MustAsync(async (activityname, cancellation) =>
+                //                 !await _activityMasterQueryRepository.GetByActivityNameAsync(activityname))
+                //             .WithMessage("Activity name already exists.");
+                //         break;    
+                case "AlreadyExists":
+                    RuleFor(x => x.UpdateActivityMaster.ActivityName)
+                        .MustAsync(async (model, activityname, _) =>
+                            !await _activityMasterQueryRepository.GetByActivityNameAsync(
+                                activityname, model.UpdateActivityMaster.ActivityId))
+                        .WithMessage("Activity name already exists."); break;       
+                    break;
           
                 }
             }

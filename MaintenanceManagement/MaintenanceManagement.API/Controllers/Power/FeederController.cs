@@ -83,7 +83,7 @@ namespace MaintenanceManagement.API.Controllers.Power
                 return CreatedAtAction(nameof(GetById), new { id = response }, new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = response,
+                    message = " Feeder created successfully",
                     errors = "",
                     data = response
                 });
@@ -99,7 +99,7 @@ namespace MaintenanceManagement.API.Controllers.Power
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    message = result,
+                    message = "Feeder updated successfully",
                     asset = result
                 });
             

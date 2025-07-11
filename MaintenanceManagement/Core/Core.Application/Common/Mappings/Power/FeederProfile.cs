@@ -23,16 +23,18 @@ namespace Core.Application.Common.Mappings.Power
              .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active));
 
             CreateMap<CreateFeederCommand, Core.Domain.Entities.Power.Feeder>()
-            .ForMember(dest => dest.HighPriority, opt => opt.MapFrom(src => src.HighPriority == 1 ? true : false));
+             .ForMember(dest => dest.HighPriority, opt => opt.MapFrom(src => src.HighPriority == 1 ? true : false))
+             .ForMember(dest => dest.MeterAvailable, opt => opt.MapFrom(src => src.MeterAvailable == 1));
 
-            CreateMap<UpdateFeederCommand, Core.Domain.Entities.Power.Feeder>()               
+            CreateMap<UpdateFeederCommand, Core.Domain.Entities.Power.Feeder>()
                 .ForMember(dest => dest.HighPriority, opt => opt.MapFrom(src => src.HighPriority == 1 ? true : false))
-             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive));
+             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive))
+             .ForMember(dest => dest.MeterAvailable, opt => opt.MapFrom(src => src.MeterAvailable == 1));
 
             CreateMap<DeleteFeederCommand, Core.Domain.Entities.Power.Feeder>()
              .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
              
-              CreateMap<Core.Domain.Entities.Power.Feeder, GetFeederAutoCompleteDto>();
+            CreateMap<Core.Domain.Entities.Power.Feeder, GetFeederAutoCompleteDto>();
 
         }
         

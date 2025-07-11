@@ -12,6 +12,9 @@ namespace Core.Application.Power.Feeder.Queries.GetFeeder
         public int FeederTypeId { get; set; }
         public int UnitId { get; set; }
         public string? UnitName { get; set; }
+        public byte MeterAvailable { get; set; }
+        public int? MeterTypeId { get; set; }
+        public string? MeterType { get; set; }
         public int DepartmentId { get; set; }
         public string ? DepartmentName { get; set; }
         public string? Description { get; set; }
