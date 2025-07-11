@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using BackgroundService.Application.Interfaces.Notification.INotificationGroup;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroup;
 using Dapper;
 
 namespace BackgroundService.Infrastructure.Repositories.Notification.NotificationGroup
@@ -15,6 +15,21 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
         {
             _dbConnection = dbConnection;
         }
+
+        public async Task<bool> AlreadyExistsAsync(string GroupName, int? id = null)
+        {
+            var query = "SELECT COUNT(1) FROM [AppNotification].[NotificationGroup] WHERE GroupName = @GroupName AND IsDeleted = 0";
+                var parameters = new DynamicParameters(new { GroupName });
+
+             if (id is not null)
+             {
+                 query += " AND Id != @Id";
+                 parameters.Add("Id", id);
+             }
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, parameters);
+                return count > 0;
+        }
+
         public async Task<(List<Domain.Entities.Notification.NotificationGroup>, int)> GetAllNotificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
              var query = $$"""
@@ -62,6 +77,14 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
                 
             var NotificationGroups = await _dbConnection.QueryAsync<Domain.Entities.Notification.NotificationGroup>(query, new { SearchPattern = $"%{searchPattern}%" });
             return NotificationGroups.ToList();
+        }
+
+        public async Task<bool> NotFoundAsync(int id)
+        {
+            var query = "SELECT COUNT(1) FROM [AppNotification].[NotificationGroup] WHERE Id = @Id AND IsDeleted = 0";
+             
+                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+                return count > 0;
         }
     }
 }

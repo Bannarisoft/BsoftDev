@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BackgroundService.Application.Interfaces.Notification.INotificationGroup;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroup;
 using BackgroundService.Infrastructure.Data.Notification;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
