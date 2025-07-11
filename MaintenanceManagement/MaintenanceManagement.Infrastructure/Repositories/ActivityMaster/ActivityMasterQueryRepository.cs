@@ -146,18 +146,45 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityMaster
             return machineGroups.ToList();
         }
 
-        public async Task<bool> GetByActivityNameAsync(string activityname)
-        {
-            var UnitId = _ipAddressService.GetUnitId();
-            var query = """
-                    SELECT COUNT(1) FROM Maintenance.ActivityMaster
-                    WHERE ActivityName = @activityname AND IsDeleted = 0 AND IsActive = 1 AND UnitId = @UnitId
-                    """;
+        // public async Task<bool> GetByActivityNameAsync(string activityname , int activityId)
+        // {
+        //     var UnitId = _ipAddressService.GetUnitId();
+        //     var query = """
+        //             SELECT COUNT(1) FROM Maintenance.ActivityMaster
+        //             WHERE ActivityName = @activityname AND IsDeleted = 0 AND IsActive = 1 AND UnitId = @UnitId AND Id != @activityId
+        //             """;
 
-            var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { ActivityName = activityname  , UnitId });
+        //     var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { ActivityName = activityname  , UnitId , activityId });
 
-            return result > 0;
-        }
+        //     return result > 0;
+        // }
+        public async Task<bool> GetByActivityNameAsync(string activityname, int? activityId = null)
+            {
+                var unitId = _ipAddressService.GetUnitId();
+
+                var baseQuery = """
+                    SELECT COUNT(1)
+                    FROM Maintenance.ActivityMaster
+                    WHERE ActivityName = @ActivityName
+                    AND IsDeleted = 0
+                    AND IsActive = 1
+                    AND UnitId = @UnitId
+                """;
+
+                var fullQuery = activityId.HasValue
+                    ? baseQuery + " AND Id != @ActivityId"
+                    : baseQuery;
+
+                var result = await _dbConnection.ExecuteScalarAsync<int>(fullQuery, new
+                {
+                    ActivityName = activityname,
+                    UnitId = unitId,
+                    ActivityId = activityId
+                });
+
+                return result > 0;
+            }
+
         public async Task<bool> FKColumnExistValidation(int activityId)
         {
             var sql = "SELECT COUNT(1) FROM Maintenance.ActivityMaster WHERE Id = @Id AND IsDeleted = 0 AND IsActive = 1";

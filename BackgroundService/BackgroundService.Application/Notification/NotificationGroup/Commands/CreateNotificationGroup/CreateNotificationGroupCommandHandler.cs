@@ -18,9 +18,9 @@ namespace BackgroundService.Application.Notification.NotificationGroup.Commands.
         }
         public async Task<int> Handle(CreateNotificationGroupCommand request, CancellationToken cancellationToken)
         {
-            var costCenter = _imapper.Map<Domain.Entities.Notification.NotificationGroup>(request);
+            var NotificationGroup = _imapper.Map<Domain.Entities.Notification.NotificationGroup>(request);
             
-            var result = await _notificationGroupCommand.CreateAsync(costCenter);
+            var result = await _notificationGroupCommand.CreateAsync(NotificationGroup);
             
             return result > 0 ? result : throw new ExceptionRules("NotificationGroup Creation Failed.");
         }

@@ -16,6 +16,8 @@ namespace Core.Application.Power.Feeder.Queries.GetFeederById
         public int  UnitId { get; set; }
         public int DepartmentId { get; set; }
         public string? Description { get; set; }
+        public byte MeterAvailable { get; set; }
+        public int MeterTypeId { get; set; }
         public decimal MultiplicationFactor { get; set; }
         public DateTimeOffset EffectiveDate { get; set; }
         public decimal OpeningReading { get; set; }

@@ -96,6 +96,16 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations.Power
             .HasColumnType("int")
             .IsRequired();
 
+            builder.Property(t => t.MeterAvailable)
+                .HasColumnName("MeterAvailable")
+                .HasColumnType("bit")
+                .IsRequired();
+
+            builder.Property(t => t.MeterTypeId)
+                .HasColumnName("MeterTypeId")
+                .HasColumnType("int")
+                .IsRequired(false);
+
             builder.Property(t => t.ParentFeederId)
             .HasColumnName("ParentFeederId")
             .HasColumnType("int")
