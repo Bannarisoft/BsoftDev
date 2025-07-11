@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using BackgroundService.Application.Interfaces.Notification;
+using BackgroundService.Application.Common.Notification.Interfaces;
 using Microsoft.Data.SqlClient;
 
 namespace BackgroundService.Infrastructure.Repositories.Notification

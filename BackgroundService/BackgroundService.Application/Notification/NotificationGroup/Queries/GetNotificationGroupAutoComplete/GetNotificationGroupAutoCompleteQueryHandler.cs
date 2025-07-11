@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using BackgroundService.Application.Interfaces.Notification.INotificationGroup;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroup;
 using MediatR;
 
 namespace BackgroundService.Application.Notification.NotificationGroup.Queries.GetNotificationGroupAutoComplete

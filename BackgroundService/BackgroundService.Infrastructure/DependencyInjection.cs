@@ -9,13 +9,13 @@ using BackgroundService.Infrastructure.Jobs;
 using Polly;
 using System.Data;
 using BackgroundService.Infrastructure.Repositories.HangFire;
-using BackgroundService.Application.Interfaces.Notification;
+using BackgroundService.Application.Common.Notification.Interfaces;
 using BackgroundService.Infrastructure.Repositories.Notification;
 using BackgroundService.Infrastructure.Data.Notification;
 using Microsoft.EntityFrameworkCore;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationConfig;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationConfig;
-using BackgroundService.Application.Interfaces.Notification.INotificationGroup;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroup;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationGroup;
 using BackgroundService.Application.Notification.Common.Interfaces;
 
@@ -134,6 +134,7 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationConfigCommandRepository, NotificationConfigCommandRepository>();  
             services.AddScoped<INotificationConfigQueryRepository, NotificationConfigQueryRepository>();  
             services.AddScoped<INotificationGroupCommand, NotificationGroupCommandRepository >();
+            services.AddScoped<INotificationGroupQuery, NotificationGroupQueryRepository >();
             services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddScoped<ITimeZoneService, TimeZoneService>();
             return services;

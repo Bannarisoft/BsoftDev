@@ -1,5 +1,5 @@
 using AutoMapper;
-using BackgroundService.Application.Interfaces.Notification.INotificationGroup;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroup;
 using BackgroundService.Application.Notification.Exceptions;
 using MediatR;
 

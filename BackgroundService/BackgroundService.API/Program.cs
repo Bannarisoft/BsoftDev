@@ -6,6 +6,8 @@ using BackgroundService.API.GrpcServices;
 using BackgroundService.Application.Interfaces;
 using BackgroundService.Infrastructure.Services;
 using BackgroundService.API.Validation.Common;
+using MediatR;
+using BackgroundService.Application.Notification.Common.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,7 @@ builder.Services.AddMemoryCache();
 
 // Load configuration
 builder.Services.AddGrpc();
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
