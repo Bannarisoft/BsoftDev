@@ -13,6 +13,7 @@ using MaintenanceManagement.Infrastructure.Repositories.Common;
 using Core.Application.Reports.MRS;
 using static Core.Domain.Common.MiscEnumEntity;
 using Core.Application.Reports.PowerConsumption;
+using Core.Application.Reports.GeneratorConsumption;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.Reports
 {
@@ -357,6 +358,31 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Reports
             };
 
             var result = await _dbConnection.QueryAsync<PowerReportDto>(sql, parameters);
+            return result.ToList();
+        }
+
+        public async Task<List<GeneratorReportDto>> GetGeneratorReports(DateTimeOffset? fromDate, DateTimeOffset? toDate)
+        {
+            if (fromDate.HasValue)
+                fromDate = fromDate.Value.Date;
+
+            if (toDate.HasValue)
+                toDate = toDate.Value.Date.AddDays(1); // Ensure full day is included
+
+            var sql = @"
+                SELECT * FROM vw_GensetConsumptionDetails
+                WHERE (@FromDate IS NULL OR CreatedDate >= @FromDate)
+                AND (@ToDate IS NULL OR CreatedDate < @ToDate)
+                AND UnitId = @UnitId";
+
+            var parameters = new
+            {
+                FromDate = fromDate,
+                ToDate = toDate,
+                UnitId = UnitId
+            };
+
+            var result = await _dbConnection.QueryAsync<GeneratorReportDto>(sql, parameters);
             return result.ToList();
         }
     }

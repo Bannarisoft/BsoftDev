@@ -37,6 +37,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
                 existingmachineGroup.Manufacturer = machineGroup.Manufacturer;
                 existingmachineGroup.DepartmentId = machineGroup.DepartmentId;                                  
                 existingmachineGroup.IsActive = machineGroup.IsActive;
+                existingmachineGroup.PowerSource = machineGroup.PowerSource;
                 _dbContext.MachineGroup.Update(existingmachineGroup);
                 return await _dbContext.SaveChangesAsync() > 0;
             }
