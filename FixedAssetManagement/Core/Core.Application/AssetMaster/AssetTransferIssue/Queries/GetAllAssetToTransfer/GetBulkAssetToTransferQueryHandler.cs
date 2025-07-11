@@ -36,16 +36,13 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetBulkAssetTo
 
             var asset = await _assetTransferQueryRepository.GetAssetDetailsToTransferByFiltersAsync(request.CustodianId, request.DepartmentId, request.CategoryID);
 
-            var assetList = _mapper.Map<List<GetAssetDetailsToTransferHdrDto>>(asset);
-            
-
-            
-
+            var assetList = _mapper.Map<List<GetAssetDetailsToTransferHdrDto>>(asset);  
             return new ApiResponseDTO<List<GetAssetDetailsToTransferHdrDto>>
             {
                 IsSuccess = true,
                 Message = "Success",
-                Data = assetList
+                Data = assetList,
+                TotalCount = assetList.Count
             };
         }
 

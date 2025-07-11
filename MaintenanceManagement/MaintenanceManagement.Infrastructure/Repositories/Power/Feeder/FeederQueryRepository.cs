@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.Power.IFeeder;
+using Core.Application.Power.Feeder.Queries.GetFeeder;
 using Dapper;
 
 namespace MaintenanceManagement.Infrastructure.Repositories.Power.Feeder
@@ -20,15 +21,18 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.Feeder
             _ipAddressService = ipAddressService;
         }
 
-        public async Task<(List<Core.Domain.Entities.Power.Feeder>, int)> GetAllFeederAsync(int pageNumber, int pageSize, string? searchTerm)
+        public async Task<(List<GetFeederDto>, int)> GetAllFeederAsync(int pageNumber, int pageSize, string? searchTerm)
         {
             var UnitId = _ipAddressService.GetUnitId();
+            
             var query = $$"""
             DECLARE @TotalCount INT;
+
             SELECT @TotalCount = COUNT(*) 
             FROM [Maintenance].[Feeder] F
-            WHERE F.IsDeleted = 0
-            {{(string.IsNullOrEmpty(searchTerm) ? "" : "AND (F.FeederName LIKE @Search OR F.FeederCode LIKE @Search)")}}; 
+            LEFT JOIN Maintenance.MiscMaster M ON F.MeterTypeId = M.Id
+            WHERE F.IsDeleted = 0 AND F.UnitId = @UnitId
+            {{(string.IsNullOrEmpty(searchTerm) ? "" : "AND (F.FeederName LIKE @Search OR F.FeederCode LIKE @Search)")}};
 
             SELECT 
                 F.Id,
@@ -39,6 +43,9 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.Feeder
                 F.FeederTypeId,
                 F.DepartmentId,
                 F.Description,
+                F.MeterAvailable,
+                F.MeterTypeId,
+                M.Code AS MeterType,
                 F.MultiplicationFactor,
                 F.EffectiveDate,
                 F.OpeningReading,
@@ -56,9 +63,10 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.Feeder
                 F.ModifiedIP,
                 F.UnitId
             FROM [Maintenance].[Feeder] F
+            LEFT JOIN Maintenance.MiscMaster M ON F.MeterTypeId = M.Id
             WHERE F.IsDeleted = 0 AND F.UnitId = @UnitId
             {{(string.IsNullOrEmpty(searchTerm) ? "" : "AND (F.FeederName LIKE @Search OR F.FeederCode LIKE @Search)")}}
-            ORDER BY F.Id DESC 
+            ORDER BY F.Id DESC
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
             SELECT @TotalCount AS TotalCount;
@@ -70,23 +78,24 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.Feeder
                 Offset = (pageNumber - 1) * pageSize,
                 PageSize = pageSize,
                 UnitId
-
             };
 
             var result = await _dbConnection.QueryMultipleAsync(query, parameters);
 
-            var feederList = (await result.ReadAsync<Core.Domain.Entities.Power.Feeder>()).ToList();
+            var feederList = (await result.ReadAsync<GetFeederDto>()).ToList();
             int totalCount = await result.ReadFirstAsync<int>();
 
             return (feederList, totalCount);
         }
+
 
         public async Task<Core.Domain.Entities.Power.Feeder> GetFeederByIdAsync(int id)
         {
             var UnitId = _ipAddressService.GetUnitId();
             var query = """
                 SELECT 
-                    Id,FeederCode,FeederName,ParentFeederId,FeederGroupId,FeederTypeId,DepartmentId,Description,MultiplicationFactor,EffectiveDate,OpeningReading,HighPriority,Target,IsActive,
+                    Id,FeederCode,FeederName,ParentFeederId,FeederGroupId,FeederTypeId, MeterAvailable,
+                MeterTypeId,DepartmentId,Description,MultiplicationFactor,EffectiveDate,OpeningReading,HighPriority,Target,IsActive,
                     IsDeleted,CreatedBy,CreatedDate,CreatedByName,CreatedIP,ModifiedBy,ModifiedDate,ModifiedByName,ModifiedIP ,UnitId FROM [Maintenance].[Feeder]
                 WHERE IsDeleted = 0 AND Id = @Id AND UnitId = @UnitId;
             """;
