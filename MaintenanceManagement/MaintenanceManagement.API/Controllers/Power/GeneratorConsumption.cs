@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Power.GeneratorConsumption.Command;
 using Core.Application.Power.GeneratorConsumption.Queries.GetClosingEnergyReaderValueById;
+using Core.Application.Power.GeneratorConsumption.Queries.GetUnitIdBasedOnMachineId;
 using MassTransit.Futures.Contracts;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -33,22 +34,31 @@ namespace MaintenanceManagement.API.Controllers.Power
             return Ok(new { StatusCode = StatusCodes.Status200OK, data = generatoropeningReading, message = generatoropeningReading });
 
         }
-         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateGeneratorConsumptionCommand createGeneratorConsumptionCommand)
         {
-         
+
             var CreatePowerConsumptionId = await _mediator.Send(createGeneratorConsumptionCommand);
 
-                return Ok(new
-                {
-                    StatusCode = StatusCodes.Status201Created,
-                    message = "GeneratorConsumption Created Successfully",
-                    data = CreatePowerConsumptionId
-                });
-            
-          
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status201Created,
+                message = "GeneratorConsumption Created Successfully",
+                data = CreatePowerConsumptionId
+            });
+
+
 
         }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetMachineBasedonUnitIdAsync()
+        {
+            var Machinename = await Mediator.Send(new GetUnitIdBasedOnMachineIdQuery() {});
+                return Ok(new { StatusCode = StatusCodes.Status200OK, data = Machinename, message = "MachineName Fetched Successfully" });
+               
+        }
+        
 
       
     }

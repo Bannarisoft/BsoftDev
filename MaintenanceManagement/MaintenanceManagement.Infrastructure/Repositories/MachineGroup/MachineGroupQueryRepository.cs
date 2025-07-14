@@ -27,7 +27,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
               var UnitId = _ipAddressService.GetUnitId();           
             const string query = @"
                 SELECT 
-                    Id,  GroupName,DepartmentId,Manufacturer,UnitId, IsActive, IsDeleted,CreatedBy, CreatedDate, CreatedByName,CreatedIP
+                    Id,  GroupName,DepartmentId,Manufacturer,UnitId, IsActive, IsDeleted,PowerSource,CreatedBy, CreatedDate, CreatedByName,CreatedIP
                 FROM Maintenance.MachineGroup          
                 WHERE Id = @id AND UnitId = @UnitId AND IsDeleted = 0";
                                 
@@ -77,7 +77,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
                 WHERE M.IsDeleted = 0 AND M.UnitId = @UnitId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (M.GroupName LIKE @Search)")}}; 
 
-                SELECT M.Id, M.GroupName, M.Manufacturer,M.DepartmentId,M.UnitId,M.IsActive, M.IsDeleted, 
+                SELECT M.Id, M.GroupName, M.Manufacturer,M.DepartmentId,M.UnitId,M.IsActive, M.IsDeleted,M.PowerSource, 
                     M.CreatedBy, M.CreatedDate, M.CreatedByName, M.CreatedIP, 
                     M.ModifiedBy, M.ModifiedDate, M.ModifiedByName, M.ModifiedIP
                 FROM [Maintenance].[MachineGroup] M
