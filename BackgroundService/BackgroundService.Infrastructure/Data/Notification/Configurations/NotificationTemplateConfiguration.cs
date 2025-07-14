@@ -39,11 +39,14 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
             .HasColumnType("int")
             .IsRequired();
 
-
-            builder.Property(t => t.ModuleName)
-            .HasColumnName("ModuleName")
-            .HasColumnType("Varchar(250)")
+            builder.Property(t => t.NotificationConfigId)
+            .HasColumnName("NotificationConfigId")
+            .HasColumnType("int")
             .IsRequired();
+            builder.HasOne(ac => ac.NotificationConfig)
+            .WithMany(am => am.NotificationTemplates)
+            .HasForeignKey(ac => ac.NotificationConfigId)
+            .OnDelete(DeleteBehavior.Restrict); 
 
               builder.Property(t => t.SubjectTemplate)
             .HasColumnName("SubjectTemplate")
@@ -92,10 +95,9 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
                 .HasColumnType("varchar(255)");
 
             builder.HasOne(ac => ac.NotificationType)
-     .WithMany(am => am.NotificationTemplates)
-     .HasForeignKey(ac => ac.NotificationTypeId)
-     .OnDelete(DeleteBehavior.Cascade);
-          
+                .WithMany(am => am.NotificationTemplates)
+                .HasForeignKey(ac => ac.NotificationTypeId)
+                .OnDelete(DeleteBehavior.Cascade);          
         }
     }
 }

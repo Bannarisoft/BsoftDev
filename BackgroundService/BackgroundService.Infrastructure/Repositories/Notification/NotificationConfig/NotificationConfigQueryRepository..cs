@@ -82,8 +82,12 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
         {
             const string query = @"
                     SELECT 1 
-                    FROM AppNotification.NotificationConfig
-                    WHERE id = @Id AND IsDeleted = 0;";
+                    FROM AppNotification.NotificationTemplate
+                    WHERE NotificationConfigId = @Id AND IsDeleted = 0;
+                    SELECT 1 
+                    FROM AppNotification.NotificationLevelHierarchy
+                    WHERE NotificationConfigId = @Id AND IsDeleted = 0;
+                    ";
             using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
             var notificationConfigExists = await multi.ReadFirstOrDefaultAsync<int?>();
             return notificationConfigExists.HasValue;

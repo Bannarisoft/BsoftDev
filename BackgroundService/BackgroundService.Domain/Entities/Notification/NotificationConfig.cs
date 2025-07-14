@@ -11,7 +11,7 @@ namespace BackgroundService.Domain.Entities.Notification
         public string ModuleName { get; set; }
         public int NotificationEventTypeId { get; set; }
         public MiscMaster NotificationEventType { get; set; }
-        public ICollection<NotificationLevelHierarchy> NotificationLevelHierarchies { get; set; }
-        public ICollection<NotificationEventRule> NotificationEventRules { get; set; }
+        public ICollection<NotificationLevelHierarchy> NotificationLevelHierarchies { get; set; }        
+        public ICollection<NotificationTemplate> NotificationTemplates { get; set; }
     }
 }

@@ -39,18 +39,8 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
             .HasColumnType("int")
             .IsRequired();
 
-            builder.Property(t => t.NotificationTypeId)
-            .HasColumnName("NotificationTypeId")
-            .HasColumnType("int")
-            .IsRequired();
-
             builder.Property(t => t.NotificationStatusId)
            .HasColumnName("NotificationStatusId")
-           .HasColumnType("int")
-           .IsRequired();
-
-            builder.Property(t => t.NotificationConfigId)
-           .HasColumnName("NotificationConfigId")
            .HasColumnType("int")
            .IsRequired();
 
@@ -63,6 +53,15 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
            .HasColumnName("RecipientTypeId")
            .HasColumnType("int")
            .IsRequired();
+
+            builder.Property(t => t.TemplateId)
+           .HasColumnName("TemplateId")
+           .HasColumnType("int")
+           .IsRequired();
+            builder.HasOne(ac => ac.NotificationTemplates)
+            .WithMany(am => am.NotificationEventRules)
+            .HasForeignKey(ac => ac.TemplateId)
+            .OnDelete(DeleteBehavior.Restrict); 
 
             builder.Property(cf => cf.IsActive)
             .HasColumnName("IsActive")
@@ -90,19 +89,10 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
             builder.Property(cf => cf.ModifiedIP)
                 .HasColumnType("varchar(255)");
 
-            builder.HasOne(ac => ac.NotificationType)
-     .WithMany(am => am.NotificationType)
-     .HasForeignKey(ac => ac.NotificationTypeId);
-
             builder.HasOne(ac => ac.NotificationStatus)
             .WithMany(am => am.NotificationStatus)
             .HasForeignKey(ac => ac.NotificationStatusId)
             .OnDelete(DeleteBehavior.NoAction);
-
-            builder.HasOne(ac => ac.NotificationConfig)
-           .WithMany(am => am.NotificationEventRules)
-           .HasForeignKey(ac => ac.NotificationConfigId)
-           .OnDelete(DeleteBehavior.NoAction);
           
            builder.HasOne(ac => ac.RecipientType)
           .WithMany(am => am.RecipientType)

@@ -14,8 +14,7 @@ namespace BackgroundService.Domain.Entities.Notification
         public int SortOrder { get; set; }
         public MiscTypeMaster MiscType { get; set; }
         public ICollection<NotificationLevelHierarchy> TargetType { get; set; } = new List<NotificationLevelHierarchy>();
-        public ICollection<NotificationLevelHierarchy> ApprovalMode { get; set; } = new List<NotificationLevelHierarchy>();
-        public ICollection<NotificationEventRule> NotificationType { get; set; } = new List<NotificationEventRule>();
+        public ICollection<NotificationLevelHierarchy> ApprovalMode { get; set; } = new List<NotificationLevelHierarchy>();        
         public ICollection<NotificationEventRule> NotificationStatus { get; set; } = new List<NotificationEventRule>();
         public ICollection<NotificationEventRule> RecipientType { get; set; } = new List<NotificationEventRule>();
         public ICollection<NotificationConfig> NotificationEventType { get; set; } = new List<NotificationConfig>();

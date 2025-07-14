@@ -21,7 +21,11 @@ namespace BackgroundService.Application.Notification.NotificationLevelHierarchy.
 
         public async Task<NotificationLevelHierarchyDto> Handle(GetNotificationLevelHierarchyByIdQuery request, CancellationToken cancellationToken)
         {
-            var result = await _NotificationLevelHierarchyQueryRepository.GetByIdAsync(request.Id);           
+            var result = await _NotificationLevelHierarchyQueryRepository.GetByIdAsync(request.Id);     
+            if (result == null)
+            {
+                throw new KeyNotFoundException($"NotificationLevelHierarchy with Id {request.Id} not found.");
+            }       
             var NotificationLevelHierarchy = _mapper.Map<NotificationLevelHierarchyDto>(result);
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(

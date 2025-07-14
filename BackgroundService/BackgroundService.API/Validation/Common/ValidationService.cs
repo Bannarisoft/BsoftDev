@@ -12,6 +12,10 @@ using BackgroundService.Application.Notification.NotificationGroup.Commands.Crea
 using BackgroundService.Application.Notification.NotificationGroup.Commands.DeleteNotificationGroup;
 using BackgroundService.Application.Notification.NotificationGroup.Commands.UpdateNotificationGroup;
 using FluentValidation;
+using BackgroundService.Application.Notification.NotificationTemplate.Command.CreateNotificationTemplate;
+using BackgroundService.Application.Notification.NotificationTemplate.Command.UpdateNotificationTemplate;
+using BackgroundService.Application.Notification.NotificationTemplate.Command.DeleteNotificationTemplate;
+using BackgroundService.API.Validation.NotificationTemplate;
 
 namespace BackgroundService.API.Validation.Common
 {
@@ -30,6 +34,10 @@ namespace BackgroundService.API.Validation.Common
             services.AddScoped<IValidator<CreateNotificationGroupCommand>, CreateNotificationGroupCommandValidator>();
             services.AddScoped<IValidator<UpdateNotificationGroupCommand>, UpdateNotificationGroupCommandValidator>();
             services.AddScoped<IValidator<DeleteNotificationGroupCommand>, DeleteNotificationGroupCommandValidator>();
+
+            services.AddScoped<IValidator<CreateNotificationTemplateCommand>, CreateNotificationTemplateCommandValidator>();
+            services.AddScoped<IValidator<UpdateNotificationTemplateCommand>, UpdateNotificationTemplateCommandValidator>();
+            services.AddScoped<IValidator<DeleteNotificationTemplateCommand>, DeleteNotificationTemplateCommandValidator>();
         }
     }
 }

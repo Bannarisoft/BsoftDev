@@ -94,7 +94,13 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
         }
         public async Task<bool> SoftDeleteValidation(int Id)
         {
-            return true;
+             const string query = @"
+                    SELECT 1 
+                    FROM AppNotification.NotificationEventLog
+                    WHERE NotificationLevelHierarchyId = @Id AND IsDeleted = 0";
+            using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
+            var notificationLevelHierarchyExists = await multi.ReadFirstOrDefaultAsync<int?>();
+            return notificationLevelHierarchyExists.HasValue;
         }
         public async Task<bool> NotFoundAsync(int Id)
         {
