@@ -23,8 +23,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
             const string query = @" select NH.Id,NotificationConfigId,TargetTypeId,TargetId,UnitId,ApprovalModeId,NH.Description,NH.IsActive,NH.IsDeleted,NH.CreatedBy,NH.CreatedDate,
                 NH.CreatedByName,NH.CreatedIP,NH.ModifiedBy,NH.ModifiedDate,NH.ModifiedByName,NH.ModifiedIP,
                 NC.ModuleName,MM2.Code NotificationEventType,MM.Code TargetType,
-                case when U.UserId is not null then U.UserName else Case when R.RoleName is not null then R.RoleName else NG.GroupName end end as TargetName,                
-                D.DeptName DepartmentName,MM1.Code ApprovalMode
+                case when U.UserId is not null then U.UserName else Case when R.RoleName is not null then R.RoleName else NG.GroupName end end as TargetName,MM1.Code ApprovalMode
                 from AppNotification.NotificationLevelHierarchy NH
                 INNER JOIN AppNotification.NotificationConfig NC on NH.NotificationConfigId=NC.Id
                 INNER JOIN AppData.MiscMaster MM2 on MM2.Id=NC.NotificationEventTypeId
@@ -32,8 +31,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
                 LEFT JOIN Bannari.AppSecurity.Users U on U.UserId=NH.TargetId
                 LEFT JOIN Bannari.AppSecurity.UserRole R on R.Id=NH.TargetId
                 LEFT JOIN AppNotification.NotificationGroup NG on NG.Id=NH.TargetId
-                INNER JOIN AppData.MiscMaster MM1 on MM1.Id=NH.ApprovalModeId
-                LEFT JOIN Bannari.AppData.Department D on D.Id=NH.DepartmentId
+                INNER JOIN AppData.MiscMaster MM1 on MM1.Id=NH.ApprovalModeId                
                 where /*NH.UnitId=@UnitId and*/ NH.IsDeleted=0 and NH.Id=@Id ";
 
             var NotificationLevelHierarchy = await _dbConnection.QueryFirstOrDefaultAsync<NotificationLevelHierarchyDto>(query, new { UnitId,Id });
@@ -52,16 +50,14 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
             LEFT JOIN Bannari.AppSecurity.Users U on U.UserId=NH.TargetId
             LEFT JOIN Bannari.AppSecurity.UserRole R on R.Id=NH.TargetId
             LEFT JOIN AppNotification.NotificationGroup NG on NG.Id=NH.TargetId
-            INNER JOIN AppData.MiscMaster MM1 on MM1.Id=NH.ApprovalModeId
-            LEFT JOIN Bannari.AppData.Department D on D.Id=NH.DepartmentId
+            INNER JOIN AppData.MiscMaster MM1 on MM1.Id=NH.ApprovalModeId            
             where/* NH.UnitId=@UnitId and*/ NH.IsDeleted=0
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search)")}};
 
             SELECT  NH.Id,NotificationConfigId,TargetTypeId,TargetId,UnitId,ApprovalModeId,NH.Description,NH.IsActive,NH.IsDeleted,NH.CreatedBy,NH.CreatedDate,
                 NH.CreatedByName,NH.CreatedIP,NH.ModifiedBy,NH.ModifiedDate,NH.ModifiedByName,NH.ModifiedIP,
                 NC.ModuleName,MM2.Code NotificationEventType,MM.Code TargetType,
-                case when U.UserId is not null then U.UserName else Case when R.RoleName is not null then R.RoleName else NG.GroupName end end as TargetName,                
-                D.DeptName DepartmentName,MM1.Code ApprovalMode
+                case when U.UserId is not null then U.UserName else Case when R.RoleName is not null then R.RoleName else NG.GroupName end end as TargetName,MM1.Code ApprovalMode
             from AppNotification.NotificationLevelHierarchy NH
             INNER JOIN AppNotification.NotificationConfig NC on NH.NotificationConfigId=NC.Id
             INNER JOIN AppData.MiscMaster MM2 on MM2.Id=NC.NotificationEventTypeId
@@ -69,8 +65,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
             LEFT JOIN Bannari.AppSecurity.Users U on U.UserId=NH.TargetId
             LEFT JOIN Bannari.AppSecurity.UserRole R on R.Id=NH.TargetId
             LEFT JOIN AppNotification.NotificationGroup NG on NG.Id=NH.TargetId
-            INNER JOIN AppData.MiscMaster MM1 on MM1.Id=NH.ApprovalModeId
-            LEFT JOIN Bannari.AppData.Department D on D.Id=NH.DepartmentId
+            INNER JOIN AppData.MiscMaster MM1 on MM1.Id=NH.ApprovalModeId            
             where /*NH.UnitId=@UnitId and*/ NH.IsDeleted=0 
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search )")}}
             ORDER BY Id desc

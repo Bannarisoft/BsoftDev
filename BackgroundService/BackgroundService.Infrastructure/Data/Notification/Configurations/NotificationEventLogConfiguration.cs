@@ -34,25 +34,37 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(t => t.NotificationLevelHierarchyId)
-            .HasColumnName("NotificationLevelHierarchyId")
+            builder.Property(t => t.NotificationLevelRuleId)
+            .HasColumnName("NotificationLevelRuleId")
             .HasColumnType("int")
             .IsRequired();
-
-            builder.Property(t => t.UserId)
-            .HasColumnName("UserId")
-            .HasColumnType("int")
-            .IsRequired();
-
-            builder.Property(t => t.Action)
-            .HasColumnName("Action")
-            .HasColumnType("Varchar(250)")
-            .IsRequired();
+            builder.HasOne(ac => ac.NotificationEventRules)
+            .WithMany(am => am.NotificationEventLog)
+            .HasForeignKey(ac => ac.NotificationLevelRuleId)
+            .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(t => t.ChannelId)
             .HasColumnName("ChannelId")
             .HasColumnType("int")
+            .IsRequired();               
+            builder.HasOne(ac => ac.Channel)
+            .WithMany(am => am.Channel)
+            .HasForeignKey(ac => ac.ChannelId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Property(t => t.ActionStatus)
+            .HasColumnName("ActionStatus")
+            .HasColumnType("Varchar(250)")
             .IsRequired();
+
+            builder.Property(t => t.NotificationStatusId)
+            .HasColumnName("NotificationStatusId")
+            .HasColumnType("int")
+            .IsRequired();
+              builder.HasOne(ac => ac.NotificationStatus)
+            .WithMany(am => am.NotificationStatus)
+            .HasForeignKey(ac => ac.NotificationStatusId)
+            .OnDelete(DeleteBehavior.NoAction);
 
             builder.Property(t => t.MessageText)
             .HasColumnName("MessageText")
@@ -88,17 +100,7 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
                  .HasColumnType("varchar(50)");
 
             builder.Property(cf => cf.ModifiedIP)
-                .HasColumnType("varchar(255)");
-
-            builder.HasOne(ac => ac.NotificationLevelHierarchy)
-     .WithMany(am => am.NotificationEventLog)
-     .HasForeignKey(ac => ac.NotificationLevelHierarchyId)
-     .OnDelete(DeleteBehavior.Cascade);
-          
-          builder.HasOne(ac => ac.Channel)
-          .WithMany(am => am.Channel)
-          .HasForeignKey(ac => ac.ChannelId)
-          .OnDelete(DeleteBehavior.NoAction);
+                .HasColumnType("varchar(255)");       
         }
     }
 }

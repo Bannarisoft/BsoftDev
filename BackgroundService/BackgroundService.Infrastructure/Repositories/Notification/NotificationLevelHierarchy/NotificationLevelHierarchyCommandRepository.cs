@@ -46,8 +46,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             existingNotificationLevelHierarchy.TargetId = NotificationLevelHierarchy.TargetId;
             existingNotificationLevelHierarchy.UnitId = NotificationLevelHierarchy.UnitId;
             existingNotificationLevelHierarchy.Description = NotificationLevelHierarchy.Description;
-            existingNotificationLevelHierarchy.ApprovalModeId = NotificationLevelHierarchy.ApprovalModeId;
-            existingNotificationLevelHierarchy.DepartmentId = NotificationLevelHierarchy.DepartmentId;
+            existingNotificationLevelHierarchy.ApprovalModeId = NotificationLevelHierarchy.ApprovalModeId;            
             existingNotificationLevelHierarchy.IsActive=NotificationLevelHierarchy.IsActive;
             
             _applicationDbContext.NotificationLevelHierarchy.Update(existingNotificationLevelHierarchy);            

@@ -17,8 +17,7 @@ namespace BackgroundService.Application.Notification.Common.Mappings
                 .ForMember(dest => dest.NotificationConfigId, opt => opt.MapFrom(src => src.NotificationConfigId))
                 .ForMember(dest => dest.TargetTypeId, opt => opt.MapFrom(src => src.TargetTypeId))
                 .ForMember(dest => dest.TargetId, opt => opt.MapFrom(src => src.TargetId))
-                .ForMember(dest => dest.ApprovalModeId, opt => opt.MapFrom(src => src.ApprovalModeId))
-                .ForMember(dest => dest.DepartmentId, opt => opt.MapFrom(src => src.DepartmentId))                
+                .ForMember(dest => dest.ApprovalModeId, opt => opt.MapFrom(src => src.ApprovalModeId))                            
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))      
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
@@ -27,8 +26,7 @@ namespace BackgroundService.Application.Notification.Common.Mappings
                 .ForMember(dest => dest.NotificationConfigId, opt => opt.MapFrom(src => src.NotificationConfigId))
                 .ForMember(dest => dest.TargetTypeId, opt => opt.MapFrom(src => src.TargetTypeId))
                 .ForMember(dest => dest.TargetId, opt => opt.MapFrom(src => src.TargetId))
-                .ForMember(dest => dest.ApprovalModeId, opt => opt.MapFrom(src => src.ApprovalModeId))
-                .ForMember(dest => dest.DepartmentId, opt => opt.MapFrom(src => src.DepartmentId))
+                .ForMember(dest => dest.ApprovalModeId, opt => opt.MapFrom(src => src.ApprovalModeId))                
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))      
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
 

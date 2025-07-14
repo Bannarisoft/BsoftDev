@@ -15,7 +15,7 @@ namespace BackgroundService.Domain.Entities.Notification
         public string? LanguageCode { get; set; }
         public string? FooterTemplate { get; set; }
         public MiscMaster? NotificationType { get; set; }
-        public NotificationConfig NotificationConfig { get; set; }
-        public ICollection<NotificationEventRule> NotificationEventRules { get; set; }
+        public NotificationConfig NotificationConfig { get; set; }=new NotificationConfig();
+        public ICollection<NotificationEventRule> NotificationEventRules { get; set; }= new List<NotificationEventRule>();
     }
 }

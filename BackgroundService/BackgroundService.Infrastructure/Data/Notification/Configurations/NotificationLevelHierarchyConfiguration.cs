@@ -66,11 +66,6 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
             .HasColumnType("Varchar(Max)")
             .IsRequired(false);
 
-             builder.Property(t => t.DepartmentId)
-            .HasColumnName("DepartmentId")
-            .HasColumnType("int")
-            .IsRequired(false);
-
             builder.Property(cf => cf.IsActive)
             .HasColumnName("IsActive")
             .HasColumnType("bit")
