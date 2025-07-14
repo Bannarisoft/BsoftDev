@@ -24,6 +24,8 @@ using BackgroundService.Application.Notification.Common.Interfaces.INotification
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationTemplate;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroupMembers;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationGroupMember;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationEventRule;
+using BackgroundService.Infrastructure.Repositories.Notification.NotificationEventRules;
 
 
 namespace BackgroundService.Infrastructure
@@ -149,6 +151,8 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationTemplateQueryRepository, NotificationTemplateQueryRepository>();  
             services.AddScoped<INotificationGroupMemberCommand, NotificationGroupMemberCommandRepository >();
             services.AddScoped<INotificationGroupMemberQuery, NotificationGroupMemberQueryRepository >();
+            services.AddScoped<INotificationEventRuleCommand, NotificationEventRuleCommandRepository >();
+            services.AddScoped<INotificationEventRuleQuery, NotificationEventRuleQueryRepository >();
             return services;
         }
     }
