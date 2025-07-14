@@ -22,6 +22,8 @@ using BackgroundService.Application.Notification.Common.Interfaces.INotification
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationLevelHierarchy;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationTemplate;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationTemplate;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroupMembers;
+using BackgroundService.Infrastructure.Repositories.Notification.NotificationGroupMember;
 
 
 namespace BackgroundService.Infrastructure
@@ -145,6 +147,8 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationLevelHierarchyQueryRepository, NotificationLevelHierarchyQueryRepository>();  
             services.AddScoped<INotificationTemplateCommandRepository, NotificationTemplateCommandRepository>();  
             services.AddScoped<INotificationTemplateQueryRepository, NotificationTemplateQueryRepository>();  
+            services.AddScoped<INotificationGroupMemberCommand, NotificationGroupMemberCommandRepository >();
+            services.AddScoped<INotificationGroupMemberQuery, NotificationGroupMemberQueryRepository >();
             return services;
         }
     }
