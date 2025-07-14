@@ -217,10 +217,10 @@ namespace BackgroundService.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Action")
+                    b.Property<string>("ActionStatus")
                         .IsRequired()
                         .HasColumnType("Varchar(250)")
-                        .HasColumnName("Action");
+                        .HasColumnName("ActionStatus");
 
                     b.Property<int>("ChannelId")
                         .HasColumnType("int")
@@ -265,23 +265,25 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("NotificationLevelHierarchyId")
+                    b.Property<int>("NotificationLevelRuleId")
                         .HasColumnType("int")
-                        .HasColumnName("NotificationLevelHierarchyId");
+                        .HasColumnName("NotificationLevelRuleId");
+
+                    b.Property<int>("NotificationStatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("NotificationStatusId");
 
                     b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("Timestamp");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ChannelId");
 
-                    b.HasIndex("NotificationLevelHierarchyId");
+                    b.HasIndex("NotificationLevelRuleId");
+
+                    b.HasIndex("NotificationStatusId");
 
                     b.ToTable("NotificationEventLog", "AppNotification");
                 });
@@ -329,41 +331,36 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("NotificationConfigId")
+                    b.Property<int>("NotificationChannelId")
                         .HasColumnType("int")
-                        .HasColumnName("NotificationConfigId");
+                        .HasColumnName("NotificationChannelId");
 
-                    b.Property<int>("NotificationGroupId")
-                        .HasColumnType("int")
-                        .HasColumnName("NotificationGroupId");
+                    b.Property<int?>("NotificationGroupId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("NotificationGroupMemberId")
+                    b.Property<int>("NotificationLevelHierarchyId")
                         .HasColumnType("int")
-                        .HasColumnName("NotificationGroupMemberId");
-
-                    b.Property<int>("NotificationStatusId")
-                        .HasColumnType("int")
-                        .HasColumnName("NotificationStatusId");
-
-                    b.Property<int>("NotificationTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("NotificationTypeId");
+                        .HasColumnName("NotificationLevelHierarchyId");
 
                     b.Property<int>("RecipientTypeId")
                         .HasColumnType("int")
                         .HasColumnName("RecipientTypeId");
 
+                    b.Property<int>("TemplateId")
+                        .HasColumnType("int")
+                        .HasColumnName("TemplateId");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("NotificationConfigId");
+                    b.HasIndex("NotificationChannelId");
 
                     b.HasIndex("NotificationGroupId");
 
-                    b.HasIndex("NotificationStatusId");
-
-                    b.HasIndex("NotificationTypeId");
+                    b.HasIndex("NotificationLevelHierarchyId");
 
                     b.HasIndex("RecipientTypeId");
+
+                    b.HasIndex("TemplateId");
 
                     b.ToTable("NotificationEventRule", "AppNotification");
                 });
@@ -507,7 +504,6 @@ namespace BackgroundService.Infrastructure.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("Varchar(Max)")
                         .HasColumnName("Description");
 
@@ -616,10 +612,9 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("ModuleName")
-                        .IsRequired()
-                        .HasColumnType("Varchar(250)")
-                        .HasColumnName("ModuleName");
+                    b.Property<int>("NotificationConfigId")
+                        .HasColumnType("int")
+                        .HasColumnName("NotificationConfigId");
 
                     b.Property<int>("NotificationTypeId")
                         .HasColumnType("int")
@@ -631,6 +626,8 @@ namespace BackgroundService.Infrastructure.Migrations
                         .HasColumnName("SubjectTemplate");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("NotificationConfigId");
 
                     b.HasIndex("NotificationTypeId");
 
@@ -667,28 +664,9 @@ namespace BackgroundService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("BackgroundService.Domain.Entities.Notification.NotificationLevelHierarchy", "NotificationLevelHierarchy")
+                    b.HasOne("BackgroundService.Domain.Entities.Notification.NotificationEventRule", "NotificationEventRules")
                         .WithMany("NotificationEventLog")
-                        .HasForeignKey("NotificationLevelHierarchyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Channel");
-
-                    b.Navigation("NotificationLevelHierarchy");
-                });
-
-            modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.NotificationEventRule", b =>
-                {
-                    b.HasOne("BackgroundService.Domain.Entities.Notification.NotificationConfig", "NotificationConfig")
-                        .WithMany("NotificationEventRules")
-                        .HasForeignKey("NotificationConfigId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("BackgroundService.Domain.Entities.Notification.NotificationGroup", "NotificationGroup")
-                        .WithMany("NotificationEventRules")
-                        .HasForeignKey("NotificationGroupId")
+                        .HasForeignKey("NotificationLevelRuleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -698,9 +676,28 @@ namespace BackgroundService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("BackgroundService.Domain.Entities.Notification.MiscMaster", "NotificationType")
-                        .WithMany("NotificationType")
-                        .HasForeignKey("NotificationTypeId")
+                    b.Navigation("Channel");
+
+                    b.Navigation("NotificationEventRules");
+
+                    b.Navigation("NotificationStatus");
+                });
+
+            modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.NotificationEventRule", b =>
+                {
+                    b.HasOne("BackgroundService.Domain.Entities.Notification.MiscMaster", "Channel")
+                        .WithMany("Channels")
+                        .HasForeignKey("NotificationChannelId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("BackgroundService.Domain.Entities.Notification.NotificationGroup", null)
+                        .WithMany("NotificationEventRules")
+                        .HasForeignKey("NotificationGroupId");
+
+                    b.HasOne("BackgroundService.Domain.Entities.Notification.NotificationLevelHierarchy", "NotificationLevelHierarchy")
+                        .WithMany()
+                        .HasForeignKey("NotificationLevelHierarchyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -710,13 +707,17 @@ namespace BackgroundService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("NotificationConfig");
+                    b.HasOne("BackgroundService.Domain.Entities.Notification.NotificationTemplate", "NotificationTemplates")
+                        .WithMany("NotificationEventRules")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("NotificationGroup");
+                    b.Navigation("Channel");
 
-                    b.Navigation("NotificationStatus");
+                    b.Navigation("NotificationLevelHierarchy");
 
-                    b.Navigation("NotificationType");
+                    b.Navigation("NotificationTemplates");
 
                     b.Navigation("RecipientType");
                 });
@@ -761,11 +762,19 @@ namespace BackgroundService.Infrastructure.Migrations
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.NotificationTemplate", b =>
                 {
+                    b.HasOne("BackgroundService.Domain.Entities.Notification.NotificationConfig", "NotificationConfig")
+                        .WithMany("NotificationTemplates")
+                        .HasForeignKey("NotificationConfigId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("BackgroundService.Domain.Entities.Notification.MiscMaster", "NotificationType")
                         .WithMany("NotificationTemplates")
                         .HasForeignKey("NotificationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("NotificationConfig");
 
                     b.Navigation("NotificationType");
                 });
@@ -776,13 +785,13 @@ namespace BackgroundService.Infrastructure.Migrations
 
                     b.Navigation("Channel");
 
+                    b.Navigation("Channels");
+
                     b.Navigation("NotificationEventType");
 
                     b.Navigation("NotificationStatus");
 
                     b.Navigation("NotificationTemplates");
-
-                    b.Navigation("NotificationType");
 
                     b.Navigation("RecipientType");
 
@@ -796,9 +805,14 @@ namespace BackgroundService.Infrastructure.Migrations
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.NotificationConfig", b =>
                 {
-                    b.Navigation("NotificationEventRules");
-
                     b.Navigation("NotificationLevelHierarchies");
+
+                    b.Navigation("NotificationTemplates");
+                });
+
+            modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.NotificationEventRule", b =>
+                {
+                    b.Navigation("NotificationEventLog");
                 });
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.NotificationGroup", b =>
@@ -808,9 +822,9 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Navigation("NotificationGroupMembers");
                 });
 
-            modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.NotificationLevelHierarchy", b =>
+            modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.NotificationTemplate", b =>
                 {
-                    b.Navigation("NotificationEventLog");
+                    b.Navigation("NotificationEventRules");
                 });
 #pragma warning restore 612, 618
         }

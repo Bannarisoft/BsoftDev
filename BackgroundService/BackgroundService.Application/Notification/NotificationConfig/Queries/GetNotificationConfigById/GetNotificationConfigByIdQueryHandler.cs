@@ -22,7 +22,11 @@ namespace BackgroundService.Application.Notification.NotificationConfig.Queries.
 
         public async Task<NotificationConfigDto> Handle(GetNotificationConfigByIdQuery request, CancellationToken cancellationToken)
         {
-            var result = await _notificationConfigQueryRepository.GetByIdAsync(request.Id);           
+            var result = await _notificationConfigQueryRepository.GetByIdAsync(request.Id);   
+            if (result == null)
+            {
+                throw new KeyNotFoundException($"NotificationConfig with Id {request.Id} not found.");
+            }         
             var notificationConfig = _mapper.Map<NotificationConfigDto>(result);
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(

@@ -18,6 +18,10 @@ using BackgroundService.Infrastructure.Repositories.Notification.NotificationCon
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroup;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationGroup;
 using BackgroundService.Application.Notification.Common.Interfaces;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationLevelHierarchy;
+using BackgroundService.Infrastructure.Repositories.Notification.NotificationLevelHierarchy;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationTemplate;
+using BackgroundService.Infrastructure.Repositories.Notification.NotificationTemplate;
 
 
 namespace BackgroundService.Infrastructure
@@ -137,6 +141,10 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationGroupQuery, NotificationGroupQueryRepository >();
             services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddScoped<ITimeZoneService, TimeZoneService>();
+            services.AddScoped<INotificationLevelHierarchyCommandRepository, NotificationLevelHierarchyCommandRepository>();  
+            services.AddScoped<INotificationLevelHierarchyQueryRepository, NotificationLevelHierarchyQueryRepository>();  
+            services.AddScoped<INotificationTemplateCommandRepository, NotificationTemplateCommandRepository>();  
+            services.AddScoped<INotificationTemplateQueryRepository, NotificationTemplateQueryRepository>();  
             return services;
         }
     }

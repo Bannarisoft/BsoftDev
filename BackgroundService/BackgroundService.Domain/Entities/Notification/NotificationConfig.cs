@@ -8,10 +8,10 @@ namespace BackgroundService.Domain.Entities.Notification
 {
     public class NotificationConfig : BaseEntity
     {
-        public string ModuleName { get; set; }
+        public string? ModuleName { get; set; }
         public int NotificationEventTypeId { get; set; }
-        public MiscMaster NotificationEventType { get; set; }
-        public ICollection<NotificationLevelHierarchy> NotificationLevelHierarchies { get; set; }
-        public ICollection<NotificationEventRule> NotificationEventRules { get; set; }
+        public MiscMaster NotificationEventType { get; set; }= new MiscMaster();
+        public ICollection<NotificationLevelHierarchy> NotificationLevelHierarchies { get; set; }  = new List<NotificationLevelHierarchy>();      
+        public ICollection<NotificationTemplate> NotificationTemplates { get; set; }= new List<NotificationTemplate>();
     }
 }

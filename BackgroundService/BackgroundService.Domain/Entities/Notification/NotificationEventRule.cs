@@ -8,16 +8,15 @@ namespace BackgroundService.Domain.Entities.Notification
 {
     public class NotificationEventRule : BaseEntity
     {
-        public int NotificationGroupMemberId { get; set; }
-        public int NotificationTypeId { get; set; }
-        public int NotificationStatusId { get; set; }
-        public int NotificationConfigId { get; set; }
-        public int NotificationGroupId { get; set; }
+        public int NotificationLevelHierarchyId { get; set; }
+        public int NotificationChannelId { get; set; }
         public int RecipientTypeId { get; set; }
-        public MiscMaster NotificationType { get; set; }
-        public MiscMaster NotificationStatus { get; set; }
-        public NotificationConfig NotificationConfig { get; set; }
-        public NotificationGroup NotificationGroup { get; set; }
-        public MiscMaster RecipientType { get; set; }
+        public int TemplateId { get; set; }        
+        public MiscMaster RecipientType { get; set; }= new MiscMaster();
+        public MiscMaster Channel { get; set; }= new MiscMaster();
+        public NotificationTemplate NotificationTemplates { get; set; }= new NotificationTemplate();
+        public NotificationLevelHierarchy NotificationLevelHierarchy { get; set; }= new NotificationLevelHierarchy();
+        public ICollection<NotificationEventLog> NotificationEventLog { get; set; }= new List<NotificationEventLog>();
+        
     }
 }

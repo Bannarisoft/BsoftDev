@@ -64,7 +64,7 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
             builder.Property(t => t.Description)
             .HasColumnName("Description")
             .HasColumnType("Varchar(Max)")
-            .IsRequired();
+            .IsRequired(false);
 
             builder.Property(cf => cf.IsActive)
             .HasColumnName("IsActive")

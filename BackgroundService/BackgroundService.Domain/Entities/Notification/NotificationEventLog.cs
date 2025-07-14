@@ -8,13 +8,14 @@ namespace BackgroundService.Domain.Entities.Notification
 {
     public class NotificationEventLog : BaseEntity
     {
-        public int NotificationLevelHierarchyId { get; set; }
-        public int UserId { get; set; }
-        public string Action { get; set; }
+        public int NotificationLevelRuleId { get; set; }        
         public int ChannelId { get; set; }
-        public string MessageText { get; set; }
+        public int NotificationStatusId	{ get; set; }
+        public string? MessageText { get; set; }
+        public string? ActionStatus	{ get; set; }
         public DateTimeOffset Timestamp { get; set; }
-        public NotificationLevelHierarchy NotificationLevelHierarchy { get; set; }
-        public MiscMaster Channel { get; set; }
+        public NotificationEventRule NotificationEventRules { get; set; } = new NotificationEventRule();
+        public MiscMaster Channel { get; set; }= new MiscMaster();
+        public MiscMaster NotificationStatus { get; set; }= new MiscMaster();
     }
 }

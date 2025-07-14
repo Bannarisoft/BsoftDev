@@ -34,35 +34,37 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
                 .HasColumnType("int")
                 .IsRequired();
 
-            builder.Property(t => t.NotificationGroupMemberId)
-            .HasColumnName("NotificationGroupMemberId")
+            builder.Property(t => t.NotificationLevelHierarchyId)
+            .HasColumnName("NotificationLevelHierarchyId")
             .HasColumnType("int")
             .IsRequired();
-
-            builder.Property(t => t.NotificationTypeId)
-            .HasColumnName("NotificationTypeId")
-            .HasColumnType("int")
-            .IsRequired();
-
-            builder.Property(t => t.NotificationStatusId)
-           .HasColumnName("NotificationStatusId")
-           .HasColumnType("int")
-           .IsRequired();
-
-            builder.Property(t => t.NotificationConfigId)
-           .HasColumnName("NotificationConfigId")
-           .HasColumnType("int")
-           .IsRequired();
-
-            builder.Property(t => t.NotificationGroupId)
-           .HasColumnName("NotificationGroupId")
-           .HasColumnType("int")
-           .IsRequired();
 
             builder.Property(t => t.RecipientTypeId)
            .HasColumnName("RecipientTypeId")
            .HasColumnType("int")
            .IsRequired();
+            builder.HasOne(ac => ac.RecipientType)
+          .WithMany(am => am.RecipientType)
+          .HasForeignKey(ac => ac.RecipientTypeId)
+          .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Property(t => t.NotificationChannelId)
+           .HasColumnName("NotificationChannelId")
+           .HasColumnType("int")
+           .IsRequired();
+             builder.HasOne(ac => ac.Channel)
+            .WithMany(am => am.Channels)
+            .HasForeignKey(ac => ac.NotificationChannelId)
+            .OnDelete(DeleteBehavior.NoAction);
+          
+            builder.Property(t => t.TemplateId)
+           .HasColumnName("TemplateId")
+           .HasColumnType("int")
+           .IsRequired();
+            builder.HasOne(ac => ac.NotificationTemplates)
+            .WithMany(am => am.NotificationEventRules)
+            .HasForeignKey(ac => ac.TemplateId)
+            .OnDelete(DeleteBehavior.Restrict); 
 
             builder.Property(cf => cf.IsActive)
             .HasColumnName("IsActive")
@@ -88,26 +90,7 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
                  .HasColumnType("varchar(50)");
 
             builder.Property(cf => cf.ModifiedIP)
-                .HasColumnType("varchar(255)");
-
-            builder.HasOne(ac => ac.NotificationType)
-     .WithMany(am => am.NotificationType)
-     .HasForeignKey(ac => ac.NotificationTypeId);
-
-            builder.HasOne(ac => ac.NotificationStatus)
-            .WithMany(am => am.NotificationStatus)
-            .HasForeignKey(ac => ac.NotificationStatusId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-            builder.HasOne(ac => ac.NotificationConfig)
-           .WithMany(am => am.NotificationEventRules)
-           .HasForeignKey(ac => ac.NotificationConfigId)
-           .OnDelete(DeleteBehavior.NoAction);
-          
-           builder.HasOne(ac => ac.RecipientType)
-          .WithMany(am => am.RecipientType)
-          .HasForeignKey(ac => ac.RecipientTypeId)
-          .OnDelete(DeleteBehavior.NoAction);
+                .HasColumnType("varchar(255)");          
         }
     }
 }

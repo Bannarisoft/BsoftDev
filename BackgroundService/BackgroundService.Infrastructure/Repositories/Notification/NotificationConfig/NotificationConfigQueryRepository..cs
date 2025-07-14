@@ -9,13 +9,11 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
 {
     public class NotificationConfigQueryRepository : INotificationConfigQueryRepository
     {
-        private readonly IDbConnection _dbConnection;
-        private readonly IIPAddressService _ipAddressService;
+        private readonly IDbConnection _dbConnection;       
 
-        public NotificationConfigQueryRepository(IDbConnection dbConnection, IIPAddressService ipAddressService)
+        public NotificationConfigQueryRepository(IDbConnection dbConnection)
         {
-            _dbConnection = dbConnection;
-            _ipAddressService = ipAddressService;
+            _dbConnection = dbConnection;            
         }
 
         public async Task<NotificationConfigDto> GetByIdAsync(int Id)
@@ -48,7 +46,6 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
 
         public async Task<(IEnumerable<dynamic>, int)> GetAllNotificationConfigAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-            var UnitId = _ipAddressService.GetUnitId();
             var query = $$"""
             DECLARE @TotalCount INT;
             SELECT @TotalCount = COUNT(*) 
@@ -85,8 +82,12 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
         {
             const string query = @"
                     SELECT 1 
-                    FROM AppNotification.NotificationConfig
-                    WHERE id = @Id AND IsDeleted = 0;";
+                    FROM AppNotification.NotificationTemplate
+                    WHERE NotificationConfigId = @Id AND IsDeleted = 0;
+                    SELECT 1 
+                    FROM AppNotification.NotificationLevelHierarchy
+                    WHERE NotificationConfigId = @Id AND IsDeleted = 0;
+                    ";
             using var multi = await _dbConnection.QueryMultipleAsync(query, new { Id = Id });
             var notificationConfigExists = await multi.ReadFirstOrDefaultAsync<int?>();
             return notificationConfigExists.HasValue;

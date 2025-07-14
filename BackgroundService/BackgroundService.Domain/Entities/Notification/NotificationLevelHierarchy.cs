@@ -13,10 +13,9 @@ namespace BackgroundService.Domain.Entities.Notification
         public int TargetId { get; set; }
         public int UnitId { get; set; }
         public int ApprovalModeId { get; set; }
-        public string Description { get; set; }
-        public NotificationConfig NotificationConfig { get; set; }
-        public MiscMaster TargetType { get; set; }
-        public MiscMaster ApprovalMode { get; set; }
-        public ICollection<NotificationEventLog> NotificationEventLog { get; set; }
+        public string? Description { get; set; }
+        public NotificationConfig NotificationConfig { get; set; }=new NotificationConfig();
+        public MiscMaster TargetType { get; set; }= new MiscMaster();
+        public MiscMaster ApprovalMode { get; set; }  = new MiscMaster();              
     }
 }
