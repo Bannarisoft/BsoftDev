@@ -1,28 +1,27 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IDashboard;
+using Core.Application.Dashboard;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace FAM.API.Controllers.Dashboard
-{
+{ 
+    [ApiController]    
     [Route("[controller]")]
-    public class DashboardController : Controller
+    public class DashboardController : ControllerBase
     {
-        private readonly IDashboardQueryRepository _dashboardQueryRepository ;
-          private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IDashboardQueryRepository _dashboardQueryRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMediator _mediator;
 
 
-        public DashboardController(IDashboardQueryRepository dashboardQueryRepository, IHttpContextAccessor httpContextAccessor)
+        public DashboardController(IDashboardQueryRepository dashboardQueryRepository, IHttpContextAccessor httpContextAccessor, IMediator mediator)
         {
             _dashboardQueryRepository = dashboardQueryRepository;
             _httpContextAccessor = httpContextAccessor;
+            _mediator = mediator;
         }
 
-       [HttpGet("dashboard-summary")]
+        [HttpGet("dashboard-summary")]
         public async Task<IActionResult> GetDashboardData()
         {
             try
@@ -44,6 +43,14 @@ namespace FAM.API.Controllers.Dashboard
                     error = ex.Message
                 });
             }
+        }
+
+         [HttpGet("AssetExpiry-summary")]
+        public async Task<IActionResult> GetAssertExpirySummary([FromQuery] DashboardQuery request)
+        {
+            request.Type = "assetexpirySummary";
+            var data = await _mediator.Send(request);
+            return Ok(data);
         }
     }
 }
