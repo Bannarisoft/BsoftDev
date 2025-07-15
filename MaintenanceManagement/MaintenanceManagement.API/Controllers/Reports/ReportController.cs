@@ -11,6 +11,7 @@ using Core.Application.Reports.MRS;
 using Core.Application.Reports.ScheduleReport;
 using Core.Application.Reports.MaterialPlanningReport;
 using Core.Application.Reports.PowerConsumption;
+using Core.Application.Reports.GeneratorConsumption;
 
 namespace MaintenanceManagement.API.Controllers.Reports
 {
@@ -181,7 +182,7 @@ namespace MaintenanceManagement.API.Controllers.Reports
         }
         [HttpGet("CurrentStock/{oldUnitCode}/{departmentId}")]
         [ActionName(nameof(GetAllStockItemDetails))]
-        public async Task<IActionResult> GetAllStockItemDetails(string oldUnitCode,int departmentId)
+        public async Task<IActionResult> GetAllStockItemDetails(string oldUnitCode, int departmentId)
         {
             var result = await Mediator.Send(new GetCurrentAllStockItemsQuery { OldUnitcode = oldUnitCode, DepartmentId = departmentId });
 
@@ -454,6 +455,35 @@ namespace MaintenanceManagement.API.Controllers.Reports
                 StatusCode = StatusCodes.Status200OK,
                 Message = result.Message,
                 Data = result.Data?.ToList() ?? new List<PowerReportDto>()
+
+            });
+        }
+        [HttpGet("GeneratorConsumptionReport")]
+        public async Task<IActionResult> GeneratorConsumptionReportAsync(
+            [FromQuery] DateTimeOffset? FromDate = null,
+            [FromQuery] DateTimeOffset? ToDate = null)
+        {
+            var result = await Mediator.Send(new GeneratorConsumptionReportQuery
+            {
+                FromDate = FromDate,
+                ToDate = ToDate
+            });
+
+            if (result?.Data == null || result.Data.Count == 0)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = result?.Message ?? "Generator Transactions not found.",
+                    Data = new List<GeneratorReportDto>()
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = result.Message,
+                Data = result.Data?.ToList() ?? new List<GeneratorReportDto>()
                
             });
         }

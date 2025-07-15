@@ -77,8 +77,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
             parameters.Add("FromDate", fromDate);
             parameters.Add("ToDate", toDate);
             parameters.Add("UnitId", UnitId);
-            parameters.Add("Type", type);
-            parameters.Add("DeptId", departmentId);
+            parameters.Add("Type", type);            
             var data = await _connection.QueryAsync<MaintenanceHrsDto>(
                 "Dashboard_Maintenance",
                 parameters,
@@ -89,9 +88,16 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
             var departments = await _departmentGrpcClient.GetDepartmentAllAsync();
             var deptLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
 
-            foreach (var item in data)
-                item.Name = deptLookup.TryGetValue(item.Id, out var name) ? name : item.Name;
+            // foreach (var item in data)
+            //     item.Name = deptLookup.TryGetValue(item.Id, out var name) ? name : item.Name;
 
+            foreach (var item in data)
+            {
+                if (deptLookup.TryGetValue(item.Id, out var name))
+                    item.Name = $"{name}-{item.Id}";
+                else
+                    item.Name = $"Unknown-{item.Id}";
+            }
 
             // Build categories
             var categories = data.Select(x => x.Name ?? "Unknown").Distinct().ToList();
@@ -207,9 +213,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Dashboard
 
             var departments = await _departmentGrpcClient.GetDepartmentAllAsync();
             var deptLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
-
+            
             foreach (var item in data)
-                item.Name = deptLookup.TryGetValue(item.Id, out var name) ? name : item.Name;
+            {
+                if (deptLookup.TryGetValue(item.Id, out var name))
+                    item.Name = $"{name}-{item.Id}";
+                else
+                    item.Name = $"Unknown-{item.Id}";
+            }
 
             return new ChartDto
             {

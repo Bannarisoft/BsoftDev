@@ -21,12 +21,14 @@ namespace Core.Application.Common.Mappings
             CreateMap<Core.Domain.Entities.MachineGroup, MachineGroupDto>();
 
             CreateMap<CreateMachineGroupCommand, Core.Domain.Entities.MachineGroup>()
+            .ForMember(dest => dest.PowerSource, opt => opt.MapFrom(src => src.PowerSource == 1 ? true : false))
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
             
              CreateMap<Core.Domain.Entities.MachineGroup, GetMachineGroupByIdDto>();
 
             CreateMap<UpdateMachineGroupCommand, Core.Domain.Entities.MachineGroup>()
+            .ForMember(dest => dest.PowerSource, opt => opt.MapFrom(src => src.PowerSource == 1 ? true : false))
            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));       
 
             CreateMap<DeleteMachineGroupCommand, Core.Domain.Entities.MachineGroup>()           
