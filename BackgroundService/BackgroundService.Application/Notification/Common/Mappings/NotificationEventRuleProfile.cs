@@ -16,7 +16,8 @@ namespace BackgroundService.Application.Notification.Common.Mappings
     {
         public NotificationEventRuleProfile()
         {
-             CreateMap<NotificationEventRule,NotificationEventRuleDto>();
+            CreateMap<NotificationEventRule, NotificationEventRuleDto>()
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0));
             CreateMap<CreateNotificationEventRuleCommand, NotificationEventRule>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())     
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))

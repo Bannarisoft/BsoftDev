@@ -10,6 +10,6 @@ namespace BackgroundService.Domain.Entities.Notification
     {
         public string GroupName { get; set; }
         public ICollection<NotificationGroupMembers> NotificationGroupMembers { get; set; }
-        public ICollection<NotificationEventRule> NotificationEventRules { get; set; }
+        
     }
 }

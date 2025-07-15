@@ -22,7 +22,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             var query = @"SELECT COUNT(1) 
                         FROM [AppNotification].[NotificationEventRule] 
                         WHERE NotificationChannelId = @NotificationChannelId AND 
-                        TemplateId=@TemplateId AND NotificationLevelHierarchyId = @NotificationLevelHierarchyId AND NotificationGroupId = @NotificationGroupId
+                        TemplateId=@TemplateId AND NotificationLevelHierarchyId = @NotificationLevelHierarchyId
                         AND RecipientTypeId = @RecipientTypeId AND IsDeleted = 0";
                 var parameters = new DynamicParameters(new { NotificationChannelId, TemplateId, NotificationLevelHierarchyId, RecipientTypeId });
 
@@ -39,7 +39,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
         {
              const string dataQuery = @"
               SELECT  
-                  NER.Id, NER.NotificationChannelId, NER.TemplateId, NER.NotificationLevelHierarchyId,NER.NotificationGroupId,
+                  NER.Id, NER.NotificationChannelId, NER.TemplateId, NER.NotificationLevelHierarchyId,
                   NER.RecipientTypeId,NER.IsActive, NER.CreatedBy,
                     NER.CreatedDate,NER.CreatedByName, NER.ModifiedBy, NER.ModifiedDate, NER.ModifiedByName,
                     NotificationChannel.Id,NotificationChannel.Code,RecipientType.Id,RecipientType.Code
@@ -49,7 +49,11 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
               INNER JOIN AppData.MiscMaster NotificationChannel on NotificationChannel.Id=NER.NotificationChannelId
               INNER JOIN AppData.MiscMaster RecipientType on RecipientType.Id=NER.RecipientTypeId
               WHERE NER.IsDeleted = 0
-                AND (@Search IS NULL OR NotificationChannel.Code OR RecipientType.Code LIKE @Search)
+                       AND (
+              @Search IS NULL OR 
+              NotificationChannel.Code LIKE '%' + @Search + '%' OR 
+              RecipientType.Code LIKE '%' + @Search + '%'
+                )
               ORDER BY NER.Id
               OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
           ";
@@ -62,7 +66,11 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
               INNER JOIN AppData.MiscMaster NotificationChannel on NotificationChannel.Id=NER.NotificationChannelId
               INNER JOIN AppData.MiscMaster RecipientType on RecipientType.Id=NER.RecipientTypeId
               WHERE NER.IsDeleted = 0
-                AND (@Search IS NULL  OR NotificationChannel.Code OR RecipientType.Code LIKE @Search);
+               AND (
+              @Search IS NULL OR 
+              NotificationChannel.Code LIKE '%' + @Search + '%' OR 
+              RecipientType.Code LIKE '%' + @Search + '%'
+                );
           ";
 
           var parameters = new

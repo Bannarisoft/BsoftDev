@@ -14,10 +14,10 @@ namespace BackgroundService.Application.Notification.NotificationGroupMember.Que
         public int UserName { get; set; }
         public byte IsActive { get; set; }
         public int CreatedBy { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
         public string CreatedByName { get; set; }
         public int ModifiedBy { get; set; }
-        public DateTime ModifiedDate { get; set; }
+        public DateTimeOffset ModifiedDate { get; set; }
         public string ModifiedByName { get; set; }
     }
 }

@@ -26,6 +26,8 @@ using BackgroundService.Application.Notification.Common.Interfaces.INotification
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationGroupMember;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationEventRule;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationEventRules;
+using BackgroundService.Domain.Entities.Notification;
+using BackgroundService.Application.Notification.Common.Mappings;
 
 
 namespace BackgroundService.Infrastructure
@@ -131,6 +133,8 @@ namespace BackgroundService.Infrastructure
            .AddTransientHttpErrorPolicy(policyBuilder =>
                policyBuilder.WaitAndRetryAsync(3, retryAttempt =>
                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
+
+            services.AddAutoMapper(typeof(NotificationEventRuleProfile));
 
             services.AddHttpClient();
             services.AddScoped<IEmailService, RealEmailService>();

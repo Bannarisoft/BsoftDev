@@ -46,7 +46,8 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             {
                 existingNotification.GroupId = notificationGroupMembers.GroupId;
                 existingNotification.UserId = notificationGroupMembers.UserId;
-                _notificationDbContext.NotificationGroupMembers.Update(notificationGroupMembers);
+                existingNotification.IsActive = notificationGroupMembers.IsActive;
+                _notificationDbContext.NotificationGroupMembers.Update(existingNotification);
 
                 return await _notificationDbContext.SaveChangesAsync() >0;
             }

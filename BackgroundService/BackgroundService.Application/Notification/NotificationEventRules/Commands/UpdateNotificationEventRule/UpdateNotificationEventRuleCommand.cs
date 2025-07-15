@@ -12,7 +12,6 @@ namespace BackgroundService.Application.Notification.NotificationEventRules.Comm
         public int NotificationChannelId { get; set; }
         public int TemplateId { get; set; }
         public int NotificationLevelHierarchyId { get; set; }
-        public int NotificationGroupId { get; set; }
         public int RecipientTypeId { get; set; }
         public byte IsActive { get; set; }
     }

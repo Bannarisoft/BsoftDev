@@ -43,10 +43,11 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             
             if (existingNotification != null)
             {
+                existingNotification.NotificationChannelId = notificationEventRule.NotificationChannelId;
                 existingNotification.NotificationLevelHierarchyId = notificationEventRule.NotificationLevelHierarchyId;
-                existingNotification.NotificationLevelHierarchyId = notificationEventRule.NotificationChannelId;
                 existingNotification.RecipientTypeId = notificationEventRule.RecipientTypeId;
                 existingNotification.TemplateId = notificationEventRule.TemplateId;
+                existingNotification.IsActive = notificationEventRule.IsActive;
                 _notificationDbContext.NotificationEventRule.Update(existingNotification);
 
                 return await _notificationDbContext.SaveChangesAsync() >0;
