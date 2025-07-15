@@ -78,6 +78,8 @@ using FAM.Infrastructure.Repositories.AssetSubGroup;
 using Core.Application.Common.Interfaces.IAssetSubGroup;
 using Core.Application.Common.Interfaces.IWdvDepreciation;
 using FAM.Infrastructure.Repositories.WDVDepreciation;
+using Core.Application.Common.Interfaces.IDashboard;
+using FAM.Infrastructure.Repositories.Dashboard;
 
 namespace FAM.Infrastructure
 {
@@ -239,6 +241,7 @@ namespace FAM.Infrastructure
             services.AddScoped<IAssetSubGroupQueryRepository, AssetSubGroupQueryRepository>();
             services.AddScoped<IWdvDepreciationQueryRepository, WdvDepreciationQueryRepository>();            
             services.AddScoped<IWdvDepreciationCommandRepository, WdvDepreciationCommandRepository>(); 
+            services.AddScoped<IDashboardQueryRepository, DashboardQueryRepository>();
 
 
             // Miscellaneous services
