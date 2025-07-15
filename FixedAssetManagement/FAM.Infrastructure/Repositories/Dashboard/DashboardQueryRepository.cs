@@ -8,6 +8,8 @@ using Core.Application.Common.Interfaces.IDashboard;
 using Core.Application.Dashboard.CardView;
 using FAM.Infrastructure.Data;
 using Dapper;
+using Core.Application.Dashboard.AssetExpired;
+using Core.Application.Dashboard.Common;
 
 namespace FAM.Infrastructure.Repositories.Dashboard
 {
@@ -22,6 +24,67 @@ namespace FAM.Infrastructure.Repositories.Dashboard
             _dbConnection = dbConnection; 
             _iPAddressService = iPAddressService;
         }
+
+         public async Task<ChartDto> GetAssetExpiredDashBoardDataAsync()
+        {
+            var unitId = _iPAddressService.GetUnitId(); // Or however you're getting UnitId
+
+            var query = @"
+                DECLARE @StartDate DATE = 
+                    DATEFROMPARTS(
+                        CASE 
+                            WHEN MONTH(GETDATE()) >= 4 THEN YEAR(GETDATE()) 
+                            ELSE YEAR(GETDATE()) - 1 
+                        END, 4, 1
+                    );
+
+                DECLARE @EndDate DATE = 
+                    DATEFROMPARTS(
+                        CASE 
+                            WHEN MONTH(GETDATE()) >= 4 THEN YEAR(GETDATE()) + 1 
+                            ELSE YEAR(GETDATE()) 
+                        END, 3, 31
+                    );
+
+                SELECT 
+                    G.GroupName,
+                    COUNT(*) AS ExpiredAssetCount,
+                    SUM(B.PurchaseValue) * (ISNULL(D.ResidualValue, 0) / 100.0) AS ResidualValueAmount
+                FROM 
+                    FixedAsset.AssetMaster A
+                    INNER JOIN FixedAsset.AssetPurchaseDetails B ON A.Id = B.AssetId
+                    INNER JOIN FixedAsset.AssetGroup G ON A.AssetGroupId = G.Id
+                    LEFT JOIN FixedAsset.DepreciationGroups D ON D.AssetGroupId = G.Id
+                WHERE 
+                    A.UnitId = @UnitId
+                    AND DATEADD(YEAR, D.UsefulLife, B.PoDate) BETWEEN @StartDate AND @EndDate
+                GROUP BY 
+                    G.GroupName, D.ResidualValue
+                ORDER BY 
+                    G.GroupName ASC;
+            ";
+
+            var result = await _dbConnection.QueryAsync<AssetExpiredDashBoardDto>(query, new { UnitId = unitId });
+
+            return new ChartDto
+            {
+                Categories = result.Select(x => x.GroupName).ToList(),
+                Series = new List<ChartSeriesDto>
+                {
+                    new ChartSeriesDto
+                    {
+                        Name = "Expired Assets",
+                        Data = result.Select(x => (decimal)x.ExpiredAssetCount).ToList()
+                    },
+                    new ChartSeriesDto
+                    {
+                        Name = "Residual Value",
+                        Data = result.Select(x => x.ResidualValueAmount).ToList()
+                    }
+                }
+            };
+        }
+
 
         public async Task<AssetDashboardDto> GetDashboardDataAsync()
         {
@@ -69,4 +132,5 @@ namespace FAM.Infrastructure.Repositories.Dashboard
             
         }
     }
+
 }

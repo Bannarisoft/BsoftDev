@@ -8,7 +8,7 @@ namespace Core.Application.Dashboard.AssetSummary
     public class AssetSummaryDashboardDto
     {
 
-        public string GroupName { get; set; }
+        public string? GroupName { get; set; }
 
         public int Assetcount { get; set; }
         
