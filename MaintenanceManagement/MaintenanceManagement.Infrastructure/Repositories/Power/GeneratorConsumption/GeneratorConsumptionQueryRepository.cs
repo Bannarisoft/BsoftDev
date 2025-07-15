@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.Power.IGeneratorConsumption;
 using Core.Application.Power.GeneratorConsumption.Queries.GetClosingEnergyReaderValueById;
+using Core.Application.Power.GeneratorConsumption.Queries.GetGeneratorConsumption;
 using Core.Application.Power.GeneratorConsumption.Queries.GetUnitIdBasedOnMachineId;
 using Dapper;
 
@@ -19,6 +20,61 @@ namespace MaintenanceManagement.Infrastructure.Repositories.Power.GeneratorConsu
         {
             _dbConnection = dbConnection;
             _ipAddressService = ipAddressService;
+        }
+
+        public async Task<(List<GetGeneratorConsumptionDto>, int)> GetAllGeneratorConsumptionAsync(int PageNumber, int PageSize, string? SearchTerm)
+        {
+             var UnitId = _ipAddressService.GetUnitId();
+            var query = $$"""
+            DECLARE @TotalCount INT;
+
+            SELECT @TotalCount = COUNT(*)
+            FROM Maintenance.GeneratorConsumption a
+            INNER JOIN Maintenance.MachineMaster b ON a.GeneratorId = b.Id AND a.UnitId = b.UnitId
+            INNER JOIN Maintenance.MiscMaster c ON a.PurposeId = c.Id
+            WHERE a.UnitId = @UnitId AND a.IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (b.MachineCode LIKE @Search OR b.MachineName LIKE @Search OR c.Description LIKE @Search)")}};
+            
+            SELECT 
+                a.Id,
+                b.MachineCode,
+                b.MachineName,
+                a.StartTime,
+                a.EndTime,
+                a.RunningHours,
+                a.DieselConsumption,
+                a.UnitId,
+                a.OpeningEnergyReading,
+                a.ClosingEnergyReading,
+                a.Energy,
+                c.Description AS Purpose,
+                a.CreatedByName,
+                a.CreatedDate
+            FROM Maintenance.GeneratorConsumption a
+            INNER JOIN Maintenance.MachineMaster b ON a.GeneratorId = b.Id AND a.UnitId = b.UnitId
+            INNER JOIN Maintenance.MiscMaster c ON a.PurposeId = c.Id
+            WHERE a.UnitId = @UnitId AND a.IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (b.MachineCode LIKE @Search OR b.MachineName LIKE @Search OR c.Description LIKE @Search)")}}
+            ORDER BY a.CreatedDate DESC
+            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+
+            SELECT @TotalCount AS TotalCount;
+            """;
+
+            var parameters = new
+            {
+                Search = $"%{SearchTerm}%",
+                Offset = (PageNumber - 1) * PageSize,
+                PageSize,
+                UnitId
+            };
+
+            var result = await _dbConnection.QueryMultipleAsync(query, parameters);
+
+            var generatorConsumptionList = (await result.ReadAsync<GetGeneratorConsumptionDto>()).ToList();
+            int totalCount = await result.ReadFirstAsync<int>();
+
+            return (generatorConsumptionList, totalCount);
         }
 
         public async Task<List<GetMachineIdBasedonUnitDto>> GetMachineIdBasedonUnit()

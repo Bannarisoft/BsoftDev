@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Power.GeneratorConsumption.Command;
 using Core.Application.Power.GeneratorConsumption.Queries.GetClosingEnergyReaderValueById;
+using Core.Application.Power.GeneratorConsumption.Queries.GetGeneratorConsumption;
 using Core.Application.Power.GeneratorConsumption.Queries.GetUnitIdBasedOnMachineId;
 using MassTransit.Futures.Contracts;
 using MediatR;
@@ -31,7 +32,7 @@ namespace MaintenanceManagement.API.Controllers.Power
             var generatoropeningReading = await Mediator.Send(new GetClosingEnergyReaderValueByIdQuery() { GeneratorId = generatorId });
 
 
-            return Ok(new { StatusCode = StatusCodes.Status200OK, data = generatoropeningReading, message = generatoropeningReading });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = generatoropeningReading, message = "Opening Reading Fetched Successfully" });
 
         }
         [HttpPost]
@@ -50,13 +51,33 @@ namespace MaintenanceManagement.API.Controllers.Power
 
 
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetMachineBasedonUnitIdAsync()
         {
-            var Machinename = await Mediator.Send(new GetUnitIdBasedOnMachineIdQuery() {});
-                return Ok(new { StatusCode = StatusCodes.Status200OK, data = Machinename, message = "MachineName Fetched Successfully" });
-               
+            var Machinename = await Mediator.Send(new GetUnitIdBasedOnMachineIdQuery() { });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = Machinename, message = "MachineName Fetched Successfully" });
+
+        }
+        
+        [HttpGet("GetGeneratorConsumption")]
+        public async Task<IActionResult> GetAllGeneratorConsumptionAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
+        {
+            var FeederGroup = await Mediator.Send(
+             new GetGeneratorConsumptionQuery
+             {
+                 PageNumber = PageNumber,
+                 PageSize = PageSize,
+                 SearchTerm = SearchTerm
+             });
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = FeederGroup.Data,
+                TotalCount = FeederGroup.TotalCount,
+                PageNumber = FeederGroup.PageNumber,
+                PageSize = FeederGroup.PageSize
+            });
         }
         
 
