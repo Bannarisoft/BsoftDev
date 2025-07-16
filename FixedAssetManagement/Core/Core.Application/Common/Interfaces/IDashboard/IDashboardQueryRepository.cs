@@ -10,7 +10,11 @@ namespace Core.Application.Common.Interfaces.IDashboard
 {
     public interface IDashboardQueryRepository
     {
-        Task<AssetDashboardDto> GetDashboardDataAsync();
+        Task<CardViewDto> GetDashboardDataAsync();
         Task<ChartDto> GetAssetExpiredDashBoardDataAsync();
+
+        Task<ChartDto> GetAssetChartViewAsync();
+
+        
     }
 }
