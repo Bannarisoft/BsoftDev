@@ -1,5 +1,6 @@
 using Core.Application.Common.Interfaces.IDashboard;
 using Core.Application.Dashboard;
+using Core.Application.Dashboard.CardView;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,31 +22,46 @@ namespace FAM.API.Controllers.Dashboard
             _mediator = mediator;
         }
 
-        [HttpGet("dashboard-summary")]
-        public async Task<IActionResult> GetDashboardData()
+        // [HttpGet("dashboard-summary")]
+        // public async Task<IActionResult> GetDashboardData()
+        // {
+        //     try
+        //     {
+        //         var result = await _dashboardQueryRepository.GetDashboardDataAsync(); // No unitId passed explicitly
+        //         return Ok(new
+        //         {
+        //             isSuccess = true,
+        //             message = "Dashboard data retrieved successfully",
+        //             data = result
+        //         });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return StatusCode(500, new
+        //         {
+        //             isSuccess = false,
+        //             message = "Failed to retrieve dashboard data.",
+        //             error = ex.Message
+        //         });
+        //     }
+        // }
+
+
+       [HttpGet("card-dashboard")]
+        public async Task<IActionResult> GetCardDashboard([FromQuery] CardViewQuery request)
         {
-            try
-            {
-                var result = await _dashboardQueryRepository.GetDashboardDataAsync(); // No unitId passed explicitly
-                return Ok(new
-                {
-                    isSuccess = true,
-                    message = "Dashboard data retrieved successfully",
-                    data = result
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    isSuccess = false,
-                    message = "Failed to retrieve dashboard data.",
-                    error = ex.Message
-                });
-            }
+            var data = await _mediator.Send(request);
+            return Ok(data);
         }
 
-         [HttpGet("AssetExpiry-summary")]
+          [HttpGet("Asset-summary")]
+        public async Task<IActionResult> GetAssetSummary([FromQuery] DashboardQuery request)
+        {
+            request.Type = "assetSummary";
+            var data = await _mediator.Send(request);
+            return Ok(data);
+        }
+        [HttpGet("AssetExpiry-summary")]
         public async Task<IActionResult> GetAssertExpirySummary([FromQuery] DashboardQuery request)
         {
             request.Type = "assetexpirySummary";
