@@ -7,8 +7,10 @@ using Contracts.Interfaces.External.IMaintenance;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using Core.Domain.Entities;
 using MediatR;
+using Newtonsoft.Json;
 
 namespace Core.Application.PreventiveSchedulers.Commands.MapMachine
 {
@@ -19,17 +21,20 @@ namespace Core.Application.PreventiveSchedulers.Commands.MapMachine
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IBackgroundServiceClient  _backgroundServiceClient;
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
         public MapMachineCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IPreventiveSchedulerQuery preventiveSchedulerQuery,
-        IMiscMasterQueryRepository miscMasterQueryRepository, IBackgroundServiceClient backgroundServiceClient)
+        IMiscMasterQueryRepository miscMasterQueryRepository, IBackgroundServiceClient backgroundServiceClient, IPreventiveScheduleLogService preventiveScheduleLogService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _backgroundServiceClient = backgroundServiceClient;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
         }
         public async Task<ApiResponseDTO<bool>> Handle(MapMachineCommand request, CancellationToken cancellationToken)
         {
+            await _preventiveScheduleLogService.CaptureLogs(request.Id,null,"Link Machine",JsonConvert.SerializeObject(request));
             var PreventiveSchedule = await _preventiveSchedulerQuery.GetByIdAsync(request.Id);
             var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(PreventiveSchedule.FrequencyUnitId);
 

@@ -76,6 +76,8 @@ using MaintenanceManagement.Infrastructure.Repositories.MachineSpecification;
 using Core.Application.Common.Interfaces.IMachineSpecification;
 using Core.Application.Common.Interfaces.Power.IGeneratorConsumption;
 using MaintenanceManagement.Infrastructure.Repositories.Power.GeneratorConsumption;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
+using MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulesLogs;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -193,6 +195,7 @@ namespace MaintenanceManagement.Infrastructure
             services.AddScoped<IMachineSpecificationQueryRepository, MachineSpecificationQueryRepository>(); 
             services.AddScoped<IGeneratorConsumptionQueryRepository, GeneratorConsumptionQueryRepository>(); 
             services.AddScoped<IGeneratorConsumptionCommandRepository, GeneratorConsumptionCommandRepository>();
+            services.AddScoped<IPreventiveScheduleLogService, PreventiveScheduleLogsService>();
 
             // Miscellaneous services
             services.AddScoped<IIPAddressService, IPAddressService>();

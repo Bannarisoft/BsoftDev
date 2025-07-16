@@ -18,6 +18,8 @@ using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.Common.Interfaces;
 using Contracts.Events.Maintenance.PreventiveScheduler;
 using Core.Application.Common;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
+using Newtonsoft.Json;
 
 namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler
 {
@@ -28,15 +30,17 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
         private readonly IMediator _mediator;
         private readonly IEventPublisher _eventPublisher;
         private readonly IIPAddressService _ipAddressService;
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
 
         public CreatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator,
-         IEventPublisher eventPublisher, IIPAddressService iPAddressService)
+         IEventPublisher eventPublisher, IIPAddressService iPAddressService, IPreventiveScheduleLogService preventiveScheduleLogService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
             _mediator = mediator;
             _eventPublisher = eventPublisher;
             _ipAddressService = iPAddressService;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
 
         }
         public async Task<int> Handle(CreatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
@@ -82,8 +86,9 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                     );
                
               
+                 await _preventiveScheduleLogService.CaptureLogs(response,null,"Create Header",JsonConvert.SerializeObject(request));
                  
-                    return  response;
+                    return response;
             
                 
         }
