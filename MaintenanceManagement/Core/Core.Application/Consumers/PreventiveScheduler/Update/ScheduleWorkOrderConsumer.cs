@@ -7,7 +7,9 @@ using Contracts.Events.Maintenance.PreventiveScheduler.PreventiveSchedulerUpdate
 using Contracts.Interfaces.External.IMaintenance;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using MassTransit;
+using Newtonsoft.Json;
 
 namespace Core.Application.Consumers.PreventiveScheduler.Update
 {
@@ -17,23 +19,26 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IBackgroundServiceClient  _backgroundServiceClient;
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
         public ScheduleWorkOrderConsumer(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMiscMasterQueryRepository miscMasterQueryRepository,
-        IPreventiveSchedulerQuery preventiveSchedulerQuery, IBackgroundServiceClient backgroundServiceClient)
+        IPreventiveSchedulerQuery preventiveSchedulerQuery, IBackgroundServiceClient backgroundServiceClient, IPreventiveScheduleLogService preventiveScheduleLogService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _backgroundServiceClient = backgroundServiceClient;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
         }
 
         public async Task Consume(ConsumeContext<UpdateScheduleWorkOrderCommand> context)
         {
             try
             {
+                
                 var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(context.Message.FrequencyUnitId);
 
                 var DetailResult = await _preventiveSchedulerQuery.GetPreventiveSchedulerDetail(context.Message.PreventiveSchedulerHeaderId);
-
+            await _preventiveScheduleLogService.CaptureLogs(context.Message.PreventiveSchedulerHeaderId,null,"Saga Update Schedule Details",JsonConvert.SerializeObject(DetailResult));
                 foreach (var detail in DetailResult)
                 {
 

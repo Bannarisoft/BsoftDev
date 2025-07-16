@@ -6,7 +6,9 @@ using Contracts.Interfaces.External.IMaintenance;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using MediatR;
+using Newtonsoft.Json;
 using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpdate
@@ -17,16 +19,20 @@ namespace Core.Application.PreventiveSchedulers.Commands.MachineWiseFrequencyUpd
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IBackgroundServiceClient  _backgroundServiceClient;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
         public MachineWiseFrequencyUpdateCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IPreventiveSchedulerQuery preventiveSchedulerQuery,
-        IBackgroundServiceClient backgroundServiceClient, IMiscMasterQueryRepository miscMasterQueryRepository)
+        IBackgroundServiceClient backgroundServiceClient, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveScheduleLogService preventiveScheduleLogService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _backgroundServiceClient = backgroundServiceClient;
             _miscMasterQueryRepository = miscMasterQueryRepository;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
         }
         public async Task<ApiResponseDTO<bool>> Handle(MachineWiseFrequencyUpdateCommand request, CancellationToken cancellationToken)
         {
+            await _preventiveScheduleLogService.CaptureLogs(null,request.Id,"Machine Wise Frequency Update",JsonConvert.SerializeObject(request));
+
             var DetailResult = await _preventiveSchedulerQuery.GetPreventiveSchedulerDetailById(request.Id);
 
             var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(DetailResult.FrequencyUnitId ?? 0);
