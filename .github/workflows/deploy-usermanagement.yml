@@ -1,0 +1,42 @@
+name: Deploy UserManagement API to On-Prem Windows Server
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'UserManagement/UserManagement.API/**'
+      - '.github/workflows/deploy-usermanagement.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Source Code
+        uses: actions/checkout@v3
+
+      - name: 🐳 Build Docker Image
+        run: |
+          docker build -t usermanagement-api:latest ./UserManagement/UserManagement.API
+          docker save -o usermanagement-api.tar usermanagement-api:latest
+
+      - name: 📤 Copy Docker Image to Windows Server
+        run: |
+          sudo apt-get update && sudo apt-get install -y sshpass
+          sshpass -p "${{ secrets.WINRM_PASSWORD }}" scp -o StrictHostKeyChecking=no usermanagement-api.tar ${{ secrets.WINRM_USERNAME }}@${{ secrets.WINRM_HOST }}:C:/usermanagement-api.tar
+
+      - name: 🚀 Deploy on Windows Server using PowerShell Remoting
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            Invoke-Command -ComputerName $env:WINRM_HOST -Credential (New-Object PSCredential($env:WINRM_USERNAME, (ConvertTo-SecureString $env:WINRM_PASSWORD -AsPlainText -Force))) -ScriptBlock {
+              docker load -i C:\usermanagement-api.tar
+              docker stop usermanagement -ErrorAction SilentlyContinue
+              docker rm usermanagement -ErrorAction SilentlyContinue
+              docker run -d --name usermanagement -p 5174:80 usermanagement-api:latest
+            }
+          azPSVersion: "latest"
+        env:
+          WINRM_HOST: ${{ secrets.WINRM_HOST }}
+          WINRM_USERNAME: ${{ secrets.WINRM_USERNAME }}
+          WINRM_PASSWORD: ${{ secrets.WINRM_PASSWORD }}
