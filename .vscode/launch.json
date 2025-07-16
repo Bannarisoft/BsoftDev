@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C#: MaintenanceManagement.API [http]",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/MaintenanceManagement.API/bin/Debug/net8.0/MaintenanceManagement.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/MaintenanceManagement.API",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/MaintenanceManagement.API/Views"
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+    <!-- NuGet Packages -->
+  <ItemGroup>
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="9.0.0" />
+    <PackageReference Include="Polly" Version="8.5.1" />
+    <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
+    <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
+    <!-- <PackageReference Include="Shared.Contracts" Version="1.0.0" />
+    <PackageReference Include="Shared.Infrastructure" Version="1.0.0" /> -->
+    <PackageReference Include="MongoDB.Driver" Version="3.1.0" />
+    <PackageReference Include="MongoDB.EntityFrameworkCore" Version="8.2.1" />
+  </ItemGroup>
+
+    <ItemGroup>
+    <ProjectReference Include="..\SagaOrchestrator.Application\SagaOrchestrator.Application.csproj" />  
+    <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj"/>
+    <ProjectReference Include="..\..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj"/>
+  </ItemGroup>
+
+</Project>
