@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Events.Notifications.WorkOrder;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IMaintenanceRequest;
@@ -11,8 +12,10 @@ using Core.Application.Common.RealTimeNotificationHub;
 using Core.Application.MaintenanceRequest.Queries.GetMaintenanceRequest;
 using Core.Domain.Common;
 using Core.Domain.Events;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using static Core.Domain.Common.MiscEnumEntity;
 
 namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
@@ -29,18 +32,24 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
        private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
        private readonly IIPAddressService _ipAddressService;
        private readonly IHubContext<WorkOrderScheduleHub> _hubContext;
+       private readonly IEventPublisher _eventPublisher;
+       private readonly ILogger<CreateMaintenanceRequestCommandHandler> _logger;           
+        private readonly IPublishEndpoint _publishEndpoint;
 
-       public CreateMaintenanceRequestCommandHandler( IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository, IMapper imapper, IMediator mediator, IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IWorkOrderCommandRepository workOrderCommandRepository , IWorkOrderQueryRepository workOrderQueryQueryRepository , IIPAddressService ipAddressService, IHubContext<WorkOrderScheduleHub> hubContext )
-       {
-           _maintenanceRequestCommandRepository = maintenanceRequestCommandRepository;
-           _imapper = imapper;
-           _mediator = mediator;
-           _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
-           _workOrderCommandRepository = workOrderCommandRepository;
-           _workOrderQueryRepository = workOrderQueryQueryRepository;
-           _ipAddressService = ipAddressService;
+        public CreateMaintenanceRequestCommandHandler(IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository, IMapper imapper, IMediator mediator, IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IWorkOrderCommandRepository workOrderCommandRepository, IWorkOrderQueryRepository workOrderQueryQueryRepository, IIPAddressService ipAddressService, IHubContext<WorkOrderScheduleHub> hubContext, IEventPublisher eventPublisher, ILogger<CreateMaintenanceRequestCommandHandler> logger,IPublishEndpoint publishEndpoint)
+        {
+            _maintenanceRequestCommandRepository = maintenanceRequestCommandRepository;
+            _imapper = imapper;
+            _mediator = mediator;
+            _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
+            _workOrderCommandRepository = workOrderCommandRepository;
+            _workOrderQueryRepository = workOrderQueryQueryRepository;
+            _ipAddressService = ipAddressService;
             _hubContext = hubContext;
-       }
+            _eventPublisher = eventPublisher;
+            _logger = logger;
+            _publishEndpoint = publishEndpoint;
+        }
 
         public async Task<ApiResponseDTO<int>> Handle(CreateMaintenanceRequestCommand request, CancellationToken cancellationToken)
         {
@@ -71,28 +80,31 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
             var internalTypeId = requestTypes.FirstOrDefault()?.Id;
 
             if (internalTypeId.HasValue && maintenanceRequest.RequestTypeId == internalTypeId.Value)
-           {               
-            var workOrder = _imapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(maintenanceRequest);
-           // workOrder.Id = 0; // important!
-            workOrder.RequestId = result;
-            workOrder.CompanyId = _ipAddressService.GetCompanyId();           
-            workOrder.UnitId = _ipAddressService.GetUnitId();
-            
-            await _workOrderCommandRepository.CreateAsync(workOrder,request.MaintenanceTypeId, cancellationToken);  
-            
-                //SignalR
-                var departmentGroupName = request.ProductionDepartmentId.ToString(); // or use department name if preferred
+            {
+                var workOrder = _imapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(maintenanceRequest);
+                // workOrder.Id = 0; // important!
+                workOrder.RequestId = result;
+                workOrder.CompanyId = _ipAddressService.GetCompanyId();
+                workOrder.UnitId = _ipAddressService.GetUnitId();
 
-                var notification = new
+                await _workOrderCommandRepository.CreateAsync(workOrder, request.MaintenanceTypeId, cancellationToken);
+
+                // 👇 Publish the WorkOrderCreatedEvent to trigger Saga
+                var correlationId = Guid.NewGuid();
+                await _publishEndpoint.Publish(new WorkOrderCreatedEvent
                 {
-                    Title = "Work Order Created",
-                    Message = $"Work Order '{workOrder.WorkOrderDocNo}' created from Maintenance Request {result}.",
-                    CreatedBy = maintenanceRequest.CreatedByName,
-                    Timestamp = DateTime.UtcNow
-                };
+                    CorrelationId =correlationId, // Important for Saga tracking
+                    WorkOrderId = workOrder.Id,
+                    WorkOrderTitle = "Create",
+                    CreatedByName = workOrder.CreatedByName,
+                    UnitId = _ipAddressService.GetUnitId(),
+                    ModuleName = "WorkOrder",
+                    EventTypeId = 14
+                });
 
-                await _hubContext.Clients.Group(departmentGroupName)
-                    .SendAsync("ReceiveMessage", notification, cancellationToken);
+                _logger.LogInformation("✅ Maintenance Request Workorder Created. CorrelationId: {CorrelationId}, WorkOrderId: {WorkOrderId}",
+                correlationId, workOrder.Id);     
+                        
             }                                     
             // 🔹 Publish domain event for auditing/logging
             var domainEvent = new AuditLogsDomainEvent(
