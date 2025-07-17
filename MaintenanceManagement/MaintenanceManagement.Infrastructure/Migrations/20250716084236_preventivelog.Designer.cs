@@ -4,6 +4,7 @@ using MaintenanceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaintenanceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250716084236_preventivelog")]
+    partial class preventivelog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1370,13 +1373,9 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsSuccess");
 
-                    b.Property<int?>("PreventiveScheduleDetailId")
+                    b.Property<int>("PreventiveScheduleDetailId")
                         .HasColumnType("int")
                         .HasColumnName("PreventiveScheduleDetailId");
-
-                    b.Property<int?>("PreventiveScheduleId")
-                        .HasColumnType("int")
-                        .HasColumnName("PreventiveScheduleId");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("varchar(max)")

@@ -7,7 +7,9 @@ using Core.Application.Common;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using MediatR;
+using Newtonsoft.Json;
 
 namespace Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive
 {
@@ -18,16 +20,21 @@ namespace Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive
         private readonly IMediator _mediator;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
-        public ReschedulePreventiveCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator, IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery)
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
+        public ReschedulePreventiveCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator,
+        IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IPreventiveScheduleLogService preventiveScheduleLogService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
             _mediator = mediator;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
+            _preventiveScheduleLogService = preventiveScheduleLogService;           
         }
         public async Task<ApiResponseDTO<bool>> Handle(ReshedulePreventiveCommand request, CancellationToken cancellationToken)
         {
+            await _preventiveScheduleLogService.CaptureLogs(null,request.PreventiveScheduleDetailId,"Reschedule",JsonConvert.SerializeObject(request));
+            
             var result = await _preventiveSchedulerQuery.ExistWorkOrderBySchedulerDetailId(request.PreventiveScheduleDetailId);
 
             if (result == true)
@@ -41,7 +48,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive
                     requestData: request,
                     cancellationToken
                    );
-                var DetailResult = await _preventiveSchedulerCommand.UpdateRescheduleDate(request.PreventiveScheduleDetailId, request.RescheduleDate);
+                 await _preventiveSchedulerCommand.UpdateRescheduleDate(request.PreventiveScheduleDetailId, request.RescheduleDate);
             }
             else
             {
@@ -54,13 +61,8 @@ namespace Core.Application.PreventiveSchedulers.Commands.ReschedulePreventive
                     requestData: request,
                     cancellationToken
                    );
-                var Result = await _preventiveSchedulerCommand.AddReScheduleDetailAsync(request.PreventiveScheduleDetailId, request.RescheduleDate, cancellationToken);
-
-                if (Result != null)
-                {
-                    await _preventiveSchedulerCommand.UpdateDetailAsync(Result.Id, Result.HangfireJobId);
-                }
-                 
+                 await _preventiveSchedulerCommand.RescheduleWithoutWorkOrderAsync(request.PreventiveScheduleDetailId, request.RescheduleDate, cancellationToken);
+ 
             }
 
           
