@@ -15,7 +15,7 @@ namespace BackgroundService.API.Validation.NotificationGroup
         private readonly INotificationGroupQuery _notificationGroupQuery;
         public UpdateNotificationGroupCommandValidator(MaxLengthProvider maxLengthProvider, INotificationGroupQuery notificationGroupQuery)
         {
-            var maxLength = maxLengthProvider.GetMaxLength<Domain.Entities.Notification.NotificationConfig>("GroupName") ?? 250;
+            var maxLength = maxLengthProvider.GetMaxLength<Domain.Entities.Notification.NotificationGroup>("GroupName") ?? 250;
             _notificationGroupQuery = notificationGroupQuery;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();

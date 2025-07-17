@@ -22,68 +22,69 @@ namespace BackgroundService.Infrastructure.Logging.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            var traceId = context.TraceIdentifier;  
+            var traceId = context.TraceIdentifier;
             context.Request.EnableBuffering();
 
             try
             {
-                
-                if (context.Request.Method == HttpMethods.Post || 
-                    context.Request.Method == HttpMethods.Put || 
-                    context.Request.Method == HttpMethods.Get) 
+
+                if (context.Request.Method == HttpMethods.Post ||
+                    context.Request.Method == HttpMethods.Put ||
+                    context.Request.Method == HttpMethods.Get)
                 {
-                    
+
                     if (context.Request.Method == HttpMethods.Get)
                     {
-                        _logger.LogInformation("TraceId: {TraceId}, Request Path: {Path}, Method: {Method}", 
+                        _logger.LogInformation("TraceId: {TraceId}, Request Path: {Path}, Method: {Method}",
                             traceId, context.Request.Path, context.Request.Method);
                     }
                     else
                     {
-                       
-                        context.Request.Body.Position = 0; 
+
+                        context.Request.Body.Position = 0;
                         var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
-                        _logger.LogInformation("TraceId: {TraceId}, Request Path: {Path}, Method: {Method}, Body: {Body}", 
+                        _logger.LogInformation("TraceId: {TraceId}, Request Path: {Path}, Method: {Method}, Body: {Body}",
                             traceId, context.Request.Path, context.Request.Method, requestBody);
-                        context.Request.Body.Position = 0;  
+                        context.Request.Body.Position = 0;
                     }
                 }
 
-                
+
                 await _next(context);
             }
-             catch (ValidationException ex)
+            catch (ValidationException ex)
             {
-                
+
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
-    
+
                 var response = new
                 {
                     statusCode = context.Response.StatusCode,
                     message = "Validation failed",
                     errors = ex.Errors.Select(e => e.ErrorMessage).ToArray()
                 };
-    
+
                 await context.Response.WriteAsync(JsonSerializer.Serialize(response));
             }
             catch (Exception ex)
             {
-                
+
                 _logger.LogError(ex, "Unhandled exception");
 
-                 context.Response.ContentType = "application/json";
-                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                context.Response.ContentType = "application/json";
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-                 var response = new
-                 {
-                     statusCode = context.Response.StatusCode,
-                     message = "Internal Server Error",
-                     errors = new[] { ex.Message }
-                 };
+                var response = new
+                {
+                    statusCode = context.Response.StatusCode,
+                    message = "Internal Server Error",
+                    errors = new[] { ex.Message }
+                };
 
-                 await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                await context.Response.WriteAsync(JsonSerializer.Serialize(response));
             }
+            
         }
     }
 }

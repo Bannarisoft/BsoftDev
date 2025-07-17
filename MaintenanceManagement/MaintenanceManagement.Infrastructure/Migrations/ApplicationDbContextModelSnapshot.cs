@@ -401,6 +401,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(50)");
 
+                    b.Property<bool>("PowerSource")
+                        .HasColumnType("bit")
+                        .HasColumnName("PowerSource");
+
                     b.Property<int>("UnitId")
                         .HasColumnType("int")
                         .HasColumnName("UnitId");

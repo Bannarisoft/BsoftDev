@@ -16,6 +16,14 @@ using BackgroundService.Application.Notification.NotificationTemplate.Command.Cr
 using BackgroundService.Application.Notification.NotificationTemplate.Command.UpdateNotificationTemplate;
 using BackgroundService.Application.Notification.NotificationTemplate.Command.DeleteNotificationTemplate;
 using BackgroundService.API.Validation.NotificationTemplate;
+using BackgroundService.Application.Notification.NotificationGroupMember.Commands.CreateNotificationGroupMember;
+using BackgroundService.API.Validation.NotificationGroupMember;
+using BackgroundService.Application.Notification.NotificationGroupMember.Commands.UpdateNotificationGroupMember;
+using BackgroundService.Application.Notification.NotificationGroupMember.Commands.DeleteNotificationGroupMember;
+using BackgroundService.Application.Notification.NotificationEventRules.Commands.CreateNotificationEventRule;
+using BackgroundService.API.Validation.NotificationEventRule;
+using BackgroundService.Application.Notification.NotificationEventRules.Commands.UpdateNotificationEventRule;
+using BackgroundService.Application.Notification.NotificationEventRules.Commands.DeleteNotificationEventRule;
 
 namespace BackgroundService.API.Validation.Common
 {
@@ -38,6 +46,14 @@ namespace BackgroundService.API.Validation.Common
             services.AddScoped<IValidator<CreateNotificationTemplateCommand>, CreateNotificationTemplateCommandValidator>();
             services.AddScoped<IValidator<UpdateNotificationTemplateCommand>, UpdateNotificationTemplateCommandValidator>();
             services.AddScoped<IValidator<DeleteNotificationTemplateCommand>, DeleteNotificationTemplateCommandValidator>();
+
+            services.AddScoped<IValidator<CreateNotificationGroupMemberCommand>, CreateNotificationGroupMemberCommandValidator>();
+            services.AddScoped<IValidator<UpdateNotificationGroupMemberCommand>, UpdateNotificationGroupMemberCommandValidator>();
+            services.AddScoped<IValidator<DeleteNotificationGroupMemberCommand>, DeleteNotificationGroupMemberCommandValidator>();
+            
+            services.AddScoped<IValidator<CreateNotificationEventRuleCommand>, CreateNotificationEventRuleCommandValidator>();
+            services.AddScoped<IValidator<UpdateNotificationEventRuleCommand>, UpdateNotificationEventRuleCommandValidator>();
+            services.AddScoped<IValidator<DeleteNotificationEventRuleCommand>, DeleteNotificationEventRuleCommandValidator>();
         }
     }
 }

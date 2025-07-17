@@ -335,9 +335,6 @@ namespace BackgroundService.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("NotificationChannelId");
 
-                    b.Property<int?>("NotificationGroupId")
-                        .HasColumnType("int");
-
                     b.Property<int>("NotificationLevelHierarchyId")
                         .HasColumnType("int")
                         .HasColumnName("NotificationLevelHierarchyId");
@@ -353,8 +350,6 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("NotificationChannelId");
-
-                    b.HasIndex("NotificationGroupId");
 
                     b.HasIndex("NotificationLevelHierarchyId");
 
@@ -691,10 +686,6 @@ namespace BackgroundService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("BackgroundService.Domain.Entities.Notification.NotificationGroup", null)
-                        .WithMany("NotificationEventRules")
-                        .HasForeignKey("NotificationGroupId");
-
                     b.HasOne("BackgroundService.Domain.Entities.Notification.NotificationLevelHierarchy", "NotificationLevelHierarchy")
                         .WithMany()
                         .HasForeignKey("NotificationLevelHierarchyId")
@@ -817,8 +808,6 @@ namespace BackgroundService.Infrastructure.Migrations
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.NotificationGroup", b =>
                 {
-                    b.Navigation("NotificationEventRules");
-
                     b.Navigation("NotificationGroupMembers");
                 });
 

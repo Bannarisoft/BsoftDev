@@ -22,12 +22,17 @@ using BackgroundService.Application.Notification.Common.Interfaces.INotification
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationLevelHierarchy;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationTemplate;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationTemplate;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroupMembers;
+using BackgroundService.Infrastructure.Repositories.Notification.NotificationGroupMember;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationEventRule;
+using BackgroundService.Infrastructure.Repositories.Notification.NotificationEventRules;
+using BackgroundService.Domain.Entities.Notification;
+using BackgroundService.Application.Notification.Common.Mappings;
 using MassTransit;
 using BackgroundService.Application.Consumers;
 using BackgroundService.Application.Interfaces.Notification;
 using BackgroundService.Infrastructure.Services.Notification;
 using BackgroundService.Application.Notification;
-
 
 namespace BackgroundService.Infrastructure
 {
@@ -169,6 +174,8 @@ namespace BackgroundService.Infrastructure
                policyBuilder.WaitAndRetryAsync(3, retryAttempt =>
                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
+            services.AddAutoMapper(typeof(NotificationEventRuleProfile));
+
             services.AddHttpClient();
             services.AddScoped<IEmailService, RealEmailService>();
             services.AddScoped<ISmsService, RealSmsService>();
@@ -192,6 +199,10 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<ISmsSender, SmsSender>();
             services.AddScoped<IInAppNotifier, InAppNotifier>(); 
+            services.AddScoped<INotificationGroupMemberCommand, NotificationGroupMemberCommandRepository >();
+            services.AddScoped<INotificationGroupMemberQuery, NotificationGroupMemberQueryRepository >();
+            services.AddScoped<INotificationEventRuleCommand, NotificationEventRuleCommandRepository >();
+            services.AddScoped<INotificationEventRuleQuery, NotificationEventRuleQueryRepository >();
             return services;
         }
     }

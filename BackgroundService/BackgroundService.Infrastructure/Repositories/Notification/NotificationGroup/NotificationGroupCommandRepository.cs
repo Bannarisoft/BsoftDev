@@ -45,6 +45,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             if (existingNotification != null)
             {
                 existingNotification.GroupName = notificationGroup.GroupName;
+                existingNotification.IsActive = notificationGroup.IsActive;
                 _notificationDbContext.NotificationGroup.Update(existingNotification);
 
                 return await _notificationDbContext.SaveChangesAsync() >0;

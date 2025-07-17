@@ -12,11 +12,11 @@ namespace BackgroundService.Domain.Entities.Notification
         public int NotificationChannelId { get; set; }
         public int RecipientTypeId { get; set; }
         public int TemplateId { get; set; }        
-        public MiscMaster RecipientType { get; set; }= new MiscMaster();
-        public MiscMaster Channel { get; set; }= new MiscMaster();
-        public NotificationTemplate NotificationTemplates { get; set; }= new NotificationTemplate();
-        public NotificationLevelHierarchy NotificationLevelHierarchy { get; set; }= new NotificationLevelHierarchy();
-        public ICollection<NotificationEventLog> NotificationEventLog { get; set; }= new List<NotificationEventLog>();
+        public MiscMaster RecipientType { get; set; }
+        public MiscMaster Channel { get; set; }
+        public NotificationTemplate NotificationTemplates { get; set; }
+        public NotificationLevelHierarchy NotificationLevelHierarchy { get; set; }
+        public ICollection<NotificationEventLog> NotificationEventLog { get; set; }
         
     }
 }
