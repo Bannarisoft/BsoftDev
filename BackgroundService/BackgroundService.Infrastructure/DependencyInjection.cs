@@ -22,6 +22,11 @@ using BackgroundService.Application.Notification.Common.Interfaces.INotification
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationLevelHierarchy;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationTemplate;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationTemplate;
+using MassTransit;
+using BackgroundService.Application.Consumers;
+using BackgroundService.Application.Interfaces.Notification;
+using BackgroundService.Infrastructure.Services.Notification;
+using BackgroundService.Application.Notification;
 
 
 namespace BackgroundService.Infrastructure
@@ -75,7 +80,7 @@ namespace BackgroundService.Infrastructure
             });
 
             services.AddDbContext<NotificationDbContext>(options =>
-    options.UseSqlServer(NotificationConnectionString));
+                options.UseSqlServer(NotificationConnectionString));
 
             // Add the Hangfire server
             services.AddHangfireServer(options =>
@@ -83,6 +88,42 @@ namespace BackgroundService.Infrastructure
                 options.ServerName = configuration["HangfireServer:Server"];
                 options.Queues = HangfireQueues;
             });
+            //Notification
+            services.AddMassTransit(x =>
+            {
+                x.AddConsumer<SendEmailNotificationConsumer>();
+                x.AddConsumer<SendSmsNotificationConsumer>();
+                x.AddConsumer<SendInAppNotificationConsumer>();
+
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host("localhost", "/", h =>
+                    {
+                        h.Username("guest");
+                        h.Password("guest");
+                    });
+
+                    cfg.ReceiveEndpoint("email-notification-queue", e =>
+                    {
+                        e.ConfigureConsumer<SendEmailNotificationConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("sms-notification-queue", e =>
+                    {
+                        e.ConfigureConsumer<SendSmsNotificationConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("inapp-notification-queue", e =>
+                    {
+                        e.ConfigureConsumer<SendInAppNotificationConsumer>(context);
+                    });
+                    
+                });
+            });
+
+            services.AddMassTransitHostedService();
+
+            
             // ✅ Correctly bind EmailSettings
             var emailSettings = new EmailSettings();
             configuration.GetSection("EmailSettings").Bind(emailSettings);
@@ -144,7 +185,13 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationLevelHierarchyCommandRepository, NotificationLevelHierarchyCommandRepository>();  
             services.AddScoped<INotificationLevelHierarchyQueryRepository, NotificationLevelHierarchyQueryRepository>();  
             services.AddScoped<INotificationTemplateCommandRepository, NotificationTemplateCommandRepository>();  
-            services.AddScoped<INotificationTemplateQueryRepository, NotificationTemplateQueryRepository>();  
+            services.AddScoped<INotificationTemplateQueryRepository, NotificationTemplateQueryRepository>();
+            services.AddScoped<INotificationUserResolver, NotificationUserResolver>();
+            services.AddScoped<NotificationResolverHandler>();
+            //Notification
+            services.AddScoped<IEmailSender, EmailSender>();
+            services.AddScoped<ISmsSender, SmsSender>();
+            services.AddScoped<IInAppNotifier, InAppNotifier>(); 
             return services;
         }
     }

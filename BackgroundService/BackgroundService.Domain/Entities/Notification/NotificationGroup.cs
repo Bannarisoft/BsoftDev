@@ -9,7 +9,6 @@ namespace BackgroundService.Domain.Entities.Notification
     public class NotificationGroup : BaseEntity
     {
         public string GroupName { get; set; }
-        public ICollection<NotificationGroupMembers> NotificationGroupMembers { get; set; }
-        public ICollection<NotificationEventRule> NotificationEventRules { get; set; }
+        public ICollection<NotificationGroupMembers> NotificationGroupMembers { get; set; }        
     }
 }

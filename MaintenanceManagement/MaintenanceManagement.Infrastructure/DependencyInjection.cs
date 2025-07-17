@@ -76,6 +76,9 @@ using MaintenanceManagement.Infrastructure.Repositories.MachineSpecification;
 using Core.Application.Common.Interfaces.IMachineSpecification;
 using Core.Application.Common.Interfaces.Power.IGeneratorConsumption;
 using MaintenanceManagement.Infrastructure.Repositories.Power.GeneratorConsumption;
+using Contracts.Interfaces.External.IMaintenance;
+using MaintenanceManagement.Infrastructure.GrpcClients;
+using Polly;
 
 namespace MaintenanceManagement.Infrastructure
 {
@@ -138,6 +141,19 @@ namespace MaintenanceManagement.Infrastructure
                 builder.AddSerilog();
 
             });
+            services.AddScoped<IBackgroundServiceClient, BackgroundServiceClient>();
+            services.AddHttpClient("BackgroundServiceClient", client =>
+            {
+                client.BaseAddress = new Uri(configuration["HttpClientSettings:BackgroundService"]);
+                //client.BaseAddress = new Uri("http://localhost:5011"); 
+            })
+             .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.CircuitBreakerAsync(
+                    handledEventsAllowedBeforeBreaking: 3,
+                    durationOfBreak: TimeSpan.FromSeconds(30)))
+            .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.WaitAndRetryAsync(3, retryAttempt =>
+                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
             // Register IDateTime
             services.AddHttpContextAccessor();

@@ -1,16 +1,17 @@
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SagaOrchestrator.Application.Orchestration;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IAssets;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IMaintenance;
 using SagaOrchestrator.Application.Orchestration.Interfaces.IUsers;
 using SagaOrchestrator.Application.Orchestration.Models;
+using SagaOrchestrator.Application.Orchestration.Models.Notifications;
 using SagaOrchestrator.Application.Orchestration.Models.PreventiveSchedule;
 using SagaOrchestrator.Application.Orchestration.Services.AssetServices;
 using SagaOrchestrator.Application.Orchestration.Services.MaintenanceServices;
 using SagaOrchestrator.Application.Orchestration.Services.UserServices;
 using SagaOrchestrator.Application.StateMachines;
+using SagaOrchestrator.Application.StateMachines.Notification;
 using SagaOrchestrator.Infrastructure.Consumers;
 using SagaOrchestrator.Infrastructure.Services.AssetServices;
 using SagaOrchestrator.Infrastructure.Services.MaintenanceServices;
@@ -20,10 +21,8 @@ namespace SagaOrchestrator.Infrastructure
 {
     public static class DependencyInjection
     {
-
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
-
             // HttpClient Registration using HttpClientFactory
             services.AddHttpClient<IUserService, UserService>(client =>
             {
@@ -39,9 +38,7 @@ namespace SagaOrchestrator.Infrastructure
             {
                 // client.BaseAddress = new Uri("http://localhost:5174");
                 client.BaseAddress = new Uri("http://192.168.1.126:81");
-            });
-
-
+            });            
             // Register OrchestratorServices
             // services.AddScoped<OrchestratorService>();
             services.AddScoped<UserSagaService>();
@@ -58,26 +55,30 @@ namespace SagaOrchestrator.Infrastructure
                     .InMemoryRepository();
                     x.AddSagaStateMachine<PreventiveSchedulerUpdateStateMachine, PreventiveUpdateState>()
                     .InMemoryRepository();
+                x.AddSagaStateMachine<WorkOrderNotificationState, NotificationWorkOrder>()
+                    .InMemoryRepository();
+
+                
 
                 // Register Event Consumers (for other workflows if any)
                 x.AddConsumer<UserCreatedEventConsumer>();
                 x.AddConsumer<AssetCreatedEventConsumer>();
                 x.AddConsumer<SagaCompletedEventConsumer>();
-                x.AddConsumer<DeleteUserCommandConsumer>();                
-
+                x.AddConsumer<DeleteUserCommandConsumer>();                                
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host("localhost", "/", h =>
                     {
                         h.Username("guest");
                         h.Password("guest");
-                    });
-                   cfg.ConfigureEndpoints(context);
+                    });  
+                    // Saga endpoint
+                cfg.ReceiveEndpoint("workorder-notification-saga", e =>
+                {
+                    e.ConfigureSaga<NotificationWorkOrder>(context);
+                });                 
                 });
             });
-
-
-           
             return services;
         }
     }

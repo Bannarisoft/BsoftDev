@@ -8,9 +8,10 @@ using BackgroundService.Infrastructure.Services;
 using BackgroundService.API.Validation.Common;
 using MediatR;
 using BackgroundService.Application.Notification.Common.Behaviors;
+using BackgroundService.Application.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddSignalR();
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?? "Development";
 
 builder.Configuration
@@ -51,12 +52,14 @@ app.UseRouting();
 app.UseCors("AllowAll");
 app.UseMiddleware<BackgroundService.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseAuthorization();
+app.MapHub<NotificationHub>("/notificationHub");
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapGrpcService<MaintenanceJobGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<MaintenanceHangfireRemoveGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
 });
+
 // app.MapControllers();
 app.ConfigureHangfireDashboard();
 app.Run();
