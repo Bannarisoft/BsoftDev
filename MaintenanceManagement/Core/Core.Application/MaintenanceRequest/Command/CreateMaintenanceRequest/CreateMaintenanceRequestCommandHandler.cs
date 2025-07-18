@@ -99,12 +99,11 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
                     CreatedByName = workOrder.CreatedByName,
                     UnitId = _ipAddressService.GetUnitId(),
                     ModuleName = "WorkOrder",
-                    EventTypeId = 14
+                    EventTypeId = 14                    
                 });
 
                 _logger.LogInformation("✅ Maintenance Request Workorder Created. CorrelationId: {CorrelationId}, WorkOrderId: {WorkOrderId}",
-                correlationId, workOrder.Id);     
-                        
+                correlationId, workOrder.Id);                          
             }                                     
             // 🔹 Publish domain event for auditing/logging
             var domainEvent = new AuditLogsDomainEvent(

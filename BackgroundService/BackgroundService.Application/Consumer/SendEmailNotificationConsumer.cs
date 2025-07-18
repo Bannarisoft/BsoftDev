@@ -1,54 +1,49 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Hangfire;
-using BackgroundService.Application.Interfaces.Notification;
-using BackgroundService.Application.Notification;
 using Contracts.Events.Notifications.WorkOrder.Email;
-using Contracts.Events.Notifications.Internal.Email;
-using Contracts.Events.Notifications.WorkOrder;
+using BackgroundService.Application.Notification;
+using BackgroundService.Application.Interfaces.Notification;
 
 namespace BackgroundService.Application.Consumers
 {
     public class SendEmailNotificationConsumer : IConsumer<SendEmailNotificationInternalCommand>
     {
+        private readonly NotificationResolverHandler _resolverHandler;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<SendEmailNotificationConsumer> _logger;
-        private readonly IBackgroundJobClient _backgroundJobClient;        
-        private readonly NotificationResolverHandler _resolverHandler;
 
         public SendEmailNotificationConsumer(
+            NotificationResolverHandler resolverHandler,
             IEmailSender emailSender,
-            ILogger<SendEmailNotificationConsumer> logger,
-            IBackgroundJobClient backgroundJobClient,            
-            NotificationResolverHandler resolverHandler)
+            ILogger<SendEmailNotificationConsumer> logger)
         {
+            _resolverHandler = resolverHandler;
             _emailSender = emailSender;
             _logger = logger;
-            _backgroundJobClient = backgroundJobClient;            
-            _resolverHandler = resolverHandler;
         }
 
         public async Task Consume(ConsumeContext<SendEmailNotificationInternalCommand> context)
         {
-            var msg = context.Message;
+            var message = context.Message;
+
             try
             {
-                _logger.LogInformation("📨 Processing SendEmailNotificationCommand for CorrelationId: {CorrelationId}", msg.CorrelationId);
+                // Resolve all recipient emails and templates
+                var (toEmails, ccEmails, bccEmails, _, _, subject, body, footer, langCode)
+                    = await _resolverHandler.ResolveNotificationTemplatesAsync(
+                        message.UnitId,
+                        message.ModuleName,
+                        message.EventTypeId
+                    );
 
-                // ✅ Resolve targets and templates
-                var (toEmails, ccEmails, bccEmails, _, _, subject, body, footer, _) =
-                    await _resolverHandler.ResolveEmailChannelAsync(msg.UnitId, msg.ModuleName, msg.EventTypeId);
-
-                if (toEmails == null || !toEmails.Any())
+                if (!toEmails.Any())
                 {
-                    _logger.LogWarning("❌ No email recipients found for CorrelationId: {CorrelationId}", msg.CorrelationId);
-
+                    _logger.LogWarning("No email recipients found for CorrelationId: {CorrelationId}", message.CorrelationId);
                     await context.Publish(new SendEmailNotificationFailed
                     {
-                        CorrelationId = msg.CorrelationId,
-                        Reason = "No email recipients resolved"
+                        CorrelationId = message.CorrelationId,
+                        Reason = "No email recipients found"
                     });
-
                     return;
                 }
 
@@ -63,31 +58,27 @@ namespace BackgroundService.Application.Consumers
 
                 if (success)
                 {
-                    _logger.LogInformation("✅ Email sent successfully for CorrelationId: {CorrelationId}", msg.CorrelationId);
-
                     await context.Publish(new SendEmailNotificationCompleted
                     {
-                        CorrelationId = msg.CorrelationId
+                        CorrelationId = message.CorrelationId
                     });
                 }
                 else
                 {
-                    throw new Exception("Email sending failed.");
+                    await context.Publish(new SendEmailNotificationFailed
+                    {
+                        CorrelationId = message.CorrelationId,
+                        Reason = "Email sending failed"
+                    });
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Email sending failed for CorrelationId: {CorrelationId}", msg.CorrelationId);
-
-                // ✅ Retry via Hangfire after 5 minutes
-                _backgroundJobClient.Schedule<INotificationHandler<SendEmailNotificationInternalCommand>>(handler =>
-                    handler.ExecuteAsync(msg, msg.CorrelationId),
-                    TimeSpan.FromMinutes(5));
-
+                _logger.LogError(ex, "Email notification failed for CorrelationId: {CorrelationId}", message.CorrelationId);
                 await context.Publish(new SendEmailNotificationFailed
                 {
-                    CorrelationId = msg.CorrelationId,
-                    Reason = ex.Message
+                    CorrelationId = message.CorrelationId,
+                    Reason = $"Exception: {ex.Message}"
                 });
             }
         }

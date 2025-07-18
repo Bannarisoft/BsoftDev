@@ -8,7 +8,6 @@ namespace Contracts.Events.Notifications.WorkOrder
     public class WorkOrderCreatedEvent : CorrelatedBy<Guid>
     {
         public Guid CorrelationId { get; set; }
-
         public int WorkOrderId { get; set; }
         public string WorkOrderTitle { get; set; }
         public string CreatedByName { get; set; }

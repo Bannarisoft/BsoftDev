@@ -1,11 +1,9 @@
-using MassTransit;
-using SagaOrchestrator.Application.Orchestration.Models.Notifications;
 using Contracts.Events.Notifications.WorkOrder;
 using Contracts.Events.Notifications.WorkOrder.Email;
-using Contracts.Events.Notifications.WorkOrder.Sms;
 using Contracts.Events.Notifications.WorkOrder.InApp;
-using Contracts.Events.Notifications.Internal.Email;
-
+using Contracts.Events.Notifications.WorkOrder.Sms;
+using MassTransit;
+using SagaOrchestrator.Application.Orchestration.Models.Notifications;
 
 namespace SagaOrchestrator.Application.StateMachines.Notification
 {
@@ -34,67 +32,40 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
             Event(() => EmailCompleted, x => x.CorrelateById(m => m.Message.CorrelationId));
             Event(() => SmsCompleted, x => x.CorrelateById(m => m.Message.CorrelationId));
             Event(() => InAppCompleted, x => x.CorrelateById(m => m.Message.CorrelationId));
-
             Event(() => EmailFailed, x => x.CorrelateById(m => m.Message.CorrelationId));
             Event(() => SmsFailed, x => x.CorrelateById(m => m.Message.CorrelationId));
             Event(() => InAppFailed, x => x.CorrelateById(m => m.Message.CorrelationId));
 
             Initially(
+                When(SmsCompleted).Then(ctx => Console.WriteLine("⚠️ SmsCompleted received too early, ignoring...")).Finalize(),
+                When(EmailCompleted).Then(ctx => Console.WriteLine("⚠️ EmailCompleted received too early, ignoring...")).Finalize(),
+                When(InAppCompleted).Then(ctx => Console.WriteLine("⚠️ InAppCompleted received too early, ignoring...")).Finalize(),
+
                 When(WorkOrderCreated)
-                    .Then(context => context.Instance.CreatedAt = DateTime.UtcNow)
-                    .ThenAsync(async context =>
+                    .Then(ctx =>
                     {
-                        await context.Publish(new SendEmailNotificationInternalCommand
-                        {
-                            CorrelationId = context.Data.CorrelationId,
-                            UnitId = context.Data.UnitId,
-                            ModuleName = "WorkOrder",
-                            EventTypeId = context.Data.EventTypeId
-                        });
-
-                        await context.Publish(new SendSmsNotificationInternalCommand
-                        {
-                            CorrelationId = context.Data.CorrelationId,
-                            UnitId = context.Data.UnitId,
-                            ModuleName = "WorkOrder",
-                            EventTypeId =context.Data.EventTypeId
-                        });
-
-                        await context.Publish(new SendInAppNotificationInternalCommand
-                        {
-                            CorrelationId = context.Data.CorrelationId,
-                            UnitId = context.Data.UnitId,
-                            ModuleName = "WorkOrder",
-                            EventTypeId = context.Data.EventTypeId
-                        });
+                        ctx.Instance.CreatedAt = DateTime.UtcNow;
+                        ctx.Instance.CorrelationId = ctx.Data.CorrelationId;
+                        ctx.Instance.UnitId = ctx.Data.UnitId;
+                        ctx.Instance.EventTypeId = ctx.Data.EventTypeId;
+                        ctx.Instance.ModuleName = "WorkOrder";
                     })
+                    .Activity(x => x.OfType<ResolveAndPublishNotificationActivity>()) // ✅ Custom activity
                     .TransitionTo(Notifying)
             );
 
             During(Notifying,
                 When(EmailCompleted)
                     .Then(ctx => ctx.Instance.EmailSent = true)
-                    .IfElse(
-                        context => AllChannelsHandled(context.Instance),
-                        binder => binder.TransitionTo(Completed),
-                        binder => binder
-                    ),
+                    .IfElse(ctx => AllChannelsHandled(ctx.Instance), binder => binder.TransitionTo(Completed), binder => binder),
 
                 When(SmsCompleted)
                     .Then(ctx => ctx.Instance.SmsSent = true)
-                    .IfElse(
-                        context => AllChannelsHandled(context.Instance),
-                        binder => binder.TransitionTo(Completed),
-                        binder => binder
-                    ),
+                    .IfElse(ctx => AllChannelsHandled(ctx.Instance), binder => binder.TransitionTo(Completed), binder => binder),
 
                 When(InAppCompleted)
                     .Then(ctx => ctx.Instance.InAppSent = true)
-                    .IfElse(
-                        context => AllChannelsHandled(context.Instance),
-                        binder => binder.TransitionTo(Completed),
-                        binder => binder
-                    ),
+                    .IfElse(ctx => AllChannelsHandled(ctx.Instance), binder => binder.TransitionTo(Completed), binder => binder),
 
                 When(EmailFailed)
                     .Then(ctx =>
@@ -123,6 +94,15 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
                     .ThenAsync(TriggerRollback)
                     .TransitionTo(Rollback)
             );
+
+            During(Rollback,
+                Ignore(EmailCompleted),
+                Ignore(SmsCompleted),
+                Ignore(InAppCompleted),
+                Ignore(EmailFailed),
+                Ignore(SmsFailed),
+                Ignore(InAppFailed)
+            );
         }
 
         private bool AllChannelsHandled(NotificationWorkOrder instance)
@@ -132,14 +112,13 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
                 && (instance.InAppSent || instance.InAppFailed);
         }
 
-        private Task TriggerRollback(BehaviorContext<NotificationWorkOrder> context)
+        private Task TriggerRollback(BehaviorContext<NotificationWorkOrder> ctx)
         {
-            var instance = context.Instance;
-
-            return context.Publish(new NotificationSagaRollbackTriggered
+            var publishEndpoint = ctx.GetPayload<IPublishEndpoint>();
+            return publishEndpoint.Publish(new NotificationSagaRollbackTriggered
             {
-                CorrelationId = instance.CorrelationId,
-                Reason = instance.FailureReason
+                CorrelationId = ctx.Instance.CorrelationId,
+                Reason = ctx.Instance.FailureReason
             });
         }
     }

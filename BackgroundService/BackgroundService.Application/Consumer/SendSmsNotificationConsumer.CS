@@ -1,62 +1,65 @@
-using MassTransit;
-using Hangfire;
-using Microsoft.Extensions.Logging;
 using BackgroundService.Application.Interfaces.Notification;
 using BackgroundService.Application.Notification;
 using Contracts.Events.Notifications.WorkOrder.Sms;
-using Contracts.Events.Notifications.Internal;
-using Contracts.Events.Notifications.WorkOrder;
+using Hangfire;
+using MassTransit;
+using Microsoft.Extensions.Logging;
 
 namespace BackgroundService.Application.Consumers
 {
-    public class SendSmsNotificationConsumer : IConsumer<SendNotificationInternalCommand>
+    public class SendSmsNotificationConsumer : IConsumer<SendSmsNotificationInternalCommand>
     {
         private readonly ISmsSender _smsSender;
         private readonly ILogger<SendSmsNotificationConsumer> _logger;
-        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IBackgroundJobClient _jobClient;
         private readonly NotificationResolverHandler _resolverHandler;
 
         public SendSmsNotificationConsumer(
             ISmsSender smsSender,
             ILogger<SendSmsNotificationConsumer> logger,
-            IBackgroundJobClient backgroundJobClient,
+            IBackgroundJobClient jobClient,
             NotificationResolverHandler resolverHandler)
         {
             _smsSender = smsSender;
             _logger = logger;
-            _backgroundJobClient = backgroundJobClient;
+            _jobClient = jobClient;
             _resolverHandler = resolverHandler;
         }
 
-        public async Task Consume(ConsumeContext<SendNotificationInternalCommand> context)
+        public async Task Consume(ConsumeContext<SendSmsNotificationInternalCommand> context)
         {
+            
             var msg = context.Message;
+            Console.WriteLine($"✅ SMS Consumer Received: ",msg); 
             try
             {
-                _logger.LogInformation("📨 Processing SendSMSNotificationCommand for CorrelationId: {CorrelationId}", msg.CorrelationId);
+                var (_, _, _, smsNumbers, _, subject, body, footer, langCode) =
+                    await _resolverHandler.ResolveNotificationTemplatesAsync(
+                        msg.UnitId, msg.ModuleName, msg.EventTypeId);
 
-                var (_, _, _,mobileNumbers,  _, _, body, _, _) =
-                         await _resolverHandler.ResolveEmailChannelAsync(msg.UnitId, msg.ModuleName, msg.EventTypeId); 
-
-                if (mobileNumbers  == null || !mobileNumbers .Any())
-                    {
-                        _logger.LogWarning("❌ No email recipients found for CorrelationId: {CorrelationId}", msg.CorrelationId);
-
-                        await context.Publish(new SendSmsNotificationFailed
-                        {
-                            CorrelationId = msg.CorrelationId,
-                            Reason = "No sms recipients resolved"
-                        });
-                        return;
-                    }
-                var success = await _smsSender.SendSmsAsync(mobileNumbers, body);
-
-                if (success)
+                if (smsNumbers == null || !smsNumbers.Any())
                 {
-                    _logger.LogInformation("✅ SMS sent successfully for CorrelationId: {CorrelationId}", msg.CorrelationId);
+                    await context.Publish(new SendSmsNotificationFailed
+                    {
+                        CorrelationId = msg.CorrelationId,
+                        Reason = "No mobile numbers found"
+                    });
+                    return;
+                }
+
+                var messageText = $"Dear {subject}, We received a request to reset your password. Use the verification code below to proceed:Code:{body}, This code is valid for {footer} minutes.";     
+                
+                var sent = await _smsSender.SendSmsAsync(new()
+                {
+                    mobileNumbers = smsNumbers,
+                    message = messageText
+                });
+
+                if (sent)
+                {
                     await context.Publish(new SendSmsNotificationCompleted
                     {
-                        CorrelationId = context.Message.CorrelationId
+                        CorrelationId = msg.CorrelationId
                     });
                 }
                 else
@@ -66,16 +69,16 @@ namespace BackgroundService.Application.Consumers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "SMS sending failed for CorrelationId: {CorrelationId}", context.Message.CorrelationId);
+                _logger.LogError(ex, "❌ SMS Notification Failed for CorrelationId: {CorrelationId}", msg.CorrelationId);
 
-                // Schedule retry via Hangfire
-                     _backgroundJobClient.Schedule<INotificationHandler<SendNotificationInternalCommand>>(handler =>
-                    handler.ExecuteAsync(context.Message, context.Message.CorrelationId),
-                    TimeSpan.FromMinutes(5)); 
+                _jobClient.Schedule<INotificationHandler<SendSmsNotificationInternalCommand>>(
+                    handler => handler.ExecuteAsync(context.Message, msg.CorrelationId),
+                    TimeSpan.FromMinutes(5)
+                );
 
                 await context.Publish(new SendSmsNotificationFailed
                 {
-                    CorrelationId = context.Message.CorrelationId,
+                    CorrelationId = msg.CorrelationId,
                     Reason = ex.Message
                 });
             }

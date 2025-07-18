@@ -33,6 +33,9 @@ using BackgroundService.Application.Consumers;
 using BackgroundService.Application.Interfaces.Notification;
 using BackgroundService.Infrastructure.Services.Notification;
 using BackgroundService.Application.Notification;
+using Contracts.Events.Notifications.WorkOrder.Sms;
+using Contracts.Events.Notifications.WorkOrder.Email;
+using Contracts.Events.Notifications.WorkOrder.InApp;
 
 namespace BackgroundService.Infrastructure
 {
@@ -96,9 +99,12 @@ namespace BackgroundService.Infrastructure
             //Notification
             services.AddMassTransit(x =>
             {
+                x.SetKebabCaseEndpointNameFormatter();
+                x.AddConsumer<ResolveNotificationChannelsConsumer>();
                 x.AddConsumer<SendEmailNotificationConsumer>();
                 x.AddConsumer<SendSmsNotificationConsumer>();
                 x.AddConsumer<SendInAppNotificationConsumer>();
+                
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -107,22 +113,62 @@ namespace BackgroundService.Infrastructure
                         h.Username("guest");
                         h.Password("guest");
                     });
+                
 
-                    cfg.ReceiveEndpoint("email-notification-queue", e =>
+                    cfg.ReceiveEndpoint("resolve-notification-channels-queue", e =>
+                    {
+                        e.ConfigureConsumer<ResolveNotificationChannelsConsumer>(context);
+                         
+                    });
+                /*     cfg.ReceiveEndpoint("email-notification-queue", e =>
                     {
                         e.ConfigureConsumer<SendEmailNotificationConsumer>(context);
-                    });
-
+                         e.Bind<SendEmailNotificationInternalCommand>();
+                    }); 
                     cfg.ReceiveEndpoint("sms-notification-queue", e =>
                     {
                         e.ConfigureConsumer<SendSmsNotificationConsumer>(context);
+                        e.Bind<SendSmsNotificationInternalCommand>(); 
                     });
 
                     cfg.ReceiveEndpoint("inapp-notification-queue", e =>
                     {
                         e.ConfigureConsumer<SendInAppNotificationConsumer>(context);
+                        e.Bind<SendInAppNotificationInternalCommand>();
                     });
+                    */
+                    cfg.ReceiveEndpoint("email-notification-queue", e =>
+                    {
+                        // Bind exchange explicitly (if you're using fanout or custom name)
+                        e.Bind("Contracts.Events.Notifications.WorkOrder.Email:SendEmailNotificationInternalCommand", s =>
+                        {
+                            s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
+                        });
+
+                        e.ConfigureConsumer<SendEmailNotificationConsumer>(context);
+                    });
+                    cfg.ReceiveEndpoint("sms-notification-queue", e =>
+                    {
+                        // Bind exchange explicitly (if you're using fanout or custom name)
+                        e.Bind("Contracts.Events.Notifications.WorkOrder.Sms:SendSmsNotificationInternalCommand", s =>
+                        {
+                            s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
+                        });
+
+                        e.ConfigureConsumer<SendSmsNotificationConsumer>(context);
+                    });  cfg.ReceiveEndpoint("inapp-notification-queue", e =>
+                    {
+                        // Bind exchange explicitly (if you're using fanout or custom name)
+                        e.Bind("Contracts.Events.Notifications.WorkOrder.InApp:SendInAppNotificationInternalCommand", s =>
+                        {
+                            s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
+                        });
+
+                        e.ConfigureConsumer<SendInAppNotificationConsumer>(context);
+                    });
+
                     
+                     cfg.ConfigureEndpoints(context);
                 });
             });
 

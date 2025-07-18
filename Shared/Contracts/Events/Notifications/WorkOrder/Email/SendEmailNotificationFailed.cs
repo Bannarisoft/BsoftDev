@@ -1,6 +1,6 @@
 using System;
 using MassTransit;
-namespace Contracts.Events.Notifications.Internal.Email
+namespace Contracts.Events.Notifications.WorkOrder.Email
 {
     public class SendEmailNotificationFailed : CorrelatedBy<Guid>
     {

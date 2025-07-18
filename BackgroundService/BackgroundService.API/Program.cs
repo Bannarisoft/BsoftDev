@@ -9,6 +9,7 @@ using BackgroundService.API.Validation.Common;
 using MediatR;
 using BackgroundService.Application.Notification.Common.Behaviors;
 using BackgroundService.Application.Hubs;
+using BackgroundService.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
@@ -51,14 +52,16 @@ app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
 app.UseMiddleware<BackgroundService.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseRouting();
 app.UseCors("AllowAll");
-
+app.UseAuthentication();
+app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
-app.MapHub<NotificationHub>("/notificationHub");
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapGrpcService<MaintenanceJobGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<MaintenanceHangfireRemoveGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/notificationHub");    
 });
 
 // app.MapControllers();
