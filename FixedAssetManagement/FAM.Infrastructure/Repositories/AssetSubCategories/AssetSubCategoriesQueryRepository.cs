@@ -16,30 +16,31 @@ namespace FAM.Infrastructure.Repositories.AssetSubCategories
         {
             _dbConnection = dbConnection;
         }
-        public async Task<(List<Core.Domain.Entities.AssetSubCategories>, int)> GetAllAssetSubCategoriesAsync(int PageNumber, int PageSize, string? SearchTerm)
+        public async Task<(List<AssetSubCategoriesDto>, int)> GetAllAssetSubCategoriesAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
               var query = $$"""
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
-               FROM FixedAsset.AssetSubCategories
-              WHERE IsDeleted = 0
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SubCategoryName LIKE @Search OR Code LIKE @Search)")}};
+               FROM FixedAsset.AssetSubCategories a INNER JOIN FixedAsset.AssetCategories b on a.AssetCategoriesId = b.Id
+              WHERE a.IsDeleted = 0
+            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (a.SubCategoryName LIKE @Search OR b.CategoryName LIKE @Search)")}};
 
                 SELECT 
-                Id, 
-                Code,
-                SubCategoryName,
-                Description,
-                AssetCategoriesId,
-                SortOrder,
-                IsActive,
-                CreatedDate,
-                CreatedByName
-            FROM FixedAsset.AssetSubCategories 
+                a.Id, 
+                a.Code,
+                a.SubCategoryName,
+                a.Description,
+                a.AssetCategoriesId,
+                b.CategoryName as AssetCategoriesName,
+                a.SortOrder,
+                a.IsActive,
+                a.CreatedDate,
+                a.CreatedByName
+            FROM FixedAsset.AssetSubCategories  a INNER JOIN FixedAsset.AssetCategories b on a.AssetCategoriesId = b.Id
             WHERE 
-            IsDeleted = 0
-                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SubCategoryName LIKE @Search OR Code LIKE @Search )")}}
-                ORDER BY Id desc
+            a.IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (SubCategoryName LIKE @Search b.CategoryName LIKE @Search )")}}
+                ORDER BY a.Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
                 SELECT @TotalCount AS TotalCount;
@@ -54,7 +55,7 @@ namespace FAM.Infrastructure.Repositories.AssetSubCategories
                        };
 
              var assetsubCategories = await _dbConnection.QueryMultipleAsync(query, parameters);
-             var assetsubcategoreplist = (await assetsubCategories.ReadAsync<Core.Domain.Entities.AssetSubCategories>()).ToList();
+             var assetsubcategoreplist = (await assetsubCategories.ReadAsync<AssetSubCategoriesDto>()).ToList();
              int totalCount = (await assetsubCategories.ReadFirstAsync<int>());
              return (assetsubcategoreplist, totalCount);
         }
@@ -66,7 +67,7 @@ namespace FAM.Infrastructure.Repositories.AssetSubCategories
             const string query = @"
              SELECT Id, SubCategoryName 
             FROM FixedAsset.AssetSubCategories 
-            WHERE IsDeleted = 0 
+            WHERE IsDeleted = 0 and IsActive = 1
             AND SubCategoryName LIKE @SearchPattern";  
             var parameters = new 
             { 
@@ -77,13 +78,13 @@ namespace FAM.Infrastructure.Repositories.AssetSubCategories
             return assetSubCategories.ToList();
         }
 
-        public async Task<Core.Domain.Entities.AssetSubCategories?> GetByIdAsync(int Id)
+        public async Task<AssetSubCategoriesDto?> GetByIdAsync(int Id)
         {
              const string query = @"
-                    SELECT * 
-                    FROM FixedAsset.AssetSubCategories 
-                    WHERE Id = @Id AND IsDeleted = 0";
-                    var assetSubCategories = await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.AssetSubCategories>(query, new { Id });
+                    SELECT a.*,b.CategoryName as AssetCategoriesName 
+                    FROM FixedAsset.AssetSubCategories a INNER JOIN FixedAsset.AssetCategories b on a.AssetCategoriesId = b.Id  
+                    WHERE a.Id = @Id AND a.IsDeleted = 0";
+                    var assetSubCategories = await _dbConnection.QueryFirstOrDefaultAsync<AssetSubCategoriesDto>(query, new { Id });
                     return assetSubCategories;
         }
 
@@ -96,7 +97,7 @@ namespace FAM.Infrastructure.Repositories.AssetSubCategories
                     from 
                     FixedAsset.AssetCategories a INNER JOIN FixedAsset.AssetSubCategories b 
                     on a.Id=b.AssetCategoriesId 
-                    and b.IsDeleted=0 
+                    and b.IsDeleted=0 and b.IsActive=1
                     and a.IsDeleted=0 
                     and a.Id=@AssetCategoriesId ";
 
