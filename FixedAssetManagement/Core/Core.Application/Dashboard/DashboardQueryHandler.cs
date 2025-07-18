@@ -18,11 +18,12 @@ namespace Core.Application.Dashboard
         public async Task<ChartDto> Handle(DashboardQuery request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(request.Type))
-                throw new ArgumentException("Type is required. Valid values: 'assetexpirySummary'");
+                throw new ArgumentException("Type is required. Valid values: 'assetexpirySummary', 'assetSummary'");
 
             return request.Type switch
             {
                 "assetexpirySummary" => await _repository.GetAssetExpiredDashBoardDataAsync(),
+                "assetSummary" => await _repository.GetAssetChartViewAsync(),
                 _ => throw new ArgumentException("Invalid type.")
             };
         }
