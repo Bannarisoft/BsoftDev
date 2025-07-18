@@ -45,5 +45,8 @@
      <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
      
   </ItemGroup>
-  
+   <ItemGroup>
+  <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" GrpcServices="Client" />
+
+</ItemGroup> 
 </Project>

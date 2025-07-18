@@ -42,7 +42,7 @@ namespace BackgroundService.Infrastructure
     public static class DependencyInjection
     {
         private static readonly string[] HangfireQueues = ["schedule_work_order_queue","forgot_password_queue","user_unlock_queue"];
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
         {
             var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
@@ -234,7 +234,8 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationGroupCommand, NotificationGroupCommandRepository >();
             services.AddScoped<INotificationGroupQuery, NotificationGroupQueryRepository >();
             services.AddScoped<IIPAddressService, IPAddressService>();
-            services.AddScoped<ITimeZoneService, TimeZoneService>();
+            services.AddSingleton<ITimeZoneService, TimeZoneService>();
+            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();   
             services.AddScoped<INotificationLevelHierarchyCommandRepository, NotificationLevelHierarchyCommandRepository>();  
             services.AddScoped<INotificationLevelHierarchyQueryRepository, NotificationLevelHierarchyQueryRepository>();  
             services.AddScoped<INotificationTemplateCommandRepository, NotificationTemplateCommandRepository>();  

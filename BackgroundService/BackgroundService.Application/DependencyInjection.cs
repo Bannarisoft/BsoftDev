@@ -20,7 +20,7 @@ namespace BackgroundService.Application
             //     cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             //     cfg.RegisterServicesFromAssembly(typeof(SendEmailCommandHandler).Assembly);
             // });
-            
+            services.AddSignalR();
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));            
             return services;
         }
