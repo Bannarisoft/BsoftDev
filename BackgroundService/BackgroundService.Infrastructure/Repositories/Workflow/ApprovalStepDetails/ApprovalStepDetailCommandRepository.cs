@@ -1,0 +1,63 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalStepDetail;
+using BackgroundService.Domain.Entities.Workflow;
+using BackgroundService.Infrastructure.Data.Notification;
+using Microsoft.EntityFrameworkCore;
+
+namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDetails
+{
+    public class ApprovalStepDetailCommandRepository : IApprovalStepDetailCommand
+    {
+        private readonly NotificationDbContext _notificationDbContext;
+        public ApprovalStepDetailCommandRepository(NotificationDbContext notificationDbContext)
+        {
+            _notificationDbContext = notificationDbContext;
+        }
+        public async Task<int> CreateAsync(ApprovalStepDetail approvalStepDetail)
+        {
+             _notificationDbContext.Entry(approvalStepDetail);
+            await _notificationDbContext.ApprovalStepDetail.AddAsync(approvalStepDetail);
+            await _notificationDbContext.SaveChangesAsync();
+
+            return approvalStepDetail.Id;
+        }
+
+        public async Task<bool> DeleteAsync(int id, ApprovalStepDetail approvalStepDetail)
+        {
+             var ApprovalStepDelete = await _notificationDbContext.ApprovalStepDetail.FirstOrDefaultAsync(u => u.Id == id);
+            if (ApprovalStepDelete != null)
+            {
+                ApprovalStepDelete.IsDeleted = approvalStepDetail.IsDeleted;
+                return await _notificationDbContext.SaveChangesAsync() >0;
+            }
+            return false; 
+        }
+
+        public async Task<bool> UpdateAsync(ApprovalStepDetail approvalStepDetail)
+        {
+             var existingApprovalStep = await _notificationDbContext.ApprovalStepDetail
+            .AsNoTracking().FirstOrDefaultAsync(u => u.Id == approvalStepDetail.Id);
+            
+            if (existingApprovalStep != null)
+            {
+                existingApprovalStep.WorkFlowTypeId = approvalStepDetail.WorkFlowTypeId;
+                existingApprovalStep.StepOrder = approvalStepDetail.StepOrder;
+                existingApprovalStep.TargetTypeId = approvalStepDetail.TargetTypeId;
+                existingApprovalStep.ApprovalStepId = approvalStepDetail.ApprovalStepId;
+                existingApprovalStep.ApprovalTypeId = approvalStepDetail.ApprovalTypeId;
+                existingApprovalStep.SLAHours = approvalStepDetail.SLAHours;
+                existingApprovalStep.ApprovalTypeId = approvalStepDetail.ApprovalTypeId;
+                existingApprovalStep.OnSLAAction = approvalStepDetail.OnSLAAction;
+                existingApprovalStep.IsActive = approvalStepDetail.IsActive;
+                _notificationDbContext.ApprovalStepDetail.Update(existingApprovalStep);
+
+                return await _notificationDbContext.SaveChangesAsync() >0;
+            }
+            
+            return false;
+        }
+    }
+}
