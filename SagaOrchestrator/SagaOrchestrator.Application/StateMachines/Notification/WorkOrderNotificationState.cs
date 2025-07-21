@@ -48,7 +48,7 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
                         ctx.Instance.CorrelationId = ctx.Data.CorrelationId;
                         ctx.Instance.UnitId = ctx.Data.UnitId;
                         ctx.Instance.EventTypeId = ctx.Data.EventTypeId;
-                        ctx.Instance.ModuleName = "WorkOrder";
+                        ctx.Instance.ModuleName = ctx.Data.ModuleName;
                     })
                     .Activity(x => x.OfType<ResolveAndPublishNotificationActivity>()) // ✅ Custom activity
                     .TransitionTo(Notifying)

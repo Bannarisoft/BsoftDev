@@ -2,20 +2,25 @@ using Microsoft.Extensions.Logging;
 using BackgroundService.Infrastructure.Configurations;
 using BackgroundService.Application.Interfaces.Notification;
 using Contracts.Events.Notifications.WorkOrder.Sms;
+using BackgroundService.Domain.Entities.Notification;
+using BackgroundService.Infrastructure.Repositories.Common;
+using BackgroundService.Application.Notification.Common.Interfaces;
+using Contracts.Events.Notifications;
 
 namespace BackgroundService.Infrastructure.Services.Notification
 {
-    public class SmsSender : ISmsSender
+    public class SmsSender : BaseQueryRepository,ISmsSender
     {
         private readonly SmsSettings _smsSettings;
         private readonly HttpClient _httpClient;
-        private readonly ILogger<SmsSender> _logger;
+        private readonly ILogger<SmsSender> _logger;        
 
-        public SmsSender(SmsSettings smsSettings, IHttpClientFactory httpClientFactory, ILogger<SmsSender> logger)
+        public SmsSender(SmsSettings smsSettings, IHttpClientFactory httpClientFactory, ILogger<SmsSender> logger, IIPAddressService ipAddressService)
+        : base(ipAddressService)
         {
             _smsSettings = smsSettings;
             _httpClient = httpClientFactory.CreateClient();
-            _logger = logger;
+            _logger = logger;         
         }
 
         public async Task<bool> SendSmsAsync(SendSmsNotificationCommand command)
@@ -36,7 +41,6 @@ namespace BackgroundService.Infrastructure.Services.Notification
                     {
                         _logger.LogWarning("❌ SMS send failed for number: {Number}", number);
                     }
-
                     await Task.Delay(50); // optional delay
                 }
 
@@ -68,7 +72,7 @@ namespace BackgroundService.Infrastructure.Services.Notification
                 }
                  Console.WriteLine("from smssender");
                  Console.WriteLine($"🔥 Channels from SQL: PhoneNumber = {phoneNumber}, msg = {message},response= {response},url={url} ");
-
+              
                 return true;
             }
             catch (Exception ex)

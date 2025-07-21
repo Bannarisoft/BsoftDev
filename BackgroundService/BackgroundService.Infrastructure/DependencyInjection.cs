@@ -120,26 +120,9 @@ namespace BackgroundService.Infrastructure
                         e.ConfigureConsumer<ResolveNotificationChannelsConsumer>(context);
                          
                     });
-                /*     cfg.ReceiveEndpoint("email-notification-queue", e =>
-                    {
-                        e.ConfigureConsumer<SendEmailNotificationConsumer>(context);
-                         e.Bind<SendEmailNotificationInternalCommand>();
-                    }); 
-                    cfg.ReceiveEndpoint("sms-notification-queue", e =>
-                    {
-                        e.ConfigureConsumer<SendSmsNotificationConsumer>(context);
-                        e.Bind<SendSmsNotificationInternalCommand>(); 
-                    });
-
-                    cfg.ReceiveEndpoint("inapp-notification-queue", e =>
-                    {
-                        e.ConfigureConsumer<SendInAppNotificationConsumer>(context);
-                        e.Bind<SendInAppNotificationInternalCommand>();
-                    });
-                    */
+             
                     cfg.ReceiveEndpoint("email-notification-queue", e =>
-                    {
-                        // Bind exchange explicitly (if you're using fanout or custom name)
+                    {                        
                         e.Bind("Contracts.Events.Notifications.WorkOrder.Email:SendEmailNotificationInternalCommand", s =>
                         {
                             s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
@@ -149,7 +132,6 @@ namespace BackgroundService.Infrastructure
                     });
                     cfg.ReceiveEndpoint("sms-notification-queue", e =>
                     {
-                        // Bind exchange explicitly (if you're using fanout or custom name)
                         e.Bind("Contracts.Events.Notifications.WorkOrder.Sms:SendSmsNotificationInternalCommand", s =>
                         {
                             s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
@@ -158,7 +140,6 @@ namespace BackgroundService.Infrastructure
                         e.ConfigureConsumer<SendSmsNotificationConsumer>(context);
                     });  cfg.ReceiveEndpoint("inapp-notification-queue", e =>
                     {
-                        // Bind exchange explicitly (if you're using fanout or custom name)
                         e.Bind("Contracts.Events.Notifications.WorkOrder.InApp:SendInAppNotificationInternalCommand", s =>
                         {
                             s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
@@ -166,9 +147,7 @@ namespace BackgroundService.Infrastructure
 
                         e.ConfigureConsumer<SendInAppNotificationConsumer>(context);
                     });
-
-                    
-                     cfg.ConfigureEndpoints(context);
+                     
                 });
             });
 
@@ -187,14 +166,7 @@ namespace BackgroundService.Infrastructure
             services.AddHttpClient("UserManagementClient", client =>
            {
                //client.BaseAddress = new Uri("http://localhost:5174"); 
-               client.BaseAddress = new Uri(configuration["HttpClientSettings:UserManagementService"]);
-               // var userServiceUrl = configuration["HttpClientSettings:UserManagement"];
-               // if (string.IsNullOrWhiteSpace(userServiceUrl))
-               // {
-               //     throw new ArgumentNullException("UserServiceUrl is missing in configuration.");
-               // }
-
-               //client.BaseAddress = new Uri(userServiceUrl);
+               client.BaseAddress = new Uri(configuration["HttpClientSettings:UserManagementService"]);          
            })
 
               .AddTransientHttpErrorPolicy(policyBuilder =>
@@ -250,6 +222,7 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationGroupMemberQuery, NotificationGroupMemberQueryRepository >();
             services.AddScoped<INotificationEventRuleCommand, NotificationEventRuleCommandRepository >();
             services.AddScoped<INotificationEventRuleQuery, NotificationEventRuleQueryRepository >();
+            services.AddScoped<INotificationLogger, NotificationLogger>();
             return services;
         }
     }

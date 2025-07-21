@@ -37,7 +37,11 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
                     CorrelationId = message.CorrelationId,
                     UnitId = message.UnitId,
                     EventTypeId = message.EventTypeId,
-                    ModuleName = "WorkOrder"
+                    ModuleName = message.ModuleName,
+                    Code = message.Code,
+                    Name = message.Name,
+                    Date = message.Date                    
+
                 });
 
             var channels = response.Message.Channels;
@@ -49,7 +53,10 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
                     CorrelationId = message.CorrelationId,
                     UnitId = message.UnitId,
                     EventTypeId = message.EventTypeId,
-                    ModuleName = "WorkOrder"
+                    ModuleName = message.ModuleName,
+                    Code = message.Code,
+                    Name = message.Name,
+                    Date = message.Date                    
                 });
             }
 
@@ -60,7 +67,10 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
                     CorrelationId = message.CorrelationId,
                     UnitId = message.UnitId,
                     EventTypeId = message.EventTypeId,
-                    ModuleName = "WorkOrder"
+                    ModuleName =message.ModuleName,
+                    Code = message.Code,
+                    Name = message.Name,
+                    Date = message.Date
                 });
             }
 
@@ -71,7 +81,10 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
                     CorrelationId = message.CorrelationId,
                     UnitId = message.UnitId,
                     EventTypeId = message.EventTypeId,
-                    ModuleName = "WorkOrder"
+                    ModuleName = message.ModuleName,
+                     Code = message.Code,
+                    Name = message.Name,
+                    Date = message.Date
                 });
             }
 

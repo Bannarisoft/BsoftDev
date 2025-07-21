@@ -12,7 +12,7 @@ namespace BackgroundService.Application.Notification
             _resolver = resolver;
         }
 
-         public async Task<(List<string> ToEmails, List<string> CcEmails, List<string> BccEmails, List<string> SmsNumbers, List<int> InAppUserIds, string Subject, string Body, string Footer, string LangCode)>
+         public async Task<(List<string> ToEmails, List<string> CcEmails, List<string> BccEmails, List<string> SmsNumbers, List<int> InAppUserIds, string Subject, string Body, string Footer, string LangCode,int? EventTypeId,int? EventRuleId, int? ChannelId)>
             ResolveNotificationTemplatesAsync(int unitId, string module, int eventTypeId)
         {
             var targets = await _resolver.GetNotificationTargetsAsync(unitId, module, eventTypeId);
@@ -44,7 +44,7 @@ namespace BackgroundService.Application.Notification
             var footer = emailTargets.FirstOrDefault()?.FooterTemplate ?? string.Empty;
             var langCode = targets.FirstOrDefault()?.LanguageCode ?? "en";
 
-            return (toEmails, ccEmails, bccEmails, smsNumbers, inAppUserIds, subject, body, footer, langCode);
+            return (toEmails, ccEmails, bccEmails, smsNumbers, inAppUserIds, subject, body, footer, langCode,eventTypeId,targets.FirstOrDefault()?.EventRuleId,targets.FirstOrDefault()?.ChannelId);    
         }
 
         // Used by ResolveNotificationChannelsConsumer to decide which channels to publish

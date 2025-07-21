@@ -9,6 +9,13 @@ namespace Contracts.Events.Notifications.WorkOrder
         public int UnitId { get; set; }
         public string ModuleName { get; set; } = string.Empty;
         public int EventTypeId { get; set; }
-        //public string Channel { get; set; } = string.Empty; 
+        public string CreatedByName { get; set; }
+        public int EventRuleId { get; set; }
+        public int ChannelId { get; set; }
+
+        
+        public string Code { get; set; }   
+        public string Name { get; set; }   
+        public DateTimeOffset Date { get; set; }  
     }
 }

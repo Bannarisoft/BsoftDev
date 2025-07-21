@@ -26,6 +26,8 @@ namespace BackgroundService.Application.Consumers
             Console.WriteLine("🔥 Channels from SQL:",channels);
             foreach (var c in channels)
                 Console.WriteLine($" - {c}");
+            //Console.WriteLine("🛑 Resolving channels for: {0}", context.Message.CorrelationId);
+            Console.WriteLine($"🛑 Resolving channels for: {context.Message.CorrelationId}");
 
             // Publish internal notification commands
             if (channels.Contains("Email", StringComparer.OrdinalIgnoreCase))
@@ -35,7 +37,13 @@ namespace BackgroundService.Application.Consumers
                     CorrelationId = context.Message.CorrelationId,
                     UnitId = context.Message.UnitId,
                     EventTypeId = context.Message.EventTypeId,
-                    ModuleName = context.Message.ModuleName
+                    ModuleName = context.Message.ModuleName,
+                    CreatedByName = context.Message.CreatedByName,
+                    ChannelId = context.Message.ChannelId,
+                    EventRuleId = context.Message.EventRuleId,
+                    Code = context.Message.Code,
+                    Name = context.Message.Name,
+                    Date = context.Message.Date
                 });
             }
 
@@ -46,7 +54,13 @@ namespace BackgroundService.Application.Consumers
                     CorrelationId = context.Message.CorrelationId,
                     UnitId = context.Message.UnitId,
                     EventTypeId = context.Message.EventTypeId,
-                    ModuleName = context.Message.ModuleName
+                    ModuleName = context.Message.ModuleName,
+                    CreatedByName = context.Message.CreatedByName,                    
+                    ChannelId= context.Message.ChannelId,
+                    EventRuleId= context.Message.EventRuleId,
+                    Code = context.Message.Code,
+                    Name = context.Message.Name,
+                    Date = context.Message.Date
                 });
             }
 
@@ -57,9 +71,16 @@ namespace BackgroundService.Application.Consumers
                     CorrelationId = context.Message.CorrelationId,
                     UnitId = context.Message.UnitId,
                     EventTypeId = context.Message.EventTypeId,
-                    ModuleName = context.Message.ModuleName
+                    ModuleName = context.Message.ModuleName,
+                    CreatedByName = context.Message.CreatedByName,                    
+                    ChannelId= context.Message.ChannelId,
+                    EventRuleId= context.Message.EventRuleId,
+                    Code = context.Message.Code,
+                    Name = context.Message.Name,
+                    Date = context.Message.Date
                 });
             }
+            
             // ✅ Respond back to the saga
             await context.RespondAsync(new ResolveNotificationChannelsResponse
             {

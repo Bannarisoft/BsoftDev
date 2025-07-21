@@ -1,6 +1,9 @@
 using BackgroundService.Application.Interfaces;
 using BackgroundService.Application.Interfaces.Notification;
+using BackgroundService.Application.Notification.Common.Interfaces;
+using BackgroundService.Domain.Entities.Notification;
 using BackgroundService.Infrastructure.Configurations;
+using Contracts.Events.Notifications;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net;
@@ -13,18 +16,17 @@ namespace BackgroundService.Infrastructure.Services.Notification
     {
         private readonly EmailSettings _emailSettings;
         private readonly ILogger<EmailSender> _logger;
-
         public EmailSender(EmailSettings emailSettings, ILogger<EmailSender> logger)
         {
             _emailSettings = emailSettings;
             _logger = logger;
         }
-
-        public async Task<bool> SendEmailAsync(List<string> toEmails, string subject, string body, string footer, List<string>? ccEmails, List<string>? bccEmails)
+        
+        public async Task<bool> SendEmailAsync(List<string> emails, string subject, string message, string footer, List<string>? CcEmails = null, List<string>? BccEmails = null, int channelId = 0, int eventTypeId = 0, int eventRuleId = 0)
         {
             try
             {
-                if (toEmails == null || !toEmails.Any())
+                if (emails == null || !emails.Any())
                 {
                     _logger.LogWarning("❌ No recipients provided. Email sending aborted.");
                     return false;
@@ -42,11 +44,11 @@ namespace BackgroundService.Infrastructure.Services.Notification
                 {
                     From = new MailAddress(provider.UserName),
                     Subject = subject,
-                    Body = $"{body}<br/><br/>{footer}",
+                    Body = $"{message}<br/><br/>{footer}",
                     IsBodyHtml = true
                 };
 
-                foreach (var toEmail in toEmails.Where(e => !string.IsNullOrWhiteSpace(e)))
+                foreach (var toEmail in emails.Where(e => !string.IsNullOrWhiteSpace(e)))
                 {
                     mailMessage.To.Add(toEmail.Trim());
                 }
@@ -57,32 +59,27 @@ namespace BackgroundService.Infrastructure.Services.Notification
                     return false;
                 }
 
-                if (ccEmails != null)
+                if (CcEmails != null)
                 {
-                    foreach (var cc in ccEmails.Where(e => !string.IsNullOrWhiteSpace(e)))
-                    {
+                    foreach (var cc in CcEmails.Where(e => !string.IsNullOrWhiteSpace(e)))
                         mailMessage.CC.Add(cc.Trim());
-                    }
                 }
 
-                if (bccEmails != null)
+                if (BccEmails != null)
                 {
-                    foreach (var bcc in bccEmails.Where(e => !string.IsNullOrWhiteSpace(e)))
-                    {
+                    foreach (var bcc in BccEmails.Where(e => !string.IsNullOrWhiteSpace(e)))
                         mailMessage.Bcc.Add(bcc.Trim());
-                    }
                 }
 
                 _logger.LogInformation("📤 Sending email to: {Recipients}", string.Join(",", mailMessage.To.Select(t => t.Address)));
-
                 await smtpClient.SendMailAsync(mailMessage);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Failed to send email to: {Recipients}", string.Join(",", toEmails ?? new List<string>()));
+                _logger.LogError(ex, "❌ Failed to send email to: {Recipients}", string.Join(",", emails ?? new List<string>()));
                 return false;
             }
-        }
+        }        
     }
 }
