@@ -9,7 +9,7 @@ namespace Core.Application.AssetSubCategories.Command.CreateAssetSubCategories
 {
     public class CreateAssetSubCategoriesCommand :IRequest<ApiResponseDTO<int>> 
     {
-        public string? Code { get; set; }
+        //public string? Code { get; set; }
         public string? SubCategoryName { get; set; }
         public string? Description { get; set; }
         public int AssetCategoriesId { get; set; }

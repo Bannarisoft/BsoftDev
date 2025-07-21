@@ -1,49 +1,72 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IDashboard;
+using Core.Application.Dashboard;
+using Core.Application.Dashboard.CardView;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace FAM.API.Controllers.Dashboard
-{
+{ 
+    [ApiController]    
     [Route("[controller]")]
-    public class DashboardController : Controller
+    public class DashboardController : ControllerBase
     {
-        private readonly IDashboardQueryRepository _dashboardQueryRepository ;
-          private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IDashboardQueryRepository _dashboardQueryRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMediator _mediator;
 
 
-        public DashboardController(IDashboardQueryRepository dashboardQueryRepository, IHttpContextAccessor httpContextAccessor)
+        public DashboardController(IDashboardQueryRepository dashboardQueryRepository, IHttpContextAccessor httpContextAccessor, IMediator mediator)
         {
             _dashboardQueryRepository = dashboardQueryRepository;
             _httpContextAccessor = httpContextAccessor;
+            _mediator = mediator;
         }
 
-       [HttpGet("dashboard-summary")]
-        public async Task<IActionResult> GetDashboardData()
+        // [HttpGet("dashboard-summary")]
+        // public async Task<IActionResult> GetDashboardData()
+        // {
+        //     try
+        //     {
+        //         var result = await _dashboardQueryRepository.GetDashboardDataAsync(); // No unitId passed explicitly
+        //         return Ok(new
+        //         {
+        //             isSuccess = true,
+        //             message = "Dashboard data retrieved successfully",
+        //             data = result
+        //         });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return StatusCode(500, new
+        //         {
+        //             isSuccess = false,
+        //             message = "Failed to retrieve dashboard data.",
+        //             error = ex.Message
+        //         });
+        //     }
+        // }
+
+
+       [HttpGet("card-dashboard")]
+        public async Task<IActionResult> GetCardDashboard([FromQuery] CardViewQuery request)
         {
-            try
-            {
-                var result = await _dashboardQueryRepository.GetDashboardDataAsync(); // No unitId passed explicitly
-                return Ok(new
-                {
-                    isSuccess = true,
-                    message = "Dashboard data retrieved successfully",
-                    data = result
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    isSuccess = false,
-                    message = "Failed to retrieve dashboard data.",
-                    error = ex.Message
-                });
-            }
+            var data = await _mediator.Send(request);
+            return Ok(data);
+        }
+
+          [HttpGet("Asset-summary")]
+        public async Task<IActionResult> GetAssetSummary([FromQuery] DashboardQuery request)
+        {
+            request.Type = "assetSummary";
+            var data = await _mediator.Send(request);
+            return Ok(data);
+        }
+        [HttpGet("AssetExpiry-summary")]
+        public async Task<IActionResult> GetAssertExpirySummary([FromQuery] DashboardQuery request)
+        {
+            request.Type = "assetexpirySummary";
+            var data = await _mediator.Send(request);
+            return Ok(data);
         }
     }
 }
