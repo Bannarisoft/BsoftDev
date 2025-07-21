@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  usermanagement:
+    build:
+      context: ./UserManagement
+      dockerfile: Dockerfile
+    image: bsoft/usermanagement
+    ports:
+      - "5001:5001"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DATABASE_SERVER: 192.168.1.126
+      DATABASE_USERID: developer
+      DATABASE_PASSWORD: Dev@#$456
+
+  maintenance:
+    build:
+      context: ./MaintenanceManagement
+      dockerfile: Dockerfile
+    image: bsoft/maintenance
+    ports:
+      - "5002:5002"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+
+  fixedasset:
+    build:
+      context: ./FixedAssetManagement
+      dockerfile: Dockerfile
+    image: bsoft/fixedasset
+    ports:
+      - "5003:5003"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+
+  saga:
+    build:
+      context: ./SagaOrchestrator
+      dockerfile: Dockerfile
+    image: bsoft/saga
+    ports:
+      - "5004:5004"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+
+  background:
+    build:
+      context: ./BackgroundService
+      dockerfile: Dockerfile
+    image: bsoft/background
+    ports:
+      - "5005:5005"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development

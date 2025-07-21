@@ -1,0 +1,90 @@
+name: Backend CI/CD (All Services)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**/*.cs"
+      - "**/Dockerfile"
+      - "docker-compose.yml"
+      - ".env"
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted # Your Windows Server GitHub runner
+
+    steps:
+      - name: 📦 Checkout Code
+        uses: actions/checkout@v3
+
+      - name: 🛠 Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: 🚀 Publish All Services
+        run: |
+          dotnet publish ./UserManagement/UserManagement.API/UserManagement.API.csproj -c Release -o ./UserManagement/publish
+          dotnet publish ./MaintenanceManagement/MaintenanceManagement.API/MaintenanceManagement.API.csproj -c Release -o ./MaintenanceManagement/publish
+          dotnet publish ./FixedAssetManagement/FAM.API/FAM.API.csproj -c Release -o ./FixedAssetManagement/publish
+          dotnet publish ./SagaOrchestrator/SagaOrchestrator.API/SagaOrchestrator.API.csproj -c Release -o ./SagaOrchestrator/publish
+          dotnet publish ./BackgroundService/BackgroundService.API/BackgroundService.API.csproj -c Release -o ./BackgroundService/publish
+
+      - name: 🐳 Build Docker Images
+        run: docker-compose build
+
+      - name: 🧹 Stop & Remove Old Containers
+        continue-on-error: true
+        run: |
+          docker stop usermanagement maintenance fixedasset saga background || echo "Not running"
+          docker rm usermanagement maintenance fixedasset saga background || echo "Not created"
+
+      - name: 🚀 Start All Services
+        run: docker-compose up -d
+
+      - name: ✅ Health Check (UserManagement)
+        run: curl --fail http://localhost:5001 || exit 1
+
+      - name: ✅ Slack Success Notification
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"✅ Deployment succeeded for backend services on Windows Server."}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: ❌ Slack Failure Notification
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"❌ Deployment failed for backend services. Please check the logs."}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: 📧 Zimbra Email Success
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          subject: "✅ Deployment Success - Backend Services"
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_FROM }}
+          body: |
+            <p><strong>✅ Deployment completed successfully.</strong></p>
+            <p>All backend services have been published and deployed to the Windows Server.</p>
+
+      - name: 📧 Zimbra Email Failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          subject: "❌ Deployment Failed - Backend Services"
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_FROM }}
+          body: |
+            <p><strong>❌ Deployment failed for backend services.</strong></p>
+            <p>Please check the GitHub Actions logs to investigate the failure.</p>
