@@ -1327,6 +1327,70 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.ToTable("PowerConsumption", "Maintenance");
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.PreventiveScheduleLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("ActionType");
+
+                    b.Property<string>("ChangedFields")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ChangedFields");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("CreatedBy");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("CreatedByName");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("CreatedIP");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ErrorMessage");
+
+                    b.Property<bool>("IsSuccess")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsSuccess");
+
+                    b.Property<int?>("PreventiveScheduleDetailId")
+                        .HasColumnType("int")
+                        .HasColumnName("PreventiveScheduleDetailId");
+
+                    b.Property<int?>("PreventiveScheduleId")
+                        .HasColumnType("int")
+                        .HasColumnName("PreventiveScheduleId");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("varchar(max)")
+                        .HasColumnName("Remarks");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("Source");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PreventiveScheduleLog", "Maintenance");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerActivity", b =>
                 {
                     b.Property<int>("Id")

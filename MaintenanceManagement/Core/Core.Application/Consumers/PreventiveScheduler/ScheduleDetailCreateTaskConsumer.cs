@@ -8,11 +8,13 @@ using Contracts.Events.Maintenance.PreventiveScheduler;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.Common.RealTimeNotificationHub;
 using Core.Domain.Entities;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 
 namespace Core.Application.Consumers.PreventiveScheduler
 {
@@ -25,8 +27,10 @@ namespace Core.Application.Consumers.PreventiveScheduler
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IWorkOrderCommandRepository _workOrderRepository;
         private readonly IHubContext<PreventiveScheduleHub> _hubContext;
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
         public ScheduleDetailCreateTaskConsumer(IPreventiveSchedulerCommand nextScheduleService, IMachineMasterQueryRepository machineMasterQueryRepository, IMapper mapper,
-        IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderCommandRepository workOrderRepository, IHubContext<PreventiveScheduleHub> hubContext)
+        IMiscMasterQueryRepository miscMasterQueryRepository, IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderCommandRepository workOrderRepository,
+         IHubContext<PreventiveScheduleHub> hubContext, IPreventiveScheduleLogService preventiveScheduleLogService)
         {
             _nextScheduleService = nextScheduleService;
             _machineMasterQueryRepository = machineMasterQueryRepository;
@@ -35,6 +39,7 @@ namespace Core.Application.Consumers.PreventiveScheduler
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _workOrderRepository = workOrderRepository;
             _hubContext = hubContext;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
         }
 
         public async Task Consume(ConsumeContext<CreateShedulerDetailsCommand> context)
@@ -46,7 +51,7 @@ namespace Core.Application.Consumers.PreventiveScheduler
                 
                 var details = _mapper.Map<List<PreventiveSchedulerDetail>>(machineMaster);
                 var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(context.Message.FrequencyUnitId);
-
+                await _preventiveScheduleLogService.CaptureLogs(context.Message.PreventiveSchedulerHeaderId,null,"Saga Create Schedule Detail",JsonConvert.SerializeObject(details));
                     // List<PreventiveSchedulerDetail> list = new List<PreventiveSchedulerDetail>();
                     foreach (var detail in details)
                      {

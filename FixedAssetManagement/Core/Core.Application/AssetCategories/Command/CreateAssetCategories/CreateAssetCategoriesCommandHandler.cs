@@ -26,19 +26,21 @@ namespace Core.Application.AssetCategories.Command.CreateAssetCategories
 
         public async Task<ApiResponseDTO<int>> Handle(CreateAssetCategoriesCommand request, CancellationToken cancellationToken)
         {
-           // Check if AssetGroup code already exists
-            var exists = await _iAssetCategoriesCommandRepository.ExistsByCodeAsync(request.Code);
-            if (exists)
-            {
-               return new ApiResponseDTO<int>
-            {
-            IsSuccess = false,
-            Message = "AssetCategories Code already exists.",
-            Data = 0
-            };
-            }
+            // Check if AssetGroup code already exists
+            // var exists = await _iAssetCategoriesCommandRepository.ExistsByCodeAsync(request.Code);
+            // if (exists)
+            // {
+            //     return new ApiResponseDTO<int>
+            //     {
+            //         IsSuccess = false,
+            //         Message = "AssetCategories Code already exists.",
+            //         Data = 0
+            //     };
+            // }
             var assetCategories = _imapper.Map<Core.Domain.Entities.AssetCategories>(request);
-            
+            var categorycode = await GenerateUniqueCodeAsync(request.CategoryName);
+            assetCategories.Code = categorycode;
+
             var result = await _iAssetCategoriesCommandRepository.CreateAsync(assetCategories);
 
             //Domain Event
@@ -49,24 +51,49 @@ namespace Core.Application.AssetCategories.Command.CreateAssetCategories
                 details: $"AssetCategories details was created",
                 module: "AssetCategories");
             await _imediator.Publish(domainEvent, cancellationToken);
-          
+
             var assetCategoriesDto = _imapper.Map<AssetCategoriesDto>(assetCategories);
             if (result > 0)
-                  {
-                   
-                        return new ApiResponseDTO<int>
-                        {
-                           IsSuccess = true,
-                           Message = "AssetCategories created successfully",
-                           Data = result
-                        };
-                 }
+            {
+
+                return new ApiResponseDTO<int>
+                {
+                    IsSuccess = true,
+                    Message = "AssetCategories created successfully",
+                    Data = result
+                };
+            }
             return new ApiResponseDTO<int>
             {
                 IsSuccess = true,
                 Message = "AssetCategories Creation Failed",
                 Data = result
-            }; 
+            };
+        }
+
+         private async Task<string> GenerateUniqueCodeAsync(string categoryName)
+        {
+            // Take first 4 alphanumeric uppercase characters from the group name
+            var baseCode = new string(categoryName
+                .Where(char.IsLetterOrDigit)             // Remove special chars
+                .Take(4)                                  // Take first 4
+                .Select(char.ToUpper)                    // Convert to uppercase
+                .ToArray());
+
+            if (string.IsNullOrWhiteSpace(baseCode))
+                baseCode = "GRP"; // Fallback if name doesn't contain valid chars
+
+            string code = baseCode;
+            int counter = 1;
+
+            // Loop to generate unique code like COMP, COMP1, COMP2, etc.
+            while (await _iAssetCategoriesCommandRepository.ExistsByCodeAsync(code))
+            {
+                code = $"{baseCode}{counter}";
+                counter++;
+            }
+
+            return code;
         }
     }
 }

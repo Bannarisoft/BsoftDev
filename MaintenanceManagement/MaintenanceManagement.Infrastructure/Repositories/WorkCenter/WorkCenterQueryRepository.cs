@@ -22,11 +22,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkCenter
 
         public async Task<(List<Core.Domain.Entities.WorkCenter>, int)> GetAllWorkCenterGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+             var UnitId = _ipAddressService.GetUnitId();
             var query = $$"""
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
                FROM Maintenance.WorkCenter
-              WHERE IsDeleted = 0
+              WHERE IsDeleted = 0 AND UnitId = @UnitId
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (WorkCenterName LIKE @Search OR WorkCenterCode LIKE @Search)")}};
 
                 SELECT 
@@ -38,7 +39,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkCenter
                 IsActive,CreatedDate
             FROM Maintenance.WorkCenter 
             WHERE 
-            IsDeleted = 0
+            IsDeleted = 0 AND UnitId = @UnitId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (WorkCenterName LIKE @Search OR WorkCenterCode LIKE @Search )")}}
                 ORDER BY Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -51,7 +52,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.WorkCenter
             {
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize
+                PageSize,
+                UnitId
             };
 
             var workCenter = await _dbConnection.QueryMultipleAsync(query, parameters);

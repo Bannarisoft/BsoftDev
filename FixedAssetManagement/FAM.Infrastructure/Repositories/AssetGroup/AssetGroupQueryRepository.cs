@@ -76,7 +76,7 @@ namespace FAM.Infrastructure.Repositories.AssetGroup
             const string query = @"
              SELECT Id, GroupName 
             FROM FixedAsset.AssetGroup 
-            WHERE IsDeleted = 0 
+            WHERE IsDeleted = 0 And IsActive = 1 
             AND GroupName LIKE @SearchPattern";  
             var parameters = new 
             { 

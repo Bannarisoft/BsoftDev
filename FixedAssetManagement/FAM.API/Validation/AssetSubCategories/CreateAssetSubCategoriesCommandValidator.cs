@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.AssetSubCategories.Command.CreateAssetSubCategories;
+using Core.Application.Common.Interfaces.IAssetSubCategories;
 using FAM.API.Validation.Common;
 using FluentValidation;
 using Serilog;
@@ -12,13 +13,15 @@ namespace FAM.API.Validation.AssetSubCategories
     public class CreateAssetSubCategoriesCommandValidator : AbstractValidator<CreateAssetSubCategoriesCommand>
     {
         private readonly List<ValidationRule> _validationRules;
-        public CreateAssetSubCategoriesCommandValidator(MaxLengthProvider maxLengthProvider)
+        private readonly IAssetSubCategoriesCommandRepository _iAssetSubCategoriesCommandRepository;
+        public CreateAssetSubCategoriesCommandValidator(MaxLengthProvider maxLengthProvider, IAssetSubCategoriesCommandRepository iAssetSubCategoriesCommandRepository)
         {
+            _iAssetSubCategoriesCommandRepository = iAssetSubCategoriesCommandRepository;
             var CodeMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.AssetSubCategories>("Code") ?? 10;
             var CategoryNameMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.AssetSubCategories>("SubCategoryName") ?? 50;
             var CategoryDescriptionMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.AssetSubCategories>("Description") ?? 250;
             var CategoryIdMaxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.AssetSubCategories>("AssetCategoriesId") ?? 4;
-              // Load validation rules from JSON or another source
+            // Load validation rules from JSON or another source
             _validationRules = ValidationRuleLoader.LoadValidationRules();
             if (_validationRules == null || !_validationRules.Any())
             {
@@ -32,9 +35,9 @@ namespace FAM.API.Validation.AssetSubCategories
                 {
                     case "NotEmpty":
                         // Apply NotEmpty validation
-                        RuleFor(x => x.Code)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.Code)} {rule.Error}");
+                        // RuleFor(x => x.Code)
+                        //     .NotEmpty()
+                        //     .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.Code)} {rule.Error}");
                         RuleFor(x => x.SubCategoryName)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.SubCategoryName)} {rule.Error}");
@@ -43,9 +46,9 @@ namespace FAM.API.Validation.AssetSubCategories
                             .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.AssetCategoriesId)} {rule.Error}");
                         break;
                     case "MaxLength":
-                        RuleFor(x => x.Code)
-                            .MaximumLength(CodeMaxLength)
-                            .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.Code)} {rule.Error} {CodeMaxLength}");
+                        // RuleFor(x => x.Code)
+                        //     .MaximumLength(CodeMaxLength)
+                        //     .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.Code)} {rule.Error} {CodeMaxLength}");
                         RuleFor(x => x.SubCategoryName)
                             .MaximumLength(CategoryNameMaxLength)
                             .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.SubCategoryName)} {rule.Error} {CategoryNameMaxLength}");
@@ -56,24 +59,30 @@ namespace FAM.API.Validation.AssetSubCategories
                             .MaximumLength(CategoryIdMaxLength)
                             .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.AssetCategoriesId)} {rule.Error} {CategoryIdMaxLength}");
                         break;
-                    case "AlphanumericOnly":
-                              RuleFor(x => x.Code)
-                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
-                             .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.Code)} {rule.Error}");   
-                        break;
+                    // case "AlphanumericOnly":
+                    //           RuleFor(x => x.Code)
+                    //          .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern)) 
+                    //          .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.Code)} {rule.Error}");   
+                    //     break;
                     case "AlphaNumericWithPunctuation":
                         RuleFor(x => x.SubCategoryName)
                             .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
                             .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.SubCategoryName)} {rule.Error}");
                         break;
                     case "AlphabeticOnly":
-                         RuleFor(x => x.Description)
-                        .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
-                        .When(x => !string.IsNullOrEmpty(x.Description))
-                        .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.Description)} {rule.Error}");
+                        RuleFor(x => x.Description)
+                       .Matches(new System.Text.RegularExpressions.Regex(rule.Pattern))
+                       .When(x => !string.IsNullOrEmpty(x.Description))
+                       .WithMessage($"{nameof(CreateAssetSubCategoriesCommand.Description)} {rule.Error}");
+                        break;
+                    case "AlreadyExists":
+                        RuleFor(x => x.SubCategoryName)
+                       .MustAsync(async (SubCategoryName, cancellation) => !await _iAssetSubCategoriesCommandRepository.ExistsByNameAsync(SubCategoryName))
+                       .WithName("SubCategoryName")
+                       .WithMessage($"{rule.Error}");
                         break;
                     default:
-                          // Handle unknown rule (log or throw)
+                        // Handle unknown rule (log or throw)
                         Log.Information("Warning: Unknown rule '{Rule}' encountered.", rule.Rule);
                         break;
                 }
