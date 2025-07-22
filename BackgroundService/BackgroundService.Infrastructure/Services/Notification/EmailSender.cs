@@ -22,10 +22,10 @@ namespace BackgroundService.Infrastructure.Services.Notification
             _logger = logger;
         }
         
-        public async Task<bool> SendEmailAsync(List<string> emails, string subject, string message, string footer, List<string>? CcEmails = null, List<string>? BccEmails = null, int channelId = 0, int eventTypeId = 0, int eventRuleId = 0)
+        public async Task<bool> SendEmailAsync(List<string> emails, string subject, string header,string message, string footer, List<string>? CcEmails = null, List<string>? BccEmails = null, int channelId = 0, int eventTypeId = 0, int eventRuleId = 0)
         {
             try
-            {
+            {                   
                 if (emails == null || !emails.Any())
                 {
                     _logger.LogWarning("❌ No recipients provided. Email sending aborted.");
@@ -44,7 +44,7 @@ namespace BackgroundService.Infrastructure.Services.Notification
                 {
                     From = new MailAddress(provider.UserName),
                     Subject = subject,
-                    Body = $"{message}<br/><br/>{footer}",
+                    Body = $"{header}<br/><br/>{message}<br/><br/>{footer}",
                     IsBodyHtml = true
                 };
 

@@ -8,6 +8,7 @@ namespace BackgroundService.Application.DTO
         public string TargetEmailIds { get; set; } = string.Empty;
         public string TargetMobileNumbers { get; set; } = string.Empty;
         public string SubjectTemplate { get; set; } = string.Empty;
+        public string HeaderTemplate { get; set; } = string.Empty;
         public string BodyTemplate { get; set; } = string.Empty;
         public string FooterTemplate { get; set; } = string.Empty;
         public string LanguageCode { get; set; } = "en";

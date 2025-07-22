@@ -1,3 +1,4 @@
+using BackgroundService.Application.DTO;
 using BackgroundService.Application.Helpers;
 using BackgroundService.Application.Interfaces.Notification;
 using BackgroundService.Application.Notification;
@@ -18,13 +19,14 @@ namespace BackgroundService.Application.Consumers
         private readonly IBackgroundJobClient _jobClient;
         private readonly NotificationResolverHandler _resolverHandler;
         private readonly IIPAddressService _ipAddressService;
-        private readonly INotificationLogger _loggerNotification;     
+        private readonly INotificationLogger _loggerNotification;    
+        private const int MaxRetries = 3; 
 
         public SendInAppNotificationConsumer(
             IInAppNotifier notifier,
             ILogger<SendInAppNotificationConsumer> logger,
             IBackgroundJobClient jobClient,
-            NotificationResolverHandler resolverHandler,INotificationLogger loggerNotification, IIPAddressService ipAddressService)
+            NotificationResolverHandler resolverHandler, INotificationLogger loggerNotification, IIPAddressService ipAddressService)
         {
             _notifier = notifier;
             _logger = logger;
@@ -39,7 +41,7 @@ namespace BackgroundService.Application.Consumers
             var msg = context.Message;
             try
             {
-                var (_, _, _, _, userIds, subject, body, footer, lang,eventTypeId,eventRuleId, channelId) =
+                var (_, _, _, _, userIds, subject, header,body, footer, lang,eventTypeId,eventRuleId, channelId) =
                 await _resolverHandler.ResolveNotificationTemplatesAsync(msg.UnitId, msg.ModuleName, msg.EventTypeId);
 
                 if (userIds == null || !userIds.Any())
@@ -55,14 +57,24 @@ namespace BackgroundService.Application.Consumers
                 var tokens = new Dictionary<string, string>
                 {
                     { "Module", msg.ModuleName },
-                    { "Code", msg.Code },
-                    { "Name", msg.Name },
-                    { "Date", msg.Date.ToString("dd-MMM-yyyy") }
+                    { "param1", msg.param1 },
+                    { "param2", msg.param2 },
+                    { "param3", msg.param3.ToString("dd-MMM-yyyy") }
                 };
                 string resolvedSubject = TemplateHelper.ReplaceTokens(subject, tokens);
                 string resolvedBody = TemplateHelper.ReplaceTokens(body, tokens);
 
-                var sent = await _notifier.SendInAppNotificationAsync(userIds, resolvedBody, resolvedSubject);
+                var contextData = new NotificationContext
+                {
+                    EventRuleId = eventRuleId ?? 0,
+                    EventTypeId = eventTypeId ?? 0,
+                    ChannelId = (int)NotificationEnum.NotificationChannel.InApp,
+                    CreatedById = int.Parse(_ipAddressService.GetCurrentUserId()),
+                    CreatedByName = _ipAddressService.GetUserName(),
+                    CreatedIp = _ipAddressService.GetSystemIPAddress()
+                };
+
+                var sent = await _notifier.SendInAppNotificationAsync(userIds, resolvedBody, msg.ModuleName ,contextData);
 
                 if (sent)
                 {
@@ -71,10 +83,11 @@ namespace BackgroundService.Application.Consumers
                     /* _logger.LogInformation("📤 resolvebody: {resolvebody}, resolvesubject: {resolvesubject}",
                        resolvedSubject,resolvedBody); */
                         
-                    await _loggerNotification.LogAsync(new NotificationEventLog
+                   /*  await _loggerNotification.LogAsync(new NotificationEventLog
                     {
                         NotificationLevelRuleId = eventRuleId ?? 0,
                         NotificationStatusId = sent ? (int)NotificationEnum.NotificationStatus.Success : (int)NotificationEnum.NotificationStatus.Failed,
+                        ReadStatusId = (int)NotificationEnum.NotificationReadStatus.Unread,
                         ActionStatus = sent ? "Sent" : "Failed",
                         ChannelId = (int)NotificationEnum.NotificationChannel.InApp,
                         MessageText = resolvedBody,
@@ -83,7 +96,7 @@ namespace BackgroundService.Application.Consumers
                         CreatedDate = DateTime.UtcNow,
                         CreatedByName = _ipAddressService.GetUserName(),
                         CreatedIP = _ipAddressService.GetSystemIPAddress()
-                    });
+                    }); */
 
                     await context.Publish(new SendInAppNotificationCompleted
                     {
@@ -93,14 +106,32 @@ namespace BackgroundService.Application.Consumers
                 }
                 else
                 {
-                    throw new Exception("In-app notification failed to send.");
+                   throw new Exception("In-app notification failed to send.");
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "❌ Error sending in-app notification");
+                if (msg.RetryCount < MaxRetries)
+                {
+                    msg.RetryCount++;
 
-                // Retry using Hangfire after 5 minutes
+                    _jobClient.Schedule<INotificationHandler<SendInAppNotificationInternalCommand>>(h =>
+                        h.ExecuteAsync(msg, msg.CorrelationId), TimeSpan.FromMinutes(5));
+
+                    _logger.LogWarning("🔁 Scheduled retry #{Retry} for InApp notification", msg.RetryCount);
+                }
+                else
+                {
+                    _logger.LogError("⛔ Max retry attempts reached. Notification dropped.");
+
+                    await context.Publish(new SendInAppNotificationFailed
+                    {
+                        CorrelationId = msg.CorrelationId,
+                        Reason = $"Max retry attempts ({MaxRetries}) exceeded. Last error: {ex.Message}"
+                    });
+                }
+                
                 _jobClient.Schedule<INotificationHandler<SendInAppNotificationInternalCommand>>(h =>
                     h.ExecuteAsync(msg, msg.CorrelationId), TimeSpan.FromMinutes(5));
 

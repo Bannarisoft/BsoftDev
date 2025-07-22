@@ -4,6 +4,6 @@ namespace BackgroundService.Application.Interfaces.Notification
 {
     public interface INotificationLogger
     {
-         Task LogAsync(NotificationEventLog log);
+        Task<int> LogAsync(NotificationEventLog log); 
     }
 }

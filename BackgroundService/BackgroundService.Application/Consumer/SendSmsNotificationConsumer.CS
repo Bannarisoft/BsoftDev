@@ -17,8 +17,9 @@ namespace BackgroundService.Application.Consumers
         private readonly ILogger<SendSmsNotificationConsumer> _logger;
         private readonly IBackgroundJobClient _jobClient;
         private readonly NotificationResolverHandler _resolverHandler;
-           private readonly IIPAddressService _ipAddressService;
+        private readonly IIPAddressService _ipAddressService;
         private readonly INotificationLogger _loggerNotification;
+        private const int MaxRetries = 3; 
 
         public SendSmsNotificationConsumer(
             ISmsSender smsSender,
@@ -30,7 +31,7 @@ namespace BackgroundService.Application.Consumers
             _logger = logger;
             _jobClient = jobClient;
             _resolverHandler = resolverHandler;
-             _loggerNotification = loggerNotification;
+            _loggerNotification = loggerNotification;
             _ipAddressService = ipAddressService;
         }
 
@@ -40,7 +41,7 @@ namespace BackgroundService.Application.Consumers
             Console.WriteLine($"✅ SMS Consumer Received: ",msg); 
             try
             {
-                var (_, _, _, smsNumbers, _, subject, body, footer, langCode,eventTypeId,eventRuleId, channelId) =
+                var (_, _, _, smsNumbers, _, subject, header,body, footer, langCode,eventTypeId,eventRuleId, channelId) =
                     await _resolverHandler.ResolveNotificationTemplatesAsync(
                         msg.UnitId, msg.ModuleName, msg.EventTypeId);
 
@@ -58,9 +59,9 @@ namespace BackgroundService.Application.Consumers
                 var tokens = new Dictionary<string, string>
                 {
                     { "Module", msg.ModuleName },
-                    { "Code", msg.Code },
-                    { "Name", msg.Name },
-                    { "Date", msg.Date.ToString("dd-MMM-yyyy") }
+                    { "param1", msg.param1 },
+                    { "param2", msg.param2 },
+                    { "param3", msg.param3.ToString("dd-MMM-yyyy") }
                 };
                 
                 string resolvedBody = TemplateHelper.ReplaceTokens(body, tokens);
@@ -79,10 +80,12 @@ namespace BackgroundService.Application.Consumers
                     {
                         CorrelationId = msg.CorrelationId
                     });
-                    await _loggerNotification.LogAsync(new NotificationEventLog
+                    int savedLogId = await _loggerNotification.LogAsync(new NotificationEventLog
                     {
                         NotificationLevelRuleId = eventRuleId ?? 0,
                         NotificationStatusId = sent ? (int)NotificationEnum.NotificationStatus.Success : (int)NotificationEnum.NotificationStatus.Failed,
+                        ReadStatusId = (int)NotificationEnum.NotificationReadStatus.Unread,
+                        SendTo =  string.Join(",", smsNumbers),
                         ActionStatus = sent ? "Sent" : "Failed",
                         ChannelId = (int)NotificationEnum.NotificationChannel.SMS,
                         MessageText = resolvedBody,
@@ -95,17 +98,38 @@ namespace BackgroundService.Application.Consumers
                 }
                 else
                 {
-                    throw new Exception("SMS sending failed.");
+                     await context.Publish(new SendSmsNotificationFailed
+                    {
+                        CorrelationId = msg.CorrelationId,
+                        Reason = "Sms sending failed"
+                    });
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "❌ SMS Notification Failed for CorrelationId: {CorrelationId}", msg.CorrelationId);
+                if (msg.RetryCount < MaxRetries)
+                {
+                    msg.RetryCount++;
 
-                _jobClient.Schedule<INotificationHandler<SendSmsNotificationInternalCommand>>(
-                    handler => handler.ExecuteAsync(context.Message, msg.CorrelationId),
-                    TimeSpan.FromMinutes(5)
-                );
+                    _jobClient.Schedule<INotificationHandler<SendSmsNotificationInternalCommand>>(h =>
+                        h.ExecuteAsync(msg, msg.CorrelationId), TimeSpan.FromMinutes(5));
+
+                    _logger.LogWarning("🔁 Scheduled retry #{Retry} for Sms notification", msg.RetryCount);
+                }
+                else
+                {
+                    _logger.LogError("⛔ Max retry attempts reached. Notification dropped.");
+
+                    await context.Publish(new SendSmsNotificationFailed
+                    {
+                        CorrelationId = msg.CorrelationId,
+                        Reason = $"Max retry attempts ({MaxRetries}) exceeded. Last error: {ex.Message}"
+                    });
+                }
+                
+                _jobClient.Schedule<INotificationHandler<SendSmsNotificationInternalCommand>>(h =>
+                    h.ExecuteAsync(msg, msg.CorrelationId), TimeSpan.FromMinutes(5));
 
                 await context.Publish(new SendSmsNotificationFailed
                 {

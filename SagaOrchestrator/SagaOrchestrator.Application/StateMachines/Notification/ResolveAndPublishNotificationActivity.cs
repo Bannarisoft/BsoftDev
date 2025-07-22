@@ -38,9 +38,9 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
                     UnitId = message.UnitId,
                     EventTypeId = message.EventTypeId,
                     ModuleName = message.ModuleName,
-                    Code = message.Code,
-                    Name = message.Name,
-                    Date = message.Date                    
+                    param1 = message.param1,
+                    param2 = message.param2,
+                    param3 = message.param3                    
 
                 });
 
@@ -54,9 +54,9 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
                     UnitId = message.UnitId,
                     EventTypeId = message.EventTypeId,
                     ModuleName = message.ModuleName,
-                    Code = message.Code,
-                    Name = message.Name,
-                    Date = message.Date                    
+                    param1 = message.param1,
+                    param2 = message.param2,
+                    param3 = message.param3                      
                 });
             }
 
@@ -68,9 +68,9 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
                     UnitId = message.UnitId,
                     EventTypeId = message.EventTypeId,
                     ModuleName =message.ModuleName,
-                    Code = message.Code,
-                    Name = message.Name,
-                    Date = message.Date
+                    param1 = message.param1,
+                    param2 = message.param2,
+                    param3 = message.param3   
                 });
             }
 
@@ -82,9 +82,9 @@ namespace SagaOrchestrator.Application.StateMachines.Notification
                     UnitId = message.UnitId,
                     EventTypeId = message.EventTypeId,
                     ModuleName = message.ModuleName,
-                     Code = message.Code,
-                    Name = message.Name,
-                    Date = message.Date
+                    param1 = message.param1,
+                    param2 = message.param2,
+                    param3 = message.param3   
                 });
             }
 

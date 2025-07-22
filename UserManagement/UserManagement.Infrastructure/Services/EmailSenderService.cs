@@ -14,6 +14,7 @@ public class EmailSenderService  : IEmailService
 
     public async Task<bool> SendEmailAsync(SendEmailCommand command)
     {
+        _logger.LogInformation("✅ from EmailSenderService");    
         var client = _httpClientFactory.CreateClient("BackgroundServiceClient");
         var response = await client.PostAsJsonAsync("api/email/send", command);
         return response.IsSuccessStatusCode;

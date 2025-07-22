@@ -4,6 +4,7 @@ using BackgroundService.Infrastructure.Data.Notification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackgroundService.Infrastructure.Migrations
 {
     [DbContext(typeof(NotificationDbContext))]
-    partial class NotificationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250722053753_Noti-Log")]
+    partial class NotiLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -276,11 +279,6 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Property<int>("ReadStatusId")
                         .HasColumnType("int")
                         .HasColumnName("ReadStatusId");
-
-                    b.Property<string>("SendTo")
-                        .IsRequired()
-                        .HasColumnType("varchar(1000)")
-                        .HasColumnName("SendTo");
 
                     b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("datetimeoffset")

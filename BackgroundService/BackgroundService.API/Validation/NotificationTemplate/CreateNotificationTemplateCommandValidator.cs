@@ -36,7 +36,10 @@ namespace BackgroundService.API.Validation.NotificationTemplate
                             .WithMessage($"{nameof(CreateNotificationTemplateCommand.NotificationConfigId)} {rule.Error}");
                         RuleFor(x => x.BodyTemplate)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateNotificationTemplateCommand.BodyTemplate)} {rule.Error}");
+                            .WithMessage($"{nameof(CreateNotificationTemplateCommand.BodyTemplate)} {rule.Error}");     
+                        RuleFor(x => x.HeaderTemplate)
+                            .NotEmpty()
+                            .WithMessage($"{nameof(CreateNotificationTemplateCommand.HeaderTemplate)} {rule.Error}");
                         RuleFor(x => x.LanguageCode)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateNotificationTemplateCommand.LanguageCode)} {rule.Error}");                        

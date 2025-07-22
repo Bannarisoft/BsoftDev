@@ -30,7 +30,7 @@ namespace BackgroundService.Application.Consumers
             Console.WriteLine($"🛑 Resolving channels for: {context.Message.CorrelationId}");
 
             // Publish internal notification commands
-            if (channels.Contains("Email", StringComparer.OrdinalIgnoreCase))
+           /*  if (channels.Contains("Email", StringComparer.OrdinalIgnoreCase))
             {
                 await context.Publish(new SendEmailNotificationInternalCommand
                 {
@@ -41,9 +41,9 @@ namespace BackgroundService.Application.Consumers
                     CreatedByName = context.Message.CreatedByName,
                     ChannelId = context.Message.ChannelId,
                     EventRuleId = context.Message.EventRuleId,
-                    Code = context.Message.Code,
-                    Name = context.Message.Name,
-                    Date = context.Message.Date
+                    param1 = context.Message.param1,
+                    param2 = context.Message.param2,
+                    param3 = context.Message.param3
                 });
             }
 
@@ -58,9 +58,9 @@ namespace BackgroundService.Application.Consumers
                     CreatedByName = context.Message.CreatedByName,                    
                     ChannelId= context.Message.ChannelId,
                     EventRuleId= context.Message.EventRuleId,
-                    Code = context.Message.Code,
-                    Name = context.Message.Name,
-                    Date = context.Message.Date
+                    param1 = context.Message.param1,
+                    param2 = context.Message.param2,
+                    param3 = context.Message.param3
                 });
             }
 
@@ -75,11 +75,11 @@ namespace BackgroundService.Application.Consumers
                     CreatedByName = context.Message.CreatedByName,                    
                     ChannelId= context.Message.ChannelId,
                     EventRuleId= context.Message.EventRuleId,
-                    Code = context.Message.Code,
-                    Name = context.Message.Name,
-                    Date = context.Message.Date
+                    param1 = context.Message.param1,
+                    param2 = context.Message.param2,
+                    param3 = context.Message.param3
                 });
-            }
+            } */
             
             // ✅ Respond back to the saga
             await context.RespondAsync(new ResolveNotificationChannelsResponse

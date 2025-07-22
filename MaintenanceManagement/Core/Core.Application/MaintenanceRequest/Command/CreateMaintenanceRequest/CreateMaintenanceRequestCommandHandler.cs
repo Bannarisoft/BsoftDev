@@ -102,9 +102,9 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
                     UnitId = _ipAddressService.GetUnitId(),
                     ModuleName = "WorkOrder",
                     EventTypeId = (int)NotificationEnum.NotificationEvent.Create,  
-                    Code = workOrder.Id.ToString(),                
-                    Name =machineName,         
-                    Date = workOrder.CreatedDate   ?? DateTimeOffset.UtcNow                                
+                    param1 = workOrder.Id.ToString(),                
+                    param2 =machineName,         
+                    param3 = workOrder.CreatedDate   ?? DateTimeOffset.UtcNow                                
                 });
 
                 _logger.LogInformation("✅ Maintenance Request Workorder Created. CorrelationId: {CorrelationId}, WorkOrderId: {WorkOrderId}",

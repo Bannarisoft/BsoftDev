@@ -8,6 +8,7 @@ namespace BackgroundService.Application.Notification.NotificationTemplate.Comman
         public int NotificationTypeId { get; set; }
         public int NotificationConfigId { get; set; }
         public string? SubjectTemplate { get; set; }
+        public string? HeaderTemplate { get; set; }
         public string? BodyTemplate { get; set; }
         public string? FooterTemplate { get; set; }
         public string?  LanguageCode { get; set; }

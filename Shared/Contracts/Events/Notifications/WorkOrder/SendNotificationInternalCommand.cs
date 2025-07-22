@@ -14,8 +14,8 @@ namespace Contracts.Events.Notifications.WorkOrder
         public int ChannelId { get; set; }
 
         
-        public string Code { get; set; }   
-        public string Name { get; set; }   
-        public DateTimeOffset Date { get; set; }  
+        public string param1 { get; set; }   
+        public string param2 { get; set; }   
+        public DateTimeOffset param3 { get; set; }  
     }
 }

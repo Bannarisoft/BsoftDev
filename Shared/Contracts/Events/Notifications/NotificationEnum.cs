@@ -27,5 +27,10 @@ namespace Contracts.Events.Notifications
             Delete = 16,
             Approve = 17,
         }
+        public enum NotificationReadStatus
+        {
+            Unread = 25,
+            Read = 11
+        }       
     }
 }

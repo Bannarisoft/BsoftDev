@@ -39,6 +39,9 @@ namespace BackgroundService.API.Validation.NotificationTemplate
                         RuleFor(x => x.BodyTemplate)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateNotificationTemplateCommand.BodyTemplate)} {rule.Error}");
+                        RuleFor(x => x.HeaderTemplate)
+                            .NotEmpty()
+                            .WithMessage($"{nameof(UpdateNotificationTemplateCommand.HeaderTemplate)} {rule.Error}");
                         RuleFor(x => x.LanguageCode)
                             .NotEmpty()
                             .WithMessage($"{nameof(UpdateNotificationTemplateCommand.LanguageCode)} {rule.Error}");  
