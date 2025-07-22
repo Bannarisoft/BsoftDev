@@ -32,6 +32,11 @@ namespace BackgroundService.API.Middleware
                 await _next(context);
                 return;
             }
+              if (context.Request.Path.StartsWithSegments("/hangfire"))
+                {
+                    await _next(context);
+                    return;
+                }
 
             // Check for token in the Authorization header
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
