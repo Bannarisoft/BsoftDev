@@ -19,7 +19,7 @@ namespace Core.Application.Dashboard.CardView
 
         public  async Task<CardViewDto> Handle(CardViewQuery request, CancellationToken cancellationToken)
         {
-          return await _dashboardQueryRepository.GetDashboardDataAsync();
+          return await _dashboardQueryRepository.GetDashboardDataAsync( );
         }
     }
 

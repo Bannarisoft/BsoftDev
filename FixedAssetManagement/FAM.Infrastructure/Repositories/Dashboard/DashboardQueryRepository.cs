@@ -10,6 +10,7 @@ using FAM.Infrastructure.Data;
 using Dapper;
 using Core.Application.Dashboard.AssetExpired;
 using Core.Application.Dashboard.Common;
+using Contracts.Interfaces.External.IUser;
 
 namespace FAM.Infrastructure.Repositories.Dashboard
 {
@@ -19,30 +20,44 @@ namespace FAM.Infrastructure.Repositories.Dashboard
         private readonly IDbConnection _dbConnection;
         private readonly IIPAddressService _iPAddressService;
 
-        public DashboardQueryRepository(IDbConnection dbConnection, IIPAddressService iPAddressService)
+         private readonly IDepartmentAllGrpcClient _departmentGrpcClient;
+
+        public DashboardQueryRepository(IDbConnection dbConnection, IIPAddressService iPAddressService, IDepartmentAllGrpcClient departmentGrpcClient)
         {
             _dbConnection = dbConnection;
             _iPAddressService = iPAddressService;
+            _departmentGrpcClient = departmentGrpcClient;
         }
 
-        public async Task<ChartDto> GetAssetChartViewAsync()
+        public async Task<ChartDto> GetAssetChartViewAsync( int? departmentId = null)
         {
              var unitId = _iPAddressService.GetUnitId(); // Or however you're getting UnitId
 
-            var query = @"
-                 SELECT 
-                        ag.GroupName,
-                        COUNT(am.Id) AS AssetCount,
-                        SUM(ISNULL(ap.PurchaseValue, 0)) AS TotalPurchaseValue
-                    FROM FixedAsset.AssetMaster am
-                    INNER JOIN FixedAsset.AssetGroup ag ON am.AssetGroupId = ag.Id
-                    LEFT JOIN FixedAsset.AssetPurchaseDetails ap ON am.Id = ap.AssetId
-                    WHERE am.IsDeleted = 0 AND am.UnitId = @UnitId
-                    GROUP BY ag.GroupName
-                    ORDER BY ag.GroupName;
-                ";
+             var query = @" 
+                SELECT 
+            ag.GroupName,
+                COUNT(am.Id) AS AssetCount,
+                SUM(ISNULL(ap.PurchaseValue, 0)) AS TotalPurchaseValue
+            FROM FixedAsset.AssetMaster am
+            INNER JOIN FixedAsset.AssetGroup ag ON am.AssetGroupId = ag.Id
+            LEFT JOIN FixedAsset.AssetPurchaseDetails ap ON am.Id = ap.AssetId
+            LEFT JOIN FixedAsset.AssetLocation ASL ON am.Id = ASL.AssetId 
+            WHERE 
+                am.IsDeleted = 0 
+                AND am.UnitId = @UnitId
+                AND (@departmentId IS NULL OR ASL.DepartmentId = @departmentId)
+            GROUP BY ag.GroupName
+            ORDER BY ag.GroupName;
+             ";
+           
+            var result = await _dbConnection.QueryAsync<AssetGroupSummaryDto>(query, new { UnitId = unitId  , DepartmentId = departmentId });
+            
 
-            var result = await _dbConnection.QueryAsync<AssetGroupSummaryDto>(query, new { UnitId = unitId });
+               var departments = await _departmentGrpcClient.GetDepartmentAllAsync();
+            var deptLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+
+       
+
 
             return new ChartDto
             {
