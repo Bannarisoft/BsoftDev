@@ -22,3 +22,19 @@
 /Shared/Shared.Infrastructure/bin
 
 .fake
+/InventoryManagement/Core/Core.Application/obj
+/InventoryManagement/Core/Core.Application/bin
+/InventoryManagement/Core/Core.Domain/obj
+/InventoryManagement/Core/Core.Domain/bin
+/InventoryManagement/InventoryManagement.API/obj
+/InventoryManagement/InventoryManagement.API/bin
+/InventoryManagement/InventoryManagement.Infrastructure/obj
+/InventoryManagement/InventoryManagement.Infrastructure/bin
+/PurchaseManagement/Core/Core.Application/obj
+/PurchaseManagement/Core/Core.Application/bin
+/PurchaseManagement/Core/Core.Domain/obj
+/PurchaseManagement/Core/Core.Domain/bin
+/PurchaseManagement/PurchaseManagement.API/obj
+/PurchaseManagement/PurchaseManagement.API/bin
+/PurchaseManagement/PurchaseManagement.Infrastructure/obj
+/PurchaseManagement/PurchaseManagement.Infrastructure/bin
