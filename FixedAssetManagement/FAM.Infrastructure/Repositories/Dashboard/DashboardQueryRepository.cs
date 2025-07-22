@@ -49,19 +49,7 @@ namespace FAM.Infrastructure.Repositories.Dashboard
             GROUP BY ag.GroupName
             ORDER BY ag.GroupName;
              ";
-            // var query = @"
-            //      SELECT 
-            //             ag.GroupName,
-            //             COUNT(am.Id) AS AssetCount,
-            //             SUM(ISNULL(ap.PurchaseValue, 0)) AS TotalPurchaseValue
-            //         FROM FixedAsset.AssetMaster am
-            //         INNER JOIN FixedAsset.AssetGroup ag ON am.AssetGroupId = ag.Id
-            //         LEFT JOIN FixedAsset.AssetPurchaseDetails ap ON am.Id = ap.AssetId
-            //         WHERE am.IsDeleted = 0 AND am.UnitId = @UnitId
-            //         GROUP BY ag.GroupName
-            //         ORDER BY ag.GroupName;
-            //     ";
-
+           
             var result = await _dbConnection.QueryAsync<AssetGroupSummaryDto>(query, new { UnitId = unitId  , DepartmentId = departmentId });
             
 
