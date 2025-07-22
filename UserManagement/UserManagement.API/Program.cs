@@ -3,7 +3,6 @@ using UserManagement.Infrastructure;
 using UserManagement.API.Validation.Common;
 using UserManagement.API.Middleware;
 using UserManagement.API.Configurations;
-using UserManagement.Infrastructure.PollyResilience;
 using UserManagement.API.GrpcServices;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Security.Claims;
@@ -40,7 +39,6 @@ builder.Services.AddApplicationServices();
 builder.Services.AddGrpcClients(builder.Configuration);
 builder.Services.AddSagaInfrastructure(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration, builder.Environment);
-builder.Services.AddHttpClientServices(); // Register HttpClient with Polly
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 
