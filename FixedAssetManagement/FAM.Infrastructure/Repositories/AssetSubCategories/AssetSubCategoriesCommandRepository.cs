@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common.Interfaces.IAssetSubCategories;
+using Core.Domain.Common;
 using FAM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,6 +66,11 @@ namespace FAM.Infrastructure.Repositories.AssetSubCategories
         public async Task<bool> ExistsByCodeAsync(string code)
         {
            return await _applicationDbContext.AssetSubCategories.AnyAsync(c => c.Code == code);
+        }
+
+        public async Task<bool> ExistsByNameAsync(string subcategoryName)
+        {
+           return await _applicationDbContext.AssetSubCategories.AnyAsync(c => c.SubCategoryName == subcategoryName && c.IsDeleted == BaseEntity.IsDelete.NotDeleted && c.IsActive == BaseEntity.Status.Active);
         }
 
         public async Task<int> GetMaxSortOrderAsync()

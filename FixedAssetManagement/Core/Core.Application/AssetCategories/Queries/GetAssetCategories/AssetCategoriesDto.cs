@@ -14,6 +14,7 @@ namespace Core.Application.AssetCategories.Queries.GetAssetCategories
         public string? Description { get; set; }
         public int SortOrder { get; set; }
         public int AssetGroupId { get; set; }
+        public string? AssetGroupName { get; set; }
         public Status IsActive { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public string? CreatedByName { get; set; }
