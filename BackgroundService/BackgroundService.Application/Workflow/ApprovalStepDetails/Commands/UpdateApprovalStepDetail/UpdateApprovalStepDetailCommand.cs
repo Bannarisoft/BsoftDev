@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.CreateApprovalStepDetail;
 using MediatR;
 
 namespace BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.UpdateApprovalStepDetail
@@ -16,5 +17,7 @@ namespace BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.Up
         public int ApprovalTypeId { get; set; }
         public decimal SLAHours { get; set; }
         public string OnSLAAction { get; set; }
+        public List<ApprovalStepUnitMappingDto> ApprovalStepUnitMappings { get; set; }
+        public List<RuleSkipApproverMappingDto> RuleSkipApproverMappings { get; set; }
     }
 }

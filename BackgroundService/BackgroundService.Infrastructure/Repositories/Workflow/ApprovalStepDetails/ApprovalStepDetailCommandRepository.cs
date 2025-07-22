@@ -39,10 +39,16 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
         public async Task<bool> UpdateAsync(ApprovalStepDetail approvalStepDetail)
         {
              var existingApprovalStep = await _notificationDbContext.ApprovalStepDetail
-            .AsNoTracking().FirstOrDefaultAsync(u => u.Id == approvalStepDetail.Id);
+              .Include(cf => cf.ApprovalStepUnitMappings)
+            .Include(cf => cf.RuleSkipApproverMappings)
+            .FirstOrDefaultAsync(u => u.Id == approvalStepDetail.Id);
             
             if (existingApprovalStep != null)
             {
+                               _notificationDbContext.ApprovalStepUnitMapping.RemoveRange(existingApprovalStep.ApprovalStepUnitMappings);
+
+               _notificationDbContext.RuleSkipApproverMapping.RemoveRange(existingApprovalStep.RuleSkipApproverMappings);
+
                 existingApprovalStep.WorkFlowTypeId = approvalStepDetail.WorkFlowTypeId;
                 existingApprovalStep.StepOrder = approvalStepDetail.StepOrder;
                 existingApprovalStep.TargetTypeId = approvalStepDetail.TargetTypeId;
@@ -52,9 +58,14 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
                 existingApprovalStep.ApprovalTypeId = approvalStepDetail.ApprovalTypeId;
                 existingApprovalStep.OnSLAAction = approvalStepDetail.OnSLAAction;
                 existingApprovalStep.IsActive = approvalStepDetail.IsActive;
-                _notificationDbContext.ApprovalStepDetail.Update(existingApprovalStep);
+                
+                if (approvalStepDetail.ApprovalStepUnitMappings?.Any() == true)
+                   await _notificationDbContext.ApprovalStepUnitMapping.AddRangeAsync(approvalStepDetail.ApprovalStepUnitMappings);
 
-                return await _notificationDbContext.SaveChangesAsync() >0;
+               if (approvalStepDetail.RuleSkipApproverMappings?.Any() == true)
+                   await _notificationDbContext.RuleSkipApproverMapping.AddRangeAsync(approvalStepDetail.RuleSkipApproverMappings);
+
+                return await _notificationDbContext.SaveChangesAsync() > 0;
             }
             
             return false;
