@@ -491,7 +491,3 @@ $RECYCLE.BIN/
 /InventoryManagement/InventoryManagement.API/bin
 /InventoryManagement/InventoryManagement.Infrastructure/obj
 /InventoryManagement/InventoryManagement.Infrastructure/bin
-**/appsettings.Development.json
-**/appsettings.QA.json
-**/appsettings.Production.json
-**/launchSettings.json
