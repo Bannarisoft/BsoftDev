@@ -24,7 +24,8 @@ namespace BackgroundService.Application.Notification.Common.Mappings
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted));
 
             CreateMap<UpdateNotificationEventRuleCommand, NotificationEventRule>()    
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ==1 ? Status.Active : Status.Inactive));            
+
 
               CreateMap<DeleteNotificationEventRuleCommand, NotificationEventRule>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id)) 

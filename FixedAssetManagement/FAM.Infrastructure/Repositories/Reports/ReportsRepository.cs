@@ -40,10 +40,8 @@ namespace FAM.Infrastructure.Repositories.Reports
                     commandType: CommandType.Text, // ✅ Must be 'Text' for SELECT
                     commandTimeout: 120);
 
-                return result.ToList();
-            
+                return result.ToList();            
         }
-
 
         public async Task<List<AssetReportDto>> AssetReportAsync(DateTimeOffset? fromDate, DateTimeOffset? toDate)
         {
@@ -74,7 +72,7 @@ namespace FAM.Infrastructure.Repositories.Reports
             {
                 FromDate = fromDate,
                 ToDate = toDate,
-                UnitId = UnitId // <-- FIXED: must match the SQL parameter name
+                UnitId = UnitId 
             };
 
             var result = await _dbConnection.QueryAsync<AssetTransferDetailsDto>(sql, parameters);

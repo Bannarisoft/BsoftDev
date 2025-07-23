@@ -34,30 +34,27 @@ namespace BackgroundService.Application.Consumers
             _jobClient = jobClient;
         }
 
-        public async Task Consume(ConsumeContext<SendEmailNotificationInternalCommand> context)
+       public async Task Consume(ConsumeContext<SendEmailNotificationInternalCommand> context)
         {
             var msg = context.Message;
 
             try
             {
-                // Resolve all recipient emails and templates
                 var (toEmails, ccEmails, bccEmails, _, _, subject, header, body, footer, langCode, eventTypeId, eventRuleId, channelId)
                     = await _resolverHandler.ResolveNotificationTemplatesAsync(
-                        msg.UnitId,
-                        msg.ModuleName,
-                        msg.EventTypeId
-                    );                
+                        msg.UnitId, msg.ModuleName, msg.EventTypeId
+                    );
+
                 if (!toEmails.Any())
                 {
-                    _logger.LogWarning("No email recipients found for CorrelationId: {CorrelationId}", msg.CorrelationId);
+                    _logger.LogWarning("❗ No email recipients found for CorrelationId: {CorrelationId}", msg.CorrelationId);
                     await context.Publish(new SendEmailNotificationFailed
                     {
                         CorrelationId = msg.CorrelationId,
-                        Reason = "No email recipients found"
+                        Reason = "No recipients found"
                     });
                     return;
                 }
-                Console.WriteLine($"🛑 triggered id: {context.Message.CorrelationId}");
 
                 var tokens = new Dictionary<string, string>
                 {
@@ -66,37 +63,30 @@ namespace BackgroundService.Application.Consumers
                     { "param2", msg.param2 },
                     { "param3", msg.param3.ToString("dd-MMM-yyyy") }
                 };
-                string resolvedSubject = TemplateHelper.ReplaceTokens(subject, tokens);
-                string resolvedBody = TemplateHelper.ReplaceTokens(body, tokens);
-                
-                     var success = await _emailSender.SendEmailAsync(
-                    toEmails,
-                    resolvedSubject,
-                    header,
-                    resolvedBody,
-                    footer,
-                    ccEmails,
-                    bccEmails, channelId ?? 0, eventRuleId ?? 0, eventTypeId ?? 0
-                ); 
-               if (success)
+
+                var resolvedSubject = TemplateHelper.ReplaceTokens(subject, tokens);
+                var resolvedBody = TemplateHelper.ReplaceTokens(body, tokens);
+
+                var success = await _emailSender.SendEmailAsync(
+                    toEmails, resolvedSubject, header, resolvedBody, footer,
+                    ccEmails, bccEmails, channelId ?? 0, eventRuleId ?? 0, eventTypeId ?? 0
+                );
+
+                if (success)
                 {
-
-                    //  _logger.LogInformation("📤 ChannelId: {ChannelId}, EventRuleId: {EventRuleId}, EventTypeId: {EventTypeId}",
-                    //     channelId, (int)NotificationEnum.NotificationChannel.Email, eventTypeId);    
-
-
                     await context.Publish(new SendEmailNotificationCompleted
                     {
                         CorrelationId = msg.CorrelationId
                     });
-                    int savedLogId = await _loggerNotification.LogAsync(new NotificationEventLog
+
+                    await _loggerNotification.LogAsync(new NotificationEventLog
                     {
                         NotificationLevelRuleId = eventRuleId ?? 0,
-                        NotificationStatusId = success ? (int)NotificationEnum.NotificationStatus.Success : (int)NotificationEnum.NotificationStatus.Failed,
+                        NotificationStatusId = (int)NotificationEnum.NotificationStatus.Success,
                         ReadStatusId = (int)NotificationEnum.NotificationReadStatus.Read,
                         SendTo = string.Join(",", toEmails),
-                        ActionStatus = success ? "Sent" : "Failed",
-                        ChannelId = (int)NotificationEnum.NotificationChannel.Email, //channelId ?? 0,
+                        ActionStatus = "Sent",
+                        ChannelId = (int)NotificationEnum.NotificationChannel.Email,
                         MessageText = resolvedBody,
                         Timestamp = DateTime.UtcNow,
                         CreatedBy = int.Parse(_ipAddressService.GetCurrentUserId()),
@@ -104,50 +94,56 @@ namespace BackgroundService.Application.Consumers
                         CreatedByName = _ipAddressService.GetUserName(),
                         CreatedIP = _ipAddressService.GetSystemIPAddress()
                     });
-
                 }
                 else
                 {
-                    //  await context.Publish(new SendEmailNotificationFailed
-                    //  {
-                    //      CorrelationId = msg.CorrelationId,
-                    //      Reason = "Email sending failed"
-                    //  }); 
-                    throw new Exception("Email notification failed to send.");
-                } 
+                    throw new Exception("❌ Email sending failed (no exception thrown by sender).");
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Email notification failed for CorrelationId: {CorrelationId}", msg.CorrelationId);
+                _logger.LogError(ex, "📛 Email notification failed for CorrelationId: {CorrelationId}", msg.CorrelationId);
+
                 if (msg.RetryCount < MaxRetries)
                 {
                     msg.RetryCount++;
 
-                    _jobClient.Schedule<INotificationHandler<SendEmailNotificationInternalCommand>>(h =>
-                        h.ExecuteAsync(msg, msg.CorrelationId), TimeSpan.FromMinutes(5));
+                    _jobClient.Schedule<INotificationHandler<SendEmailNotificationInternalCommand>>(
+                        h => h.ExecuteAsync(msg, msg.CorrelationId),
+                        TimeSpan.FromMinutes(5));
 
-                    _logger.LogWarning("🔁 Scheduled retry #{Retry} for Email notification", msg.RetryCount);
+                    _logger.LogWarning("🔁 Scheduled retry #{Retry} for Email notification CorrelationId: {CorrelationId}",
+                        msg.RetryCount, msg.CorrelationId);
                 }
                 else
                 {
-                    _logger.LogError("⛔ Max retry attempts reached. Notification dropped.");
+                    _logger.LogError("⛔ Max retries ({MaxRetries}) reached. Logging failure.", MaxRetries);
+
+                    await _loggerNotification.LogAsync(new NotificationEventLog
+                    {
+                        NotificationLevelRuleId = msg.EventRuleId,
+                        NotificationStatusId = (int)NotificationEnum.NotificationStatus.Failed,
+                        ReadStatusId = (int)NotificationEnum.NotificationReadStatus.Unread,
+                        SendTo = "Unknown or Failed",
+                        ActionStatus = "Failed",
+                        ChannelId = (int)NotificationEnum.NotificationChannel.Email,
+                        MessageText = ex.Message,
+                        Timestamp = DateTime.UtcNow,
+                        CreatedBy =_ipAddressService.GetUserId(),
+                        CreatedDate = DateTime.UtcNow,
+                        CreatedByName = _ipAddressService.GetUserName(),
+                        CreatedIP = _ipAddressService.GetSystemIPAddress()
+                    });
 
                     await context.Publish(new SendEmailNotificationFailed
                     {
                         CorrelationId = msg.CorrelationId,
-                        Reason = $"Max retry attempts ({MaxRetries}) exceeded. Last error: {ex.Message}"
+                        Reason = $"Retry limit exceeded. Last error: {ex.Message}"
                     });
                 }
-                
-                _jobClient.Schedule<INotificationHandler<SendEmailNotificationInternalCommand>>(h =>
-                    h.ExecuteAsync(msg, msg.CorrelationId), TimeSpan.FromMinutes(5));
-
-                await context.Publish(new SendEmailNotificationFailed
-                {
-                    CorrelationId = msg.CorrelationId,
-                    Reason = $"Exception: {ex.Message}"
-                });
             }
         }
+
+       
     }
 }

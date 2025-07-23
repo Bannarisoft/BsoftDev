@@ -19,11 +19,11 @@ namespace Core.Application.Reports.AssetReport
         public string? SubLocation { get; set; }   
         public string? CustodianName { get; set; }   
         public string? UserName { get; set; }   
-        public string? ParentAssetName { get; set; }   
-        public string? DepreciationGroup { get; set; }   
+        public string? ParentAssetName { get; set; }           
         public string? GRNNumber { get; set; }   
         public string? GRNValue { get; set; }   
         public decimal PurchaseValue { get; set; }
+        public decimal AdditionalCost { get; set; }
         public string? BillNumber { get; set; }   
         public string? BillDate { get; set; }   
         public DateTimeOffset? CapitalizationDate { get; set; }          

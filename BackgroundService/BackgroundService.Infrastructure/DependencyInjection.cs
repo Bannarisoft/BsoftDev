@@ -36,6 +36,8 @@ using BackgroundService.Application.Notification;
 using Contracts.Events.Notifications.WorkOrder.Sms;
 using Contracts.Events.Notifications.WorkOrder.Email;
 using Contracts.Events.Notifications.WorkOrder.InApp;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationDetail;
+using BackgroundService.Infrastructure.Repositories.Notification.NotificationDetail;
 
 namespace BackgroundService.Infrastructure
 {
@@ -138,7 +140,8 @@ namespace BackgroundService.Infrastructure
                         });
 
                         e.ConfigureConsumer<SendSmsNotificationConsumer>(context);
-                    });  cfg.ReceiveEndpoint("inapp-notification-queue", e =>
+                    }); 
+                     cfg.ReceiveEndpoint("inapp-notification-queue", e =>
                     {
                         e.Bind("Contracts.Events.Notifications.WorkOrder.InApp:SendInAppNotificationInternalCommand", s =>
                         {
@@ -213,6 +216,7 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationTemplateCommandRepository, NotificationTemplateCommandRepository>();  
             services.AddScoped<INotificationTemplateQueryRepository, NotificationTemplateQueryRepository>();
             services.AddScoped<INotificationUserResolver, NotificationUserResolver>();
+            services.AddScoped<INotificationDetailRepository, NotificationDetailRepository>();
             services.AddScoped<NotificationResolverHandler>();
             //Notification
             services.AddScoped<IEmailSender, EmailSender>();
@@ -223,6 +227,7 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationEventRuleCommand, NotificationEventRuleCommandRepository >();
             services.AddScoped<INotificationEventRuleQuery, NotificationEventRuleQueryRepository >();
             services.AddScoped<INotificationLogger, NotificationLogger>();
+            
             return services;
         }
     }
