@@ -91,7 +91,7 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
                 .HasColumnType("varchar(255)");
                 
                 builder.HasOne(ac => ac.WorkflowType)
-          .WithMany(am => am.ApprovalRule)
+          .WithMany(am => am.ApprovalRules)
           .HasForeignKey(ac => ac.WorkflowTypeId)
           .OnDelete(DeleteBehavior.NoAction);
         }

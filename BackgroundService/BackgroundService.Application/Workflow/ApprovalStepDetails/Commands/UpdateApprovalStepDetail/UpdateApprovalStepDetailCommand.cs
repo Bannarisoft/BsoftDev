@@ -17,6 +17,7 @@ namespace BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.Up
         public int ApprovalTypeId { get; set; }
         public decimal SLAHours { get; set; }
         public string OnSLAAction { get; set; }
+        public byte IsActive { get; set; }
         public List<ApprovalStepUnitMappingDto> ApprovalStepUnitMappings { get; set; }
         public List<RuleSkipApproverMappingDto> RuleSkipApproverMappings { get; set; }
     }

@@ -33,6 +33,12 @@ using BackgroundService.Application.Consumers;
 using BackgroundService.Application.Interfaces.Notification;
 using BackgroundService.Infrastructure.Services.Notification;
 using BackgroundService.Application.Notification;
+using BackgroundService.Application.Workflow.Common.Interfaces.IWorkflowType;
+using BackgroundService.Infrastructure.Repositories.Workflow.WorkflowTypes;
+using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalStepDetail;
+using BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDetails;
+using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRule;
+using BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules;
 
 namespace BackgroundService.Infrastructure
 {
@@ -203,6 +209,13 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationGroupMemberQuery, NotificationGroupMemberQueryRepository >();
             services.AddScoped<INotificationEventRuleCommand, NotificationEventRuleCommandRepository >();
             services.AddScoped<INotificationEventRuleQuery, NotificationEventRuleQueryRepository >();
+
+             services.AddScoped<IWorkflowTypeQuery, WorkflowTypeQueryRepository >();
+            services.AddScoped<IWorkflowTypeCommand, WorkflowTypeCommandRepository >();
+             services.AddScoped<IApprovalStepDetailQuery, ApprovalStepDetailQueryRepository >();
+            services.AddScoped<IApprovalStepDetailCommand, ApprovalStepDetailCommandRepository >();
+             services.AddScoped<IApprovalRuleQuery, ApprovalRuleQueryRepository >();
+            services.AddScoped<IApprovalRuleCommand, ApprovalRuleCommandRepository >();
             return services;
         }
     }

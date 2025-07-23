@@ -24,6 +24,18 @@ using BackgroundService.Application.Notification.NotificationEventRules.Commands
 using BackgroundService.API.Validation.NotificationEventRule;
 using BackgroundService.Application.Notification.NotificationEventRules.Commands.UpdateNotificationEventRule;
 using BackgroundService.Application.Notification.NotificationEventRules.Commands.DeleteNotificationEventRule;
+using BackgroundService.Application.Workflow.WorkflowTypes.Commands.CreateWorkflowType;
+using BackgroundService.API.Validation.Workflow.WorkflowTypes;
+using BackgroundService.Application.Workflow.WorkflowTypes.Commands.UpdateWorkflowType;
+using BackgroundService.Application.Workflow.WorkflowTypes.Commands.DeleteWorkflowType;
+using BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.CreateApprovalStepDetail;
+using BackgroundService.API.Validation.Workflow.ApprovalStepDetail;
+using BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.UpdateApprovalStepDetail;
+using BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.DeleteApprovalStepDetail;
+using BackgroundService.API.Validation.Workflow.ApprovalRules;
+using BackgroundService.Application.Workflow.ApprovalRules.Commands.CreateApprovalRule;
+using BackgroundService.Application.Workflow.ApprovalRules.Commands.UpdateApprovalRule;
+using BackgroundService.Application.Workflow.ApprovalRules.Commands.DeleteApprovalRule;
 
 namespace BackgroundService.API.Validation.Common
 {
@@ -50,10 +62,22 @@ namespace BackgroundService.API.Validation.Common
             services.AddScoped<IValidator<CreateNotificationGroupMemberCommand>, CreateNotificationGroupMemberCommandValidator>();
             services.AddScoped<IValidator<UpdateNotificationGroupMemberCommand>, UpdateNotificationGroupMemberCommandValidator>();
             services.AddScoped<IValidator<DeleteNotificationGroupMemberCommand>, DeleteNotificationGroupMemberCommandValidator>();
-            
+
             services.AddScoped<IValidator<CreateNotificationEventRuleCommand>, CreateNotificationEventRuleCommandValidator>();
             services.AddScoped<IValidator<UpdateNotificationEventRuleCommand>, UpdateNotificationEventRuleCommandValidator>();
             services.AddScoped<IValidator<DeleteNotificationEventRuleCommand>, DeleteNotificationEventRuleCommandValidator>();
+
+            services.AddScoped<IValidator<CreateWorkflowTypeCommand>, CreateWorkflowTypeCommandValidator>();
+            services.AddScoped<IValidator<UpdateWorkflowTypeCommand>, UpdateWorkflowTypeCommandValidator>();
+            services.AddScoped<IValidator<DeleteWorkflowTypeCommand>, DeleteWorkflowTypeCommandValidator>();
+
+            services.AddScoped<IValidator<CreateApprovalStepDetailCommand>, CreateApprovalStepDetailCommandValidator>();
+            services.AddScoped<IValidator<UpdateApprovalStepDetailCommand>, UpdateApprovalStepDetailCommandValidator>();
+            services.AddScoped<IValidator<DeleteApprovalStepDetailCommand>, DeleteApprovalStepDetailCommandValidator>();
+            
+            services.AddScoped<IValidator<CreateApprovalRuleCommand>, CreateApprovalRuleCommandValidator>();
+            services.AddScoped<IValidator<UpdateApprovalRuleCommand>, UpdateApprovalRuleCommandValidator>();
+            services.AddScoped<IValidator<DeleteApprovalRuleCommand>, DeleteApprovalRuleCommandValidator>();
         }
     }
 }

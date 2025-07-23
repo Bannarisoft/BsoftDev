@@ -47,7 +47,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules
                 existingApprovalRule.Operator = approvalRule.Operator;
                 existingApprovalRule.Value = approvalRule.Value;
                 existingApprovalRule.IsActive = approvalRule.IsActive;
-                _notificationDbContext.WorkflowType.Update(existingApprovalRule);
+                _notificationDbContext.ApprovalRule.Update(existingApprovalRule);
 
                 return await _notificationDbContext.SaveChangesAsync() >0;
             }

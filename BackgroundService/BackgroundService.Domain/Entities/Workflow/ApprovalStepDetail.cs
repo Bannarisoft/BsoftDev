@@ -16,7 +16,7 @@ namespace BackgroundService.Domain.Entities.Workflow
         public int ApprovalTypeId { get; set; }
         public decimal? SLAHours { get; set; }
         public string? OnSLAAction { get; set; }
-        public MiscMaster WorkflowType { get; set; }
+        public WorkflowType WorkflowType { get; set; }
         public MiscMaster ApprovalStep { get; set; }
         public MiscMaster ApprovalType { get; set; }
         public ICollection<RuleSkipApproverMapping> RuleSkipApproverMappings { get; set; }

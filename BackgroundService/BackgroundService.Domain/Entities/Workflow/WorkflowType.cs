@@ -10,6 +10,8 @@ namespace BackgroundService.Domain.Entities.Workflow
     {
         public int ModuleId { get; set; }
         public required string ModuleTypeName { get; set; }
+        public ICollection<ApprovalStepDetail> ApprovalStepDetails { get; set; }
+        public ICollection<ApprovalRule> ApprovalRules { get; set; }
         
     }
 }

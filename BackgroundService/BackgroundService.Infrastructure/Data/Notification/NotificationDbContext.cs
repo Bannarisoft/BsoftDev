@@ -48,7 +48,7 @@ namespace BackgroundService.Infrastructure.Data.Notification
             modelBuilder.ApplyConfiguration(new WorkflowTypeConfiguration());
             modelBuilder.ApplyConfiguration(new ApprovalStepDetailConfiguration());
             modelBuilder.ApplyConfiguration(new ApprovalStepUnitMappingConfiguration());
-            // modelBuilder.ApplyConfiguration(new ApprovalRuleConfiguration());
+             modelBuilder.ApplyConfiguration(new ApprovalRuleConfiguration());
             modelBuilder.ApplyConfiguration(new RuleSkipApproverMappingConfiguration());
         }
           public override int SaveChanges()

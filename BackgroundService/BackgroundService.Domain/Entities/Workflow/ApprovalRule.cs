@@ -15,6 +15,6 @@ namespace BackgroundService.Domain.Entities.Workflow
         public string? Action { get; set; }
         public int UnitId { get; set; }
         public int WorkflowTypeId { get; set; }
-        public MiscMaster WorkflowType { get; set; }
+        public WorkflowType WorkflowType { get; set; }
     }
 }

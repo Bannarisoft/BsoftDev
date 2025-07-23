@@ -9,7 +9,7 @@ namespace BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRule
     public interface IApprovalRuleQuery
     {
         Task<(List<ApprovalRule>, int)> GetAllApprovalRuleAsync(int PageNumber, int PageSize, string? SearchTerm);
-        Task<bool> AlreadyExistsAsync(int WorkFlowTypeId,int TargetTypeId,int ApprovalStepId,int ApprovalTypeId, int? id = null);
+        Task<bool> AlreadyExistsAsync(string ConditionKey, string Operator, string Value, string Action, int UnitId, int WorkFlowTypeId, int? id = null);
         Task<bool> NotFoundAsync(int id);
     }
 }

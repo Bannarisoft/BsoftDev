@@ -14,6 +14,13 @@ namespace BackgroundService.Application.Workflow.ApprovalStepDetails.Queries.Get
         public int ApprovalTypeId { get; set; }
         public decimal SLAHours { get; set; }
         public string OnSLAAction { get; set; }
+        public byte IsActive { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public string CreatedByName { get; set; }
+        public int ModifiedBy { get; set; }
+        public DateTimeOffset ModifiedDate { get; set; }
+        public string ModifiedByName { get; set; }
         public WorkflowTypeApprovalStepDto WorkflowType { get; set; }
         public ApprovalStepDto ApprovalStep { get; set; }
         public ApprovalTypeDto ApprovalType { get; set; }

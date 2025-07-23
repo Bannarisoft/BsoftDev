@@ -4,6 +4,7 @@ using BackgroundService.Infrastructure.Data.Notification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackgroundService.Infrastructure.Migrations
 {
     [DbContext(typeof(NotificationDbContext))]
-    partial class NotificationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250723043122_approvalruleSchemaUpdate")]
+    partial class approvalruleSchemaUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1037,8 +1040,8 @@ namespace BackgroundService.Infrastructure.Migrations
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalRule", b =>
                 {
-                    b.HasOne("BackgroundService.Domain.Entities.Workflow.WorkflowType", "WorkflowType")
-                        .WithMany("ApprovalRules")
+                    b.HasOne("BackgroundService.Domain.Entities.Notification.MiscMaster", "WorkflowType")
+                        .WithMany("ApprovalRule")
                         .HasForeignKey("WorkflowTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -1060,8 +1063,8 @@ namespace BackgroundService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("BackgroundService.Domain.Entities.Workflow.WorkflowType", "WorkflowType")
-                        .WithMany("ApprovalStepDetails")
+                    b.HasOne("BackgroundService.Domain.Entities.Notification.MiscMaster", "WorkflowType")
+                        .WithMany("WorkflowType")
                         .HasForeignKey("WorkFlowTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -1099,6 +1102,8 @@ namespace BackgroundService.Infrastructure.Migrations
                 {
                     b.Navigation("ApprovalMode");
 
+                    b.Navigation("ApprovalRule");
+
                     b.Navigation("ApprovalStep");
 
                     b.Navigation("ApprovalType");
@@ -1116,6 +1121,8 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Navigation("RecipientType");
 
                     b.Navigation("TargetType");
+
+                    b.Navigation("WorkflowType");
                 });
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.MiscTypeMaster", b =>
@@ -1150,13 +1157,6 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Navigation("ApprovalStepUnitMappings");
 
                     b.Navigation("RuleSkipApproverMappings");
-                });
-
-            modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.WorkflowType", b =>
-                {
-                    b.Navigation("ApprovalRules");
-
-                    b.Navigation("ApprovalStepDetails");
                 });
 #pragma warning restore 612, 618
         }

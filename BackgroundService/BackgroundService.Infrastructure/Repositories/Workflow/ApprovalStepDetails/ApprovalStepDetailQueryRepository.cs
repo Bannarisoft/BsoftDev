@@ -50,19 +50,19 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
                 ApprovalStep.Id,ApprovalStep.Code,WorkFlow.Id,WorkFlow.Code,ApprovalType.Id,ApprovalType.Code
             FROM [AppData].[ApprovalStepDetail] ASD
             INNER JOIN [AppData].[MiscMaster] ApprovalStep on ApprovalStep.Id=ASD.ApprovalStepId
-            INNER JOIN [AppData].[MiscMaster] WorkFlow on WorkFlow.Id=ASD.WorkFlowId
+            INNER JOIN [AppData].[WorkflowType] WorkFlow on WorkFlow.Id=ASD.WorkFlowTypeId
             INNER JOIN [AppData].[MiscMaster] ApprovalType on ApprovalType.Id=ASD.ApprovalTypeId
             WHERE 
-            IsDeleted = 0
+            ASD.IsDeleted = 0
                 AND (@Search IS NULL OR ApprovalStep.Code LIKE @Search OR WorkFlow.Code LIKE @Search OR ApprovalType.Code LIKE @Search)
-                ORDER BY Id desc
+                ORDER BY ASD.Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
             ";
               const string countQuery = @"
               SELECT COUNT(*) 
                FROM [AppData].[ApprovalStepDetail] ASD
             INNER JOIN [AppData].[MiscMaster] ApprovalStep on ApprovalStep.Id=ASD.ApprovalStepId
-            INNER JOIN [AppData].[MiscMaster] WorkFlow on WorkFlow.Id=ASD.WorkFlowId
+            INNER JOIN [AppData].[WorkflowType] WorkFlow on WorkFlow.Id=ASD.WorkFlowTypeId
             INNER JOIN [AppData].[MiscMaster] ApprovalType on ApprovalType.Id=ASD.ApprovalTypeId
              WHERE ASD.IsDeleted = 0  AND (@Search IS NULL OR ApprovalStep.Code LIKE @Search OR WorkFlow.Code LIKE @Search OR ApprovalType.Code LIKE @Search);
           ";
@@ -75,7 +75,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
                 PageSize
             };
 
-            var ApprovalStep = await _dbConnection.QueryAsync<ApprovalStepDetail, MiscMaster, MiscMaster, MiscMaster, ApprovalStepDetail>(
+            var ApprovalStep = await _dbConnection.QueryAsync<ApprovalStepDetail, MiscMaster, WorkflowType, MiscMaster, ApprovalStepDetail>(
                 dataQuery,
                 (detail, approvalStep, workFlow, approvalType) =>
                 {
@@ -84,10 +84,10 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
                          Id = approvalStep.Id,
                          Code = approvalStep.Code
                      };
-                     detail.WorkflowType = new MiscMaster
+                     detail.WorkflowType = new WorkflowType
                      {
                          Id = workFlow.Id,
-                         Code = workFlow.Code
+                         ModuleTypeName = workFlow.ModuleTypeName
                      };
                      detail.ApprovalType = new MiscMaster
                      {

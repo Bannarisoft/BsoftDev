@@ -11,5 +11,6 @@ namespace BackgroundService.Application.Workflow.WorkflowTypes.Commands.UpdateWo
         public int Id { get; set; }
         public int ModuleId { get; set; }
         public string ModuleTypeName { get; set; }
+        public byte IsActive { get; set; }
     }
 }
