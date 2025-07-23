@@ -491,7 +491,3 @@ $RECYCLE.BIN/
 /PurchaseManagement/PurchaseManagement.API/bin
 /PurchaseManagement/PurchaseManagement.Infrastructure/obj
 /FixedAssetManagement/PurchaseManagement.Infrastructure/bin
-**/appsettings.Development.json
-**/appsettings.QA.json
-**/appsettings.Production.json
-**/launchSettings.json
