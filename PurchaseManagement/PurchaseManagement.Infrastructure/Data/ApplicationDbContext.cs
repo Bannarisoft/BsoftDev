@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
+using Core.Domain.Entities;
+using PurchaseManagement.Infrastructure.Data.Configurations;
 
 namespace PurchaseManagement.Infrastructure.Data
 {
@@ -20,12 +22,16 @@ namespace PurchaseManagement.Infrastructure.Data
 
         // public DbSet<AssetGroup> AssetGroup { get; set; } 
 
+        public DbSet<HSNMaster> HSNMaster { get; set; } 
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
+
+            modelBuilder.ApplyConfiguration(new HSNMasterConfiguration());   
+            
 
 
             base.OnModelCreating(modelBuilder);
