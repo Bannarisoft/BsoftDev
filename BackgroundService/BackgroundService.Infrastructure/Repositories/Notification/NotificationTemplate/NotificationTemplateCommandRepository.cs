@@ -43,7 +43,8 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             existingNotificationTemplate.NotificationTypeId = NotificationTemplate.NotificationTypeId;
             existingNotificationTemplate.NotificationConfigId = NotificationTemplate.NotificationConfigId;            
             existingNotificationTemplate.SubjectTemplate = NotificationTemplate.SubjectTemplate;    
-            existingNotificationTemplate.BodyTemplate = NotificationTemplate.BodyTemplate;    
+            existingNotificationTemplate.BodyTemplate = NotificationTemplate.BodyTemplate;                
+            existingNotificationTemplate.HeaderTemplate = NotificationTemplate.HeaderTemplate;
             existingNotificationTemplate.FooterTemplate = NotificationTemplate.FooterTemplate;    
             existingNotificationTemplate.LanguageCode = NotificationTemplate.LanguageCode;    
             existingNotificationTemplate.IsActive=NotificationTemplate.IsActive;

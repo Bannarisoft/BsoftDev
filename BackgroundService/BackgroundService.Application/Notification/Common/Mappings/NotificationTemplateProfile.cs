@@ -18,6 +18,7 @@ namespace BackgroundService.Application.Notification.Common.Mappings
                  .ForMember(dest => dest.NotificationTypeId, opt => opt.MapFrom(src => src.NotificationTypeId))
                  .ForMember(dest => dest.NotificationConfigId, opt => opt.MapFrom(src => src.NotificationConfigId))
                 .ForMember(dest => dest.SubjectTemplate, opt => opt.MapFrom(src => src.SubjectTemplate))
+                .ForMember(dest => dest.HeaderTemplate, opt => opt.MapFrom(src => src.HeaderTemplate))
                 .ForMember(dest => dest.BodyTemplate, opt => opt.MapFrom(src => src.BodyTemplate))
                 .ForMember(dest => dest.FooterTemplate, opt => opt.MapFrom(src => src.FooterTemplate))      
                 .ForMember(dest => dest.LanguageCode, opt => opt.MapFrom(src => src.LanguageCode))      
@@ -26,8 +27,9 @@ namespace BackgroundService.Application.Notification.Common.Mappings
 
             CreateMap<UpdateNotificationTemplateCommand, Domain.Entities.Notification.NotificationTemplate>()
                 .ForMember(dest => dest.NotificationTypeId, opt => opt.MapFrom(src => src.NotificationTypeId))
-                .ForMember(dest => dest.NotificationConfigId, opt => opt.MapFrom(src => src.NotificationConfigId))     
+                .ForMember(dest => dest.NotificationConfigId, opt => opt.MapFrom(src => src.NotificationConfigId))
                 .ForMember(dest => dest.SubjectTemplate, opt => opt.MapFrom(src => src.SubjectTemplate))
+                .ForMember(dest => dest.HeaderTemplate, opt => opt.MapFrom(src => src.HeaderTemplate))
                 .ForMember(dest => dest.BodyTemplate, opt => opt.MapFrom(src => src.BodyTemplate))
                 .ForMember(dest => dest.FooterTemplate, opt => opt.MapFrom(src => src.FooterTemplate))      
                 .ForMember(dest => dest.LanguageCode, opt => opt.MapFrom(src => src.LanguageCode))      

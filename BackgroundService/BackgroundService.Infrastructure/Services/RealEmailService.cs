@@ -4,6 +4,7 @@ using System.Net.Mail;
 using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Infrastructure.Configurations;
 using Contracts.Events.Notifications;
+using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace BackgroundService.Infrastructure.Services
@@ -11,10 +12,12 @@ namespace BackgroundService.Infrastructure.Services
     public class RealEmailService : IEmailService
     {
         private readonly EmailSettings _emailSettings;
+        private readonly ILogger<RealEmailService> _logger;
 
-        public RealEmailService(EmailSettings emailSettings)
+        public RealEmailService(EmailSettings emailSettings, ILogger<RealEmailService> logger)
         {
             _emailSettings = emailSettings;
+             _logger = logger;
         }
 
         public async Task<bool> SendEmailAsync(SendEmailCommand command)
@@ -27,6 +30,8 @@ namespace BackgroundService.Infrastructure.Services
             }
             try
             {
+                _logger.LogInformation("✅ from RealEmailService");    
+
                 var smtpClient = new SmtpClient(provider.Host)
                 {
                     Port = provider.Port,

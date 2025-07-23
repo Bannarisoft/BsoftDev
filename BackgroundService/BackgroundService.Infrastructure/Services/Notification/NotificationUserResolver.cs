@@ -21,15 +21,15 @@ namespace BackgroundService.Infrastructure.Services.Notification
              var parameters = new DynamicParameters();
                 parameters.Add("@UnitId", unitId);
                 parameters.Add("@ModuleName", moduleName);
-                parameters.Add("@EventType", eventTypeId);  // 🔧 This is missing!
+                parameters.Add("@EventType", eventTypeId);
 
-                var results = await _dbConnection.QueryAsync<NotificationTargetDto>(
-                    "WorkFlow_GetUserId",
-                    parameters,
-                    commandType: CommandType.StoredProcedure
-                );
+            var result = (await _dbConnection.QueryAsync<NotificationTargetDto>(
+                "WorkFlow_GetUserId", 
+                parameters,
+                commandType: CommandType.StoredProcedure
+            )).ToList();
 
-                return results.ToList();
+            return result;
         }
     }
 

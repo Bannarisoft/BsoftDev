@@ -39,13 +39,19 @@ using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalStepDeta
 using BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDetails;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRule;
 using BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules;
+using Contracts.Events.Notifications.WorkOrder.Sms;
+using Contracts.Events.Notifications.WorkOrder.Email;
+using Contracts.Events.Notifications.WorkOrder.InApp;
+using BackgroundService.Application.Notification.Common.Interfaces.INotificationDetail;
+using BackgroundService.Infrastructure.Repositories.Notification.NotificationDetail;
 
 namespace BackgroundService.Infrastructure
 {
     public static class DependencyInjection
     {
         private static readonly string[] HangfireQueues = ["schedule_work_order_queue","forgot_password_queue","user_unlock_queue"];
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IServiceCollection builder)
         {
             var HangfireConnectionString = configuration.GetConnectionString("HangfireConnection")
                                                .Replace("{SERVER}", Environment.GetEnvironmentVariable("DATABASE_SERVER") ?? "")
@@ -102,9 +108,12 @@ namespace BackgroundService.Infrastructure
             //Notification
             services.AddMassTransit(x =>
             {
+                x.SetKebabCaseEndpointNameFormatter();
+                x.AddConsumer<ResolveNotificationChannelsConsumer>();
                 x.AddConsumer<SendEmailNotificationConsumer>();
                 x.AddConsumer<SendSmsNotificationConsumer>();
                 x.AddConsumer<SendInAppNotificationConsumer>();
+                
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -113,22 +122,43 @@ namespace BackgroundService.Infrastructure
                         h.Username("guest");
                         h.Password("guest");
                     });
+                
 
-                    cfg.ReceiveEndpoint("email-notification-queue", e =>
+                    cfg.ReceiveEndpoint("resolve-notification-channels-queue", e =>
                     {
+                        e.ConfigureConsumer<ResolveNotificationChannelsConsumer>(context);
+                         
+                    });
+             
+                    cfg.ReceiveEndpoint("email-notification-queue", e =>
+
+                    {                        
+                        e.Bind("Contracts.Events.Notifications.WorkOrder.Email:SendEmailNotificationInternalCommand", s =>
+                        {
+                            s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
+                        });
+
                         e.ConfigureConsumer<SendEmailNotificationConsumer>(context);
                     });
-
                     cfg.ReceiveEndpoint("sms-notification-queue", e =>
                     {
-                        e.ConfigureConsumer<SendSmsNotificationConsumer>(context);
-                    });
+                        e.Bind("Contracts.Events.Notifications.WorkOrder.Sms:SendSmsNotificationInternalCommand", s =>
+                        {
+                            s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
+                        });
 
-                    cfg.ReceiveEndpoint("inapp-notification-queue", e =>
+                        e.ConfigureConsumer<SendSmsNotificationConsumer>(context);
+
+                    }); 
+                     cfg.ReceiveEndpoint("inapp-notification-queue", e =>
                     {
-                        e.ConfigureConsumer<SendInAppNotificationConsumer>(context);
-                    });
+                        e.Bind("Contracts.Events.Notifications.WorkOrder.InApp:SendInAppNotificationInternalCommand", s =>
+                        {
+                            s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
+                        });
+
                     
+                     
                 });
             });
 
@@ -147,14 +177,8 @@ namespace BackgroundService.Infrastructure
             services.AddHttpClient("UserManagementClient", client =>
            {
                //client.BaseAddress = new Uri("http://localhost:5174"); 
-               client.BaseAddress = new Uri(configuration["HttpClientSettings:UserManagementService"]);
-               // var userServiceUrl = configuration["HttpClientSettings:UserManagement"];
-               // if (string.IsNullOrWhiteSpace(userServiceUrl))
-               // {
-               //     throw new ArgumentNullException("UserServiceUrl is missing in configuration.");
-               // }
 
-               //client.BaseAddress = new Uri(userServiceUrl);
+               client.BaseAddress = new Uri(configuration["HttpClientSettings:UserManagementService"]);          
            })
 
               .AddTransientHttpErrorPolicy(policyBuilder =>
@@ -194,12 +218,15 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationGroupCommand, NotificationGroupCommandRepository >();
             services.AddScoped<INotificationGroupQuery, NotificationGroupQueryRepository >();
             services.AddScoped<IIPAddressService, IPAddressService>();
-            services.AddScoped<ITimeZoneService, TimeZoneService>();
+
+            services.AddSingleton<ITimeZoneService, TimeZoneService>();
+            services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();   
             services.AddScoped<INotificationLevelHierarchyCommandRepository, NotificationLevelHierarchyCommandRepository>();  
             services.AddScoped<INotificationLevelHierarchyQueryRepository, NotificationLevelHierarchyQueryRepository>();  
             services.AddScoped<INotificationTemplateCommandRepository, NotificationTemplateCommandRepository>();  
             services.AddScoped<INotificationTemplateQueryRepository, NotificationTemplateQueryRepository>();
             services.AddScoped<INotificationUserResolver, NotificationUserResolver>();
+            services.AddScoped<INotificationDetailRepository, NotificationDetailRepository>();
             services.AddScoped<NotificationResolverHandler>();
             //Notification
             services.AddScoped<IEmailSender, EmailSender>();
@@ -209,6 +236,8 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationGroupMemberQuery, NotificationGroupMemberQueryRepository >();
             services.AddScoped<INotificationEventRuleCommand, NotificationEventRuleCommandRepository >();
             services.AddScoped<INotificationEventRuleQuery, NotificationEventRuleQueryRepository >();
+            services.AddScoped<INotificationLogger, NotificationLogger>();
+            
 
              services.AddScoped<IWorkflowTypeQuery, WorkflowTypeQueryRepository >();
             services.AddScoped<IWorkflowTypeCommand, WorkflowTypeCommandRepository >();

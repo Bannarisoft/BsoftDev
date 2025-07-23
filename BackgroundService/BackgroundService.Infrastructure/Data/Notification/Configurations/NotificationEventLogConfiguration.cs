@@ -66,10 +66,25 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
             .HasForeignKey(ac => ac.NotificationStatusId)
             .OnDelete(DeleteBehavior.NoAction);
 
+             builder.Property(t => t.SendTo)
+            .HasColumnName("SendTo")
+            .HasColumnType("varchar(1000)")
+            .IsRequired();
+
             builder.Property(t => t.MessageText)
             .HasColumnName("MessageText")
             .HasColumnType("Varchar(Max)")
             .IsRequired();
+
+            builder.Property(t => t.ReadStatusId)
+            .HasColumnName("ReadStatusId")
+            .HasColumnType("int")
+            .IsRequired();
+              builder.HasOne(ac => ac.ReadStatus)
+            .WithMany(am => am.ReadStatus)
+            .HasForeignKey(ac => ac.ReadStatusId)
+            .OnDelete(DeleteBehavior.NoAction);
+
 
             builder.Property(t => t.Timestamp)
             .HasColumnName("Timestamp")

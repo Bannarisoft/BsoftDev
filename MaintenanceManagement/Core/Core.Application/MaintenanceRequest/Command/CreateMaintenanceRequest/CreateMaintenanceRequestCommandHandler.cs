@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Events.Notifications;
 using Contracts.Events.Notifications.WorkOrder;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
@@ -79,6 +80,9 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
             var requestTypes = await _maintenanceRequestQueryRepository.GetMaintenanceRequestTypeAsync();
             var internalTypeId = requestTypes.FirstOrDefault()?.Id;
 
+            var machineId = await _maintenanceRequestQueryRepository.GetMachineNameAsync(maintenanceRequest.MachineId);
+            var machineName = machineId;
+
             if (internalTypeId.HasValue && maintenanceRequest.RequestTypeId == internalTypeId.Value)
             {
                 var workOrder = _imapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(maintenanceRequest);
@@ -93,18 +97,18 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
                 var correlationId = Guid.NewGuid();
                 await _publishEndpoint.Publish(new WorkOrderCreatedEvent
                 {
-                    CorrelationId =correlationId, // Important for Saga tracking
-                    WorkOrderId = workOrder.Id,
-                    WorkOrderTitle = "Create",
+                    CorrelationId = correlationId,                     
                     CreatedByName = workOrder.CreatedByName,
                     UnitId = _ipAddressService.GetUnitId(),
                     ModuleName = "WorkOrder",
-                    EventTypeId = 14
+                    EventTypeId = (int)NotificationEnum.NotificationEvent.Create,  
+                    param1 = workOrder.Id.ToString(),                
+                    param2 =machineName,         
+                    param3 = workOrder.CreatedDate   ?? DateTimeOffset.UtcNow                                
                 });
 
                 _logger.LogInformation("✅ Maintenance Request Workorder Created. CorrelationId: {CorrelationId}, WorkOrderId: {WorkOrderId}",
-                correlationId, workOrder.Id);     
-                        
+                correlationId, workOrder.Id);                          
             }                                     
             // 🔹 Publish domain event for auditing/logging
             var domainEvent = new AuditLogsDomainEvent(

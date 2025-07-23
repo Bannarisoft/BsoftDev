@@ -19,7 +19,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
         public async Task<NotificationTemplateDto> GetByIdAsync(int Id)
         {
             const string query = @" select 
-                    NC.Id, NotificationTypeId, NotificationConfigId,SubjectTemplate,BodyTemplate,FooterTemplate,LanguageCode,NCF.ModuleName,MM.Code ChannelName, NC.IsActive, 
+                    NC.Id, NotificationTypeId, NotificationConfigId,SubjectTemplate,HeaderTemplate,BodyTemplate,FooterTemplate,LanguageCode,NCF.ModuleName,MM.Code ChannelName, NC.IsActive, 
                     NC.IsDeleted, NC.CreatedBy, NC.CreatedDate, NC.CreatedByName, NC.CreatedIP, NC.ModifiedBy, NC.ModifiedDate, NC.ModifiedByName, NC.ModifiedIP
                     FROM  AppNotification.NotificationTemplate NC
                     INNER JOIN AppNotification.NotificationConfig NCF on NCF.Id=NC.NotificationConfigId                    
@@ -57,7 +57,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search)")}};
 
             SELECT 
-                NC.Id, NotificationTypeId, NotificationConfigId,SubjectTemplate,BodyTemplate,FooterTemplate,LanguageCode,NCF.ModuleName,MM.Code ChannelName, NC.IsActive, 
+                NC.Id, NotificationTypeId, NotificationConfigId,SubjectTemplate,HeaderTemplate,BodyTemplate,FooterTemplate,LanguageCode,NCF.ModuleName,MM.Code ChannelName, NC.IsActive, 
                 NC.IsDeleted, NC.CreatedBy, NC.CreatedDate, NC.CreatedByName, NC.CreatedIP, NC.ModifiedBy, NC.ModifiedDate, NC.ModifiedByName, NC.ModifiedIP
                 FROM  AppNotification.NotificationTemplate NC
                 INNER JOIN AppNotification.NotificationConfig NCF on NCF.Id=NC.NotificationConfigId                    

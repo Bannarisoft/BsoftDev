@@ -9,13 +9,14 @@ using BackgroundService.API.Validation.Common;
 using MediatR;
 using BackgroundService.Application.Notification.Common.Behaviors;
 using BackgroundService.Application.Hubs;
+using BackgroundService.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSignalR();
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?? "Development";
 
 builder.Configuration
 .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+.AddJsonFile("settings/jwtsetting.json", optional: false, reloadOnChange: true)
 .AddEnvironmentVariables();
 
 // Add validation services
@@ -24,9 +25,11 @@ validationService.AddValidationServices(builder.Services);
 // Add services
 builder.Services.AddControllers();
 builder.Services.AddSwaggerDocumentation();
+builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCorsPolicy();
 builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddHttpClients(builder.Configuration);
+builder.Services.AddInfrastructureServices(builder.Configuration, builder.Services);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 builder.Services.AddMemoryCache();
@@ -51,14 +54,16 @@ app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
 app.UseMiddleware<BackgroundService.Infrastructure.Logging.Middleware.LoggingMiddleware>();
 app.UseRouting();
 app.UseCors("AllowAll");
-
+app.UseAuthentication();
+app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
-app.MapHub<NotificationHub>("/notificationHub");
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapGrpcService<MaintenanceJobGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<MaintenanceHangfireRemoveGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/notificationHub");    
 });
 
 // app.MapControllers();

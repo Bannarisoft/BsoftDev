@@ -53,6 +53,11 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
             .HasColumnType("NVarchar(Max)")
             .IsRequired();
 
+            builder.Property(t => t.HeaderTemplate)
+            .HasColumnName("HeaderTemplate")
+            .HasColumnType("NVarchar(Max)")
+            .IsRequired();
+
               builder.Property(t => t.BodyTemplate)
             .HasColumnName("BodyTemplate")
             .HasColumnType("NVarchar(Max)")

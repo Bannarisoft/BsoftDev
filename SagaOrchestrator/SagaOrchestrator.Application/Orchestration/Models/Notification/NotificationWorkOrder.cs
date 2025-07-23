@@ -28,7 +28,6 @@ namespace SagaOrchestrator.Application.Orchestration.Models.Notifications
 
         public string? FailureReason { get; set; }
 
-        // Optional: For rollback logging, traceability, etc.
         public int UnitId { get; set; }
         public int EventTypeId { get; set; }
         public string ModuleName { get; set; } = string.Empty;

@@ -1,7 +1,10 @@
+using Contracts.Events.Notifications.WorkOrder.Sms;
+
 namespace BackgroundService.Application.Interfaces.Notification
 {
     public interface ISmsSender
     {
-        Task<bool> SendSmsAsync(List<string> mobileNumbers, string message);
+        Task<bool> SendSmsAsyncOld(List<string> mobileNumbers, string message);
+        Task<bool> SendSmsAsync(SendSmsNotificationCommand command);
     }
 }

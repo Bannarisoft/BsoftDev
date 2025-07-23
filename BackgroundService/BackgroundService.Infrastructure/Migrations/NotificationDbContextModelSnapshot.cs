@@ -273,6 +273,15 @@ namespace BackgroundService.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("NotificationStatusId");
 
+                    b.Property<int>("ReadStatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("ReadStatusId");
+
+                    b.Property<string>("SendTo")
+                        .IsRequired()
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("SendTo");
+
                     b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("Timestamp");
@@ -284,6 +293,8 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.HasIndex("NotificationLevelRuleId");
 
                     b.HasIndex("NotificationStatusId");
+
+                    b.HasIndex("ReadStatusId");
 
                     b.ToTable("NotificationEventLog", "AppNotification");
                 });
@@ -581,6 +592,11 @@ namespace BackgroundService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("NVarchar(Max)")
                         .HasColumnName("FooterTemplate");
+
+                    b.Property<string>("HeaderTemplate")
+                        .IsRequired()
+                        .HasColumnType("NVarchar(Max)")
+                        .HasColumnName("HeaderTemplate");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
@@ -936,11 +952,19 @@ namespace BackgroundService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("BackgroundService.Domain.Entities.Notification.MiscMaster", "ReadStatus")
+                        .WithMany("ReadStatus")
+                        .HasForeignKey("ReadStatusId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Channel");
 
                     b.Navigation("NotificationEventRules");
 
                     b.Navigation("NotificationStatus");
+
+                    b.Navigation("ReadStatus");
                 });
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.NotificationEventRule", b =>
@@ -1112,6 +1136,8 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Navigation("NotificationStatus");
 
                     b.Navigation("NotificationTemplates");
+
+                    b.Navigation("ReadStatus");
 
                     b.Navigation("RecipientType");
 

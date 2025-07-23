@@ -27,6 +27,7 @@ namespace Core.Application.Common.Interfaces.IMaintenanceRequest
            Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceServiceLocationDescAsync();  
           Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceSpareTypeDescAsync();
          Task<List<Core.Domain.Entities.MiscMaster>> GetMaintenanceDispatchModeDescAsync();
+         Task<string> GetMachineNameAsync(int id);
 
           //Task<List<RequestReportDto>> GetMaintenanceStatusDescAsync( DateTimeOffset? RequestFromDate, DateTimeOffset? RequestToDate , int? GetRequestType , int?  RequestStatus);  
           
