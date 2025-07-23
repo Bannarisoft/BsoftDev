@@ -7,7 +7,6 @@ namespace BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.Cr
 {
     public class ApprovalStepUnitMappingDto
     {
-        public int ApprovalStepDetailId { get; set; }
         public int UnitId { get; set; }
     }
 }

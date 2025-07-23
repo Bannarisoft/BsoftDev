@@ -156,8 +156,8 @@ namespace BackgroundService.Infrastructure
                         {
                             s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
                         });
-
-                    
+                         e.ConfigureConsumer<SendInAppNotificationConsumer>(context);
+                     }); 
                      
                 });
             });

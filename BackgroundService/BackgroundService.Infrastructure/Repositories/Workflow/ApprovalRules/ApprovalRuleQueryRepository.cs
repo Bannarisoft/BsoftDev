@@ -44,9 +44,9 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules
                 AR.UnitId,
                 AR.WorkflowTypeId,
                 AR.IsActive,AR.CreatedDate,AR.CreatedBy,AR.CreatedByName,AR.ModifiedBy,AR.ModifiedDate,AR.ModifiedByName,
-                WT.Id,WT.ModuleTypeName
+                WorkFlow.Id,WorkFlow.ModuleTypeName
             FROM [AppData].[ApprovalRule] AR
-            INNER JOIN [AppData].[WorkflowType] WorkFlow on WorkFlow.Id=ASD.WorkFlowTypeId
+            INNER JOIN [AppData].[WorkflowType] WorkFlow on WorkFlow.Id=AR.WorkFlowTypeId
             WHERE 
             AR.IsDeleted = 0
                 AND (@Search IS NULL OR WorkFlow.ModuleTypeName LIKE @Search)
@@ -56,7 +56,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules
               const string countQuery = @"
               SELECT COUNT(*) 
                FROM [AppData].[ApprovalRule] AR
-            INNER JOIN [AppData].[WorkflowType] WorkFlow on WorkFlow.Id=ASD.WorkFlowTypeId
+            INNER JOIN [AppData].[WorkflowType] WorkFlow on WorkFlow.Id=AR.WorkFlowTypeId
              WHERE AR.IsDeleted = 0  AND (@Search IS NULL OR WorkFlow.ModuleTypeName LIKE @Search );
           ";
 

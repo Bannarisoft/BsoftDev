@@ -22,7 +22,7 @@ namespace BackgroundService.API.Controller.Workflow
         {
             _mediator = mediator;
         }
-                   [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> GetAllApprovalRuleAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
         {
            var ApprovalRule = await Mediator.Send(

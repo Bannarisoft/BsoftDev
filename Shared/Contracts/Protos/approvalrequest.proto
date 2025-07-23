@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcServices.Background";
+
+package background;
+
+// gRPC service exposed by BackgroundService
+service ApprovalRequestJobService {
+  rpc ApprovalRequest (ApprovalRequestDto) returns (ApprovalRequestResponse);
+}
+
+
+message ApprovalRequestDto {
+  string ModuleTypeName =1;
+  int32 ModuleTransactionId = 2;
+}
+
+
+message ApprovalRequestResponse {
+  bool IsSuccess = 1;
+}

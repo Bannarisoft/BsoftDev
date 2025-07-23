@@ -34,6 +34,8 @@ namespace BackgroundService.Infrastructure.Data.Notification
         public DbSet<ApprovalStepUnitMapping> ApprovalStepUnitMapping { get; set; }
         public DbSet<ApprovalRule> ApprovalRule { get; set; }
         public DbSet<RuleSkipApproverMapping> RuleSkipApproverMapping { get; set; }
+        public DbSet<ApprovalRequest> ApprovalRequest { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new NotificationConfigConfiguration());
@@ -48,8 +50,9 @@ namespace BackgroundService.Infrastructure.Data.Notification
             modelBuilder.ApplyConfiguration(new WorkflowTypeConfiguration());
             modelBuilder.ApplyConfiguration(new ApprovalStepDetailConfiguration());
             modelBuilder.ApplyConfiguration(new ApprovalStepUnitMappingConfiguration());
-             modelBuilder.ApplyConfiguration(new ApprovalRuleConfiguration());
+            modelBuilder.ApplyConfiguration(new ApprovalRuleConfiguration());
             modelBuilder.ApplyConfiguration(new RuleSkipApproverMappingConfiguration());
+            modelBuilder.ApplyConfiguration(new ApprovalRequestConfiguration());
         }
           public override int SaveChanges()
         {

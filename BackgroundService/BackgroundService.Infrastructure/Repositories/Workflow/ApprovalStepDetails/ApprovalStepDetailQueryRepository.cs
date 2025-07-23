@@ -47,14 +47,14 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
                 ASD.SLAHours,
                 ASD.OnSLAAction,
                 ASD.IsActive,ASD.CreatedDate,ASD.CreatedBy,ASD.CreatedByName,ASD.ModifiedBy,ASD.ModifiedDate,ASD.ModifiedByName,
-                ApprovalStep.Id,ApprovalStep.Code,WorkFlow.Id,WorkFlow.Code,ApprovalType.Id,ApprovalType.Code
+                ApprovalStep.Id,ApprovalStep.Code,WorkFlow.Id,WorkFlow.ModuleTypeName,ApprovalType.Id,ApprovalType.Code
             FROM [AppData].[ApprovalStepDetail] ASD
             INNER JOIN [AppData].[MiscMaster] ApprovalStep on ApprovalStep.Id=ASD.ApprovalStepId
             INNER JOIN [AppData].[WorkflowType] WorkFlow on WorkFlow.Id=ASD.WorkFlowTypeId
             INNER JOIN [AppData].[MiscMaster] ApprovalType on ApprovalType.Id=ASD.ApprovalTypeId
             WHERE 
             ASD.IsDeleted = 0
-                AND (@Search IS NULL OR ApprovalStep.Code LIKE @Search OR WorkFlow.Code LIKE @Search OR ApprovalType.Code LIKE @Search)
+                AND (@Search IS NULL OR ApprovalStep.Code LIKE @Search OR WorkFlow.ModuleTypeName LIKE @Search OR ApprovalType.Code LIKE @Search)
                 ORDER BY ASD.Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
             ";
@@ -64,7 +64,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
             INNER JOIN [AppData].[MiscMaster] ApprovalStep on ApprovalStep.Id=ASD.ApprovalStepId
             INNER JOIN [AppData].[WorkflowType] WorkFlow on WorkFlow.Id=ASD.WorkFlowTypeId
             INNER JOIN [AppData].[MiscMaster] ApprovalType on ApprovalType.Id=ASD.ApprovalTypeId
-             WHERE ASD.IsDeleted = 0  AND (@Search IS NULL OR ApprovalStep.Code LIKE @Search OR WorkFlow.Code LIKE @Search OR ApprovalType.Code LIKE @Search);
+             WHERE ASD.IsDeleted = 0  AND (@Search IS NULL OR ApprovalStep.Code LIKE @Search OR WorkFlow.ModuleTypeName LIKE @Search OR ApprovalType.Code LIKE @Search);
           ";
 
 

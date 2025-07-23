@@ -16,5 +16,6 @@ namespace BackgroundService.Domain.Entities.Workflow
         public int UnitId { get; set; }
         public int WorkflowTypeId { get; set; }
         public WorkflowType WorkflowType { get; set; }
+        public ICollection<ApprovalRequest> ApprovalRequest { get; set; }
     }
 }

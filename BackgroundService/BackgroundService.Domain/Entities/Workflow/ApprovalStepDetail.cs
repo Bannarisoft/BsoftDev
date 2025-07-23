@@ -21,5 +21,6 @@ namespace BackgroundService.Domain.Entities.Workflow
         public MiscMaster ApprovalType { get; set; }
         public ICollection<RuleSkipApproverMapping> RuleSkipApproverMappings { get; set; }
         public ICollection<ApprovalStepUnitMapping> ApprovalStepUnitMappings { get; set; }
+        public ICollection<ApprovalRequest> ApprovalRequest { get; set; }
     }
 }

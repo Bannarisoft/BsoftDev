@@ -8,6 +8,6 @@ namespace BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.Cr
     public class RuleSkipApproverMappingDto
     {
         public int RuleId { get; set; }
-        public int ApprovalDetailId { get; set; }
+    
     }
 }

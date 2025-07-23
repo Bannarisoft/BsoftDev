@@ -7,6 +7,7 @@ using BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.Create
 using BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.DeleteApprovalStepDetail;
 using BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.UpdateApprovalStepDetail;
 using BackgroundService.Application.Workflow.ApprovalStepDetails.Queries.GetAllApprovalStepDetail;
+using BackgroundService.Domain.Entities.Notification;
 using BackgroundService.Domain.Entities.Workflow;
 using static BackgroundService.Domain.Common.BaseEntity;
 
@@ -22,7 +23,12 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
             .ForMember(dest => dest.ApprovalStep, opt => opt.MapFrom(src => src.ApprovalStep))
             .ForMember(dest => dest.ApprovalType, opt => opt.MapFrom(src => src.ApprovalType));
 
-
+            CreateMap<WorkflowType, WorkflowTypeApprovalStepDto>();
+            CreateMap<MiscMaster, ApprovalStepDto>()
+            .ForMember(dest => dest.StepName, opt => opt.MapFrom(src => src.Code));
+            CreateMap<MiscMaster, ApprovalTypeDto>()
+            .ForMember(dest => dest.ApproverTypeName, opt => opt.MapFrom(src => src.Code));
+    
             CreateMap<CreateApprovalStepDetailCommand, ApprovalStepDetail>()
                  .ForMember(dest => dest.Id, opt => opt.Ignore())
                  .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
@@ -30,6 +36,8 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
                  .ForMember(dest => dest.ApprovalStepUnitMappings, opt => opt.MapFrom(src => src.ApprovalStepUnitMappings))
                  .ForMember(dest => dest.RuleSkipApproverMappings, opt => opt.MapFrom(src => src.RuleSkipApproverMappings));
 
+            CreateMap<ApprovalStepUnitMappingDto, ApprovalStepUnitMapping>();
+            CreateMap<RuleSkipApproverMappingDto, RuleSkipApproverMapping>();
 
             CreateMap<UpdateApprovalStepDetailCommand, ApprovalStepDetail>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive))
