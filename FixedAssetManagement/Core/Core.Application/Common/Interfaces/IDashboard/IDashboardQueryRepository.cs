@@ -13,7 +13,7 @@ namespace Core.Application.Common.Interfaces.IDashboard
         Task<CardViewDto> GetDashboardDataAsync();
         Task<ChartDto> GetAssetExpiredDashBoardDataAsync();
 
-        Task<ChartDto> GetAssetChartViewAsync();
+        Task<ChartDto> GetAssetChartViewAsync(int? departmentId);
 
         
     }

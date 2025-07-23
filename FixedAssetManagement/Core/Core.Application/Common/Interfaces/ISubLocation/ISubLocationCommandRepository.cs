@@ -7,8 +7,10 @@ namespace Core.Application.Common.Interfaces.ISubLocation
 {
     public interface ISubLocationCommandRepository
     {
-        Task<Core.Domain.Entities.SubLocation> CreateAsync(Core.Domain.Entities.SubLocation sublocation);     
+        Task<Core.Domain.Entities.SubLocation> CreateAsync(Core.Domain.Entities.SubLocation sublocation);
         Task<bool> UpdateAsync(Core.Domain.Entities.SubLocation sublocation);
-        Task<bool> DeleteAsync(int id,Core.Domain.Entities.SubLocation sublocation); 
+        Task<bool> DeleteAsync(int id, Core.Domain.Entities.SubLocation sublocation); 
+        Task<bool> ExistsByCodeAsync(string code , int? Id=null);        
+        
     }
 }
