@@ -43,11 +43,11 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
 
             builder.Property(t => t.HSNCode)
                 .HasColumnName("HSNCode")
-                .HasColumnType("varchar(250)")
+                .HasColumnType("varchar(10)")
                 .IsRequired();
 
             builder.Property(t => t.Description)
-                .HasColumnName("HSNDescription")
+                .HasColumnName("Description")
                 .HasColumnType("varchar(250)")
                 .IsRequired();
 
@@ -78,7 +78,7 @@ namespace PurchaseManagement.Infrastructure.Data.Configurations
 
             builder.Property(t => t.ValidFrom)
                 .HasColumnName("ValidFrom")
-                .HasColumnType("date")
+                .HasColumnType("datetimeoffset")
                 .IsRequired();      
 
             builder.Property(b => b.IsActive)
