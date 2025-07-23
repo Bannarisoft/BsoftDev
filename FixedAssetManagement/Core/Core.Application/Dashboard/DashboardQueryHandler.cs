@@ -23,7 +23,7 @@ namespace Core.Application.Dashboard
             return request.Type switch
             {
                 "assetexpirySummary" => await _repository.GetAssetExpiredDashBoardDataAsync(),
-                "assetSummary" => await _repository.GetAssetChartViewAsync(),
+                "assetSummary" => await _repository.GetAssetChartViewAsync( request.DepartmentId),
                 _ => throw new ArgumentException("Invalid type.")
             };
         }
