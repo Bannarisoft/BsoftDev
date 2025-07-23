@@ -194,43 +194,87 @@ namespace FAM.API.Controllers.AssetMaster
             return Ok(result);
 
         }
+        
         [HttpGet("GetAssetDetailsToTransfer/{AssetId}")]
+          
         public async Task<IActionResult> GetAssetDetailsToTransferByIdAsync(int AssetId)
         {
-
-            // 🔹 Check if the asset is pending or approved (with AckStatus <> 1)
+            // 🔹 Step 1: Restriction Check
             bool isRestricted = await _assetTransferQueryRepository.IsAssetPendingOrApprovedAsync(AssetId);
-
             if (isRestricted)
             {
-                var errorResponse = new ApiResponseDTO<object>
+                return BadRequest(new
                 {
-                    IsSuccess = false,
-                    Message = $"Asset ID {AssetId} is in 'Pending' or 'Approved' state with unacknowledged status.",
-                    Data = null,
-                    StatusCode = StatusCodes.Status400BadRequest
-                };
-                return BadRequest(errorResponse);
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    message = $"Asset ID {AssetId} is in 'Pending' or 'Approved' state with unacknowledged status.",
+                    data = (object)null
+                });
             }
 
+            // 🔹 Step 2: Query Execution
             var query = new GetAssetDetailsToTransferQuery { AssetId = AssetId };
             var result = await Mediator.Send(query);
-              if (result == null || result.Data == null)
+
+            // 🔹 Step 3: Not Found Check
+            if (result == null || result.Data == null)
+            {
+                return NotFound(new
                 {
-                    var notFoundResponse = new ApiResponseDTO<object>
-                    {
-                        IsSuccess = false,
-                        Message = $"Asset with ID {AssetId} not found.",
-                        Data = null,
-                        StatusCode = StatusCodes.Status404NotFound
-                    };
-                    return NotFound(notFoundResponse);
-                }
+                    StatusCode = StatusCodes.Status404NotFound,
+                    message = $"Asset with ID {AssetId} not found.",
+                    data = (object)null
+                });
+            }
 
-                // Return result as is, since it already has ApiResponseDTO<T>
-                return Ok(result); 
-
+            // 🔹 Step 4: Success Response (Fixed 200 OK)
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = result.Message,
+                data = result.Data
+            });
         }
+
+
+        // [HttpGet("GetAssetDetailsToTransfer/{AssetId}")]
+        // public async Task<IActionResult> GetAssetDetailsToTransferByIdAsync(int AssetId)
+        // {
+
+        //     // 🔹 Check if the asset is pending or approved (with AckStatus <> 1)
+        //     bool isRestricted = await _assetTransferQueryRepository.IsAssetPendingOrApprovedAsync(AssetId);
+
+        //     if (isRestricted)
+        //     {
+        //         var errorResponse = new ApiResponseDTO<object>
+        //         {
+        //             IsSuccess = false,
+        //             Message = $"Asset ID {AssetId} is in 'Pending' or 'Approved' state with unacknowledged status.",
+        //             Data = null,
+        //             StatusCode = StatusCodes.Status400BadRequest
+        //         };
+        //         return BadRequest(errorResponse);
+        //     }
+
+        //     var query = new GetAssetDetailsToTransferQuery { AssetId = AssetId };
+        //     var result = await Mediator.Send(query);
+        //       if (result == null || result.Data == null)
+        //         {
+        //             var notFoundResponse = new ApiResponseDTO<object>
+        //             {
+        //                 IsSuccess = false,
+        //                 Message = $"Asset with ID {AssetId} not found.",
+        //                 Data = null,
+        //                 StatusCode = StatusCodes.Status404NotFound
+        //             };
+        //             return NotFound(notFoundResponse);
+        //         }
+
+        //         // Return result as is, since it already has ApiResponseDTO<T>
+
+
+        //         return Ok(result); 
+
+        // }
 
 
 
