@@ -9,7 +9,8 @@ namespace BackgroundService.Application.Notification.GetNotificationDetail.GetNo
         public string? ChannelName { get; set; }
         public string? ActionStatus { get; set; }
         public string? ReadStatus { get; set; }
-        public string?  MessageText { get; set; }
+        public string? ReadStatusId { get; set; }
+        public string? MessageText { get; set; }
         public DateTimeOffset?  Timestamp { get; set; }      
         public int CreatedBy { get; set; }
         public DateTimeOffset? CreatedDate { get; set; }
