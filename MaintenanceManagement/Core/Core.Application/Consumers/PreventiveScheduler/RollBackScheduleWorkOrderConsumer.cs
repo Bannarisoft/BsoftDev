@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Contracts.Commands.Maintenance.PreventiveScheduler;
 using Contracts.Interfaces.External.IMaintenance;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using Hangfire;
 using MassTransit;
 
@@ -15,15 +16,19 @@ namespace Core.Application.Consumers.PreventiveScheduler
         private readonly IPreventiveSchedulerCommand _preventiveSchedulerCommand;
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IBackgroundServiceClient _backgroundServiceClient;
-        public RollBackScheduleWorkOrderConsumer(IPreventiveSchedulerCommand preventiveSchedulerCommand, IPreventiveSchedulerQuery preventiveSchedulerQuery, IBackgroundServiceClient backgroundServiceClient)
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
+        public RollBackScheduleWorkOrderConsumer(IPreventiveSchedulerCommand preventiveSchedulerCommand, IPreventiveSchedulerQuery preventiveSchedulerQuery,
+         IBackgroundServiceClient backgroundServiceClient, IPreventiveScheduleLogService preventiveScheduleLogService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _backgroundServiceClient = backgroundServiceClient;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
         }
 
         public async Task Consume(ConsumeContext<RollbackPreventiveCommand> context)
         {
+            await _preventiveScheduleLogService.CaptureLogs(context.Message.PreventiveSchedulerHeaderId,null,"Create Schedule Roll Back Schedules",context.Message.Reason);
             var details =  await _preventiveSchedulerQuery.GetPreventiveSchedulerDetail(context.Message.PreventiveSchedulerHeaderId);
            foreach (var detail in details)
            {

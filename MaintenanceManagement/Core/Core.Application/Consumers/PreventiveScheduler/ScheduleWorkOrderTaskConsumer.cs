@@ -69,8 +69,7 @@ namespace Core.Application.Consumers.PreventiveScheduler
                 if (getMachineWiseDetail.Count > 0)
                 {
 
-                    await _hubContext.Clients.All.SendAsync("ReceiveMessage",
-                    $"Preventive Schedule created successfully: {headerId}");
+                  
 
                     await context.Publish(new ScheduleWorkOrderCreationEvent
                     {
@@ -80,8 +79,7 @@ namespace Core.Application.Consumers.PreventiveScheduler
 
                 else
                 {
-                    await _hubContext.Clients.All.SendAsync("ReceiveMessage",
-                    $"Preventive Schedule creation failed: {headerId}");
+                  
 
                     await context.Publish(new ScheduleWorkOrderFailedEvent
                     {
@@ -92,9 +90,7 @@ namespace Core.Application.Consumers.PreventiveScheduler
              }
             catch (Exception ex)
             {
-                var headerId = context.Message.PreventiveSchedulerHeaderId;
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", 
-                $"Preventive Schedule creation failed: {headerId}");
+            
 
                 await context.RespondAsync(new ScheduleWorkOrderFailedEvent
                 {

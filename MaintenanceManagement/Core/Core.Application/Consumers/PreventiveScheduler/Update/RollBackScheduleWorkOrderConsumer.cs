@@ -7,6 +7,7 @@ using Contracts.Commands.Maintenance.PreventiveScheduler.Update;
 using Contracts.Interfaces.External.IMaintenance;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using Core.Domain.Entities;
 using MassTransit;
 
@@ -19,17 +20,21 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IBackgroundServiceClient  _backgroundServiceClient;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
         public RollBackScheduleWorkOrderConsumer(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper,
-        IPreventiveSchedulerQuery preventiveSchedulerQuery, IBackgroundServiceClient backgroundServiceClient, IMiscMasterQueryRepository miscMasterQueryRepository)
+        IPreventiveSchedulerQuery preventiveSchedulerQuery, IBackgroundServiceClient backgroundServiceClient, IMiscMasterQueryRepository miscMasterQueryRepository,
+        IPreventiveScheduleLogService preventiveScheduleLogService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _backgroundServiceClient = backgroundServiceClient;
             _miscMasterQueryRepository = miscMasterQueryRepository;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
         }
         public async Task Consume(ConsumeContext<RollBackScheduleWorkOrderCommand> context)
         {
+            await _preventiveScheduleLogService.CaptureLogs(context.Message.PreventiveSchedulerHeaderId,null,"Update Schedule Roll Back",context.Message.Reason);
             var rollbackHeader = _mapper.Map<PreventiveSchedulerHeader>(context.Message.rollbackHeaders);
             await _preventiveSchedulerCommand.UpdateScheduleMetadata(rollbackHeader);
 
