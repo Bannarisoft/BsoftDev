@@ -10,6 +10,7 @@ using Core.Application.Common.Interfaces.IMachineGroup;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
 using Core.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 
 namespace Core.Application.PreventiveSchedulers.Commands.RescheduleBulkImport
@@ -21,13 +22,15 @@ namespace Core.Application.PreventiveSchedulers.Commands.RescheduleBulkImport
         private readonly IBackgroundServiceClient  _backgroundServiceClient;
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public RescheduleBulkImportCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IBackgroundServiceClient backgroundServiceClient,
-         IPreventiveSchedulerQuery preventiveSchedulerQuery, IMapper mapper)
+         IPreventiveSchedulerQuery preventiveSchedulerQuery, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _backgroundServiceClient = backgroundServiceClient;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ApiResponseDTO<string>> Handle(RescheduleBulkImportCommand request, CancellationToken cancellationToken)
@@ -140,16 +143,16 @@ namespace Core.Application.PreventiveSchedulers.Commands.RescheduleBulkImport
                         var delay = startDateTime - DateTime.Now;
                         string newJobId;
                         var delayInMinutes = (int)delay.TotalMinutes;
-
+                        var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
                         if (delay.TotalSeconds > 0)
                         {
-                            newJobId = await _backgroundServiceClient.ScheduleWorkOrder(machinedetail.Id, delayInMinutes);
+                            newJobId = await _backgroundServiceClient.ScheduleWorkOrder(machinedetail.Id, delayInMinutes,token);
                         }
                         else
                         {
                             jobDelayMin += 2;
 
-                            newJobId = await _backgroundServiceClient.ScheduleWorkOrder(machinedetail.Id, jobDelayMin);
+                            newJobId = await _backgroundServiceClient.ScheduleWorkOrder(machinedetail.Id, jobDelayMin,token);
                         }
                         machinedetail.HangfireJobId = newJobId;
                         await _preventiveSchedulerCommand.UpdateDetailAsync(machinedetail.Id, newJobId);

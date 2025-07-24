@@ -20,8 +20,9 @@ namespace Contracts.Commands.Maintenance.PreventiveScheduler
         public int FrequencyInterval { get; set; }
         public int ReminderWorkOrderDays { get; set; }
         public int ReminderMaterialReqDays { get; set; }
-         public byte IsDownTimeRequired { get; set; }
+        public byte IsDownTimeRequired { get; set; }
         public decimal DownTimeEstimateHrs { get; set; }
-         public int UnitId { get; set; }
+        public int UnitId { get; set; }
+         public string token { get; set; }
     }
 }

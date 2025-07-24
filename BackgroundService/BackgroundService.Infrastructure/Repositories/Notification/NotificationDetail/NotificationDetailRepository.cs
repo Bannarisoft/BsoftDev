@@ -23,7 +23,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
         public async Task<List<GetNotificationDetailDto>> GetAllByUserIdAsync(string userId)
         {
             const string query = @" SELECT L.Id,NC.ModuleName,MM.Code  EventType,MM1.Code TargetType,MM2.Code ChannelName,
-                    ActionStatus, MM4.Code ReadStatus, MessageText, Timestamp, L.CreatedBy,L.CreatedDate, L.CreatedByName, L.CreatedIP, SendTo
+                    ActionStatus, MM4.Code ReadStatus,MM4.Id ReadStatusId, MessageText, Timestamp, L.CreatedBy,L.CreatedDate, L.CreatedByName, L.CreatedIP, SendTo
                     FROM AppNotification.NotificationEventLog L
                     INNER JOIN  AppNotification.NotificationEventRule NR on NR.Id=L.NotificationLevelRuleId
                     INNER JOIN  AppNotification.NotificationLevelHierarchy NH  on NR.NotificationLevelHierarchyId=NH.Id 

@@ -29,7 +29,7 @@ namespace Core.Application.Consumers.PreventiveScheduler
            {
                 if (!string.IsNullOrEmpty(detail.HangfireJobId))
                 {
-                     _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId);
+                     _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId,context.Message.token);
                 }
            }
            

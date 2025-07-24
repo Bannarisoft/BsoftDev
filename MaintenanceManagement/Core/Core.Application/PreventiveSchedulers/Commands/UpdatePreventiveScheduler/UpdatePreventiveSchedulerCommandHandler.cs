@@ -19,6 +19,7 @@ using Core.Domain.Entities;
 using Core.Domain.Events;
 using Hangfire;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using static Core.Domain.Common.MiscEnumEntity;
 
@@ -37,9 +38,10 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
         
         private readonly IEventPublisher _eventPublisher;
         private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public UpdatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator,
          IPreventiveSchedulerQuery preventiveSchedulerQuery, IWorkOrderCommandRepository workOrderRepository,
-        IIPAddressService ipAddressService, ITimeZoneService timeZoneService, IEventPublisher eventPublisher, IPreventiveScheduleLogService preventiveScheduleLogService)
+        IIPAddressService ipAddressService, ITimeZoneService timeZoneService, IEventPublisher eventPublisher, IPreventiveScheduleLogService preventiveScheduleLogService, IHttpContextAccessor httpContextAccessor)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
@@ -52,6 +54,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
 
             _eventPublisher = eventPublisher;
             _preventiveScheduleLogService = preventiveScheduleLogService;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<ApiResponseDTO<bool>> Handle(UpdatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
         {
@@ -75,7 +78,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
                 {
 
                 var UnitId = _ipAddressService.GetUnitId();
-               
+               var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
                     var correlationId = Guid.NewGuid();
                     var @event = new HeaderUpdateEvent
                     {
@@ -86,7 +89,8 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
                         FrequencyInterval = metaDataResponse.FrequencyInterval,
                         ReminderWorkOrderDays = metaDataResponse.ReminderWorkOrderDays,
                         ReminderMaterialReqDays = metaDataResponse.ReminderMaterialReqDays,
-                        rollbackHeaders = rollbackHeader
+                        rollbackHeaders = rollbackHeader,
+                        token = token
                     };
 
                     await _eventPublisher.SaveEventAsync(@event);
