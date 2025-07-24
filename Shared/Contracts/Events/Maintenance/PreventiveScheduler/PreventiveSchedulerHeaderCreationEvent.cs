@@ -22,6 +22,7 @@ namespace Contracts.Events.Maintenance.PreventiveScheduler
         public int ReminderMaterialReqDays { get; set; }
         public byte IsDownTimeRequired { get; set; }
         public decimal DownTimeEstimateHrs { get; set; }
-         public int UnitId { get; set; }
+        public int UnitId { get; set; }
+         public string token { get; set; }
     }
 }

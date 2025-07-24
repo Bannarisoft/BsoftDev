@@ -24,15 +24,15 @@ namespace MaintenanceManagement.Infrastructure.GrpcClients
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<string> ScheduleWorkOrder(int preventiveScheduleId, int delayInMinutes)
+        public async Task<string> ScheduleWorkOrder(int preventiveScheduleId, int delayInMinutes, string token)
         {
-            var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
+            
 
             if (string.IsNullOrEmpty(token))
             {
                 throw new Exception("No Authorization token found in the current context.");
             }
-            //  ✅ Ensure it has "Bearer " prefix
+           
             if (!token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
 
@@ -53,10 +53,9 @@ namespace MaintenanceManagement.Infrastructure.GrpcClients
             var response = await _grpcClient.ScheduleWorkOrderAsync(request,callOptions);
             return response.JobId ?? string.Empty;
         }
-        public  Task<bool> RemoveHangFireJob(string HangfireJobId)
+        public  Task<bool> RemoveHangFireJob(string HangfireJobId, string token)
         {
-            var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
-
+            
             if (string.IsNullOrEmpty(token))
             {
                 throw new Exception("No Authorization token found in the current context.");

@@ -40,7 +40,7 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
             {
                 if (!string.IsNullOrEmpty(detail.HangfireJobId))
                 {
-                    _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId);
+                    _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId,context.Message.token);
                 }
 
                 var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((detail.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue),
@@ -59,12 +59,12 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
                 if (delay.TotalSeconds > 0)
                 {
 
-                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, delayInMinutes);
+                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, delayInMinutes,context.Message.token);
                 }
                 else
                 {
 
-                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, 5);
+                    newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, 5,context.Message.token);
                 }
                 detail.HangfireJobId = newJobId;
                  await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id, newJobId);

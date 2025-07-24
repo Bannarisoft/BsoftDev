@@ -9,5 +9,6 @@ namespace Contracts.Events.Maintenance.PreventiveScheduler
     {
         public Guid CorrelationId { get; set; }
         public string Reason { get; set; }
+        public string token { get; set; }
     }
 }

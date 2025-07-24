@@ -96,7 +96,8 @@ namespace Core.Application.Consumers.PreventiveScheduler
                     await context.Publish(new PreventiveSchedulerDetailCreationFailedEvent
                     {
                         CorrelationId = context.Message.CorrelationId,
-                        Reason = "Failed to create schedule detail"
+                        Reason = "Failed to create schedule detail",
+                        token = context.Message.token
                     });
                 }
             }
@@ -108,7 +109,8 @@ namespace Core.Application.Consumers.PreventiveScheduler
                 await context.RespondAsync(new PreventiveSchedulerDetailCreationFailedEvent
                 {
                     CorrelationId = context.Message.CorrelationId,
-                    Reason = $"Exception: {ex.Message}"
+                    Reason = $"Exception: {ex.Message}",
+                    token = context.Message.token
                 });
             }
         }

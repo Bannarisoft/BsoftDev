@@ -60,7 +60,7 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
 
                         if (!string.IsNullOrEmpty(detail.HangfireJobId))
                         {
-                            _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId);
+                            _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId,context.Message.token);
                         }
 
                         var delay = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
@@ -70,12 +70,12 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
                         if (delay.TotalSeconds > 0)
                         {
 
-                            newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, delayInMinutes);
+                            newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, delayInMinutes,context.Message.token);
                         }
                         else
                         {
 
-                            newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, 5);
+                            newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, 5,context.Message.token);
                         }
                         detail.HangfireJobId = newJobId;
                     }
@@ -88,9 +88,10 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
             catch (Exception ex)
             {
                 await context.Publish(new UpdateScheduleWorkOrderFailedEvent
-                    {
-                        CorrelationId = context.Message.CorrelationId,
-                        Reason = "Failed to update schedule detail"
+                {
+                    CorrelationId = context.Message.CorrelationId,
+                    Reason = "Failed to update schedule detail",
+                        token = context.Message.token
                         
                     });
             }

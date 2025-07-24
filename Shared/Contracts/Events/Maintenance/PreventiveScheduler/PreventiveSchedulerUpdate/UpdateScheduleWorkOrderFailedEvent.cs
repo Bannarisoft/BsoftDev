@@ -12,5 +12,6 @@ namespace Contracts.Events.Maintenance.PreventiveScheduler.PreventiveSchedulerUp
         public string Reason { get; set; }
         // public List<MachinedetailDto> MachinedetailDtos { get; set; }
         public RollbackHeaderDto rollbackHeaders { get; set; }
+        public string token { get; set; }
     }
 }

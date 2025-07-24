@@ -13,5 +13,6 @@ namespace Contracts.Commands.Maintenance.PreventiveScheduler.Update
         public int PreventiveSchedulerHeaderId { get; set; }
         public string Reason { get; set; }
         public RollbackHeaderDto rollbackHeaders { get; set; }
+        public string token { get; set; }
     }
 }
