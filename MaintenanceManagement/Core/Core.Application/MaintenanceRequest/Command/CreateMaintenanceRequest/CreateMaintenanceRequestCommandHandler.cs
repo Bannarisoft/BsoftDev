@@ -29,26 +29,22 @@ namespace Core.Application.MaintenanceRequest.Command.CreateMaintenanceRequest
        private readonly IMapper _imapper;
        private readonly IMediator _mediator;
        private readonly IMaintenanceRequestQueryRepository  _maintenanceRequestQueryRepository;
-       private readonly IWorkOrderCommandRepository _workOrderCommandRepository;
-       private readonly IWorkOrderQueryRepository _workOrderQueryRepository;
-       private readonly IIPAddressService _ipAddressService;
-       private readonly IHubContext<WorkOrderScheduleHub> _hubContext;
-       private readonly IEventPublisher _eventPublisher;
+       private readonly IWorkOrderCommandRepository _workOrderCommandRepository;       
+       private readonly IIPAddressService _ipAddressService;              
        private readonly ILogger<CreateMaintenanceRequestCommandHandler> _logger;           
         private readonly IPublishEndpoint _publishEndpoint;
 
-        public CreateMaintenanceRequestCommandHandler(IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository, IMapper imapper, IMediator mediator, IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IWorkOrderCommandRepository workOrderCommandRepository, IWorkOrderQueryRepository workOrderQueryQueryRepository, IIPAddressService ipAddressService, IHubContext<WorkOrderScheduleHub> hubContext, IEventPublisher eventPublisher, ILogger<CreateMaintenanceRequestCommandHandler> logger,IPublishEndpoint publishEndpoint)
+        public CreateMaintenanceRequestCommandHandler(IMaintenanceRequestCommandRepository maintenanceRequestCommandRepository, IMapper imapper, IMediator mediator, IMaintenanceRequestQueryRepository maintenanceRequestQueryRepository, IWorkOrderCommandRepository workOrderCommandRepository,  IIPAddressService ipAddressService, ILogger<CreateMaintenanceRequestCommandHandler> logger,IPublishEndpoint publishEndpoint)
+
         {
             _maintenanceRequestCommandRepository = maintenanceRequestCommandRepository;
             _imapper = imapper;
             _mediator = mediator;
             _maintenanceRequestQueryRepository = maintenanceRequestQueryRepository;
-            _workOrderCommandRepository = workOrderCommandRepository;
-            _workOrderQueryRepository = workOrderQueryQueryRepository;
-            _ipAddressService = ipAddressService;
-            _hubContext = hubContext;
-            _eventPublisher = eventPublisher;
+            _workOrderCommandRepository = workOrderCommandRepository;            
+            _ipAddressService = ipAddressService;                        
             _logger = logger;
+            
             _publishEndpoint = publishEndpoint;
         }
 
