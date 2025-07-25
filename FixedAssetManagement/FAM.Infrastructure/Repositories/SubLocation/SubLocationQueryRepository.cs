@@ -89,7 +89,7 @@ namespace FAM.Infrastructure.Repositories.SubLocation
             JOIN Bannari.AppData.Department D ON D.Id = S.DepartmentId
             JOIN Bannari.AppData.Unit U ON U.Id = S.UnitId
 			JOIN FixedAsset.Location L on L.Id= S.LocationId
-            WHERE S.SubLocationName = @SubLocationName AND S.IsDeleted = 0 AND S.DepartmentId = @DepartmentId AND S.LocationId=@LocationId AND S.UnitId = @UnitId
+            WHERE S.SubLocationName = @SubLocationName AND L.IsActive = 1 AND S.IsDeleted = 0 AND S.DepartmentId = @DepartmentId AND S.LocationId=@LocationId AND S.UnitId = @UnitId
             
         ";
 

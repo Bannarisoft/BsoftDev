@@ -1,6 +1,8 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IMiscTypeMaster;
+using Core.Application.Common.Mappings;
 using Infrastructure.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using PurchaseManagement.Infrastructure.Data;
 using PurchaseManagement.Infrastructure.Repositories;
+using PurchaseManagement.Infrastructure.Repositories.MiscTypeMaster;
 using PurchaseManagement.Infrastructure.Services;
 using Serilog;
 
@@ -87,6 +90,8 @@ namespace PurchaseManagement.Infrastructure
 
             // Register repositories
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();            
+            services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
             
 
 
@@ -97,10 +102,10 @@ namespace PurchaseManagement.Infrastructure
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
 
             // AutoMapper profiles
-            // services.AddAutoMapper(
-                // typeof(AssetGroupProfile),
+            services.AddAutoMapper(
+                typeof(MiscTypeMasterProfile)
                 
-            // );
+            );
             return services;
         }
 

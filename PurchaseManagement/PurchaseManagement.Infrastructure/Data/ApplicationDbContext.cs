@@ -21,8 +21,9 @@ namespace PurchaseManagement.Infrastructure.Data
         }
 
         // public DbSet<AssetGroup> AssetGroup { get; set; } 
-
-        public DbSet<HSNMaster> HSNMaster { get; set; } 
+        public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
+        public DbSet<MiscMaster> MiscMaster { get; set; }
+        //public DbSet<HSNMaster> HSNMaster { get; set; } 
 
 
 
@@ -30,8 +31,11 @@ namespace PurchaseManagement.Infrastructure.Data
         {
             // modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
 
-            modelBuilder.ApplyConfiguration(new HSNMasterConfiguration());   
-            
+            // modelBuilder.ApplyConfiguration(new HSNMasterConfiguration()); 
+
+            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+
 
 
             base.OnModelCreating(modelBuilder);
