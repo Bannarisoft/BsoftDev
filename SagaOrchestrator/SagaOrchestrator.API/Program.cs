@@ -1,11 +1,11 @@
+using System.Data;
+using System.Data.SqlClient;
 using MassTransit;
 using Microsoft.OpenApi.Models;
 using SagaOrchestrator.Infrastructure;
 using SagaOrchestrator.Infrastructure.PollyResilience;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddInfrastructureServices(builder.Configuration);

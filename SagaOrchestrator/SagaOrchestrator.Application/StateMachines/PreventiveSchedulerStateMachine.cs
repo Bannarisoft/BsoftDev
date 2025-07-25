@@ -52,6 +52,7 @@ namespace SagaOrchestrator.Application.StateMachines
                         context.Instance.GraceDays = context.Data.GraceDays;
                         context.Instance.IsDownTimeRequired = context.Data.IsDownTimeRequired;
                         context.Instance.DownTimeEstimateHrs = context.Data.DownTimeEstimateHrs;
+                        context.Instance.token = context.Data.token;
                     })
                     .Send(new Uri("queue:schedule-detail-task-queue"), context => new CreateShedulerDetailsCommand
                     {
@@ -68,7 +69,8 @@ namespace SagaOrchestrator.Application.StateMachines
                         FrequencyTypeId = context.Data.FrequencyTypeId,
                         GraceDays = context.Data.GraceDays,
                         IsDownTimeRequired = context.Data.IsDownTimeRequired,
-                        DownTimeEstimateHrs = context.Data.DownTimeEstimateHrs
+                        DownTimeEstimateHrs = context.Data.DownTimeEstimateHrs,
+                        token = context.Data.token
                     })
                     .TransitionTo(CreatingPreventiveSchedulerDetail)
 
@@ -78,7 +80,8 @@ namespace SagaOrchestrator.Application.StateMachines
                       .Send(new Uri("queue:schedule-workorder-queue"), ctx => new SheduleWorkOrderCommand
                       {
                           CorrelationId = ctx.Instance.CorrelationId,
-                          PreventiveSchedulerHeaderId = ctx.Instance.PreventiveSchedulerHeaderId
+                          PreventiveSchedulerHeaderId = ctx.Instance.PreventiveSchedulerHeaderId,
+                          token = ctx.Instance.token
                       })
                  .TransitionTo(CreatingScheduleWorkOrder),
                      When(DetailFailedEvent)
@@ -86,7 +89,8 @@ namespace SagaOrchestrator.Application.StateMachines
                         {
                             CorrelationId = ctx.Data.CorrelationId,
                             PreventiveSchedulerHeaderId = ctx.Instance.PreventiveSchedulerHeaderId,
-                            Reason = ctx.Data.Reason                        
+                            Reason = ctx.Data.Reason
+                                                    
                         })
                     .TransitionTo(Failed)
 
@@ -104,7 +108,8 @@ namespace SagaOrchestrator.Application.StateMachines
                     {
                         CorrelationId = ctx.Data.CorrelationId,
                         PreventiveSchedulerHeaderId = ctx.Instance.PreventiveSchedulerHeaderId,
-                        Reason = ctx.Data.Reason
+                        Reason = ctx.Data.Reason,
+                        token = ctx.Instance.token
                     });
 
                     
@@ -112,7 +117,8 @@ namespace SagaOrchestrator.Application.StateMachines
                     {
                         CorrelationId = ctx.Data.CorrelationId,
                         PreventiveSchedulerHeaderId = ctx.Instance.PreventiveSchedulerHeaderId,
-                        Reason = "Rollback triggered after ScheduleWorkOrder failure"
+                        Reason = "Rollback triggered after ScheduleWorkOrder failure",
+                        token = ctx.Instance.token
                     });
                 })
                            .TransitionTo(Failed)

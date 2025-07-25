@@ -40,7 +40,8 @@ namespace SagaOrchestrator.Application.StateMachines
                          context.Saga.FrequencyInterval = context.Data.FrequencyInterval;
                          context.Saga.ReminderWorkOrderDays = context.Data.ReminderWorkOrderDays;
                          context.Saga.ReminderMaterialReqDays = context.Data.ReminderMaterialReqDays;
-                        context.Saga.rollbackHeaders = context.Data.rollbackHeaders;
+                         context.Saga.rollbackHeaders = context.Data.rollbackHeaders;
+                        context.Saga.token = context.Data.token;
                      })
                      .Send(new Uri("queue:update-scheduleWorkOrder-task-queue"), context => new UpdateScheduleWorkOrderCommand
                      {
@@ -52,7 +53,8 @@ namespace SagaOrchestrator.Application.StateMachines
                          FrequencyInterval = context.Data.FrequencyInterval,
                          ReminderWorkOrderDays = context.Data.ReminderWorkOrderDays,
                          ReminderMaterialReqDays = context.Data.ReminderMaterialReqDays,
-                         rollbackHeaders = context.Data.rollbackHeaders
+                         rollbackHeaders = context.Data.rollbackHeaders,
+                         token = context.Data.token
                      })
                      .TransitionTo(CreatingScheduleWorkOrder)
 
@@ -70,7 +72,8 @@ namespace SagaOrchestrator.Application.StateMachines
                         CorrelationId = ctx.Data.CorrelationId,
                         PreventiveSchedulerHeaderId = ctx.Instance.PreventiveSchedulerHeaderId,
                         Reason = ctx.Data.Reason,
-                        rollbackHeaders = ctx.Data.rollbackHeaders
+                        rollbackHeaders = ctx.Data.rollbackHeaders,
+                        token = ctx.Data.token
                     });
                 })
                 .TransitionTo(Failed)

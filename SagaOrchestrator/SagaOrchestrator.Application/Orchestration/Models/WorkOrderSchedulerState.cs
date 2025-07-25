@@ -10,5 +10,6 @@ namespace SagaOrchestrator.Application.Orchestration.Models
         public int PreventiveSchedulerDetailId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? FailureReason { get; set; }
+        public string token { get; set; }
     }
 }

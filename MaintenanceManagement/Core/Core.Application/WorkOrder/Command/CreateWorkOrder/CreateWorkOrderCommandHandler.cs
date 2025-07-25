@@ -40,11 +40,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
 
             var companyId = _ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
-     
-            //var latestWoCode = await _workOrderQueryRepository.GetLatestWorkOrderDocNo(request.WorkOrderDto.RequestTypeId);            
-            
-            
-            //woEntity.WorkOrderDocNo = latestWoCode;         
+      
             woEntity.CompanyId = companyId; 
             woEntity.UnitId = unitId; 
             woEntity.TotalManPower=0;
@@ -67,9 +63,7 @@ namespace Core.Application.WorkOrder.Command.CreateWorkOrder
             var woMasterDTO = _mapper.Map<WorkOrderCombineDto>(result);
             if (result.Id > 0)
             {    
-                // Notify clients via SignalR
-              
-       
+                // Notify clients via SignalR       
                 string tempFilePath = request.WorkOrderDto.Image;
                 if (tempFilePath != null){
                     string baseDirectory = await _workOrderQueryRepository.GetBaseDirectoryAsync();

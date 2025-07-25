@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Application.Common.Interfaces;
 using Core.Application.Consumers;
 using Core.Application.Consumers.PreventiveScheduler;
@@ -11,7 +7,6 @@ using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-
 namespace MaintenanceManagement.Infrastructure
 {
     public static class SagaDependencyInjection
@@ -35,12 +30,12 @@ namespace MaintenanceManagement.Infrastructure
                 // Register Consumer
                 x.AddConsumer<ScheduleNextPreventiveTaskConsumer>();
                 x.AddConsumer<RollbackWorkOrderConsumer>();
-                x.AddConsumer<ScheduleDetailCreateTaskConsumer>(); 
-                x.AddConsumer<ScheduleWorkOrderTaskConsumer>();             
-                x.AddConsumer<RollbackPreventiveDetailConsumer>(); 
-                x.AddConsumer<RollBackScheduleWorkOrderConsumer>(); 
-                x.AddConsumer<Core.Application.Consumers.PreventiveScheduler.Update.ScheduleWorkOrderConsumer>(); 
-                x.AddConsumer<Core.Application.Consumers.PreventiveScheduler.Update.RollBackScheduleWorkOrderConsumer>();                
+                x.AddConsumer<ScheduleDetailCreateTaskConsumer>();
+                x.AddConsumer<ScheduleWorkOrderTaskConsumer>();
+                x.AddConsumer<RollbackPreventiveDetailConsumer>();
+                x.AddConsumer<RollBackScheduleWorkOrderConsumer>();
+                x.AddConsumer<Core.Application.Consumers.PreventiveScheduler.Update.ScheduleWorkOrderConsumer>();
+                x.AddConsumer<Core.Application.Consumers.PreventiveScheduler.Update.RollBackScheduleWorkOrderConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -64,33 +59,32 @@ namespace MaintenanceManagement.Infrastructure
                        e.ConfigureConsumer<ScheduleDetailCreateTaskConsumer>(context);
                    });
                     cfg.ReceiveEndpoint("schedule-workorder-queue", e =>
-               {
-                   e.ConfigureConsumer<ScheduleWorkOrderTaskConsumer>(context);
-               });
+                    {
+                        e.ConfigureConsumer<ScheduleWorkOrderTaskConsumer>(context);
+                    });
                     cfg.ReceiveEndpoint("rollback-scheduleHeader-queue", e =>
-               {
-                   e.ConfigureConsumer<RollbackPreventiveDetailConsumer>(context);
-               });
+                    {
+                        e.ConfigureConsumer<RollbackPreventiveDetailConsumer>(context);
+                    });
 
                     cfg.ReceiveEndpoint("rollback-ScheduleWorkOrder-queue", e =>
-               {
-                   e.ConfigureConsumer<RollBackScheduleWorkOrderConsumer>(context);
-               });
-                    cfg.ReceiveEndpoint("update-rollback-scheduleWorkOrder-queue", e =>
-                  {
-                      e.ConfigureConsumer<Core.Application.Consumers.PreventiveScheduler.Update.RollBackScheduleWorkOrderConsumer>(context);
-                  }); 
-
-                  cfg.ReceiveEndpoint("update-scheduleWorkOrder-task-queue", e =>
-               {
-                   e.ConfigureConsumer<Core.Application.Consumers.PreventiveScheduler.Update.ScheduleWorkOrderConsumer>(context);
-               });              
-                });
+            {
+                e.ConfigureConsumer<RollBackScheduleWorkOrderConsumer>(context);
             });
+                    cfg.ReceiveEndpoint("update-rollback-scheduleWorkOrder-queue", e =>
+                {
+                    e.ConfigureConsumer<Core.Application.Consumers.PreventiveScheduler.Update.RollBackScheduleWorkOrderConsumer>(context);
+                });
 
-            // Ensure MassTransit background service is added
-            services.AddMassTransitHostedService();
+                    cfg.ReceiveEndpoint("update-scheduleWorkOrder-task-queue", e =>
+                    {
+                        e.ConfigureConsumer<Core.Application.Consumers.PreventiveScheduler.Update.ScheduleWorkOrderConsumer>(context);
+                    });
 
+
+                });
+                services.AddMassTransitHostedService();
+            });
             return services;
         }
     }

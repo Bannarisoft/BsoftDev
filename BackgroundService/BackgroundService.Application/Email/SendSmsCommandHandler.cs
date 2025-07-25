@@ -1,5 +1,5 @@
+using BackgroundService.Application.Notification.Common.Interfaces;
 using Contracts.Events.Notifications;
-using Core.Application.Common.Interfaces;
 using MediatR;
 
 

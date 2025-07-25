@@ -1,7 +1,7 @@
 
+using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Infrastructure.Configurations;
 using Contracts.Events.Notifications;
-using Core.Application.Common.Interfaces;
 
 
 namespace BackgroundService.Infrastructure.Services
