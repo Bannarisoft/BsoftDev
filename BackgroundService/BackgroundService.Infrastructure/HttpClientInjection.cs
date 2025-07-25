@@ -42,6 +42,18 @@ namespace BackgroundService.Infrastructure
 
             services.AddScoped<IUserSessionGrpcClient, GrpcUserSessionClient>();
 
+            services.AddGrpcClient<GetAllUsersJobService.GetAllUsersJobServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+            services.AddScoped<IUsersAllGrpcClient, GrpcGetAllUserClient>();
+
 
         
             return services;

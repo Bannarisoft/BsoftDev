@@ -15,6 +15,10 @@ namespace BackgroundService.Domain.Entities.Workflow
         public int? ApprovalRuleId { get; set; }
         public int StatusId { get; set; }
         public DateTimeOffset RequestedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTimeOffset? ModifiedDate { get; set; }
+        public string? ModifiedByName { get; set; }
+        public string? ModifiedIP { get; set; }
         public WorkflowType WorkflowType { get; set; }
         public ApprovalStepDetail ApprovalStepDetail { get; set; }
         public ApprovalRule ApprovalRule { get; set; }

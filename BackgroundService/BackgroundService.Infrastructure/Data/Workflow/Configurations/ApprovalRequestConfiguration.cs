@@ -50,6 +50,12 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
             .HasColumnType("datetimeoffset")
             .IsRequired();
 
+             builder.Property(cf => cf.ModifiedByName)
+                 .HasColumnType("varchar(50)");
+
+            builder.Property(cf => cf.ModifiedIP)
+                .HasColumnType("varchar(255)");
+
             builder.HasOne(ac => ac.WorkflowType)
       .WithMany(am => am.ApprovalRequest)
       .HasForeignKey(ac => ac.WorkflowTypeId)

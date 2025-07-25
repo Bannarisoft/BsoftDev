@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
+using BackgroundService.Domain.Entities.Notification;
+using BackgroundService.Domain.Entities.Workflow;
 using Dapper;
 
 namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequests
@@ -11,11 +14,86 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
     public class ApprovalRequestQueryRepository : IApprovalRequestQuery
     {
         private readonly IDbConnection _dbConnection;
-        public ApprovalRequestQueryRepository(IDbConnection dbConnection)
+        private readonly IIPAddressService _ipaddressService;
+        public ApprovalRequestQueryRepository(IDbConnection dbConnection, IIPAddressService ipaddressService)
         {
             _dbConnection = dbConnection;
+            _ipaddressService = ipaddressService;
         }
-        public async Task<int> GetApprovalStepDetailByIdAsync(int WorkFlowTypeId, int ModuleTransactionId)
+
+        public async Task<(List<ApprovalRequest>, int)> GetAllApprovalRequestAsync(int PageNumber, int PageSize, string? SearchTerm)
+        {
+                const string dataQuery =    @" SELECT 
+                AR.Id, 
+                AR.WorkFlowTypeId,
+                AR.ModuleTransactionId,
+                AR.ApprovalStepDetailId,
+                AR.ApprovalRuleId,
+                AR.StatusId,
+                AR.RequestedDate,
+                ASD.TargetTypeId,
+                Status.Code,WorkFlow.ModuleTypeName
+            FROM [AppData].[ApprovalRequest] AR
+            INNER JOIN [AppData].[ApprovalStepDetail] ASD on ASD.Id=AR.ApprovalStepDetailId
+            INNER JOIN [AppData].[MiscMaster] Status on Status.Id=AR.StatusId
+            INNER JOIN [AppData].[WorkflowType] WorkFlow on WorkFlow.Id=AR.WorkflowTypeId
+            INNER JOIN [AppData].[ApprovalStepUnitMapping] ASM on ASM.ApprovalStepDetailId=ASD.Id
+            WHERE 
+             (@Search IS NULL OR Status.Code LIKE @Search OR WorkFlow.ModuleTypeName LIKE @Search)
+                AND ASD.TargetTypeId= @Userid AND ASM.UnitId= @UnitId
+                ORDER BY AR.Id desc
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+            ";
+              const string countQuery = @"
+              SELECT COUNT(*) 
+               FROM [AppData].[ApprovalRequest] AR
+            INNER JOIN [AppData].[ApprovalStepDetail] ASD on ASD.Id=AR.ApprovalStepDetailId
+            INNER JOIN [AppData].[MiscMaster] Status on Status.Id=AR.StatusId
+            INNER JOIN [AppData].[WorkflowType] WorkFlow on WorkFlow.Id=AR.WorkflowTypeId
+            INNER JOIN [AppData].[ApprovalStepUnitMapping] ASM on ASM.ApprovalStepDetailId=ASD.Id
+            WHERE 
+             (@Search IS NULL OR Status.Code LIKE @Search OR WorkFlow.ModuleTypeName LIKE @Search)
+                AND ASD.TargetTypeId= @Userid AND ASM.UnitId= @UnitId;
+          ";
+
+
+            var parameters = new
+            {
+                Search = string.IsNullOrEmpty(SearchTerm) ? null : $"%{SearchTerm}%",
+                Offset = (PageNumber - 1) * PageSize,
+                PageSize,
+                Userid = _ipaddressService.GetUserId(),
+                UnitId = _ipaddressService.GetUnitId()
+            };
+
+            var ApprovalRequest = await _dbConnection.QueryAsync<ApprovalRequest, ApprovalStepDetail, MiscMaster, WorkflowType, ApprovalRequest>(
+                dataQuery,
+                (approvalReq,detail, status, workFlow) =>
+                {
+                     approvalReq.ApprovalStepDetail = new ApprovalStepDetail
+                     {
+                         TargetTypeId = detail.TargetTypeId
+                     };
+                     approvalReq.Status = new MiscMaster
+                     {
+                         Code = status.Code
+                     };
+                     approvalReq.WorkflowType = new WorkflowType
+                     {
+                         ModuleTypeName = workFlow.ModuleTypeName
+                     };
+                     return approvalReq;
+                },
+                parameters,
+                splitOn: "TargetTypeId,Code,ModuleTypeName"                
+                );
+            
+            var totalCount = await _dbConnection.ExecuteScalarAsync<int>(countQuery, parameters);
+
+            return (ApprovalRequest.ToList(), totalCount);
+        }
+
+        public async Task<int?> GetApprovalStepDetailByIdAsync(int WorkFlowTypeId, int ModuleTransactionId)
         {
             const string query = @"
                 SELECT TOP 1 ASD.Id

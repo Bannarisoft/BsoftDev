@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BackgroundService.Application.Notification.Common.Interfaces.IMiscMaster;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
 using BackgroundService.Application.Workflow.Common.Interfaces.IWorkflowType;
+using BackgroundService.Domain.Entities.Workflow;
 using Contracts.Commands.Workflow;
 using MassTransit;
 using static BackgroundService.Domain.Common.MiscEnumEntity;
@@ -28,10 +29,24 @@ namespace BackgroundService.Application.Consumer.Workflow
         public async Task Consume(ConsumeContext<CreateApprovalRequestCommand> context)
         {
             var WorkflowType = await _workflowTypeQuery.GetWorkflowByName(context.Message.ModuleTypeName);
-            var ApprovalStepDetailId = await _approvalRequestQuery.GetApprovalStepDetailByIdAsync(WorkflowType.Id, context.Message.ModuleTransactionId);
-            var status = await _miscMasterQuery.GetMiscMasterByName(GetApprovalStatus.Status,GetStatusPending.Status);
+            int? ApprovalStepDetailId = await _approvalRequestQuery.GetApprovalStepDetailByIdAsync(WorkflowType.Id, context.Message.ModuleTransactionId);
+            var status = await _miscMasterQuery.GetMiscMasterByName(GetApprovalStatus.Status, GetStatusPending.Status);
 
+            if (ApprovalStepDetailId is null)
+            {
+                throw new InvalidOperationException($"Approval step detail not found");
+            }
+            var ApprovalReq = new ApprovalRequest
+            {
+                WorkflowTypeId = WorkflowType.Id,
+                ModuleTransactionId = context.Message.ModuleTransactionId,
+                ApprovalStepDetailId = ApprovalStepDetailId.Value,
+                StatusId = status.Id,
+                RequestedDate = DateTimeOffset.Now
+            };
 
+            await _approvalRequestCommand.CreateAsync(ApprovalReq);
+            
         }
     }
 }

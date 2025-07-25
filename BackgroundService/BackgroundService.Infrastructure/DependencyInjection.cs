@@ -44,6 +44,9 @@ using Contracts.Events.Notifications.WorkOrder.Email;
 using Contracts.Events.Notifications.WorkOrder.InApp;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationDetail;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationDetail;
+using BackgroundService.Application.Consumer.Workflow;
+using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
+using BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequests;
 
 namespace BackgroundService.Infrastructure
 {
@@ -113,6 +116,7 @@ namespace BackgroundService.Infrastructure
                 x.AddConsumer<SendEmailNotificationConsumer>();
                 x.AddConsumer<SendSmsNotificationConsumer>();
                 x.AddConsumer<SendInAppNotificationConsumer>();
+                x.AddConsumer<ApprovalRequestConsumer>();
                 
 
                 x.UsingRabbitMq((context, cfg) =>
@@ -122,17 +126,17 @@ namespace BackgroundService.Infrastructure
                         h.Username("guest");
                         h.Password("guest");
                     });
-                
+
 
                     cfg.ReceiveEndpoint("resolve-notification-channels-queue", e =>
                     {
                         e.ConfigureConsumer<ResolveNotificationChannelsConsumer>(context);
-                         
+
                     });
-             
+
                     cfg.ReceiveEndpoint("email-notification-queue", e =>
 
-                    {                        
+                    {
                         e.Bind("Contracts.Events.Notifications.WorkOrder.Email:SendEmailNotificationInternalCommand", s =>
                         {
                             s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
@@ -149,15 +153,19 @@ namespace BackgroundService.Infrastructure
 
                         e.ConfigureConsumer<SendSmsNotificationConsumer>(context);
 
-                    }); 
-                     cfg.ReceiveEndpoint("inapp-notification-queue", e =>
+                    });
+                    cfg.ReceiveEndpoint("inapp-notification-queue", e =>
+                   {
+                       e.Bind("Contracts.Events.Notifications.WorkOrder.InApp:SendInAppNotificationInternalCommand", s =>
+                       {
+                           s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
+                       });
+                       e.ConfigureConsumer<SendInAppNotificationConsumer>(context);
+                   }); 
+                      cfg.ReceiveEndpoint("approval-request-task-queue", e =>
                     {
-                        e.Bind("Contracts.Events.Notifications.WorkOrder.InApp:SendInAppNotificationInternalCommand", s =>
-                        {
-                            s.ExchangeType = "fanout"; // Required if you're using fanout-based exchange
-                        });
-                         e.ConfigureConsumer<SendInAppNotificationConsumer>(context);
-                     }); 
+                        e.ConfigureConsumer<ApprovalRequestConsumer>(context);
+                    });
                      
                 });
             });
@@ -245,6 +253,7 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<IApprovalStepDetailCommand, ApprovalStepDetailCommandRepository >();
              services.AddScoped<IApprovalRuleQuery, ApprovalRuleQueryRepository >();
             services.AddScoped<IApprovalRuleCommand, ApprovalRuleCommandRepository >();
+            services.AddScoped<IApprovalRequestQuery, ApprovalRequestQueryRepository >();
             return services;
         }
     }
