@@ -12,9 +12,7 @@ namespace Core.Domain.Entities
         public string? HSNCode { get; set; }      
         public string? Description { get; set; }  
         public string? GstCategory { get; set; }  
-
         private decimal _gstPercentage;
-
         public decimal GstPercentage
         {
             get => _gstPercentage;
@@ -25,7 +23,6 @@ namespace Core.Domain.Entities
                 SgstPercentage = Math.Round(value / 2, 2);
             }
         }
-
         public decimal CgstPercentage { get; private set; }
         public decimal SgstPercentage { get; private set; }
         public decimal IgstPercentage { get; set; }     

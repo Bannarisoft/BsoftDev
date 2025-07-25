@@ -25,7 +25,7 @@ namespace Core.Application.Consumers
             var departmentGroupName = context.Message.UserId.ToString(); 
             try
             {
-                var result = await _nextScheduleService.CreateNextSchedulerDetailAsync(context.Message.SchedulerId);
+                var result = await _nextScheduleService.CreateNextSchedulerDetailAsync(context.Message.SchedulerId,context.Message.token);
                 if (result)
                 {                    
                     await context.Publish(new NextSchedulerCreatedEvent
@@ -61,7 +61,8 @@ namespace Core.Application.Consumers
                     await context.Publish(new NextSchedulerCreationFailedEvent
                     {
                         CorrelationId = context.Message.CorrelationId,
-                        Reason = "Failed to create next schedule"
+                        Reason = "Failed to create next schedule",
+                        token = context.Message.token
                     });
                 }
             }
@@ -80,7 +81,8 @@ namespace Core.Application.Consumers
                 await context.RespondAsync(new NextSchedulerCreationFailedEvent
                 {
                     CorrelationId = context.Message.CorrelationId,
-                    Reason = $"Exception: {ex.Message}"
+                    Reason = $"Exception: {ex.Message}",
+                    token = context.Message.token
                 });
 
             }

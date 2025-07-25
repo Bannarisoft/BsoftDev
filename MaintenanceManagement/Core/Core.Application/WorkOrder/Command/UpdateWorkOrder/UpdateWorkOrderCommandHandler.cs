@@ -8,6 +8,7 @@ using Core.Domain.Common;
 using Core.Domain.Events;
 using MassTransit;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
@@ -24,22 +25,27 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
         private readonly ILogQueryService _logQueryService;
         private readonly IUnitGrpcClient _unitGrpcClient; 
         private readonly ICompanyGrpcClient _companyGrpcClient; 
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UpdateWorkOrderCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper,IWorkOrderQueryRepository workOrderQueryRepository, IMediator mediator, IEventPublisher eventPublisher, ILogger<UpdateWorkOrderCommandHandler> logger, ILogQueryService logQueryService, IUnitGrpcClient unitGrpcClient,ICompanyGrpcClient companyGrpcClient) 
-               {
+        public UpdateWorkOrderCommandHandler(IWorkOrderCommandRepository workOrderRepository, IMapper mapper, IWorkOrderQueryRepository workOrderQueryRepository,
+        IMediator mediator, IEventPublisher eventPublisher, ILogger<UpdateWorkOrderCommandHandler> logger, ILogQueryService logQueryService,
+        IUnitGrpcClient unitGrpcClient, ICompanyGrpcClient companyGrpcClient, IHttpContextAccessor httpContextAccessor)
+        {
             _workOrderRepository = workOrderRepository;
             _mapper = mapper;
             _workOrderQueryRepository = workOrderQueryRepository;
-            _mediator = mediator;         
+            _mediator = mediator;
             _eventPublisher = eventPublisher;
-            _logger = logger;         
-            _logQueryService = logQueryService ?? throw new ArgumentNullException(nameof(logQueryService));  
-             _unitGrpcClient = unitGrpcClient;
-            _companyGrpcClient=companyGrpcClient;
+            _logger = logger;
+            _logQueryService = logQueryService ?? throw new ArgumentNullException(nameof(logQueryService));
+            _unitGrpcClient = unitGrpcClient;
+            _companyGrpcClient = companyGrpcClient;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ApiResponseDTO<bool>> Handle(UpdateWorkOrderCommand request, CancellationToken cancellationToken)
         {            
+            var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
             var updatedEntity = _mapper.Map<Core.Domain.Entities.WorkOrderMaster.WorkOrder>(request.WorkOrder);
             var updateResult = await _workOrderRepository.UpdateAsync(updatedEntity.Id, updatedEntity);
 
@@ -66,7 +72,8 @@ namespace Core.Application.WorkOrder.Command.UpdateWorkOrder
                     {
                         CorrelationId = correlationId,
                         WorkOrderId = updatedEntity.Id,
-                        PreventiveSchedulerDetailId = updatedEntity.PreventiveScheduleId.Value
+                        PreventiveSchedulerDetailId = updatedEntity.PreventiveScheduleId.Value,
+                        token = token
                     };
                     // Save and publish event (RabbitMQ/Saga)
                     await _eventPublisher.SaveEventAsync(@event);
