@@ -16,18 +16,22 @@ namespace BackgroundService.Infrastructure.Services.Notification
         private readonly ILogger<InAppNotifier> _logger;
         private readonly IHubContext<NotificationHub> _hubContext;        
         private readonly INotificationLogger _loggerNotification;
+        private readonly ITimeZoneService _timeZoneService;
 
-        public InAppNotifier(ILogger<InAppNotifier> logger, IHubContext<NotificationHub> hubContext, INotificationLogger loggerNotification)
+        public InAppNotifier(ILogger<InAppNotifier> logger, IHubContext<NotificationHub> hubContext, INotificationLogger loggerNotification, ITimeZoneService timeZoneService)
         {
             _logger = logger;
             _hubContext = hubContext;
-            _loggerNotification = loggerNotification;            
+            _loggerNotification = loggerNotification;
+            _timeZoneService = timeZoneService;
         }
 
         public async Task<bool> SendInAppNotificationAsync(List<int> userIds, string message, string title, NotificationContext context)
         {
             try
             {
+                var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+                var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
                 if (userIds == null || !userIds.Any())
                 {
                     _logger.LogWarning("⚠️ No users provided for in-app notification.");
@@ -44,7 +48,7 @@ namespace BackgroundService.Infrastructure.Services.Notification
                         ActionStatus = "Sent",
                         ChannelId =(int)NotificationEnum.NotificationChannel.InApp,
                         MessageText = message,
-                        Timestamp = DateTime.UtcNow,
+                        Timestamp = currentTime,
                         CreatedBy = context.CreatedById,
                         CreatedDate = DateTime.UtcNow,
                         CreatedByName = context.CreatedByName,
@@ -57,7 +61,7 @@ namespace BackgroundService.Infrastructure.Services.Notification
                         LogId = savedLogId,
                         Message = message,
                         Title = title,
-                        Timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
+                        Timestamp = currentTime,
                         Type = "info" 
                     });
                 }

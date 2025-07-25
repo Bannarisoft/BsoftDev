@@ -20,11 +20,12 @@ namespace BackgroundService.Application.Consumers
         private readonly IIPAddressService _ipAddressService;
         private readonly IBackgroundJobClient _jobClient;
         private const int MaxRetries = 3;
+        private readonly ITimeZoneService _timeZoneService;
 
         public SendEmailNotificationConsumer(
             NotificationResolverHandler resolverHandler,
             IEmailSender emailSender,
-            ILogger<SendEmailNotificationConsumer> logger, INotificationLogger loggerNotification, IIPAddressService ipAddressService, IBackgroundJobClient jobClient)
+            ILogger<SendEmailNotificationConsumer> logger, INotificationLogger loggerNotification, IIPAddressService ipAddressService, IBackgroundJobClient jobClient, ITimeZoneService timeZoneService)
         {
             _resolverHandler = resolverHandler;
             _emailSender = emailSender;
@@ -32,14 +33,16 @@ namespace BackgroundService.Application.Consumers
             _loggerNotification = loggerNotification;
             _ipAddressService = ipAddressService;
             _jobClient = jobClient;
+            _timeZoneService = timeZoneService;
         }
 
        public async Task Consume(ConsumeContext<SendEmailNotificationInternalCommand> context)
         {
-            var msg = context.Message;
-
+            var msg = context.Message;            
             try
             {
+                var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+                var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
                 var (toEmails, ccEmails, bccEmails, _, _, subject, header, body, footer, langCode, eventTypeId, eventRuleId, channelId)
                     = await _resolverHandler.ResolveNotificationTemplatesAsync(
                         msg.UnitId, msg.ModuleName, msg.EventTypeId
@@ -88,7 +91,7 @@ namespace BackgroundService.Application.Consumers
                         ActionStatus = "Sent",
                         ChannelId = (int)NotificationEnum.NotificationChannel.Email,
                         MessageText = resolvedBody,
-                        Timestamp = DateTime.UtcNow,
+                        Timestamp = currentTime,
                         CreatedBy = int.Parse(_ipAddressService.GetCurrentUserId()),
                         CreatedDate = DateTime.UtcNow,
                         CreatedByName = _ipAddressService.GetUserName(),

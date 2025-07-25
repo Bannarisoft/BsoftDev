@@ -13,7 +13,8 @@ namespace BackgroundService.Infrastructure.Services.Notification
     {
         private readonly SmsSettings _smsSettings;
         private readonly HttpClient _httpClient;
-        private readonly ILogger<SmsSender> _logger;        
+        private readonly ILogger<SmsSender> _logger;      
+          
 
         public SmsSender(SmsSettings smsSettings, IHttpClientFactory httpClientFactory, ILogger<SmsSender> logger, IIPAddressService ipAddressService)
         : base(ipAddressService)
