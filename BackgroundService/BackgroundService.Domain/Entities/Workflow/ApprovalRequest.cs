@@ -12,7 +12,7 @@ namespace BackgroundService.Domain.Entities.Workflow
         public int WorkflowTypeId { get; set; }
         public int ModuleTransactionId { get; set; }
         public int ApprovalStepDetailId { get; set; }
-        public int ApprovalRuleId { get; set; }
+        public int? ApprovalRuleId { get; set; }
         public int StatusId { get; set; }
         public DateTimeOffset RequestedDate { get; set; }
         public WorkflowType WorkflowType { get; set; }

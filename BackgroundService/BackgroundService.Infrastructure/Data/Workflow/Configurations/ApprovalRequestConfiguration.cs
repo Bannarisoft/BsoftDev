@@ -38,7 +38,7 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
             builder.Property(t => t.ApprovalRuleId)
             .HasColumnName("ApprovalRuleId")
             .HasColumnType("int")
-            .IsRequired();
+            .IsRequired(false);
 
             builder.Property(t => t.StatusId)
            .HasColumnName("StatusId")

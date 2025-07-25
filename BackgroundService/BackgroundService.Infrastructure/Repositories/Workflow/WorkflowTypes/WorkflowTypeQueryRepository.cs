@@ -69,6 +69,17 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.WorkflowTypes
             return (WorkflowTypelist, totalCount);
         }
 
+        public async Task<WorkflowType> GetWorkflowByName(string ModuleTypeName)
+        {
+            const string query = @"
+                SELECT Id, ModuleTypeName 
+                FROM [AppData].[WorkflowType] 
+                WHERE IsDeleted = 0 AND IsActive=1 AND ModuleTypeName= @ModuleTypeName";
+                
+            var WorkflowType = await _dbConnection.QueryAsync<WorkflowType>(query, new { ModuleTypeName });
+            return WorkflowType.FirstOrDefault();
+        }
+
         public async Task<List<WorkflowType>> GetWorkflowTypeAutoComplete(string searchPattern)
         {
               const string query = @"
