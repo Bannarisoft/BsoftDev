@@ -32,6 +32,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
         private readonly IBackgroundServiceClient _backgroundServiceClient;
         private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+
         // private readonly IPreventiveSchedulerCommand _preventiveSchedulerCommand;
         public PreventiveSchedulerCommandRepository(ApplicationDbContext applicationDbContext, IPreventiveSchedulerQuery preventiveSchedulerQuery,
         IMiscMasterQueryRepository miscMasterQueryRepository, IMapper mapper, IIPAddressService ipAddressService, IBackgroundServiceClient backgroundServiceClient,
@@ -46,6 +47,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             _preventiveScheduleLogService = preventiveScheduleLogService;
             // _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _httpContextAccessor = httpContextAccessor;
+
         }
 
         public async Task<int> CreateAsync(PreventiveSchedulerHeader preventiveSchedulerHdr)
@@ -137,7 +139,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
             return false;
 
         }
-        public async Task<bool> CreateNextSchedulerDetailAsync(int Id)
+        public async Task<bool> CreateNextSchedulerDetailAsync(int Id,string token)
         {
             await _preventiveScheduleLogService.CaptureLogs(null,Id,"Create Next Schedule",JsonConvert.SerializeObject(Id));
             var existingPreventiveScheduler = await _applicationDbContext.PreventiveSchedulerDtl
@@ -146,7 +148,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.PreventiveSchedulers
                 u.IsActive == Status.Active &&
                 u.IsDeleted == IsDelete.NotDeleted);
 
-            var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
+            
             if (existingPreventiveScheduler != null)
             {
                 DateTimeOffset? lastMaintenanceDate = await _preventiveSchedulerQuery.GetLastMaintenanceDateAsync(existingPreventiveScheduler.MachineId, Id, WOStatus.MiscCode, MaintenanceStatusUpdate.Code);

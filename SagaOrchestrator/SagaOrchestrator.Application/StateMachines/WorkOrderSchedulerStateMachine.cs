@@ -56,11 +56,13 @@ namespace SagaOrchestrator.Application.StateMachines
                     {
                         context.Instance.WorkOrderId = context.Data.WorkOrderId;
                         context.Instance.PreventiveSchedulerDetailId = context.Data.PreventiveSchedulerDetailId;
+                        context.Instance.token = context.Data.token;
                     })
                     .Send(new Uri("queue:schedule-next-task-queue"), context => new ScheduleNextPreventiveTaskCommand
                     {
                         CorrelationId = context.Instance.CorrelationId,
-                        SchedulerId = context.Instance.PreventiveSchedulerDetailId
+                        SchedulerId = context.Instance.PreventiveSchedulerDetailId,
+                        token = context.Instance.token
                     })
                     .TransitionTo(CreatingNextScheduler)
             );
@@ -94,7 +96,8 @@ namespace SagaOrchestrator.Application.StateMachines
                         {
                             CorrelationId = ctx.Data.CorrelationId,
                             WorkOrderId = ctx.Instance.WorkOrderId,
-                            Reason = ctx.Data.Reason                        
+                            Reason = ctx.Data.Reason,
+                            token = ctx.Data.token                        
                         })
                     .TransitionTo(Failed)
             );
