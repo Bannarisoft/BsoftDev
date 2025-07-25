@@ -38,50 +38,53 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
                 var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(context.Message.FrequencyUnitId);
 
                 var DetailResult = await _preventiveSchedulerQuery.GetPreventiveSchedulerDetail(context.Message.PreventiveSchedulerHeaderId);
-            await _preventiveScheduleLogService.CaptureLogs(context.Message.PreventiveSchedulerHeaderId,null,"Saga Update Schedule Details",JsonConvert.SerializeObject(DetailResult));
-                foreach (var detail in DetailResult)
+                 await _preventiveScheduleLogService.CaptureLogs(context.Message.PreventiveSchedulerHeaderId,null,"Saga Update Schedule Details",JsonConvert.SerializeObject(DetailResult));
+                if (context.Message.isFrequencyChanged)
                 {
-
-                    var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((detail.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue),
-                     context.Message.FrequencyInterval, frequencyUnit.Code ?? "", context.Message.ReminderWorkOrderDays);
-                    var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((detail.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue), context.Message.FrequencyInterval, frequencyUnit.Code ?? "", context.Message.ReminderMaterialReqDays);
-
-                    detail.PreventiveSchedulerHeaderId = context.Message.PreventiveSchedulerHeaderId;
-                    
-                    detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
-                    detail.FrequencyInterval = context.Message.FrequencyInterval;
-                    
-
-                    var result = await _preventiveSchedulerQuery.ExistWorkOrderBySchedulerDetailId(detail.Id);
-                    if (result != true)
+                    foreach (var detail in DetailResult)
                     {
-                        detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
-                        detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
 
-                        if (!string.IsNullOrEmpty(detail.HangfireJobId))
+                        var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((detail.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue),
+                         context.Message.FrequencyInterval, frequencyUnit.Code ?? "", context.Message.ReminderWorkOrderDays);
+                        var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((detail.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue), context.Message.FrequencyInterval, frequencyUnit.Code ?? "", context.Message.ReminderMaterialReqDays);
+
+                        detail.PreventiveSchedulerHeaderId = context.Message.PreventiveSchedulerHeaderId;
+
+                        detail.ActualWorkOrderDate = DateOnly.FromDateTime(nextDate);
+                        detail.FrequencyInterval = context.Message.FrequencyInterval;
+
+
+                        var result = await _preventiveSchedulerQuery.ExistWorkOrderBySchedulerDetailId(detail.Id);
+                        if (result != true)
                         {
-                            _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId,context.Message.token);
+                            detail.WorkOrderCreationStartDate = DateOnly.FromDateTime(reminderDate);
+                            detail.MaterialReqStartDays = DateOnly.FromDateTime(ItemReminderDate);
+
+                            if (!string.IsNullOrEmpty(detail.HangfireJobId))
+                            {
+                                _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId, context.Message.token);
+                            }
+
+                            var delay = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
+
+                            string newJobId;
+                            var delayInMinutes = (int)delay.TotalMinutes;
+                            if (delay.TotalSeconds > 0)
+                            {
+
+                                newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, delayInMinutes, context.Message.token);
+                            }
+                            else
+                            {
+
+                                newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, 5, context.Message.token);
+                            }
+                            detail.HangfireJobId = newJobId;
                         }
 
-                        var delay = detail.WorkOrderCreationStartDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today;
 
-                        string newJobId;
-                        var delayInMinutes = (int)delay.TotalMinutes;
-                        if (delay.TotalSeconds > 0)
-                        {
 
-                            newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, delayInMinutes,context.Message.token);
-                        }
-                        else
-                        {
-
-                            newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, 5,context.Message.token);
-                        }
-                        detail.HangfireJobId = newJobId;
                     }
-
-                    
-
                 }
                 await _preventiveSchedulerCommand.UpdateScheduleDetails(context.Message.PreventiveSchedulerHeaderId, DetailResult);
             }
