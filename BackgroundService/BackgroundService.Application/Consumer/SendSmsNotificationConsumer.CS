@@ -20,12 +20,13 @@ namespace BackgroundService.Application.Consumers
         private readonly IIPAddressService _ipAddressService;
         private readonly INotificationLogger _loggerNotification;
         private const int MaxRetries = 3; 
+        private readonly ITimeZoneService _timeZoneService;
 
         public SendSmsNotificationConsumer(
             ISmsSender smsSender,
             ILogger<SendSmsNotificationConsumer> logger,
             IBackgroundJobClient jobClient,
-            NotificationResolverHandler resolverHandler, INotificationLogger loggerNotification, IIPAddressService ipAddressService)
+            NotificationResolverHandler resolverHandler, INotificationLogger loggerNotification, IIPAddressService ipAddressService, ITimeZoneService timeZoneService)
         {
             _smsSender = smsSender;
             _logger = logger;
@@ -33,6 +34,7 @@ namespace BackgroundService.Application.Consumers
             _resolverHandler = resolverHandler;
             _loggerNotification = loggerNotification;
             _ipAddressService = ipAddressService;
+            _timeZoneService = timeZoneService;
         }
 
         public async Task Consume(ConsumeContext<SendSmsNotificationInternalCommand> context)
@@ -41,6 +43,8 @@ namespace BackgroundService.Application.Consumers
             Console.WriteLine($"✅ SMS Consumer Received: ",msg); 
             try
             {
+                var systemTimeZoneId = _timeZoneService.GetSystemTimeZone();
+                var currentTime = _timeZoneService.GetCurrentTime(systemTimeZoneId);
                 var (_, _, _, smsNumbers, _, subject, header,body, footer, langCode,eventTypeId,eventRuleId, channelId) =
                     await _resolverHandler.ResolveNotificationTemplatesAsync(
                         msg.UnitId, msg.ModuleName, msg.EventTypeId);
@@ -89,7 +93,7 @@ namespace BackgroundService.Application.Consumers
                         ActionStatus = sent ? "Sent" : "Failed",
                         ChannelId = (int)NotificationEnum.NotificationChannel.SMS,
                         MessageText = resolvedBody,
-                        Timestamp = DateTime.UtcNow,
+                        Timestamp = currentTime,
                         CreatedBy = int.Parse(_ipAddressService.GetCurrentUserId()),
                         CreatedDate = DateTime.UtcNow,
                         CreatedByName = _ipAddressService.GetUserName(),

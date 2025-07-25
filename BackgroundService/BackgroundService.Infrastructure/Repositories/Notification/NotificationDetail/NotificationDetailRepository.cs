@@ -34,7 +34,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
                     INNER JOIN AppData.MiscMaster MM1 on MM1.id=NH.TargetTypeId  
                     INNER JOIN AppData.MiscMaster MM4 on MM4.id=L.ReadStatusId
                     where L.SendTo = @userId AND L.IsDeleted = 0
-                    ORDER BY L.Timestamp DESC";
+                    ORDER BY L.Timestamp DESC ";
       
             var notifications = await _dbConnection.QueryAsync<GetNotificationDetailDto>(query, new { userId });
             return notifications.ToList();
@@ -51,11 +51,6 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             _applicationDbContext.NotificationEventLog.Update(existingNotificationDetail);            
             await _applicationDbContext.SaveChangesAsync();
             return 1;
-        }
-
-        public Task<int> UpdateAsync(string id, NotificationEventLog NotificationLog)
-        {
-            throw new NotImplementedException();
         }
     }
 }
