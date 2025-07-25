@@ -1,29 +1,32 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using static Core.Domain.Common.BaseEntity;
 
-namespace MaintenanceManagement.Infrastructure.Data.Configurations
+namespace PurchaseManagement.Infrastructure.Data.Configurations
 {
-    public class MiscTypeMasterConfiguration : IEntityTypeConfiguration<MiscTypeMaster>
+    public class MiscTypeMasterConfiguration   : IEntityTypeConfiguration<MiscTypeMaster>
     {
         public void Configure(EntityTypeBuilder<MiscTypeMaster> builder)
         {
-            // ValueConverter for Status (enum to bit)
-            var statusConverter = new ValueConverter<Status, bool>(
-                v => v == Status.Active,                    // Convert to DB (1 for Active)
-                v => v ? Status.Active : Status.Inactive    // Convert to Entity
-            );
 
-                // ValueConverter for IsDelete (enum to bit)
+            var statusConverter = new ValueConverter<Status, bool>(
+                 v => v == Status.Active,                    // Convert to DB (1 for Active)
+                 v => v ? Status.Active : Status.Inactive    // Convert to Entity
+             );
+
+            // ValueConverter for IsDelete (enum to bit)
             var isDeleteConverter = new ValueConverter<IsDelete, bool>(
                 v => v == IsDelete.Deleted,                 // Convert to DB (1 for Deleted)
                 v => v ? IsDelete.Deleted : IsDelete.NotDeleted // Convert to Entity
-            );
-
-             
-            builder.ToTable("MiscTypeMaster", "Maintenance");
+            );   
+            
+             builder.ToTable("MiscTypeMaster", "Purchase");
 
                 // Primary Key
             builder.HasKey(m => m.Id);
@@ -45,35 +48,33 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
                 .IsRequired();
 
 
-                 builder.Property(b => b.IsActive)
+            builder.Property(b => b.IsActive)
                 .HasColumnName("IsActive")
                 .HasColumnType("bit")
                 .HasConversion(statusConverter)
                 .IsRequired();
 
-                 builder.Property(b => b.IsDeleted)
+            builder.Property(b => b.IsDeleted)
                 .HasColumnName("IsDeleted")
                 .HasColumnType("bit")
                 .HasConversion(isDeleteConverter)
                 .IsRequired();
 
 
-                builder.Property(b => b.CreatedByName)
+            builder.Property(b => b.CreatedByName)
                 .IsRequired()
                 .HasColumnType("varchar(50)");
 
     
-                builder.Property(b => b.CreatedIP)
+            builder.Property(b => b.CreatedIP)
                 .IsRequired()
                 .HasColumnType("varchar(255)");
 
-                builder.Property(b => b.ModifiedByName)
+            builder.Property(b => b.ModifiedByName)
                 .HasColumnType("varchar(50)");
 
-                builder.Property(b => b.ModifiedIP)
+            builder.Property(b => b.ModifiedIP)
                 .HasColumnType("varchar(255)");
-
-
         }
     }
 }
