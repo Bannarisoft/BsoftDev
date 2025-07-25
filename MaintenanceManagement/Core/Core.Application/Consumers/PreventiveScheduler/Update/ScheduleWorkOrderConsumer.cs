@@ -39,11 +39,11 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
 
                 var DetailResult = await _preventiveSchedulerQuery.GetPreventiveSchedulerDetail(context.Message.PreventiveSchedulerHeaderId);
                  await _preventiveScheduleLogService.CaptureLogs(context.Message.PreventiveSchedulerHeaderId,null,"Saga Update Schedule Details",JsonConvert.SerializeObject(DetailResult));
-                if (context.Message.isFrequencyChanged)
-                {
-                    foreach (var detail in DetailResult)
-                    {
 
+                foreach (var detail in DetailResult)
+                {
+                    if (context.Message.isFrequencyChanged)
+                    {
                         var (nextDate, reminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((detail.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue),
                          context.Message.FrequencyInterval, frequencyUnit.Code ?? "", context.Message.ReminderWorkOrderDays);
                         var (ItemNextDate, ItemReminderDate) = await _preventiveSchedulerQuery.CalculateNextScheduleDate((detail.LastMaintenanceActivityDate ?? DateOnly.FromDateTime(DateTime.Today)).ToDateTime(TimeOnly.MinValue), context.Message.FrequencyInterval, frequencyUnit.Code ?? "", context.Message.ReminderMaterialReqDays);
@@ -82,11 +82,18 @@ namespace Core.Application.Consumers.PreventiveScheduler.Update
                             detail.HangfireJobId = newJobId;
                         }
 
-
-
                     }
-                }
-                await _preventiveSchedulerCommand.UpdateScheduleDetails(context.Message.PreventiveSchedulerHeaderId, DetailResult);
+                    else
+                    {
+                        detail.ReminderWorkOrderDays = context.Message.ReminderWorkOrderDays;
+                        detail.ReminderMaterialReqDays = context.Message.ReminderMaterialReqDays;
+                    }
+
+                 }
+                    await _preventiveSchedulerCommand.UpdateScheduleDetails(context.Message.PreventiveSchedulerHeaderId, DetailResult);
+                
+               
+                
             }
             catch (Exception ex)
             {
