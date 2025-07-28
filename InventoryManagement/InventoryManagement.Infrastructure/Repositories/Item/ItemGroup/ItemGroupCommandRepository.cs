@@ -1,4 +1,5 @@
 
+using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.Item.ItemGroup;
 using InventoryManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -8,50 +9,68 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemGroup
     public class ItemGroupCommandRepository : IItemGroupCommandRepository
     {
         private readonly ApplicationDbContext _applicationDbContext;
+        private readonly IIPAddressService _ipAddressService;
 
-        public ItemGroupCommandRepository(ApplicationDbContext applicationDbContext)
+        public ItemGroupCommandRepository(ApplicationDbContext applicationDbContext, IIPAddressService ipAddressService)
         {
             _applicationDbContext = applicationDbContext;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<int> CreateAsync(Core.Domain.Entities.Item.ItemGroup itemGroup)
-        {                
+        {
+            var entry = _applicationDbContext.Entry(itemGroup);
+            itemGroup.UnitId = _ipAddressService.GetUnitId();
             await _applicationDbContext.ItemGroup.AddAsync(itemGroup);
-            await _applicationDbContext.SaveChangesAsync();                
+            await _applicationDbContext.SaveChangesAsync();
             return itemGroup.Id;
         }
 
         public async Task<int> DeleteAsync(int Id, Core.Domain.Entities.Item.ItemGroup itemGroup)
-        {            
-            var itemGroupToDelete = await _applicationDbContext.ItemGroup.FirstOrDefaultAsync(u => u.Id == Id);            
+        {
+            var itemGroupToDelete = await _applicationDbContext.ItemGroup.FirstOrDefaultAsync(u => u.Id == Id);
             if (itemGroupToDelete is null)
             {
                 return -1;
-            }            
-            itemGroupToDelete.IsDeleted = itemGroup.IsDeleted;            
-            await _applicationDbContext.SaveChangesAsync();
-            return 1; 
-        }
-        public async Task<int> UpdateAsync(int Id, Core.Domain.Entities.Item.ItemGroup itemGroup)
-        {
-            var existingItemGroup = await _applicationDbContext.ItemGroup.FirstOrDefaultAsync(u => u.Id == Id);          
-            if (existingItemGroup is null)
-            {
-                return -1;
-            }            
-            existingItemGroup.ItemGroupName = itemGroup.ItemGroupName;                       
-            existingItemGroup.IsActive=itemGroup.IsActive;
-            
-            _applicationDbContext.ItemGroup.Update(existingItemGroup);
-            
+            }
+            itemGroupToDelete.IsDeleted = itemGroup.IsDeleted;
             await _applicationDbContext.SaveChangesAsync();
             return 1;
         }
-        public async Task<bool> IsNameDuplicateAsync(string? name, int excludeId)
+        public async Task<int> UpdateAsync(int Id, Core.Domain.Entities.Item.ItemGroup itemGroup)
+        {
+            var existingItemGroup = await _applicationDbContext.ItemGroup.FirstOrDefaultAsync(u => u.Id == Id);
+            if (existingItemGroup is null)
+            {
+                return -1;
+            }
+            existingItemGroup.ItemGroupName = itemGroup.ItemGroupName;
+            existingItemGroup.ItemGroupCode = itemGroup.ItemGroupCode;
+            existingItemGroup.IsActive = itemGroup.IsActive;
+
+            _applicationDbContext.ItemGroup.Update(existingItemGroup);
+
+            await _applicationDbContext.SaveChangesAsync();
+            return 1;
+        }
+        public async Task<bool> ExistsByCodeAsync(string code)
         {
             return await _applicationDbContext.ItemGroup
-                .Where(cc => cc.ItemGroupName == name  && cc.Id != excludeId)
-                .AnyAsync();
+            .Where(cc => cc.ItemGroupCode == code && cc.IsDeleted == 0)
+            .AnyAsync();
         }
+
+        public async Task<bool> IsNameDuplicateAsync(string name, int excludeId)
+        {
+            return await _applicationDbContext.ItemGroup
+            .Where(cc => cc.ItemGroupName == name && cc.Id != excludeId)
+            .AnyAsync();
+        }
+        public async Task<bool> IsCodeDuplicateAsync(string? code, int excludeId)
+        {
+            return await _applicationDbContext.ItemGroup
+            .AnyAsync(cc => cc.ItemGroupCode == code && cc.Id != excludeId && cc.IsDeleted == 0);
+        }
+
     }
 }

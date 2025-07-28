@@ -27,7 +27,7 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item
                 .IsRequired();
 
             builder.Property(ag => ag.ItemGroupId)
-                .HasColumnName("GroupId")
+                .HasColumnName("ItemGroupId")
                 .HasColumnType("int")
                 .IsRequired();  
             builder.HasOne(dg => dg.ItemGroup)
@@ -36,18 +36,9 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item
                 .OnDelete(DeleteBehavior.Restrict); 
 
             builder.Property(ag => ag.ItemCategoryName)
-                .HasColumnName("CategoryName")
+                .HasColumnName("ItemCategoryName")
                 .HasColumnType("varchar(100)")
                 .IsRequired(); 
-
-            builder.Property(ag => ag.ParentCategoryId)
-                .HasColumnName("ParentCategoryId")
-                .HasColumnType("int")
-                .IsRequired(false);
-            builder.HasOne(dg => dg.ItemCategoryParent)
-                .WithMany(ag => ag.ChildCategories)
-                .HasForeignKey(dg => dg.ParentCategoryId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(ag => ag.IsGroup)
                 .HasColumnName("IsGroup")
@@ -58,6 +49,15 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item
                 )
                 .IsRequired(false);
 
+            builder.Property(ag => ag.ParentCategoryId)
+                .HasColumnName("ParentCategoryId")
+                .HasColumnType("int")
+                .IsRequired(false);
+            builder.HasOne(dg => dg.ItemCategoryParent)
+                .WithMany(ag => ag.ChildCategories)
+                .HasForeignKey(dg => dg.ParentCategoryId)
+                .OnDelete(DeleteBehavior.Restrict);           
+
             builder.Property(ag => ag.IsBudgetApplicable)
                 .HasColumnName("IsBudgetApplicable")
                 .HasColumnType("Bit")
@@ -67,6 +67,11 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item
                 )
                 .IsRequired(false);          
            
+            builder.Property(ag => ag.RootCategoryId)
+                .HasColumnName("RootCategoryId")
+                .HasColumnType("int")
+                .IsRequired(false);
+
             builder.Property(b => b.IsActive)                
                 .HasColumnType("bit")
                 .HasConversion(statusConverter)

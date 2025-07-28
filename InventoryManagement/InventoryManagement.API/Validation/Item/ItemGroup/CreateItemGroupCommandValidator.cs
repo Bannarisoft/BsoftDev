@@ -34,19 +34,19 @@ namespace InventoryManagement.API.Validation.Item.ItemGroup
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateItemGroupCommand.ItemGroupCode)} {rule.Error}");
                         break;
-                    case "MaxLength":                        
+                    case "MaxLength":
                         RuleFor(x => x.ItemGroupName)
                             .MaximumLength(maxLength)
                             .WithMessage($"{nameof(CreateItemGroupCommand.ItemGroupName)} {rule.Error}");
                         break;
-                    case "AlreadyExists":                       
-                        RuleFor(x => x.ItemGroupName)
+                    case "AlreadyExists":
+                        RuleFor(x => x.ItemGroupCode)
                            .NotEmpty()
-                           .WithMessage($"{nameof(CreateItemGroupCommand.ItemGroupName)} {rule.Error}")
-                           .MustAsync(async (command, moduleName, cancellation) =>
-                            !await _itemGroupCommandRepository.IsNameDuplicateAsync(moduleName,command.Id))
-                             .WithMessage("A Group Name already exists in this Group.");
-                        break;
+                           .WithMessage($"{nameof(CreateItemGroupCommand.ItemGroupCode)} {rule.Error}")
+                           .MustAsync(async (command, code, cancellation) =>
+                            !await _itemGroupCommandRepository.ExistsByCodeAsync(code))
+                            .WithMessage("Item Group Code already exists.");
+                        break;                   
                 }
             }
         }

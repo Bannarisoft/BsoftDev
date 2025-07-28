@@ -95,11 +95,6 @@
         "error": "must be a PNG or JPG file and less than 2 MB in size."    
     },
     {
-        "rule": "FilePDFValidation",  
-        "allowedExtensions": [".pdf"],      
-        "error": "must be a PDF file and less than 2 MB in size."    
-    },
-    {
         "rule": "Pincode",
         "pattern": "^[0-9]{6}$", 
         "error": " must be a valid 6-digit pincode."
@@ -114,20 +109,36 @@
         "error": "{PropertyName} already exists."
     },
     {
+        "rule": "CodeUnique",      
+        "error": "{PropertyName} already exists."
+    },
+    {
+        "rule": "RecordNotFound",      
+        "error": "{PropertyName} not found."
+    },
+    {
         "rule": "SoftDelete",      
         "error": "Cannot delete the relationship as it is active with another table."
     },
     {
-        "rule": "ActivePolicy",      
-        "error": "Please Inactive previous active policy."
+        "rule": "DateValidation",      
+        "error": " Invalid date format."
     },
     {
-        "rule": "UniqueCombination",
-        "error": "Combination of values already Exists."
+        "rule": "NotFound",      
+        "error": "{PropertyName} not found."
     },
     {
-        "rule": "Percentage",
-        "pattern": "^(100(\\.00?)?|[0-9]?[0-9](\\.[0-9]{1,2})?)$",
-        "error": "SubGroupPercentage must be a number between 0 and 100 with up to 2 decimal places."
-    }
+        "rule": "FKColumnActiveOrInactive",      
+        "error": "{PropertyName} is inactive."
+    },
+    {
+        "rule": "PastDateValidation",      
+        "error": "{PropertyName} cannot be in the past."
+    },
+    {
+        "rule": "FKColumnDelete",      
+        "error": "{PropertyName} is inactive/deleted."
+    }   
+    
 ]

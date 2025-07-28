@@ -14,7 +14,7 @@ namespace InventoryManagement.API.Validation.Item.ItemCategory
         {
             _itemCategoryCommandRepository = itemCategoryCommandRepository;            
             _itemCategoryQueryRepository = itemCategoryQueryRepository;
-            var maxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.Item.ItemCategory>("ItemCategoryName") ?? 250;
+            var maxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.Item.ItemCategory>("ItemCategoryName") ?? 100;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();
 
@@ -50,11 +50,11 @@ namespace InventoryManagement.API.Validation.Item.ItemCategory
                         break;
                     case "RecordNotFound":
                         RuleFor(x => x.Id)
-                            .MustAsync(async (Id, cancellation) =>
-                                await _itemCategoryQueryRepository.NotFoundAsync(Id))
+                            .MustAsync(async (id, cancellation) => 
+                            (await _itemCategoryQueryRepository.GetByIdAsync(id)) != null) 
                             .WithName("Id")
                             .WithMessage($"{rule.Error}");
-                        break;
+                            break;
                     default:
                         break;
                 }

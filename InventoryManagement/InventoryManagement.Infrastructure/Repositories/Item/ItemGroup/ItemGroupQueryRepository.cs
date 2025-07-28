@@ -13,17 +13,14 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemGroup
         public ItemGroupQueryRepository(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;            
-        }       
+        }
         public async Task<ItemGroupDto> GetByIdAsync(int Id)
         {
             const string query = @" select 
-                    IG.Id,ItemGroupCode, ItemGroupName,IG,UnitId ,
-                    ,IC.IsActive, IC.IsDeleted, IC.CreatedBy, IC.CreatedDate, IC.CreatedByName, IC.CreatedIP, IC.ModifiedBy, IC.ModifiedDate, IC.ModifiedByName, IC.ModifiedIP
-                    FROM  Inventory.ItemGroup IG
-                    WHERE IG.Id = @Id AND IG.IsDeleted = 0";
-
-            var notificationConfig = await _dbConnection.QueryFirstOrDefaultAsync<ItemGroupDto>(query, new { Id });
-            return notificationConfig;
+                    Id,ItemGroupCode, ItemGroupName,UnitId 
+                    ,IsActive, IsDeleted, CreatedBy, CreatedDate, CreatedByName, CreatedIP, ModifiedBy, ModifiedDate, ModifiedByName, ModifiedIP
+                    FROM  Inventory.ItemGroup WHERE Id = @Id AND IsDeleted = 0";
+            return await _dbConnection.QueryFirstOrDefaultAsync<ItemGroupDto>(query, new { Id });
         }
         public async Task<(IEnumerable<dynamic>, int)> GetAllItemGroupAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
@@ -35,10 +32,9 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemGroup
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search)")}};
 
             SELECT 
-                IG.Id,ItemGroupCode, ItemGroupName,IG,UnitId ,
-                ,IC.IsActive, IC.IsDeleted, IC.CreatedBy, IC.CreatedDate, IC.CreatedByName, IC.CreatedIP, IC.ModifiedBy, IC.ModifiedDate, IC.ModifiedByName, IC.ModifiedIP
-                FROM  Inventory.ItemGroup IG
-            WHERE IC.IsDeleted = 0
+                Id,ItemGroupCode, ItemGroupName,UnitId 
+                ,IsActive, IsDeleted, CreatedBy, CreatedDate, CreatedByName, CreatedIP, ModifiedBy, ModifiedDate, ModifiedByName, ModifiedIP
+                FROM  Inventory.ItemGroup             WHERE IsDeleted = 0
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ItemGroupName LIKE @Search )")}}
             ORDER BY Id desc
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -82,7 +78,7 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemGroup
              SELECT IC.Id, IC.ItemGroupName
             FROM Inventory.ItemGroup IC            
             WHERE IC.IsDeleted = 0 
-            AND ModuleName LIKE @SearchPattern";
+            AND ItemGroupName LIKE @SearchPattern";
             var parameters = new
             {
                 SearchPattern = $"%{searchPattern}%"

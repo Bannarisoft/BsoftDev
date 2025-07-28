@@ -8,7 +8,6 @@ namespace Core.Application.Common.Interfaces.Item.ItemCategory
         Task<ItemCategoryDto> GetByIdAsync(int id);
         Task<(IEnumerable<dynamic>, int)> GetAllItemCategoryAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<List<ItemCategoryAutoCompleteDto>> GetItemCategoryAutoCompleteAsync(string searchPattern);
-        Task<bool> SoftDeleteValidation(int Id);        
-        Task<bool> NotFoundAsync(int Id );
+        Task<bool> SoftDeleteValidation(int Id);                
     }
 }

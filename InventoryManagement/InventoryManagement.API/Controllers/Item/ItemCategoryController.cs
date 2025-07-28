@@ -40,11 +40,11 @@ namespace Core.API.Controller.Item
         }
         
         [HttpGet("by-name")]
-        public async Task<IActionResult> GetItemCategoryAutoCompleteAsync([FromQuery] string? ModuleName)
+        public async Task<IActionResult> GetItemCategoryAutoCompleteAsync([FromQuery] string? CategoryName)
         {
             var notificationConfig = await Mediator.Send(new GetItemCategoryAutoCompleteQuery 
             { 
-                    SearchPattern = ModuleName ?? string.Empty 
+                    SearchPattern = CategoryName ?? string.Empty 
             });
             return Ok(new { StatusCode = StatusCodes.Status200OK, data = notificationConfig});
         }
@@ -53,7 +53,12 @@ namespace Core.API.Controller.Item
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             var notificationConfig = await Mediator.Send(new GetItemCategoryByIdQuery() { Id = id});           
-            return Ok(new { StatusCode=StatusCodes.Status200OK, data = notificationConfig,message = notificationConfig });            
+            return Ok(new 
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = notificationConfig,
+                message = "Item category fetched successfully"
+            });
         }
 
         [HttpPost]

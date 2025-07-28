@@ -29,11 +29,11 @@ namespace InventoryManagement.API.Validation.Item.ItemGroup
                         break;
                     case "RecordNotFound":
                         RuleFor(x => x.Id)
-                        .MustAsync(async (Id, cancellation) => 
-                        await _itemGroupQueryRepository.NotFoundAsync(Id))             
-                        .WithName("Id")
-                        .WithMessage($"{rule.Error}");
-                        break;
+                            .MustAsync(async (id, cancellation) => 
+                                (await _itemGroupQueryRepository.GetByIdAsync(id)) != null) 
+                            .WithName("Id")
+                            .WithMessage($"{rule.Error}");
+                            break;
                     case "SoftDelete":
                         RuleFor(x => x.Id)
                         .MustAsync(async (Id, cancellation) => !await _itemGroupQueryRepository.SoftDeleteValidation(Id))
