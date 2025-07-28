@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
+using Core.Domain.Entities.Item;
+using InventoryManagement.Infrastructure.Data.Configurations.Item;
 
 namespace InventoryManagement.Infrastructure.Data
 {
@@ -18,14 +20,15 @@ namespace InventoryManagement.Infrastructure.Data
 
         }
 
-        // public DbSet<AssetGroup> AssetGroup { get; set; } 
+         public DbSet<ItemGroup> ItemGroup { get; set; } 
+         public DbSet<ItemCategory> ItemCategory { get; set; } 
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
-
+            modelBuilder.ApplyConfiguration(new ItemGroupConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemCategoryConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
