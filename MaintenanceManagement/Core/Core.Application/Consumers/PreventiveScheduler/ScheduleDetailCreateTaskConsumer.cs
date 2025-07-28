@@ -84,31 +84,32 @@ namespace Core.Application.Consumers.PreventiveScheduler
                     await context.Publish(new MachineWiseScheduleCreationEvent
                     {
                         CorrelationId = context.Message.CorrelationId,
-                        PreventiveSchedulerHeaderId =context.Message.PreventiveSchedulerHeaderId
+                        PreventiveSchedulerHeaderId = context.Message.PreventiveSchedulerHeaderId,
+                        token = context.Message.token
                         
                     });
                 }
                 else
                 {
-                     var headerId = context.Message.PreventiveSchedulerHeaderId;
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", 
-                $"Preventive Schedule creation failed: {headerId}");
+                     
+               
                     await context.Publish(new PreventiveSchedulerDetailCreationFailedEvent
                     {
                         CorrelationId = context.Message.CorrelationId,
-                        Reason = "Failed to create schedule detail"
+                        Reason = "Failed to create schedule detail",
+                        token = context.Message.token
                     });
                 }
             }
             catch (Exception ex)
             {
-                var headerId = context.Message.PreventiveSchedulerHeaderId;
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", 
-                $"Preventive Schedule creation failed: {headerId}");
+                
+            
                 await context.RespondAsync(new PreventiveSchedulerDetailCreationFailedEvent
                 {
                     CorrelationId = context.Message.CorrelationId,
-                    Reason = $"Exception: {ex.Message}"
+                    Reason = $"Exception: {ex.Message}",
+                    token = context.Message.token
                 });
             }
         }

@@ -629,14 +629,19 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MaintenanceRequest
                         var parameters = new { MiscTypeCode = MiscEnumEntity.MaintenanceDispatchMode.MiscCode };        
                         var result = await _dbConnection.QueryAsync<Core.Domain.Entities.MiscMaster>(query,parameters);
                         return result.ToList();
-                    } 
-
-                
+                    }
 
 
+        public async Task<string> GetMachineNameAsync(int id)
+        {
+            const string query = @"
+                        SELECT M.MachineName
+                        FROM Maintenance.Maintenance.MachineMaster M
+                        WHERE M.Id = @id
+                        ORDER BY M.Id DESC";
 
-                             
-                         
-
+             var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query, new { id });
+            return result ?? string.Empty; 
+        }
     }
 }

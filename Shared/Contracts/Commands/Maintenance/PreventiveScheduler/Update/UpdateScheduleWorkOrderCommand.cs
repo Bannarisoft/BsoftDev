@@ -18,5 +18,7 @@ namespace Contracts.Commands.Maintenance.PreventiveScheduler.Update
         public int ReminderWorkOrderDays { get; set; }
         public int ReminderMaterialReqDays { get; set; }
         public RollbackHeaderDto rollbackHeaders { get; set; }
+        public string token { get; set; }
+        public bool isFrequencyChanged { get; set; }
     }
 }
