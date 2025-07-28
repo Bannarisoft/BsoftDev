@@ -11,21 +11,21 @@ namespace Core.Domain.Entities
         public int Type { get; set; }         
         public string? HSNCode { get; set; }      
         public string? Description { get; set; }  
-        public string? GstCategory { get; set; }  
+        public string? GSTCategory { get; set; }  
         private decimal _gstPercentage;
-        public decimal GstPercentage
+        public decimal GSTPercentage
         {
             get => _gstPercentage;
             set
             {
                 _gstPercentage = value;
-                CgstPercentage = Math.Round(value / 2, 2);
-                SgstPercentage = Math.Round(value / 2, 2);
+                CGSTPercentage = Math.Round(value / 2, 2);
+                SGSTPercentage = Math.Round(value / 2, 2);
             }
         }
-        public decimal CgstPercentage { get; private set; }
-        public decimal SgstPercentage { get; private set; }
-        public decimal IgstPercentage { get; set; }     
+        public decimal CGSTPercentage { get; private set; }
+        public decimal SGSTPercentage { get; private set; }
+        public decimal IGSTPercentage { get; set; }     
         public DateTimeOffset ValidFrom { get; set; } 
     }
 }
