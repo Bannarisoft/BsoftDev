@@ -50,6 +50,21 @@ namespace BackgroundService.Infrastructure.Data.Workflow.Configurations
             .HasColumnType("datetimeoffset")
             .IsRequired();
 
+            builder.Property(t => t.UnitId)
+           .HasColumnName("UnitId")
+           .HasColumnType("int")
+           .IsRequired();
+
+           builder.Property(t => t.DepartmentId)
+           .HasColumnName("DepartmentId")
+           .HasColumnType("int")
+           .IsRequired();
+
+           builder.Property(t => t.Remark)
+           .HasColumnName("Remark")
+           .HasColumnType("Varchar(max)")
+           .IsRequired(false);
+
              builder.Property(cf => cf.ModifiedByName)
                  .HasColumnType("varchar(50)");
 

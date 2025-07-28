@@ -18,8 +18,8 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.MiscMasters
         }
         public async Task<MiscMaster> GetMiscMasterByName(string miscTypeCode, string miscTypeName)
         {
-            const string query = @"SELECT M.Id,M.Code ,M.Description  FROM Maintenance.MiscMaster AS M
-                                INNER JOIN Maintenance.MiscTypeMaster AS MT 
+            const string query = @"SELECT M.Id,M.Code ,M.Description  FROM [AppData].MiscMaster AS M
+                                INNER JOIN [AppData].MiscTypeMaster AS MT 
                                 ON MT.Id = M.MiscTypeId
                                 WHERE M.IsDeleted = 0 AND MT.IsDeleted = 0 AND M.IsActive = 1 AND MT.MiscTypeCode= @MiscTypeCode AND M.Code=@MiscTypeName  ";
 

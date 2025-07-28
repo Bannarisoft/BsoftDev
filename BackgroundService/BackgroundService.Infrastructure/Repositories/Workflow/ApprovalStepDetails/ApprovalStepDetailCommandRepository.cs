@@ -41,13 +41,15 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
              var existingApprovalStep = await _notificationDbContext.ApprovalStepDetail
               .Include(cf => cf.ApprovalStepUnitMappings)
             .Include(cf => cf.RuleSkipApproverMappings)
+            .Include(cf => cf.ApprovalStepDepartmentMappings)
             .FirstOrDefaultAsync(u => u.Id == approvalStepDetail.Id);
             
             if (existingApprovalStep != null)
             {
-                               _notificationDbContext.ApprovalStepUnitMapping.RemoveRange(existingApprovalStep.ApprovalStepUnitMappings);
+                 _notificationDbContext.ApprovalStepUnitMapping.RemoveRange(existingApprovalStep.ApprovalStepUnitMappings);
 
                _notificationDbContext.RuleSkipApproverMapping.RemoveRange(existingApprovalStep.RuleSkipApproverMappings);
+               _notificationDbContext.ApprovalStepDepartmentMapping.RemoveRange(existingApprovalStep.ApprovalStepDepartmentMappings);
 
                 existingApprovalStep.WorkFlowTypeId = approvalStepDetail.WorkFlowTypeId;
                 existingApprovalStep.StepOrder = approvalStepDetail.StepOrder;
@@ -64,6 +66,9 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
 
                if (approvalStepDetail.RuleSkipApproverMappings?.Any() == true)
                    await _notificationDbContext.RuleSkipApproverMapping.AddRangeAsync(approvalStepDetail.RuleSkipApproverMappings);
+
+                if (approvalStepDetail.ApprovalStepDepartmentMappings?.Any() == true)
+                   await _notificationDbContext.ApprovalStepDepartmentMapping.AddRangeAsync(approvalStepDetail.ApprovalStepDepartmentMappings);
 
                 return await _notificationDbContext.SaveChangesAsync() > 0;
             }

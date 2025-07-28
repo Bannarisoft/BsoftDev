@@ -15,6 +15,9 @@ namespace BackgroundService.Domain.Entities.Workflow
         public int? ApprovalRuleId { get; set; }
         public int StatusId { get; set; }
         public DateTimeOffset RequestedDate { get; set; }
+        public int UnitId { get; set; }
+        public int DepartmentId { get; set; }
+        public string Remark { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTimeOffset? ModifiedDate { get; set; }
         public string? ModifiedByName { get; set; }
@@ -23,5 +26,6 @@ namespace BackgroundService.Domain.Entities.Workflow
         public ApprovalStepDetail ApprovalStepDetail { get; set; }
         public ApprovalRule ApprovalRule { get; set; }
         public MiscMaster Status { get; set; }
+        public ICollection<ApprovalDocument> ApprovalDocuments { get; set; }
     }
 }

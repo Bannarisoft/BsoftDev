@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Notification.Common.Interfaces.IMiscMaster;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
+using BackgroundService.Domain.Common;
 using BackgroundService.Domain.Entities.Workflow;
 using MediatR;
-using static BackgroundService.Domain.Common.MiscEnumEntity;
+
 
 namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.RejectApprovalRequest
 {
@@ -28,7 +29,7 @@ namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.Rejec
 
         public async Task<bool> Handle(RejectApprovalRequestCommand request, CancellationToken cancellationToken)
         {
-             var status = await _miscMasterQuery.GetMiscMasterByName(GetApprovalStatus.Status, GetStatusRejected.Status);
+             var status = await _miscMasterQuery.GetMiscMasterByName(MiscEnumEntity.ApprovalStatus, MiscEnumEntity.Rejected);
             string currentIp = _ipAddressService.GetSystemIPAddress();
             int userId = _ipAddressService.GetUserId();
             string username = _ipAddressService.GetUserName();

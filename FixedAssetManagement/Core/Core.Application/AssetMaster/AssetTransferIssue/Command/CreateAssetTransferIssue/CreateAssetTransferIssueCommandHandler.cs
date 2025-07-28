@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contracts.Events.Workflow;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
@@ -11,6 +12,7 @@ using Core.Domain.Entities.AssetMaster;
 using Core.Domain.Events;
 using FluentValidation;
 using MediatR;
+using static Core.Domain.Common.MiscEnumEntity;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Command.CreateAssetTransferIssue
 {
@@ -22,16 +24,19 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Command.CreateAssetTra
          private readonly IIPAddressService _ipAddressService;
         private readonly ITimeZoneService _timeZoneService; 
         private readonly IValidator<CreateAssetTransferIssueCommand> _validator; 
-      
-    
-        public CreateAssetTransferIssueCommandHandler(IAssetTransferCommandRepository assetTransferCommandRepository , IMapper mapper, IMediator Imediator, IIPAddressService ipAddressService, ITimeZoneService timeZoneService, IValidator<CreateAssetTransferIssueCommand> validator)
+        private readonly IEventPublisher _eventPublisher;
+
+
+        public CreateAssetTransferIssueCommandHandler(IAssetTransferCommandRepository assetTransferCommandRepository, IMapper mapper, IMediator Imediator,
+        IIPAddressService ipAddressService, ITimeZoneService timeZoneService, IValidator<CreateAssetTransferIssueCommand> validator, IEventPublisher eventPublisher)
         {
             _assetTransferCommandRepository = assetTransferCommandRepository;
-            _mapper = mapper;      
-            _Imediator = Imediator;      
+            _mapper = mapper;
+            _Imediator = Imediator;
             _ipAddressService = ipAddressService;
             _timeZoneService = timeZoneService;
-            _validator = validator;       
+            _validator = validator;
+            _eventPublisher = eventPublisher;
 
         }
      public async Task<ApiResponseDTO<int>> Handle(CreateAssetTransferIssueCommand request, CancellationToken cancellationToken)
@@ -75,13 +80,25 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Command.CreateAssetTra
                   await _Imediator.Publish(domainEvent, cancellationToken);
                   if (result > 0)
                   {
+                     var correlationId = Guid.NewGuid();
+                     var @event = new TransactionCreatedEvent
+                     {
+                         CorrelationId = correlationId,
+                         ModuleTypeName = ApprovalRequest.AssetTransfer,
+                         ModuleTransactionId = result,
+                         UnitId = request.AssetTransferIssueHdrDto.FromUnitId,
+                         DepartmentId = request.AssetTransferIssueHdrDto.FromDepartmentId
+                     };
+                
+                await _eventPublisher.SaveEventAsync(@event);
+                await _eventPublisher.PublishPendingEventsAsync();
                      
                         return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "Asset Transfer created successfully",
-                           Data = result
-                      };
+                {
+                    IsSuccess = true,
+                    Message = "Asset Transfer created successfully",
+                    Data = result
+                };
                  }
                  return new ApiResponseDTO<int>
                   {

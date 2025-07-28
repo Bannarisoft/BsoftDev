@@ -17,5 +17,7 @@ namespace BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.Cr
         public string OnSLAAction { get; set; }
         public List<ApprovalStepUnitMappingDto> ApprovalStepUnitMappings { get; set; }
         public List<RuleSkipApproverMappingDto> RuleSkipApproverMappings { get; set; }
+        public List<ApprovalStepDepartmentMappingDto> ApprovalStepDepartmentMappings { get; set; }
+        
     }
 }

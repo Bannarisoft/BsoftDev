@@ -93,21 +93,25 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
             return (ApprovalRequest.ToList(), totalCount);
         }
 
-        public async Task<int?> GetApprovalStepDetailByIdAsync(int WorkFlowTypeId, int ModuleTransactionId)
+        public async Task<int?> GetApprovalStepDetailByIdAsync(int WorkFlowTypeId, int ModuleTransactionId,int UnitId,int DepartmentId)
         {
             const string query = @"
                 SELECT TOP 1 ASD.Id
             FROM [AppData].[ApprovalStepDetail] ASD
+            INNER JOIN [AppData].[ApprovalStepUnitMapping] ASM 
+                ON ASM.ApprovalStepDetailId = ASD.Id
+            INNER JOIN [AppData].[ApprovalStepDepartmentMapping] ApprovalDept 
+                ON ApprovalDept.ApprovalStepDetailId = ASD.Id
             LEFT JOIN [AppData].[ApprovalRequest] AR 
                 ON AR.ApprovalStepDetailId = ASD.Id 
                 AND AR.WorkflowTypeId = @WorkFlowTypeId 
                 AND AR.ModuleTransactionId = @ModuleTransactionId
             WHERE ASD.IsDeleted = 0 
               AND ASD.IsActive = 1 
-              AND AR.Id IS NULL 
+              AND AR.Id IS NULL AND ASM.UnitId = @UnitId AND ApprovalDept.DepartmentId = @DepartmentId
             ORDER BY ASD.StepOrder ASC;";
                 
-            var WorkflowType = await _dbConnection.QueryAsync<int>(query, new { WorkFlowTypeId, ModuleTransactionId });
+            var WorkflowType = await _dbConnection.QueryAsync<int>(query, new { WorkFlowTypeId, ModuleTransactionId,UnitId, DepartmentId });
             return WorkflowType.FirstOrDefault();
         }
     }

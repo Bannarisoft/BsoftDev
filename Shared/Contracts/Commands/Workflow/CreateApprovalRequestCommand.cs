@@ -11,5 +11,7 @@ namespace Contracts.Commands.Workflow
         public Guid CorrelationId { get; set; }
         public string ModuleTypeName { get; set; }
         public int ModuleTransactionId { get; set; }
+        public int UnitId { get; set; }
+        public int DepartmentId { get; set; }
     }
 }

@@ -47,6 +47,13 @@ using BackgroundService.Infrastructure.Repositories.Notification.NotificationDet
 using BackgroundService.Application.Consumer.Workflow;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
 using BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequests;
+using BackgroundService.Application.Notification.Common.Interfaces.IMiscMaster;
+using BackgroundService.Infrastructure.Repositories.Notification.MiscMasters;
+using MongoDB.Driver;
+using BackgroundService.Infrastructure.Persistence;
+using BackgroundService.Infrastructure.Data;
+using BackgroundService.Application.Workflow.Common.Interfaces;
+using BackgroundService.Infrastructure.Repositories.Workflow;
 
 namespace BackgroundService.Infrastructure
 {
@@ -81,6 +88,35 @@ namespace BackgroundService.Infrastructure
             {
                 var factory = sp.GetRequiredService<INotificationDbConnectionFactory>();
                 return factory.CreateConnection();
+            });
+
+              // MongoDB Context
+            services.AddSingleton<IMongoClient>(sp =>
+            {
+                var mongoConnectionString = configuration.GetConnectionString("MongoDbConnectionString");
+                if (string.IsNullOrWhiteSpace(mongoConnectionString))
+                {
+                    throw new InvalidOperationException("MongoDB connection string is missing or empty.");
+                }
+                return new MongoClient(mongoConnectionString);
+            });
+
+            services.AddSingleton<IMongoDbContext>(sp =>
+            {
+                var client = sp.GetRequiredService<IMongoClient>();
+                var databaseName = configuration["MongoDb:DatabaseName"];
+                if (string.IsNullOrWhiteSpace(databaseName))
+                {
+                    throw new InvalidOperationException("MongoDB database name is missing or empty.");
+                }
+                return new MongoDbContext(client, databaseName);
+            });
+
+            // Optional: Register IMongoDatabase if needed directly
+            services.AddSingleton(sp =>
+            {
+                var mongoDbContext = (MongoDbContext)sp.GetRequiredService<IMongoDbContext>();
+                return mongoDbContext.GetDatabase();
             });
             // Register Hangfire services
             services.AddHangfire(config =>
@@ -254,6 +290,17 @@ namespace BackgroundService.Infrastructure
              services.AddScoped<IApprovalRuleQuery, ApprovalRuleQueryRepository >();
             services.AddScoped<IApprovalRuleCommand, ApprovalRuleCommandRepository >();
             services.AddScoped<IApprovalRequestQuery, ApprovalRequestQueryRepository >();
+            services.AddScoped<IApprovalRequestCommand, ApprovalRequestCommandRepository >();
+            services.AddScoped<IMiscMasterQuery, MiscMasterQueryRepository >();
+            services.AddScoped<IEventPublisher, EventPublisher>();
+
+                  services.AddScoped<IMongoCollection<OutboxMessage>>(sp =>
+            {
+                var database = sp.GetRequiredService<IMongoDatabase>();
+                var collectionName = configuration["MongoDbSettings:OutboxCollectionName"] ?? "OutboxMessages";
+                return database.GetCollection<OutboxMessage>(collectionName);
+            });
+            services.AddScoped<IFileStorageService, FileStorageService>();
             return services;
         }
     }

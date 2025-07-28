@@ -4,6 +4,7 @@ using BackgroundService.Infrastructure.Data.Notification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackgroundService.Infrastructure.Migrations
 {
     [DbContext(typeof(NotificationDbContext))]
-    partial class NotificationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250728035500_approvalstepDepartment")]
+    partial class approvalstepDepartment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -645,62 +648,6 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.ToTable("NotificationTemplate", "AppNotification");
                 });
 
-            modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalDocument", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ApprovalRequestId")
-                        .HasColumnType("int")
-                        .HasColumnName("ApprovalRequestId");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("FileName");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("FilePath");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApprovalRequestId");
-
-                    b.ToTable("ApprovalDocument", "AppData");
-                });
-
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalRequest", b =>
                 {
                     b.Property<int>("Id")
@@ -718,10 +665,6 @@ namespace BackgroundService.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ApprovalStepDetailId");
 
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int")
-                        .HasColumnName("DepartmentId");
-
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
@@ -738,10 +681,6 @@ namespace BackgroundService.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ModuleTransactionId");
 
-                    b.Property<string>("Remark")
-                        .HasColumnType("Varchar(max)")
-                        .HasColumnName("Remark");
-
                     b.Property<DateTimeOffset>("RequestedDate")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("RequestedDate");
@@ -749,10 +688,6 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Property<int>("StatusId")
                         .HasColumnType("int")
                         .HasColumnName("StatusId");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("UnitId");
 
                     b.Property<int>("WorkflowTypeId")
                         .HasColumnType("int")
@@ -1209,17 +1144,6 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Navigation("NotificationType");
                 });
 
-            modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalDocument", b =>
-                {
-                    b.HasOne("BackgroundService.Domain.Entities.Workflow.ApprovalRequest", "ApprovalRequest")
-                        .WithMany("ApprovalDocuments")
-                        .HasForeignKey("ApprovalRequestId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("ApprovalRequest");
-                });
-
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalRequest", b =>
                 {
                     b.HasOne("BackgroundService.Domain.Entities.Workflow.ApprovalRule", "ApprovalRule")
@@ -1377,11 +1301,6 @@ namespace BackgroundService.Infrastructure.Migrations
             modelBuilder.Entity("BackgroundService.Domain.Entities.Notification.NotificationTemplate", b =>
                 {
                     b.Navigation("NotificationEventRules");
-                });
-
-            modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalRequest", b =>
-                {
-                    b.Navigation("ApprovalDocuments");
                 });
 
             modelBuilder.Entity("BackgroundService.Domain.Entities.Workflow.ApprovalRule", b =>

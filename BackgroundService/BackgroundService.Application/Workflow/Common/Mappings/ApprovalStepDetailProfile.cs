@@ -28,13 +28,14 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
             .ForMember(dest => dest.StepName, opt => opt.MapFrom(src => src.Code));
             CreateMap<MiscMaster, ApprovalTypeDto>()
             .ForMember(dest => dest.ApproverTypeName, opt => opt.MapFrom(src => src.Code));
-    
+
             CreateMap<CreateApprovalStepDetailCommand, ApprovalStepDetail>()
                  .ForMember(dest => dest.Id, opt => opt.Ignore())
                  .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => Status.Active))
                  .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.NotDeleted))
                  .ForMember(dest => dest.ApprovalStepUnitMappings, opt => opt.MapFrom(src => src.ApprovalStepUnitMappings))
-                 .ForMember(dest => dest.RuleSkipApproverMappings, opt => opt.MapFrom(src => src.RuleSkipApproverMappings));
+                 .ForMember(dest => dest.RuleSkipApproverMappings, opt => opt.MapFrom(src => src.RuleSkipApproverMappings))
+                 .ForMember(dest => dest.ApprovalStepDepartmentMappings, opt => opt.MapFrom(src => src.ApprovalStepDepartmentMappings));
 
             CreateMap<ApprovalStepUnitMappingDto, ApprovalStepUnitMapping>();
             CreateMap<RuleSkipApproverMappingDto, RuleSkipApproverMapping>();
@@ -42,7 +43,8 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
             CreateMap<UpdateApprovalStepDetailCommand, ApprovalStepDetail>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive))
                 .ForMember(dest => dest.ApprovalStepUnitMappings, opt => opt.MapFrom(src => src.ApprovalStepUnitMappings))
-                 .ForMember(dest => dest.RuleSkipApproverMappings, opt => opt.MapFrom(src => src.RuleSkipApproverMappings));
+                 .ForMember(dest => dest.RuleSkipApproverMappings, opt => opt.MapFrom(src => src.RuleSkipApproverMappings))
+                 .ForMember(dest => dest.ApprovalStepDepartmentMappings, opt => opt.MapFrom(src => src.ApprovalStepDepartmentMappings));
 
 
               CreateMap<DeleteApprovalStepDetailCommand, ApprovalStepDetail>()

@@ -20,5 +20,6 @@ namespace BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.Up
         public byte IsActive { get; set; }
         public List<ApprovalStepUnitMappingDto> ApprovalStepUnitMappings { get; set; }
         public List<RuleSkipApproverMappingDto> RuleSkipApproverMappings { get; set; }
+        public List<ApprovalStepDepartmentMappingDto> ApprovalStepDepartmentMappings { get; set; }
     }
 }

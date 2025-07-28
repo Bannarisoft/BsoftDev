@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Notification.Common.Interfaces.IMiscMaster;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
+using BackgroundService.Domain.Common;
 using BackgroundService.Domain.Entities.Workflow;
 using Contracts.Events.Workflow;
 using MediatR;
-using static BackgroundService.Domain.Common.MiscEnumEntity;
 
 namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.ApproveApprovalRequest
 {
@@ -32,9 +32,9 @@ namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.Appro
         }
         public async Task<bool> Handle(ApproveApprovalRequestCommand request, CancellationToken cancellationToken)
         {
-            int? ApprovalStepDetailId = await _approvalRequestQuery.GetApprovalStepDetailByIdAsync(request.WorkFlowTypeId, request.ModuleTransactionId);
+            int? ApprovalStepDetailId = await _approvalRequestQuery.GetApprovalStepDetailByIdAsync(request.WorkFlowTypeId, request.ModuleTransactionId,request.UnitId,request.DepartmentId);
 
-            var status = await _miscMasterQuery.GetMiscMasterByName(GetApprovalStatus.Status, GetStatusApproved.Status);
+            var status = await _miscMasterQuery.GetMiscMasterByName(MiscEnumEntity.ApprovalStatus, MiscEnumEntity.Approved);
             string currentIp = _ipAddressService.GetSystemIPAddress();
             int userId = _ipAddressService.GetUserId();
             string username = _ipAddressService.GetUserName();
@@ -58,7 +58,9 @@ namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.Appro
                 {
                     CorrelationId = correlationId,
                     ModuleTypeName = request.ModuleTypeName,
-                    ModuleTransactionId = request.ModuleTransactionId
+                    ModuleTransactionId = request.ModuleTransactionId,
+                    UnitId = request.UnitId,
+                    DepartmentId = request.DepartmentId
                 };
                 
                 await _eventPublisher.SaveEventAsync(@event);

@@ -7,21 +7,10 @@ namespace BackgroundService.Domain.Common
 {
     public static class MiscEnumEntity
     {
-        public static class GetStatusPending
-        {
-            public const string Status = "Pending";
-        }
-        public static class GetApprovalStatus
-        {
-            public const string Status = "ApprovalStatus";
-        }
-        public static class GetStatusApproved
-        {
-            public const string Status = "Approved";
-        }
-        public static class GetStatusRejected
-        {
-            public const string Status = "Rejected";
-        }
+            public const string ApprovalStatus = "ApprovalStatus";
+            public const string Approved = "Approved";
+            public const string Rejected = "Rejected";
+            public const string Pending = "Pending";
+        
     }
 }

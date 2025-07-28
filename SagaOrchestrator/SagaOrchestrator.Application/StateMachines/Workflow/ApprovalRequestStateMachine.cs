@@ -34,32 +34,36 @@ namespace SagaOrchestrator.Application.StateMachines.Workflow
                       {
                           context.Saga.ModuleTypeName = context.Data.ModuleTypeName;
                           context.Saga.ModuleTransactionId = context.Data.ModuleTransactionId;
+                          context.Saga.UnitId = context.Data.UnitId;
+                          context.Saga.DepartmentId = context.Data.DepartmentId;
                       })
                       .Send(new Uri("queue:approval-request-task-queue"), context => new CreateApprovalRequestCommand
                       {
                           CorrelationId = context.Saga.CorrelationId,
                           ModuleTypeName = context.Saga.ModuleTypeName,
-                          ModuleTransactionId = context.Saga.ModuleTransactionId
+                          ModuleTransactionId = context.Saga.ModuleTransactionId,
+                          UnitId = context.Saga.UnitId,
+                          DepartmentId = context.Saga.DepartmentId
                       })
                       .TransitionTo(CreatingApprovalRequest)
 
               );
             During(CreatingApprovalRequest,
             When(ApprovalRequestCreated)
-                .Finalize(),
+                .Finalize()
 
-             When(ApprovalRequestFailed)
-             .ThenAsync(async ctx =>
-             {
+            //  When(ApprovalRequestFailed)
+            //  .ThenAsync(async ctx =>
+            //  {
 
-                //  await ctx.Send(new Uri("queue:approval-request-rollback-queue"), new RollBackScheduleWorkOrderCommand
-                //  {
-                //      CorrelationId = ctx.Data.CorrelationId,
-                //      Reason = ctx.Data.Reason,
-                //      rollbackHeaders = ctx.Data.rollbackHeaders
-                //  });
-             })
-             .TransitionTo(Failed)
+            //     //  await ctx.Send(new Uri("queue:approval-request-rollback-queue"), new RollBackScheduleWorkOrderCommand
+            //     //  {
+            //     //      CorrelationId = ctx.Data.CorrelationId,
+            //     //      Reason = ctx.Data.Reason,
+            //     //      rollbackHeaders = ctx.Data.rollbackHeaders
+            //     //  });
+            //  })
+            //  .TransitionTo(Failed)
         );
 
             SetCompletedWhenFinalized();

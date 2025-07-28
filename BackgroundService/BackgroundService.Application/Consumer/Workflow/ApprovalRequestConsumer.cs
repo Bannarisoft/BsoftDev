@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using BackgroundService.Application.Notification.Common.Interfaces.IMiscMaster;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
 using BackgroundService.Application.Workflow.Common.Interfaces.IWorkflowType;
+using BackgroundService.Domain.Common;
 using BackgroundService.Domain.Entities.Workflow;
 using Contracts.Commands.Workflow;
 using MassTransit;
-using static BackgroundService.Domain.Common.MiscEnumEntity;
+
 
 namespace BackgroundService.Application.Consumer.Workflow
 {
@@ -29,8 +30,8 @@ namespace BackgroundService.Application.Consumer.Workflow
         public async Task Consume(ConsumeContext<CreateApprovalRequestCommand> context)
         {
             var WorkflowType = await _workflowTypeQuery.GetWorkflowByName(context.Message.ModuleTypeName);
-            int? ApprovalStepDetailId = await _approvalRequestQuery.GetApprovalStepDetailByIdAsync(WorkflowType.Id, context.Message.ModuleTransactionId);
-            var status = await _miscMasterQuery.GetMiscMasterByName(GetApprovalStatus.Status, GetStatusPending.Status);
+            int? ApprovalStepDetailId = await _approvalRequestQuery.GetApprovalStepDetailByIdAsync(WorkflowType.Id, context.Message.ModuleTransactionId,context.Message.UnitId,context.Message.DepartmentId);
+            var status = await _miscMasterQuery.GetMiscMasterByName(MiscEnumEntity.ApprovalStatus, MiscEnumEntity.Pending);
 
             if (ApprovalStepDetailId is null)
             {
@@ -42,7 +43,9 @@ namespace BackgroundService.Application.Consumer.Workflow
                 ModuleTransactionId = context.Message.ModuleTransactionId,
                 ApprovalStepDetailId = ApprovalStepDetailId.Value,
                 StatusId = status.Id,
-                RequestedDate = DateTimeOffset.Now
+                RequestedDate = DateTimeOffset.Now,
+                UnitId = context.Message.UnitId,
+                DepartmentId = context.Message.DepartmentId
             };
 
             await _approvalRequestCommand.CreateAsync(ApprovalReq);
