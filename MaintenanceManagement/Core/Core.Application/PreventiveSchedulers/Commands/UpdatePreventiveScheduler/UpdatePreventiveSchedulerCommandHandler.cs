@@ -74,8 +74,8 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
 
             if (metaDataResponse != null && metaDataResponse.Id > 0)
             {
-                if (isFrequencyChanged)
-                {
+                
+                
 
                 var UnitId = _ipAddressService.GetUnitId();
                var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
@@ -90,12 +90,13 @@ namespace Core.Application.PreventiveSchedulers.Commands.UpdatePreventiveSchedul
                         ReminderWorkOrderDays = metaDataResponse.ReminderWorkOrderDays,
                         ReminderMaterialReqDays = metaDataResponse.ReminderMaterialReqDays,
                         rollbackHeaders = rollbackHeader,
-                        token = token
+                        token = token,
+                        isFrequencyChanged = isFrequencyChanged
                     };
 
                     await _eventPublisher.SaveEventAsync(@event);
                     await _eventPublisher.PublishPendingEventsAsync();
-                }
+                
             }
 
               await AuditLogPublisher.PublishAuditLogAsync(

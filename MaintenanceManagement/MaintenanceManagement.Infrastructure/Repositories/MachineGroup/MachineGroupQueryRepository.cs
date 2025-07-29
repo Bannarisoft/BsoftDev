@@ -24,7 +24,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
        
        public async Task<Core.Domain.Entities.MachineGroup?>GetByIdAsync(int id)
         { 
-              var UnitId = _ipAddressService.GetUnitId();           
+            var UnitId = _ipAddressService.GetUnitId();           
             const string query = @"
                 SELECT 
                     Id,  GroupName,DepartmentId,Manufacturer,UnitId, IsActive, IsDeleted,PowerSource,CreatedBy, CreatedDate, CreatedByName,CreatedIP

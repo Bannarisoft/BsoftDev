@@ -1,0 +1,6 @@
+@PartyManagement.API_HostAddress = http://localhost:5252
+
+GET {{PartyManagement.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
