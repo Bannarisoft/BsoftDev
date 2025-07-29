@@ -23,7 +23,7 @@ namespace MaintenanceManagement.API.Controllers
     public class MiscTypeMasterController : ApiControllerBase
     {
 
-
+          
           
           public MiscTypeMasterController(ISender mediator ):base(mediator) 
         

@@ -50,10 +50,10 @@ namespace Core.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster
               
                 if(misctypemresult)
                 {
-                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Misctypemresult updated successfully."};
+                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Misctypemaster result updated successfully."};
                 }
 
-                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Misctypemresult not updated."};
+                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "Misctypemaster result not updated."};
            
         }
 

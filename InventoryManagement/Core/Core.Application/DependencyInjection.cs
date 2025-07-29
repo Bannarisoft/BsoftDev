@@ -1,4 +1,6 @@
 using System.Reflection;
+using Core.Application.Common.Behaviors;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +22,10 @@ namespace Core.Application
             {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             });
+             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+            // ✅ Register ValidationBehavior for all MediatR requests
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             return services;
         }
