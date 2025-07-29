@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
+using BackgroundService.Domain.Common;
 using BackgroundService.Domain.Entities.Notification;
 using BackgroundService.Domain.Entities.Workflow;
 using Dapper;
@@ -91,6 +92,74 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
             var totalCount = await _dbConnection.ExecuteScalarAsync<int>(countQuery, parameters);
 
             return (ApprovalRequest.ToList(), totalCount);
+        }
+
+        public async Task<List<dynamic>> GetAllApprovalRequestByApprover(string ModuleTypeName, int ApproverId)
+        {
+             const string dataQuery = @" 
+                SELECT 
+                    AR.ModuleTransactionId,
+                    AR.Id AS ApprovalRequestId,
+                    Status.Code AS CurrentStatus,
+                    WorkFlow.ModuleTypeName,
+                    ApprovalStep.Code AS ApprovalStep,
+                    ASD.StepOrder
+                    
+                FROM [AppData].[ApprovalRequest] AR
+                INNER JOIN [AppData].[ApprovalStepDetail] ASD ON ASD.Id = AR.ApprovalStepDetailId
+                INNER JOIN [AppData].[MiscMaster] Status ON Status.Id = AR.StatusId
+                INNER JOIN [AppData].[WorkflowType] WorkFlow ON WorkFlow.Id = AR.WorkflowTypeId
+                INNER JOIN [AppData].[MiscMaster] ApprovalStep ON ApprovalStep.Id = ASD.ApprovalStepId
+                WHERE WorkFlow.ModuleTypeName = @ModuleTypeName AND ASD.TargetTypeId= @ApproverId
+                AND Status.Code=@Status
+
+            ";
+
+            var parameters = new
+            {
+                ModuleTypeName,
+                ApproverId,
+                Status = MiscEnumEntity.Pending
+            };
+            var result = await _dbConnection.QueryAsync(dataQuery, parameters);
+             return result.ToList();
+        }
+
+        public async Task<List<dynamic>> GetAllApprovalRequestByWorkflowType(string ModuleTypeName)
+        {
+            const string dataQuery = @" WITH RankedApprovals AS (
+                SELECT 
+                    AR.ModuleTransactionId,
+                    AR.Id AS ApprovalRequestId,
+                    Status.Code AS CurrentStatus,
+                    WorkFlow.ModuleTypeName,
+                    ApprovalStep.Code AS ApprovalStep,
+                    ASD.StepOrder,
+                    ROW_NUMBER() OVER (PARTITION BY AR.ModuleTransactionId ORDER BY ASD.StepOrder DESC) AS rn
+                FROM [AppData].[ApprovalRequest] AR
+                INNER JOIN [AppData].[ApprovalStepDetail] ASD ON ASD.Id = AR.ApprovalStepDetailId
+                INNER JOIN [AppData].[MiscMaster] Status ON Status.Id = AR.StatusId
+                INNER JOIN [AppData].[WorkflowType] WorkFlow ON WorkFlow.Id = AR.WorkflowTypeId
+                INNER JOIN [AppData].[MiscMaster] ApprovalStep ON ApprovalStep.Id = ASD.ApprovalStepId
+                WHERE WorkFlow.ModuleTypeName = @ModuleTypeName
+            )
+            SELECT 
+                ModuleTransactionId,
+                ApprovalRequestId,
+                CurrentStatus,
+                ModuleTypeName,
+                ApprovalStep
+            FROM RankedApprovals
+            WHERE rn = 1;
+
+            ";
+
+            var parameters = new
+            {
+                ModuleTypeName
+            };
+            var result = await _dbConnection.QueryAsync(dataQuery, parameters);
+             return result.ToList();
         }
 
         public async Task<int?> GetApprovalStepDetailByIdAsync(int WorkFlowTypeId, int ModuleTransactionId,int UnitId,int DepartmentId)

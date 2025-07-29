@@ -4,6 +4,7 @@ namespace Core.Domain.Common
 {
     public static class MiscEnumEntity
     {
+        public const string AssetTransfer = "AssetTransfer";
         public static class Depreciation_BookType
         {
             public const string MiscCode = "BOOKTYPE";

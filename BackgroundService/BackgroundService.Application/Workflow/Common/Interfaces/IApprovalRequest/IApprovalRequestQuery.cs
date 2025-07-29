@@ -8,7 +8,9 @@ namespace BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequ
 {
     public interface IApprovalRequestQuery
     {
-        Task<int?> GetApprovalStepDetailByIdAsync(int WorkFlowTypeId, int ModuleTransactionId,int UnitId,int DepartmentId);
+        Task<int?> GetApprovalStepDetailByIdAsync(int WorkFlowTypeId, int ModuleTransactionId, int UnitId, int DepartmentId);
         Task<(List<ApprovalRequest>, int)> GetAllApprovalRequestAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<List<dynamic>> GetAllApprovalRequestByWorkflowType(string ModuleTypeName);
+        Task<List<dynamic>> GetAllApprovalRequestByApprover(string ModuleTypeName,int ApproverId);
     }
 }

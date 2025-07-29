@@ -35,6 +35,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransf
         public string? ToCustodianName { get; set; }
         public byte AckStatus { get; set; }
         public string? GatePassNo { get; set; }
+        public string ApprovalStatus { get; set; }
         
     }
 }
