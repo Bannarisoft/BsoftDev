@@ -29,8 +29,8 @@ namespace InventoryManagement.API.Validation.Item.ItemCategory
                         break;
                     case "RecordNotFound":
                         RuleFor(x => x.Id)
-                        .MustAsync(async (Id, cancellation) => 
-                        await _itemCategoryQueryRepository.NotFoundAsync(Id))             
+                        .MustAsync(async (id, cancellation) => 
+                        (await _itemCategoryQueryRepository.GetByIdAsync(id)) != null) 
                         .WithName("Id")
                         .WithMessage($"{rule.Error}");
                         break;

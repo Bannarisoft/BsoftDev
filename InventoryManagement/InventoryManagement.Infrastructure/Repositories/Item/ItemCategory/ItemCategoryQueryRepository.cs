@@ -16,52 +16,97 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemCategory
         }       
         public async Task<ItemCategoryDto> GetByIdAsync(int Id)
         {
-            const string query = @" select 
-                     IC.Id, ItemCategoryName,IG,Id ItemGroupId,IG.ItemGroupName,IsGroup,IC.ParentCategoryId,IC1.ItemCategoryName ParentCategoryName ,IsBudgetApplicable
-                    ,IC.IsActive, IC.IsDeleted, IC.CreatedBy, IC.CreatedDate, IC.CreatedByName, IC.CreatedIP, IC.ModifiedBy, IC.ModifiedDate, IC.ModifiedByName, IC.ModifiedIP
-                    FROM  Inventory.ItemCategory IC
-                    INNER JOIN Inventory.ItemGroup IG on IG.Id=N=IC.ItemGroupId
-                    LEFT JOIN Inventory.ItemCategory IC1 on IC1.ParentCategoryId=IC.Id                 
-                    WHERE IC.Id = @Id AND IC.IsDeleted = 0";
+            const string query = @"
+        WITH CategoryTree AS (
+            SELECT IC.Id,IC.ItemCategoryName,IG.Id AS ItemGroupId,IG.ItemGroupName,IC.IsGroup,IC.ParentCategoryId,IC1.ItemCategoryName AS ParentCategoryName,
+                IC.IsBudgetApplicable,IC.IsActive,IC.IsDeleted,IC.CreatedBy,IC.CreatedDate,IC.CreatedByName,IC.CreatedIP,IC.ModifiedBy,
+                IC.ModifiedDate,IC.ModifiedByName,IC.ModifiedIP
+            FROM Inventory.ItemCategory IC
+            INNER JOIN Inventory.ItemGroup IG ON IG.Id = IC.ItemGroupId
+            LEFT JOIN Inventory.ItemCategory IC1 ON IC.ParentCategoryId = IC1.Id -- ✅ FIXED
+            WHERE IC.Id = @Id AND IC.IsDeleted = 0
+            UNION ALL
+            SELECT IC.Id,IC.ItemCategoryName,IG.Id AS ItemGroupId,IG.ItemGroupName,IC.IsGroup,IC.ParentCategoryId,CT.ItemCategoryName AS ParentCategoryName,
+                IC.IsBudgetApplicable,IC.IsActive,IC.IsDeleted,IC.CreatedBy,IC.CreatedDate,IC.CreatedByName,IC.CreatedIP,IC.ModifiedBy,
+                IC.ModifiedDate,IC.ModifiedByName,IC.ModifiedIP
+            FROM Inventory.ItemCategory IC
+            INNER JOIN Inventory.ItemGroup IG ON IG.Id = IC.ItemGroupId
+            INNER JOIN CategoryTree CT ON IC.ParentCategoryId = CT.Id
+            WHERE IC.IsDeleted = 0)
+			  SELECT * FROM CategoryTree;
+            ";
 
-            var notificationConfig = await _dbConnection.QueryFirstOrDefaultAsync<ItemCategoryDto>(query, new { Id });
-            return notificationConfig;
+            var allCategories = (await _dbConnection.QueryAsync<ItemCategoryDto>(query, new { Id })).ToList();
+
+            // Create lookup dictionary
+            var lookup = allCategories.ToDictionary(x => x.Id);
+
+            // Build nested subGroups
+            foreach (var node in allCategories)
+            {
+                if (node.ParentCategoryId.HasValue && lookup.ContainsKey(node.ParentCategoryId.Value))
+                {
+                    lookup[node.ParentCategoryId.Value].SubGroups.Add(node);
+                }
+            }
+
+            // Return the requested node with its tree
+            return lookup.TryGetValue(Id, out var root) ? root : null;
         }
         public async Task<(IEnumerable<dynamic>, int)> GetAllItemCategoryAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
             var query = $$"""
-            DECLARE @TotalCount INT;
-            SELECT @TotalCount = COUNT(*) 
-            FROM Inventory.ItemCategory 
-            WHERE IsDeleted = 0
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search)")}};
+                DECLARE @TotalCount INT;
+                SELECT @TotalCount = COUNT(*) 
+                FROM Inventory.ItemCategory 
+                WHERE IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ItemCategoryName LIKE @Search )")}};
 
-            SELECT 
-            IC.Id, ItemCategoryName,IG,Id ItemGroupId,IG.ItemGroupName,IsGroup,IC.ParentCategoryId,IC1.ItemCategoryName ParentCategoryName ,IsBudgetApplicable
-            ,IC.IsActive, IC.IsDeleted, IC.CreatedBy, IC.CreatedDate, IC.CreatedByName, IC.CreatedIP, IC.ModifiedBy, IC.ModifiedDate, IC.ModifiedByName, IC.ModifiedIP
-            FROM  Inventory.ItemCategory IC
-            INNER JOIN Inventory.ItemGroup IG on IG.Id=N=IC.ItemGroupId
-            LEFT JOIN Inventory.ItemCategory IC1 on IC1.ParentCategoryId=IC.Id
-            WHERE 
-            IC.IsDeleted = 0
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ItemCategoryName LIKE @Search )")}}
-            ORDER BY Id desc
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+                SELECT 
+                    IC.Id, IC.ItemCategoryName, IG.Id AS ItemGroupId, IG.ItemGroupName,
+                    IC.IsGroup, IC.ParentCategoryId,
+                    IC1.ItemCategoryName AS ParentCategoryName,
+                    IC.IsBudgetApplicable, IC.IsActive, IC.IsDeleted,
+                    IC.CreatedBy, IC.CreatedDate, IC.CreatedByName, IC.CreatedIP,
+                    IC.ModifiedBy, IC.ModifiedDate, IC.ModifiedByName, IC.ModifiedIP
+                FROM Inventory.ItemCategory IC
+                INNER JOIN Inventory.ItemGroup IG ON IG.Id = IC.ItemGroupId
+                LEFT JOIN Inventory.ItemCategory IC1 ON IC.ParentCategoryId = IC1.Id
+                WHERE IC.IsDeleted = 0
+                {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (IC.ItemCategoryName LIKE @Search )")}}
 
-            SELECT @TotalCount AS TotalCount;
-            """;
+                SELECT @TotalCount AS TotalCount;
+                """;
 
-            var parameters = new
-            {
-                Search = $"%{SearchTerm}%",
-                Offset = (PageNumber - 1) * PageSize,
-                PageSize
-            };
+                var parameters = new
+                {
+                    Search = $"%{SearchTerm}%",
+                    Offset = (PageNumber - 1) * PageSize,
+                    PageSize = PageSize
+                };
 
-            var notificationConfig = await _dbConnection.QueryMultipleAsync(query, parameters);
-            var notificationConfigList = (await notificationConfig.ReadAsync<ItemCategoryDto>()).ToList();
-            int totalCount = (await notificationConfig.ReadFirstAsync<int>());
-            return (notificationConfigList, totalCount);
+                var result = await _dbConnection.QueryMultipleAsync(query, parameters);
+
+                var flatList = (await result.ReadAsync<ItemCategoryDto>()).ToList();
+                int totalCount = await result.ReadFirstAsync<int>();
+
+                // Build hierarchy
+                var lookup = flatList.ToDictionary(x => x.Id);
+                foreach (var node in flatList)
+                {
+                    if (node.ParentCategoryId.HasValue && lookup.ContainsKey(node.ParentCategoryId.Value))
+                    {
+                        var parent = lookup[node.ParentCategoryId.Value];
+                        parent.SubGroups.Add(node);
+                    }
+                }
+
+                // Return only root-level nodes (where ParentCategoryId == null)
+                var rootCategories = flatList
+                    .Where(x => x.ParentCategoryId == null)
+                    .ToList();
+
+                return (rootCategories, totalCount);
         }
         public async Task<bool> SoftDeleteValidation(int Id)
         {
@@ -84,10 +129,11 @@ namespace  InventoryManagement.Infrastructure.Repositories.Item.ItemCategory
         {
             searchPattern = searchPattern ?? string.Empty;
             const string query = @"
-             SELECT IC.Id, IC.ItemCategoryName
-            FROM Inventory.ItemCategory IC            
+             SELECT IC.Id, IC.ItemCategoryName,IC1.ItemCategoryName AS ParentCategoryName
+            FROM Inventory.ItemCategory IC       
+            LEFT JOIN Inventory.ItemCategory IC1 ON IC.ParentCategoryId = IC1.Id     
             WHERE IC.IsDeleted = 0 
-            AND ModuleName LIKE @SearchPattern";
+            AND IC.ItemCategoryName LIKE @SearchPattern";
             var parameters = new
             {
                 SearchPattern = $"%{searchPattern}%"

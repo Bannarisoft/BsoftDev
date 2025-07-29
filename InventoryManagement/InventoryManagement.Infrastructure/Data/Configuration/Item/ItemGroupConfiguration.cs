@@ -26,20 +26,20 @@ namespace InventoryManagement.Infrastructure.Data.Configurations.Item
                 .HasColumnType("int")
                 .IsRequired();
 
+            builder.Property(ag => ag.UnitId)
+                .HasColumnName("UnitId")
+                .HasColumnType("int")
+                .IsRequired();                
+
             builder.Property(ag => ag.ItemGroupCode)
-                .HasColumnName("GroupCode")
+                .HasColumnName("ItemGroupCode")
                 .HasColumnType("varchar(10)")
                 .IsRequired();  
 
             builder.Property(ag => ag.ItemGroupName)
-                .HasColumnName("GroupName")
+                .HasColumnName("ItemGroupName")
                 .HasColumnType("varchar(100)")
                 .IsRequired(); 
-
-            builder.Property(ag => ag.UnitId)
-                .HasColumnName("UnitId")
-                .HasColumnType("int")
-                .IsRequired();
 
             builder.Property(b => b.IsActive)                
                 .HasColumnType("bit")

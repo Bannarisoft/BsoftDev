@@ -40,11 +40,11 @@ namespace Core.API.Controller.Item
         }
         
         [HttpGet("by-name")]
-        public async Task<IActionResult> GetItemGroupAutoCompleteAsync([FromQuery] string? ModuleName)
+        public async Task<IActionResult> GetItemGroupAutoCompleteAsync([FromQuery] string? GroupName)
         {
             var notificationConfig = await Mediator.Send(new GetItemGroupAutoCompleteQuery 
             { 
-                    SearchPattern = ModuleName ?? string.Empty 
+                    SearchPattern = GroupName ?? string.Empty 
             });
             return Ok(new { StatusCode = StatusCodes.Status200OK, data = notificationConfig});
         }
@@ -53,7 +53,12 @@ namespace Core.API.Controller.Item
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             var notificationConfig = await Mediator.Send(new GetItemGroupByIdQuery() { Id = id});           
-            return Ok(new { StatusCode=StatusCodes.Status200OK, data = notificationConfig,message = notificationConfig });            
+            return Ok(new 
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = notificationConfig,
+                message = "Item Group fetched successfully"
+            });
         }
 
         [HttpPost]

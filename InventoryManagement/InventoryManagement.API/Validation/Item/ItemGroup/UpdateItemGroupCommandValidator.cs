@@ -14,7 +14,7 @@ namespace InventoryManagement.API.Validation.Item.ItemGroup
         {
             _itemGroupCommandRepository = itemGroupCommandRepository;            
             _itemGroupQueryRepository = itemGroupQueryRepository;
-            var maxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.Item.ItemGroup>("ItemGroupName") ?? 250;
+            var maxLength = maxLengthProvider.GetMaxLength<Core.Domain.Entities.Item.ItemGroup>("ItemGroupName") ?? 100;
 
             _validationRules = ValidationRuleLoader.LoadValidationRules();
 
@@ -41,20 +41,26 @@ namespace InventoryManagement.API.Validation.Item.ItemGroup
                             .WithMessage($"{nameof(UpdateItemGroupCommand.ItemGroupName)} {rule.Error}");
                         break;
                     case "AlreadyExists":
-                          RuleFor(x => x.ItemGroupName)
+                        RuleFor(x => x.ItemGroupName)
                            .NotEmpty()
                            .WithMessage($"{nameof(UpdateItemGroupCommand.ItemGroupName)} {rule.Error}")
                            .MustAsync(async (command, moduleName, cancellation) =>
                             !await _itemGroupCommandRepository.IsNameDuplicateAsync(moduleName,command.Id))
                              .WithMessage("A Group Name already exists in this Group.");
-                        break;
+                        RuleFor(x => x.ItemGroupCode)
+                           .NotEmpty()
+                           .WithMessage($"{nameof(UpdateItemGroupCommand.ItemGroupCode)} {rule.Error}")
+                           .MustAsync(async (command, code, cancellation) =>
+                            !await _itemGroupCommandRepository.IsCodeDuplicateAsync(code,command.Id))
+                             .WithMessage("A Group Code already exists in this Group.");
+                        break;                    
                     case "RecordNotFound":
                         RuleFor(x => x.Id)
-                            .MustAsync(async (Id, cancellation) =>
-                                await _itemGroupQueryRepository.NotFoundAsync(Id))
+                            .MustAsync(async (id, cancellation) => 
+                            (await _itemGroupQueryRepository.GetByIdAsync(id)) != null) 
                             .WithName("Id")
                             .WithMessage($"{rule.Error}");
-                        break;
+                            break;
                     default:
                         break;
                 }

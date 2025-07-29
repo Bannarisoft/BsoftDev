@@ -44,7 +44,7 @@ namespace InventoryManagement.API.Validation.Item.ItemCategory
                            .NotEmpty()
                            .WithMessage($"{nameof(CreateItemCategoryCommand.ItemCategoryName)} {rule.Error}")
                            .MustAsync(async (command, moduleName, cancellation) =>
-                            !await _itemCategoryCommandRepository.IsNameDuplicateAsync(moduleName, command.ItemGroupId,command.Id))
+                            !await _itemCategoryCommandRepository.ExistsByNameAsync(moduleName,command.ItemGroupId))
                              .WithMessage("A Category Name already exists in this Group.");
                         break;
                 }

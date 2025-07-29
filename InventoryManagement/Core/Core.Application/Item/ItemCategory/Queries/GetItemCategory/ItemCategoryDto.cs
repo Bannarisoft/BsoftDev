@@ -8,10 +8,10 @@ namespace Core.Application.Item.ItemCategory.Queries.GetItemCategory
         public string? ItemCategoryName { get; set; }
         public int ItemGroupId { get; set; }
         public string? ItemGroupName { get; set; }
-        public byte IsGroup { get; set; }
+        public bool  IsGroup { get; set; }
         public int? ParentCategoryId { get; set; }
-        public int? ParentCategoryName { get; set; }
-        public byte IsBudgetApplicable { get; set; }  
+        public string? ParentCategoryName { get; set; }
+        public bool  IsBudgetApplicable { get; set; }
         public int IsActive { get; set; }
         public int IsDeleted { get; set; }
         public int CreatedBy { get; set; }
@@ -22,5 +22,7 @@ namespace Core.Application.Item.ItemCategory.Queries.GetItemCategory
         public DateTimeOffset? ModifiedDate { get; set; }
         public string? ModifiedByName { get; set; }
         public string? ModifiedIP { get; set; }
-        }      
-    }
+          // 👇 Subgroups
+        public List<ItemCategoryDto> SubGroups { get; set; } = new();
+    }      
+}

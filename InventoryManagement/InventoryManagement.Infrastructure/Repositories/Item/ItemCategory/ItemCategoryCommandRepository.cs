@@ -17,7 +17,25 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemCategory
         public async Task<int> CreateAsync(Core.Domain.Entities.Item.ItemCategory itemCategory)
         {                
             await _applicationDbContext.ItemCategory.AddAsync(itemCategory);
-            await _applicationDbContext.SaveChangesAsync();                
+            await _applicationDbContext.SaveChangesAsync();     
+             // Step 2: Determine RootCategoryId
+            if (itemCategory.ParentCategoryId == null)
+            {
+                itemCategory.RootCategoryId = itemCategory.Id;
+            }
+            else
+            {
+                var parent = await _applicationDbContext.ItemCategory
+                    .Where(p => p.Id == itemCategory.ParentCategoryId)
+                    .Select(p => new { p.RootCategoryId })
+                    .FirstOrDefaultAsync();
+
+                itemCategory.RootCategoryId = parent?.RootCategoryId ?? itemCategory.ParentCategoryId;
+            }
+
+            // Step 3: Update the RootCategoryId
+            _applicationDbContext.ItemCategory.Update(itemCategory);
+            await _applicationDbContext.SaveChangesAsync();           
             return itemCategory.Id;
         }
 
@@ -51,11 +69,18 @@ namespace InventoryManagement.Infrastructure.Repositories.Item.ItemCategory
             await _applicationDbContext.SaveChangesAsync();
             return 1;
         }
-        public async Task<bool> IsNameDuplicateAsync(string? name, int itemGroupId,int excludeId)
+        public async Task<bool> ExistsByNameAsync(string? name, int itemGroupId)
         {
             return await _applicationDbContext.ItemCategory
-                .Where(cc => cc.ItemCategoryName == name && cc.ItemGroupId == itemGroupId && cc.Id != excludeId)
+                .Where(cc => cc.ItemCategoryName == name  && cc.ItemGroupId == itemGroupId  && cc.IsDeleted == 0)
                 .AnyAsync();
         }
+
+        public async Task<bool> IsNameDuplicateAsync(string? name, int itemGroupId, int excludeId)
+        {
+            return await _applicationDbContext.ItemCategory
+                .Where(cc => cc.ItemCategoryName == name && cc.ItemGroupId == itemGroupId && cc.Id != excludeId && cc.IsDeleted == 0)
+                .AnyAsync();
+        }   
     }
 }
