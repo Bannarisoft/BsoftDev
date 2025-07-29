@@ -57,7 +57,6 @@ namespace Core.Application.ExcelImport
             }
             assetDto.AssetSubCategoryId = assetSubCategoryId.Value;
 
-
             assetDto.AssetName = worksheet.Cells[row, 6].Value?.ToString();
             assetDto.Quantity = int.TryParse(worksheet.Cells[row, 7].Value?.ToString(), out int quantity) ? quantity : throw new Exception("Invalid Quantity");
             assetDto.Active = bool.TryParse(worksheet.Cells[row, 9].Value?.ToString(), out bool isActive) ? isActive : false;

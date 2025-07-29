@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
+using Core.Domain.Entities.Item;
+using InventoryManagement.Infrastructure.Data.Configurations.Item;
 using Core.Domain.Entities;
 using InventoryManagement.Infrastructure.Data.Configurations;
 
@@ -20,16 +22,18 @@ namespace InventoryManagement.Infrastructure.Data
 
         }
 
-        // public DbSet<AssetGroup> AssetGroup { get; set; } 
-        
-        public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
+         public DbSet<ItemGroup> ItemGroup { get; set; } 
+         public DbSet<ItemCategory> ItemCategory { get; set; } 
+		public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<MiscMaster> MiscMaster { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
-            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemGroupConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemCategoryConfiguration());
+			modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
 
             base.OnModelCreating(modelBuilder);
@@ -74,3 +78,4 @@ namespace InventoryManagement.Infrastructure.Data
         }
     }
 }
+

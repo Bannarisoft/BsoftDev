@@ -44,12 +44,12 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBeh
 
 
 var app = builder.Build();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 
 }
-
 // Configure the HTTP request pipeline
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -64,7 +64,6 @@ app.UseMiddleware<LoggingMiddleware>();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
-
     endpoints.MapControllers();
 });
 app.Run();

@@ -3,10 +3,15 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
+using Core.Application.Common.Interfaces.Item.ItemCategory;
+using Core.Application.Common.Interfaces.Item.ItemGroup;
 using Core.Application.Common.Mappings;
+using Core.Domain.Entities.Item;
 using Infrastructure.Data;
 using InventoryManagement.Infrastructure.Data;
 using InventoryManagement.Infrastructure.Repositories;
+using InventoryManagement.Infrastructure.Repositories.Item.ItemCategory;
+using InventoryManagement.Infrastructure.Repositories.Item.ItemGroup;
 using InventoryManagement.Infrastructure.Repositories.MiscMaster;
 using InventoryManagement.Infrastructure.Repositories.MiscTypeMaster;
 using InventoryManagement.Infrastructure.Services;
@@ -92,11 +97,14 @@ namespace InventoryManagement.Infrastructure
 
             // Register repositories
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-            services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();            
+            services.AddScoped<IItemGroupCommandRepository, ItemGroupCommandRepository>();
+            services.AddScoped<IItemGroupQueryRepository, ItemGroupQueryRepository>();
+            services.AddScoped<IItemCategoryQueryRepository, ItemCategoryQueryRepository>();
+            services.AddScoped<IItemCategoryCommandRepository, ItemCategoryCommandRepository>();    
+			services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();            
             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
-            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
-            
+            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();      
 
 
             // Miscellaneous services
@@ -106,7 +114,7 @@ namespace InventoryManagement.Infrastructure
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
 
             // AutoMapper profiles
-            services.AddAutoMapper(
+          services.AddAutoMapper(
                  typeof(MiscTypeMasterProfile),
                 typeof(MiscMasterProfile)
                 
@@ -116,3 +124,4 @@ namespace InventoryManagement.Infrastructure
 
     }
 }
+

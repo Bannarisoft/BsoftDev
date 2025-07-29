@@ -22,7 +22,169 @@ namespace InventoryManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBudgetApplicable")
+                        .HasColumnType("Bit")
+                        .HasColumnName("IsBudgetApplicable");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsGroup")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsGroup");
+
+                    b.Property<string>("ItemCategoryName")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("ItemCategoryName");
+
+                    b.Property<int>("ItemGroupId")
+                        .HasColumnType("int")
+                        .HasColumnName("ItemGroupId");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int?>("ParentCategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("ParentCategoryId");
+
+                    b.Property<int?>("RootCategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("RootCategoryId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemGroupId");
+
+                    b.HasIndex("ParentCategoryId");
+
+                    b.ToTable("ItemCategory", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedIP")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ItemGroupCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("ItemGroupCode");
+
+                    b.Property<string>("ItemGroupName")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("ItemGroupName");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedIP")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ItemGroup", "Inventory");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemCategory", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Item.ItemGroup", "ItemGroup")
+                        .WithMany("ItemCategory")
+                        .HasForeignKey("ItemGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Item.ItemCategory", "ItemCategoryParent")
+                        .WithMany("ChildCategories")
+                        .HasForeignKey("ParentCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ItemCategoryParent");
+
+                    b.Navigation("ItemGroup");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemCategory", b =>
+                {
+                    b.Navigation("ChildCategories");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Item.ItemGroup", b =>
+                {
+                    b.Navigation("ItemCategory");
+                });
+ modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
