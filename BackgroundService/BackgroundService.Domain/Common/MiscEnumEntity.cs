@@ -7,10 +7,12 @@ namespace BackgroundService.Domain.Common
 {
     public static class MiscEnumEntity
     {
-            public const string ApprovalStatus = "ApprovalStatus";
-            public const string Approved = "Approved";
-            public const string Rejected = "Rejected";
-            public const string Pending = "Pending";
+        public const string ApprovalStatus = "ApprovalStatus";
+        public const string Approved = "Approved";
+        public const string Rejected = "Rejected";
+        public const string Pending = "Pending";
+        public const string wwwroot = "wwwroot";
+        public const string ApproveDocument = "ApproveDocument";
         
     }
 }

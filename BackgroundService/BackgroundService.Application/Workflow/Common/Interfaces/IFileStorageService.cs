@@ -9,5 +9,6 @@ namespace BackgroundService.Application.Workflow.Common.Interfaces
     public interface IFileStorageService
     {
         Task<FileUploadResult> SaveFileAsync(IFormFile file, string subDirectory);
+        Task<string> GetContentType(string path);
     }
 }

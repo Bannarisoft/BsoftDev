@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackgroundService.API.Controller.Notification;
 using BackgroundService.Application.Workflow.ApprovalRequests.Commands.ApproveApprovalRequest;
+using BackgroundService.Application.Workflow.ApprovalRequests.Commands.ApproveDocumentUpload;
 using BackgroundService.Application.Workflow.ApprovalRequests.Commands.RejectApprovalRequest;
+using BackgroundService.Application.Workflow.ApprovalRequests.Queries.ApprovalDocumentDownload;
 using BackgroundService.Application.Workflow.ApprovalRequests.Queries.GetAllApprovalRequest;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -52,17 +54,36 @@ namespace BackgroundService.API.Controller.Workflow
             });
 
         }
-          [HttpPost("reject")]
+        [HttpPost("reject")]
         public async Task<IActionResult> RejectAsync(RejectApprovalRequestCommand approveApprovalRequestCommand)
-        {            
-            var ApproveReq = await _mediator.Send(approveApprovalRequestCommand);            
+        {
+            var ApproveReq = await _mediator.Send(approveApprovalRequestCommand);
             return Ok(new
             {
                 StatusCode = StatusCodes.Status201Created,
-                message ="Rejected successfully.",
+                message = "Rejected successfully.",
                 data = ApproveReq
-            });            
-        
+            });
+
+        }
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadFile(UploadFileCommand uploadFileCommand)
+        {
+            var Result = await _mediator.Send(uploadFileCommand);
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status201Created,
+                message = "Upload successfully.",
+                data = Result
+            });
+
+        }
+        [HttpGet("download")]
+        public async Task<IActionResult> DownloadFile([FromQuery] string relativePath)
+        {
+            var result = await Mediator.Send(new DownloadFileQuery { RelativePath = relativePath });
+
+            return File(result.FileBytes, result.ContentType, result.FileName);
         }
     }
 }
