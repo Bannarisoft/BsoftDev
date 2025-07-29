@@ -40,6 +40,7 @@ builder.Services.AddHttpContextAccessor();
 //builder.Services.AddProblemDetails();
 // Register gRPC
 builder.Services.AddGrpc();
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 
 var app = builder.Build();

@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MiscTypeMaster.Queries.GetMiscTypeMasterById
 {
-    public class GetMiscTypeMasterByIdQueryHandler: IRequestHandler<GetMiscTypeMasterByIdQuery, ApiResponseDTO<GetMiscTypeMasterDto>>
+    public class GetMiscTypeMasterByIdQueryHandler : IRequestHandler<GetMiscTypeMasterByIdQuery, ApiResponseDTO<GetMiscTypeMasterDto>>
     {
        private readonly IMiscTypeMasterQueryRepository  _miscTypeMasterQueryRepository;
         private readonly IMapper _mapper;

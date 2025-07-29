@@ -23,15 +23,13 @@ namespace PurchaseManagement.Infrastructure.Data
         // public DbSet<AssetGroup> AssetGroup { get; set; } 
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<MiscMaster> MiscMaster { get; set; }
-        //public DbSet<HSNMaster> HSNMaster { get; set; } 
+
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
-
-            // modelBuilder.ApplyConfiguration(new HSNMasterConfiguration()); 
+            // modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());           
 
             modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
