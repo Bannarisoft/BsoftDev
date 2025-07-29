@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster
 {
-    public class CreateMiscTypeMasterCommandHandler: IRequestHandler<CreateMiscTypeMasterCommand, ApiResponseDTO<GetMiscTypeMasterDto>>
+    public class CreateMiscTypeMasterCommandHandler : IRequestHandler<CreateMiscTypeMasterCommand, ApiResponseDTO<GetMiscTypeMasterDto>>
     {
               private readonly IMiscTypeMasterCommandRepository _miscTypeMasterCommandRepository;
         private readonly IMapper _imapper;

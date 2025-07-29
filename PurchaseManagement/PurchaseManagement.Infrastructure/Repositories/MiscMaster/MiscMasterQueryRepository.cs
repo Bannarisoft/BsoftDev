@@ -71,7 +71,7 @@ namespace PurchaseManagement.Infrastructure.Repositories.MiscMaster
         {
             
 
-            const string query = @"SELECT M.Id,M.Code ,M.Description  FROM Maintenance.MiscMaster M
+            const string query = @"SELECT M.Id,M.Code ,M.Description  FROM Purchase.MiscMaster M
             INNER JOIN [Purchase].[MiscTypeMaster] MT ON MT.Id = M.MiscTypeId
                 WHERE M.IsDeleted = 0 AND MT.IsDeleted = 0 AND M.IsActive = 1  AND MT.MiscTypeCode= @MiscTypeCode AND M.Code LIKE @SearchPattern  ";
                 

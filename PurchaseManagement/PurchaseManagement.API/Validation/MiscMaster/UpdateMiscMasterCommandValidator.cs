@@ -9,7 +9,7 @@ using PurchaseManagement.API.Validation.Common;
 
 namespace PurchaseManagement.API.Validation.MiscMaster
 {
-    public class UpdateMiscMasterCommandValidator: AbstractValidator<UpdateMiscMasterCommand>
+    public class UpdateMiscMasterCommandValidator : AbstractValidator<UpdateMiscMasterCommand>
     {
     
 

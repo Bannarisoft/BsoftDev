@@ -14,7 +14,7 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
     {
          private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IMapper _mapper;
-        private readonly IMediator _mediator;
+        private readonly IMediator _mediator; 
      public GetMiscMasterAutoCompleteQueryHandler(IMiscMasterQueryRepository miscMasterQueryRepository, IMapper mapper, IMediator mediator)
          {
             _miscMasterQueryRepository =miscMasterQueryRepository;

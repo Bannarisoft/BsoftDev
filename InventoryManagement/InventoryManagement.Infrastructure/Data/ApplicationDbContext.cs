@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
+using Core.Domain.Entities;
+using InventoryManagement.Infrastructure.Data.Configurations;
 
 namespace InventoryManagement.Infrastructure.Data
 {
@@ -19,13 +21,16 @@ namespace InventoryManagement.Infrastructure.Data
         }
 
         // public DbSet<AssetGroup> AssetGroup { get; set; } 
-
+        
+        public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
+        public DbSet<MiscMaster> MiscMaster { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
-
+            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

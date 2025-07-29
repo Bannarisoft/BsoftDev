@@ -1,8 +1,10 @@
 using Core.Application;
+using Core.Application.Common.Behaviors;
 using InventoryManagement.API.Configurations;
 using InventoryManagement.API.Middleware;
 using InventoryManagement.API.Validation.Common;
 using InventoryManagement.Infrastructure;
+using MediatR;
 using PurchaseManagement.Infrastructure.Logging.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +40,7 @@ builder.Services.AddHttpContextAccessor();
 //builder.Services.AddProblemDetails();
 // Register gRPC
 builder.Services.AddGrpc();
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 
 var app = builder.Build();

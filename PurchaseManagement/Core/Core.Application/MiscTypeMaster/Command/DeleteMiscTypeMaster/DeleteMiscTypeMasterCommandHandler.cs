@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster
 {
-    public class DeleteMiscTypeMasterCommandHandler: IRequestHandler<DeleteMiscTypeMasterCommand, ApiResponseDTO<GetMiscTypeMasterDto>>
+    public class DeleteMiscTypeMasterCommandHandler : IRequestHandler<DeleteMiscTypeMasterCommand, ApiResponseDTO<GetMiscTypeMasterDto>>
     {
 
         private readonly IMiscTypeMasterCommandRepository _miscTypeMasterCommandRepository;

@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.MiscMaster.Queries.GetMiscMaster
 {
-    public class GetMiscMasterQueryHanlder:IRequestHandler<GetMiscMasterQuery,ApiResponseDTO<List<GetMiscMasterDto>>> 
+    public class GetMiscMasterQueryHanlder : IRequestHandler<GetMiscMasterQuery,ApiResponseDTO<List<GetMiscMasterDto>>> 
     {
 
          private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;

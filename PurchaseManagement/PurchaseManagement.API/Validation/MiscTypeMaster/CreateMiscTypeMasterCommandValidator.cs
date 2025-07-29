@@ -9,7 +9,7 @@ using PurchaseManagement.API.Validation.Common;
 
 namespace PurchaseManagement.API.Validation.MiscTypeMaster
 {
-    public class CreateMiscTypeMasterCommandValidator: AbstractValidator<CreateMiscTypeMasterCommand>
+    public class CreateMiscTypeMasterCommandValidator  : AbstractValidator<CreateMiscTypeMasterCommand>
     {
              private readonly List<ValidationRule> _validationRules;
              private readonly IMiscTypeMasterQueryRepository _miscTypeMasterQueryRepository;

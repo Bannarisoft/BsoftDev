@@ -9,8 +9,8 @@ using PurchaseManagement.API.Validation.Common;
 
 namespace PurchaseManagement.API.Validation.MiscTypeMaster
 {
-    public class UpdateMiscTypeMasterCommandValidator: AbstractValidator<UpdateMiscTypeMasterCommand>
-    {
+    public class UpdateMiscTypeMasterCommandValidator  : AbstractValidator<UpdateMiscTypeMasterCommand>
+    { 
 
           private readonly List<ValidationRule> _validationRules;
             private readonly IMiscTypeMasterQueryRepository _miscTypeMasterQueryRepository;

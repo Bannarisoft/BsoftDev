@@ -9,7 +9,7 @@ using PurchaseManagement.API.Validation.Common;
 
 namespace PurchaseManagement.API.Validation.MiscTypeMaster
 {
-    public class DeleteMiscTypeMasterCommandValidator: AbstractValidator<DeleteMiscTypeMasterCommand>
+    public class DeleteMiscTypeMasterCommandValidator : AbstractValidator<DeleteMiscTypeMasterCommand>
     {
       
         private readonly List<ValidationRule> _validationRules;
