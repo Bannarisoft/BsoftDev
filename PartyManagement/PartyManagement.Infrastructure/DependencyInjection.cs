@@ -1,6 +1,9 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IPartyGroup;
+using Core.Application.Common.Mappings;
+using Core.Domain.Entities;
 using Infrastructure.Data;
 using InventoryManagement.Infrastructure.Services;
 using Microsoft.Data.SqlClient;
@@ -10,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using PartyManagement.Infrastructure.Data;
 using PartyManagement.Infrastructure.Repositories;
+using PartyManagement.Infrastructure.Repositories.PartyGroup;
 using Serilog;
 
 namespace PartyManagement.Infrastructure
@@ -87,6 +91,9 @@ namespace PartyManagement.Infrastructure
 
             // Register repositories
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+                  // Register repositories
+            services.AddScoped<IPartyGroupCommandRepository, PartyGroupCommandRepository>();
+            services.AddScoped<IPartyGroupQueryRepository, PartyGroupQueryRepository>();
 
 
 
@@ -95,12 +102,13 @@ namespace PartyManagement.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
+            
 
             // AutoMapper profiles
-            // services.AddAutoMapper(
-            // typeof(AssetGroupProfile),
+            services.AddAutoMapper(
+            typeof(PartyGroupProfile)
 
-            // );
+            );
             return services;
         }
 
