@@ -64,6 +64,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGrpcService<MaintenanceHangfireRemoveGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<ApprovalRequestStatusAllGrpcService>().EnableGrpcWeb();
     endpoints.MapGrpcService<ApprovalRequestByApproverGrpcService>().EnableGrpcWeb();
+    endpoints.MapGrpcService<ApprovedApprovalRequestGrpcService>().EnableGrpcWeb();
     endpoints.MapControllers();
     endpoints.MapHub<NotificationHub>("/notificationHub");    
 });

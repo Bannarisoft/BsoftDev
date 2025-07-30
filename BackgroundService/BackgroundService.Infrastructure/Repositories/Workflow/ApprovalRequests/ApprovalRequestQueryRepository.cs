@@ -94,6 +94,28 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
             return (ApprovalRequest.ToList(), totalCount);
         }
 
+        public async Task<List<int>> GetAllApprovalRequestByApproved(string ModuleTypeName)
+        {
+               const string dataQuery = @" 
+               SELECT 
+                    AR.ModuleTransactionId
+                    FROM [AppData].[ApprovalRequest] AR
+                    INNER JOIN [AppData].[WorkflowType] WF ON WF.Id = AR.WorkflowTypeId
+                    INNER JOIN [AppData].[MiscMaster] Status ON Status.Id = AR.StatusId
+                    WHERE WF.ModuleTypeName = @ModuleTypeName
+                    GROUP BY AR.ModuleTransactionId
+                 HAVING COUNT(CASE WHEN Status.Code = 'Approved' THEN 1 END) = COUNT(*)
+            ";
+
+            var parameters = new
+            {
+                ModuleTypeName,
+                Status = MiscEnumEntity.Pending
+            };
+            var result = await _dbConnection.QueryAsync<int>(dataQuery, parameters);
+             return result.ToList();
+        }
+
         public async Task<List<dynamic>> GetAllApprovalRequestByApprover(string ModuleTypeName, int ApproverId)
         {
              const string dataQuery = @" 

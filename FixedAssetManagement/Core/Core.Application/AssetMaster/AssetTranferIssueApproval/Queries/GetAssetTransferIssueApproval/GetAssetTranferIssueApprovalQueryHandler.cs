@@ -50,7 +50,14 @@ namespace Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAsse
             .Where(p => TransferStatusDict.ContainsKey(p.Id))
             .ToList();
           
-
+             foreach (var status in filteredassetIssueTransfer)
+            {
+                if (TransferStatusDict.TryGetValue(status.Id, out var approvalstatus))
+                {
+                    status.ApprovalStatus = approvalstatus;
+                }
+                
+            }
 
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(

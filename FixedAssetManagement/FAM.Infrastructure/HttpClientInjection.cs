@@ -137,6 +137,14 @@ namespace FAM.Infrastructure
             .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
             .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+
+            services.AddGrpcClient<ApprovedApprovalRequestService.ApprovedApprovalRequestServiceClient>(options =>
+            {
+                options.Address = new Uri(backGroundServiceUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => GrpcHttpHandler)
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
             
 
             return services;

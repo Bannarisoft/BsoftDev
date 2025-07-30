@@ -51,6 +51,7 @@
   <Protobuf Include="..\..\Shared\Contracts\Protos\hangfirejob_delete.proto" GrpcServices="Server" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\allapprovalrequeststatus.proto" GrpcServices="Server" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\approvalrequestbyapprover.proto" GrpcServices="Server" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\approvedapprovalrequest.proto" GrpcServices="Server" />
 </ItemGroup>
 
 </Project>

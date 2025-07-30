@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Contracts.Interfaces.External.IUser;
+using Contracts.Interfaces.External.IWorkflow;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetTransferReceipt;
+using Core.Domain.Common;
 using Core.Domain.Events;
 using MediatR;
 
@@ -17,13 +19,16 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
         private readonly IMapper _mapper;        
         private readonly IMediator _mediator; 
         private readonly IDepartmentGrpcClient _departmentGrpcClient;
+        private readonly IWorkflowGrpcClient _workflowGrpcClient;
 
-        public GetAssetReceiptPendingQueryHandler(IAssetTransferReceiptQueryRepository assetTransferReceiptQueryRepository, IMapper mapper, IMediator mediator, IDepartmentGrpcClient departmentGrpcClient)
+        public GetAssetReceiptPendingQueryHandler(IAssetTransferReceiptQueryRepository assetTransferReceiptQueryRepository, IMapper mapper, IMediator mediator,
+        IDepartmentGrpcClient departmentGrpcClient, IWorkflowGrpcClient workflowGrpcClient)
         {
             _assetTransferReceiptQueryRepository = assetTransferReceiptQueryRepository;
             _mapper = mapper;
             _mediator = mediator;
             _departmentGrpcClient = departmentGrpcClient;
+            _workflowGrpcClient = workflowGrpcClient;
         }
 
         public async Task<ApiResponseDTO<List<AssetTransferReceiptPendingDto>>> Handle(GetAssetReceiptPendingQuery request, CancellationToken cancellationToken)
@@ -32,11 +37,11 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
                                                 .GetAllPendingAssetTransferAsync(request.PageNumber, request.PageSize,request.AssetTransferId ,request.SearchTerm, request.FromDate, request.ToDate);
             var assetIssueTransferList = _mapper.Map<List<AssetTransferReceiptPendingDto>>(assetIssueTransfer);
                    // 🔥 Fetch departments using gRPC
-            var departments = await _departmentGrpcClient.GetAllDepartmentAsync();
-            var departmentLookup = departments.ToDictionary(d => d.DepartmentId, d => d.DepartmentName);
+            var approvedList = await _workflowGrpcClient.GetAllApprovalRequestByApproved(MiscEnumEntity.AssetTransfer);
+           
 
                  var filteredassetIssueTransfer = assetIssueTransferList
-            .Where(p => departmentLookup.ContainsKey(p.ToDepartmentId))
+            .Where(p => approvedList.Contains(p.AssetTransferId))
             .ToList();
 
             //Domain Event

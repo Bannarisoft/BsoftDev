@@ -14,14 +14,38 @@ namespace FAM.Infrastructure.GrpcClients
     {
         private readonly ApprovalRequestStatusAllService.ApprovalRequestStatusAllServiceClient _client;
         private readonly ApprovalRequestByApproverService.ApprovalRequestByApproverServiceClient _clientByApprover;
+        private readonly ApprovedApprovalRequestService.ApprovedApprovalRequestServiceClient _approvedList;
         private readonly IHttpContextAccessor _httpContextAccessor;
         public WorkflowGrpcClient(ApprovalRequestStatusAllService.ApprovalRequestStatusAllServiceClient client, IHttpContextAccessor httpContextAccessor,
-            ApprovalRequestByApproverService.ApprovalRequestByApproverServiceClient clientByApprover)
+            ApprovalRequestByApproverService.ApprovalRequestByApproverServiceClient clientByApprover,
+            ApprovedApprovalRequestService.ApprovedApprovalRequestServiceClient approvedList)
         {
             _client = client;
             _httpContextAccessor = httpContextAccessor;
             _clientByApprover = clientByApprover;
+            _approvedList = approvedList;
             
+        }
+
+        public async Task<List<int>> GetAllApprovalRequestByApproved(string ModuleTypeName)
+        {
+            var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
+
+            if (string.IsNullOrWhiteSpace(token))
+                throw new UnauthorizedAccessException("Authorization token not found.");
+
+            if (!token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                token = $"Bearer {token}";
+
+            var metadata = new Metadata
+            {
+                { "Authorization", token }
+            };
+            var request = new ApprovedApprovalRequest { ModuleTypeName = ModuleTypeName };
+
+            var response = await _approvedList.GetApprovedApprovalRequestAsync(request, new CallOptions(metadata));
+             
+             return response.ModuleTransactionIds.ToList();
         }
 
         public async Task<List<Contracts.Dtos.Workflow.ApprovalByApproverDto>> GetAllApprovalRequestByApprover(string ModuleTypeName, int ApproverId)
