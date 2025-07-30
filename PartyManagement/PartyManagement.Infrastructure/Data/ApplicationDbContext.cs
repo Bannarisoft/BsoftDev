@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Application.Common.Interfaces;
 using Core.Domain.Common;
+using Core.Domain.Entities;
+using PartyManagement.Infrastructure.Data.Configurations;
 
 namespace PartyManagement.Infrastructure.Data
 {
@@ -18,14 +20,18 @@ namespace PartyManagement.Infrastructure.Data
 
         }
 
-        // public DbSet<AssetGroup> AssetGroup { get; set; } 
+        public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
+        public DbSet<MiscMaster> MiscMaster { get; set; }
+        public DbSet<PartyGroup> PartyGroup { get; set; }
+
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // modelBuilder.ApplyConfiguration(new AssetGroupConfiguration());
-
+            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new PartyGroupConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
