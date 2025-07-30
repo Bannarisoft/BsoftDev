@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationEventRule;
 using BackgroundService.Domain.Entities.Notification;
-using BackgroundService.Infrastructure.Data.Notification;
 using Dapper;
 
 namespace BackgroundService.Infrastructure.Repositories.Notification.NotificationEventRules
@@ -80,7 +75,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
               PageSize = pageSize
           };
 
-          var result = await _dbConnection.QueryAsync<NotificationEventRule, MiscMaster, MiscMaster, NotificationEventRule>(
+          var result = await _dbConnection.QueryAsync<NotificationEventRule,Domain.Entities.Notification.MiscMaster, Domain.Entities.Notification.MiscMaster, NotificationEventRule>(
               dataQuery,
               (eventRule, notificationChannel,recipientType) =>
               {

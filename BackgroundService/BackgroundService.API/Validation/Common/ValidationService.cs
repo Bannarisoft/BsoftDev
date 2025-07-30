@@ -24,6 +24,15 @@ using BackgroundService.Application.Notification.NotificationEventRules.Commands
 using BackgroundService.API.Validation.NotificationEventRule;
 using BackgroundService.Application.Notification.NotificationEventRules.Commands.UpdateNotificationEventRule;
 using BackgroundService.Application.Notification.NotificationEventRules.Commands.DeleteNotificationEventRule;
+using BackgroundService.Application.MiscTypeMaster.Command.CreateMiscTypeMaster;
+using BackgroundService.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster;
+using BackgroundService.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster;
+using BackgroundService.Application.MiscMaster.Command.CreateMiscMaster;
+using BackgroundService.Application.MiscMaster.Command.DeleteMiscMaster;
+using BackgroundService.Application.MiscMaster.Command.UpdateMiscMaster;
+using BackgroundService.API.Validation.MiscTypeMaster;
+using BackgroundService.Application.MiscMaster;
+using BackgroundService.API.Validation.MiscMaster;
 
 namespace BackgroundService.API.Validation.Common
 {
@@ -50,10 +59,19 @@ namespace BackgroundService.API.Validation.Common
             services.AddScoped<IValidator<CreateNotificationGroupMemberCommand>, CreateNotificationGroupMemberCommandValidator>();
             services.AddScoped<IValidator<UpdateNotificationGroupMemberCommand>, UpdateNotificationGroupMemberCommandValidator>();
             services.AddScoped<IValidator<DeleteNotificationGroupMemberCommand>, DeleteNotificationGroupMemberCommandValidator>();
-            
+
             services.AddScoped<IValidator<CreateNotificationEventRuleCommand>, CreateNotificationEventRuleCommandValidator>();
             services.AddScoped<IValidator<UpdateNotificationEventRuleCommand>, UpdateNotificationEventRuleCommandValidator>();
             services.AddScoped<IValidator<DeleteNotificationEventRuleCommand>, DeleteNotificationEventRuleCommandValidator>();
+            
+            services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteMiscTypeMasterCommand>, DeleteMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteMiscMasterCommand>, DeleteMiscMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>();
+            
+
         }
     }
 }

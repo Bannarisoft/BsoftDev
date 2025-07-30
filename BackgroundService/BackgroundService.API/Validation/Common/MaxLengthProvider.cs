@@ -1,48 +1,29 @@
-using BackgroundService.Infrastructure.Data.Notification;
-using Microsoft.EntityFrameworkCore.Metadata;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace BackgroundService.API.Validation.Common
 {
-    public class MaxLengthProvider 
+    public class MaxLengthProvider
     {
-        private readonly IModel _model;
-
-        public MaxLengthProvider(NotificationDbContext  dbContext)
-        {
-            _model = dbContext.Model;
-        }   
-
         public int? GetMaxLength<T>(string propertyName) where T : class
         {
-            var entityType = _model.FindEntityType(typeof(T));
+            var property = typeof(T).GetProperty(propertyName);
 
-            if (entityType is null)
-            {
-                throw new InvalidOperationException($"Entity type {typeof(T).Name} not found in the model.");
-            }
+            if (property == null)
+                throw new InvalidOperationException($"Property {propertyName} not found in {typeof(T).Name}");
 
-            var property = entityType.FindProperty(propertyName);
+            // First, check for [MaxLength]
+            var maxLengthAttr = property.GetCustomAttribute<MaxLengthAttribute>();
+            if (maxLengthAttr != null)
+                return maxLengthAttr.Length;
 
-            if (property is null)
-            {
-                throw new InvalidOperationException($"Property {propertyName} not found in entity type {typeof(T).Name}.");
-            }
+            // Check for [StringLength]
+            var stringLengthAttr = property.GetCustomAttribute<StringLengthAttribute>();
+            if (stringLengthAttr != null)
+                return stringLengthAttr.MaximumLength;
 
-            // Retrieve the column type from annotations
-            var columnType = property.GetAnnotations()
-                                     .FirstOrDefault(a => a.Name is "Relational:ColumnType")?.Value?.ToString();
-
-            if (string.IsNullOrEmpty(columnType))
-            {
-                return null;
-            }
-
-            // Extract the max length from the column type (e.g., "varchar(50)")
-            var maxLength = columnType.StartsWith("varchar(")
-                ? int.Parse(columnType.Substring(8, columnType.Length - 9)) // Extract value inside parentheses
-                : (int?)null;
-
-            return maxLength;
+            // If not found, return null
+            return null;
         }
     }
 }
