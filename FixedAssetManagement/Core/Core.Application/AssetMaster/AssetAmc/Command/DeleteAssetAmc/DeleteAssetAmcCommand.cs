@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAmc.Command.DeleteAssetAmc
 {
-    public class DeleteAssetAmcCommand : IRequest<ApiResponseDTO<int>> 
+    public class DeleteAssetAmcCommand : IRequest<int>
     {
         public int Id { get; set; }
     }

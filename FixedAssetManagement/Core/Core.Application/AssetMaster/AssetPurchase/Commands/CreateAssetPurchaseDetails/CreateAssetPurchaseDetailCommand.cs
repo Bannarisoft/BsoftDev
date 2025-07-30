@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetPurchase.Commands.CreateAssetPurchaseDetails
 {
-    public class CreateAssetPurchaseDetailCommand :IRequest<ApiResponseDTO<int>> 
+    public class CreateAssetPurchaseDetailCommand :IRequest<int>
     {
         public string? BudgetType { get; set; }
         public string? OldUnitId { get; set; }

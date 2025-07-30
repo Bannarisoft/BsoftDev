@@ -24,16 +24,12 @@ namespace FAM.API.Controllers.AssetMaster
     {
         private readonly ILogger<AssetAmcController> _logger;
         private readonly IMediator _mediator;
-        private readonly IValidator<CreateAssetAmcCommand> _createAssetAmcCommand;
-        private readonly IValidator<UpdateAssetAmcCommand> _updateAmcCommand;
 
-        public AssetAmcController(ILogger<AssetAmcController> logger, IMediator mediator,IValidator<CreateAssetAmcCommand> createAssetAmcCommand,IValidator<UpdateAssetAmcCommand> updateAmcCommand)
+        public AssetAmcController(ILogger<AssetAmcController> logger, IMediator mediator)
         : base(mediator)
         {
             _logger = logger;
             _mediator = mediator;
-            _createAssetAmcCommand=createAssetAmcCommand;
-            _updateAmcCommand=updateAmcCommand;
         }
 
         [HttpGet("GetExistingVendor/{oldUnitId}/{VendorCode}")]
@@ -50,12 +46,7 @@ namespace FAM.API.Controllers.AssetMaster
 
             var result = await _mediator.Send(new GetExistingVendorDetailsQuery { OldUnitCode = oldUnitId,VendorCode = VendorCode });
 
-            if (result == null || !result.IsSuccess || result.Data == null)
-            {
-                return NotFound(new { StatusCode = StatusCodes.Status404NotFound, Message = "No Vendor details found" });
-            }
-
-            return Ok(new { StatusCode = StatusCodes.Status200OK, Data = result.Data });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, Data = result });
         }
 
          [HttpGet("RenewStatus")]
@@ -106,12 +97,9 @@ namespace FAM.API.Controllers.AssetMaster
         {
             var assetamc = await Mediator.Send(new GetAssetAmcByIdQuery() { Id = id});
           
-            if(assetamc.IsSuccess)
-            {
-                
-              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetamc.Data,message = assetamc.Message });
-            }
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetamc.Message });
+            
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetamc,message = assetamc });
+            
            
         }
 
@@ -141,38 +129,15 @@ namespace FAM.API.Controllers.AssetMaster
         public async Task<IActionResult> CreateAsync(CreateAssetAmcCommand createAssetAmcCommand)
         {
             
-            // Validate the incoming command
-            var validationResult = await _createAssetAmcCommand.ValidateAsync(createAssetAmcCommand);
-            
-            if (!validationResult.IsValid)
-            {
-                
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                });
-            }
-
-            // Process the command
             var CreatedAssetamcid = await _mediator.Send(createAssetAmcCommand);
 
-            if (CreatedAssetamcid.IsSuccess)
-            {
-          
             return Ok(new
             {
                 StatusCode = StatusCodes.Status201Created,
-                message =CreatedAssetamcid.Message,
-                data = CreatedAssetamcid.Data
+                message ="Asset Amc Created Successfully",
+                data = CreatedAssetamcid
             });
-            }
-            return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = CreatedAssetamcid.Message
-                });
+           
         
         }
 
@@ -180,62 +145,27 @@ namespace FAM.API.Controllers.AssetMaster
         public async Task<IActionResult> UpdateAsync(UpdateAssetAmcCommand updateAssetAmcCommand )
         {
         
-                // Validate the incoming command
-                var validationResult = await _updateAmcCommand.ValidateAsync(updateAssetAmcCommand);
-       
-                if (!validationResult.IsValid)
-                {
-                
-                    return BadRequest(new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "Validation failed",
-                        errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                    });
-                }
+                 await _mediator.Send(updateAssetAmcCommand);
 
-                var updatedassetamc = await _mediator.Send(updateAssetAmcCommand);
-
-                if (updatedassetamc.IsSuccess)
-                {
-                    
                 return Ok(new
                     {
-                        message = updatedassetamc.Message,
+                        message = "Asset Amc Updated Successfully",
                         statusCode = StatusCodes.Status200OK
                     });
-                }
                
-                return NotFound(new
-                {
-                    message =updatedassetamc.Message,
-                    statusCode = StatusCodes.Status404NotFound
-                });   
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAssetAmcAsync(int id)
         {
 
-                // Process the delete command
-                var result = await _mediator.Send(new DeleteAssetAmcCommand { Id = id });
-
-                if (result.IsSuccess) 
-                {
-                    
+                await _mediator.Send(new DeleteAssetAmcCommand { Id = id });
+ 
                     return Ok(new
                     {
-                        message = result.Message,
+                        message = "Asset Amc Deleted Successfully",
                         statusCode = StatusCodes.Status200OK
                     });
-                    
-                }
-              
-                return NotFound(new
-                {
-                    message = result.Message,
-                    statusCode = StatusCodes.Status404NotFound
-                });
         
         }
 

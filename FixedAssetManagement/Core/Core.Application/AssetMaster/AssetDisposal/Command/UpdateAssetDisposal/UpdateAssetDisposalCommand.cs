@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetDisposal.Command.UpdateAssetDisposal
 {
-    public class UpdateAssetDisposalCommand :IRequest<ApiResponseDTO<int>> 
+    public class UpdateAssetDisposalCommand :IRequest<int>
     {
         public int Id { get; set; } 
         public DateOnly DisposalDate { get; set; }

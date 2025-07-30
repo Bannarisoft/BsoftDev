@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetCategories;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetCategories.Command.UpdateAssetCategories
 {
-    public class UpdateAssetCategoriesCommandHandler : IRequestHandler<UpdateAssetCategoriesCommand, ApiResponseDTO<int>>
+    public class UpdateAssetCategoriesCommandHandler : IRequestHandler<UpdateAssetCategoriesCommand, int>
     {
         private readonly IAssetCategoriesCommandRepository _iAssetCategoriesCommandRepository;
         private readonly IAssetCategoriesQueryRepository _iAssetCategoriesQueryRepository;
@@ -25,18 +26,14 @@ namespace Core.Application.AssetCategories.Command.UpdateAssetCategories
             _iAssetCategoriesQueryRepository = iAssetCategoriesQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(UpdateAssetCategoriesCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(UpdateAssetCategoriesCommand request, CancellationToken cancellationToken)
         {
         // 🔹 First, check if the ID exists in the database
         var existingassetcategory = await _iAssetCategoriesQueryRepository.GetByIdAsync(request.Id);
         if (existingassetcategory is null)
         {
-      
-        return new ApiResponseDTO<int>
-        {
-            IsSuccess = false,
-            Message = "AssetCategory Id not found / AssetCategory is deleted ."
-        };
+            throw new ValidationException("AssetCategory Id not found / AssetCategory is deleted .");
+       
         }
          // Check for duplicate GroupName or SortOrder
        var (isNameDuplicate, isSortOrderDuplicate) = await _iAssetCategoriesCommandRepository
@@ -50,11 +47,8 @@ namespace Core.Application.AssetCategories.Command.UpdateAssetCategories
             ? "AssetCategory with the same CategoryName already exists."
             : "AssetCategory with the same Sort Order already exists.";
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = false,
-                Message = errorMessage
-            };
+            throw new ValidationException(errorMessage);
+           
         }
         var assetCategories = _Imapper.Map<Core.Domain.Entities.AssetCategories>(request);
         var result = await _iAssetCategoriesCommandRepository.UpdateAsync(request.Id, assetCategories);
@@ -62,8 +56,7 @@ namespace Core.Application.AssetCategories.Command.UpdateAssetCategories
         // AssetGroup not found
         {
         if (result <= 0) 
-           
-            return new ApiResponseDTO<int> { IsSuccess = false, Message = "AssetGroup not found." };
+           throw new ValidationException("AssetGroup not found.");
         }
 
         //Domain Event
@@ -75,7 +68,7 @@ namespace Core.Application.AssetCategories.Command.UpdateAssetCategories
             module: "AssetCategory");
         await _mediator.Publish(domainEvent, cancellationToken);
      
-        return new ApiResponseDTO<int> { IsSuccess = true, Message = "AssetCategory Updated Successfully.", Data = result };  
+        return result ;  
         }
     }      
     }

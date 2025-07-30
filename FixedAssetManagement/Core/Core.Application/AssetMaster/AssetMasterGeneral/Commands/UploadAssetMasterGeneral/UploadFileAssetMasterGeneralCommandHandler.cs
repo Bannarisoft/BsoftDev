@@ -4,12 +4,13 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGene
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral
 {
-    public class UploadFileAssetMasterGeneralCommandHandler : IRequestHandler<UploadFileAssetMasterGeneralCommand, ApiResponseDTO<AssetMasterImageDto>>
+    public class UploadFileAssetMasterGeneralCommandHandler : IRequestHandler<UploadFileAssetMasterGeneralCommand, AssetMasterImageDto>
     {
         private readonly IFileUploadService _fileUploadService;
         private readonly IMediator _mediator;
@@ -40,11 +41,12 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             _companyGrpcClient = companyGrpcClient;
         }
 
-        public async Task<ApiResponseDTO<AssetMasterImageDto>> Handle(UploadFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
+        public async Task<AssetMasterImageDto> Handle(UploadFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         {
             if (request.File == null || request.File.Length == 0)
             {
-                return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = false, Message = "No file uploaded" };
+                throw new ValidationException("No file uploaded");
+                
             }
 
              // 🔹 Fetch Base Directory from Database
@@ -52,7 +54,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
             if (string.IsNullOrWhiteSpace(baseDirectory))
             {
                 _logger.LogError("Base directory path not found in database.");
-                return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = false, Message = "Base directory not configured." };
+                throw new ValidationException("Base directory not configured.");
+                
             }
             
             var companyId =_ipAddressService.GetCompanyId();
@@ -95,12 +98,14 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMa
                     AssetImage = formattedPath,  // ✅ Correctly formatted file path
                     AssetImageBase64 = base64Image  // ✅ Convert to Base64
                 };
-                return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = true, Data = response };
+                return response;
             }
             catch (Exception ex)
             {
                 _logger.LogError($"File upload failed: {ex.Message}");
-                return new ApiResponseDTO<AssetMasterImageDto> { IsSuccess = false, Message = $"File upload failed: {ex.Message}" };
+                
+                throw new Exception($"File upload failed: {ex.Message}");
+                
             }
         }   
         private void EnsureDirectoryExists(string path)

@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetGrnDetails
 {
-    public class GetAssetDetailsQueryHandler : IRequestHandler<GetAssetDetailsQuery, ApiResponseDTO<List<AssetGrnDetails>>>
+    public class GetAssetDetailsQueryHandler : IRequestHandler<GetAssetDetailsQuery, List<AssetGrnDetails>>
     {
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
@@ -24,7 +24,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetGrnDetails
             _iAssetPurchaseQueryRepository = iAssetPurchaseQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<List<AssetGrnDetails>>> Handle(GetAssetDetailsQuery request, CancellationToken cancellationToken)
+        public async Task<List<AssetGrnDetails>> Handle(GetAssetDetailsQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetPurchaseQueryRepository.GetAssetGrnItemDetails(request.OldUnitId,request.AssetSourceId ,request.GrnNo,request.GrnSerialNo);
             var assetunits  = _mapper.Map<List<AssetGrnDetails>>(result);
@@ -37,7 +37,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetGrnDetails
                     module:"GrnItemDetails"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<AssetGrnDetails>> { IsSuccess = true, Message = "Success", Data = assetunits };
+            return assetunits;
         }
     }
 }

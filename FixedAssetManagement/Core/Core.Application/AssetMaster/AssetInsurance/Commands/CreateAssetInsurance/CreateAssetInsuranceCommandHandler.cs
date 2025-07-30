@@ -7,11 +7,12 @@ using Core.Application.AssetMaster.AssetInsurance.Queries.GetAssetInsurance;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetInsurance;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetInsurance.Commands.CreateAssetInsurance
 {
-    public class CreateAssetInsuranceCommandHandler : IRequestHandler<CreateAssetInsuranceCommand, ApiResponseDTO<GetAssetInsuranceDto>>
+    public class CreateAssetInsuranceCommandHandler : IRequestHandler<CreateAssetInsuranceCommand, GetAssetInsuranceDto>
     {
 
 
@@ -33,7 +34,7 @@ namespace Core.Application.AssetMaster.AssetInsurance.Commands.CreateAssetInsura
         }
 
         
-        public async Task<ApiResponseDTO<GetAssetInsuranceDto>> Handle(CreateAssetInsuranceCommand request, CancellationToken cancellationToken)
+        public async Task<GetAssetInsuranceDto> Handle(CreateAssetInsuranceCommand request, CancellationToken cancellationToken)
         {
 
             // Map request to domain entity
@@ -43,12 +44,8 @@ namespace Core.Application.AssetMaster.AssetInsurance.Commands.CreateAssetInsura
             var result = await _assetInsuranceCommandRepository.CreateAsync(assetInsurance);
             if (result.Id <= 0)
             {
-                return new ApiResponseDTO<GetAssetInsuranceDto>
-                {
-                    IsSuccess = false,
-                    Message = "Failed to create Asset Insurance",
-                    Data = null
-                };
+                throw new ValidationException("Failed to create Asset Insurance");
+              
             }
 
             // Fetch newly created record
@@ -67,12 +64,7 @@ namespace Core.Application.AssetMaster.AssetInsurance.Commands.CreateAssetInsura
             await _mediator.Publish(domainEvent, cancellationToken);
 
             // Return success response
-            return new ApiResponseDTO<GetAssetInsuranceDto>
-            {
-                IsSuccess = true,
-                Message = "Asset Insurance created successfully",
-                Data = mappedResult
-            };
+            return  mappedResult;
         }
 
       
