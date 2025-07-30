@@ -1,6 +1,7 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IHSNMaster;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.Common.Interfaces.Item.ItemCategory;
@@ -10,6 +11,7 @@ using Core.Domain.Entities.Item;
 using Infrastructure.Data;
 using InventoryManagement.Infrastructure.Data;
 using InventoryManagement.Infrastructure.Repositories;
+using InventoryManagement.Infrastructure.Repositories.HSNMaster;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemCategory;
 using InventoryManagement.Infrastructure.Repositories.Item.ItemGroup;
 using InventoryManagement.Infrastructure.Repositories.MiscMaster;
@@ -104,7 +106,9 @@ namespace InventoryManagement.Infrastructure
 			services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();            
             services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
             services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
-            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();      
+            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>(); 
+            services.AddScoped<IHSNMasterQueryRepository , HSNMasterQueryRepository>();     
+            services.AddScoped<IHSNMasterCommandRepository, HSNMasterCommandRepository>();
 
 
             // Miscellaneous services

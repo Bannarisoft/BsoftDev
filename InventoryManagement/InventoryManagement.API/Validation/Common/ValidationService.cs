@@ -1,3 +1,6 @@
+using Core.Application.HSNMaster.Command.CreateHSNMaster;
+using Core.Application.HSNMaster.Command.DeleteHSNMaster;
+using Core.Application.HSNMaster.Command.UpdateHSNMaster;
 using Core.Application.Item.ItemCategory.Commands.CreateItemCategory;
 using Core.Application.Item.ItemCategory.Commands.DeleteItemCategory;
 using Core.Application.Item.ItemCategory.Commands.UpdateItemCategory;
@@ -12,6 +15,7 @@ using Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster;
 using Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster;
 using Core.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster;
 using FluentValidation;
+using InventoryManagement.API.Validation.HSNMaster;
 using InventoryManagement.API.Validation.Item.ItemCategory;
 using InventoryManagement.API.Validation.Item.ItemGroup;
 using InventoryManagement.API.Validation.MiscMaster;
@@ -30,12 +34,15 @@ namespace InventoryManagement.API.Validation.Common
             services.AddScoped<IValidator<CreateItemGroupCommand>, CreateItemGroupCommandValidator>();
             services.AddScoped<IValidator<UpdateItemGroupCommand>, UpdateItemGroupCommandValidator>();
             services.AddScoped<IValidator<DeleteItemGroupCommand>, DeleteItemGroupCommandValidator>();
-			services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
             services.AddScoped<IValidator<DeleteMiscTypeMasterCommand>, DeleteMiscTypeMasterCommandValidator>();
             services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
             services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
             services.AddScoped<IValidator<DeleteMiscMasterCommand>, DeleteMiscMasterCommandValidator>();
             services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateHSNMasterCommand>, CreateHSNMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateHSNMasterCommand>, UpdateHSNMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteHSNMasterCommand>, DeleteHSNMasterCommandValidator>();
         }
     }
 }

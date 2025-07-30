@@ -4,6 +4,7 @@ using InventoryManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventoryManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250729095243_AddHSNMasterAndMiscMasterRelationships")]
+    partial class AddHSNMasterAndMiscMasterRelationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,7 +36,7 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     b.Property<decimal>("CGSTPercentage")
                         .HasColumnType("decimal(5,2)")
-                        .HasColumnName("CGSTPercentage");
+                        .HasColumnName("CgstPercentage");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -60,7 +63,7 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     b.Property<decimal>("GSTPercentage")
                         .HasColumnType("decimal(5,2)")
-                        .HasColumnName("GSTPercentage");
+                        .HasColumnName("GstPercentage");
 
                     b.Property<string>("HSNCode")
                         .IsRequired()
@@ -69,7 +72,7 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     b.Property<decimal>("IGSTPercentage")
                         .HasColumnType("decimal(5,2)")
-                        .HasColumnName("IGSTPercentage");
+                        .HasColumnName("IgstPercentage");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
@@ -93,11 +96,11 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     b.Property<decimal>("SGSTPercentage")
                         .HasColumnType("decimal(5,2)")
-                        .HasColumnName("SGSTPercentage");
+                        .HasColumnName("SgstPercentage");
 
-                    b.Property<int>("TypeId")
+                    b.Property<int>("Type")
                         .HasColumnType("int")
-                        .HasColumnName("TypeId");
+                        .HasColumnName("Type");
 
                     b.Property<DateTimeOffset>("ValidFrom")
                         .HasColumnType("datetimeoffset")
@@ -109,8 +112,6 @@ namespace InventoryManagement.Infrastructure.Migrations
 
                     b.HasIndex("HSNCode")
                         .IsUnique();
-
-                    b.HasIndex("TypeId");
 
                     b.ToTable("HSNMaster", "Inventory");
                 });
@@ -387,16 +388,7 @@ namespace InventoryManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "Type")
-                        .WithMany("TypeHSNs")
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_HSNMaster_MiscMaster_Type");
-
                     b.Navigation("GstCategory");
-
-                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Item.ItemCategory", b =>
@@ -447,8 +439,6 @@ namespace InventoryManagement.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.MiscMaster", b =>
                 {
                     b.Navigation("HSNMasters");
-
-                    b.Navigation("TypeHSNs");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.MiscTypeMaster", b =>

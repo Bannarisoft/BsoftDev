@@ -24,8 +24,9 @@ namespace InventoryManagement.Infrastructure.Data
 
          public DbSet<ItemGroup> ItemGroup { get; set; } 
          public DbSet<ItemCategory> ItemCategory { get; set; } 
-		public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
-        public DbSet<MiscMaster> MiscMaster { get; set; }
+		 public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
+         public DbSet<MiscMaster> MiscMaster { get; set; }        
+         public DbSet<HSNMaster> HSNMaster { get; set; }
 
 
 
@@ -33,8 +34,9 @@ namespace InventoryManagement.Infrastructure.Data
         {
             modelBuilder.ApplyConfiguration(new ItemGroupConfiguration());
             modelBuilder.ApplyConfiguration(new ItemCategoryConfiguration());
-			modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new MiscTypeMasterConfiguration());
             modelBuilder.ApplyConfiguration(new MiscMasterConfiguration());
+            modelBuilder.ApplyConfiguration(new HSNMasterConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

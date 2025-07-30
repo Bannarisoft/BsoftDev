@@ -47,12 +47,7 @@ namespace InventoryManagement.API.Validation.MiscTypeMaster
                             .MaximumLength(DescriptionMaxLength)
                             .WithMessage($"{nameof(UpdateMiscTypeMasterCommand.Description)} {rule.Error}");
                         break;
-                    // case "AlreadyExists":
-                    // RuleFor(x => x.MiscTypeCode)
-                    //     .MustAsync(async (miscTypeCode, cancellation) =>
-                    //         !await _miscTypeMasterQueryRepository.AlreadyExistsAsync(miscTypeCode ))
-                    //     .WithMessage("MiscTypeCode already exists.");
-                    // break;
+                  
                     case "AlreadyExists":
                          RuleFor(x => x)
                             .MustAsync(async (command, cancellation) =>
