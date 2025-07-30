@@ -1,5 +1,7 @@
 
 using Core.Application;
+using Core.Application.Common.Behaviors;
+using MediatR;
 using PartyManagement.API.Configurations;
 using PartyManagement.API.Middleware;
 using PartyManagement.API.Validation.Common;
@@ -39,7 +41,7 @@ builder.Services.AddHttpContextAccessor();
 //builder.Services.AddProblemDetails();
 // Register gRPC
 builder.Services.AddGrpc();
-
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

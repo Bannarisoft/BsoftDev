@@ -31,7 +31,7 @@ namespace FAM.API.Controllers
           :base(mediator)
           {
               _createMiscTypeMasterCommand=createMiscTypeMasterCommand;
-            _updateMiscTypeMasterCommand=updateMiscTypeMasterCommand;
+              _updateMiscTypeMasterCommand=updateMiscTypeMasterCommand;
           }      
     
       [HttpGet] 

@@ -89,6 +89,9 @@ namespace PartyManagement.Infrastructure
 
             // Register repositories
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+                  // Register repositories
+            services.AddScoped<IPartyGroupCommandRepository, PartyGroupCommandRepository>();
+            services.AddScoped<IPartyGroupQueryRepository, PartyGroupQueryRepository>();
 
 
 
@@ -97,13 +100,12 @@ namespace PartyManagement.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
-            
-            services.AddHttpClient<IGSTAuthService, GSTAuthService>();            
+			services.AddHttpClient<IGSTAuthService, GSTAuthService>(); 
             // AutoMapper profiles
-            // services.AddAutoMapper(
-            // typeof(AssetGroupProfile),
+            services.AddAutoMapper(
+            typeof(PartyGroupProfile)
 
-            // );
+            );
             return services;
         }
 

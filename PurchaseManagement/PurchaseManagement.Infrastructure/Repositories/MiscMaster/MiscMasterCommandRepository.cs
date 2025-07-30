@@ -8,7 +8,7 @@ using PurchaseManagement.Infrastructure.Data;
 
 namespace PurchaseManagement.Infrastructure.Repositories.MiscMaster
 {
-    public class MiscMasterCommandRepository: IMiscMasterCommandRepository
+    public class MiscMasterCommandRepository : IMiscMasterCommandRepository
   {
         private readonly ApplicationDbContext _dbContext;
 
