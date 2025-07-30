@@ -1,6 +1,7 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Interfaces.GST;
 using Infrastructure.Data;
 using InventoryManagement.Infrastructure.Services;
 using Microsoft.Data.SqlClient;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using PartyManagement.Infrastructure.Data;
 using PartyManagement.Infrastructure.Repositories;
+using PartyManagement.Infrastructure.Services;
 using Serilog;
 
 namespace PartyManagement.Infrastructure
@@ -95,7 +97,8 @@ namespace PartyManagement.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
-
+            
+            services.AddHttpClient<IGSTAuthService, GSTAuthService>();            
             // AutoMapper profiles
             // services.AddAutoMapper(
             // typeof(AssetGroupProfile),
