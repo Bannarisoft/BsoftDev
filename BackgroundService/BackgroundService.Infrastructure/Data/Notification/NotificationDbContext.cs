@@ -27,6 +27,7 @@ namespace BackgroundService.Infrastructure.Data.Notification
         public DbSet<NotificationTemplate> NotificationTemplate { get; set; }
         public DbSet<MiscTypeMaster> MiscTypeMaster { get; set; }
         public DbSet<MiscMaster> MiscMaster { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new NotificationConfigConfiguration());

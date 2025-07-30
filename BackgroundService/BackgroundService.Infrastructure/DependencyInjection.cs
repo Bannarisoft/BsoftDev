@@ -38,6 +38,10 @@ using Contracts.Events.Notifications.WorkOrder.Email;
 using Contracts.Events.Notifications.WorkOrder.InApp;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationDetail;
 using BackgroundService.Infrastructure.Repositories.Notification.NotificationDetail;
+using BackgroundService.Application.Interfaces.IMiscMaster;
+using BackgroundService.Infrastructure.Repositories.MiscMaster;
+using BackgroundService.Application.Common.Interfaces.IMiscTypeMaster;
+using BackgroundService.Infrastructure.Repositories.MiscTypeMaster;
 
 namespace BackgroundService.Infrastructure
 {
@@ -64,6 +68,7 @@ namespace BackgroundService.Infrastructure
             {
                 throw new InvalidOperationException("Connection string 'NotificationConnectionString' not found or is empty.");
             }
+
 
             services.AddTransient<IHangfireDbConnectionFactory>(sp => new HangfireDbConnectionFactory(HangfireConnectionString));
             services.AddTransient<INotificationDbConnectionFactory>(sp => new NotificationDbConnectionFactory(NotificationConnectionString));
@@ -218,6 +223,10 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationUserResolver, NotificationUserResolver>();
             services.AddScoped<INotificationDetailRepository, NotificationDetailRepository>();
             services.AddScoped<NotificationResolverHandler>();
+            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
+            services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
+            services.AddScoped<IMiscTypeMasterCommandRepository , MiscTypeMasterCommandRepository>();
+            services.AddScoped<IMiscTypeMasterQueryRepository , MiscTypeMasterQueryRepository>();
             //Notification
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<ISmsSender, SmsSender>();
