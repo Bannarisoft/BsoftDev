@@ -1,4 +1,5 @@
 using System.Data;
+using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationDetail;
 using BackgroundService.Application.Notification.GetNotificationDetail.GetNotificationDetailById;
 using BackgroundService.Domain.Entities.Notification;
@@ -13,15 +14,18 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
     {
         private readonly NotificationDbContext _applicationDbContext;
         private readonly IDbConnection _dbConnection;
+        private readonly IIPAddressService _ipAddressService;
 
-        public NotificationDetailRepository(IDbConnection dbConnection,NotificationDbContext applicationDbContext)
+        public NotificationDetailRepository(IDbConnection dbConnection, NotificationDbContext applicationDbContext, IIPAddressService iPAddressService)
         {
-            _dbConnection = dbConnection;      
-            _applicationDbContext = applicationDbContext;      
+            _dbConnection = dbConnection;
+            _applicationDbContext = applicationDbContext;
+            _ipAddressService = iPAddressService;
         }
 
         public async Task<List<GetNotificationDetailDto>> GetAllByUserIdAsync(string userId)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             const string query = @" SELECT L.Id,NC.ModuleName,MM.Code  EventType,MM1.Code TargetType,MM2.Code ChannelName,
                     ActionStatus, MM4.Code ReadStatus,MM4.Id ReadStatusId, MessageText, Timestamp, L.CreatedBy,L.CreatedDate, L.CreatedByName, L.CreatedIP, SendTo
                     FROM AppNotification.NotificationEventLog L
@@ -33,10 +37,10 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
                     INNER JOIN AppData.MiscMaster MM on MM.id=NC.NotificationEventTypeId  
                     INNER JOIN AppData.MiscMaster MM1 on MM1.id=NH.TargetTypeId  
                     INNER JOIN AppData.MiscMaster MM4 on MM4.id=L.ReadStatusId
-                    where L.SendTo = @userId AND L.IsDeleted = 0
+                    where L.SendTo = @userId AND L.IsDeleted = 0 and L.UnitId = @UnitId
                     ORDER BY L.Timestamp DESC ";
       
-            var notifications = await _dbConnection.QueryAsync<GetNotificationDetailDto>(query, new { userId });
+            var notifications = await _dbConnection.QueryAsync<GetNotificationDetailDto>(query, new { userId,UnitId });
             return notifications.ToList();
         }
 

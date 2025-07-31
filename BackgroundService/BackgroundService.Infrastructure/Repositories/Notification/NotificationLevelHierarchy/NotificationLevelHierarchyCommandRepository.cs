@@ -43,8 +43,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
             }            
             existingNotificationLevelHierarchy.NotificationConfigId = NotificationLevelHierarchy.NotificationConfigId;
             existingNotificationLevelHierarchy.TargetTypeId = NotificationLevelHierarchy.TargetTypeId;            
-            existingNotificationLevelHierarchy.TargetId = NotificationLevelHierarchy.TargetId;
-            existingNotificationLevelHierarchy.UnitId = NotificationLevelHierarchy.UnitId;
+            existingNotificationLevelHierarchy.TargetId = NotificationLevelHierarchy.TargetId;            
             existingNotificationLevelHierarchy.Description = NotificationLevelHierarchy.Description;
             existingNotificationLevelHierarchy.ApprovalModeId = NotificationLevelHierarchy.ApprovalModeId;            
             existingNotificationLevelHierarchy.IsActive=NotificationLevelHierarchy.IsActive;
@@ -56,7 +55,7 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
         public async Task<bool> IsNameDuplicateAsync(int notificationConfigId, int targetTypeId, int targetId)
         {
             return await _applicationDbContext.NotificationLevelHierarchy
-                .AnyAsync(cc => cc.UnitId == UnitId && cc.NotificationConfigId == notificationConfigId && cc.TargetTypeId == targetTypeId && cc.TargetId == targetId && cc.IsDeleted == 0);
+                .AnyAsync(cc => cc.NotificationConfigId == notificationConfigId && cc.TargetTypeId == targetTypeId && cc.TargetId == targetId && cc.IsDeleted == 0);
         }       
     }
 }

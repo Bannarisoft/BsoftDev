@@ -22,7 +22,7 @@ namespace BackgroundService.Application.Notification.NotificationEventRules.Quer
         }
         public async Task<ApiResponseDTO<List<NotificationEventRuleDto>>> Handle(GetAllNotificationEventRuleQuery request, CancellationToken cancellationToken)
         {
-            var (Notification, TotalCount) = await _notificationEventRuleQuery.GetAllNotificationGroupAsync(request.PageNumber, request.PageSize, request.SearchTerm);
+            var (Notification, TotalCount) = await _notificationEventRuleQuery.GetAllNotificationEventRuleAsync(request.PageNumber, request.PageSize, request.SearchTerm);
             var NotificationDto = _mapper.Map<List<NotificationEventRuleDto>>(Notification);
 
 

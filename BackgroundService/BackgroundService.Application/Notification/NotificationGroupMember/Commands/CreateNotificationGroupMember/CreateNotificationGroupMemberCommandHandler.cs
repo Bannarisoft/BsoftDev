@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroupMembers;
 using BackgroundService.Application.Notification.Exceptions;
@@ -12,21 +8,26 @@ namespace BackgroundService.Application.Notification.NotificationGroupMember.Com
 {
     public class CreateNotificationGroupMemberCommandHandler : IRequestHandler<CreateNotificationGroupMemberCommand, int>
     {
-        private readonly INotificationGroupMemberCommand _notificationGroupMemberCommand;
-        private readonly IMediator _imediator;
-        private readonly IMapper _imapper;
-        public CreateNotificationGroupMemberCommandHandler(INotificationGroupMemberCommand notificationGroupMemberCommand, IMediator imediator, IMapper imapper)
+        private readonly INotificationGroupMemberCommand _notificationGroupMemberCommand;        
+        private readonly IMapper _mapper;
+        public CreateNotificationGroupMemberCommandHandler(INotificationGroupMemberCommand notificationGroupMemberCommand,  IMapper mapper)
         {
-            _notificationGroupMemberCommand = notificationGroupMemberCommand;
-            _imediator = imediator;
-            _imapper = imapper;
+            _notificationGroupMemberCommand = notificationGroupMemberCommand;            
+            _mapper = mapper;
         }
         public async Task<int> Handle(CreateNotificationGroupMemberCommand request, CancellationToken cancellationToken)
         {
-            var NotificationGroup = _imapper.Map<NotificationGroupMembers>(request);
-            
-            var result = await _notificationGroupMemberCommand.CreateAsync(NotificationGroup);
-            
+            if (request.UserIds == null || !request.UserIds.Any())
+                throw new ExceptionRules("At least one UserId must be provided.");
+
+            var members = request.UserIds.Select(userId => new NotificationGroupMembers
+            {
+                GroupId = request.GroupId,
+                UserId = userId
+            }).ToList();
+
+            var result = await _notificationGroupMemberCommand.CreateMultipleAsync(members);
+
             return result > 0 ? result : throw new ExceptionRules("Notification Group Member Creation Failed.");
         }
     }

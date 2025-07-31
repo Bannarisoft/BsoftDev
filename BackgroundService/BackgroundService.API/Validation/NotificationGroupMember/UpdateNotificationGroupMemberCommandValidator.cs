@@ -29,26 +29,29 @@ namespace BackgroundService.API.Validation.NotificationGroupMember
                 switch (rule.Rule)
                 {
                     case "NotEmpty":
-                        RuleFor(x => x.GroupId)
-                            .NotEmpty()
-                            .WithMessage($"{nameof(UpdateNotificationGroupMemberCommand.GroupId)} {rule.Error}");
+                       RuleFor(x => x.GroupId)
+                        .GreaterThan(0)
+                        .WithMessage("GroupId is required and must be greater than zero.");
 
-                            RuleFor(x => x.UserId)
+                        RuleFor(x => x.UserIds)
                             .NotEmpty()
-                            .WithMessage($"{nameof(UpdateNotificationGroupMemberCommand.UserId)} {rule.Error}");
+                            .WithMessage("At least one UserId must be provided.")
+                            .Must(list => list.Distinct().Count() == list.Count)
+                            .WithMessage("Duplicate UserIds are not allowed in the same request.");
+
+                        
                         break;
                     case "AlreadyExists":
-                        RuleFor(x => new { x.GroupId,x.UserId, x.Id })
-                         .MustAsync(async (notification, cancellation) =>
-                      !await _notificationGroupQuery.AlreadyExistsAsync(notification.GroupId,notification.UserId, notification.Id))
-                         .WithName("Group Name")
-                          .WithMessage($"{rule.Error}");
+                        RuleForEach(x => x.UserIds)
+                            .MustAsync(async (command, userId, cancellation) =>
+                            !await notificationGroupQuery.AlreadyExistsAsync(command.GroupId, userId))
+                            .WithMessage("UserId '{PropertyValue}' already exists in this group.");
                         break;
                         
                     case "NotFound":
-                           RuleFor(x => x.Id )
-                           .MustAsync(async (Id, cancellation) => 
-                        await _notificationGroupQuery.NotFoundAsync(Id))             
+                           RuleFor(x => x.GroupId )
+                           .MustAsync(async (GroupId, cancellation) => 
+                        await _notificationGroupQuery.NotFoundAsync(GroupId))             
                            .WithName("Notification Group Member Id")
                             .WithMessage($"{rule.Error}");
                             break; 

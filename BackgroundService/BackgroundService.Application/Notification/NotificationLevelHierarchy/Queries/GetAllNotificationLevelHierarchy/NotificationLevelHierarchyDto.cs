@@ -13,8 +13,7 @@ namespace BackgroundService.Application.Notification.NotificationLevelHierarchy.
         public string? NotificationEventType { get; set; }
         public string? TargetType { get; set; }
         public string? TargetName { get; set; }
-        public string? ApprovalMode { get; set; }        
-        public string? DepartmentName { get; set; }
+        public string? ApprovalMode { get; set; }                
         public int IsActive { get; set; }
         public int IsDeleted { get; set; }
         public int CreatedBy { get; set; }
