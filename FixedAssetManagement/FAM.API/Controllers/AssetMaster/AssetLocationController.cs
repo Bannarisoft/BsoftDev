@@ -22,22 +22,15 @@ namespace FAM.API.Controllers.AssetMaster
    [Route("api/[controller]")]
     public class AssetLocationController : ApiControllerBase
     {  
-         private  readonly IValidator<CreateAssetLocationCommand>  _createAssetLocationCommandValidator;
-         private readonly IValidator<UpdateAssetLocationCommand> _updateAssetLocationCommandValidator;
+         
         private readonly ILogger<AssetLocationController> _logger;
-      
-        private readonly ApplicationDbContext _dbContext;
         private readonly IMediator _mediator;
 
-        public AssetLocationController( ILogger<AssetLocationController> logger,IMediator mediator, ApplicationDbContext dbContext,
-        IValidator<CreateAssetLocationCommand> createAssetLocationCommandValidator, IValidator<UpdateAssetLocationCommand> updateAssetLocationCommandValidator) : base(mediator)
+        public AssetLocationController( ILogger<AssetLocationController> logger,IMediator mediator) : base(mediator)
         
         {
             _logger = logger;
-            _dbContext = dbContext;
             _mediator = mediator;
-            _createAssetLocationCommandValidator = createAssetLocationCommandValidator;
-            _updateAssetLocationCommandValidator = updateAssetLocationCommandValidator;
 
         }
         [HttpGet]
@@ -68,96 +61,40 @@ namespace FAM.API.Controllers.AssetMaster
         {
             var assetLocation = await Mediator.Send(new GetAssetLocationByIdQuery() { Id = id});
            
-             if(assetLocation.IsSuccess)
-            {
-                
-              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetLocation.Data,message = assetLocation.Message });
-            }
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetLocation.Message });
+           
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetLocation,message = assetLocation });
+          
 
         }
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateAssetLocationCommand command)
         {
-            
-            var validationResult = await _createAssetLocationCommandValidator.ValidateAsync(command);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+          
 
             var response = await Mediator.Send(command);
 
-            if (response.IsSuccess)
-            {
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = response.Message, 
-                    data = response.Data
+                    message = "AssetLocation Created Successfully", 
+                    data = response
                 });
-            }
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = response.Message,
-                Errors = ""
-            });
+            
         }
 
         [HttpPut]
         public async Task<IActionResult> Update(UpdateAssetLocationCommand command)
         {
-            // Validate the command
-            var validationResult = await _updateAssetLocationCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                { 
-                    StatusCode = StatusCodes.Status400BadRequest, 
-                    Message = "Validation Failed", 
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
-
-            // Check if the AssetLocation exists
-            var assetLocationExists = await Mediator.Send(new GetAssetLocationByIdQuery { Id = command.AssetId });
-            if (assetLocationExists == null)
-            {
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound, 
-                    Message = $"AssetLocation ID {command.AssetId} not found.", 
-                    Errors = "" 
-                });
-            }
-
-            // Update the AssetLocation
-            var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
+            
+             await Mediator.Send(command);
+           
                 return Ok(new 
                 { 
                     StatusCode = StatusCodes.Status200OK, 
-                    Message = response.Message, 
+                    Message = "AssetLocation Updated Successfully", 
                     Errors = "" 
                 });
-            }
-
-            // If update failed
-            return BadRequest(new 
-            { 
-                StatusCode = StatusCodes.Status400BadRequest, 
-                Message = response.Message, 
-                Errors = "" 
-            });
+           
         }
         [HttpGet]  
         [Route("GetAllCustodian/{OldUnitId}")]      
@@ -186,13 +123,8 @@ namespace FAM.API.Controllers.AssetMaster
            
             var assetLocation = await Mediator.Send(new GetSubLocationByIdQuery() { Id = id });
 
-           
-             if(assetLocation.IsSuccess && assetLocation.Data != null)
-            {
-                
-              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetLocation.Data,message = assetLocation.Message });
-            }
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetLocation.Message });
+   
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetLocation,message = assetLocation });
 
         }
          

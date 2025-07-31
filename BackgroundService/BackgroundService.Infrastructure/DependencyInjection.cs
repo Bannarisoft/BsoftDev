@@ -47,13 +47,15 @@ using BackgroundService.Infrastructure.Repositories.Notification.NotificationDet
 using BackgroundService.Application.Consumer.Workflow;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
 using BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequests;
-using BackgroundService.Application.Notification.Common.Interfaces.IMiscMaster;
-using BackgroundService.Infrastructure.Repositories.Notification.MiscMasters;
 using MongoDB.Driver;
 using BackgroundService.Infrastructure.Persistence;
 using BackgroundService.Infrastructure.Data;
 using BackgroundService.Application.Workflow.Common.Interfaces;
 using BackgroundService.Infrastructure.Repositories.Workflow;
+using BackgroundService.Application.Interfaces.IMiscMaster;
+using BackgroundService.Infrastructure.Repositories.MiscMaster;
+using BackgroundService.Application.Common.Interfaces.IMiscTypeMaster;
+using BackgroundService.Infrastructure.Repositories.MiscTypeMaster;
 
 namespace BackgroundService.Infrastructure
 {
@@ -272,6 +274,10 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<INotificationUserResolver, NotificationUserResolver>();
             services.AddScoped<INotificationDetailRepository, NotificationDetailRepository>();
             services.AddScoped<NotificationResolverHandler>();
+			services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
+            services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
+            services.AddScoped<IMiscTypeMasterCommandRepository , MiscTypeMasterCommandRepository>();
+            services.AddScoped<IMiscTypeMasterQueryRepository , MiscTypeMasterQueryRepository>();
             //Notification
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<ISmsSender, SmsSender>();
@@ -291,7 +297,6 @@ namespace BackgroundService.Infrastructure
             services.AddScoped<IApprovalRuleCommand, ApprovalRuleCommandRepository >();
             services.AddScoped<IApprovalRequestQuery, ApprovalRequestQueryRepository >();
             services.AddScoped<IApprovalRequestCommand, ApprovalRequestCommandRepository >();
-            services.AddScoped<IMiscMasterQuery, MiscMasterQueryRepository >();
             services.AddScoped<IEventPublisher, EventPublisher>();
 
                   services.AddScoped<IMongoCollection<OutboxMessage>>(sp =>
@@ -305,3 +310,4 @@ namespace BackgroundService.Infrastructure
         }
     }
 }
+

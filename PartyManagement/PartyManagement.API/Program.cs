@@ -64,7 +64,6 @@ app.UseMiddleware<LoggingMiddleware>();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
-
     endpoints.MapControllers();
 });
 app.Run();

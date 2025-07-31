@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.AssetSubCategories.Queries.GetAssetSubCategoriesAutoComplete
 {
-    public class GetAssetSubCategoriesAutoCompleteQueryHandler :  IRequestHandler<GetAssetSubCategoriesAutoCompleteQuery,ApiResponseDTO<List<AssetSubCategoriesAutoCompleteDto>>>
+    public class GetAssetSubCategoriesAutoCompleteQueryHandler :  IRequestHandler<GetAssetSubCategoriesAutoCompleteQuery,List<AssetSubCategoriesAutoCompleteDto>>
     {
         
         private readonly IAssetSubCategoriesQueryRepository _iAssetSubCategoriesQueryRepository;
@@ -25,7 +25,7 @@ namespace Core.Application.AssetSubCategories.Queries.GetAssetSubCategoriesAutoC
             _mediator = mediator;
         }
         
-        public async Task<ApiResponseDTO<List<AssetSubCategoriesAutoCompleteDto>>> Handle(GetAssetSubCategoriesAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<AssetSubCategoriesAutoCompleteDto>> Handle(GetAssetSubCategoriesAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetSubCategoriesQueryRepository.GetAssetSubCategories(request.SearchPattern);
             var assetsubcategories  = _mapper.Map<List<AssetSubCategoriesAutoCompleteDto>>(result);
@@ -38,7 +38,7 @@ namespace Core.Application.AssetSubCategories.Queries.GetAssetSubCategoriesAutoC
                     module:"AssetSubCategories"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<AssetSubCategoriesAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = assetsubcategories };
+            return assetsubcategories;
         }
 
     }

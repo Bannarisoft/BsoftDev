@@ -75,11 +75,11 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
                 PageSize
             };
 
-            var ApprovalStep = await _dbConnection.QueryAsync<ApprovalStepDetail, MiscMaster, WorkflowType, MiscMaster, ApprovalStepDetail>(
+            var ApprovalStep = await _dbConnection.QueryAsync<ApprovalStepDetail, Domain.Entities.Notification.MiscMaster, WorkflowType, Domain.Entities.Notification.MiscMaster, ApprovalStepDetail>(
                 dataQuery,
                 (detail, approvalStep, workFlow, approvalType) =>
                 {
-                     detail.ApprovalStep = new MiscMaster
+                     detail.ApprovalStep = new Domain.Entities.Notification.MiscMaster
                      {
                          Id = approvalStep.Id,
                          Code = approvalStep.Code
@@ -89,7 +89,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
                          Id = workFlow.Id,
                          ModuleTypeName = workFlow.ModuleTypeName
                      };
-                     detail.ApprovalType = new MiscMaster
+                     detail.ApprovalType = new Domain.Entities.Notification.MiscMaster
                      {
                          Id = approvalType.Id,
                          Code = approvalType.Code

@@ -7,11 +7,12 @@ using Core.Application.AssetMaster.AssetWarranty.Queries.GetAssetWarranty;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Queries.GetAssetWarrantyById
 {
-    public class GetAssetWarrantyByIdQueryHandler : IRequestHandler<GetAssetWarrantyByIdQuery, ApiResponseDTO<AssetWarrantyDTO>>
+    public class GetAssetWarrantyByIdQueryHandler : IRequestHandler<GetAssetWarrantyByIdQuery, AssetWarrantyDTO>
     {
         private readonly IAssetWarrantyQueryRepository _assetWarrantyRepository;
         private readonly IMapper _mapper;
@@ -24,17 +25,14 @@ namespace Core.Application.AssetMaster.AssetWarranty.Queries.GetAssetWarrantyByI
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<AssetWarrantyDTO>> Handle(GetAssetWarrantyByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AssetWarrantyDTO> Handle(GetAssetWarrantyByIdQuery request, CancellationToken cancellationToken)
         {
             var assetWarranty = await _assetWarrantyRepository.GetByIdAsync(request.Id);                
             var assetWarrantyDto = _mapper.Map<AssetWarrantyDTO>(assetWarranty);
             if (assetWarranty is null)
-            {                
-                return new ApiResponseDTO<AssetWarrantyDTO>
-                {
-                    IsSuccess = false,
-                    Message = "AssetWarranty with ID {request.Id} not found."
-                };   
+            {             
+                throw new ValidationException("AssetWarranty with ID {request.Id} not found.");   
+                 
             }       
                 //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -45,12 +43,7 @@ namespace Core.Application.AssetMaster.AssetWarranty.Queries.GetAssetWarrantyByI
                 module:"WarrantyMaster"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<AssetWarrantyDTO>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = assetWarrantyDto
-            };       
+            return  assetWarrantyDto;       
         }
     }
 }

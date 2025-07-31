@@ -36,6 +36,15 @@ using BackgroundService.API.Validation.Workflow.ApprovalRules;
 using BackgroundService.Application.Workflow.ApprovalRules.Commands.CreateApprovalRule;
 using BackgroundService.Application.Workflow.ApprovalRules.Commands.UpdateApprovalRule;
 using BackgroundService.Application.Workflow.ApprovalRules.Commands.DeleteApprovalRule;
+using BackgroundService.Application.MiscTypeMaster.Command.CreateMiscTypeMaster;
+using BackgroundService.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster;
+using BackgroundService.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster;
+using BackgroundService.Application.MiscMaster.Command.CreateMiscMaster;
+using BackgroundService.Application.MiscMaster.Command.DeleteMiscMaster;
+using BackgroundService.Application.MiscMaster.Command.UpdateMiscMaster;
+using BackgroundService.API.Validation.MiscTypeMaster;
+using BackgroundService.Application.MiscMaster;
+using BackgroundService.API.Validation.MiscMaster;
 
 namespace BackgroundService.API.Validation.Common
 {
@@ -78,6 +87,15 @@ namespace BackgroundService.API.Validation.Common
             services.AddScoped<IValidator<CreateApprovalRuleCommand>, CreateApprovalRuleCommandValidator>();
             services.AddScoped<IValidator<UpdateApprovalRuleCommand>, UpdateApprovalRuleCommandValidator>();
             services.AddScoped<IValidator<DeleteApprovalRuleCommand>, DeleteApprovalRuleCommandValidator>();
+            
+            services.AddScoped<IValidator<CreateMiscTypeMasterCommand>, CreateMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteMiscTypeMasterCommand>, DeleteMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateMiscTypeMasterCommand>, UpdateMiscTypeMasterCommandValidator>();
+            services.AddScoped<IValidator<CreateMiscMasterCommand>, CreateMiscMasterCommandValidator>();
+            services.AddScoped<IValidator<DeleteMiscMasterCommand>, DeleteMiscMasterCommandValidator>();
+            services.AddScoped<IValidator<UpdateMiscMasterCommand>, UpdateMiscMasterCommandValidator>();
+            
+
         }
     }
 }

@@ -67,7 +67,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
                 UnitId = _ipaddressService.GetUnitId()
             };
 
-            var ApprovalRequest = await _dbConnection.QueryAsync<ApprovalRequest, ApprovalStepDetail, MiscMaster, WorkflowType, ApprovalRequest>(
+            var ApprovalRequest = await _dbConnection.QueryAsync<ApprovalRequest, ApprovalStepDetail, Domain.Entities.Notification.MiscMaster, WorkflowType, ApprovalRequest>(
                 dataQuery,
                 (approvalReq,detail, status, workFlow) =>
                 {
@@ -75,7 +75,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
                      {
                          TargetTypeId = detail.TargetTypeId
                      };
-                     approvalReq.Status = new MiscMaster
+                     approvalReq.Status = new Domain.Entities.Notification.MiscMaster
                      {
                          Code = status.Code
                      };

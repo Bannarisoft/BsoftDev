@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BackgroundService.Application.Notification.Common.Interfaces.IMiscMaster;
+using BackgroundService.Application.Interfaces.IMiscMaster;
 using BackgroundService.Application.Workflow.Common.Interfaces.IApprovalRequest;
 using BackgroundService.Application.Workflow.Common.Interfaces.IWorkflowType;
 using BackgroundService.Domain.Common;
@@ -18,9 +18,9 @@ namespace BackgroundService.Application.Consumer.Workflow
         private readonly IWorkflowTypeQuery _workflowTypeQuery;
         private readonly IApprovalRequestCommand _approvalRequestCommand;
         private readonly IApprovalRequestQuery _approvalRequestQuery;
-        private readonly IMiscMasterQuery _miscMasterQuery;
+        private readonly IMiscMasterQueryRepository _miscMasterQuery;
         public ApprovalRequestConsumer(IWorkflowTypeQuery workflowTypeQuery, IApprovalRequestCommand approvalRequestCommand,
-        IApprovalRequestQuery approvalRequestQuery, IMiscMasterQuery miscMasterQuery)
+        IApprovalRequestQuery approvalRequestQuery, IMiscMasterQueryRepository miscMasterQuery)
         {
             _workflowTypeQuery = workflowTypeQuery;
             _approvalRequestCommand = approvalRequestCommand;

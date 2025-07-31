@@ -13,7 +13,9 @@ namespace BackgroundService.Application.Workflow.ApprovalRules.Queries.GetAllApp
         public string Value { get; set; }
         public string Action { get; set; }
         public int UnitId { get; set; }
+        public string UnitName { get; set; }
         public int WorkflowTypeId { get; set; }
+        public string ModuleTypeName { get; set; }
         public byte IsActive { get; set; }
         public int CreatedBy { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
@@ -21,6 +23,6 @@ namespace BackgroundService.Application.Workflow.ApprovalRules.Queries.GetAllApp
         public int ModifiedBy { get; set; }
         public DateTimeOffset ModifiedDate { get; set; }
         public string ModifiedByName { get; set; }
-        public WorkflowTypeDto WorkflowType { get; set; }
+        // public WorkflowTypeDto WorkflowType { get; set; }
     }
 }

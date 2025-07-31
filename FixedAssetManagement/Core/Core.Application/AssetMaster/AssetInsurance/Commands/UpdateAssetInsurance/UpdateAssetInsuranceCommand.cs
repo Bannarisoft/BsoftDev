@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetInsurance.Commands.UpdateAssetInsurance
 {
-    public class UpdateAssetInsuranceCommand  :   IRequest<ApiResponseDTO<bool>>  
+    public class UpdateAssetInsuranceCommand  :   IRequest<bool>
     {   
         public int Id { get; set; }
          public int  AssetId { get; set; }       

@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Command.UpdateAssetTransferIssue
 {
-    public class UpdateAssetTransferIssueCommand  : IRequest<ApiResponseDTO<int>> 
+    public class UpdateAssetTransferIssueCommand  : IRequest<bool>
     {
        
        public UpdateAssetTransferHdrDto? AssetTransferHdr  { get; set; }

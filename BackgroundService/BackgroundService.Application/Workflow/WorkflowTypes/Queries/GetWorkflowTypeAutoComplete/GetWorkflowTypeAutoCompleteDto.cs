@@ -8,6 +8,6 @@ namespace BackgroundService.Application.Workflow.WorkflowTypes.Queries.GetWorkfl
     public class GetWorkflowTypeAutoCompleteDto
     {
         public int Id { get; set; }
-        public int ModuleTypeName { get; set; }
+        public string ModuleTypeName { get; set; }
     }
 }

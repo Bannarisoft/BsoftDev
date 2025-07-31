@@ -18,16 +18,13 @@ namespace FAM.API.Controllers.AssetPurchase
     {
         private readonly ILogger<AssetPurchaseController> _logger;
         private readonly IMediator _mediator;
-        private readonly IValidator<CreateAssetPurchaseDetailCommand> _createassetpurchasedetailcommandvalidator; 
-        private readonly IValidator<UpdateAssetPurchaseDetailCommand> _updateassetpurchasedetailcommandvalidator; 
 
-        public AssetPurchaseController(ILogger<AssetPurchaseController> logger, IMediator mediator, IValidator<CreateAssetPurchaseDetailCommand> createassetpurchasedetailcommandvalidator, IValidator<UpdateAssetPurchaseDetailCommand> updateassetpurchasedetailcommandvalidator)
+        public AssetPurchaseController(ILogger<AssetPurchaseController> logger, IMediator mediator
+       )
          : base(mediator)
         {
             _logger = logger;
            _mediator = mediator;
-            _createassetpurchasedetailcommandvalidator = createassetpurchasedetailcommandvalidator;
-            _updateassetpurchasedetailcommandvalidator = updateassetpurchasedetailcommandvalidator;
         }
 
          [HttpGet("AssetSource/by-name")]
@@ -38,7 +35,7 @@ namespace FAM.API.Controllers.AssetPurchase
                 SearchPattern = SourceName ?? string.Empty 
         });
 
-        return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetsource.Data });
+        return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetsource });
         }
         [HttpGet("{userName}")]
         public async Task<IActionResult> GetAssetUnitByUser(string userName)
@@ -60,7 +57,7 @@ namespace FAM.API.Controllers.AssetPurchase
             return Ok(new 
             { 
                 StatusCode = StatusCodes.Status200OK, 
-                Data = assetUnits.Data 
+                Data = assetUnits 
             });
         }
 
@@ -79,12 +76,8 @@ namespace FAM.API.Controllers.AssetPurchase
 
             var result = await _mediator.Send(new GetAssetGrnQuery { OldUnitId = oldUnitId,AssetSourceId = assetSourceId ,SearchGrnNo = searchGrnNo });
 
-            if (result == null || !result.IsSuccess || result.Data == null)
-            {
-                return NotFound(new { StatusCode = StatusCodes.Status404NotFound, Message = "No GRN details found" });
-            }
-
-            return Ok(new { StatusCode = StatusCodes.Status200OK, Data = result.Data });
+            
+            return Ok(new { StatusCode = StatusCodes.Status200OK, Data = result });
         }
             [HttpGet("GetGrnItems/{oldUnitId}/{assetSourceId}/{grnNo}")]
             public async Task<IActionResult> GetGrnItems(string oldUnitId, int assetSourceId,  int grnNo)
@@ -100,8 +93,7 @@ namespace FAM.API.Controllers.AssetPurchase
                 var query = new GetAssetGrnItemQuery { OldUnitId = oldUnitId,AssetSourceId = assetSourceId, GrnNo = grnNo };
                 var result = await _mediator.Send(query);
 
-                if (!result.IsSuccess)
-                    return BadRequest(result);
+              
 
                 return Ok(result);
             }
@@ -120,8 +112,7 @@ namespace FAM.API.Controllers.AssetPurchase
                 var query = new GetAssetDetailsQuery { OldUnitId = oldUnitId,AssetSourceId = assetSourceId,GrnNo = grnNo, GrnSerialNo = grnSerialNo };
                 var result = await _mediator.Send(query);
 
-                if (!result.IsSuccess)
-                    return BadRequest(result);
+               
 
                 return Ok(result);
             }
@@ -130,38 +121,17 @@ namespace FAM.API.Controllers.AssetPurchase
             public async Task<IActionResult> CreateAsync(CreateAssetPurchaseDetailCommand createAssetPurchaseDetailCommand)
             {
                 
-                // Validate the incoming command
-                var validationResult = await _createassetpurchasedetailcommandvalidator.ValidateAsync(createAssetPurchaseDetailCommand);
-                if (!validationResult.IsValid)
-                {
-                    
-                    return BadRequest(new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "Validation failed",
-                        errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                    });
-                }
-
-                // Process the command
                 var CreatedAssetPurchaseDetailId = await _mediator.Send(createAssetPurchaseDetailCommand);
 
-                if (CreatedAssetPurchaseDetailId.IsSuccess)
-                {
+              
                 
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message =CreatedAssetPurchaseDetailId.Message,
-                    data = CreatedAssetPurchaseDetailId.Data
+                    message ="AssetPurchaseDetail Created Successfully",
+                    data = CreatedAssetPurchaseDetailId
                 });
-                }
-                
-                return BadRequest(new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = CreatedAssetPurchaseDetailId.Message
-                    });
+             
             
             }
 
@@ -169,37 +139,16 @@ namespace FAM.API.Controllers.AssetPurchase
             public async Task<IActionResult> UpdateAsync(UpdateAssetPurchaseDetailCommand updateAssetPurchaseDetailCommand)
             {
             
-                // Validate the incoming command
-                    var validationResult = await _updateassetpurchasedetailcommandvalidator.ValidateAsync(updateAssetPurchaseDetailCommand);
-                    _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-                    if (!validationResult.IsValid)
-                    {
-                    
-                        return BadRequest(new
-                        {
-                            StatusCode = StatusCodes.Status400BadRequest,
-                            message = "Validation failed",
-                            errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                        });
-                    }
 
-                    var updatedassetpurchasedetail = await _mediator.Send(updateAssetPurchaseDetailCommand);
+                     await _mediator.Send(updateAssetPurchaseDetailCommand);
 
-                    if (updatedassetpurchasedetail.IsSuccess)
-                    {
                     
                     return Ok(new
                         {
-                            message = updatedassetpurchasedetail.Message,
+                            message = "AssetPurchaseDetail Updated Successfully",
                             statusCode = StatusCodes.Status200OK
                         });
-                    }
-            
-                    return NotFound(new
-                    {
-                        message =updatedassetpurchasedetail.Message,
-                        statusCode = StatusCodes.Status404NotFound
-                    });   
+                  
             }
 
         [HttpGet("AssetPurchase/{id}")]
@@ -208,12 +157,11 @@ namespace FAM.API.Controllers.AssetPurchase
         {
             var assetpurchase = await Mediator.Send(new GetAssetPurchaseByIdQuery() { Id = id});
           
-            if(assetpurchase.IsSuccess)
-            {
+          
                 
-              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetpurchase.Data,message = assetpurchase.Message });
-            }
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetpurchase.Message });
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetpurchase,message = assetpurchase });
+            
+            
            
         }
 

@@ -3,12 +3,13 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Commands.DeleteFileAssetWarranty
 {
-    public class DeleteFileAssetWarrantyCommandHandler : IRequestHandler<DeleteFileAssetWarrantyCommand, ApiResponseDTO<bool>>
+    public class DeleteFileAssetWarrantyCommandHandler : IRequestHandler<DeleteFileAssetWarrantyCommand, bool>
     {
         private readonly IFileUploadService _fileUploadService;
         private readonly IAssetWarrantyCommandRepository _assetWarrantyRepository;
@@ -31,7 +32,7 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.DeleteFileAssetWar
             _companyGrpcClient = companyGrpcClient;
         }
 
-       public async Task<ApiResponseDTO<bool>> Handle(DeleteFileAssetWarrantyCommand request, CancellationToken cancellationToken)
+       public async Task<bool> Handle(DeleteFileAssetWarrantyCommand request, CancellationToken cancellationToken)
         {
             var companyId = _ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
@@ -48,7 +49,8 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.DeleteFileAssetWar
             if (string.IsNullOrWhiteSpace(baseDirectory))
             {
                 _logger.LogError("Base directory path not found in database.");
-                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Base directory not configured." };                
+                throw new ValidationException("Base directory not configured.");
+                             
             }
             
             string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);       
@@ -60,9 +62,10 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.DeleteFileAssetWar
             await _assetWarrantyRepository.RemoveAssetWarrantyAsync(request.assetPath);
               if (result)
             {
-                return new ApiResponseDTO<bool> { IsSuccess = true, Message = "File deleted successfully" };
+                return result;
             }
-            return new ApiResponseDTO<bool> { IsSuccess = false, Message = "File deletion failed" };
+            throw new Exception("File deletion failed");
+            
         }
 
     }

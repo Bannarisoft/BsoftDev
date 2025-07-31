@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetGRN
 {
-    public class GetAssetGrnQuery : IRequest<ApiResponseDTO<List<GetAssetGrnDto>>>
+    public class GetAssetGrnQuery : IRequest<List<GetAssetGrnDto>>
     {
         
          public string? OldUnitId { get; set; } 

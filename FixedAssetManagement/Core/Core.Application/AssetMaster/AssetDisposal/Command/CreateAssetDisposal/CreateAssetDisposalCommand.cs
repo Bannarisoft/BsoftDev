@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetDisposal.Command.CreateAssetDisposal
 {
-    public class CreateAssetDisposalCommand :IRequest<ApiResponseDTO<int>> 
+    public class CreateAssetDisposalCommand :IRequest<int>
     {
         public int AssetId { get; set; } 
         public int AssetPurchaseId { get; set; } 

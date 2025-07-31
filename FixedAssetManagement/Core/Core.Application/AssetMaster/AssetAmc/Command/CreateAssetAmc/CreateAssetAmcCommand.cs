@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAmc.Command.CreateAssetAmc
 {
-    public class CreateAssetAmcCommand :IRequest<ApiResponseDTO<int>> 
+    public class CreateAssetAmcCommand :IRequest<int>
     {
         public int AssetId { get; set; } 
         public DateOnly? StartDate { get; set; }

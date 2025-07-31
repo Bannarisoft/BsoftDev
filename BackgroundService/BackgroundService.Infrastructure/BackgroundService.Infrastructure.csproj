@@ -48,6 +48,7 @@
    <ItemGroup>
   <Protobuf Include="..\..\Shared\Contracts\Protos\session.proto" GrpcServices="Client" />
   <Protobuf Include="..\..\Shared\Contracts\Protos\allusers.proto" GrpcServices="Client" />
+  <Protobuf Include="..\..\Shared\Contracts\Protos\unit.proto" GrpcServices="Client" />
 
 </ItemGroup> 
 </Project>

@@ -54,6 +54,18 @@ namespace BackgroundService.Infrastructure
             .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
             services.AddScoped<IUsersAllGrpcClient, GrpcGetAllUserClient>();
 
+            services.AddGrpcClient<UnitService.UnitServiceClient>(options =>
+            {
+                options.Address = new Uri(userManagementUrl);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            })
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicyExtensions.GetCircuitBreakerPolicy());
+            services.AddScoped<IUnitGrpcClient, UnitGrpcClient>();
+
 
         
             return services;

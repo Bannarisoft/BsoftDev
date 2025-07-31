@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetInsurance.Commands.DeleteAssetInsurance
 {
-    public class DeleteAssetInsuranceCommand :  IRequest<ApiResponseDTO<GetAssetInsuranceDto>>
+    public class DeleteAssetInsuranceCommand :  IRequest<bool>
     {
         public int Id { get; set; }  
     }

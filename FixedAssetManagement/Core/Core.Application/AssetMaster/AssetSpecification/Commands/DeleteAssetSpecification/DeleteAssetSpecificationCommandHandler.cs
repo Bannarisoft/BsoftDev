@@ -4,11 +4,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetSpecification;
 using Core.Domain.Entities.AssetMaster;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetSpecification.Commands.DeleteAssetSpecification
 {
-    public class DeleteAssetSpecificationCommandHandler : IRequestHandler<DeleteAssetSpecificationCommand, ApiResponseDTO<AssetSpecificationDTO>>
+    public class DeleteAssetSpecificationCommandHandler : IRequestHandler<DeleteAssetSpecificationCommand, AssetSpecificationDTO>
     {
         private readonly IAssetSpecificationCommandRepository _assetSpecificationRepository;
         private readonly IMapper _mapper;
@@ -23,16 +24,13 @@ namespace Core.Application.AssetMaster.AssetSpecification.Commands.DeleteAssetSp
             _assetSpecificationQueryRepository=assetSpecificationQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<AssetSpecificationDTO>> Handle(DeleteAssetSpecificationCommand request, CancellationToken cancellationToken)
+        public async Task<AssetSpecificationDTO> Handle(DeleteAssetSpecificationCommand request, CancellationToken cancellationToken)
         {             
             var assetSpecifications = await _assetSpecificationQueryRepository.GetByIdAsync(request.Id);
             if (assetSpecifications is null )
             {
-                return new ApiResponseDTO<AssetSpecificationDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid DepreciationGroupID."
-                };
+                throw new ValidationException("Invalid DepreciationGroupID.");
+               
             }
             var assetSpecificationDelete = _mapper.Map<AssetSpecifications>(request);      
             var updateResult = await _assetSpecificationRepository.DeleteAsync(request.Id, assetSpecificationDelete);
@@ -48,18 +46,10 @@ namespace Core.Application.AssetMaster.AssetSpecification.Commands.DeleteAssetSp
                     module:"AssetSpecification"
                 );               
                 await _mediator.Publish(domainEvent, cancellationToken);                 
-                return new ApiResponseDTO<AssetSpecificationDTO>
-                {
-                    IsSuccess = true,
-                    Message = "Asset Specification deleted successfully.",
-                    Data = assetSpecificationDto
-                };
+                return assetSpecificationDto;
             }
-            return new ApiResponseDTO<AssetSpecificationDTO>
-            {
-                IsSuccess = false,
-                Message = "Asset Specification deletion failed."                             
-            };           
+            throw new Exception("Asset Specification deletion failed.");
+                   
         }
     }
 }

@@ -7,12 +7,13 @@ using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Domain.Common;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Serilog;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMasterGeneral
 {
-    public class UpdateAssetMasterGeneralCommandHandler : IRequestHandler<UpdateAssetMasterGeneralCommand, ApiResponseDTO<bool>>
+    public class UpdateAssetMasterGeneralCommandHandler : IRequestHandler<UpdateAssetMasterGeneralCommand, bool>
     {
         private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
@@ -31,15 +32,12 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
             _companyGrpcClient = companyGrpcClient;
         }
 
-        public async Task<ApiResponseDTO<bool>> Handle(UpdateAssetMasterGeneralCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         {
             var assetMaster = await _assetMasterGeneralQueryRepository.GetByIdAsync(request.AssetMaster.Id);
             if (assetMaster is null)
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = false,
-                Message = "Invalid AssetId. The specified AssetName does not exist or is inactive."
-            };
+            throw new ValidationException("Invalid AssetId. The specified AssetName does not exist or is inactive.");
+          
             var oldAssetName = assetMaster.AssetName;
             assetMaster.AssetName = request.AssetMaster.AssetName;
 
@@ -121,17 +119,10 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UpdateAssetMa
                     }
                 }       
                 
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = true,
-                    Message = "AssetMaster updated successfully."                        
-                };
+                return true;
             }
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = false,
-                Message = "AssetMaster not updated."
-            };                          
+            throw new Exception("AssetMaster not updated.");
+                                   
         }
          private void EnsureDirectoryExists(string path)
         {

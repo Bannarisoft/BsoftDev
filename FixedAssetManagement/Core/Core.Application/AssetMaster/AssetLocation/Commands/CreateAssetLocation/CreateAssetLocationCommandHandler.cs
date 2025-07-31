@@ -7,11 +7,12 @@ using Core.Application.AssetLocation.Queries.GetAssetLocation;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetLocation;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetLocation.Commands.CreateAssetLocation
 {
-    public class CreateAssetLocationCommandHandler  : IRequestHandler<CreateAssetLocationCommand, ApiResponseDTO<AssetLocationDto>>
+    public class CreateAssetLocationCommandHandler  : IRequestHandler<CreateAssetLocationCommand, AssetLocationDto>
     {
         private readonly IAssetLocationCommandRepository _assetLocationCommandRepository;
         private readonly IAssetLocationQueryRepository _assetLocationQueryRepository;
@@ -30,19 +31,15 @@ namespace Core.Application.AssetLocation.Commands.CreateAssetLocation
             _assetLocationQueryRepository = assetLocationQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<AssetLocationDto>> Handle(CreateAssetLocationCommand request, CancellationToken cancellationToken)
+        public async Task<AssetLocationDto> Handle(CreateAssetLocationCommand request, CancellationToken cancellationToken)
         {
             // Check if AssetLocation with the same AssetId already exists
             var existingAssetLocation = await _assetLocationQueryRepository.GetByIdAsync(request.AssetId);
             
             if (existingAssetLocation != null)
             {
-                return new ApiResponseDTO<AssetLocationDto>
-                {
-                    IsSuccess = false,
-                    Message = "Asset Location already exists",
-                    Data = null
-                };
+                throw new ValidationException("Asset Location already exists");
+               
             }
 
             // Map request to domain entity
@@ -52,12 +49,8 @@ namespace Core.Application.AssetLocation.Commands.CreateAssetLocation
             var result = await _assetLocationCommandRepository.CreateAsync(assetLocation);
             if (result.Id <= 0)
             {
-                return new ApiResponseDTO<AssetLocationDto>
-                {
-                    IsSuccess = false,
-                    Message = "Failed to create Asset Location",
-                    Data = null
-                };
+                throw new Exception("Failed to create Asset Location");
+               
             }
 
             // Fetch newly created record
@@ -76,12 +69,7 @@ namespace Core.Application.AssetLocation.Commands.CreateAssetLocation
             await _mediator.Publish(domainEvent, cancellationToken);
 
             // Return success response
-            return new ApiResponseDTO<AssetLocationDto>
-            {
-                IsSuccess = true,
-                Message = "Asset Location created successfully",
-                Data = mappedResult
-            };
+            return  mappedResult;
         }
     }
 

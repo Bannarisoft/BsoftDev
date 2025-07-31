@@ -7,11 +7,12 @@ using Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptD
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetTransferReceipt;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRecieptDtlPending
 {
-    public class GetAssetRecieptDtlPendingQueryHandler : IRequestHandler<GetAssetRecieptDtlPendingQuery, ApiResponseDTO<AssetTrasnferReceiptHdrPendingDto>>
+    public class GetAssetRecieptDtlPendingQueryHandler : IRequestHandler<GetAssetRecieptDtlPendingQuery, AssetTrasnferReceiptHdrPendingDto>
     {
         
         private readonly IAssetTransferReceiptQueryRepository _assetTransferReceiptQueryRepository;
@@ -25,25 +26,16 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReci
             _mediator = mediator;   
         }
 
-        public async Task<ApiResponseDTO<AssetTrasnferReceiptHdrPendingDto>> Handle(GetAssetRecieptDtlPendingQuery request, CancellationToken cancellationToken)
+        public async Task<AssetTrasnferReceiptHdrPendingDto> Handle(GetAssetRecieptDtlPendingQuery request, CancellationToken cancellationToken)
         {
              var assetTransfer = await _assetTransferReceiptQueryRepository.GetAssetTransferByIdAsync(request.AssetTransferId);
 
             if (assetTransfer == null)
             {
-                return new ApiResponseDTO<AssetTrasnferReceiptHdrPendingDto>
-                {
-                    IsSuccess = false,
-                    Message = $"Asset Transfer Issue with ID {request.AssetTransferId} not found."
-                
-                };
+                throw new ValidationException($"Asset Transfer Issue with ID {request.AssetTransferId} not found.");
+             
             }
-                return new ApiResponseDTO<AssetTrasnferReceiptHdrPendingDto>
-                {
-                    IsSuccess = true,
-                    Message = "Asset Transfer retrieved successfully.",
-                    Data = assetTransfer
-                };   
+                return  assetTransfer;   
         }
     }
 }

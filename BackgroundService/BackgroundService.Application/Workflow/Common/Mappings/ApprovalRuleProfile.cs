@@ -18,7 +18,7 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
         {
              CreateMap<ApprovalRule, ApprovalRuleDto>()
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
-            .ForMember(dest => dest.WorkflowType, opt => opt.MapFrom(src => src.WorkflowType));
+            .ForMember(dest => dest.ModuleTypeName, opt => opt.MapFrom(src => src.WorkflowType.ModuleTypeName));
 
             CreateMap<WorkflowType, WorkflowTypeDto>();
             CreateMap<CreateApprovalRuleCommand, ApprovalRule>()

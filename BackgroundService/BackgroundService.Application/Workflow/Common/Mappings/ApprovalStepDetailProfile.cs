@@ -24,9 +24,9 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
             .ForMember(dest => dest.ApprovalType, opt => opt.MapFrom(src => src.ApprovalType));
 
             CreateMap<WorkflowType, WorkflowTypeApprovalStepDto>();
-            CreateMap<MiscMaster, ApprovalStepDto>()
+            CreateMap<Domain.Entities.Notification.MiscMaster, ApprovalStepDto>()
             .ForMember(dest => dest.StepName, opt => opt.MapFrom(src => src.Code));
-            CreateMap<MiscMaster, ApprovalTypeDto>()
+            CreateMap<Domain.Entities.Notification.MiscMaster, ApprovalTypeDto>()
             .ForMember(dest => dest.ApproverTypeName, opt => opt.MapFrom(src => src.Code));
 
             CreateMap<CreateApprovalStepDetailCommand, ApprovalStepDetail>()
