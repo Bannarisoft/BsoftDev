@@ -8,10 +8,13 @@ namespace BackgroundService.Application.Workflow.ApprovalStepDetails.Queries.Get
     public class ApprovalStepDetailDto
     {
         public int WorkFlowTypeId { get; set; }
+        public string ModuleTypeName { get; set; }
         public int StepOrder { get; set; }
         public int TargetTypeId { get; set; }
         public int ApprovalStepId { get; set; }
+        public string ApprovalStepName { get; set; }
         public int ApprovalTypeId { get; set; }
+        public string ApprovalTypeName { get; set; }
         public decimal SLAHours { get; set; }
         public string OnSLAAction { get; set; }
         public byte IsActive { get; set; }

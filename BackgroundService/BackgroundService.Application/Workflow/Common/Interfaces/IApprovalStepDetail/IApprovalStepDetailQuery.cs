@@ -8,8 +8,9 @@ namespace BackgroundService.Application.Workflow.Common.Interfaces.IApprovalStep
 {
     public interface IApprovalStepDetailQuery
     {
-         Task<(List<ApprovalStepDetail>, int)> GetAllApprovalStepDetailAsync(int PageNumber, int PageSize, string? SearchTerm);
-        Task<bool> AlreadyExistsAsync(int WorkFlowTypeId,int TargetTypeId,int ApprovalStepId,int ApprovalTypeId, int? id = null);
+        Task<(List<ApprovalStepDetail>, int)> GetAllApprovalStepDetailAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<bool> AlreadyExistsAsync(int WorkFlowTypeId, int TargetTypeId, int ApprovalStepId, int ApprovalTypeId, int? id = null);
         Task<bool> NotFoundAsync(int id);
+        Task<ApprovalStepDetail> GetByIdAsync(int id);
     }
 }

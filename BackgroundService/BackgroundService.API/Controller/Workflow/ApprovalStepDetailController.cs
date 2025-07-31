@@ -7,6 +7,7 @@ using BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.Create
 using BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.DeleteApprovalStepDetail;
 using BackgroundService.Application.Workflow.ApprovalStepDetails.Commands.UpdateApprovalStepDetail;
 using BackgroundService.Application.Workflow.ApprovalStepDetails.Queries.GetAllApprovalStepDetail;
+using BackgroundService.Application.Workflow.ApprovalStepDetails.Queries.GetApprovalStepDetailById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,47 +23,47 @@ namespace BackgroundService.API.Controller.Workflow
         {
             _mediator = mediator;
         }
-           [HttpGet]
-        public async Task<IActionResult> GetAllApprovalStepDetailAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        [HttpGet]
+        public async Task<IActionResult> GetAllApprovalStepDetailAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
         {
-           var ApprovalStep = await Mediator.Send(
-            new GetAllApprovalStepDetailQuery
+            var ApprovalStep = await Mediator.Send(
+             new GetAllApprovalStepDetailQuery
+             {
+                 PageNumber = PageNumber,
+                 PageSize = PageSize,
+                 SearchTerm = SearchTerm
+             });
+            return Ok(new
             {
-                PageNumber = PageNumber, 
-                PageSize = PageSize, 
-                SearchTerm = SearchTerm
-            });
-            return Ok( new 
-            { 
-                StatusCode=StatusCodes.Status200OK, 
+                StatusCode = StatusCodes.Status200OK,
                 data = ApprovalStep.Data,
                 TotalCount = ApprovalStep.TotalCount,
                 PageNumber = ApprovalStep.PageNumber,
                 PageSize = ApprovalStep.PageSize
-                });
+            });
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateApprovalStepDetailCommand createApprovalStepDetailCommand)
-        {            
-            var CreatedApprovalStep = await _mediator.Send(createApprovalStepDetailCommand);            
+        {
+            var CreatedApprovalStep = await _mediator.Send(createApprovalStepDetailCommand);
             return Ok(new
             {
                 StatusCode = StatusCodes.Status201Created,
-                message ="Created successfully.",
+                message = "Created successfully.",
                 data = CreatedApprovalStep
-            });            
-        
+            });
+
         }
         [HttpPut]
         public async Task<IActionResult> UpdateAsync(UpdateApprovalStepDetailCommand updateApprovalStepDetailCommand)
         {
-            await _mediator.Send(updateApprovalStepDetailCommand);            
+            await _mediator.Send(updateApprovalStepDetailCommand);
             return Ok(new
             {
                 message = "Updated successfully.",
                 statusCode = StatusCodes.Status200OK
-            });                
+            });
         }
 
         [HttpDelete]
@@ -74,7 +75,13 @@ namespace BackgroundService.API.Controller.Workflow
                 message = "Deleted successfully.",
                 statusCode = StatusCodes.Status200OK
             });
-        
+
+        }
+        [HttpGet("{id}")]        
+        public async Task<IActionResult> GetByIdAsync(int id)
+        {
+            var ApprovalStep = await Mediator.Send(new GetApprovalStepDetailByIdQuery() { Id = id});           
+            return Ok(new { StatusCode=StatusCodes.Status200OK, data = ApprovalStep,message = "" });            
         }
     }
 }

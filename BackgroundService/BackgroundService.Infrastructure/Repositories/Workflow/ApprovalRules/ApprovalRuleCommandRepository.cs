@@ -30,7 +30,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules
             var ApprovalRuleDelete = await _notificationDbContext.ApprovalRule.FirstOrDefaultAsync(u => u.Id == id);
             if (ApprovalRuleDelete != null)
             {
-                ApprovalRuleDelete.IsDeleted = ApprovalRuleDelete.IsDeleted;
+                ApprovalRuleDelete.IsDeleted = approvalRule.IsDeleted;
                 return await _notificationDbContext.SaveChangesAsync() >0;
             }
             return false; 

@@ -19,10 +19,10 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules
         }
         public async Task<bool> AlreadyExistsAsync(string ConditionKey, string Operator, string Value, string Action, int UnitId, int WorkFlowTypeId, int? id = null)
         {
-             var query = @"SELECT COUNT(1) FROM [AppData].[ApprovalRule] WHERE ConditionKey = @ConditionKey
+            var query = @"SELECT COUNT(1) FROM [AppData].[ApprovalRule] WHERE ConditionKey = @ConditionKey
              
              AND Operator = @Operator AND Value = @Value AND Action = @Action AND UnitId = @UnitId AND WorkflowTypeId = @WorkflowTypeId AND IsDeleted = 0";
-            var parameters = new DynamicParameters(new { ConditionKey,Operator, Value,Action, UnitId, WorkFlowTypeId });
+            var parameters = new DynamicParameters(new { ConditionKey, Operator, Value, Action, UnitId, WorkFlowTypeId });
 
             if (id is not null)
             {
@@ -35,7 +35,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules
 
         public async Task<(List<ApprovalRule>, int)> GetAllApprovalRuleAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
-              const string dataQuery =    @" SELECT 
+            const string dataQuery = @" SELECT 
                 AR.Id, 
                 AR.ConditionKey,
                 AR.Operator,
@@ -53,7 +53,7 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules
                 ORDER BY AR.Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
             ";
-              const string countQuery = @"
+            const string countQuery = @"
               SELECT COUNT(*) 
                FROM [AppData].[ApprovalRule] AR
             INNER JOIN [AppData].[WorkflowType] WorkFlow on WorkFlow.Id=AR.WorkFlowTypeId
@@ -72,18 +72,18 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules
                 dataQuery,
                 (approvalRule, workflow) =>
                 {
-                     approvalRule.WorkflowType = new WorkflowType
-                     {
-                         Id = workflow.Id,
-                         ModuleTypeName = workflow.ModuleTypeName
-                     };
-                   
-                     return approvalRule;
+                    approvalRule.WorkflowType = new WorkflowType
+                    {
+                        Id = workflow.Id,
+                        ModuleTypeName = workflow.ModuleTypeName
+                    };
+
+                    return approvalRule;
                 },
                 parameters,
-                splitOn: "Id"                
+                splitOn: "Id"
                 );
-            
+
             var totalCount = await _dbConnection.ExecuteScalarAsync<int>(countQuery, parameters);
 
             return (ApprovalRule.ToList(), totalCount);
@@ -91,10 +91,20 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRules
 
         public async Task<bool> NotFoundAsync(int id)
         {
-             var query = "SELECT COUNT(1) FROM [AppData].[ApprovalRule]  WHERE Id = @Id AND IsDeleted = 0";
-             
-                var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
-                return count > 0;
+            var query = "SELECT COUNT(1) FROM [AppData].[ApprovalRule]  WHERE Id = @Id AND IsDeleted = 0";
+
+            var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Id = id });
+            return count > 0;
+        }
+         public async Task<List<ApprovalRule>> GetApprovalRuleAutoComplete(string searchPattern)
+        {
+              const string query = @"
+                SELECT Id,ConditionKey,Operator,Value 
+                FROM [AppData].[ApprovalRule] 
+                WHERE IsDeleted = 0 AND IsActive=1 AND ConditionKey LIKE @SearchPattern  OR Value LIKE @SearchPattern";
+                
+            var ApprovalRule = await _dbConnection.QueryAsync<ApprovalRule>(query, new { SearchPattern = $"%{searchPattern}%" });
+            return ApprovalRule.ToList();
         }
     }
 }

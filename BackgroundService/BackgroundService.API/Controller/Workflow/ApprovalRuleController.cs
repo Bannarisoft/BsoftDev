@@ -7,6 +7,7 @@ using BackgroundService.Application.Workflow.ApprovalRules.Commands.CreateApprov
 using BackgroundService.Application.Workflow.ApprovalRules.Commands.DeleteApprovalRule;
 using BackgroundService.Application.Workflow.ApprovalRules.Commands.UpdateApprovalRule;
 using BackgroundService.Application.Workflow.ApprovalRules.Queries.GetAllApprovalRule;
+using BackgroundService.Application.Workflow.ApprovalRules.Queries.GetApprovalRuleAutoComplete;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,46 +24,46 @@ namespace BackgroundService.API.Controller.Workflow
             _mediator = mediator;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllApprovalRuleAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
+        public async Task<IActionResult> GetAllApprovalRuleAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
         {
-           var ApprovalRule = await Mediator.Send(
-            new GetAllApprovalRuleQuery
+            var ApprovalRule = await Mediator.Send(
+             new GetAllApprovalRuleQuery
+             {
+                 PageNumber = PageNumber,
+                 PageSize = PageSize,
+                 SearchTerm = SearchTerm
+             });
+            return Ok(new
             {
-                PageNumber = PageNumber, 
-                PageSize = PageSize, 
-                SearchTerm = SearchTerm
-            });
-            return Ok( new 
-            { 
-                StatusCode=StatusCodes.Status200OK, 
+                StatusCode = StatusCodes.Status200OK,
                 data = ApprovalRule.Data,
                 TotalCount = ApprovalRule.TotalCount,
                 PageNumber = ApprovalRule.PageNumber,
                 PageSize = ApprovalRule.PageSize
-                });
+            });
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateApprovalRuleCommand createApprovalRuleCommand)
-        {            
-            var CreatedApprovalStep = await _mediator.Send(createApprovalRuleCommand);            
+        {
+            var CreatedApprovalStep = await _mediator.Send(createApprovalRuleCommand);
             return Ok(new
             {
                 StatusCode = StatusCodes.Status201Created,
-                message ="Created successfully.",
+                message = "Created successfully.",
                 data = CreatedApprovalStep
-            });            
-        
+            });
+
         }
         [HttpPut]
         public async Task<IActionResult> UpdateAsync(UpdateApprovalRuleCommand updateApprovalRuleCommand)
         {
-            await _mediator.Send(updateApprovalRuleCommand);            
+            await _mediator.Send(updateApprovalRuleCommand);
             return Ok(new
             {
                 message = "Updated successfully.",
                 statusCode = StatusCodes.Status200OK
-            });                
+            });
         }
 
         [HttpDelete]
@@ -74,7 +75,16 @@ namespace BackgroundService.API.Controller.Workflow
                 message = "Deleted successfully.",
                 statusCode = StatusCodes.Status200OK
             });
-        
+
+        }
+        [HttpGet("by-name")]
+        public async Task<IActionResult> GetApprovalRuleAutoCompleteAsync([FromQuery] string? SearchPattern)
+        {
+            var ApprovalRule = await Mediator.Send(new GetApprovalRuleAutoCompleteQuery 
+            { 
+                    SearchPattern = SearchPattern ?? string.Empty 
+            });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = ApprovalRule});
         }
     }
 }

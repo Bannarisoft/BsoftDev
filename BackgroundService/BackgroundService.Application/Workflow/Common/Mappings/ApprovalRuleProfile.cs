@@ -7,6 +7,7 @@ using BackgroundService.Application.Workflow.ApprovalRules.Commands.CreateApprov
 using BackgroundService.Application.Workflow.ApprovalRules.Commands.DeleteApprovalRule;
 using BackgroundService.Application.Workflow.ApprovalRules.Commands.UpdateApprovalRule;
 using BackgroundService.Application.Workflow.ApprovalRules.Queries.GetAllApprovalRule;
+using BackgroundService.Application.Workflow.ApprovalRules.Queries.GetApprovalRuleAutoComplete;
 using BackgroundService.Domain.Entities.Workflow;
 using static BackgroundService.Domain.Common.BaseEntity;
 
@@ -16,9 +17,9 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
     {
         public ApprovalRuleProfile()
         {
-             CreateMap<ApprovalRule, ApprovalRuleDto>()
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
-            .ForMember(dest => dest.ModuleTypeName, opt => opt.MapFrom(src => src.WorkflowType.ModuleTypeName));
+            CreateMap<ApprovalRule, ApprovalRuleDto>()
+           .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == Status.Active ? 1 : 0))
+           .ForMember(dest => dest.ModuleTypeName, opt => opt.MapFrom(src => src.WorkflowType.ModuleTypeName));
 
             CreateMap<WorkflowType, WorkflowTypeDto>();
             CreateMap<CreateApprovalRuleCommand, ApprovalRule>()
@@ -31,9 +32,11 @@ namespace BackgroundService.Application.Workflow.Common.Mappings
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive == 1 ? Status.Active : Status.Inactive));
 
 
-              CreateMap<DeleteApprovalRuleCommand, ApprovalRule>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id)) 
-                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
+            CreateMap<DeleteApprovalRuleCommand, ApprovalRule>()
+              .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+              .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => IsDelete.Deleted));
+                
+                CreateMap<ApprovalRule, ApprovalRuleAutoCompleteDto>(); 
         }
     }
 }

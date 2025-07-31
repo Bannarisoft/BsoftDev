@@ -105,6 +105,63 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalStepDet
             return (ApprovalStep.ToList(), totalCount);
         }
 
+        public async Task<ApprovalStepDetail> GetByIdAsync(int id)
+        {
+            const string query = @"
+                SELECT ASD.Id,ASD.WorkFlowTypeId,ASD.StepOrder,ASD.TargetTypeId,ASD.ApprovalStepId,ASD.ApprovalTypeId,
+                ASD.SLAHours,ASD.OnSLAAction,ASD.IsActive,ASM.Id,ASM.UnitId,ApprovalDept.Id,ApprovalDept.DepartmentId,RSM.Id,RSM.RuleId
+            FROM [AppData].[ApprovalStepDetail] ASD
+            INNER JOIN [AppData].[ApprovalStepUnitMapping] ASM 
+                ON ASM.ApprovalStepDetailId = ASD.Id
+            INNER JOIN [AppData].[ApprovalStepDepartmentMapping] ApprovalDept
+                ON ApprovalDept.ApprovalStepDetailId = ASD.Id
+            LEFT JOIN [AppData].[RuleSkipApproverMapping] RSM
+                ON RSM.ApprovalDetailId = ASD.Id
+            WHERE ASD.IsDeleted = 0 
+              AND ASD.IsActive = 1 AND ASD.Id = @Id;";
+
+              var ApprovalStepDetailDictionary = new Dictionary<int, ApprovalStepDetail>();
+
+            var ApprovalStepDetailResponse = await _dbConnection.QueryAsync<ApprovalStepDetail, ApprovalStepUnitMapping, ApprovalStepDepartmentMapping, RuleSkipApproverMapping,ApprovalStepDetail>(
+                query,
+                (approvalStep, approvalStepUnit, approvalStepDepartment, ruleSkipApprover) =>
+                {
+                    if (!ApprovalStepDetailDictionary.TryGetValue(approvalStep.Id, out var existingApprovalStep))
+                    {
+                        existingApprovalStep = approvalStep;
+                        existingApprovalStep.ApprovalStepUnitMappings = new List<ApprovalStepUnitMapping>();
+                        existingApprovalStep.ApprovalStepDepartmentMappings = new List<ApprovalStepDepartmentMapping>();
+                        existingApprovalStep.RuleSkipApproverMappings = new List<RuleSkipApproverMapping>();
+                        ApprovalStepDetailDictionary[approvalStep.Id] = existingApprovalStep;
+                    }
+
+                    if (!existingApprovalStep.ApprovalStepUnitMappings!
+                        .Any(a => a.Id == approvalStepUnit.Id))
+                    {
+                        existingApprovalStep.ApprovalStepUnitMappings.Add(approvalStepUnit);
+                    }
+
+                     if (!existingApprovalStep.ApprovalStepDepartmentMappings!
+                        .Any(a => a.Id == approvalStepDepartment.Id))
+                    {
+                        existingApprovalStep.ApprovalStepDepartmentMappings.Add(approvalStepDepartment);
+                    }
+                    if (!existingApprovalStep.RuleSkipApproverMappings!
+                        .Any(a => a.Id == ruleSkipApprover.Id))
+                    {
+                        existingApprovalStep.RuleSkipApproverMappings.Add(ruleSkipApprover);
+                    }
+
+                    return existingApprovalStep;
+                },
+                new { id },
+                splitOn: "Id,Id,Id"
+                );
+
+            return ApprovalStepDetailResponse.FirstOrDefault()!;
+         
+        }
+
         public async Task<bool> NotFoundAsync(int id)
         {
              var query = "SELECT COUNT(1) FROM [AppData].[ApprovalStepDetail]  WHERE Id = @Id AND IsDeleted = 0";
