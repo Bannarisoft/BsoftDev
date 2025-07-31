@@ -11,7 +11,7 @@ namespace BackgroundService.Application.Notification.NotificationTemplate.Querie
         public string? FooterTemplate { get; set; }
         public string?  LanguageCode { get; set; }
         public string?  ModuleName { get; set; }
-        public string?  ChannelName { get; set; }
+        public string?  ChannelName { get; set; }        
         public int IsActive { get; set; }
         public int IsDeleted { get; set; }
         public int CreatedBy { get; set; }

@@ -9,6 +9,6 @@ namespace BackgroundService.Application.Notification.NotificationGroupMember.Com
     public class CreateNotificationGroupMemberCommand : IRequest<int>
     {
         public int GroupId { get; set; }
-        public int UserId { get; set; }
+        public List<int> UserIds { get; set; }  
     }
 }

@@ -32,17 +32,20 @@ namespace BackgroundService.API.Validation.NotificationGroupMember
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateNotificationGroupMemberCommand.GroupId)} {rule.Error}");
 
-                            RuleFor(x => x.UserId)
+                            RuleFor(x => x.UserIds)
                             .NotEmpty()
-                            .WithMessage($"{nameof(CreateNotificationGroupMemberCommand.UserId)} {rule.Error}");
-                        break;
-                    case "AlreadyExists":                       
-                        RuleFor(x => new { x.GroupId, x.UserId })
-                          .MustAsync(async (Notification, cancellation) => !await _notificationGroupQuery.AlreadyExistsAsync(Notification.GroupId,Notification.UserId))
-                           .WithName("Group Id")
-                             .WithMessage($"{rule.Error}");
-                        break;
+                            .WithMessage($"{nameof(CreateNotificationGroupMemberCommand.UserIds)} {rule.Error}");
 
+                            RuleFor(x => x.UserIds)
+                                .Must(list => list.Distinct().Count() == list.Count)
+                                .WithMessage("Duplicate UserIds are not allowed in the same request.");
+                        break;
+                      case "AlreadyExists":                          
+                        RuleForEach(x => x.UserIds)
+                            .MustAsync(async (command, userId, cancellation) =>
+                                !await _notificationGroupQuery.AlreadyExistsAsync(command.GroupId, userId))
+                            .WithMessage("UserId '{PropertyValue}' already exists in this group.");                        
+                        break;
                 }
             }
         }

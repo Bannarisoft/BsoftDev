@@ -1,15 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackgroundService.Domain.Entities.Notification;
+
+using BackgroundService.Application.Notification.NotificationGroupMember.Queries.GetAllNotificationGroupMember;
+
 
 namespace BackgroundService.Application.Notification.Common.Interfaces.INotificationGroupMembers
 {
-    public interface INotificationGroupMemberQuery
+    public interface  INotificationGroupMemberQuery
     {
-         Task<(List<NotificationGroupMembers>, int)> GetAllNotificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm);
+         Task<(List<NotificationGroupMemberDto>, int)> GetAllNotificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<bool> AlreadyExistsAsync(int GroupId,int UserId, int? id = null);
-        Task<bool> NotFoundAsync(int id);
+        Task<bool> NotFoundAsync(int groupId);
     }
 }
