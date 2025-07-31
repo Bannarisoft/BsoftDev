@@ -15,14 +15,12 @@ namespace FAM.API.Controllers
 
     public class LocationController : ApiControllerBase
     {
-        private readonly IValidator<CreateLocationCommand> _createLocationCommandValidator;
-        private readonly IValidator<UpdateLocationCommand> _updateLocationCommandValidator;
+        
 
-        public LocationController(ISender mediator, IValidator<CreateLocationCommand> createLocationCommandValidator, IValidator<UpdateLocationCommand> updateLocationCommandValidator)
+        public LocationController(ISender mediator)
         : base(mediator)
         {
-            _createLocationCommandValidator = createLocationCommandValidator;
-            _updateLocationCommandValidator = updateLocationCommandValidator;
+            
         }
         [HttpGet]
         public async Task<IActionResult> GetAllLocationAsync([FromQuery] int PageNumber, [FromQuery] int PageSize, [FromQuery] string? SearchTerm = null)
@@ -48,32 +46,15 @@ namespace FAM.API.Controllers
         public async Task<IActionResult> CreateAsync(CreateLocationCommand createlocationcommand)
         {
 
-            var validationResult = await _createLocationCommandValidator.ValidateAsync(createlocationcommand);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
             var result = await Mediator.Send(createlocationcommand);
-            if (result.IsSuccess)
-            {
+         
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = result.Message,
-                    data = result.Data
+                    message = "Location Created Successfully",
+                    data = result
                 });
-            }
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = result.Message
-            });
+          
 
         }
         [HttpGet("{id}")]
@@ -90,30 +71,18 @@ namespace FAM.API.Controllers
             }
             var result = await Mediator.Send(new GetLocationByIdQuery() { Id = id });
 
-            if (!result.IsSuccess)
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+          
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                data = result.Data
+                data = result
             });
         }
 
         [HttpPut]
         public async Task<IActionResult> Update(UpdateLocationCommand updateLocationcommand)
         {
-            var validationResult = await _updateLocationCommandValidator.ValidateAsync(updateLocationcommand);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.Errors);
-            }
-
+           
 
             var locationExists = await Mediator.Send(new GetLocationByIdQuery { Id = updateLocationcommand.Id });
 
@@ -123,23 +92,14 @@ namespace FAM.API.Controllers
             }
 
             var result = await Mediator.Send(updateLocationcommand);
-            if (result.IsSuccess)
-            {
+          
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = result.Message,
-                    data = result.Data
+                    message = "Location Updated Successfully",
+                    data = result
                 });
-            }
-            else
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = result.Message
-                });
-            }
+           
         }
 
 
@@ -154,21 +114,13 @@ namespace FAM.API.Controllers
                     message = "Invalid Location ID"
                 });
             }
-            var deletedlocation = await Mediator.Send(new DeleteLocationCommand { Id = id });
+             await Mediator.Send(new DeleteLocationCommand { Id = id });
 
-            if (!deletedlocation.IsSuccess)
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = deletedlocation.Message
-                });
-            }
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data = $"Location ID {id} Deleted",
-                message = deletedlocation.Message
+                message = "Location Deleted Successfully"
             });
 
         }
@@ -177,19 +129,12 @@ namespace FAM.API.Controllers
         public async Task<IActionResult> GetLocation([FromQuery] string? name)
         {
             var result = await Mediator.Send(new GetLocationAutoCompleteQuery { SearchPattern = name });
-            if (!result.IsSuccess)
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+         
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
-                data = result.Data
+                message = result,
+                data = result
             });
         }
     }

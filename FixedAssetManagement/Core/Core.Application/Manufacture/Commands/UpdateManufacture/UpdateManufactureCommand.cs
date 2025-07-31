@@ -9,7 +9,7 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.Manufacture.Commands.UpdateManufacture
 {
-    public class UpdateManufactureCommand  : IRequest<ApiResponseDTO<bool>> 
+    public class UpdateManufactureCommand  : IRequest<bool>
     {
         public int Id { get; set; }       
         public string? Code { get; set; }        

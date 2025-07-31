@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.Manufacture.Commands.DeleteManufacture
 {
-    public class DeleteManufactureCommand :  IRequest<ApiResponseDTO<ManufactureDTO>>  
+    public class DeleteManufactureCommand :  IRequest<ManufactureDTO>
     {
         public int Id { get; set; }  
     }

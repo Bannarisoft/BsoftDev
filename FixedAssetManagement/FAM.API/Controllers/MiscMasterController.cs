@@ -25,14 +25,11 @@ namespace FAM.API.Controllers
     public class MiscMasterController : ApiControllerBase
     {
         private readonly ILogger<MiscMaster> _logger;
-        private readonly IValidator<CreateMiscMasterCommand> _miscMasterCommand;
-        private readonly IValidator<UpdateMiscMasterCommand> _updateMiscMasterCommand;
         private readonly IMiscMasterCommandRepository _miscMasterCommandRepository;
-        public MiscMasterController(ISender mediator, IValidator<CreateMiscMasterCommand> miscMasterCommand, IValidator<UpdateMiscMasterCommand> updateMiscMasterCommand, IMiscMasterCommandRepository miscMasterCommandRepository) : base(mediator)
+        public MiscMasterController(ISender mediator,IMiscMasterCommandRepository miscMasterCommandRepository) 
+        : base(mediator)
         {
 
-            _miscMasterCommand = miscMasterCommand;
-            _updateMiscMasterCommand = updateMiscMasterCommand;
             _miscMasterCommandRepository = miscMasterCommandRepository;
 
         }
@@ -65,12 +62,9 @@ namespace FAM.API.Controllers
 
             var miscmaster = await Mediator.Send(new GetMiscMasterByIdQuery() { Id = id });
 
-            if (miscmaster.IsSuccess)
-            {
-                return Ok(new { StatusCode = StatusCodes.Status200OK, data = miscmaster.Data, message = miscmaster.Message });
-            }
-
-            return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = $"MiscMaster ID {id} not found.", errors = "" });
+          
+                return Ok(new { StatusCode = StatusCodes.Status200OK, data = miscmaster, message = miscmaster });
+           
 
         }
         [HttpGet("by-name")]
@@ -78,47 +72,25 @@ namespace FAM.API.Controllers
         {
 
             var miscmaster = await Mediator.Send(new GetMiscMasterAutoCompleteQuery { MiscTypeName = name, MiscTypeCode = MiscTypeCode });
-            if (miscmaster.IsSuccess)
-            {
-                return Ok(new { StatusCode = StatusCodes.Status200OK, data = miscmaster.Data });
-            }
-            return NotFound(new { StatusCode = miscmaster.Message });
+          
+                return Ok(new { StatusCode = StatusCodes.Status200OK, data = miscmaster });
+          
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateMiscMasterCommand command)
         {
-            var validationResult = await _miscMasterCommand.ValidateAsync(command);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
-
+            
             var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
+         
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = response.Message,
+                    message = "MiscMaster created successfully",
                     errors = "",
-                    data = response.Data
+                    data = response
                 });
-            }
-
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = response.Message,
-                errors = ""
-            });
+          
 
         }
         [HttpPut]
@@ -127,17 +99,6 @@ namespace FAM.API.Controllers
         {
 
 
-            // Validate the command
-            var validationResult = await _updateMiscMasterCommand.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation Failed",
-                    Errors = validationResult.Errors
-                });
-            }
 
             // Check if the record exists
             var miscMasterExists = await Mediator.Send(new GetMiscMasterByIdQuery { Id = command.Id });
@@ -164,39 +125,26 @@ namespace FAM.API.Controllers
             }
 
             // Update the record
-            var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
+             await Mediator.Send(command);
+        
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status200OK,
-                    Message = response.Message,
+                    Message = "MiscMaster updated successfully",
                     Errors = ""
                 });
-            }
-
-            // If update failed
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = response.Message,
-                Errors = ""
-            });
+         
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
 
-            var updatedMiscMaster = await Mediator.Send(new DeleteMiscMasterCommand { Id = id });
+             await Mediator.Send(new DeleteMiscMasterCommand { Id = id });
 
-            if (updatedMiscMaster.IsSuccess)
-            {
-                return Ok(new { StatusCode = StatusCodes.Status200OK, message = updatedMiscMaster.Message, errors = "" });
+           
+                return Ok(new { StatusCode = StatusCodes.Status200OK, message = "MiscMaster deleted successfully", errors = "" });
 
-            }
-
-            return BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, message = updatedMiscMaster.Message, errors = "" });
-
+    
         }
 
         [HttpPost("import")]

@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.MiscTypeMaster.Queries.GetMiscTypeMaster;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.MiscTypeMaster.Queries.GetMiscTypeMasterAutoComplete
 {
-    public class GetMiscTypeMasterAutoCompleteQueryHandler : IRequestHandler<GetMiscTypeMasterAutoCompleteQuery,ApiResponseDTO<List<GetMiscTypeMasterAutocompleteDto>>>
+    public class GetMiscTypeMasterAutoCompleteQueryHandler : IRequestHandler<GetMiscTypeMasterAutoCompleteQuery,List<GetMiscTypeMasterAutocompleteDto>>
     {
          private readonly IMiscTypeMasterQueryRepository _miscTypeMasterQueryRepository;
         private readonly IMapper _mapper;
@@ -24,18 +25,14 @@ namespace Core.Application.MiscTypeMaster.Queries.GetMiscTypeMasterAutoComplete
             _mediator = mediator;
          }
 
-        public  async Task<ApiResponseDTO<List<GetMiscTypeMasterAutocompleteDto>>> Handle(GetMiscTypeMasterAutoCompleteQuery request, CancellationToken cancellationToken)
+        public  async Task<List<GetMiscTypeMasterAutocompleteDto>> Handle(GetMiscTypeMasterAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var miscTypeMasters  = await _miscTypeMasterQueryRepository.GetMiscTypeMaster(request.SearchPattern);
 
                     if (miscTypeMasters == null || !miscTypeMasters.Any())
             {
-                return new ApiResponseDTO<List<GetMiscTypeMasterAutocompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"No Misc Type Masters found matching '{request.SearchPattern}'.",
-                    Data = new List<GetMiscTypeMasterAutocompleteDto>()
-                };
+                throw new ValidationException($"No Misc Type Masters found matching '{request.SearchPattern}'.");
+             
             }
 
             var division = _mapper.Map<List<GetMiscTypeMasterAutocompleteDto>>(miscTypeMasters);
@@ -48,7 +45,7 @@ namespace Core.Application.MiscTypeMaster.Queries.GetMiscTypeMasterAutoComplete
                     module:"Division"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetMiscTypeMasterAutocompleteDto>> { IsSuccess = true, Message = "Success", Data = division }; 
+            return division; 
         }
     }
 }

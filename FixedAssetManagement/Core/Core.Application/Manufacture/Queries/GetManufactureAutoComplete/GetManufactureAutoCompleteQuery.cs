@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.Manufacture.Queries.GetManufactureAutoComplete
 {
-    public class GetManufactureAutoCompleteQuery : IRequest<ApiResponseDTO<List<ManufactureAutoCompleteDTO>>>
+    public class GetManufactureAutoCompleteQuery : IRequest<List<ManufactureAutoCompleteDTO>>
     {
          public string? SearchPattern { get; set; }
     }

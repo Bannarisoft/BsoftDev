@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MiscMaster.Command.UpdateMiscMaster
 {
-    public class UpdateMiscMasterCommand : IRequest<ApiResponseDTO<bool>>
+    public class UpdateMiscMasterCommand : IRequest<bool>
     {
         
          

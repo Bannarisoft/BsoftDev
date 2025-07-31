@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster
 {
-    public class DeleteMiscTypeMasterCommandHandler : IRequestHandler<DeleteMiscTypeMasterCommand, ApiResponseDTO<GetMiscTypeMasterDto>>
+    public class DeleteMiscTypeMasterCommandHandler : IRequestHandler<DeleteMiscTypeMasterCommand, bool>
     {
 
         private readonly IMiscTypeMasterCommandRepository _miscTypeMasterCommandRepository;
@@ -28,7 +28,7 @@ namespace Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<GetMiscTypeMasterDto>> Handle(DeleteMiscTypeMasterCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteMiscTypeMasterCommand request, CancellationToken cancellationToken)
         {
              var misctypemaster  = _imapper.Map<Core.Domain.Entities.MiscTypeMaster>(request);
             var misctyperesult = await _miscTypeMasterCommandRepository.DeleteAsync(request.Id, misctypemaster);
@@ -46,10 +46,10 @@ namespace Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster
 
                  if(misctyperesult)
                 {
-                    return new ApiResponseDTO<GetMiscTypeMasterDto>{IsSuccess = true, Message = "MiscTypeMaster deleted successfully."};
+                    return misctyperesult;
                 }
-
-                return new ApiResponseDTO<GetMiscTypeMasterDto>{IsSuccess = false, Message = "MiscTypeMaster not deleted."};
+            throw new Exception("MiscTypeMaster not deleted.");
+                
             
         }
     }

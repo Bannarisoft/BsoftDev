@@ -115,8 +115,8 @@ namespace FAM.API.Controllers
             return Ok(new 
             { 
                 StatusCode = StatusCodes.Status200OK, 
-                message = assetMaster.Message,
-                data = assetMaster.Data?.ToList()               
+                message = assetMaster,
+                data = assetMaster?.ToList()               
             });
         }
         [HttpPost]               
@@ -135,38 +135,24 @@ namespace FAM.API.Controllers
         public async Task<IActionResult> DeleteAsync(DeleteDepreciationDetailCommand  command)
         {             
             var result = await Mediator.Send(new DeleteDepreciationDetailCommand { companyId=command.companyId,unitId=command.unitId,finYearId=command.finYearId,depreciationType=command.depreciationType,depreciationPeriod=command.depreciationPeriod});                 
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new     
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+           
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data =$"Depreciation Details Deleted" ,
-                message = result.Message
+                message = result
             });
         }
          [HttpPut]        
         public async Task<IActionResult> UpdateAsync(DeleteDepreciationDetailCommand  command)
         {             
             var result = await Mediator.Send(new UpdateDepreciationDetailCommand { companyId=command.companyId,unitId=command.unitId,finYearId=command.finYearId,depreciationType=command.depreciationType,depreciationPeriod=command.depreciationPeriod});                 
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new     
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+           
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data =$"Depreciation Details Locked" ,
-                message = result.Message
+                message = result
             });
         }            // GET: api/AssetMasterGeneral/WorkingStatus
        
@@ -174,14 +160,7 @@ namespace FAM.API.Controllers
         public async Task<IActionResult> GetDepreciationMethod()
         {
             var result = await Mediator.Send(new GetDepreciationMethodQuery());
-            if (result == null || result.Data == null || result.Data.Count == 0)
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = "No Working Status found."
-                });
-            }
+          
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,

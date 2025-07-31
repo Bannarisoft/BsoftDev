@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.MiscTypeMaster.Queries.GetMiscTypeMaster;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster
 {
-    public class CreateMiscTypeMasterCommandHandler : IRequestHandler<CreateMiscTypeMasterCommand, ApiResponseDTO<GetMiscTypeMasterDto>>
+    public class CreateMiscTypeMasterCommandHandler : IRequestHandler<CreateMiscTypeMasterCommand, GetMiscTypeMasterDto>
     {
               private readonly IMiscTypeMasterCommandRepository _miscTypeMasterCommandRepository;
         private readonly IMapper _imapper;
@@ -25,19 +26,15 @@ namespace Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster
             _miscTypeMasterQueryRepository = miscTypeMasterQueryRepository   ;
         }
 
-        public async Task<ApiResponseDTO<GetMiscTypeMasterDto>> Handle(CreateMiscTypeMasterCommand request, CancellationToken cancellationToken)
+        public async Task<GetMiscTypeMasterDto> Handle(CreateMiscTypeMasterCommand request, CancellationToken cancellationToken)
         {
                // 🔹 Check if a MiscTypeMaster with the same name already exists
             var existingMiscTypeMaster = await _miscTypeMasterQueryRepository.GetByMiscTypeMasterCodeAsync(request.MiscTypeCode);
 
             if (existingMiscTypeMaster != null)
             {
-                return new ApiResponseDTO<GetMiscTypeMasterDto>
-                {
-                    IsSuccess = false,
-                    Message = "Misc Type Master already exists",
-                    Data = null
-                };
+                throw new ValidationException("Misc Type Master already exists");
+               
             }
 
             // 🔹 Map request to domain entity
@@ -48,12 +45,8 @@ namespace Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster
              var result = await _miscTypeMasterCommandRepository.CreateAsync(miscTypeMaster);
               if (result.Id <= 0)
                 {
-                return new ApiResponseDTO<GetMiscTypeMasterDto>
-                {
-                    IsSuccess = false,
-                    Message = "Failed to create Misc Type Master",
-                    Data = null
-                };
+                    throw new Exception("Failed to create Misc Type Master");
+               
             }
 
             // 🔹 Fetch newly created record
@@ -72,12 +65,7 @@ namespace Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster
             await _mediator.Publish(domainEvent, cancellationToken);
 
             // 🔹 Return success response
-            return new ApiResponseDTO<GetMiscTypeMasterDto>
-            {
-                IsSuccess = true,
-                Message = "Misc Type Master created successfully",
-                Data = mappedResult
-            };
+            return  mappedResult;
 
         }
     }
