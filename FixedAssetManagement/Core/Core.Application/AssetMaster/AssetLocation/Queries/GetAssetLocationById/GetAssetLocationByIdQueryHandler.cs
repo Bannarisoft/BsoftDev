@@ -7,12 +7,13 @@ using Core.Application.AssetLocation.Queries.GetAssetLocation;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetLocation;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetLocation.Queries.GetAssetLocationById
 {
  
-    public class GetAssetLocationByIdQueryHandler : IRequestHandler<GetAssetLocationByIdQuery, ApiResponseDTO<AssetLocationDto>>
+    public class GetAssetLocationByIdQueryHandler : IRequestHandler<GetAssetLocationByIdQuery, AssetLocationDto>
     {
         private readonly IAssetLocationQueryRepository _assetLocationRepository;
         private readonly IMapper _mapper;
@@ -26,7 +27,7 @@ namespace Core.Application.AssetLocation.Queries.GetAssetLocationById
         }
 
  
-      public async Task<ApiResponseDTO<AssetLocationDto>> Handle(GetAssetLocationByIdQuery request, CancellationToken cancellationToken)
+      public async Task<AssetLocationDto> Handle(GetAssetLocationByIdQuery request, CancellationToken cancellationToken)
         {
              var assetLocation = await _assetLocationRepository.GetByIdAsync(request.Id);
            
@@ -35,12 +36,9 @@ namespace Core.Application.AssetLocation.Queries.GetAssetLocationById
          
 
             if (assetLocation is null)
-            {                
-                return new ApiResponseDTO<AssetLocationDto>
-                {
-                    IsSuccess = false,
-                    Message = "AssetLocation with ID {request.Id} not found."
-                };   
+            {       
+                throw new ValidationException("AssetLocation with ID {request.Id} not found.");         
+  
             }       
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -51,12 +49,7 @@ namespace Core.Application.AssetLocation.Queries.GetAssetLocationById
                 module:"AssetMasterGeneral"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<AssetLocationDto>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = assetlocationDto
-            };       
+            return  assetlocationDto;       
         }
 
        

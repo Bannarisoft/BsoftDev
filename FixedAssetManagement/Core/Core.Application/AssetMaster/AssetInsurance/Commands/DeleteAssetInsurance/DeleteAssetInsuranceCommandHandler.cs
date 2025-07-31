@@ -13,20 +13,20 @@ using Core.Domain.Events;
 
 namespace Core.Application.AssetMaster.AssetInsurance.Commands.DeleteAssetInsurance
 {
-    public class DeleteAssetInsuranceCommandHandler    : IRequestHandler<DeleteAssetInsuranceCommand, ApiResponseDTO<GetAssetInsuranceDto>>
+    public class DeleteAssetInsuranceCommandHandler    : IRequestHandler<DeleteAssetInsuranceCommand, bool>
     {  
         private readonly IAssetInsuranceCommandRepository? _assetInsuranceCommandRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator; 
-        private readonly  IAssetInsuranceQueryRepository? _assetInsuranceQueryRepository;
-        public DeleteAssetInsuranceCommandHandler(IAssetInsuranceCommandRepository assetInsuranceCommandRepository , IMapper mapper,  IMediator mediator, IAssetInsuranceQueryRepository assetInsuranceQueryRepository )
+        public DeleteAssetInsuranceCommandHandler(IAssetInsuranceCommandRepository assetInsuranceCommandRepository , IMapper mapper,  IMediator mediator
+         )
         {
             _assetInsuranceCommandRepository = assetInsuranceCommandRepository;
              _mapper = mapper;        
             _mediator = mediator;
-            _assetInsuranceQueryRepository=assetInsuranceQueryRepository;
+            
         }
-        public async Task<ApiResponseDTO<GetAssetInsuranceDto>> Handle(DeleteAssetInsuranceCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteAssetInsuranceCommand request, CancellationToken cancellationToken)
         {
               // Map the request to the entity
             var assetInsuranceDelete = _mapper.Map<Core.Domain.Entities.AssetMaster.AssetInsurance>(request);
@@ -47,18 +47,10 @@ namespace Core.Application.AssetMaster.AssetInsurance.Commands.DeleteAssetInsura
             // Return the response based on the result
             if (isDeleted)
             {
-                return new ApiResponseDTO<GetAssetInsuranceDto>
-                {
-                    IsSuccess = true,
-                    Message = "AssetInsurance deleted successfully."
-                };
+                return isDeleted;
             }
-
-            return new ApiResponseDTO<GetAssetInsuranceDto>
-            {
-                IsSuccess = false,
-                Message = "AssetInsurance not deleted."
-            };
+            throw new Exception("AssetInsurance not deleted.");
+          
         }
        
     }

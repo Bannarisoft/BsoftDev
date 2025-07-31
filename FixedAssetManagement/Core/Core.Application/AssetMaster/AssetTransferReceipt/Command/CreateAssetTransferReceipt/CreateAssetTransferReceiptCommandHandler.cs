@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferReceipt.Command.CreateAssetTransferReceipt
 {
-    public class CreateAssetTransferReceiptCommandHandler : IRequestHandler<CreateAssetTransferReceiptCommand, ApiResponseDTO<int>>
+    public class CreateAssetTransferReceiptCommandHandler : IRequestHandler<CreateAssetTransferReceiptCommand, int>
     {
         private readonly IAssetTransferReceiptCommandRepository _iassettransferreceiptcommandrepository;
         private readonly IAssetTransferReceiptQueryRepository _iassettransferreceiptqueryrepository;
@@ -31,7 +31,7 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Command.CreateAssetT
             _iassettransferreceiptqueryrepository=iassettransferreceiptqueryrepository;
 
         }
-        public async Task<ApiResponseDTO<int>> Handle(CreateAssetTransferReceiptCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateAssetTransferReceiptCommand request, CancellationToken cancellationToken)
         {
 
             //Asset Location Mapping
@@ -80,20 +80,11 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Command.CreateAssetT
                   await _imediator.Publish(domainEvent, cancellationToken);
                   if (result > 0)
                   {
-                       return new ApiResponseDTO<int>
-                        {
-                            IsSuccess = true,
-                            Message = existingReceipt is null 
-                                ? "Asset Transfer Receipt created successfully" 
-                                : "Asset Transfer Receipt updated successfully",
-                            Data = result
-                        };
-                                }
-                 return new ApiResponseDTO<int>
-                  {
-                      IsSuccess = false,
-                      Message = "Asset Transfer Receipt could not be processed"
-                  };
+                       return  result;
+                               
+                    }
+                    throw new Exception("Asset Transfer Receipt could not be processed");
+                 
         }
     }
 }

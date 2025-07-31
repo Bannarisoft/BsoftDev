@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetParentMaster
 {
-    public class GetAssetParentMasterQuery : IRequest<ApiResponseDTO<List<AssetMasterGeneralAutoCompleteDTO>>>
+    public class GetAssetParentMasterQuery : IRequest<List<AssetMasterGeneralAutoCompleteDTO>>
     {
         public string? AssetType { get; set; }
     }

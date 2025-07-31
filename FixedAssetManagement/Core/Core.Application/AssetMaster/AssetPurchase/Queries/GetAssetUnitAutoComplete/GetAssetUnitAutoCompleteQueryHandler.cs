@@ -12,7 +12,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetPurchase.Queries
 {
-    public class GetAssetUnitAutoCompleteQueryHandler  :  IRequestHandler<GetAssetUnitAutoCompleteQuery,ApiResponseDTO<List<AssetUnitAutoCompleteDto>>>
+    public class GetAssetUnitAutoCompleteQueryHandler  :  IRequestHandler<GetAssetUnitAutoCompleteQuery,List<AssetUnitAutoCompleteDto>>
     {
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
@@ -27,7 +27,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries
         }
 
 
-        public async Task<ApiResponseDTO<List<AssetUnitAutoCompleteDto>>> Handle(GetAssetUnitAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<AssetUnitAutoCompleteDto>> Handle(GetAssetUnitAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetPurchaseQueryRepository.GetAssetUnit(request.Username);
             var assetunits  = _mapper.Map<List<AssetUnitAutoCompleteDto>>(result);
@@ -40,7 +40,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries
                     module:"Assetunit"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<AssetUnitAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = assetunits };
+            return assetunits;
         }
     }
 }

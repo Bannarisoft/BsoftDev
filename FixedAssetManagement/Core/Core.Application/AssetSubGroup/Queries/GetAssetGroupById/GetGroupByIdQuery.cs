@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.AssetSubGroup.Queries.GetAssetGroupById
 {
-    public class GetGroupByIdQuery : IRequest<ApiResponseDTO<List<AssetSubGroupDto>>>
+    public class GetGroupByIdQuery : IRequest<List<AssetSubGroupDto>>
     {
         public int GroupId { get; set; }        
     }

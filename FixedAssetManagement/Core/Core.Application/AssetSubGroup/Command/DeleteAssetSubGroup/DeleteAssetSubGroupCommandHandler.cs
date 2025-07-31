@@ -2,12 +2,13 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetSubGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AssetSubGroup.Command.DeleteAssetSubGroup
 {
-    public class DeleteAssetSubGroupCommandHandler : IRequestHandler<DeleteAssetSubGroupCommand, ApiResponseDTO<int>>
+    public class DeleteAssetSubGroupCommandHandler : IRequestHandler<DeleteAssetSubGroupCommand, int>
     {
         private readonly IAssetSubGroupCommandRepository _iAssetSubGroupCommandRepository;
         private readonly IAssetSubGroupQueryRepository _iAssetSubGroupQueryRepository;
@@ -24,7 +25,7 @@ namespace Core.Application.AssetSubGroup.Command.DeleteAssetSubGroup
             _iAssetSubGroupQueryRepository = iAssetSubGroupQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(DeleteAssetSubGroupCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(DeleteAssetSubGroupCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Starting DeleteAssetSubGroupCommandHandler for request: {request}");
 
@@ -33,11 +34,8 @@ namespace Core.Application.AssetSubGroup.Command.DeleteAssetSubGroup
             if (existingAssetSubGroup is null)
             {
                 _logger.LogWarning($"AssetSubGroup ID {request.Id} not found.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "AssetSubGroup Id not found / AssetSubGroup is deleted ."
-                };
+                throw new ValidationException("AssetSubGroup Id not found / AssetSubGroup is deleted .");
+               
             }
 
             var assetSubGroup = _IMapper.Map<Core.Domain.Entities.AssetSubGroup>(request);
@@ -45,7 +43,8 @@ namespace Core.Application.AssetSubGroup.Command.DeleteAssetSubGroup
             if (result == -1) 
             {
             _logger.LogInformation($"AssetSubGroup {request.Id} not found.");
-             return new ApiResponseDTO<int> { IsSuccess = false, Message = "AssetSubGroupId not found."};
+            throw new ValidationException("AssetSubGroupId not found.");
+             
             }
 
             //Domain Event
@@ -58,13 +57,7 @@ namespace Core.Application.AssetSubGroup.Command.DeleteAssetSubGroup
             await _mediator.Publish(domainEvent);
             _logger.LogInformation($"AssetSubGroup {assetSubGroup.SubGroupName} Deleted successfully.");
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,   
-                Data = result,
-                Message = "AssetSubGroup deleted successfully."
-    
-            };
+            return  result;
         }
     }
 }

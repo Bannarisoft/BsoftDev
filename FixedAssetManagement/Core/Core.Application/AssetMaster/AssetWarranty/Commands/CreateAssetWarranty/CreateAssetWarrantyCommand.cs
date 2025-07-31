@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Commands.CreateAssetWarranty
 {
-    public class CreateAssetWarrantyCommand : IRequest<ApiResponseDTO<AssetWarrantyDTO>>  
+    public class CreateAssetWarrantyCommand : IRequest<AssetWarrantyDTO>
     { 
         public int AssetId { get; set; }
         public DateOnly? StartDate { get; set; } 

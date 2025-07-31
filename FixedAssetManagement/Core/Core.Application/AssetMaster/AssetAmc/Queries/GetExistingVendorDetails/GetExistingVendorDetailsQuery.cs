@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAmc.Queries.GetExistingVendorDetails
 {
-    public class GetExistingVendorDetailsQuery : IRequest<ApiResponseDTO<List<GetExistingVendorDetailsDto>>>
+    public class GetExistingVendorDetailsQuery : IRequest<List<GetExistingVendorDetailsDto>>
     {
         public string? OldUnitCode { get; set; }
         public string? VendorCode { get; set; }

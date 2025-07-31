@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.AssetGroup.Queries.GetAssetGroupAutoComplete
 {
-    public class GetAssetGroupAutoCompleteQueryHandler: IRequestHandler<GetAssetGroupAutoCompleteQuery,ApiResponseDTO<List<AssetGroupAutoCompleteDTO>>>
+    public class GetAssetGroupAutoCompleteQueryHandler: IRequestHandler<GetAssetGroupAutoCompleteQuery,List<AssetGroupAutoCompleteDTO>>
     {
         private readonly IAssetGroupQueryRepository _iAssetGroupQueryRepository;
         private readonly IMapper _mapper;
@@ -24,7 +24,7 @@ namespace Core.Application.AssetGroup.Queries.GetAssetGroupAutoComplete
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<AssetGroupAutoCompleteDTO>>> Handle(GetAssetGroupAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<AssetGroupAutoCompleteDTO>> Handle(GetAssetGroupAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetGroupQueryRepository.GetAssetGroups(request.SearchPattern);
             var assetGroups = _mapper.Map<List<AssetGroupAutoCompleteDTO>>(result);
@@ -37,7 +37,7 @@ namespace Core.Application.AssetGroup.Queries.GetAssetGroupAutoComplete
                     module:"AssetGroup"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<AssetGroupAutoCompleteDTO>> { IsSuccess = true, Message = "Success", Data = assetGroups };
+            return assetGroups;
         }
     }
 }

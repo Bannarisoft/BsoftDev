@@ -4,11 +4,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Application.DepreciationGroup.Queries.GetDepreciationGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralAutoComplete
 {
-    public class GetAssetMasterGeneralAutoCompleteQueryHandler : IRequestHandler<GetAssetMasterGeneralAutoCompleteQuery, ApiResponseDTO<List<AssetMasterGeneralAutoCompleteDTO>>>
+    public class GetAssetMasterGeneralAutoCompleteQueryHandler : IRequestHandler<GetAssetMasterGeneralAutoCompleteQuery, List<AssetMasterGeneralAutoCompleteDTO>>
     {
         private readonly IAssetMasterGeneralQueryRepository _assetMasterRepository;
         private readonly IMapper _mapper;
@@ -20,16 +21,13 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
             _mapper =mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<List<AssetMasterGeneralAutoCompleteDTO>>> Handle(GetAssetMasterGeneralAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<AssetMasterGeneralAutoCompleteDTO>> Handle(GetAssetMasterGeneralAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _assetMasterRepository.GetByAssetNameAsync(request.SearchPattern ?? string.Empty);
             if (result is null || result.Count is 0)
             {
-                return new ApiResponseDTO<List<AssetMasterGeneralAutoCompleteDTO>>
-                {
-                    IsSuccess = false,
-                    Message = "No Asset found matching the search pattern."
-                };
+                throw new ValidationException("No Asset found matching the search pattern."); 
+              
             }
             var assetMasterDto = _mapper.Map<List<AssetMasterGeneralAutoCompleteDTO>>(result);
             //Domain Event
@@ -41,12 +39,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
                 module:"AssetMasterGeneral"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<AssetMasterGeneralAutoCompleteDTO>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = assetMasterDto
-            };  
+            return  assetMasterDto;  
         }
     }
 }

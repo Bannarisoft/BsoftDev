@@ -22,19 +22,13 @@ namespace FAM.API.Controllers
     public class AssetSubCategoriesController  : ApiControllerBase
     {
         private readonly ILogger<AssetSubCategoriesController> _logger;
-        private readonly ApplicationDbContext _dbContext;
         private readonly IMediator _mediator;
-        private readonly IValidator<CreateAssetSubCategoriesCommand> _createassetsubcategoriescommandvalidator;
-        private readonly IValidator<UpdateAssetSubCategoriesCommand> _updateassetsubcategoriescommandvalidator;
 
-        public AssetSubCategoriesController(ILogger<AssetSubCategoriesController> logger, IMediator mediator, ApplicationDbContext dbContext,IValidator<CreateAssetSubCategoriesCommand>  createassetsubcategoriescommandvalidator,IValidator<UpdateAssetSubCategoriesCommand> updateassetsubcategoriescommandvalidator)
+        public AssetSubCategoriesController(ILogger<AssetSubCategoriesController> logger, IMediator mediator)
         :base(mediator)
         {
             _logger = logger;
             _mediator = mediator;
-            _dbContext = dbContext;
-            _createassetsubcategoriescommandvalidator=createassetsubcategoriescommandvalidator;
-            _updateassetsubcategoriescommandvalidator=updateassetsubcategoriescommandvalidator;
 
         }
          [HttpGet]
@@ -67,7 +61,7 @@ namespace FAM.API.Controllers
                 SearchPattern = subcategoryname ?? string.Empty 
         });
 
-        return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetsubcategoriesgroups.Data });
+        return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetsubcategoriesgroups });
         }
 
         [HttpGet("{id}")]
@@ -76,112 +70,53 @@ namespace FAM.API.Controllers
         {
             var assetsubcategoriesgroups = await Mediator.Send(new GetAssetSubCategoriesByIdQuery() { Id = id});
           
-            if(assetsubcategoriesgroups.IsSuccess)
-            {
                 
-              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetsubcategoriesgroups.Data,message = assetsubcategoriesgroups.Message });
-            }
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetsubcategoriesgroups.Message });
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetsubcategoriesgroups,message = assetsubcategoriesgroups });
            
         }
-        [HttpPost]
+     [HttpPost]
 public async Task<IActionResult> CreateAsync(CreateAssetSubCategoriesCommand createAssetsubCategoriesCommand)
 {
-     // Validate the incoming command
-    var validationResult = await _createassetsubcategoriescommandvalidator.ValidateAsync(createAssetsubCategoriesCommand);
   
-    if (!validationResult.IsValid)
-    {
-        
-        return BadRequest(new
-        {
-            StatusCode = StatusCodes.Status400BadRequest,
-            message = "Validation failed",
-            errors = validationResult.Errors.Select(e => e.ErrorMessage)
-        });
-    }
-
-    // Process the command
     var CreatedAssetsubCategoriesId = await _mediator.Send(createAssetsubCategoriesCommand);
 
-    if (CreatedAssetsubCategoriesId.IsSuccess)
-    {
-     
+  
       return Ok(new
       {
           StatusCode = StatusCodes.Status201Created,
-          message =CreatedAssetsubCategoriesId.Message,
-          data = CreatedAssetsubCategoriesId.Data
+          message ="AssetSubCategories Created Successfully",
+          data = CreatedAssetsubCategoriesId
       });
-    }
-     
-      return BadRequest(new
-        {
-            StatusCode = StatusCodes.Status400BadRequest,
-            message = CreatedAssetsubCategoriesId.Message
-        });
-  
+   
 }
 [HttpPut]
 public async Task<IActionResult> UpdateAsync(UpdateAssetSubCategoriesCommand updateAssetsubCategoriesCommand)
 {
   
-        // Validate the incoming command
-        var validationResult = await _updateassetsubcategoriescommandvalidator.ValidateAsync(updateAssetsubCategoriesCommand);
-       
-        if (!validationResult.IsValid)
-        {
-           
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = "Validation failed",
-                errors = validationResult.Errors.Select(e => e.ErrorMessage)
-            });
-        }
+      
 
-        var updatedassetsubcategories = await _mediator.Send(updateAssetsubCategoriesCommand);
+         await _mediator.Send(updateAssetsubCategoriesCommand);
 
-        if (updatedassetsubcategories.IsSuccess)
-        {
            
            return Ok(new
             {
-                message = updatedassetsubcategories.Message,
+                message = "AssetSubCategories Updated Successfully",
                 statusCode = StatusCodes.Status200OK
             });
-        }
         
-        return NotFound(new
-        {
-            message =updatedassetsubcategories.Message,
-            statusCode = StatusCodes.Status404NotFound
-        });   
 }
 
 [HttpDelete("{id}")]
 public async Task<IActionResult> DeleteAssetSubCategoriesAsync(int id)
 {
+        
+         await _mediator.Send(new DeleteAssetSubCategoriesCommand { Id = id });
 
-        // Process the delete command
-        var result = await _mediator.Send(new DeleteAssetSubCategoriesCommand { Id = id });
-
-        if (result.IsSuccess) 
-        {
-           
              return Ok(new
             {
-                message = result.Message,
+                message = "AssetSubCategories Deleted Successfully",
                 statusCode = StatusCodes.Status200OK
             });
-            
-        }
-      
-        return NotFound(new
-        {
-            message = result.Message,
-            statusCode = StatusCodes.Status404NotFound
-        });
    
 }
 
@@ -190,17 +125,11 @@ public async Task<IActionResult> DeleteAssetSubCategoriesAsync(int id)
         public async Task<IActionResult> GetAssetSubCategoryBasedonCategoryId(int AssetCategoriesId)
         {
             var assetsubcategory = await Mediator.Send(new GetAssetSubCategoriesByCategoryIdQuery() { AssetCategoriesId = AssetCategoriesId});
-          
-            if(assetsubcategory.IsSuccess)
-            {
-                
-              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetsubcategory.Data,message = assetsubcategory.Message });
-            }
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetsubcategory.Message });
+
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetsubcategory,message = assetsubcategory });
+            
            
         }
-
-
        
     }
 }

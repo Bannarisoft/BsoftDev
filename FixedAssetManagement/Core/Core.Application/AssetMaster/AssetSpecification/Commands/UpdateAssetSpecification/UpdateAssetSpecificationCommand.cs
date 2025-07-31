@@ -5,7 +5,7 @@ using static Core.Domain.Common.BaseEntity;
 
 namespace Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSpecification
 {
-     public class UpdateAssetSpecificationCommand : IRequest<ApiResponseDTO<string>>
+     public class UpdateAssetSpecificationCommand : IRequest<string>
     {
         public int AssetId { get; set; }
         public List<UpdateSpecificationItem>? Specifications { get; set; }

@@ -2,12 +2,13 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetSubGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AssetSubGroup.Command.UpdateAssetSubGroup
 {
-    public class UpdateAssetSubGroupCommandHandler : IRequestHandler<UpdateAssetSubGroupCommand, ApiResponseDTO<int>>
+    public class UpdateAssetSubGroupCommandHandler : IRequestHandler<UpdateAssetSubGroupCommand, int>
     {
         private readonly IAssetSubGroupCommandRepository _iAssetSubGroupCommandRepository;
         private readonly IAssetSubGroupQueryRepository _iAssetSubGroupQueryRepository;
@@ -24,7 +25,7 @@ namespace Core.Application.AssetSubGroup.Command.UpdateAssetSubGroup
             _iAssetSubGroupQueryRepository = iAssetSubGroupQueryRepository;
         }
 
-        public async  Task<ApiResponseDTO<int>> Handle(UpdateAssetSubGroupCommand request, CancellationToken cancellationToken)
+        public async  Task<int> Handle(UpdateAssetSubGroupCommand request, CancellationToken cancellationToken)
         {
         _logger.LogInformation($"Starting UpdateAssetSubGroupCommandHandler for request: {request}");
         // 🔹 First, check if the ID exists in the database
@@ -32,11 +33,8 @@ namespace Core.Application.AssetSubGroup.Command.UpdateAssetSubGroup
         if (existingAssetSubGroup is null)
         {
         _logger.LogWarning($"AssetSubGroup ID {request.Id} not found.");
-        return new ApiResponseDTO<int>
-        {
-            IsSuccess = false,
-            Message = "AssetSubGroup Id not found / AssetSubGroup is deleted ."
-        };
+        throw new ValidationException("AssetSubGroup Id not found / AssetSubGroup is deleted .");
+     
         }
          // Check for duplicate GroupName or SortOrder
        var (isNameDuplicate, isSortOrderDuplicate) = await _iAssetSubGroupCommandRepository
@@ -51,19 +49,16 @@ namespace Core.Application.AssetSubGroup.Command.UpdateAssetSubGroup
             : "AssetSubGroup with the same Sort Order already exists.";
 
              _logger.LogWarning($"Duplicate detected: {errorMessage}");
-
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = false,
-                Message = errorMessage
-            };
+            throw new ValidationException(errorMessage);
+           
         }
         var assetSubGroup = _IMapper.Map<Core.Domain.Entities.AssetSubGroup>(request);
         var result = await _iAssetSubGroupCommandRepository.UpdateAsync(request.Id, assetSubGroup);
         if (result <= 0) 
         {
             _logger.LogInformation($"AssetSubGroup {request.Id} not found.");
-            return new ApiResponseDTO<int> { IsSuccess = false, Message = "AssetSubGroup not found." };
+            throw new ValidationException("AssetSubGroup not found.");
+            
         }
         //Domain Event
         var domainEvent = new AuditLogsDomainEvent(
@@ -74,7 +69,7 @@ namespace Core.Application.AssetSubGroup.Command.UpdateAssetSubGroup
             module: "AssetSubGroup");
         await _mediator.Publish(domainEvent, cancellationToken);
         _logger.LogInformation($"AssetSubGroupId {result} Updated successfully.");
-        return new ApiResponseDTO<int> { IsSuccess = true, Message = "AssetSubGroup Updated Successfully.", Data = result };   
+        return result;   
         }
     }
 }

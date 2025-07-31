@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetDisposal.Queries.GetAssetDisposalById
 {
-    public class GetAssetDisposalByIdQuery : IRequest<ApiResponseDTO<AssetDisposalDto>>
+    public class GetAssetDisposalByIdQuery : IRequest<AssetDisposalDto>
     {
         public int Id { get; set; }
     }

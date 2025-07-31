@@ -7,11 +7,12 @@ using Core.Application.AssetCategories.Queries.GetAssetCategories;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetCategories;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetCategories.Queries.GetAssetCategoriesByAssetGroupId
 {
-    public class GetAssetCategoriesByAssetGroupIdQueryHandler : IRequestHandler<GetAssetCategoriesByAssetGroupIdQuery,ApiResponseDTO<List<AssetCategoriesAutoCompleteDto>>>
+    public class GetAssetCategoriesByAssetGroupIdQueryHandler : IRequestHandler<GetAssetCategoriesByAssetGroupIdQuery,List<AssetCategoriesAutoCompleteDto>>
     {
         private readonly IAssetCategoriesQueryRepository _iAssetCategoriesQueryRepository;        
         private readonly IMapper _mapper;
@@ -25,18 +26,15 @@ namespace Core.Application.AssetCategories.Queries.GetAssetCategoriesByAssetGrou
         }
 
 
-        public async Task<ApiResponseDTO<List<AssetCategoriesAutoCompleteDto>>> Handle(GetAssetCategoriesByAssetGroupIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<AssetCategoriesAutoCompleteDto>> Handle(GetAssetCategoriesByAssetGroupIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetCategoriesQueryRepository.GetByAssetgroupIdAsync(request.AssetGroupId);
 
             // Check if data exists
             if (result is null || !result.Any())
             {
-                return new ApiResponseDTO<List<AssetCategoriesAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"No records found for ID {request.AssetGroupId}."
-                };
+                throw new ValidationException($"No records found for ID {request.AssetGroupId}.");
+               
             }
 
             // Map list of results
@@ -52,12 +50,7 @@ namespace Core.Application.AssetCategories.Queries.GetAssetCategoriesByAssetGrou
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<List<AssetCategoriesAutoCompleteDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = assetTransferReceiptList
-            };
+            return assetTransferReceiptList;
         }
     }
 }

@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetGRN
 {
-    public class GetAssetGrnQueryHandler :  IRequestHandler<GetAssetGrnQuery,ApiResponseDTO<List<GetAssetGrnDto>>>
+    public class GetAssetGrnQueryHandler :  IRequestHandler<GetAssetGrnQuery,List<GetAssetGrnDto>>
     {
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
@@ -23,7 +23,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetGRN
             _iAssetPurchaseQueryRepository = iAssetPurchaseQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<List<GetAssetGrnDto>>> Handle(GetAssetGrnQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetAssetGrnDto>> Handle(GetAssetGrnQuery request, CancellationToken cancellationToken)
         {
              var result = await _iAssetPurchaseQueryRepository.GetAssetGrnNo(request.OldUnitId,request.AssetSourceId,request.SearchGrnNo);
             var assetunits  = _mapper.Map<List<GetAssetGrnDto>>(result);
@@ -36,7 +36,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetGRN
                     module:"GRNNO"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetAssetGrnDto>> { IsSuccess = true, Message = "Success", Data = assetunits };
+            return assetunits;
         }
     }
 }

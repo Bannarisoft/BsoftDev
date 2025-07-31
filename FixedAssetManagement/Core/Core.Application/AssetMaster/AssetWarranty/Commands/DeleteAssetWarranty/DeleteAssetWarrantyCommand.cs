@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Commands.DeleteAssetWarranty
 {
-    public class DeleteAssetWarrantyCommand :  IRequest<ApiResponseDTO<AssetWarrantyDTO>>  
+    public class DeleteAssetWarrantyCommand :  IRequest<AssetWarrantyDTO>
     {
          public int Id { get; set; }    
     }

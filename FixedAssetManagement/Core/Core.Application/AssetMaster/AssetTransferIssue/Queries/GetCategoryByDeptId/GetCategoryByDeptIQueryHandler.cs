@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByDeptId
 {
-    public class GetCategoryByDeptIQueryHandler  : IRequestHandler<GetCategoryByDeptIQuery,  ApiResponseDTO<List<GetCategoryByDeptIdDto>>>
+    public class GetCategoryByDeptIQueryHandler  : IRequestHandler<GetCategoryByDeptIQuery,  List<GetCategoryByDeptIdDto>>
     {
         private readonly IAssetTransferQueryRepository _assetTransferQueryRepository;
 
@@ -25,7 +25,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByD
          
         }
 
-          public async Task<ApiResponseDTO<List<GetCategoryByDeptIdDto>>> Handle(GetCategoryByDeptIQuery request, CancellationToken cancellationToken)
+          public async Task<List<GetCategoryByDeptIdDto>> Handle(GetCategoryByDeptIQuery request, CancellationToken cancellationToken)
         {
             var CategoryList = await _assetTransferQueryRepository.GetCategoriesByDepartmentAsync(request.DepartmentId);
 
@@ -41,13 +41,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByD
                 module:"Asset Category"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetCategoryByDeptIdDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = AssetTransferList
-                         
-            };                 
+            return AssetTransferList;                 
         }
   
     }
