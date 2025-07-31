@@ -4,11 +4,12 @@ using Core.Application.AssetSubGroup.Queries.GetAssetSubGroup;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetSubGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetSubGroup.Queries.GetAssetGroupById
 {
-    public class GetGroupByIdQueryHandler : IRequestHandler<GetGroupByIdQuery,ApiResponseDTO<List<AssetSubGroupDto>>>
+    public class GetGroupByIdQueryHandler : IRequestHandler<GetGroupByIdQuery,List<AssetSubGroupDto>>
     {
         private readonly IAssetSubGroupQueryRepository _iAssetSubGroupQueryRepository;        
         private readonly IMapper _mapper;
@@ -21,13 +22,14 @@ namespace Core.Application.AssetSubGroup.Queries.GetAssetGroupById
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<AssetSubGroupDto>>> Handle(GetGroupByIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<AssetSubGroupDto>> Handle(GetGroupByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetSubGroupQueryRepository.GetByGroupIdAsync(request.GroupId);
             // Check if the entity exists
             if (result is null)
             {
-                return new ApiResponseDTO<List<AssetSubGroupDto>> { IsSuccess = false, Message = $"AssetSubGroup ID {request.GroupId} not found." };
+                throw new ValidationException($"AssetSubGroup ID {request.GroupId} not found.");
+                
             }
             // Map a single entity
             var assetSubGroup = _mapper.Map<List<AssetSubGroupDto>>(result);
@@ -41,8 +43,8 @@ namespace Core.Application.AssetSubGroup.Queries.GetAssetGroupById
                 module: "AssetSubGroup"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            //return new ApiResponseDTO<AssetSubGroupDto> { IsSuccess = true, Message = "Success", Data = assetSubGroup };
-           return new ApiResponseDTO<List<AssetSubGroupDto>> { IsSuccess = true, Message = "Success", Data = assetSubGroup };
+            
+           return  assetSubGroup;
 
         }
     }

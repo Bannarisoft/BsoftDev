@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetSubCategories;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetSubCategories.Command.UpdateAssetSubCategories
 {
-    public class UpdateAssetSubCategoriesCommandHandler : IRequestHandler<UpdateAssetSubCategoriesCommand, ApiResponseDTO<int>>
+    public class UpdateAssetSubCategoriesCommandHandler : IRequestHandler<UpdateAssetSubCategoriesCommand, int>
     {
          private readonly IAssetSubCategoriesCommandRepository _iAssetSubCategoriesCommandRepository;
         private readonly IAssetSubCategoriesQueryRepository _iAssetSubCategoriesQueryRepository;
@@ -25,18 +26,14 @@ namespace Core.Application.AssetSubCategories.Command.UpdateAssetSubCategories
             _iAssetSubCategoriesQueryRepository = iAssetCategoriesQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(UpdateAssetSubCategoriesCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(UpdateAssetSubCategoriesCommand request, CancellationToken cancellationToken)
         {
              // 🔹 First, check if the ID exists in the database
         var existingassetsubcategory = await _iAssetSubCategoriesQueryRepository.GetByIdAsync(request.Id);
         if (existingassetsubcategory is null)
         {
-      
-        return new ApiResponseDTO<int>
-        {
-            IsSuccess = false,
-            Message = "AssetCategory Id not found / AssetCategory is deleted ."
-        };
+      throw new ValidationException("AssetCategory Id not found / AssetCategory is deleted .");
+     
         }
          // Check for duplicate GroupName or SortOrder
        var (isNameDuplicate, isSortOrderDuplicate) = await _iAssetSubCategoriesCommandRepository
@@ -49,12 +46,8 @@ namespace Core.Application.AssetSubCategories.Command.UpdateAssetSubCategories
             : isNameDuplicate
             ? "AssetSubCategory with the same SubCategoryName already exists."
             : "AssetSubCategory with the same Sort Order already exists.";
-
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = false,
-                Message = errorMessage
-            };
+            throw new ValidationException(errorMessage);
+         
         }
         var assetsubCategories = _Imapper.Map<Core.Domain.Entities.AssetSubCategories>(request);
         var result = await _iAssetSubCategoriesCommandRepository.UpdateAsync(request.Id, assetsubCategories);
@@ -62,8 +55,8 @@ namespace Core.Application.AssetSubCategories.Command.UpdateAssetSubCategories
         // AssetSubCategory not found
         {
         if (result <= 0) 
-           
-            return new ApiResponseDTO<int> { IsSuccess = false, Message = "AssetSubCategory id not found." };
+           throw new ValidationException("AssetSubCategory id not found.");
+            
         }
 
         //Domain Event
@@ -75,7 +68,7 @@ namespace Core.Application.AssetSubCategories.Command.UpdateAssetSubCategories
             module: "AssetSubCategory");
         await _mediator.Publish(domainEvent, cancellationToken);
      
-        return new ApiResponseDTO<int> { IsSuccess = true, Message = "AssetSubCategory Updated Successfully.", Data = result };  
+        return result;  
         }
     }
 }

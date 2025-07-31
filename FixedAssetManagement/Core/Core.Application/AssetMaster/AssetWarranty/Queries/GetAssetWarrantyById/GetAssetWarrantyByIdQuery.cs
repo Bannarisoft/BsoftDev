@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Queries.GetAssetWarrantyById
 {
-    public class GetAssetWarrantyByIdQuery : IRequest<ApiResponseDTO<AssetWarrantyDTO>>
+    public class GetAssetWarrantyByIdQuery : IRequest<AssetWarrantyDTO>
     {
          public int Id { get; set; }
     }

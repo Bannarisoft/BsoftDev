@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetCustodian
 {
-    public class GetAssetCustodianQuery : IRequest<ApiResponseDTO<List<GetAssetCustodianDto>>>
+    public class GetAssetCustodianQuery : IRequest<List<GetAssetCustodianDto>>
     {
         public string? OldUnitId { get; set; }
         

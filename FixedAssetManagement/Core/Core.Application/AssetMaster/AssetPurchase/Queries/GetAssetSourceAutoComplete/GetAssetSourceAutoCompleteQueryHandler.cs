@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetSourceAutoComplete
 {
-    public class GetAssetSourceAutoCompleteQueryHandler :  IRequestHandler<GetAssetSourceAutoCompleteQuery,ApiResponseDTO<List<AssetSourceAutoCompleteDto>>>
+    public class GetAssetSourceAutoCompleteQueryHandler :  IRequestHandler<GetAssetSourceAutoCompleteQuery,List<AssetSourceAutoCompleteDto>>
     {
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
@@ -24,7 +24,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetSourceAutoC
             _iAssetPurchaseQueryRepository = iAssetPurchaseQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<List<AssetSourceAutoCompleteDto>>> Handle(GetAssetSourceAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<AssetSourceAutoCompleteDto>> Handle(GetAssetSourceAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetPurchaseQueryRepository.GetAssetSources(request.SearchPattern);
             var assetSources  = _mapper.Map<List<AssetSourceAutoCompleteDto>>(result);
@@ -37,7 +37,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetSourceAutoC
                     module:"AssetSource"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<AssetSourceAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = assetSources };
+            return assetSources;
         }
     }
 }

@@ -4,11 +4,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
 using Core.Domain.Entities.AssetMaster;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Commands.DeleteAssetWarranty
 {
-    public class DeleteAssetWarrantyCommandHandler : IRequestHandler<DeleteAssetWarrantyCommand, ApiResponseDTO<AssetWarrantyDTO>>
+    public class DeleteAssetWarrantyCommandHandler : IRequestHandler<DeleteAssetWarrantyCommand, AssetWarrantyDTO>
     {
         private readonly IAssetWarrantyCommandRepository _assetWarrantyRepository;
         private readonly IMapper _mapper;
@@ -23,16 +24,13 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.DeleteAssetWarrant
             _assetWarrantyQueryRepository=assetWarrantyQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<AssetWarrantyDTO>> Handle(DeleteAssetWarrantyCommand request, CancellationToken cancellationToken)
+        public async Task<AssetWarrantyDTO> Handle(DeleteAssetWarrantyCommand request, CancellationToken cancellationToken)
         {             
             var assetWarranty = await _assetWarrantyQueryRepository.GetByIdAsync(request.Id);
             if (assetWarranty is null )
             {
-                return new ApiResponseDTO<AssetWarrantyDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid DepreciationGroupID."
-                };
+                throw new ValidationException("Invalid DepreciationGroupID.");
+              
             }
             var assetWarrantyDelete = _mapper.Map<AssetWarranties>(request);      
             var updateResult = await _assetWarrantyRepository.DeleteAsync(request.Id, assetWarrantyDelete);
@@ -48,18 +46,10 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.DeleteAssetWarrant
                     module:"AssetWarranty"
                 );               
                 await _mediator.Publish(domainEvent, cancellationToken);                 
-                return new ApiResponseDTO<AssetWarrantyDTO>
-                {
-                    IsSuccess = true,
-                    Message = "Asset Warranty deleted successfully.",
-                    Data = assetWarrantyDto
-                };
+                return  assetWarrantyDto;
             }
-            return new ApiResponseDTO<AssetWarrantyDTO>
-            {
-                IsSuccess = false,
-                Message = "Asset Warranty deletion failed."                             
-            };           
+            throw new Exception("Asset Warranty deletion failed.");
+                  
         }
     }
 }

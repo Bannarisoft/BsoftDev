@@ -7,11 +7,12 @@ using Core.Application.AssetMaster.AssetAdditionalCost.Queries.GetAssetAdditiona
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetAdditionalCost;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAdditionalCost.Queries.GetAssetAdditionalCostById
 {
-    public class GetAssetAdditionalCostByIdQueryHandler : IRequestHandler<GetAssetAdditionalCostByIdQuery,ApiResponseDTO<AssetAdditionalCostDto>>
+    public class GetAssetAdditionalCostByIdQueryHandler : IRequestHandler<GetAssetAdditionalCostByIdQuery,AssetAdditionalCostDto>
     {
         private readonly IAssetAdditionalCostQueryRepository _iAssetAdditionalCostQueryRepository;        
         private readonly IMapper _mapper;
@@ -24,13 +25,14 @@ namespace Core.Application.AssetMaster.AssetAdditionalCost.Queries.GetAssetAddit
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<AssetAdditionalCostDto>> Handle(GetAssetAdditionalCostByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AssetAdditionalCostDto> Handle(GetAssetAdditionalCostByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetAdditionalCostQueryRepository.GetByIdAsync(request.Id);
             // Check if the entity exists
             if (result is null)
             {
-                return new ApiResponseDTO<AssetAdditionalCostDto> { IsSuccess = false, Message =$"AssetAdditionalCost ID {request.Id} not found." };
+                throw new ValidationException($"AssetAdditionalCost ID {request.Id} not found.");
+                
             }
             // Map a single entity
             var assetGroup = _mapper.Map<AssetAdditionalCostDto>(result);
@@ -44,7 +46,7 @@ namespace Core.Application.AssetMaster.AssetAdditionalCost.Queries.GetAssetAddit
                     module:"AssetAdditionalCost"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<AssetAdditionalCostDto> { IsSuccess = true, Message = "Success", Data = assetGroup };
+          return assetGroup;
         }
     }
 }

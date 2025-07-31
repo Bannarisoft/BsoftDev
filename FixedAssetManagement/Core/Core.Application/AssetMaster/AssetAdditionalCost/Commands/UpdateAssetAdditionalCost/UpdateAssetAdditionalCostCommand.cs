@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAdditionalCost.Commands.UpdateAssetAdditionalCost
 {
-    public class UpdateAssetAdditionalCostCommand  :IRequest<ApiResponseDTO<int>> 
+    public class UpdateAssetAdditionalCostCommand  :IRequest<int>
     { 
         public int Id {get; set;}
         public decimal Amount { get; set; }

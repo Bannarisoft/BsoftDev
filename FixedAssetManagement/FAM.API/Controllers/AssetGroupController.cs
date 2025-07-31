@@ -21,122 +21,57 @@ namespace FAM.API.Controllers
      [ApiController]
     public class AssetGroupController : ApiControllerBase
     {
-        private readonly IValidator<CreateAssetGroupCommand> _createassetgroupcommandvalidator;
-        private readonly IValidator<UpdateAssetGroupCommand> _updateassetgroupcommandvalidator;
         private readonly ILogger<AssetGroupController> _logger;
-        
-        private readonly ApplicationDbContext _dbContext;
         private readonly IMediator _mediator;
 
-        public AssetGroupController(ILogger<AssetGroupController> logger, IMediator mediator, ApplicationDbContext dbContext, IValidator<CreateAssetGroupCommand> createassetgroupcommandvalidator, IValidator<UpdateAssetGroupCommand> updateassetgroupcommandvalidator)
+        public AssetGroupController(ILogger<AssetGroupController> logger, IMediator mediator)
         : base(mediator)
         {
             _logger = logger;
             _mediator = mediator;
-            _dbContext = dbContext;
-            _createassetgroupcommandvalidator = createassetgroupcommandvalidator;
-            _updateassetgroupcommandvalidator = updateassetgroupcommandvalidator;
         }
 
 [HttpPost]
 public async Task<IActionResult> CreateAsync(CreateAssetGroupCommand createAssetGroupCommand)
 {
     
-    // Validate the incoming command
-    var validationResult = await _createassetgroupcommandvalidator.ValidateAsync(createAssetGroupCommand);
-     _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-    if (!validationResult.IsValid)
-    {
-        
-        return BadRequest(new
-        {
-            StatusCode = StatusCodes.Status400BadRequest,
-            message = "Validation failed",
-            errors = validationResult.Errors.Select(e => e.ErrorMessage)
-        });
-    }
-
-    // Process the command
     var CreatedAssetGroupId = await _mediator.Send(createAssetGroupCommand);
 
-    if (CreatedAssetGroupId.IsSuccess)
-    {
      _logger.LogInformation($"AssetGroup {createAssetGroupCommand.Code} created successfully.");
       return Ok(new
       {
           StatusCode = StatusCodes.Status201Created,
-          message =CreatedAssetGroupId.Message,
-          data = CreatedAssetGroupId.Data
+          message ="AssetGroup Created Successfully",
+          data = CreatedAssetGroupId
       });
-    }
-     _logger.LogWarning($"AssetGroup {createAssetGroupCommand.Code} Creation failed.");
-      return BadRequest(new
-        {
-            StatusCode = StatusCodes.Status400BadRequest,
-            message = CreatedAssetGroupId.Message
-        });
+   
   
 }
 [HttpPut]
 public async Task<IActionResult> UpdateAsync(UpdateAssetGroupCommand updateAssetGroupCommand)
 {
   
-        // Validate the incoming command
-        var validationResult = await _updateassetgroupcommandvalidator.ValidateAsync(updateAssetGroupCommand);
-        _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-        if (!validationResult.IsValid)
-        {
-           
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = "Validation failed",
-                errors = validationResult.Errors.Select(e => e.ErrorMessage)
-            });
-        }
-
-        var updatedassetgroup = await _mediator.Send(updateAssetGroupCommand);
-
-        if (updatedassetgroup.IsSuccess)
-        {
-            _logger.LogInformation($"AssetGroup {updateAssetGroupCommand.GroupName} updated successfully.");
-           return Ok(new
-            {
-                message = updatedassetgroup.Message,
-                statusCode = StatusCodes.Status200OK
-            });
-        }
-        _logger.LogWarning($"AssetGroup {updateAssetGroupCommand.GroupName} Update failed.");
-        return NotFound(new
-        {
-            message =updatedassetgroup.Message,
-            statusCode = StatusCodes.Status404NotFound
-        });   
+       await _mediator.Send(updateAssetGroupCommand);
+          _logger.LogInformation($"AssetGroup {updateAssetGroupCommand.GroupName} updated successfully.");
+         return Ok(new
+          {
+              message = "AssetGroup Updated Successfully",
+              statusCode = StatusCodes.Status200OK
+          });
+        
 }
 
 [HttpDelete("{id}")]
 public async Task<IActionResult> DeleteAssetGroupAsync(int id)
 {
 
-        // Process the delete command
-        var result = await _mediator.Send(new DeleteAssetGroupCommand { Id = id });
-
-        if (result.IsSuccess) 
-        {
-            _logger.LogInformation($"AssetGroup {id} deleted successfully.");
-             return Ok(new
-            {
-                message = result.Message,
-                statusCode = StatusCodes.Status200OK
-            });
-            
-        }
-         _logger.LogWarning($"AssetGroup {id} Not Found or Invalid AssetGroupId.");
-        return NotFound(new
-        {
-            message = result.Message,
-            statusCode = StatusCodes.Status404NotFound
-        });
+      await _mediator.Send(new DeleteAssetGroupCommand { Id = id });
+         _logger.LogInformation($"AssetGroup {id} deleted successfully.");
+          return Ok(new
+         {
+             message = "AssetGroup Deleted Successfully",
+             statusCode = StatusCodes.Status200OK
+         });    
    
 }
         [HttpGet]
@@ -169,7 +104,7 @@ public async Task<IActionResult> DeleteAssetGroupAsync(int id)
                 SearchPattern = groupname ?? string.Empty 
         });
 
-        return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetgroups.Data });
+        return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetgroups });
         }
 
         [HttpGet("{id}")]
@@ -178,12 +113,10 @@ public async Task<IActionResult> DeleteAssetGroupAsync(int id)
         {
             var assetgroup = await Mediator.Send(new GetAssetGroupByIdQuery() { Id = id});
           
-            if(assetgroup.IsSuccess)
-            {
                 
-              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetgroup.Data,message = assetgroup.Message });
-            }
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetgroup.Message });
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetgroup,message = assetgroup });
+            
+            
            
         }
 

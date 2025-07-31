@@ -18,15 +18,13 @@ namespace FAM.API.Controllers.AssetMaster
 {
     [Route("api/[controller]")]
     public class AssetInsuranceController : ApiControllerBase
-    {        
-        private  readonly IValidator<CreateAssetInsuranceCommand>  _createAssetInsuranceCommandValidator;
-         private readonly IValidator<UpdateAssetInsuranceCommand> _updateAssetInsuranceCommandValidator;      
+    {            
        
 
-        public AssetInsuranceController(ISender mediator,IValidator<CreateAssetInsuranceCommand> createAssetInsuranceCommandValidator, IValidator<UpdateAssetInsuranceCommand> updateAssetInsuranceCommandValidator) : base(mediator)
+        public AssetInsuranceController(ISender mediator
+        ) : base(mediator)
         {
-            _createAssetInsuranceCommandValidator = createAssetInsuranceCommandValidator;
-            _updateAssetInsuranceCommandValidator = updateAssetInsuranceCommandValidator;
+            
            
         }
 
@@ -34,96 +32,40 @@ namespace FAM.API.Controllers.AssetMaster
         public async Task<IActionResult> GetByAssetIdAsync(int id)
         {
              var assetInsurance = await Mediator.Send(new GetAssetInsuranceByIdQuery() { Id = id});
-           
-             if(assetInsurance.IsSuccess)
-            {
+       
                 
-              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetInsurance.Data,message = assetInsurance.Message });
-            }
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetInsurance.Message });
-
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetInsurance,message = assetInsurance });
+          
            
         }
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateAssetInsuranceCommand command)
         {
-            var validationResult = await _createAssetInsuranceCommandValidator.ValidateAsync(command);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
-
+           
             var response = await Mediator.Send(command);
 
-            if (response.IsSuccess)
-            {
                 return StatusCode(StatusCodes.Status201Created, new 
                 { 
                     StatusCode = StatusCodes.Status201Created,
-                    Message = response.Message,
-                    Data = response.Data
+                    Message = "AssetInsurance Created Successfully",
+                    Data = response
                 });
-            }
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = response.Message,
-                Errors = ""
-            });
+          
         }
 
         [HttpPut]
             public async Task<IActionResult> Update(UpdateAssetInsuranceCommand command)
             {
-                // Validate the command
-                var validationResult = await _updateAssetInsuranceCommandValidator.ValidateAsync(command);
-                if (!validationResult.IsValid)
-                {
-                    return BadRequest(new 
-                    { 
-                        StatusCode = StatusCodes.Status400BadRequest, 
-                        Message = "Validation Failed", 
-                        Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                    });
-                }
-
-                // Check if the AssetInsurance exists
-                var assetInsuranceExists = await Mediator.Send(new GetAssetInsuranceByIdQuery { Id = command.Id });
-                if (assetInsuranceExists == null)
-                {
-                    return NotFound(new 
-                    { 
-                        StatusCode = StatusCodes.Status404NotFound, 
-                        Message = $"AssetInsurance ID {command.Id} not found.", 
-                        Errors = "" 
-                    });
-                }
-
-                // Update the AssetInsurance
-                var response = await Mediator.Send(command);
-                if (response.IsSuccess)
-                {
+        
+                 await Mediator.Send(command);
+                
                     return Ok(new 
                     { 
                         StatusCode = StatusCodes.Status200OK, 
-                        Message = response.Message, 
+                        Message = "AssetInsurance Updated Successfully", 
                         Errors = "" 
                     });
-                }
-
-                return BadRequest(new 
-                { 
-                    StatusCode = StatusCodes.Status400BadRequest, 
-                    Message = response.Message, 
-                    Errors = "" 
-                });
+               
             }
 
          [HttpDelete("{id}")]
@@ -137,20 +79,13 @@ namespace FAM.API.Controllers.AssetMaster
                     message = "Invalid Asset ID"
                 });
             }            
-            var result = await Mediator.Send(new DeleteAssetInsuranceCommand { Id = id });                 
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+             await Mediator.Send(new DeleteAssetInsuranceCommand { Id = id });                 
+            
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data =$"Asset Insurance ID {id} Deleted" ,
-                message = result.Message
+                message = "Asset Insurance Deleted Successfully"
             });
         }   
 
@@ -174,13 +109,6 @@ namespace FAM.API.Controllers.AssetMaster
                 PageSize = assetInsurances.PageSize
             });
         }
-
-
-
-
-
-
-
 
     }
 }

@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetCustodian
 {
-    public class GetAssetCustodianQueryHandler : IRequestHandler<GetAssetCustodianQuery, ApiResponseDTO<List<GetAssetCustodianDto>>>
+    public class GetAssetCustodianQueryHandler : IRequestHandler<GetAssetCustodianQuery, List<GetAssetCustodianDto>>
     {
         private readonly IAssetTransferQueryRepository _assetTransferQueryRepository;
         private readonly IMapper _mapper;
@@ -23,29 +24,20 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetCustod
 
         }
 
-        public async Task<ApiResponseDTO<List<GetAssetCustodianDto>>> Handle(GetAssetCustodianQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetAssetCustodianDto>> Handle(GetAssetCustodianQuery request, CancellationToken cancellationToken)
         {
             var oldUnitId = request.OldUnitId;
               
 
                 if (string.IsNullOrWhiteSpace(oldUnitId))
                 {
-                    return new ApiResponseDTO<List<GetAssetCustodianDto>>
-                    {
-                        IsSuccess = false,
-                        Message = "OldUnitId not found in token.",
-                        Data = null
-                    };
+                    throw new ValidationException("OldUnitId not found in token.");
+                  
                 }
             
               var result = await _assetTransferQueryRepository.GetCustodianByDepartmentAsync(oldUnitId, request.DepartmentId);
 
-                return new ApiResponseDTO<List<GetAssetCustodianDto>>
-                {
-                    IsSuccess = true,
-                    Message = "Success",
-                    Data = result
-                };
+                return result;
         }
     }
 }

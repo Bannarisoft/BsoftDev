@@ -4,11 +4,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
 using Core.Domain.Entities.AssetMaster;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Commands.CreateAssetWarranty
 {
-    public class CreateAssetWarrantyCommandHandler : IRequestHandler<CreateAssetWarrantyCommand, ApiResponseDTO<AssetWarrantyDTO>>
+    public class CreateAssetWarrantyCommandHandler : IRequestHandler<CreateAssetWarrantyCommand, AssetWarrantyDTO>
     {
         private readonly IMapper _mapper;
         private readonly IAssetWarrantyCommandRepository _assetWarrantyRepository;
@@ -21,15 +22,13 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.CreateAssetWarrant
             _mediator = mediator;    
         } 
 
-        public async Task<ApiResponseDTO<AssetWarrantyDTO>> Handle(CreateAssetWarrantyCommand request, CancellationToken cancellationToken)
+        public async Task<AssetWarrantyDTO> Handle(CreateAssetWarrantyCommand request, CancellationToken cancellationToken)
         {
             var assetSpecificationExists = await _assetWarrantyRepository.ExistsByAssetIdAsync(request.AssetId);
             if (assetSpecificationExists)
             {
-                return new ApiResponseDTO<AssetWarrantyDTO> {
-                    IsSuccess = false, 
-                    Message = "Asset Warranty already exists."
-                };                 
+                throw new ValidationException("Asset Warranty already exists.");
+                              
             }
             var assetEntity = _mapper.Map<AssetWarranties>(request);     
             var result = await _assetWarrantyRepository.CreateAsync(assetEntity);
@@ -47,16 +46,10 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.CreateAssetWarrant
             var assetMasterDTO = _mapper.Map<AssetWarrantyDTO>(result);
             if (assetMasterDTO.Id > 0)
             {
-                return new ApiResponseDTO<AssetWarrantyDTO>{
-                    IsSuccess = true, 
-                    Message = "Asset Warranty created successfully.",
-                    Data = assetMasterDTO
-                };
+                return  assetMasterDTO;
             }
-            return  new ApiResponseDTO<AssetWarrantyDTO>{
-                IsSuccess = false, 
-                Message = "Asset Warranty not created."
-            };      
+            throw new Exception("Asset Warranty not created.");
+                
         }
     }
 }

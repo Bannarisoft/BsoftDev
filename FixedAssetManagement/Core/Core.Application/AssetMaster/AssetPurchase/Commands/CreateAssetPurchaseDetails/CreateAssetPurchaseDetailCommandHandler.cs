@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetPurchase.Commands.CreateAssetPurchaseDetails
 {
-    public class CreateAssetPurchaseDetailCommandHandler  : IRequestHandler<CreateAssetPurchaseDetailCommand, ApiResponseDTO<int>>
+    public class CreateAssetPurchaseDetailCommandHandler  : IRequestHandler<CreateAssetPurchaseDetailCommand, int>
     {
         private readonly IAssetPurchaseCommandRepository _iassetPurchaseCommandRepository;
         private readonly IMediator _imediator;
@@ -25,7 +25,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Commands.CreateAssetPurchas
             
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateAssetPurchaseDetailCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateAssetPurchaseDetailCommand request, CancellationToken cancellationToken)
         {
             var assetPurchaseDetails = _imapper.Map<Core.Domain.Entities.AssetPurchase.AssetPurchaseDetails>(request);
              
@@ -43,23 +43,14 @@ namespace Core.Application.AssetMaster.AssetPurchase.Commands.CreateAssetPurchas
                 module: "AssetPurchaseDetails");
             await _imediator.Publish(domainEvent, cancellationToken);
             
-            var assetPurchaseDetailsDto = _imapper.Map<AssetPurchaseDetailsDto>(assetPurchaseDetails);
+             
             if (result > 0)
                   {
                     
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "AssetPurchase created successfully",
-                           Data = result
-                      };
+                        return result;
                  }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "AssetPurchase Creation Failed",
-                Data = result
-            };
+
+                 throw new Exception("AssetPurchase Creation Failed");
         }
     }
 }

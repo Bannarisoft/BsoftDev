@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetLocation.Queries.GetAssetLocationById
 {
-    public class GetAssetLocationByIdQuery : IRequest<ApiResponseDTO<AssetLocationDto>>
+    public class GetAssetLocationByIdQuery : IRequest<AssetLocationDto>
     {
          public int Id { get; set; }
          

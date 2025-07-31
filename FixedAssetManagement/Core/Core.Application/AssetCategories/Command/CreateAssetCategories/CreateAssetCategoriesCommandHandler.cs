@@ -7,11 +7,12 @@ using Core.Application.AssetCategories.Queries.GetAssetCategories;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetCategories;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetCategories.Command.CreateAssetCategories
 {
-    public class CreateAssetCategoriesCommandHandler : IRequestHandler<CreateAssetCategoriesCommand, ApiResponseDTO<int>>
+    public class CreateAssetCategoriesCommandHandler : IRequestHandler<CreateAssetCategoriesCommand, int>
     {
         private readonly IAssetCategoriesCommandRepository _iAssetCategoriesCommandRepository;
         private readonly IMediator _imediator;
@@ -24,23 +25,18 @@ namespace Core.Application.AssetCategories.Command.CreateAssetCategories
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateAssetCategoriesCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateAssetCategoriesCommand request, CancellationToken cancellationToken)
         {
-            // Check if AssetGroup code already exists
+           // Check if AssetGroup code already exists
             // var exists = await _iAssetCategoriesCommandRepository.ExistsByCodeAsync(request.Code);
             // if (exists)
             // {
-            //     return new ApiResponseDTO<int>
-            //     {
-            //         IsSuccess = false,
-            //         Message = "AssetCategories Code already exists.",
-            //         Data = 0
-            //     };
+            //     throw new ValidationException("AssetCategories Code already exists.");
             // }
             var assetCategories = _imapper.Map<Core.Domain.Entities.AssetCategories>(request);
-            var categorycode = await GenerateUniqueCodeAsync(request.CategoryName);
+			var categorycode = await GenerateUniqueCodeAsync(request.CategoryName);
             assetCategories.Code = categorycode;
-
+            
             var result = await _iAssetCategoriesCommandRepository.CreateAsync(assetCategories);
 
             //Domain Event
@@ -51,27 +47,17 @@ namespace Core.Application.AssetCategories.Command.CreateAssetCategories
                 details: $"AssetCategories details was created",
                 module: "AssetCategories");
             await _imediator.Publish(domainEvent, cancellationToken);
-
-            var assetCategoriesDto = _imapper.Map<AssetCategoriesDto>(assetCategories);
-            if (result > 0)
-            {
-
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = true,
-                    Message = "AssetCategories created successfully",
-                    Data = result
-                };
-            }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "AssetCategories Creation Failed",
-                Data = result
-            };
+          
+            
+            if (result <= 0)
+             {
+              
+               throw new Exception("AssetCategories Creation Failed");
+             }
+             return result;
+            
         }
-
-         private async Task<string> GenerateUniqueCodeAsync(string categoryName)
+  private async Task<string> GenerateUniqueCodeAsync(string categoryName)
         {
             // Take first 4 alphanumeric uppercase characters from the group name
             var baseCode = new string(categoryName

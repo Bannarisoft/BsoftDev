@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetDisposal;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetDisposal.Command.UpdateAssetDisposal
 {
-    public class UpdateAssetDisposalCommandHandler : IRequestHandler<UpdateAssetDisposalCommand, ApiResponseDTO<int>>
+    public class UpdateAssetDisposalCommandHandler : IRequestHandler<UpdateAssetDisposalCommand, int>
     {
          private readonly IAssetDisposalCommandRepository _iassetdisposalcommandrepository;
         private readonly IMediator _imediator;
@@ -22,13 +23,14 @@ namespace Core.Application.AssetMaster.AssetDisposal.Command.UpdateAssetDisposal
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(UpdateAssetDisposalCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(UpdateAssetDisposalCommand request, CancellationToken cancellationToken)
         {
             var assetDisposal = _imapper.Map<Core.Domain.Entities.AssetMaster.AssetDisposal>(request);
             var result = await _iassetdisposalcommandrepository.UpdateAsync(request.Id, assetDisposal);
             if (result <= 0) // AssetGroup not found
             {
-                return new ApiResponseDTO<int> { IsSuccess = false, Message = "AssetDisposal Id not found." };
+                throw new ValidationException("AssetDisposal Id not found.");
+                
             }
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -38,7 +40,7 @@ namespace Core.Application.AssetMaster.AssetDisposal.Command.UpdateAssetDisposal
                 details: $"AssetDisposal details was updated",
                 module: "AssetDisposal");
             await _imediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<int> { IsSuccess = true, Message = "AssetDisposal Updated Successfully.", Data = result };  
+            return  result;  
         }
     }
 }

@@ -5,13 +5,14 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadDocumentAss
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.SaveAssetDocument
 {
-    public class SaveAssetDocumentCommandHandler : IRequestHandler<SaveAssetDocumentCommand, ApiResponseDTO<bool>>
+    public class SaveAssetDocumentCommandHandler : IRequestHandler<SaveAssetDocumentCommand, bool>
     {
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly IAssetMasterGeneralCommandRepository _assetMasterGeneralRepository;
@@ -32,11 +33,12 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.SaveAssetDocu
             _companyGrpcClient = companyGrpcClient;
         }
 
-        public async Task<ApiResponseDTO<bool>> Handle(SaveAssetDocumentCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(SaveAssetDocumentCommand request, CancellationToken cancellationToken)
         {
              if (request.assetPath == null || request.assetPath.Length == 0)
             {
-                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "No file uploaded" };
+                throw new ValidationException("No file uploaded");
+                
             }
 
             string tempFilePath = request.assetPath;
@@ -78,11 +80,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.SaveAssetDocu
                     }
                 }
             }                    
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = true,
-                Message = "WorkOrder updated."                     
-            };
+            return true;
         }   
         private void EnsureDirectoryExists(string path)
         {

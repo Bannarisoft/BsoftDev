@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetPurchaseById
 {
-    public class GetAssetPurchaseByIdQuery : IRequest<ApiResponseDTO<AssetPurchaseDetailsDto>>
+    public class GetAssetPurchaseByIdQuery : IRequest<AssetPurchaseDetailsDto>
     {
          public int Id { get; set; }
     }

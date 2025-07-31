@@ -3,11 +3,12 @@ using Core.Application.AssetMaster.AssetWarranty.Queries.GetAssetWarranty;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Queries.GetAssetWarrantyAutoComplete
 {
-    public class GetAssetWarrantyAutoCompleteQueryHandler  : IRequestHandler<GetAssetWarrantyAutoCompleteQuery, ApiResponseDTO<List<AssetWarrantyAutoCompleteDTO>>>
+    public class GetAssetWarrantyAutoCompleteQueryHandler  : IRequestHandler<GetAssetWarrantyAutoCompleteQuery, List<AssetWarrantyAutoCompleteDTO>>
         {
             private readonly IAssetWarrantyQueryRepository _assetWarrantyRepository;
             private readonly IMapper _mapper;
@@ -20,16 +21,13 @@ namespace Core.Application.AssetMaster.AssetWarranty.Queries.GetAssetWarrantyAut
                 _mediator = mediator;
             }
 
-            public async Task<ApiResponseDTO<List<AssetWarrantyAutoCompleteDTO>>> Handle(GetAssetWarrantyAutoCompleteQuery request, CancellationToken cancellationToken)
+            public async Task<List<AssetWarrantyAutoCompleteDTO>> Handle(GetAssetWarrantyAutoCompleteQuery request, CancellationToken cancellationToken)
             {
                 var result = await _assetWarrantyRepository.GetByAssetWarrantyNameAsync(request.SearchPattern ?? string.Empty);
                 if (result is null || result.Count is 0)
                 {
-                    return new ApiResponseDTO<List<AssetWarrantyAutoCompleteDTO>>
-                    {
-                        IsSuccess = false,
-                        Message = "No WarrantyMaster found matching the search pattern."
-                    };
+                    throw new ValidationException("No WarrantyMaster found matching the search pattern.");
+                 
                 }
                 var WarrantyMasterDto = _mapper.Map<List<AssetWarrantyAutoCompleteDTO>>(result);
                 //Domain Event
@@ -41,12 +39,7 @@ namespace Core.Application.AssetMaster.AssetWarranty.Queries.GetAssetWarrantyAut
                     module:"Asset Warranty"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return new ApiResponseDTO<List<AssetWarrantyAutoCompleteDTO>>
-                {
-                    IsSuccess = true,
-                    Message = "Success",
-                    Data = WarrantyMasterDto
-                };          
+                return  WarrantyMasterDto;          
             }      
         }
     }

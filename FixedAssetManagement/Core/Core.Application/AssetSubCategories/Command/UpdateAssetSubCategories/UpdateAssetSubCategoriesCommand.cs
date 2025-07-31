@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetSubCategories.Command.UpdateAssetSubCategories
 {
-    public class UpdateAssetSubCategoriesCommand:IRequest<ApiResponseDTO<int>> 
+    public class UpdateAssetSubCategoriesCommand:IRequest<int>
     {
         public int Id { get; set; }
         public string? SubCategoryName { get; set; }

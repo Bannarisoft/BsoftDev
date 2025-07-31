@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Commands.UploadAssetWarranty
 {
-    public class UploadFileAssetWarrantyCommand : IRequest<ApiResponseDTO<AssetWarrantyDTO>>
+    public class UploadFileAssetWarrantyCommand : IRequest<AssetWarrantyDTO>
     {
         public IFormFile? File { get; set; }
         // public string? CompanyName { get; set; }  

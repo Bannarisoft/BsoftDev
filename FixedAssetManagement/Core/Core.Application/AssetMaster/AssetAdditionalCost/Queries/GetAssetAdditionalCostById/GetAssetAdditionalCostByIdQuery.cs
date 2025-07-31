@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAdditionalCost.Queries.GetAssetAdditionalCostById
 {
-    public class GetAssetAdditionalCostByIdQuery : IRequest<ApiResponseDTO<AssetAdditionalCostDto>>
+    public class GetAssetAdditionalCostByIdQuery : IRequest<AssetAdditionalCostDto>
     {
         public int Id { get; set; }
     }

@@ -8,6 +8,8 @@ using FAM.API.Middleware;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using FAM.Infrastructure.Logging.Middleware;
 using FAM.API.GrpcServices;
+using MediatR;
+using Core.Application.Common.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +44,7 @@ builder.Services.AddHttpContextAccessor();
 //builder.Services.AddProblemDetails();
 // Register gRPC
 builder.Services.AddGrpc();
-
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

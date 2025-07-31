@@ -7,11 +7,12 @@ using Core.Application.AssetMaster.AssetAmc.Queries.GetAssetAmc;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAmc.Queries.GetAssetAmcById
 {
-    public class GetAssetAmcByIdQueryHandler : IRequestHandler<GetAssetAmcByIdQuery, ApiResponseDTO<AssetAmcDto>>
+    public class GetAssetAmcByIdQueryHandler : IRequestHandler<GetAssetAmcByIdQuery, AssetAmcDto>
     {
         private readonly IAssetAmcQueryRepository _iAssetAmcQueryRepository;
         private readonly IMapper _mapper;
@@ -22,13 +23,14 @@ namespace Core.Application.AssetMaster.AssetAmc.Queries.GetAssetAmcById
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<AssetAmcDto>> Handle(GetAssetAmcByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AssetAmcDto> Handle(GetAssetAmcByIdQuery request, CancellationToken cancellationToken)
         {
            var result = await _iAssetAmcQueryRepository.GetByIdAsync(request.Id);
-            // Check if the entity exists
+    
             if (result is null)
             {
-                return new ApiResponseDTO<AssetAmcDto> { IsSuccess = false, Message =$"Asset ID {request.Id} not found." }; 
+                throw new ValidationException($"Asset ID {request.Id} not found.");
+                
             }
             // Map a single entity
             var assetamc = _mapper.Map<AssetAmcDto>(result);
@@ -42,7 +44,7 @@ namespace Core.Application.AssetMaster.AssetAmc.Queries.GetAssetAmcById
                     module:"AssetAmc"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return new ApiResponseDTO<AssetAmcDto> { IsSuccess = true, Message = "Success", Data = assetamc };
+                return assetamc;
         }
     }
 }

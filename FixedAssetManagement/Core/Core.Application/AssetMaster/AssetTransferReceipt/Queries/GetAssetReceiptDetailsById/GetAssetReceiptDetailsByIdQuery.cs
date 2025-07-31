@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetailsById
 {
-    public class GetAssetReceiptDetailsByIdQuery : IRequest<ApiResponseDTO<List<AssetReceiptDetailsByIdDto>>>
+    public class GetAssetReceiptDetailsByIdQuery : IRequest<List<AssetReceiptDetailsByIdDto>>
     {
         public int AssetReceiptId { get; set; }
     }
