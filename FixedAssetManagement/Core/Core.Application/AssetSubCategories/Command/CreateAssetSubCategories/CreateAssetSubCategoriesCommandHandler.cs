@@ -30,12 +30,12 @@ namespace Core.Application.AssetSubCategories.Command.CreateAssetSubCategories
         public async Task<int> Handle(CreateAssetSubCategoriesCommand request, CancellationToken cancellationToken)
         {
              // Check if AssetGroup code already exists
-            var exists = await _iAssetSubCategoriesCommandRepository.ExistsByCodeAsync(request.Code);
-            if (exists)
-            {
-                throw new ValidationException("AssetSubCategories Code already exists.");
+            // var exists = await _iAssetSubCategoriesCommandRepository.ExistsByCodeAsync(request.Code);
+            // if (exists)
+            // {
+            //     throw new ValidationException("AssetSubCategories Code already exists.");
               
-            }
+            // }
             var assetSubCategories = _imapper.Map<Core.Domain.Entities.AssetSubCategories>(request);
 			var subcategorycode = await GenerateUniqueCodeAsync(request.SubCategoryName);
             assetSubCategories.Code = subcategorycode;

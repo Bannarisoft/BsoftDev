@@ -28,11 +28,11 @@ namespace Core.Application.AssetCategories.Command.CreateAssetCategories
         public async Task<int> Handle(CreateAssetCategoriesCommand request, CancellationToken cancellationToken)
         {
            // Check if AssetGroup code already exists
-            var exists = await _iAssetCategoriesCommandRepository.ExistsByCodeAsync(request.Code);
-            if (exists)
-            {
-                throw new ValidationException("AssetCategories Code already exists.");
-            }
+            // var exists = await _iAssetCategoriesCommandRepository.ExistsByCodeAsync(request.Code);
+            // if (exists)
+            // {
+            //     throw new ValidationException("AssetCategories Code already exists.");
+            // }
             var assetCategories = _imapper.Map<Core.Domain.Entities.AssetCategories>(request);
 			var categorycode = await GenerateUniqueCodeAsync(request.CategoryName);
             assetCategories.Code = categorycode;
