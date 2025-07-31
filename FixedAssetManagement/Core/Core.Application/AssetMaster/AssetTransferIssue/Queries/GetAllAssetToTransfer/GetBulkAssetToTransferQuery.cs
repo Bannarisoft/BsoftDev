@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetBulkAssetToTransfer
 {
-    public class GetBulkAssetToTransferQuery : IRequest<List<GetAssetDetailsToTransferHdrDto>>
+    public class GetBulkAssetToTransferQuery : IRequest<ApiResponseDTO<List<GetAssetDetailsToTransferHdrDto>>>
     {
 
         public int DepartmentId { get; set; }

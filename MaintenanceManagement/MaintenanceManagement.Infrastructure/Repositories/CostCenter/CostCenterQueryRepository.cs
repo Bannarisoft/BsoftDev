@@ -27,7 +27,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.CostCenter
              DECLARE @TotalCount INT;
              SELECT @TotalCount = COUNT(*) 
                FROM Maintenance.CostCenter
-              WHERE IsDeleted = 0
+              WHERE IsDeleted = 0 AND UnitId = @UnitId
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CostCenterName LIKE @Search OR CostCenterCode LIKE @Search)")}};
 
                 SELECT 
@@ -43,7 +43,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.CostCenter
                 IsActive
             FROM Maintenance.CostCenter 
             WHERE 
-            IsDeleted = 0
+            IsDeleted = 0 AND UnitId = @UnitId
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (CostCenterName LIKE @Search OR CostCenterCode LIKE @Search )")}}
                 ORDER BY Id desc
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -56,7 +56,8 @@ namespace MaintenanceManagement.Infrastructure.Repositories.CostCenter
             {
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
-                PageSize
+                PageSize,
+                UnitId
             };
 
             var costCenter = await _dbConnection.QueryMultipleAsync(query, parameters);

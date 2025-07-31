@@ -37,3 +37,4 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTranfe
     }
 }
 
+

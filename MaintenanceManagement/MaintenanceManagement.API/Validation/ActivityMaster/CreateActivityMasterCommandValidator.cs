@@ -29,26 +29,33 @@ namespace MaintenanceManagement.API.Validation.ActivityMaster
 
             foreach (var rule in _validationRules)
             {
-                 switch (rule.Rule)
-                { 
-                  case "NotEmpty":
+                switch (rule.Rule)
+                {
+                    case "NotEmpty":
                         // Apply NotEmpty validation
                         RuleFor(x => x.CreateActivityMasterDto.ActivityName)
                             .NotEmpty()
                             .WithMessage($"{nameof(CreateActivityMasterCommand.CreateActivityMasterDto.ActivityName)} {rule.Error}");
                         break;
-                  case "MaxLength":
+                    case "MaxLength":
                         // Apply MaxLength validation using dynamic max length values
                         RuleFor(x => x.CreateActivityMasterDto.ActivityName)
                             .MaximumLength(maxLength)
-                            .WithMessage($"{nameof(CreateActivityMasterCommand.CreateActivityMasterDto.ActivityName)} {rule.Error}"); 
-                            break;
-                   case "AlreadyExists":
-                        RuleFor(x => x.CreateActivityMasterDto.ActivityName)
-                            .MustAsync(async (activityname, cancellation) =>
-                                !await _activityMasterQueryRepository.GetByActivityNameAsync(activityname))
-                            .WithMessage("Activity name already exists.");
-                        break;    
+                            .WithMessage($"{nameof(CreateActivityMasterCommand.CreateActivityMasterDto.ActivityName)} {rule.Error}");
+                        break;
+                    //    case "AlreadyExists":
+                    //         RuleFor(x => x.CreateActivityMasterDto.ActivityName)
+                    //             .MustAsync(async (activityname, cancellation) =>
+                    //                 !await _activityMasterQueryRepository.GetByActivityNameAsync(activityname ))
+                    //             .WithMessage("Activity name already exists.");
+                    //         break;   
+
+                    case "AlreadyExists":
+                                                RuleFor(x => x.CreateActivityMasterDto.ActivityName)
+                        .MustAsync(async (activityName, _) =>
+                            !await _activityMasterQueryRepository.GetByActivityNameAsync(activityName ))
+                        .WithMessage("Activity name already exists.");
+                     break; 
 
 
           

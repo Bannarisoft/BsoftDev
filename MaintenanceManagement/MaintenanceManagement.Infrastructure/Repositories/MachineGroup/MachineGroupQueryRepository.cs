@@ -24,12 +24,12 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
        
        public async Task<Core.Domain.Entities.MachineGroup?>GetByIdAsync(int id)
         { 
-              var UnitId = _ipAddressService.GetUnitId();           
+            var UnitId = _ipAddressService.GetUnitId();           
             const string query = @"
                 SELECT 
-                    Id,  GroupName,DepartmentId,Manufacturer,UnitId, IsActive, IsDeleted,CreatedBy, CreatedDate, CreatedByName,CreatedIP
+                    Id,  GroupName,DepartmentId,Manufacturer,UnitId, IsActive, IsDeleted,PowerSource,CreatedBy, CreatedDate, CreatedByName,CreatedIP
                 FROM Maintenance.MachineGroup          
-                WHERE Id = @id AND UnitId = @UnitId AND IsDeleted = 0";
+                WHERE Id = @id AND UnitId = @UnitId AND IsDeleted = 0 and IsActive = 1 ";
                                 
             return await _dbConnection.QueryFirstOrDefaultAsync<Core.Domain.Entities.MachineGroup>(query, new { id , UnitId });
         }
@@ -74,14 +74,14 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
                 DECLARE @TotalCount INT;
                 SELECT @TotalCount = COUNT(*) 
                 FROM [Maintenance].[MachineGroup] M
-                WHERE M.IsDeleted = 0 AND M.UnitId = @UnitId
+                WHERE M.IsDeleted = 0 AND M.UnitId = @UnitId AND M.IsActive = 1
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (M.GroupName LIKE @Search)")}}; 
 
-                SELECT M.Id, M.GroupName, M.Manufacturer,M.DepartmentId,M.UnitId,M.IsActive, M.IsDeleted, 
+                SELECT M.Id, M.GroupName, M.Manufacturer,M.DepartmentId,M.UnitId,M.IsActive, M.IsDeleted,M.PowerSource, 
                     M.CreatedBy, M.CreatedDate, M.CreatedByName, M.CreatedIP, 
                     M.ModifiedBy, M.ModifiedDate, M.ModifiedByName, M.ModifiedIP
                 FROM [Maintenance].[MachineGroup] M
-                WHERE M.IsDeleted = 0 AND M.UnitId = @UnitId
+                WHERE M.IsDeleted = 0 AND M.UnitId = @UnitId AND M.IsActive = 1
                 {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (M.GroupName LIKE @Search)")}}
                 ORDER BY M.Id DESC 
                 OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -114,7 +114,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.MachineGroup
                    const string query = @"
                        SELECT Id, GroupName  
                        FROM Maintenance.MachineGroup
-                       WHERE IsDeleted = 0 AND GroupName LIKE @SearchPattern AND UnitId = @UnitId";
+                       WHERE IsDeleted = 0 AND GroupName LIKE @SearchPattern AND UnitId = @UnitId  AND IsActive = 1";
 
                    var parameters = new
                    {

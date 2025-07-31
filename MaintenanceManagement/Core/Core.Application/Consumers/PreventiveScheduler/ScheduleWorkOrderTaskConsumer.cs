@@ -54,13 +54,13 @@ namespace Core.Application.Consumers.PreventiveScheduler
                     
                     if (delay.TotalSeconds > 0)
                     {
-                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, delayInMinutes);
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, delayInMinutes,context.Message.token);
                     }
                     else
                     {
                         jobDelayMin += 2;
 
-                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, jobDelayMin);
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detail.Id, jobDelayMin,context.Message.token);
                     }
                     detail.HangfireJobId = newJobId;
                     await _preventiveSchedulerCommand.UpdateDetailAsync(detail.Id, newJobId);
@@ -69,8 +69,7 @@ namespace Core.Application.Consumers.PreventiveScheduler
                 if (getMachineWiseDetail.Count > 0)
                 {
 
-                    await _hubContext.Clients.All.SendAsync("ReceiveMessage",
-                    $"Preventive Schedule created successfully: {headerId}");
+                  
 
                     await context.Publish(new ScheduleWorkOrderCreationEvent
                     {
@@ -80,25 +79,24 @@ namespace Core.Application.Consumers.PreventiveScheduler
 
                 else
                 {
-                    await _hubContext.Clients.All.SendAsync("ReceiveMessage",
-                    $"Preventive Schedule creation failed: {headerId}");
+                  
 
                     await context.Publish(new ScheduleWorkOrderFailedEvent
                     {
-                        CorrelationId = context.Message.CorrelationId
+                        CorrelationId = context.Message.CorrelationId,
+                        token = context.Message.token
                     });
                 }
              }
             catch (Exception ex)
             {
-                var headerId = context.Message.PreventiveSchedulerHeaderId;
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", 
-                $"Preventive Schedule creation failed: {headerId}");
+            
 
                 await context.RespondAsync(new ScheduleWorkOrderFailedEvent
                 {
                     CorrelationId = context.Message.CorrelationId,
-                    Reason = $"Exception: {ex.Message}"
+                    Reason = $"Exception: {ex.Message}",
+                    token = context.Message.token
                 });
             }
         }

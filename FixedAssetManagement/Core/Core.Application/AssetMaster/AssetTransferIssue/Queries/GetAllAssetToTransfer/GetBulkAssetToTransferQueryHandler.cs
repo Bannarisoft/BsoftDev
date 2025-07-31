@@ -6,12 +6,11 @@ using AutoMapper;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetDtlToTransfer;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
-using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetBulkAssetToTransfer
 {
-    public class GetBulkAssetToTransferQueryHandler : IRequestHandler<GetBulkAssetToTransferQuery, List<GetAssetDetailsToTransferHdrDto>>
+    public class GetBulkAssetToTransferQueryHandler : IRequestHandler<GetBulkAssetToTransferQuery, ApiResponseDTO<List<GetAssetDetailsToTransferHdrDto>>>
     {
 
         private readonly IAssetTransferQueryRepository _assetTransferQueryRepository;
@@ -23,19 +22,28 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetBulkAssetTo
         }
 
 
-            public async Task<List<GetAssetDetailsToTransferHdrDto>> Handle(GetBulkAssetToTransferQuery request, CancellationToken cancellationToken)
+            public async Task<ApiResponseDTO<List<GetAssetDetailsToTransferHdrDto>>> Handle(GetBulkAssetToTransferQuery request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(request.CustodianId))
             {
-                throw new ValidationException("CustodianId is required.");
-              
+                return new ApiResponseDTO<List<GetAssetDetailsToTransferHdrDto>>
+                {
+                    IsSuccess = false,
+                    Message = "CustodianId is required.",
+                    Data = null
+                };
             }
 
             var asset = await _assetTransferQueryRepository.GetAssetDetailsToTransferByFiltersAsync(request.CustodianId, request.DepartmentId, request.CategoryID);
 
-            var assetList = _mapper.Map<List<GetAssetDetailsToTransferHdrDto>>(asset);
-            
-            return assetList;
+            var assetList = _mapper.Map<List<GetAssetDetailsToTransferHdrDto>>(asset);  
+            return new ApiResponseDTO<List<GetAssetDetailsToTransferHdrDto>>
+            {
+                IsSuccess = true,
+                Message = "Success",
+                Data = assetList,
+                TotalCount = assetList.Count
+            };
         }
 
     }

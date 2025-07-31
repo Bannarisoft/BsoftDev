@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Contracts.Commands.Maintenance.PreventiveScheduler;
 using Contracts.Interfaces.External.IMaintenance;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -16,17 +17,20 @@ namespace Core.Application.Consumers.PreventiveScheduler
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly ILogger<RollbackWorkOrderConsumer> _logger;
         private readonly IBackgroundServiceClient _backgroundServiceClient;
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
         public RollbackPreventiveDetailConsumer(IPreventiveSchedulerCommand preventiveSchedulerCommand, IPreventiveSchedulerQuery preventiveSchedulerQuery,
-        ILogger<RollbackWorkOrderConsumer> logger, IBackgroundServiceClient backgroundServiceClient)
+        ILogger<RollbackWorkOrderConsumer> logger, IBackgroundServiceClient backgroundServiceClient, IPreventiveScheduleLogService preventiveScheduleLogService)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _logger = logger;
             _backgroundServiceClient = backgroundServiceClient;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
         }
 
         public async Task Consume(ConsumeContext<RollbackPreventiveCommand> context)
         {
+            await _preventiveScheduleLogService.CaptureLogs(context.Message.PreventiveSchedulerHeaderId,null,"Create Schedule Roll Back Preventive Detail",context.Message.Reason);
             var existingPreventiveScheduler = await _preventiveSchedulerQuery.GetByIdAsync(context.Message.PreventiveSchedulerHeaderId);
             existingPreventiveScheduler.IsDeleted = Domain.Common.BaseEntity.IsDelete.Deleted;
 
@@ -37,7 +41,7 @@ namespace Core.Application.Consumers.PreventiveScheduler
              {
                   if (!string.IsNullOrEmpty(detail.HangfireJobId))
                   {
-                       _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId);
+                       _backgroundServiceClient.RemoveHangFireJob(detail.HangfireJobId,context.Message.token);
                   }
              }
            

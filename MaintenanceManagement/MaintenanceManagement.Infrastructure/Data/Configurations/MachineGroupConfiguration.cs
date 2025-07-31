@@ -12,22 +12,22 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
 {
     public class MachineGroupConfiguration :IEntityTypeConfiguration<MachineGroup>
     {
-        
-          public void Configure(EntityTypeBuilder<MachineGroup> builder)
+
+        public void Configure(EntityTypeBuilder<MachineGroup> builder)
         {
             var statusConverter = new ValueConverter<Status, bool>(
                     v => v == Status.Active,
                     v => v ? Status.Active : Status.Inactive
                 );
             // ValueConverter for IsDelete (enum to bit)
-                var isDeleteConverter = new ValueConverter<IsDelete, bool>(
-                    v => v == IsDelete.Deleted,
-                    v => v ? IsDelete.Deleted : IsDelete.NotDeleted
-                );
+            var isDeleteConverter = new ValueConverter<IsDelete, bool>(
+                v => v == IsDelete.Deleted,
+                v => v ? IsDelete.Deleted : IsDelete.NotDeleted
+            );
 
             builder.ToTable("MachineGroup", "Maintenance");
 
-              // Primary Key
+            // Primary Key
             builder.HasKey(b => b.Id);
             builder.Property(b => b.Id)
                 .HasColumnName("Id")
@@ -37,14 +37,14 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
             builder.Property(mg => mg.GroupName)
                 .HasColumnName("GroupName")
                 .HasColumnType("varchar(50)")
-                .IsRequired(); 
+                .IsRequired();
 
-            builder.Property(mg=>mg.Manufacturer)
+            builder.Property(mg => mg.Manufacturer)
             .HasColumnName("Manufacturer")
             .HasColumnType("int")
             .IsRequired();
 
-            builder.Property(mg=>mg.UnitId)
+            builder.Property(mg => mg.UnitId)
             .HasColumnName("UnitId")
             .HasColumnType("int")
             .IsRequired();
@@ -53,11 +53,11 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
            .HasColumnName("DepartmentId")
            .HasColumnType("int")
            .IsRequired();
-      
-             builder.Property(b => b.IsActive)
-                .HasColumnType("bit")
-                .HasConversion(statusConverter)
-                .IsRequired();
+
+            builder.Property(b => b.IsActive)
+               .HasColumnType("bit")
+               .HasConversion(statusConverter)
+               .IsRequired();
 
             builder.Property(b => b.IsDeleted)
                 .HasColumnType("bit")
@@ -74,9 +74,14 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
 
             builder.Property(b => b.ModifiedByName)
                 .HasColumnType("varchar(50)");
-                
+
             builder.Property(b => b.ModifiedIP)
                 .HasColumnType("varchar(50)");  
+                
+              builder.Property(t => t.PowerSource)
+                .HasColumnName("PowerSource")
+                .HasColumnType("bit")
+                .IsRequired();
 
         }
     }

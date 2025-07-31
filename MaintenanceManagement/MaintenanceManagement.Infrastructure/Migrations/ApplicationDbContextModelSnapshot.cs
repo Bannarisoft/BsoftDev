@@ -401,6 +401,10 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(50)");
 
+                    b.Property<bool>("PowerSource")
+                        .HasColumnType("bit")
+                        .HasColumnName("PowerSource");
+
                     b.Property<int>("UnitId")
                         .HasColumnType("int")
                         .HasColumnName("UnitId");
@@ -1049,6 +1053,14 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("MeterAvailable")
+                        .HasColumnType("bit")
+                        .HasColumnName("MeterAvailable");
+
+                    b.Property<int?>("MeterTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("MeterTypeId");
+
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
@@ -1149,101 +1161,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("FeederGroup", "Maintenance");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Power.Generator", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedByName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedIP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Current")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Frequency")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("FuelTankCapacity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("GenSetName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<int>("GensetStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("GensetStatusTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IsActive")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IsDeleted")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("KVA")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ModifiedIP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MultiplicationFactor")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Power")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("PowerFactor")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("RPM")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Serialnumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Voltage")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GensetStatusTypeId");
-
-                    b.ToTable("Generator", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Power.GeneratorConsumption", b =>
@@ -1408,6 +1325,70 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.HasIndex("FeederTypeId");
 
                     b.ToTable("PowerConsumption", "Maintenance");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.PreventiveScheduleLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("ActionType");
+
+                    b.Property<string>("ChangedFields")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ChangedFields");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("CreatedBy");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("CreatedByName");
+
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<string>("CreatedIP")
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("CreatedIP");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ErrorMessage");
+
+                    b.Property<bool>("IsSuccess")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsSuccess");
+
+                    b.Property<int?>("PreventiveScheduleDetailId")
+                        .HasColumnType("int")
+                        .HasColumnName("PreventiveScheduleDetailId");
+
+                    b.Property<int?>("PreventiveScheduleId")
+                        .HasColumnType("int")
+                        .HasColumnName("PreventiveScheduleId");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("varchar(max)")
+                        .HasColumnName("Remarks");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("Source");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PreventiveScheduleLog", "Maintenance");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.PreventiveSchedulerActivity", b =>
@@ -2517,15 +2498,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("ParentFeeder");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Power.Generator", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.MiscMaster", "GensetStatusType")
-                        .WithMany("Generators")
-                        .HasForeignKey("GensetStatusTypeId");
-
-                    b.Navigation("GensetStatusType");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.Power.GeneratorConsumption", b =>
                 {
                     b.HasOne("Core.Domain.Entities.MachineMaster", "GeneratorTran")
@@ -2874,8 +2846,6 @@ namespace MaintenanceManagement.Infrastructure.Migrations
                     b.Navigation("FrequencyUnit");
 
                     b.Navigation("GeneratorConsumptions");
-
-                    b.Navigation("Generators");
 
                     b.Navigation("MachineMasterLineNo");
 

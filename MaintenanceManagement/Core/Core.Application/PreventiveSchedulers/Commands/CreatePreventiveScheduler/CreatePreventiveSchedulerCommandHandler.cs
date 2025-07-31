@@ -18,6 +18,9 @@ using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Application.Common.Interfaces;
 using Contracts.Events.Maintenance.PreventiveScheduler;
 using Core.Application.Common;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveScheduler
 {
@@ -28,15 +31,20 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
         private readonly IMediator _mediator;
         private readonly IEventPublisher _eventPublisher;
         private readonly IIPAddressService _ipAddressService;
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public CreatePreventiveSchedulerCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IMediator mediator,
-         IEventPublisher eventPublisher, IIPAddressService iPAddressService)
+         IEventPublisher eventPublisher, IIPAddressService iPAddressService, IPreventiveScheduleLogService preventiveScheduleLogService,
+         IHttpContextAccessor httpContextAccessor)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
             _mediator = mediator;
             _eventPublisher = eventPublisher;
             _ipAddressService = iPAddressService;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
+            _httpContextAccessor = httpContextAccessor;
 
         }
         public async Task<int> Handle(CreatePreventiveSchedulerCommand request, CancellationToken cancellationToken)
@@ -46,6 +54,7 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
 
                 var response = await _preventiveSchedulerCommand.CreateAsync(preventiveScheduler);
             var UnitId = _ipAddressService.GetUnitId();
+            var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
                  if (response > 0 || response != null)
             {
                 var correlationId = Guid.NewGuid();
@@ -64,7 +73,8 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                     DownTimeEstimateHrs = preventiveScheduler.DownTimeEstimateHrs,
                     EffectiveDate = preventiveScheduler.EffectiveDate,
                     FrequencyInterval = preventiveScheduler.FrequencyInterval,
-                    UnitId =UnitId
+                    UnitId = UnitId,
+                    token = token
                 };
                 // Save and publish event (RabbitMQ/Saga)
                 await _eventPublisher.SaveEventAsync(@event);
@@ -82,8 +92,9 @@ namespace Core.Application.PreventiveSchedulers.Commands.CreatePreventiveSchedul
                     );
                
               
+                 await _preventiveScheduleLogService.CaptureLogs(response,null,"Create Header",JsonConvert.SerializeObject(request));
                  
-                    return  response;
+                    return response;
             
                 
         }

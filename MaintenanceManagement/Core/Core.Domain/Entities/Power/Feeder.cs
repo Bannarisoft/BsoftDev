@@ -21,7 +21,9 @@ namespace Core.Domain.Entities.Power
         public decimal? OpeningReading { get; set; }
         public bool HighPriority { get; set; }
         public decimal? Target { get; set; }
-        public int UnitId { get; set; }  
+        public int UnitId { get; set; } 
+        public bool MeterAvailable { get; set; }
+        public int? MeterTypeId { get; set; } 
         public int? ParentFeederId { get; set; }
         public Feeder? ParentFeeder { get; set; }
         public ICollection<Feeder>? SubFeeders { get; set; }      

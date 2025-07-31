@@ -9,6 +9,7 @@ namespace Core.Application.Common.Interfaces.IAssetCategories
     {
          Task<int> CreateAsync(Core.Domain.Entities.AssetCategories assetCategories);
          Task<bool> ExistsByCodeAsync(string code );
+         Task<bool> ExistsByNameAsync(string categoryName );
          Task<int> GetMaxSortOrderAsync();
          Task<int> UpdateAsync(int Id,Core.Domain.Entities.AssetCategories assetCategories);
          Task<(bool IsNameDuplicate, bool IsSortOrderDuplicate)> CheckForDuplicatesAsync(string name, int sortOrder, int excludeId);   

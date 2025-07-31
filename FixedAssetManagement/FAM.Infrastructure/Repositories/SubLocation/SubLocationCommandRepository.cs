@@ -28,7 +28,7 @@ namespace FAM.Infrastructure.Repositories.SubLocation
             if (existingsubLocation != null)
             {
                 existingsubLocation.IsDeleted = sublocation.IsDeleted;
-                return await _applicationDbContext.SaveChangesAsync() >0;
+                return await _applicationDbContext.SaveChangesAsync() > 0;
             }
             return false;
         }
@@ -50,6 +50,17 @@ namespace FAM.Infrastructure.Repositories.SubLocation
                 return await _applicationDbContext.SaveChangesAsync() > 0;
             }
             return false;
+        }
+        public async Task<bool> ExistsByCodeAsync(string code, int? Id = null)
+        {
+            if (Id is not null)
+            {
+                return await _applicationDbContext.SubLocations.AnyAsync(c => c.Code == code && c.Id != Id);
+            }
+            else
+            {
+                return await _applicationDbContext.SubLocations.AnyAsync(c => c.Code == code);
+            }
         }
     }
 }

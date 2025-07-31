@@ -14,9 +14,10 @@ namespace BackgroundService.API.Configurations
                 options.AddPolicy("AllowAll", builder =>
                 {
                     builder
-                        .AllowAnyOrigin() 
+                        .SetIsOriginAllowed(_ => true) 
                         .AllowAnyMethod()
-                        .AllowAnyHeader();
+                        .AllowAnyHeader()
+                        .AllowCredentials();
                 });
             });
         }

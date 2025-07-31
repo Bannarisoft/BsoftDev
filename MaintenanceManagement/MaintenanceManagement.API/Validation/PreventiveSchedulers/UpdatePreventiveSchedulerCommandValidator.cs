@@ -107,6 +107,12 @@ namespace MaintenanceManagement.API.Validation.PreventiveSchedulers
                             .WithMessage($"{rule.Error}")
                             .Must(x => x.Count > 0)
                             .WithMessage($"{rule.Error}");
+                        RuleFor(x => x)
+                                .Must(x => x.ReminderWorkOrderDays < x.FrequencyInterval)
+                           .WithMessage("Work Reminder Days should be less than Frequency.");
+                        RuleFor(x => x)
+                                .Must(x => x.ReminderMaterialReqDays < x.FrequencyInterval)
+                           .WithMessage("Material Reminder Days should be less than Frequency.");
                     break;
                 case "FKColumnDelete":
                         RuleFor(x => x.MachineGroupId)

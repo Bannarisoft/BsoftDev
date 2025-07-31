@@ -34,7 +34,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                     FROM Maintenance.Maintenance.ActivityCheckListMaster aclm
                     INNER JOIN Maintenance.ActivityMaster am 
                         ON aclm.ActivityID = am.Id
-                    WHERE aclm.IsDeleted = 0 AND aclm.UnitId = @UnitId   AND am.UnitId = @UnitId
+                    WHERE aclm.IsDeleted = 0 AND aclm.UnitId = @UnitId   AND am.UnitId = @UnitId  AND aclm.IsActive = 1
                     {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (am.ActivityName LIKE @Search OR aclm.ActivityChecklist LIKE @Search)")}};
 
                     SELECT 
@@ -57,7 +57,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                     FROM Maintenance.ActivityCheckListMaster aclm
                     INNER JOIN Maintenance.ActivityMaster am 
                         ON aclm.ActivityID = am.Id
-                    WHERE aclm.IsDeleted = 0   AND aclm.UnitId = @UnitId   AND am.UnitId = @UnitId
+                    WHERE aclm.IsDeleted = 0   AND aclm.UnitId = @UnitId   AND am.UnitId = @UnitId  AND aclm.IsActive = 1
                     {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (am.ActivityName LIKE @Search OR aclm.ActivityChecklist LIKE @Search)")}}
                     ORDER BY aclm.Id DESC 
                     OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -105,7 +105,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                 FROM Maintenance.ActivityCheckListMaster aclm
                 INNER JOIN Maintenance.ActivityMaster am 
                     ON aclm.ActivityID = am.Id
-                WHERE aclm.Id = @id AND aclm.IsDeleted = 0 AND aclm.UnitId = @UnitId AND am.UnitId = @UnitId";
+                WHERE aclm.Id = @id AND aclm.IsDeleted = 0 AND aclm.UnitId = @UnitId AND am.UnitId = @UnitId AND aclm.IsActive = 1";
 
             return await _dbConnection.QueryFirstOrDefaultAsync<GetAllActivityCheckListMasterDto>(query, new { id , UnitId});
         }
@@ -116,7 +116,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
             var UnitId = _ipAddressService.GetUnitId();
             var query = """
             SELECT COUNT(1) FROM Maintenance.ActivityCheckListMaster
-            WHERE ActivityCheckList = @activityCheckList AND ActivityID = @activityId  AND IsDeleted = 0  AND UnitId = @UnitId
+            WHERE ActivityCheckList = @activityCheckList AND ActivityID = @activityId  AND IsDeleted = 0  AND UnitId = @UnitId  AND IsActive = 1
             """;
 
             var result = await _dbConnection.ExecuteScalarAsync<int>(query, new { ActivityCheckList = activityCheckList, ActivityID = activityId  , UnitId});
@@ -127,7 +127,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
         public async Task<bool> AlreadyExistsCheckListAsync(string activityCheckList, int activityId, int? id = null)
         {
            var UnitId = _ipAddressService.GetUnitId();
-            var query = "SELECT COUNT(1) FROM Maintenance.ActivityCheckListMaster WHERE ActivityCheckList = @activityCheckList AND ActivityID = @activityId AND IsDeleted = 0 AND UnitId = @UnitId"; 
+            var query = "SELECT COUNT(1) FROM Maintenance.ActivityCheckListMaster WHERE ActivityCheckList = @activityCheckList AND ActivityID = @activityId AND IsDeleted = 0 AND UnitId = @UnitId AND IsActive = 1"; 
             var parameters = new DynamicParameters(new { ActivityCheckList = activityCheckList, ActivityID = activityId , UnitId});
 
             if (id is not null)
@@ -176,7 +176,7 @@ namespace MaintenanceManagement.Infrastructure.Repositories.ActivityCheckListMas
                         aclm.Id, aclm.ActivityID, am.ActivityName, aclm.ActivityChecklist, aclm.IsActive, 
                         aclm.IsDeleted, aclm.CreatedBy, aclm.CreatedDate, aclm.CreatedByName, aclm.CreatedIP,
                         aclm.ModifiedBy, aclm.ModifiedDate, aclm.ModifiedByName, aclm.ModifiedIP,
-                        am.DepartmentId, aclm.UnitId";
+                        am.DepartmentId, aclm.UnitId ";
 
             var parameters = new
             {

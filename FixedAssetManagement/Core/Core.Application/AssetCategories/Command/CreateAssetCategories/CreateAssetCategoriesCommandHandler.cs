@@ -34,6 +34,8 @@ namespace Core.Application.AssetCategories.Command.CreateAssetCategories
                 throw new ValidationException("AssetCategories Code already exists.");
             }
             var assetCategories = _imapper.Map<Core.Domain.Entities.AssetCategories>(request);
+			var categorycode = await GenerateUniqueCodeAsync(request.CategoryName);
+            assetCategories.Code = categorycode;
             
             var result = await _iAssetCategoriesCommandRepository.CreateAsync(assetCategories);
 
@@ -54,6 +56,30 @@ namespace Core.Application.AssetCategories.Command.CreateAssetCategories
              }
              return result;
             
+        }
+  private async Task<string> GenerateUniqueCodeAsync(string categoryName)
+        {
+            // Take first 4 alphanumeric uppercase characters from the group name
+            var baseCode = new string(categoryName
+                .Where(char.IsLetterOrDigit)             // Remove special chars
+                .Take(4)                                  // Take first 4
+                .Select(char.ToUpper)                    // Convert to uppercase
+                .ToArray());
+
+            if (string.IsNullOrWhiteSpace(baseCode))
+                baseCode = "GRP"; // Fallback if name doesn't contain valid chars
+
+            string code = baseCode;
+            int counter = 1;
+
+            // Loop to generate unique code like COMP, COMP1, COMP2, etc.
+            while (await _iAssetCategoriesCommandRepository.ExistsByCodeAsync(code))
+            {
+                code = $"{baseCode}{counter}";
+                counter++;
+            }
+
+            return code;
         }
     }
 }

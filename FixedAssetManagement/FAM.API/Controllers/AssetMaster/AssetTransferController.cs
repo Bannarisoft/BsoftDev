@@ -125,7 +125,12 @@ namespace FAM.API.Controllers.AssetMaster
             {
                 return NotFound($"Asset Transfer with ID {id} not found.");
             }
-            return Ok(result);
+            return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = result,
+                    Data = result
+                });
         }
 
 
@@ -177,7 +182,12 @@ namespace FAM.API.Controllers.AssetMaster
             var query = new GetAssetDetailsToTransferQuery { AssetId = AssetId };
             var result = await Mediator.Send(query);
            
-                return Ok(result); 
+                  return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                message = result,
+                data = result
+            }); 
 
         }
 

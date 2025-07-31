@@ -7,8 +7,11 @@ using Contracts.Interfaces.External.IMaintenance;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using Core.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace Core.Application.PreventiveSchedulers.Commands.MapMachine
 {
@@ -19,17 +22,23 @@ namespace Core.Application.PreventiveSchedulers.Commands.MapMachine
         private readonly IPreventiveSchedulerQuery _preventiveSchedulerQuery;
         private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IBackgroundServiceClient  _backgroundServiceClient;
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public MapMachineCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMapper mapper, IPreventiveSchedulerQuery preventiveSchedulerQuery,
-        IMiscMasterQueryRepository miscMasterQueryRepository, IBackgroundServiceClient backgroundServiceClient)
+        IMiscMasterQueryRepository miscMasterQueryRepository, IBackgroundServiceClient backgroundServiceClient, IPreventiveScheduleLogService preventiveScheduleLogService,
+         IHttpContextAccessor httpContextAccessor)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mapper = mapper;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _miscMasterQueryRepository = miscMasterQueryRepository;
             _backgroundServiceClient = backgroundServiceClient;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<ApiResponseDTO<bool>> Handle(MapMachineCommand request, CancellationToken cancellationToken)
         {
+            await _preventiveScheduleLogService.CaptureLogs(request.Id,null,"Link Machine",JsonConvert.SerializeObject(request));
             var PreventiveSchedule = await _preventiveSchedulerQuery.GetByIdAsync(request.Id);
             var frequencyUnit = await _miscMasterQueryRepository.GetByIdAsync(PreventiveSchedule.FrequencyUnitId);
 
@@ -64,16 +73,16 @@ namespace Core.Application.PreventiveSchedulers.Commands.MapMachine
             var delay = startDateTime - DateTime.Today;
             string newJobId;
             var delayInMinutes = (int)delay.TotalMinutes;
-
+            var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
             if (delay.TotalSeconds > 0)
             {
-                newJobId = await _backgroundServiceClient.ScheduleWorkOrder(Preventiveresult.Id, delayInMinutes);
+                newJobId = await _backgroundServiceClient.ScheduleWorkOrder(Preventiveresult.Id, delayInMinutes,token);
             }
             else
             {
                 jobDelayMin += 2;
 
-                newJobId = await _backgroundServiceClient.ScheduleWorkOrder(Preventiveresult.Id, jobDelayMin);
+                newJobId = await _backgroundServiceClient.ScheduleWorkOrder(Preventiveresult.Id, jobDelayMin,token);
             }
 
             await _preventiveSchedulerCommand.UpdateDetailAsync(Preventiveresult.Id, newJobId);

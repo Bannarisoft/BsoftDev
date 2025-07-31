@@ -23,7 +23,7 @@ namespace MaintenanceManagement.Infrastructure.Data.Configurations
             );
 
              
-              builder.ToTable("MiscTypeMaster", "Maintenance");
+            builder.ToTable("MiscTypeMaster", "Maintenance");
 
                 // Primary Key
             builder.HasKey(m => m.Id);

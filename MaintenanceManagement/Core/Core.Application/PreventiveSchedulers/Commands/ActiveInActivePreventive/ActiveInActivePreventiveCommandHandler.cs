@@ -10,10 +10,13 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMachineMaster;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IPreventiveScheduler;
+using Core.Application.Common.Interfaces.IPreventiveSchedulerLog;
 using Core.Application.Common.Interfaces.IWorkOrder;
 using Core.Domain.Entities;
 using Hangfire;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using static Core.Domain.Common.BaseEntity;
 using static Core.Domain.Common.MiscEnumEntity;
 
@@ -29,19 +32,28 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
         private readonly IWorkOrderCommandRepository _workOrderRepository;
         private readonly IMapper _mapper;
         private readonly IBackgroundServiceClient  _backgroundServiceClient;
-        public ActiveInActivePreventiveCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMediator mediator, IPreventiveSchedulerQuery preventiveSchedulerQuery, IMachineMasterQueryRepository machineMasterQueryRepository, IMiscMasterQueryRepository miscMasterQueryRepository,IWorkOrderCommandRepository workOrderRepository,IMapper mapper,IBackgroundServiceClient backgroundServiceClient)
+        private readonly IPreventiveScheduleLogService _preventiveScheduleLogService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public ActiveInActivePreventiveCommandHandler(IPreventiveSchedulerCommand preventiveSchedulerCommand, IMediator mediator,
+        IPreventiveSchedulerQuery preventiveSchedulerQuery, IMachineMasterQueryRepository machineMasterQueryRepository,
+        IMiscMasterQueryRepository miscMasterQueryRepository, IWorkOrderCommandRepository workOrderRepository, IMapper mapper,
+        IBackgroundServiceClient backgroundServiceClient, IPreventiveScheduleLogService preventiveScheduleLogService, IHttpContextAccessor httpContextAccessor)
         {
             _preventiveSchedulerCommand = preventiveSchedulerCommand;
             _mediator = mediator;
             _preventiveSchedulerQuery = preventiveSchedulerQuery;
             _machineMasterQueryRepository = machineMasterQueryRepository;
             _miscMasterQueryRepository = miscMasterQueryRepository;
-            _mapper =mapper;
+            _mapper = mapper;
             _backgroundServiceClient = backgroundServiceClient;
+            _preventiveScheduleLogService = preventiveScheduleLogService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<bool> Handle(ActiveInActivePreventiveCommand request, CancellationToken cancellationToken)
         {
+           await _preventiveScheduleLogService.CaptureLogs(null,request.Id,"Active/Inactive",JsonConvert.SerializeObject(request));
+            var token = _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].ToString();
             var Scheduledetail = await _preventiveSchedulerQuery.GetByIdAsync(request.Id);
             Scheduledetail.Id = 0;
             Scheduledetail.EffectiveDate = DateOnly.FromDateTime(DateTime.Today);
@@ -122,11 +134,11 @@ namespace Core.Application.PreventiveSchedulers.Commands.ActiveInActivePreventiv
                     var delayInMinutes = (int)delay.TotalMinutes;
                     if (delay.TotalSeconds > 0)
                     {
-                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detailsResponse.Id, delayInMinutes);
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detailsResponse.Id, delayInMinutes,token);
                     }
                     else
                     {
-                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detailsResponse.Id, 5);
+                        newJobId = await _backgroundServiceClient.ScheduleWorkOrder(detailsResponse.Id, 5,token);
                     }
 
                     await AuditLogPublisher.PublishAuditLogAsync(

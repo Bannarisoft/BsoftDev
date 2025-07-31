@@ -19,7 +19,7 @@ namespace Core.Application.Common.Mappings
              CreateMap<Core.Domain.Entities.AssetCategories, AssetCategoriesAutoCompleteDto>(); 
              CreateMap<CreateAssetCategoriesCommand, Core.Domain.Entities.AssetCategories>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Code))
+                .ForMember(dest => dest.Code, opt => opt.Ignore())
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.CategoryName))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.AssetGroupId, opt => opt.MapFrom(src => src.AssetGroupId))

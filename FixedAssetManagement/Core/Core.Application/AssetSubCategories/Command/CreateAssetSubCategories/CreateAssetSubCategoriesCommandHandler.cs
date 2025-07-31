@@ -37,6 +37,8 @@ namespace Core.Application.AssetSubCategories.Command.CreateAssetSubCategories
               
             }
             var assetSubCategories = _imapper.Map<Core.Domain.Entities.AssetSubCategories>(request);
+			var subcategorycode = await GenerateUniqueCodeAsync(request.SubCategoryName);
+            assetSubCategories.Code = subcategorycode;
             
             var result = await _iAssetSubCategoriesCommandRepository.CreateAsync(assetSubCategories);
 
@@ -57,6 +59,30 @@ namespace Core.Application.AssetSubCategories.Command.CreateAssetSubCategories
                  }
                  throw new Exception("AssetSubCategories Creation Failed");
             
+        }
+  private async Task<string> GenerateUniqueCodeAsync(string subcategoryName)
+        {
+            // Take first 4 alphanumeric uppercase characters from the group name
+            var baseCode = new string(subcategoryName
+                .Where(char.IsLetterOrDigit)             // Remove special chars
+                .Take(4)                                  // Take first 4
+                .Select(char.ToUpper)                    // Convert to uppercase
+                .ToArray());
+
+            if (string.IsNullOrWhiteSpace(baseCode))
+                baseCode = "GRP"; // Fallback if name doesn't contain valid chars
+
+            string code = baseCode;
+            int counter = 1;
+
+            // Loop to generate unique code like COMP, COMP1, COMP2, etc.
+            while (await _iAssetSubCategoriesCommandRepository.ExistsByCodeAsync(code))
+            {
+                code = $"{baseCode}{counter}";
+                counter++;
+            }
+
+            return code;
         }
     }
 }

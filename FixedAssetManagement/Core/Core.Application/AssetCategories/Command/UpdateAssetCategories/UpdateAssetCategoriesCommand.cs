@@ -15,6 +15,6 @@ namespace Core.Application.AssetCategories.Command.UpdateAssetCategories
         public int SortOrder { get; set; }
         public int AssetGroupId { get; set; }
         public byte IsActive { get; set; }
-        public decimal GroupPercentage { get; set; }       
+        //public decimal GroupPercentage { get; set; }       
     }
 }

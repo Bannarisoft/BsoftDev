@@ -8,6 +8,7 @@ namespace Contracts.Commands.Maintenance
         public Guid CorrelationId { get; set; }
         public int SchedulerId { get; set; }
         public Guid UserId { get; set; }
+        public string token { get; set; }
     }
    
 }
