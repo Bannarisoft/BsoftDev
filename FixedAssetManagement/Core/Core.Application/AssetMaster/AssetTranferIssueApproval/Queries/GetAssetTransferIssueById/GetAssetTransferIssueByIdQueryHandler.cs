@@ -7,11 +7,12 @@ using Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAssetTra
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetTransferIssueApproval;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAssetTransferIssueById
 {
-    public class GetAssetTransferIssueByIdQueryHandler : IRequestHandler<GetAssetTransferIssueByIdQuery, ApiResponseDTO<List<AssetTransferIssueByIdDto>>> 
+    public class GetAssetTransferIssueByIdQueryHandler : IRequestHandler<GetAssetTransferIssueByIdQuery, List<AssetTransferIssueByIdDto>>
     {
         private readonly IAssetTransferIssueApprovalQueryRepository _assetTransferIssueQueryRepository;
         private readonly IMapper _mapper;
@@ -24,18 +25,15 @@ namespace Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAsse
             _mediator = mediator;
         }
 
-       public async Task<ApiResponseDTO<List<AssetTransferIssueByIdDto>>> Handle(GetAssetTransferIssueByIdQuery request, CancellationToken cancellationToken)
+       public async Task<List<AssetTransferIssueByIdDto>> Handle(GetAssetTransferIssueByIdQuery request, CancellationToken cancellationToken)
     {
         var result = await _assetTransferIssueQueryRepository.GetByAssetTransferIdAsync(request.Id);
 
         // Check if data exists
         if (result is null || !result.Any())
         {
-            return new ApiResponseDTO<List<AssetTransferIssueByIdDto>>
-            {
-                IsSuccess = false,
-                Message = $"No records found for ID {request.Id}."
-            };
+            throw new ValidationException($"No records found for ID {request.Id}.");
+          
         }
 
         // Map list of results
@@ -51,12 +49,7 @@ namespace Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAsse
         );
         await _mediator.Publish(domainEvent, cancellationToken);
 
-        return new ApiResponseDTO<List<AssetTransferIssueByIdDto>>
-        {
-            IsSuccess = true,
-            Message = "Success",
-            Data = assetTransferIssueList
-        };
+        return  assetTransferIssueList;
     }
     }
 }

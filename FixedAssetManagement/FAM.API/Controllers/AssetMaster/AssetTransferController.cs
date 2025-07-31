@@ -27,14 +27,11 @@ namespace FAM.API.Controllers.AssetMaster
 
     {
 
-        private readonly IValidator<CreateAssetTransferIssueCommand> _createAssetTransferIssueCommandValidator;
-        private readonly IValidator<UpdateAssetTransferIssueCommand> _UpdateAssetTransferIssueCommandValidator;
         private readonly IAssetTransferQueryRepository _assetTransferQueryRepository;
 
-        public AssetTransferController(ISender mediator, IValidator<CreateAssetTransferIssueCommand> createAssetTransferIssueCommand, IValidator<UpdateAssetTransferIssueCommand> updateAssetTransferIssueCommand, IAssetTransferQueryRepository assetTransferQueryRepository) : base(mediator)
+        public AssetTransferController(ISender mediator, IAssetTransferQueryRepository assetTransferQueryRepository) 
+        : base(mediator)
         {
-            _createAssetTransferIssueCommandValidator = createAssetTransferIssueCommand;
-            _UpdateAssetTransferIssueCommandValidator = updateAssetTransferIssueCommand;
             _assetTransferQueryRepository = assetTransferQueryRepository;
 
         }
@@ -89,7 +86,7 @@ namespace FAM.API.Controllers.AssetMaster
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Data = assetCategoryList.Data,
+                Data = assetCategoryList,
 
             });
         }
@@ -100,16 +97,7 @@ namespace FAM.API.Controllers.AssetMaster
         public async Task<IActionResult> CreateAsync(CreateAssetTransferIssueCommand command)
         {
 
-            var validationResult = await _createAssetTransferIssueCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation Failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+           
             if (command == null)
                 return BadRequest(new ApiResponseDTO<AssetTransferIssueHdr>
                 {
@@ -118,27 +106,14 @@ namespace FAM.API.Controllers.AssetMaster
                 });
 
             var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
+          
                 return StatusCode(StatusCodes.Status201Created, new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    Message = response.Message,
-                    Data = response.Data
+                    Message = response,
+                    Data = response
                 });
-            }
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = response.Message,
-                Errors = ""
-            });
-            // if (!response.IsSuccess)
-
-            //     return BadRequest(response);
-
-            // return Ok(response);
+           
         }
 
         [HttpGet("{id}")]
@@ -160,28 +135,14 @@ namespace FAM.API.Controllers.AssetMaster
         public async Task<IActionResult> UpdateAssetTransferIssue([FromBody] UpdateAssetTransferIssueCommand command)
         {
 
-            var validationResult = await _UpdateAssetTransferIssueCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation Failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
 
-            var result = await Mediator.Send(command);
+             await Mediator.Send(command);
 
-            if (!result.IsSuccess)
-            {
-                return NotFound(result);
-            }
 
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
+                message = "Asset Transfer Updated Successfully",
                 errors = ""
             });
         }
@@ -215,19 +176,7 @@ namespace FAM.API.Controllers.AssetMaster
 
             var query = new GetAssetDetailsToTransferQuery { AssetId = AssetId };
             var result = await Mediator.Send(query);
-              if (result == null || result.Data == null)
-                {
-                    var notFoundResponse = new ApiResponseDTO<object>
-                    {
-                        IsSuccess = false,
-                        Message = $"Asset with ID {AssetId} not found.",
-                        Data = null,
-                        StatusCode = StatusCodes.Status404NotFound
-                    };
-                    return NotFound(notFoundResponse);
-                }
-
-                // Return result as is, since it already has ApiResponseDTO<T>
+           
                 return Ok(result); 
 
         }
@@ -294,7 +243,7 @@ namespace FAM.API.Controllers.AssetMaster
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Data = assetCategoryList.Data,
+                Data = assetCategoryList,
 
             });
         }
@@ -337,22 +286,11 @@ namespace FAM.API.Controllers.AssetMaster
 
             var response = await Mediator.Send(query);
 
-            if (response == null || !response.IsSuccess)
+            return Ok(new
             {
-                var notFoundResponse = new ApiResponseDTO<List<GetAssetDetailsToTransferHdrDto>>
-                {
-                    IsSuccess = false,
-                    Message = response?.Message ?? $"No assets found for DepartmentId {departmentId}.",
-                    Data = null,
-                    StatusCode = 404,
-                    Errors = new List<string> { "No matching records found." }
-                };
-                return NotFound(notFoundResponse);
-            }
-
-            // Success case
-            response.StatusCode = 200;
-            return Ok(response);
+                StatusCode = StatusCodes.Status200OK,
+                data = response
+            });
         }
 
         

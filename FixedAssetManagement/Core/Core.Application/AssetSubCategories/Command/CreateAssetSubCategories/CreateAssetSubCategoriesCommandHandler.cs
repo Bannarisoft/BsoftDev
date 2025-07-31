@@ -9,11 +9,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetCategories;
 using Core.Application.Common.Interfaces.IAssetSubCategories;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetSubCategories.Command.CreateAssetSubCategories
 {
-    public class CreateAssetSubCategoriesCommandHandler: IRequestHandler<CreateAssetSubCategoriesCommand, ApiResponseDTO<int>>
+    public class CreateAssetSubCategoriesCommandHandler: IRequestHandler<CreateAssetSubCategoriesCommand, int>
     {
         private readonly IAssetSubCategoriesCommandRepository _iAssetSubCategoriesCommandRepository;
         private readonly IMediator _imediator;
@@ -26,18 +27,14 @@ namespace Core.Application.AssetSubCategories.Command.CreateAssetSubCategories
             _imapper = imapper;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateAssetSubCategoriesCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateAssetSubCategoriesCommand request, CancellationToken cancellationToken)
         {
              // Check if AssetGroup code already exists
             var exists = await _iAssetSubCategoriesCommandRepository.ExistsByCodeAsync(request.Code);
             if (exists)
             {
-               return new ApiResponseDTO<int>
-            {
-            IsSuccess = false,
-            Message = "AssetSubCategories Code already exists.",
-            Data = 0
-            };
+                throw new ValidationException("AssetSubCategories Code already exists.");
+              
             }
             var assetSubCategories = _imapper.Map<Core.Domain.Entities.AssetSubCategories>(request);
             
@@ -52,23 +49,14 @@ namespace Core.Application.AssetSubCategories.Command.CreateAssetSubCategories
                 module: "AssetSubCategories");
             await _imediator.Publish(domainEvent, cancellationToken);
           
-            var assetsubCategoriesDto = _imapper.Map<AssetSubCategoriesDto>(assetSubCategories);
+            
             if (result > 0)
                   {
                    
-                        return new ApiResponseDTO<int>
-                        {
-                           IsSuccess = true,
-                           Message = "AssetSubCategories created successfully",
-                           Data = result
-                        };
+                        return  result;
                  }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "AssetSubCategories Creation Failed",
-                Data = result
-            }; 
+                 throw new Exception("AssetSubCategories Creation Failed");
+            
         }
     }
 }

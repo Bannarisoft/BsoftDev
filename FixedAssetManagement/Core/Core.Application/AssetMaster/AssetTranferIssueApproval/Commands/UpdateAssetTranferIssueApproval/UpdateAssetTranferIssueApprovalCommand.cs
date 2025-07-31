@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTranferIssueApproval.Commands.UpdateAssetTranferIssueApproval
 {
-    public class UpdateAssetTranferIssueApprovalCommand :IRequest<ApiResponseDTO<int>> 
+    public class UpdateAssetTranferIssueApprovalCommand :IRequest<int>
     {
         public List<int>? Id { get; set; }
         public string Status { get; set; }

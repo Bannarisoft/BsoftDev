@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTranferedById
 {
-   public class  GetAssetTranferedByIdQueryHanlder  : IRequestHandler<GetAssetTranferedByIdQuery, ApiResponseDTO<AssetTransferJsonDto>>
+   public class  GetAssetTranferedByIdQueryHanlder  : IRequestHandler<GetAssetTranferedByIdQuery, AssetTransferJsonDto>
 
     {
        private readonly IAssetTransferQueryRepository _assetTransferQueryRepository;       
@@ -22,25 +23,16 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTranfe
             _assetTransferQueryRepository = assetTransferQueryRepository;
         }
          // ✅ Handle Method
-        public async Task<ApiResponseDTO<AssetTransferJsonDto>> Handle(GetAssetTranferedByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AssetTransferJsonDto> Handle(GetAssetTranferedByIdQuery request, CancellationToken cancellationToken)
         {
             var assetTransfer = await _assetTransferQueryRepository.GetAssetTransferByIdAsync(request.AssetTransferId);
 
             if (assetTransfer == null)
             {
-                return new ApiResponseDTO<AssetTransferJsonDto>
-                {
-                    IsSuccess = false,
-                    Message = $"Asset Transfer Issue with ID {request.AssetTransferId} not found."
-                
-                };
+                throw new ValidationException($"Asset Transfer Issue with ID {request.AssetTransferId} not found.");
+             
             }
-                return new ApiResponseDTO<AssetTransferJsonDto>
-                {
-                    IsSuccess = true,
-                    Message = "Asset Transfer retrieved successfully.",
-                    Data = assetTransfer
-                };            
+                return assetTransfer;            
         }
     }
 }

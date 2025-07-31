@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.AssetSubGroup.Queries.GetAssetSubGroupAutoComplete
 {
-    public class GetAssetSubGroupAutoCompleteQuery : IRequest<ApiResponseDTO<List<AssetSubGroupAutoCompleteDTO>>>
+    public class GetAssetSubGroupAutoCompleteQuery : IRequest<List<AssetSubGroupAutoCompleteDTO>>
     {
         public string? SearchPattern { get; set; }
     }

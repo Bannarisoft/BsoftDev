@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetSubCategories.Command.CreateAssetSubCategories
 {
-    public class CreateAssetSubCategoriesCommand :IRequest<ApiResponseDTO<int>> 
+    public class CreateAssetSubCategoriesCommand :IRequest<int>
     {
         public string? Code { get; set; }
         public string? SubCategoryName { get; set; }

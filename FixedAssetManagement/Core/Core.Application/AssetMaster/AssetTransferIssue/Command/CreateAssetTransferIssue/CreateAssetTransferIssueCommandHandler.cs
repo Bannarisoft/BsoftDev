@@ -14,7 +14,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Command.CreateAssetTransferIssue
 {
-    public class CreateAssetTransferIssueCommandHandler : IRequestHandler<CreateAssetTransferIssueCommand,ApiResponseDTO<int>>
+    public class CreateAssetTransferIssueCommandHandler : IRequestHandler<CreateAssetTransferIssueCommand,int>
     {
        private readonly  IAssetTransferCommandRepository _assetTransferCommandRepository;
         private readonly IMapper _mapper;  
@@ -34,19 +34,8 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Command.CreateAssetTra
             _validator = validator;       
 
         }
-     public async Task<ApiResponseDTO<int>> Handle(CreateAssetTransferIssueCommand request, CancellationToken cancellationToken)
+     public async Task<int> Handle(CreateAssetTransferIssueCommand request, CancellationToken cancellationToken)
         {
-            // 🔹 Validate the request
-                var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-                if (!validationResult.IsValid)
-                {
-                    return new ApiResponseDTO<int>
-                    {
-                        IsSuccess = false,
-                        Message = "Validation failed",
-                        Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
-                    };
-                }
                 
             string currentIp = _ipAddressService.GetSystemIPAddress();
             int userId = _ipAddressService.GetUserId(); 
@@ -76,20 +65,9 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Command.CreateAssetTra
                   if (result > 0)
                   {
                      
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "Asset Transfer created successfully",
-                           Data = result
-                      };
+                        return result;
                  }
-                 return new ApiResponseDTO<int>
-                  {
-                      IsSuccess = false,
-                      Message = "Asset Transfer not created",
-                      Data = result
-                  };
-           
+                 throw new Exception("Asset Transfer not created");
         }
         
     }

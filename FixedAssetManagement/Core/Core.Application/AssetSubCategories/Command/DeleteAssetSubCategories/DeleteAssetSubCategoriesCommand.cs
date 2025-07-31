@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetSubCategories.Command.DeleteAssetSubCategories
 {
-    public class DeleteAssetSubCategoriesCommand :IRequest<ApiResponseDTO<int>> 
+    public class DeleteAssetSubCategoriesCommand :IRequest<int>
     {
          public int Id { get; set; }
     }

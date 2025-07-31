@@ -17,129 +17,64 @@ namespace FAM.API.Controllers
     [ApiController]
     public class AssetSubGroupController : ApiControllerBase
     {
-        private readonly IValidator<CreateAssetSubGroupCommand> _createAssetSubGroupCommandValidator;
-        private readonly IValidator<UpdateAssetSubGroupCommand> _updateAssetSubGroupCommandValidator;
         private readonly ILogger<AssetSubGroupController> _logger;
-
-        private readonly ApplicationDbContext _dbContext;
         private readonly IMediator _mediator;
 
-        public AssetSubGroupController(ILogger<AssetSubGroupController> logger, IMediator mediator, ApplicationDbContext dbContext, IValidator<CreateAssetSubGroupCommand> createAssetSubGroupCommandValidator, IValidator<UpdateAssetSubGroupCommand> updateAssetSubGroupCommandValidator)
+        public AssetSubGroupController(ILogger<AssetSubGroupController> logger, IMediator mediator
+        )
         : base(mediator)
         {
             _logger = logger;
             _mediator = mediator;
-            _dbContext = dbContext;
-            _createAssetSubGroupCommandValidator = createAssetSubGroupCommandValidator;
-            _updateAssetSubGroupCommandValidator = updateAssetSubGroupCommandValidator;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateAssetSubGroupCommand createAssetSubGroupCommand)
         {
-            /*   if (createAssetSubGroupCommand.GroupId <= 0)
-              {
-                  return BadRequest(new
-                  {
-                      StatusCode = StatusCodes.Status400BadRequest,
-                      message = "Enter valid GroupId"                                
-                  });
-              } */
-
-            // Validate the incoming command
-            var validationResult = await _createAssetSubGroupCommandValidator.ValidateAsync(createAssetSubGroupCommand);
-            _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-            if (!validationResult.IsValid)
-            {
-
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                });
-            }
-
-            // Process the command
+            
             var CreatedAssetSubGroupId = await _mediator.Send(createAssetSubGroupCommand);
 
-            if (CreatedAssetSubGroupId.IsSuccess)
-            {
+          
                 _logger.LogInformation($"AssetSubGroup {createAssetSubGroupCommand.Code} created successfully.");
                 return Ok(new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    message = CreatedAssetSubGroupId.Message,
-                    data = CreatedAssetSubGroupId.Data
+                    message = "AssetSubGroup created successfully.",
+                    data = CreatedAssetSubGroupId
                 });
-            }
-            _logger.LogWarning($"AssetSubGroup {createAssetSubGroupCommand.Code} Creation failed.");
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                message = CreatedAssetSubGroupId.Message
-            });
+            
 
         }
         [HttpPut]
         public async Task<IActionResult> UpdateAsync(UpdateAssetSubGroupCommand updateAssetSubGroupCommand)
         {
 
-            var validationResult = await _updateAssetSubGroupCommandValidator.ValidateAsync(updateAssetSubGroupCommand);
-            _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-            if (!validationResult.IsValid)
-            {
+          
+             await _mediator.Send(updateAssetSubGroupCommand);
 
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                });
-            }
-
-            var updatedAssetSubGroup = await _mediator.Send(updateAssetSubGroupCommand);
-
-            if (updatedAssetSubGroup.IsSuccess)
-            {
                 _logger.LogInformation($"AssetSubGroup {updateAssetSubGroupCommand.SubGroupName} updated successfully.");
                 return Ok(new
                 {
-                    message = updatedAssetSubGroup.Message,
+                    message = "AssetSubGroup updated successfully.",
                     statusCode = StatusCodes.Status200OK
                 });
-            }
-            _logger.LogWarning($"AssetSubGroup {updateAssetSubGroupCommand.SubGroupName} Update failed.");
-            return NotFound(new
-            {
-                message = updatedAssetSubGroup.Message,
-                statusCode = StatusCodes.Status404NotFound
-            });
+            
+           
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAssetSubGroupAsync(int id)
         {
 
-            // Process the delete command
-            var result = await _mediator.Send(new DeleteAssetSubGroupCommand { Id = id });
+             await _mediator.Send(new DeleteAssetSubGroupCommand { Id = id });
 
-            if (result.IsSuccess)
-            {
                 _logger.LogInformation($"AssetSubGroup {id} deleted successfully.");
                 return Ok(new
                 {
-                    message = result.Message,
+                    message = "AssetSubGroup deleted successfully.",
                     statusCode = StatusCodes.Status200OK
                 });
 
-            }
-            _logger.LogWarning($"AssetSubGroup {id} Not Found or Invalid AssetSubGroupId.");
-            return NotFound(new
-            {
-                message = result.Message,
-                statusCode = StatusCodes.Status404NotFound
-            });
 
         }
         [HttpGet]
@@ -170,7 +105,7 @@ namespace FAM.API.Controllers
                 SearchPattern = SubGroupName ?? string.Empty
             });
 
-            return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetSubGroups.Data });
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetSubGroups });
         }
 
         [HttpGet("{id}")]
@@ -179,11 +114,8 @@ namespace FAM.API.Controllers
         {
             var assetSubGroup = await Mediator.Send(new GetAssetSubGroupByIdQuery() { Id = id });
 
-            if (assetSubGroup.IsSuccess)
-            {
-                return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetSubGroup.Data, message = assetSubGroup.Message });
-            }
-            return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = assetSubGroup.Message });
+                return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetSubGroup, message = assetSubGroup });
+          
 
         }
         [HttpGet("groupId")]    
@@ -191,12 +123,7 @@ namespace FAM.API.Controllers
         {
             var assetSubGroup = await Mediator.Send(new GetGroupByIdQuery() { GroupId = groupId });
 
-            if (assetSubGroup.IsSuccess)
-            {
-                return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetSubGroup.Data, message = assetSubGroup.Message });
-            }
-            return NotFound(new { StatusCode = StatusCodes.Status404NotFound, message = assetSubGroup.Message });
-
+            return Ok(new { StatusCode = StatusCodes.Status200OK, data = assetSubGroup, message = assetSubGroup });
         }
 
     }
