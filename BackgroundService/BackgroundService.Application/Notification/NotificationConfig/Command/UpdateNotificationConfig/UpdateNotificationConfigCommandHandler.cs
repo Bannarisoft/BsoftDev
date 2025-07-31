@@ -12,11 +12,12 @@ namespace  BackgroundService.Application.Notification.NotificationConfig.Command
         private readonly INotificationConfigCommandRepository _notificationConfigCommandRepository;
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
+        
         public UpdateNotificationConfigCommandHandler(INotificationConfigCommandRepository notificationConfigCommandRepository, IMediator mediator, IMapper mapper)
-        {
+        {                        
             _notificationConfigCommandRepository = notificationConfigCommandRepository;
             _mediator = mediator;
-            _mapper = mapper;
+            _mapper = mapper;            
         }
 
         public async Task<int> Handle(UpdateNotificationConfigCommand request, CancellationToken cancellationToken)

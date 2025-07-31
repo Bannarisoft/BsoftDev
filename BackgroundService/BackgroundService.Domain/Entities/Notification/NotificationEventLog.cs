@@ -9,6 +9,7 @@ namespace BackgroundService.Domain.Entities.Notification
     public class NotificationEventLog : BaseEntity
     {
         public int NotificationLevelRuleId { get; set; }
+        public int UnitId { get; set; }
         public int ChannelId { get; set; }
         public int NotificationStatusId { get; set; }
         public string? MessageText { get; set; }

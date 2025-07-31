@@ -33,7 +33,7 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
                 .HasColumnName("Id")
                 .HasColumnType("int")
                 .IsRequired();
-
+    
             builder.Property(t => t.NotificationTypeId)
             .HasColumnName("NotificationTypeId")
             .HasColumnType("int")
