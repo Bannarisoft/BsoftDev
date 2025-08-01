@@ -8,8 +8,9 @@ namespace BackgroundService.Application.Notification.Common.Interfaces.INotifica
 {
     public interface INotificationGroupMemberCommand
     {
-        Task<int> CreateAsync(NotificationGroupMembers notificationGroupMembers);     
-        Task<bool> UpdateAsync(NotificationGroupMembers notificationGroupMembers);
+        // Task<int> CreateAsync(NotificationGroupMembers notificationGroupMembers);     
+        Task<int> CreateMultipleAsync(IEnumerable<NotificationGroupMembers> members);
+        Task<bool> UpdateMultipleAsync(int groupId, List<int> userIds, byte isActive);
         Task<bool> DeleteAsync(int id,NotificationGroupMembers notificationGroupMembers); 
     }
 }

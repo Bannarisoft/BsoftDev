@@ -8,7 +8,7 @@ namespace BackgroundService.Application.Notification.Common.Interfaces.INotifica
 {
     public interface INotificationEventRuleQuery
     {
-        Task<(List<NotificationEventRule>, int)> GetAllNotificationGroupAsync(int PageNumber, int PageSize, string? SearchTerm);
+        Task<(IEnumerable<dynamic>, int)> GetAllNotificationEventRuleAsync(int PageNumber, int PageSize, string? SearchTerm);
         Task<bool> AlreadyExistsAsync(int NotificationChannelId, int TemplateId, int NotificationLevelHierarchyId,  int RecipientTypeId, int? id = null);
         Task<bool> NotFoundAsync(int id);
     }
