@@ -483,11 +483,11 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-/PurchaseManagement/Core/Core.Application/obj
-/PurchaseManagement/Core/Core.Application/bin
-/PurchaseManagement/Core/Core.Domain/obj
-/PurchaseManagement/Core/Core.Domain/bin
-/PurchaseManagement/PurchaseManagement.API/obj
-/PurchaseManagement/PurchaseManagement.API/bin
-/PurchaseManagement/PurchaseManagement.Infrastructure/obj
-/PurchaseManagement/PurchaseManagement.Infrastructure/bin
+/WarehouseManagement/Core/Core.Application/obj
+/WarehouseManagement/Core/Core.Application/bin
+/WarehouseManagement/Core/Core.Domain/obj
+/WarehouseManagement/Core/Core.Domain/bin
+/WarehouseManagement/WarehouseManagement.API/obj
+/WarehouseManagement/WarehouseManagement.API/bin
+/WarehouseManagement/WarehouseManagement.Infrastructure/obj
+/WarehouseManagement/WarehouseManagement.Infrastructure/bin

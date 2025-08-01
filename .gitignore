@@ -44,3 +44,11 @@
 /InventoryManagement/InventoryManagement.API/obj
 /InventoryManagement/Core/Core.Application/obj
 /InventoryManagement/Core/Core.Domain/obj
+/PartyManagement/Core/Core.Application/obj
+/PartyManagement/Core/Core.Domain/obj
+/PartyManagement/PartyManagement.API/obj
+/PartyManagement/PartyManagement.Infrastructure/obj
+/PurchaseManagement/Core/Core.Application/obj
+/PurchaseManagement/Core/Core.Domain/obj
+/PurchaseManagement/PurchaseManagement.API/obj
+/PurchaseManagement/PurchaseManagement.Infrastructure/obj
