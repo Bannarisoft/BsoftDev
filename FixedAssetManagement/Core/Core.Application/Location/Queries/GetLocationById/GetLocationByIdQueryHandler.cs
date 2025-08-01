@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ILocation;
 using Core.Application.Location.Queries.GetLocations;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Location.Queries.GetLocationById
 {
-    public class GetLocationByIdQueryHandler : IRequestHandler<GetLocationByIdQuery, ApiResponseDTO<LocationDto>>
+    public class GetLocationByIdQueryHandler : IRequestHandler<GetLocationByIdQuery, LocationDto>
     {
         private readonly ILocationQueryRepository _locationQueryRepository;        
         private readonly IMapper _mapper;
@@ -21,16 +22,13 @@ namespace Core.Application.Location.Queries.GetLocationById
             _mediator = mediator;
             _mapper = mapper;
         }
-        public async Task<ApiResponseDTO<LocationDto>> Handle(GetLocationByIdQuery request, CancellationToken cancellationToken)
+        public async Task<LocationDto> Handle(GetLocationByIdQuery request, CancellationToken cancellationToken)
         {
            var result = await _locationQueryRepository.GetByIdAsync(request.Id);
             if (result is null)
             {
-                return new ApiResponseDTO<LocationDto>
-                {
-                    IsSuccess = false,
-                    Message = "LocationId not found"
-                };
+                throw new ValidationException("LocationId not found");
+                
             }  
            var location = _mapper.Map<LocationDto>(result);
 
@@ -43,7 +41,7 @@ namespace Core.Application.Location.Queries.GetLocationById
                     module:"Location"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<LocationDto> { IsSuccess = true, Message = "Success", Data = location };
+          return location;
         }
     }
 }

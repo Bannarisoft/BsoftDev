@@ -8,7 +8,7 @@ using Core.Application.MiscTypeMaster.Queries.GetMiscTypeMaster;
 
 namespace Core.Application.MiscTypeMaster.Queries.GetMiscTypeMasterAutoComplete
 {
-    public class GetMiscTypeMasterAutoCompleteQuery  :  IRequest<ApiResponseDTO<List<GetMiscTypeMasterAutocompleteDto>>>
+    public class GetMiscTypeMasterAutoCompleteQuery  :  IRequest<List<GetMiscTypeMasterAutocompleteDto>>
     {
           public string? SearchPattern { get; set; }
     }

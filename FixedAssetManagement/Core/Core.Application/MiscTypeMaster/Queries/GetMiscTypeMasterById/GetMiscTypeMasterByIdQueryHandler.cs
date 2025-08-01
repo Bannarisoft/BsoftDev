@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.MiscTypeMaster.Queries.GetMiscTypeMaster;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.MiscTypeMaster.Queries.GetMiscTypeMasterById
 {
-    public class GetMiscTypeMasterByIdQueryHandler : IRequestHandler<GetMiscTypeMasterByIdQuery, ApiResponseDTO<GetMiscTypeMasterDto>>
+    public class GetMiscTypeMasterByIdQueryHandler : IRequestHandler<GetMiscTypeMasterByIdQuery, GetMiscTypeMasterDto>
     {
        private readonly IMiscTypeMasterQueryRepository  _miscTypeMasterQueryRepository;
         private readonly IMapper _mapper;
@@ -24,18 +25,14 @@ namespace Core.Application.MiscTypeMaster.Queries.GetMiscTypeMasterById
             _mediator = mediator;
         } 
 
-        public async  Task<ApiResponseDTO<GetMiscTypeMasterDto>> Handle(GetMiscTypeMasterByIdQuery request, CancellationToken cancellationToken)
+        public async  Task<GetMiscTypeMasterDto> Handle(GetMiscTypeMasterByIdQuery request, CancellationToken cancellationToken)
         {
                   
             var result = await _miscTypeMasterQueryRepository.GetByIdAsync(request.Id);
             if (result is null )
             {
-                  return new ApiResponseDTO<GetMiscTypeMasterDto>
-                    {
-                        IsSuccess = false,
-                        Message = $"MiscTypeMaster with Id {request.Id} not found.",
-                        Data = null
-                    };
+                throw new ValidationException($"MiscTypeMaster with Id {request.Id} not found.");
+              
             }
            
             var misctypemaster = _mapper.Map<GetMiscTypeMasterDto>(result);
@@ -49,12 +46,7 @@ namespace Core.Application.MiscTypeMaster.Queries.GetMiscTypeMasterById
                         module:"MiscTypeMaster"
                     );
                     await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<GetMiscTypeMasterDto> 
-            {
-                 IsSuccess = true, 
-                Message = "Success", 
-                Data = misctypemaster
-             };
+            return misctypemaster;
         }
     }
 }

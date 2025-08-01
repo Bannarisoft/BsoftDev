@@ -9,11 +9,12 @@ using Core.Application.Common.Interfaces.ILocation;
 using Core.Application.Location.Queries.GetLocations;
 using Core.Domain.Common;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Location.Command.DeleteLocation
 {
-    public class DeleteLocationCommandHandler : IRequestHandler<DeleteLocationCommand, ApiResponseDTO<LocationDto>>
+    public class DeleteLocationCommandHandler : IRequestHandler<DeleteLocationCommand, LocationDto>
     {
         private readonly ILocationCommandRepository _locationCommandRepository;
         private readonly ILocationQueryRepository _locationQueryRepository;
@@ -28,25 +29,19 @@ namespace Core.Application.Location.Command.DeleteLocation
             _mapper = mapper;
             _assetLocationQueryRepository = assetLocationQueryRepository;
         }
-        public async Task<ApiResponseDTO<LocationDto>> Handle(DeleteLocationCommand request, CancellationToken cancellationToken)
+        public async Task<LocationDto> Handle(DeleteLocationCommand request, CancellationToken cancellationToken)
         {
             var locations = await _locationQueryRepository.GetByIdAsync(request.Id);
             if (locations is null || locations.IsDeleted is BaseEntity.IsDelete.Deleted)
             {
-                return new ApiResponseDTO<LocationDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid LocationID.The specified Location does not exist or is inactive.  "
-                };
+                throw new ValidationException("Invalid LocationID.The specified Location does not exist or is inactive.  ");
+              
             }
             var (assetLocations, _) = await _assetLocationQueryRepository.GetAllAssetLocationAsync(1, int.MaxValue, null);
             if (assetLocations.Any(a => a.LocationId == request.Id))
             {
-                return new ApiResponseDTO<LocationDto>
-                {
-                    IsSuccess = false,
-                    Message = "Location already exists for this assetlocation.Cannot delete the Location."
-                };
+                throw new ValidationException("Location already exists for this assetlocation.Cannot delete the Location.");
+             
             }
             var locationdelete = _mapper.Map<Core.Domain.Entities.Location>(request);
             var locationresult = await _locationCommandRepository.DeleteAsync(request.Id, locationdelete);
@@ -62,19 +57,10 @@ namespace Core.Application.Location.Command.DeleteLocation
                     module: "Location"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-                return new ApiResponseDTO<LocationDto>
-                {
-                    IsSuccess = true,
-                    Message = "Location deleted successfully.",
-                    Data = locationDto
-                };
+                return  locationDto;
             }
-
-            return new ApiResponseDTO<LocationDto>
-            {
-                IsSuccess = false,
-                Message = "Location deletion failed."
-            };
+            throw new Exception("Location deletion failed.");
+      
         }
     }
 }

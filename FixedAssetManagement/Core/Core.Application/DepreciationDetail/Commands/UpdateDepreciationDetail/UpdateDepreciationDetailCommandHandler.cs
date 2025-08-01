@@ -8,11 +8,12 @@ using Core.Application.Common.Interfaces.IDepreciationDetail;
 using Core.Application.DepreciationDetail.Queries.GetDepreciationDetail;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.DepreciationDetail.Commands.UpdateDepreciationDetail
 {
-    public class UpdateDepreciationDetailCommandHandler : IRequestHandler<UpdateDepreciationDetailCommand, ApiResponseDTO<DepreciationDto>>
+    public class UpdateDepreciationDetailCommandHandler : IRequestHandler<UpdateDepreciationDetailCommand, DepreciationDto>
     {
         private readonly IDepreciationDetailCommandRepository _depreciationRepository;
         private readonly IDepreciationDetailQueryRepository _depreciationQueryRepository;
@@ -27,26 +28,20 @@ namespace Core.Application.DepreciationDetail.Commands.UpdateDepreciationDetail
             _depreciationQueryRepository=depreciationQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<DepreciationDto>> Handle(UpdateDepreciationDetailCommand request, CancellationToken cancellationToken)
+        public async Task<DepreciationDto> Handle(UpdateDepreciationDetailCommand request, CancellationToken cancellationToken)
         {             
             
             var depreciationLocked = await _depreciationQueryRepository.ExistDataLockedAsync( request.finYearId, request.depreciationType,request.depreciationPeriod);
             if (depreciationLocked==true)
             {
-                return new ApiResponseDTO<DepreciationDto>
-                {
-                    IsSuccess = false,
-                    Message = "Already depreciation details Locked."
-                };
+                throw new ValidationException("Already depreciation details Locked.");
+           
             }
             var depreciationGroups = await _depreciationQueryRepository.ExistDataAsync( request.finYearId, request.depreciationType,request.depreciationPeriod);
             if (depreciationGroups==false)
             {
-                return new ApiResponseDTO<DepreciationDto>
-                {
-                    IsSuccess = false,
-                    Message = "No details found for this period"
-                };
+                throw new ValidationException("No details found for this period");
+              
             }
             
             var depreciationUpdate = _mapper.Map<DepreciationDetails>(request);      
@@ -63,18 +58,10 @@ namespace Core.Application.DepreciationDetail.Commands.UpdateDepreciationDetail
                     module:"DepreciationDetail"
                 );               
                 await _mediator.Publish(domainEvent, cancellationToken);                 
-                return new ApiResponseDTO<DepreciationDto>
-                {
-                    IsSuccess = true,
-                    Message = "Depreciation Locked successfully.",
-                    Data = depreciationGroupDto
-                };
+                return  depreciationGroupDto;
             }
-            return new ApiResponseDTO<DepreciationDto>
-            {
-                IsSuccess = false,
-                Message = "Depreciation Locked failed."                             
-            };           
+            throw new Exception("Depreciation Locked failed.");
+                   
         }
     }
 }

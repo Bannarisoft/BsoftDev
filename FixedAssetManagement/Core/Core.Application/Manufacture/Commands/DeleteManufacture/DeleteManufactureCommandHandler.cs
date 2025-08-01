@@ -7,11 +7,12 @@ using Core.Application.Manufacture.Queries.GetManufacture;
 using Core.Domain.Common;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Manufacture.Commands.DeleteManufacture
 {
-    public class DeleteManufactureCommandHandler   : IRequestHandler<DeleteManufactureCommand, ApiResponseDTO<ManufactureDTO>>
+    public class DeleteManufactureCommandHandler   : IRequestHandler<DeleteManufactureCommand, ManufactureDTO>
     {
          private readonly IManufactureCommandRepository _manufactureRepository;
         private readonly IMapper _mapper;
@@ -26,16 +27,13 @@ namespace Core.Application.Manufacture.Commands.DeleteManufacture
             _manufactureQueryRepository=manufactureQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<ManufactureDTO>> Handle(DeleteManufactureCommand request, CancellationToken cancellationToken)
+        public async Task<ManufactureDTO> Handle(DeleteManufactureCommand request, CancellationToken cancellationToken)
         {
               var manufactures = await _manufactureQueryRepository.GetByIdAsync(request.Id);
             if (manufactures is null )
             {
-                return new ApiResponseDTO<ManufactureDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid ManufactureID. "
-                };
+                throw new ValidationException("Invalid ManufactureID.");
+               
             }
             var manufacturesDelete = _mapper.Map<Manufactures>(request);      
             var updateResult = await _manufactureRepository.DeleteAsync(request.Id, manufacturesDelete);
@@ -51,19 +49,10 @@ namespace Core.Application.Manufacture.Commands.DeleteManufacture
                     module:"Manufacture"
                 );               
                 await _mediator.Publish(domainEvent, cancellationToken);                 
-                return new ApiResponseDTO<ManufactureDTO>
-                {
-                    IsSuccess = true,
-                    Message = "Manufacture deleted successfully.",
-                    Data = manufactureDto
-                };
+                return  manufactureDto;
             }
-
-            return new ApiResponseDTO<ManufactureDTO>
-            {
-                IsSuccess = false,
-                Message = "Manufacture deletion failed."                             
-            };
+            throw new Exception("Manufacture deletion failed.");
+        
         }
     }
 }

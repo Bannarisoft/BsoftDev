@@ -5,11 +5,12 @@ using Core.Application.Common.Interfaces.ISpecificationMaster;
 using Core.Application.SpecificationMaster.Queries.GetSpecificationMaster;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.SpecificationMaster.Commands.CreateSpecificationMaster
 {
-    public class CreateSpecificationMasterCommandHandler : IRequestHandler<CreateSpecificationMasterCommand, ApiResponseDTO<SpecificationMasterDTO>>
+    public class CreateSpecificationMasterCommandHandler : IRequestHandler<CreateSpecificationMasterCommand, SpecificationMasterDTO>
     {        
         private readonly IMapper _mapper;
         private readonly ISpecificationMasterCommandRepository _specificationMasterRepository;
@@ -22,15 +23,13 @@ namespace Core.Application.SpecificationMaster.Commands.CreateSpecificationMaste
             _mediator = mediator;    
         } 
 
-       public async Task<ApiResponseDTO<SpecificationMasterDTO>> Handle(CreateSpecificationMasterCommand request, CancellationToken cancellationToken)
+       public async Task<SpecificationMasterDTO> Handle(CreateSpecificationMasterCommand request, CancellationToken cancellationToken)
         {
             var specificationMasterExists = await _specificationMasterRepository.ExistsByAssetGroupIdAsync(request.AssetGroupId,request.SpecificationName);
             if (specificationMasterExists)
             {
-                return new ApiResponseDTO<SpecificationMasterDTO> {
-                    IsSuccess = false, 
-                    Message = "SpecificationMaster already exists."
-                };                 
+                throw new ValidationException("SpecificationMaster already exists.");
+                               
             }
        
             var specificationMasterEntity = _mapper.Map<SpecificationMasters>(request);            
@@ -49,16 +48,10 @@ namespace Core.Application.SpecificationMaster.Commands.CreateSpecificationMaste
             var specificationMasterDto = _mapper.Map<SpecificationMasterDTO>(result);
             if (specificationMasterDto.Id > 0)
             {
-                return new ApiResponseDTO<SpecificationMasterDTO>{
-                    IsSuccess = true, 
-                    Message = "SpecificationMaster created successfully.",
-                    Data = specificationMasterDto
-                };
+                return  specificationMasterDto;
             }
-            return  new ApiResponseDTO<SpecificationMasterDTO>{
-                IsSuccess = false, 
-                Message = "SpecificationMaster not created."
-            };      
+            throw new Exception("SpecificationMaster not created.");
+                 
         }
     }
 }

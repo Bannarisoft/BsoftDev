@@ -11,11 +11,12 @@ using Core.Application.Location.Command.DeleteAubLocation;
 using Core.Application.SubLocation.Queries.GetSubLocations;
 using Core.Domain.Common;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.SubLocation.Command.DeleteSubLocation
 {
-    public class DeleteSubLocationCommandHandler : IRequestHandler<DeleteSubLocationCommand, ApiResponseDTO<SubLocationDto>>
+    public class DeleteSubLocationCommandHandler : IRequestHandler<DeleteSubLocationCommand, bool>
     {
         private readonly ISubLocationCommandRepository _sublocationCommandRepository;
         private readonly ISubLocationQueryRepository _subLocationQueryRepository;
@@ -34,35 +35,19 @@ namespace Core.Application.SubLocation.Command.DeleteSubLocation
             _locationQueryRepository = locationQueryRepository;
             _assetLocationQueryRepository = assetLocationQueryRepository;
         }
-        public async Task<ApiResponseDTO<SubLocationDto>> Handle(DeleteSubLocationCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteSubLocationCommand request, CancellationToken cancellationToken)
         {
             var sublocations = await _subLocationQueryRepository.GetByIdAsync(request.Id);
             if (sublocations is null || sublocations.IsDeleted is BaseEntity.IsDelete.Deleted)
             {
-                return new ApiResponseDTO<SubLocationDto>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid SubLocationID.The specified SubLocation does not exist or is inactive.  "
-                };
+                throw new ValidationException("Invalid SubLocationID.The specified SubLocation does not exist or is inactive.");
+             
             }
-            // var location = await _locationQueryRepository.GetByIdAsync(request.Id);
-            // if (location != null)
-            // {
-            //     return new ApiResponseDTO<SubLocationDto>
-            //     {
-            //         IsSuccess = false,
-            //         Message = "SubLocation already exists for this Location.Cannot delete the SubLocation."
-            //     };
-            // }
-
             var (assetSublocations, _) = await _assetLocationQueryRepository.GetAllAssetLocationAsync(1, 1, request.Id.ToString());
             if (assetSublocations.Any(a => a.SubLocationId == request.Id))
             {
-                return new ApiResponseDTO<SubLocationDto>
-                {
-                    IsSuccess = false,
-                    Message = "SubLocation is in use by an Asset Location. Cannot delete."
-                };
+                throw new ValidationException("SubLocation is in use by an Asset Location. Cannot delete.");
+             
             }
             var sublocation = _mapper.Map<Core.Domain.Entities.SubLocation>(request);
             var sublocationresult = await _sublocationCommandRepository.DeleteAsync(request.Id, sublocation);
@@ -80,10 +65,10 @@ namespace Core.Application.SubLocation.Command.DeleteSubLocation
 
             if (sublocationresult)
             {
-                return new ApiResponseDTO<SubLocationDto> { IsSuccess = true, Message = "SubLocation deleted successfully." };
+                return sublocationresult;
             }
-
-            return new ApiResponseDTO<SubLocationDto> { IsSuccess = false, Message = "SubLocation not deleted." };
+            throw new Exception("SubLocation not deleted.");
+            
         }
     }
 }

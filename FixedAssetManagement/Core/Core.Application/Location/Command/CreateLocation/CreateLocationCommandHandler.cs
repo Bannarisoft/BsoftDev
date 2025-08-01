@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ILocation;
 using Core.Application.Location.Queries.GetLocations;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Location.Command.CreateLocation
 {
-    public class CreateLocationCommandHandler : IRequestHandler<CreateLocationCommand, ApiResponseDTO<LocationDto>>
+    public class CreateLocationCommandHandler : IRequestHandler<CreateLocationCommand, LocationDto>
     {
         private readonly ILocationCommandRepository _locationCommandRepository;
         private readonly ILocationQueryRepository _locationQueryRepository;
@@ -24,13 +25,14 @@ namespace Core.Application.Location.Command.CreateLocation
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<LocationDto>> Handle(CreateLocationCommand request, CancellationToken cancellationToken)
+        public async Task<LocationDto> Handle(CreateLocationCommand request, CancellationToken cancellationToken)
         {
                var existingLocation = await _locationQueryRepository.GetByLocationNameAsync(request.LocationName, request.DepartmentId,request.UnitId);
 
                if (existingLocation != null)
                {
-                   return new ApiResponseDTO<LocationDto>{IsSuccess = false, Message = "Location already exists"};
+                throw new ValidationException("Location already exists");
+                   
                }
            
                  var location  = _mapper.Map<Core.Domain.Entities.Location>(request);
@@ -49,10 +51,10 @@ namespace Core.Application.Location.Command.CreateLocation
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
                  
-                    return new ApiResponseDTO<LocationDto>{IsSuccess = true, Message = "Location created successfully", Data = locationMap};
+                    return locationMap;
                 }
-               
-                    return new ApiResponseDTO<LocationDto>{IsSuccess = false, Message = "Location not created"};
+               throw new Exception("Location not created");
+                    
         }
     }
 }

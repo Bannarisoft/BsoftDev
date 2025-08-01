@@ -4,11 +4,12 @@ using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IManufacture;
 using Core.Application.Manufacture.Queries.GetManufacture;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Manufacture.Queries.GetManufactureById
 {
-    public class GetManufactureByIdQueryHandler : IRequestHandler<GetManufactureByIdQuery, ApiResponseDTO<ManufactureDTO>>
+    public class GetManufactureByIdQueryHandler : IRequestHandler<GetManufactureByIdQuery, ManufactureDTO>
     {
         private readonly IManufactureQueryRepository _manufactureRepository;
         private readonly IMapper _mapper;
@@ -22,16 +23,13 @@ namespace Core.Application.Manufacture.Queries.GetManufactureById
             _mediator = mediator;
             _locationLookupService=locationLookupService;
         }
-        public async Task<ApiResponseDTO<ManufactureDTO>> Handle(GetManufactureByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ManufactureDTO> Handle(GetManufactureByIdQuery request, CancellationToken cancellationToken)
         {
             var manufacture = await _manufactureRepository.GetByIdAsync(request.Id);                            
             if (manufacture is null)
-            {                
-                return new ApiResponseDTO<ManufactureDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Manufacture with ID {request.Id} not found."
-                };   
+            {           
+                throw new ValidationException("Manufacture with ID {request.Id} not found.");     
+               
             }       
             var manufactureDto = _mapper.Map<ManufactureDTO>(manufacture);
             // Get lookup data for geo enrichment
@@ -57,12 +55,7 @@ namespace Core.Application.Manufacture.Queries.GetManufactureById
                 module:"Manufacture"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<ManufactureDTO>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = manufactureDto
-            };       
+            return  manufactureDto;       
         }
     }
 }
