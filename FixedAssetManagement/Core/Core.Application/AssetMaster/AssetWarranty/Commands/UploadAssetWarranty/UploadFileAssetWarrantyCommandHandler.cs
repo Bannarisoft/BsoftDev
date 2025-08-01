@@ -5,6 +5,7 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Commands.UploadAssetWarranty
 {
-    public class UploadFileAssetWarrantyCommandHandler : IRequestHandler<UploadFileAssetWarrantyCommand, ApiResponseDTO<AssetWarrantyDTO>>
+    public class UploadFileAssetWarrantyCommandHandler : IRequestHandler<UploadFileAssetWarrantyCommand, AssetWarrantyDTO>
     {
         private readonly IFileUploadService _fileUploadService;
         private readonly IMediator _mediator;
@@ -47,23 +48,26 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.UploadAssetWarrant
             _companyGrpcClient = companyGrpcClient;
         }
 
-        public async Task<ApiResponseDTO<AssetWarrantyDTO>> Handle(UploadFileAssetWarrantyCommand request, CancellationToken cancellationToken)
+        public async Task<AssetWarrantyDTO> Handle(UploadFileAssetWarrantyCommand request, CancellationToken cancellationToken)
         {
             if (request.File == null || request.File.Length == 0)
             {
-                return new ApiResponseDTO<AssetWarrantyDTO> { IsSuccess = false, Message = "No file uploaded" };
+                throw new ValidationException("No file uploaded");
+                
             }
 
             if (string.IsNullOrWhiteSpace(request.AssetCode))
             {
-                return new ApiResponseDTO<AssetWarrantyDTO> { IsSuccess = false, Message = "AssetCode is required for file naming." };
+                throw new ValidationException("AssetCode is required for file naming.");
+                
             }
 
             // 🔹 Check if asset exists using repository
             var existingAsset = await _assetWarrantyRepository.GetByAssetCodeAsync(request.AssetCode);
             if (existingAsset == null)
             {
-                return new ApiResponseDTO<AssetWarrantyDTO> { IsSuccess = false, Message = "Asset not found." };
+                throw new ValidationException("Asset not found.");
+                
             }
 
             try
@@ -109,7 +113,8 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.UploadAssetWarrant
                 bool updateSuccess = await _assetWarrantyRepository.UpdateAssetWarrantyImageAsync(existingAsset.Id, formattedPath);
                 if (!updateSuccess)
                 {
-                    return new ApiResponseDTO<AssetWarrantyDTO> { IsSuccess = false, Message = "Failed to update asset image." };
+                    throw new ValidationException("Failed to update asset image.");
+                    
                 }
 
                 var response = new AssetWarrantyDTO
@@ -118,12 +123,13 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.UploadAssetWarrant
                     DocumentBase64 = base64Image  // ✅ Convert to Base64
                 };
 
-                return new ApiResponseDTO<AssetWarrantyDTO> { IsSuccess = true, Data = response };
+                return  response;
             }
             catch (Exception ex)
             {
                 _logger.LogError($"File upload failed: {ex.Message}");
-                return new ApiResponseDTO<AssetWarrantyDTO> { IsSuccess = false, Message = $"File upload failed: {ex.Message}" };
+                throw new Exception($"File upload failed: {ex.Message}");
+                
             }
         }
 

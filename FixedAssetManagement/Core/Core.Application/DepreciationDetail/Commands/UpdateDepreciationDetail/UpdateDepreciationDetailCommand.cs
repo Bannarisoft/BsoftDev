@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationDetail.Commands.UpdateDepreciationDetail
 {
-    public class UpdateDepreciationDetailCommand  :  IRequest<ApiResponseDTO<DepreciationDto>>  
+    public class UpdateDepreciationDetailCommand  :  IRequest<DepreciationDto>
     {
         public int companyId { get; set; } 
         public int unitId { get; set; } 

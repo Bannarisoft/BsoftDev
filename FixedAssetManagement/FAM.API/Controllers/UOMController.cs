@@ -16,14 +16,12 @@ namespace FAM.API.Controllers
     
     public class UOMController : ApiControllerBase
     {
-        private readonly IValidator<CreateUOMCommand> _createUOMCommandValidator;
-        private readonly IValidator<UpdateUOMCommand> _updateUOMCommandValidator;
 
-        public UOMController(ISender mediator,IValidator<CreateUOMCommand> createUOMCommandValidator,IValidator<UpdateUOMCommand> updateUOMCommandValidator) 
+        public UOMController(ISender mediator
+        ) 
         : base(mediator)
         {
-            _createUOMCommandValidator = createUOMCommandValidator;
-            _updateUOMCommandValidator = updateUOMCommandValidator;
+            
         }
     [HttpGet]
     public async Task<IActionResult> GetAllUOMAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? SearchTerm = null)
@@ -49,31 +47,16 @@ namespace FAM.API.Controllers
     public async Task<IActionResult> CreateAsync(CreateUOMCommand createuomcommand)
     {
             
-        var validationResult = await _createUOMCommandValidator.ValidateAsync(createuomcommand);
-            
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new 
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray() 
-                });
-            }
+   
         var result = await Mediator.Send(createuomcommand);
-     if (result.IsSuccess)
-            {
+
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = result.Message, 
-                    data = result.Data
+                    message = "UOM created successfully", 
+                    data = result
                 });
-            }                      
-            return BadRequest(new 
-            { 
-                StatusCode=StatusCodes.Status400BadRequest,
-                message = result.Message 
-            });
+                               
             
     }
     [HttpGet("{id}")]
@@ -90,30 +73,17 @@ namespace FAM.API.Controllers
             }  
        var result = await Mediator.Send(new GetUOMByIdQuery() { Id = id});
           
-        if (!result.IsSuccess)
-                    {                
-                        return NotFound(new 
-                        { 
-                            StatusCode = StatusCodes.Status404NotFound,
-                            message = result.Message
-                        });
-                    }
                     return Ok(new
                     {
                         StatusCode = StatusCodes.Status200OK,
-                        data = result.Data
+                        data = result
                     });
     }
 
     [HttpPut]
     public async Task<IActionResult> Update( UpdateUOMCommand updateUomcommand )
     {
-        var validationResult = await _updateUOMCommandValidator.ValidateAsync(updateUomcommand);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.Errors);
-            }
-          
+        
 
         var uomExists = await Mediator.Send(new GetUOMByIdQuery { Id = updateUomcommand.Id });
 
@@ -123,23 +93,14 @@ namespace FAM.API.Controllers
              }
 
         var result = await Mediator.Send(updateUomcommand);
-         if (result.IsSuccess)
-            {
+        
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = result.Message, 
-                    data = result.Data 
+                    message = "UOM updated successfully", 
+                    data = result 
                 });
-            }
-            else
-            {            
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = result.Message 
-                });
-            }
+         
     }
 
 
@@ -154,16 +115,8 @@ namespace FAM.API.Controllers
                     message = "Invalid UOM ID"
                 });
             } 
-        var deleteduom = await Mediator.Send(new DeleteUOMCommand { Id = id });
+         await Mediator.Send(new DeleteUOMCommand { Id = id });
 
-            if (!deleteduom.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = deleteduom.Message
-                });
-            }
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
@@ -176,38 +129,24 @@ namespace FAM.API.Controllers
     public async Task<IActionResult> GetUOM([FromQuery] string? name)
     {
         var result = await Mediator.Send(new GetUOMAutoCompleteQuery {SearchPattern = name});
-        if (!result.IsSuccess)
-            {
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                 }); 
-            }
+      
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
-                data = result.Data
+                message = result,
+                data = result
             });
     }
      [HttpGet("by-Type")]
     public async Task<IActionResult> GetUOMType([FromQuery] string? name)
     {
         var result = await Mediator.Send(new GetUOMTypeAutoCompleteQuery {SearchPattern = name});
-        if (!result.IsSuccess)
-            {
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                 }); 
-            }
+      
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
-                data = result.Data
+                message = result,
+                data = result
             });
     }
     }

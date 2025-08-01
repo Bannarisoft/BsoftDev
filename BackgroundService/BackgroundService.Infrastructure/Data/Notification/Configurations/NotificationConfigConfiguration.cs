@@ -33,6 +33,11 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
                 .HasColumnName("Id")
                 .HasColumnType("int")
                 .IsRequired();
+                
+            builder.Property(t => t.UnitId)
+                .HasColumnName("UnitId")
+                .HasColumnType("int")
+                .IsRequired();
 
             builder.Property(t => t.ModuleName)
             .HasColumnName("ModuleName")

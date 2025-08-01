@@ -19,27 +19,30 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
 
         public async Task<NotificationLevelHierarchyDto> GetByIdAsync(int Id)
         {
-            
+            var UnitId = _ipAddressService.GetUnitId();
             const string query = @" select NH.Id,NotificationConfigId,TargetTypeId,TargetId,UnitId,ApprovalModeId,NH.Description,NH.IsActive,NH.IsDeleted,NH.CreatedBy,NH.CreatedDate,
                 NH.CreatedByName,NH.CreatedIP,NH.ModifiedBy,NH.ModifiedDate,NH.ModifiedByName,NH.ModifiedIP,
                 NC.ModuleName,MM2.Code NotificationEventType,MM.Code TargetType,
-                case when U.UserId is not null then U.UserName else Case when R.RoleName is not null then R.RoleName else NG.GroupName end end as TargetName,MM1.Code ApprovalMode
+                case when MM.Code='USER' then U.UserName else Case when MM.Code='ROLE' then R.RoleName else Case when MM.Code='DEPT' then D.DeptName else NG.GroupName end end end as TargetName,
+                MM1.Code ApprovalMode
                 from AppNotification.NotificationLevelHierarchy NH
                 INNER JOIN AppNotification.NotificationConfig NC on NH.NotificationConfigId=NC.Id
                 INNER JOIN AppData.MiscMaster MM2 on MM2.Id=NC.NotificationEventTypeId
                 INNER JOIN AppData.MiscMaster MM on MM.Id=NH.TargetTypeId
-                LEFT JOIN Bannari.AppSecurity.Users U on U.UserId=NH.TargetId
-                LEFT JOIN Bannari.AppSecurity.UserRole R on R.Id=NH.TargetId
+                LEFT JOIN Bannari.AppSecurity.Users U on U.UserId=NH.TargetId and MM.Code='USER'
+                LEFT JOIN Bannari.AppSecurity.UserRole R on R.Id=NH.TargetId  and MM.Code='ROLE'
                 LEFT JOIN AppNotification.NotificationGroup NG on NG.Id=NH.TargetId
+                LEFT JOIN Bannari.AppData.Department D on D.Id=NH.TargetId and MM.Code='DEPT'
                 INNER JOIN AppData.MiscMaster MM1 on MM1.Id=NH.ApprovalModeId                
-                where /*NH.UnitId=@UnitId and*/ NH.IsDeleted=0 and NH.Id=@Id ";
+                where NC.UnitId=@UnitId and NH.IsDeleted=0 and NH.Id=@Id ";
 
             var NotificationLevelHierarchy = await _dbConnection.QueryFirstOrDefaultAsync<NotificationLevelHierarchyDto>(query, new { UnitId,Id });
             return NotificationLevelHierarchy;
         }
 
         public async Task<(IEnumerable<dynamic>, int)> GetAllNotificationLevelHierarchyAsync(int PageNumber, int PageSize, string? SearchTerm)
-        {            
+        {      
+            var UnitId = _ipAddressService.GetUnitId();      
             var query = $$"""
             DECLARE @TotalCount INT;
             SELECT @TotalCount = COUNT(*) 
@@ -47,27 +50,31 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
             INNER JOIN AppNotification.NotificationConfig NC on NH.NotificationConfigId=NC.Id
             INNER JOIN AppData.MiscMaster MM2 on MM2.Id=NC.NotificationEventTypeId
             INNER JOIN AppData.MiscMaster MM on MM.Id=NH.TargetTypeId
-            LEFT JOIN Bannari.AppSecurity.Users U on U.UserId=NH.TargetId
-            LEFT JOIN Bannari.AppSecurity.UserRole R on R.Id=NH.TargetId
+            LEFT JOIN Bannari.AppSecurity.Users U on U.UserId=NH.TargetId and MM.Code='USER'
+            LEFT JOIN Bannari.AppSecurity.UserRole R on R.Id=NH.TargetId  and MM.Code='ROLE'
             LEFT JOIN AppNotification.NotificationGroup NG on NG.Id=NH.TargetId
-            INNER JOIN AppData.MiscMaster MM1 on MM1.Id=NH.ApprovalModeId            
-            where/* NH.UnitId=@UnitId and*/ NH.IsDeleted=0
+            LEFT JOIN Bannari.AppData.Department D on D.Id=NH.TargetId and MM.Code='DEPT'
+            INNER JOIN AppData.MiscMaster MM1 on MM1.Id=NH.ApprovalModeId
+            where NC.UnitId=@UnitId and NH.IsDeleted=0
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search)")}};
 
-            SELECT  NH.Id,NotificationConfigId,TargetTypeId,TargetId,UnitId,ApprovalModeId,NH.Description,NH.IsActive,NH.IsDeleted,NH.CreatedBy,NH.CreatedDate,
-                NH.CreatedByName,NH.CreatedIP,NH.ModifiedBy,NH.ModifiedDate,NH.ModifiedByName,NH.ModifiedIP,
-                NC.ModuleName,MM2.Code NotificationEventType,MM.Code TargetType,
-                case when U.UserId is not null then U.UserName else Case when R.RoleName is not null then R.RoleName else NG.GroupName end end as TargetName,MM1.Code ApprovalMode
+            SELECT  NH.Id,NotificationConfigId,TargetTypeId,TargetId,NC.UnitId,ApprovalModeId,NH.Description,NH.IsActive,NH.IsDeleted,NH.CreatedBy,NH.CreatedDate,
+            NH.CreatedByName,NH.CreatedIP,NH.ModifiedBy,NH.ModifiedDate,NH.ModifiedByName,NH.ModifiedIP,
+            NC.ModuleName,MM2.Code NotificationEventType,MM.Code TargetType,
+            case when MM.Code='USER' then U.UserName else Case when MM.Code='ROLE' then R.RoleName else Case when MM.Code='DEPT' then D.DeptName else NG.GroupName end end end as TargetName,
+            MM1.Code ApprovalMode
             from AppNotification.NotificationLevelHierarchy NH
             INNER JOIN AppNotification.NotificationConfig NC on NH.NotificationConfigId=NC.Id
             INNER JOIN AppData.MiscMaster MM2 on MM2.Id=NC.NotificationEventTypeId
             INNER JOIN AppData.MiscMaster MM on MM.Id=NH.TargetTypeId
-            LEFT JOIN Bannari.AppSecurity.Users U on U.UserId=NH.TargetId
-            LEFT JOIN Bannari.AppSecurity.UserRole R on R.Id=NH.TargetId
+            LEFT JOIN Bannari.AppSecurity.Users U on U.UserId=NH.TargetId and MM.Code='USER'
+            LEFT JOIN Bannari.AppSecurity.UserRole R on R.Id=NH.TargetId  and MM.Code='ROLE'
             LEFT JOIN AppNotification.NotificationGroup NG on NG.Id=NH.TargetId
+            LEFT JOIN Bannari.AppData.Department D on D.Id=NH.TargetId and MM.Code='DEPT'
             INNER JOIN AppData.MiscMaster MM1 on MM1.Id=NH.ApprovalModeId            
-            where /*NH.UnitId=@UnitId and*/ NH.IsDeleted=0 
-            {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search )")}}
+   
+            where NC.UnitId=@UnitId and NH.IsDeleted=0 
+            {{ (string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search )")}}
             ORDER BY Id desc
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
@@ -76,7 +83,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
 
             var parameters = new
             {
-                UnitId = UnitId,
+                UnitId,
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
                 PageSize

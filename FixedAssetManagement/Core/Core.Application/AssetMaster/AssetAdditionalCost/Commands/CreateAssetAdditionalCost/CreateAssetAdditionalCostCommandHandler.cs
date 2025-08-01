@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAdditionalCost.Commands.CreateAssetAdditionalCost
 {
-    public class CreateAssetAdditionalCostCommandHandler : IRequestHandler<CreateAssetAdditionalCostCommand, ApiResponseDTO<int>>
+    public class CreateAssetAdditionalCostCommandHandler : IRequestHandler<CreateAssetAdditionalCostCommand, int>
     {
         private readonly IAssetAdditionalCostCommandRepository _iAssetAdditionalCostCommandRepository;
         private readonly IMediator _imediator;
@@ -23,7 +23,7 @@ namespace Core.Application.AssetMaster.AssetAdditionalCost.Commands.CreateAssetA
             _imapper = imapper;
           
         }
-        public async Task<ApiResponseDTO<int>> Handle(CreateAssetAdditionalCostCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateAssetAdditionalCostCommand request, CancellationToken cancellationToken)
         {
              var assetAdditionalCost = _imapper.Map<Core.Domain.Entities.AssetPurchase.AssetAdditionalCost>(request);
             
@@ -37,23 +37,15 @@ namespace Core.Application.AssetMaster.AssetAdditionalCost.Commands.CreateAssetA
                 details: $"AssetAdditionalCost details was created",
                 module: "AssetAdditionalCost");
             await _imediator.Publish(domainEvent, cancellationToken);
-            var assetGroupDtoDto = _imapper.Map<AssetAdditionalCostDto>(assetAdditionalCost);
+            
             if (result > 0)
                   {
                      
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "AssetAdditionalCost created successfully",
-                           Data = result
-                      };
+                        return  result;
                  }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "AssetAdditionalCost Creation Failed",
-                Data = result
-            };
+                 
+                 throw new Exception("AssetAdditionalCost Creation Failed");
+          
         }
     }
 }

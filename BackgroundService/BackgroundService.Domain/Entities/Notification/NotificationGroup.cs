@@ -8,7 +8,8 @@ namespace BackgroundService.Domain.Entities.Notification
 {
     public class NotificationGroup : BaseEntity
     {
-        public string GroupName { get; set; }
+        public string? GroupName { get; set; }
+        public int UnitId { get; set; }
         public ICollection<NotificationGroupMembers> NotificationGroupMembers { get; set; }        
     }
 }

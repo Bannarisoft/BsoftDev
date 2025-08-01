@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.Location.Command.CreateLocation
 {
-    public class CreateLocationCommand : IRequest<ApiResponseDTO<LocationDto>>
+    public class CreateLocationCommand : IRequest<LocationDto>
     {
         public string? Code { get; set; }
         public string? LocationName { get; set; }

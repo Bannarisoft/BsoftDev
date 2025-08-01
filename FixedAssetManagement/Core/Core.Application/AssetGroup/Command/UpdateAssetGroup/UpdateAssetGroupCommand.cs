@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetGroup.Command.UpdateAssetGroup
 {
-    public class UpdateAssetGroupCommand : IRequest<ApiResponseDTO<int>>
+    public class UpdateAssetGroupCommand : IRequest<int>
     {
         public int Id { get; set; }
         public string? GroupName { get; set; }

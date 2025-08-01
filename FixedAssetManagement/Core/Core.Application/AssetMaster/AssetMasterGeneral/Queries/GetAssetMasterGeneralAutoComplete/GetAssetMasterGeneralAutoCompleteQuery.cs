@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralAutoComplete
 {
-    public class GetAssetMasterGeneralAutoCompleteQuery  : IRequest<ApiResponseDTO<List<AssetMasterGeneralAutoCompleteDTO>>>
+    public class GetAssetMasterGeneralAutoCompleteQuery  : IRequest<List<AssetMasterGeneralAutoCompleteDTO>>
     {
         public string? SearchPattern { get; set; }
     }

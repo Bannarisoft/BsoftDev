@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MiscTypeMaster.Command.CreateMiscTypeMaster
 {
-    public class CreateMiscTypeMasterCommand : IRequest<ApiResponseDTO<GetMiscTypeMasterDto>>
+    public class CreateMiscTypeMasterCommand : IRequest<GetMiscTypeMasterDto>
     {
       
        public string? MiscTypeCode { get; set; }

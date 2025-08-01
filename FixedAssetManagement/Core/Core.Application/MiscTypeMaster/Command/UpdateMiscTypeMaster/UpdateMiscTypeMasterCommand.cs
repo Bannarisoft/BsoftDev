@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.MiscTypeMaster.Command.UpdateMiscTypeMaster
 {
-    public class UpdateMiscTypeMasterCommand  : IRequest<ApiResponseDTO<bool>>
+    public class UpdateMiscTypeMasterCommand  : IRequest<bool>
     {
 
         public int Id { get; set; }

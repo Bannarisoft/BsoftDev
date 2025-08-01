@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteDocumentAssetMasterGeneral
 {
-    public class DeleteDocumentAssetMasterGeneralCommand : IRequest<ApiResponseDTO<bool>>
+    public class DeleteDocumentAssetMasterGeneralCommand : IRequest<bool>
     {
         public string? assetPath { get; set; }       
     }

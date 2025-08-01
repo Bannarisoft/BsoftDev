@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetCategoryByDeptId
 {
-    public class GetCategoryByDeptIQuery  :  IRequest<ApiResponseDTO<List<GetCategoryByDeptIdDto>>>
+    public class GetCategoryByDeptIQuery  :  IRequest<List<GetCategoryByDeptIdDto>>
     {    
 
         public int DepartmentId { get; set; }

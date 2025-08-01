@@ -10,11 +10,12 @@ using Core.Application.Common.Interfaces.IAssetMaster.IAssetSpecification;
 using Core.Domain.Common;
 using Core.Domain.Entities.AssetMaster;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSpecification
 {
-    public class UpdateAssetSpecificationCommandHandler : IRequestHandler<UpdateAssetSpecificationCommand, ApiResponseDTO<string>>
+    public class UpdateAssetSpecificationCommandHandler : IRequestHandler<UpdateAssetSpecificationCommand, string>
     {
         private readonly IAssetSpecificationCommandRepository _assetSpecificationRepository;
         private readonly IAssetSpecificationQueryRepository _assetSpecificationQueryRepository;
@@ -30,17 +31,14 @@ namespace Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSp
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<string>> Handle(UpdateAssetSpecificationCommand request, CancellationToken cancellationToken)
+        public async Task<string> Handle(UpdateAssetSpecificationCommand request, CancellationToken cancellationToken)
         {
             // Fetch existing specifications for the asset
             var existingSpecs = await _assetSpecificationQueryRepository.GetByIdAsync(request.AssetId);
             if (existingSpecs == null)
             {
-                return new ApiResponseDTO<string>
-                {
-                    IsSuccess = false,
-                    Message = "Asset not found or specifications are not available."
-                };
+                throw new ValidationException("Asset not found or specifications are not available.");
+               
             }
 
             int updateCount = 0;
@@ -79,11 +77,7 @@ namespace Core.Application.AssetMaster.AssetSpecification.Commands.UpdateAssetSp
             }
 
             // Return a response based on whether any updates were made
-            return new ApiResponseDTO<string>
-            {
-                IsSuccess = updateCount > 0,
-                Message = updateCount > 0 ? "Specifications updated successfully." : "No specifications updated."
-            };
+            return  updateCount > 0 ? "Specifications updated successfully." : "No specifications updated.";
         }
     }
 }

@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.SaveAssetDocument
 {
-    public class SaveAssetDocumentCommand :  IRequest<ApiResponseDTO<bool>>
+    public class SaveAssetDocumentCommand :  IRequest<bool>
     {
         public int Id { get; set; }
         public string? AssetCode { get; set; }  

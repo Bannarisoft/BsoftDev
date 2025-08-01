@@ -5,11 +5,12 @@ using Core.Application.SpecificationMaster.Queries.GetSpecificationMaster;
 using Core.Domain.Common;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.SpecificationMaster.Commands.DeleteSpecificationMaster
 {
-    public class DeleteSpecificationMasterCommandHandler : IRequestHandler<DeleteSpecificationMasterCommand, ApiResponseDTO<SpecificationMasterDTO>>
+    public class DeleteSpecificationMasterCommandHandler : IRequestHandler<DeleteSpecificationMasterCommand, SpecificationMasterDTO>
     {
         private readonly ISpecificationMasterCommandRepository _specificationMasterRepository;
         private readonly IMapper _mapper;
@@ -24,16 +25,13 @@ namespace Core.Application.SpecificationMaster.Commands.DeleteSpecificationMaste
             _specificationMasterQueryRepository=specificationMasterQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<SpecificationMasterDTO>> Handle(DeleteSpecificationMasterCommand request, CancellationToken cancellationToken)
+        public async Task<SpecificationMasterDTO> Handle(DeleteSpecificationMasterCommand request, CancellationToken cancellationToken)
         {             
             var specificationMaster = await _specificationMasterQueryRepository.GetByIdAsync(request.Id);
             if (specificationMaster is null )
             {
-                return new ApiResponseDTO<SpecificationMasterDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid SpecificationMasterID."
-                };
+                throw new ValidationException("Invalid SpecificationMasterID.");
+               
             }
             var specificationMasterDelete = _mapper.Map<SpecificationMasters>(request);      
             var updateResult = await _specificationMasterRepository.DeleteAsync(request.Id, specificationMasterDelete);
@@ -49,19 +47,10 @@ namespace Core.Application.SpecificationMaster.Commands.DeleteSpecificationMaste
                     module:"Specification Master"
                 );               
                 await _mediator.Publish(domainEvent, cancellationToken);                 
-                return new ApiResponseDTO<SpecificationMasterDTO>
-                {
-                    IsSuccess = true,
-                    Message = "Specification Master deleted successfully.",
-                    Data = specificationMasterDto
-                };
+                return  specificationMasterDto;
             }
-
-            return new ApiResponseDTO<SpecificationMasterDTO>
-            {
-                IsSuccess = false,
-                Message = "Specification Master deletion failed."                             
-            };           
+        throw new Exception("Specification Master deletion failed.");
+                   
         }
     }
 }

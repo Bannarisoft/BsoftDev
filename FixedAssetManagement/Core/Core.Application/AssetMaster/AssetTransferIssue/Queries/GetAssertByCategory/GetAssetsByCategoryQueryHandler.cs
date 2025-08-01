@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCategory
 {
-    public class GetAssetsByCategoryQueryHandler  : IRequestHandler<GetAssetsByCategoryQuery,  ApiResponseDTO<List<GetAssetMasterDto>>>
+    public class GetAssetsByCategoryQueryHandler  : IRequestHandler<GetAssetsByCategoryQuery,  List<GetAssetMasterDto>>
     {
 
 
@@ -23,7 +23,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCat
             _mapper = mapper;
             _mediator=mediator;
         }
-        public async Task<ApiResponseDTO<List<GetAssetMasterDto>>> Handle(GetAssetsByCategoryQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetAssetMasterDto>> Handle(GetAssetsByCategoryQuery request, CancellationToken cancellationToken)
         {
             var assets = await _assetTransferQueryRepository.GetAssetsByCategoryAsync(request.AssetCategoryId , request.AssetDepartmentId);
 
@@ -38,13 +38,7 @@ namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssertByCat
                 module:"Asset Category"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetAssetMasterDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = AssetList
-                         
-            };           
+            return  AssetList;           
 
           
         }

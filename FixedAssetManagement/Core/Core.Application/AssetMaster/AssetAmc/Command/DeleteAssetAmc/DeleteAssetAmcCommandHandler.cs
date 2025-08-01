@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAmc.Command.DeleteAssetAmc
 {
-    public class DeleteAssetAmcCommandHandler : IRequestHandler<DeleteAssetAmcCommand, ApiResponseDTO<int>>
+    public class DeleteAssetAmcCommandHandler : IRequestHandler<DeleteAssetAmcCommand, int>
     {
         private readonly IAssetAmcCommandRepository _iassetamccommandrepository ;
         private readonly IAssetAmcQueryRepository _iassetamcqueryrepository ;
@@ -24,26 +25,22 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.DeleteAssetAmc
             _iassetamcqueryrepository = iassetamcqueryrepository;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(DeleteAssetAmcCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(DeleteAssetAmcCommand request, CancellationToken cancellationToken)
         {
             // 🔹 First, check if the ID exists in the database
             var existingAssetamc = await _iassetamcqueryrepository.GetByIdAsync(request.Id);
             if (existingAssetamc is null)
             {
-                
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "AssetAmc Id not found / AssetAmc is deleted ."
-                };
+                throw new ValidationException("AssetAmc Id not found / AssetAmc is deleted .");
+               
             }
 
             var assetamc = _Imapper.Map<Core.Domain.Entities.AssetMaster.AssetAmc>(request);
             var result = await _iassetamccommandrepository.DeleteAsync(request.Id,assetamc);
             if (result == -1) 
             {
-            
-             return new ApiResponseDTO<int> { IsSuccess = false, Message = "AssetAmc not found."};
+            throw new ValidationException("AssetAmc not found.");
+             
             }
 
             //Domain Event
@@ -56,13 +53,7 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.DeleteAssetAmc
                 await _mediator.Publish(domainEvent);
        
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,   
-                Data = result,
-                Message = "AssetAmc deleted successfully."
-    
-            };
+            return  result;
         }
     }
 }

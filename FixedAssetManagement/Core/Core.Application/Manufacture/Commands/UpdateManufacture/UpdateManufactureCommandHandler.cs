@@ -6,11 +6,12 @@ using Core.Application.Manufacture.Queries.GetManufacture;
 using Core.Domain.Common;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Manufacture.Commands.UpdateManufacture
 {
-    public class UpdateManufactureCommandHandler : IRequestHandler<UpdateManufactureCommand, ApiResponseDTO<bool>>
+    public class UpdateManufactureCommandHandler : IRequestHandler<UpdateManufactureCommand, bool>
     {
         private readonly IManufactureCommandRepository _manufactureRepository;
         private readonly IManufactureQueryRepository _manufactureQueryRepository;
@@ -25,34 +26,26 @@ namespace Core.Application.Manufacture.Commands.UpdateManufacture
             manufactureQueryRepository;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<bool>> Handle(UpdateManufactureCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateManufactureCommand request, CancellationToken cancellationToken)
         {
             var manufactures = await _manufactureQueryRepository.GetByIdAsync(request.Id);
             if (manufactures is null)
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = false,
-                Message = "Invalid ManufactureId. The specified Name does not exist."
-            };
+            throw new ValidationException("Invalid ManufactureId. The specified Name does not exist.");
+      
             var oldManufactureName = manufactures.ManufactureName;
             manufactures.ManufactureName = request.ManufactureName;
 
             if (manufactures is null || manufactures.IsDeleted is BaseEntity.IsDelete.Deleted )
             {
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid ManufactureID. The specified ManufactureName does not exist or is deleted."
-                };
+                throw new ValidationException("Invalid ManufactureID. The specified ManufactureName does not exist or is deleted.");
+               
             }        
             var manufactureExists = await _manufactureRepository.ExistsByCodeAsync(request.Code??string.Empty,request.Id);
 
             if (manufactureExists)
             {
-                return new ApiResponseDTO<bool> {
-                    IsSuccess = false, 
-                    Message = "Manufacture Code already exists."
-                };                             
+                throw new ValidationException("Manufacture Code already exists.");
+                                       
             }
 
             var updatedManufactures = _mapper.Map<Manufactures>(request);                   
@@ -70,14 +63,10 @@ namespace Core.Application.Manufacture.Commands.UpdateManufacture
                 await _mediator.Publish(domainEvent, cancellationToken);
                 if (updateResult)
                 { 
-                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Manufacture updated successfully."};
+                    return updateResult;
                 }
-            
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "Manufacture not updated."
-                };                
+            throw new Exception("Manufacture not updated.");
+                             
             }
     }
 }

@@ -8,11 +8,12 @@ using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.MiscMaster.Queries.GetMiscMaster;
 using Core.Application.MiscTypeMaster.Queries.GetMiscTypeMaster;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
 {
-    public class GetMiscMasterAutoCompleteQueryHandler : IRequestHandler<GetMiscMasterAutoCompleteQuery,ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>>>
+    public class GetMiscMasterAutoCompleteQueryHandler : IRequestHandler<GetMiscMasterAutoCompleteQuery,List<GetMiscMasterAutoCompleteDto>>
     {
          private readonly IMiscMasterQueryRepository _miscMasterQueryRepository;
         private readonly IMapper _mapper;
@@ -25,18 +26,14 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
          }
 
 
-          public  async Task<ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>>> Handle(GetMiscMasterAutoCompleteQuery request, CancellationToken cancellationToken)
+          public  async Task<List<GetMiscMasterAutoCompleteDto>> Handle(GetMiscMasterAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var miscTypeMasters  = await _miscMasterQueryRepository.GetMiscMaster( request.MiscTypeCode,request.MiscTypeName);
 
                     if (miscTypeMasters == null )
             {
-                return new ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"No Misc Type Masters found for TypeCode '{request.MiscTypeCode}' and TypeName '{request.MiscTypeName}'.",
-                    Data = new List<GetMiscMasterAutoCompleteDto>()
-                };
+                throw new ValidationException($"No Misc Type Masters found for TypeCode '{request.MiscTypeCode}' and TypeName '{request.MiscTypeName}'.");
+              
             }
 
             var division = _mapper.Map<List<GetMiscMasterAutoCompleteDto>>(miscTypeMasters);
@@ -49,7 +46,7 @@ namespace Core.Application.MiscMaster.Queries.GetMiscMasterAutoComplete
                     module:"MiscType"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetMiscMasterAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = division }; 
+            return  division; 
         }
         
     }

@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Command.CreateAssetTransferIssue
 {
-    public class CreateAssetTransferIssueCommand   : IRequest<ApiResponseDTO<int>> 
+    public class CreateAssetTransferIssueCommand   : IRequest<int>
     {
 
       public AssetTransferIssueHdrDto? AssetTransferIssueHdrDto { get; set; }

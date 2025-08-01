@@ -7,11 +7,12 @@ using Core.Application.AssetGroup.Queries.GetAssetGroup;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetGroup.Queries.GetAssetGroupById
 {
-    public class GetAssetGroupByIdQueryHandler : IRequestHandler<GetAssetGroupByIdQuery,ApiResponseDTO<AssetGroupDto>>
+    public class GetAssetGroupByIdQueryHandler : IRequestHandler<GetAssetGroupByIdQuery,AssetGroupDto>
     {
         private readonly IAssetGroupQueryRepository _iAssetGroupQueryRepository;        
         private readonly IMapper _mapper;
@@ -24,13 +25,14 @@ namespace Core.Application.AssetGroup.Queries.GetAssetGroupById
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<AssetGroupDto>> Handle(GetAssetGroupByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AssetGroupDto> Handle(GetAssetGroupByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetGroupQueryRepository.GetByIdAsync(request.Id);
             // Check if the entity exists
             if (result is null)
             {
-                return new ApiResponseDTO<AssetGroupDto> { IsSuccess = false, Message =$"AssetGroup ID {request.Id} not found." };
+                throw new ValidationException($"AssetGroup ID {request.Id} not found.");
+                
             }
             // Map a single entity
             var assetGroup = _mapper.Map<AssetGroupDto>(result);
@@ -44,7 +46,7 @@ namespace Core.Application.AssetGroup.Queries.GetAssetGroupById
                     module:"AssetGroup"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<AssetGroupDto> { IsSuccess = true, Message = "Success", Data = assetGroup };
+          return  assetGroup;
 
         }
     }

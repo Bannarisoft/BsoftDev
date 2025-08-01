@@ -5,11 +5,12 @@ using Core.Application.SpecificationMaster.Queries.GetSpecificationMaster;
 using Core.Domain.Common;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.SpecificationMaster.Commands.UpdateSpecificationMaster
 {
-    public class UpdateSpecificationMasterCommandHandler : IRequestHandler<UpdateSpecificationMasterCommand, ApiResponseDTO<SpecificationMasterDTO>>
+    public class UpdateSpecificationMasterCommandHandler : IRequestHandler<UpdateSpecificationMasterCommand, SpecificationMasterDTO>
     {
         private readonly ISpecificationMasterCommandRepository _specificationMasterRepository;
         private readonly ISpecificationMasterQueryRepository _specificationMasterQueryRepository;
@@ -24,57 +25,17 @@ namespace Core.Application.SpecificationMaster.Commands.UpdateSpecificationMaste
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<SpecificationMasterDTO>> Handle(UpdateSpecificationMasterCommand request, CancellationToken cancellationToken)
+        public async Task<SpecificationMasterDTO> Handle(UpdateSpecificationMasterCommand request, CancellationToken cancellationToken)
         {
             var specificationMaster = await _specificationMasterQueryRepository.GetByIdAsync(request.Id);
             if (specificationMaster is null)
-            return new ApiResponseDTO<SpecificationMasterDTO>
-            {
-                IsSuccess = false,
-                Message = "Invalid SpecificationMaster. The specified Name does not exist or is inactive."
-            };
+            throw new ValidationException("Invalid SpecificationMaster. The specified Name does not exist or is inactive.");
+           
             
             var oldSpecificationMaster = specificationMaster.SpecificationName;
             specificationMaster.SpecificationName = request.SpecificationName;
 
-            /*if (specificationMaster is null || specificationMaster.IsDeleted is BaseEntity.IsDelete.Deleted )
-            {
-                return new ApiResponseDTO<SpecificationMasterDTO>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid Specification Id. The specified Name does not exist or is deleted."
-                };
-            }
-            if (specificationMaster.IsActive != request.IsActive)
-            {    
-                 specificationMaster.IsActive =  (BaseEntity.Status)request.IsActive;             
-                await _specificationMasterRepository.UpdateAsync(specificationMaster.Id, specificationMaster);
-                if (request.IsActive is 0)
-                {
-                    return new ApiResponseDTO<SpecificationMasterDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "Code DeActivated."
-                    };
-                }
-                else{
-                    return new ApiResponseDTO<SpecificationMasterDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "Code Activated."
-                    }; 
-                }                                     
-            } */
-
-         /*    var specificationMasterExistsByName = await _specificationMasterRepository.ExistsByAssetGroupIdAsync(request.AssetGroupId, request.SpecificationName);
-            if (specificationMasterExistsByName)
-            {                                   
-                return new ApiResponseDTO<SpecificationMasterDTO>
-                {
-                    IsSuccess = false,
-                    Message = $"SpecificationName already exists and is {(BaseEntity.Status) request.IsActive}."
-                };                     
-            } */ 
+           
             var updatedSpecificationEntity= _mapper.Map<SpecificationMasters>(request);                   
             var updateResult = await _specificationMasterRepository.UpdateAsync(updatedSpecificationEntity);            
 
@@ -93,25 +54,15 @@ namespace Core.Application.SpecificationMaster.Commands.UpdateSpecificationMaste
                 await _mediator.Publish(domainEvent, cancellationToken);
                 if(updateResult>0)
                 {
-                    return new ApiResponseDTO<SpecificationMasterDTO>
-                    {
-                        IsSuccess = true,
-                        Message = "SpecificationMaster updated successfully.",
-                        Data = specificationMasterDto
-                    };
+                    return  specificationMasterDto;
                 }
-                return new ApiResponseDTO<SpecificationMasterDTO>
-                {
-                    IsSuccess = false,
-                    Message = "SpecificationMaster not updated."
-                };                
+                throw new Exception("SpecificationMaster not updated.");
+                           
             }
             else
             {
-                return new ApiResponseDTO<SpecificationMasterDTO>{
-                    IsSuccess = false,
-                    Message = "SpecificationMaster not found."
-                };
+                throw new ValidationException("SpecificationMaster not found.");
+              
             }
         }
     }

@@ -9,7 +9,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
 {
     public class NotificationTemplateQueryRepository : INotificationTemplateQueryRepository
     {
-        private readonly IDbConnection _dbConnection;       
+        private readonly IDbConnection _dbConnection;            
 
         public NotificationTemplateQueryRepository(IDbConnection dbConnection)
         {
@@ -17,7 +17,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
         }
 
         public async Task<NotificationTemplateDto> GetByIdAsync(int Id)
-        {
+        {            
             const string query = @" select 
                     NC.Id, NotificationTypeId, NotificationConfigId,SubjectTemplate,HeaderTemplate,BodyTemplate,FooterTemplate,LanguageCode,NCF.ModuleName,MM.Code ChannelName, NC.IsActive, 
                     NC.IsDeleted, NC.CreatedBy, NC.CreatedDate, NC.CreatedByName, NC.CreatedIP, NC.ModifiedBy, NC.ModifiedDate, NC.ModifiedByName, NC.ModifiedIP
@@ -31,7 +31,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
         }
 
         public async Task<List<NotificationTemplateAutoCompleteDto>> GetNotificationTemplateAutoCompleteAsync(string searchPattern)
-        {
+        {            
             searchPattern = searchPattern ?? string.Empty;
             const string query = @"
             SELECT NC.Id, NCF.ModuleName,MM.Code ChannelName
@@ -40,7 +40,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
                     INNER JOIN AppData.MiscMaster  MM on MM.id=NC.NotificationTypeId
                     WHERE NC.IsDeleted = 0   AND NCF.ModuleName LIKE @SearchPattern";            
             var parameters = new
-            {
+            {                
                 SearchPattern = $"%{searchPattern}%"
             };
             var NotificationTemplate = await _dbConnection.QueryAsync<NotificationTemplateAutoCompleteDto>(query, parameters);
@@ -49,16 +49,17 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
 
         public async Task<(IEnumerable<dynamic>, int)> GetAllNotificationTemplateAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+            
             var query = $$"""
             DECLARE @TotalCount INT;
             SELECT @TotalCount = COUNT(*) 
             FROM AppNotification.NotificationTemplate
-            WHERE IsDeleted = 0
+            WHERE  IsDeleted = 0
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search)")}};
 
             SELECT 
                 NC.Id, NotificationTypeId, NotificationConfigId,SubjectTemplate,HeaderTemplate,BodyTemplate,FooterTemplate,LanguageCode,NCF.ModuleName,MM.Code ChannelName, NC.IsActive, 
-                NC.IsDeleted, NC.CreatedBy, NC.CreatedDate, NC.CreatedByName, NC.CreatedIP, NC.ModifiedBy, NC.ModifiedDate, NC.ModifiedByName, NC.ModifiedIP
+                NC.IsDeleted, NC.CreatedBy, NC.CreatedDate, NC.CreatedByName, NC.CreatedIP, NC.ModifiedBy, NC.ModifiedDate, NC.ModifiedByName, NC.ModifiedIP,NCF.ModuleName
                 FROM  AppNotification.NotificationTemplate NC
                 INNER JOIN AppNotification.NotificationConfig NCF on NCF.Id=NC.NotificationConfigId                    
                 INNER JOIN AppData.MiscMaster  MM on MM.id=NC.NotificationTypeId
@@ -71,7 +72,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
             """;
 
             var parameters = new
-            {
+            {                
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
                 PageSize

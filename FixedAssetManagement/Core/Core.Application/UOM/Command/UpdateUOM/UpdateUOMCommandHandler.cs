@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUOM;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.UOM.Command.UpdateUOM
 {
-    public class UpdateUOMCommandHandler : IRequestHandler<UpdateUOMCommand, ApiResponseDTO<bool>>
+    public class UpdateUOMCommandHandler : IRequestHandler<UpdateUOMCommand, bool>
     {
          private readonly IUOMCommandRepository _uomCommandRepository;
         private readonly IUOMQueryRepository _uomQueryRepository;
@@ -23,13 +24,14 @@ namespace Core.Application.UOM.Command.UpdateUOM
            _mapper = mapper;
            _mediator = mediator; 
         }
-        public async Task<ApiResponseDTO<bool>> Handle(UpdateUOMCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateUOMCommand request, CancellationToken cancellationToken)
         {
             var existinguom = await _uomQueryRepository.GetByUOMNameAsync(request.UOMName, request.Id);
 
                 if (existinguom != null)
                 {
-                    return new ApiResponseDTO<bool>{IsSuccess = false, Message = "UOM already exists"};
+                    throw new ValidationException("UOM already exists");
+                    
                 }
 
                      // Check for duplicate GroupName or SortOrder
@@ -44,11 +46,8 @@ namespace Core.Application.UOM.Command.UpdateUOM
             ? "UOM with the same UOMName already exists."
             : "UOM with the same Sort Order already exists.";
 
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = false,
-                Message = errorMessage
-            };
+        throw new ValidationException(errorMessage);
+           
         }
 
                  var uom  = _mapper.Map<Core.Domain.Entities.UOM>(request);
@@ -67,10 +66,11 @@ namespace Core.Application.UOM.Command.UpdateUOM
               
                 if(uomresult)
                 {
-                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "UOM updated successfully."};
+                    
+                    return uomresult;
                 }
-
-                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "UOM not updated."};
+            throw new Exception("UOM not updated.");
+                
         }
     }
 }

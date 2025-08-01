@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetInsurance.Commands.CreateAssetInsurance
 {
-    public class CreateAssetInsuranceCommand : IRequest<ApiResponseDTO<GetAssetInsuranceDto>> 
+    public class CreateAssetInsuranceCommand : IRequest<GetAssetInsuranceDto>
     {        
         public int  AssetId { get; set; }       
         public string? PolicyNo { get; set; }       

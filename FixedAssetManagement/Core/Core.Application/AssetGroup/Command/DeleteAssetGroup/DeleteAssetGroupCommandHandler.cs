@@ -6,12 +6,13 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AssetGroup.Command.DeleteAssetGroup
 {
-    public class DeleteAssetGroupCommandHandler : IRequestHandler<DeleteAssetGroupCommand, ApiResponseDTO<int>>
+    public class DeleteAssetGroupCommandHandler : IRequestHandler<DeleteAssetGroupCommand, int>
     {
         private readonly IAssetGroupCommandRepository _iAssetGroupCommandRepository;
         private readonly IAssetGroupQueryRepository _iAssetGroupQueryRepository;
@@ -28,7 +29,7 @@ namespace Core.Application.AssetGroup.Command.DeleteAssetGroup
             _iAssetGroupQueryRepository = iAssetGroupQueryRepository;
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(DeleteAssetGroupCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(DeleteAssetGroupCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Starting DeleteAssetGroupCommandHandler for request: {request}");
 
@@ -37,11 +38,9 @@ namespace Core.Application.AssetGroup.Command.DeleteAssetGroup
             if (existingAssetGroup is null)
             {
                 _logger.LogWarning($"AssetGroup ID {request.Id} not found.");
-                return new ApiResponseDTO<int>
-                {
-                    IsSuccess = false,
-                    Message = "AssetGroup Id not found / AssetGroup is deleted ."
-                };
+
+                throw new ValidationException("AssetGroup Id not found / AssetGroup is deleted .");
+             
             }
 
             var assetGroup = _Imapper.Map<Core.Domain.Entities.AssetGroup>(request);
@@ -49,7 +48,8 @@ namespace Core.Application.AssetGroup.Command.DeleteAssetGroup
             if (result == -1) 
             {
             _logger.LogInformation($"AssetGroup {request.Id} not found.");
-             return new ApiResponseDTO<int> { IsSuccess = false, Message = "AssetGroupId not found."};
+            throw new ValidationException("AssetGroupId not found.");
+             
             }
 
             //Domain Event
@@ -62,13 +62,9 @@ namespace Core.Application.AssetGroup.Command.DeleteAssetGroup
             await _mediator.Publish(domainEvent);
             _logger.LogInformation($"AssetGroup {assetGroup.GroupName} Deleted successfully.");
 
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,   
-                Data = result,
-                Message = "AssetGroup deleted successfully."
+            return result;
     
-            };
+           
         }
     }
 }

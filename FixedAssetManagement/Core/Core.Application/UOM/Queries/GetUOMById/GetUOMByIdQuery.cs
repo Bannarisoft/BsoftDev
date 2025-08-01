@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.UOM.Queries.GetUOMById
 {
-    public class GetUOMByIdQuery : IRequest<ApiResponseDTO<UOMDto>>
+    public class GetUOMByIdQuery : IRequest<UOMDto>
     {
         public int Id { get; set; }
         

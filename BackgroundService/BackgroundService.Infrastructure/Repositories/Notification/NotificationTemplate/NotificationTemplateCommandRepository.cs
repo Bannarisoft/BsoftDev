@@ -1,3 +1,4 @@
+using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationTemplate;
 using BackgroundService.Infrastructure.Data.Notification;
 using Microsoft.EntityFrameworkCore;
@@ -7,14 +8,16 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
     public class NotificationTemplateCommandRepository : INotificationTemplateCommandRepository
     {
         private readonly NotificationDbContext _applicationDbContext;
+        private readonly IIPAddressService _ipAddressService;
 
-        public NotificationTemplateCommandRepository(NotificationDbContext applicationDbContext)
+        public NotificationTemplateCommandRepository(NotificationDbContext applicationDbContext, IIPAddressService ipAddressService)
         {
             _applicationDbContext = applicationDbContext;
+            _ipAddressService = ipAddressService;
         }
 
         public async Task<int> CreateAsync(Domain.Entities.Notification.NotificationTemplate NotificationTemplate)
-        {                
+        { 
             await _applicationDbContext.NotificationTemplate.AddAsync(NotificationTemplate);
             await _applicationDbContext.SaveChangesAsync();                
             return NotificationTemplate.Id;

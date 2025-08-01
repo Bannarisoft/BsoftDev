@@ -5,11 +5,12 @@ using Core.Application.Common.Interfaces.IAssetMaster.IAssetWarranty;
 using Core.Domain.Common;
 using Core.Domain.Entities.AssetMaster;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetWarranty.Commands.UpdateAssetWarranty
 {
-    public class UpdateAssetWarrantyCommandHandler : IRequestHandler<UpdateAssetWarrantyCommand, ApiResponseDTO<bool>>
+    public class UpdateAssetWarrantyCommandHandler : IRequestHandler<UpdateAssetWarrantyCommand, bool>
     {
         private readonly IAssetWarrantyCommandRepository _assetWarrantyRepository;
         private readonly IAssetWarrantyQueryRepository _assetWarrantyQueryRepository;
@@ -24,15 +25,12 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.UpdateAssetWarrant
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<bool>> Handle(UpdateAssetWarrantyCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateAssetWarrantyCommand request, CancellationToken cancellationToken)
         {
             var assetWarranty = await _assetWarrantyQueryRepository.GetByIdAsync(request.Id);
             if (assetWarranty is null)
-            return new ApiResponseDTO<bool>
-            {
-                IsSuccess = false,
-                Message = "Invalid DepreciationGroupID. The specified Name does not exist "
-            };
+            throw new ValidationException("Invalid DepreciationGroupID. The specified Name does not exist");
+           
            
             var oldAssetWarranty= assetWarranty.Id;            
         
@@ -52,13 +50,10 @@ namespace Core.Application.AssetMaster.AssetWarranty.Commands.UpdateAssetWarrant
                 if(updateResult)
                 {
                     
-                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "Asset Warranty updated successfully."};
+                    return updateResult;
                 }
-                return new ApiResponseDTO<bool>
-                {
-                    IsSuccess = false,
-                    Message = "AssetWarranty not updated."
-                };                
+                throw new Exception("AssetWarranty not updated.");
+                            
             }           
     }
 }

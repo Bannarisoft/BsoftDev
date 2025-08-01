@@ -3,11 +3,12 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGene
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetParentMaster
 {
-    public class GetAssetParentMasterQueryHandler : IRequestHandler<GetAssetParentMasterQuery, ApiResponseDTO<List<AssetMasterGeneralAutoCompleteDTO>>>
+    public class GetAssetParentMasterQueryHandler : IRequestHandler<GetAssetParentMasterQuery, List<AssetMasterGeneralAutoCompleteDTO>>
     {
         private readonly IAssetMasterGeneralQueryRepository _assetMasterRepository;
         private readonly IMapper _mapper;
@@ -20,18 +21,15 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetParent
             _mediator = mediator;
         }
   
-        public async Task<ApiResponseDTO<List<AssetMasterGeneralAutoCompleteDTO>>> Handle(GetAssetParentMasterQuery request, CancellationToken cancellationToken)
+        public async Task<List<AssetMasterGeneralAutoCompleteDTO>> Handle(GetAssetParentMasterQuery request, CancellationToken cancellationToken)
         {
             if (request.AssetType == "Dependent Parent")
             {
                 var result = await _assetMasterRepository.GetByAssetNameAsync("");
                 if (result is null || result.Count == 0)
                 {
-                    return new ApiResponseDTO<List<AssetMasterGeneralAutoCompleteDTO>>
-                    {
-                        IsSuccess = false,
-                        Message = "No Asset found matching the search pattern."
-                    };
+                    throw new ValidationException("No Asset found matching the search pattern.");
+                   
                 }
                 var assetMasterDto = _mapper.Map<List<AssetMasterGeneralAutoCompleteDTO>>(result);
                 
@@ -45,19 +43,10 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetParent
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
 
-                return new ApiResponseDTO<List<AssetMasterGeneralAutoCompleteDTO>>
-                {
-                    IsSuccess = true,
-                    Message = "Success",
-                    Data = assetMasterDto
-                };   
+                return assetMasterDto;   
             } 
-
-            return new ApiResponseDTO<List<AssetMasterGeneralAutoCompleteDTO>>
-            {
-                IsSuccess = false,
-                Message = "Invalid AssetType. Only 'Dependent Parent' is supported."
-            };
+        throw new ValidationException("Invalid AssetType. Only 'Dependent Parent' is supported.");
+          
         }
     }
 }

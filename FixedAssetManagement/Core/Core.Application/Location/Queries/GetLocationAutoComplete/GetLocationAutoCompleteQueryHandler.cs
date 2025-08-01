@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.ILocation;
 using Core.Application.Location.Queries.GetLocations;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.Location.Queries.GetLocationAutoComplete
 {
-    public class GetLocationAutoCompleteQueryHandler : IRequestHandler<GetLocationAutoCompleteQuery, ApiResponseDTO<List<LocationAutoCompleteDto>>>
+    public class GetLocationAutoCompleteQueryHandler : IRequestHandler<GetLocationAutoCompleteQuery, List<LocationAutoCompleteDto>>
     {
         
         private readonly ILocationQueryRepository _locationQueryRepository;
@@ -23,16 +24,13 @@ namespace Core.Application.Location.Queries.GetLocationAutoComplete
             _mediator = mediator;
             _mapper = mapper;    
         }
-        public async Task<ApiResponseDTO<List<LocationAutoCompleteDto>>> Handle(GetLocationAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<LocationAutoCompleteDto>> Handle(GetLocationAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _locationQueryRepository.GetLocation(request.SearchPattern);
             if (result is null || result.Count is 0)
             {
-                return new ApiResponseDTO<List<LocationAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = "No Location found matching the search pattern."
-                };
+                throw new ValidationException("No Location found matching the search pattern.");
+              
             }
               var locations = _mapper.Map<List<LocationAutoCompleteDto>>(result);
               //Domain Event
@@ -44,7 +42,7 @@ namespace Core.Application.Location.Queries.GetLocationAutoComplete
                      module:"Location"
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<LocationAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = locations };  
+            return locations;  
         }
     }
 }

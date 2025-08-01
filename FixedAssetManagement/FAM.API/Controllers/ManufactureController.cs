@@ -15,17 +15,12 @@ namespace FAM.API.Controllers
     [Route("api/[controller]")]
     public class ManufactureController  : ApiControllerBase
     { 
-         private readonly IValidator<CreateManufactureCommand> _createManufactureCommandValidator;
-         private readonly IValidator<UpdateManufactureCommand> _updateManufactureCommandValidator;
          
          
-       public ManufactureController(ISender mediator, 
-                             IValidator<CreateManufactureCommand> createManufactureCommandValidator, 
-                             IValidator<UpdateManufactureCommand> updateManufactureCommandValidator) 
+         
+       public ManufactureController(ISender mediator) 
         : base(mediator)
-        {        
-            _createManufactureCommandValidator = createManufactureCommandValidator;    
-            _updateManufactureCommandValidator = updateManufactureCommandValidator;                 
+        {                      
         }
 
         [HttpGet]                
@@ -62,83 +57,40 @@ namespace FAM.API.Controllers
                 });
             }
             var result = await Mediator.Send(new GetManufactureByIdQuery { Id = id });            
-            if (result is null )
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode=StatusCodes.Status404NotFound,
-                    message = $"ManufactureId {id} not found", 
-                });
-            }
+          
             return Ok(new 
             {
                 StatusCode=StatusCodes.Status200OK,
-                data = result.Data
+                data = result
             });   
         }
 
         [HttpPost]               
         public async Task<IActionResult> CreateAsync(CreateManufactureCommand  command)
         { 
-            var validationResult = await _createManufactureCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = "Validation failed", 
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }        
+                 
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
+           
                 return Ok(new 
                 { 
                     StatusCode=StatusCodes.Status201Created,
-                    message = result.Message, 
-                    data = result.Data
+                    message = "Manufacture Created Successfully", 
+                    data = result
                 });
-            }  
-            else
-            {      
-                return BadRequest(new 
-                { 
-                    StatusCode=StatusCodes.Status400BadRequest,
-                    message = result.Message
-                });
-            } 
+           
         }
         [HttpPut]        
         public async Task<IActionResult> UpdateAsync(UpdateManufactureCommand command)
         {         
-            var validationResult = await _updateManufactureCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(
-                    new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "Validation failed",
-                        errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                    }
-                );
-            }            
+                     
             var result = await Mediator.Send(command);
-            if (result.IsSuccess)
-            {
+         
                 return Ok(new 
                 {   StatusCode=StatusCodes.Status200OK,
-                    message = result.Message, 
-                    manufacture = result.Data
+                    message = "Manufacture Updated Successfully", 
+                    manufacture = result
                 });
-            }
-                
-                return BadRequest( new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = result.Message
-                });
+         
                 
         }
         [HttpDelete("{id}")]        
@@ -152,20 +104,13 @@ namespace FAM.API.Controllers
                     message = "Invalid Country ID"
                 });
             }            
-              var result = await Mediator.Send(new DeleteManufactureCommand { Id = id });                 
-            if (!result.IsSuccess)
-            {                
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                });
-            }
+               await Mediator.Send(new DeleteManufactureCommand { Id = id });                 
+          
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
                 data =$"Manufacture ID {id} Deleted" ,
-                message = result.Message
+                message = "Manufacture Deleted Successfully"
             });
         }
              
@@ -173,19 +118,12 @@ namespace FAM.API.Controllers
         public async Task<IActionResult> GetManufacture([FromQuery] string? name)
         {          
             var result = await Mediator.Send(new GetManufactureAutoCompleteQuery {SearchPattern = name}); // Pass `searchPattern` to the constructor
-            if (!result.IsSuccess)
-            {
-                return NotFound(new 
-                { 
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = result.Message
-                }); 
-            }
+          
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
-                data = result.Data
+                message = result,
+                data = result
             });
         }
         [HttpGet("ManufactureType")]

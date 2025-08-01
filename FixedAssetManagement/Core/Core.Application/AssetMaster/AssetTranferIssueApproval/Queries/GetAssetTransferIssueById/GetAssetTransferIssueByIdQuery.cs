@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTranferIssueApproval.Queries.GetAssetTransferIssueById
 {
-    public class GetAssetTransferIssueByIdQuery : IRequest<ApiResponseDTO<List<AssetTransferIssueByIdDto>>>
+    public class GetAssetTransferIssueByIdQuery : IRequest<List<AssetTransferIssueByIdDto>>
     {
         public int Id {get; set;}
     }

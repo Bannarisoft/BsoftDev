@@ -201,6 +201,10 @@ namespace BackgroundService.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("NotificationEventTypeId");
 
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NotificationEventTypeId");
@@ -285,6 +289,10 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("Timestamp");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
 
                     b.HasKey("Id");
 
@@ -419,6 +427,10 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Property<string>("ModifiedIP")
                         .HasColumnType("varchar(255)");
 
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("UnitId");
+
                     b.HasKey("Id");
 
                     b.ToTable("NotificationGroup", "AppNotification");
@@ -544,10 +556,6 @@ namespace BackgroundService.Infrastructure.Migrations
                     b.Property<int>("TargetTypeId")
                         .HasColumnType("int")
                         .HasColumnName("TargetTypeId");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("UnitId");
 
                     b.HasKey("Id");
 

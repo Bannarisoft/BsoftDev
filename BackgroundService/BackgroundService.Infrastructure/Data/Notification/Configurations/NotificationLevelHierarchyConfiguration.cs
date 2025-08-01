@@ -49,12 +49,7 @@ namespace BackgroundService.Infrastructure.Data.Notification.Configurations
             .HasColumnName("TargetId")
             .HasColumnType("int")
             .IsRequired();
-
-            builder.Property(t => t.UnitId)
-            .HasColumnName("UnitId")
-            .HasColumnType("int")
-            .IsRequired();
-
+          
             builder.Property(t => t.ApprovalModeId)
             .HasColumnName("ApprovalModeId")
             .HasColumnType("int")

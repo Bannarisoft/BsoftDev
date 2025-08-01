@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAssetMasterGeneral
 {
-    public class DeleteFileAssetMasterGeneralCommandHandler : IRequestHandler<DeleteFileAssetMasterGeneralCommand, ApiResponseDTO<bool>>
+    public class DeleteFileAssetMasterGeneralCommandHandler : IRequestHandler<DeleteFileAssetMasterGeneralCommand, bool>
     {
         private readonly IFileUploadService _fileUploadService;        
         
@@ -31,7 +31,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
             _companyGrpcClient = companyGrpcClient;
         }
 
-        public async Task<ApiResponseDTO<bool>> Handle(DeleteFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteFileAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         { 
             var companyId = _ipAddressService.GetCompanyId();
             var unitId = _ipAddressService.GetUnitId();
@@ -49,7 +49,8 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
             if (string.IsNullOrWhiteSpace(baseDirectory))
             {
                 _logger.LogError("Base directory path not found in database.");
-                return new ApiResponseDTO<bool> { IsSuccess = false, Message = "Base directory not configured." };                
+                throw new Exception("Base directory not configured.");
+                            
             }
             
             string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", baseDirectory,companyName,unitName);       
@@ -61,9 +62,10 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.DeleteFileAss
             await _assetMasterGeneralRepository.RemoveAssetImageReferenceAsync(request.assetPath);
             if (result)
             {
-                return new ApiResponseDTO<bool> { IsSuccess = true, Message = "File deleted successfully" };
+                return result;
             }
-            return new ApiResponseDTO<bool> { IsSuccess = false, Message = "File deletion failed" };
+            throw new Exception("File deletion failed");
+            
         }
     }
 }

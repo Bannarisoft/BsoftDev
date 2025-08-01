@@ -5,11 +5,12 @@ using Core.Application.Common.Interfaces.IWdvDepreciation;
 using Core.Application.WDVDepreciation.Queries.CalculateDepreciation;
 using Core.Application.WDVDepreciation.Queries.GetDepreciation;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.WDVDepreciation.Commands.LockDepreciation
 {
-    public class LockDepreciationCommandHandler : IRequestHandler<LockDepreciationCommand, ApiResponseDTO<CalculationDepreciationDto>>
+    public class LockDepreciationCommandHandler : IRequestHandler<LockDepreciationCommand, CalculationDepreciationDto>
     {
         private readonly IWdvDepreciationCommandRepository _WdvCommandRepository;
         private readonly IWdvDepreciationQueryRepository _WdvQueryRepository;        private readonly IMapper _mapper;
@@ -22,24 +23,18 @@ namespace Core.Application.WDVDepreciation.Commands.LockDepreciation
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<CalculationDepreciationDto>> Handle(LockDepreciationCommand request, CancellationToken cancellationToken)
+        public async Task<CalculationDepreciationDto> Handle(LockDepreciationCommand request, CancellationToken cancellationToken)
         {
             var depreciationLocked = await _WdvQueryRepository.ExistDataLockedAsync( request.FinYearId);
             if (depreciationLocked==true)
             {
-                return new ApiResponseDTO<CalculationDepreciationDto>
-                {
-                    IsSuccess = false,
-                    Message = "Already depreciation details Locked."
-                };
+                throw new ValidationException("Already depreciation details Locked.");
+             
             }
             var depreciationGroups = await _WdvQueryRepository.ExistDataAsync( request.FinYearId);
             if (depreciationGroups==false)
-            return new ApiResponseDTO<CalculationDepreciationDto>
-            {
-                IsSuccess = false,
-                Message = "No details found for this period"
-            };
+            throw new ValidationException("No details found for this period");
+          
 
             var depreciationUpdate = _mapper.Map<CalculationDepreciationDto>(request);      
             var updateResult = await _WdvCommandRepository.LockWDVDepreciationAsync(request.FinYearId);
@@ -55,18 +50,10 @@ namespace Core.Application.WDVDepreciation.Commands.LockDepreciation
                     module:"DepreciationDetail"
                 );               
                 await _mediator.Publish(domainEvent, cancellationToken);                 
-                return new ApiResponseDTO<CalculationDepreciationDto>
-                {
-                    IsSuccess = true,
-                    Message = "Depreciation Locked successfully.",
-                    Data = depreciationGroupDto
-                };
+                return  depreciationGroupDto;
             }
-            return new ApiResponseDTO<CalculationDepreciationDto>
-            {
-                IsSuccess = false,
-                Message = "Depreciation Locked failed."                             
-            };                    
+            throw new Exception("Depreciation Locked failed.");
+                            
         
         }
     }

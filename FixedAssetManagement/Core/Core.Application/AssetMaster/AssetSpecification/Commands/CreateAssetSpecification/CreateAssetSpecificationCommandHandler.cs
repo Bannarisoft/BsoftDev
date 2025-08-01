@@ -8,11 +8,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetSpecification;
 using Core.Domain.Entities.AssetMaster;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSpecification
 {
-    public class CreateAssetSpecificationCommandHandler : IRequestHandler<CreateAssetSpecificationCommand, ApiResponseDTO<string>>
+    public class CreateAssetSpecificationCommandHandler : IRequestHandler<CreateAssetSpecificationCommand,string>
     {
         private readonly IMapper _mapper;
         private readonly IAssetSpecificationCommandRepository _assetSpecificationRepository;
@@ -25,7 +26,7 @@ namespace Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSp
             _mediator = mediator;    
         } 
 
-        public async Task<ApiResponseDTO<string>> Handle(CreateAssetSpecificationCommand request, CancellationToken cancellationToken)
+        public async Task<string> Handle(CreateAssetSpecificationCommand request, CancellationToken cancellationToken)
         {
              var createdCount = 0;
 
@@ -54,18 +55,12 @@ namespace Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSp
                     await _mediator.Publish(domainEvent, cancellationToken);
                 }
                 else{
-                     return new ApiResponseDTO<string>
-                    {
-                        IsSuccess =false,
-                        Message =  "Already Exists"
-                    };  
+                  
+                    throw new ValidationException("Already Exists");
+                      
                 }
             }
-            return new ApiResponseDTO<string>
-            {
-                IsSuccess = createdCount > 0,
-                Message = createdCount > 0 ? "Specifications saved successfully." : "No new specifications were saved."
-            };  
+            return  createdCount > 0 ? "Specifications saved successfully." : "No new specifications were saved.";  
         }
     }
 }

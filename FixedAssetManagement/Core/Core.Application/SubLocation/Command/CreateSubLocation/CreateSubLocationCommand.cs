@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.SubLocation.Command.CreateSubLocation
 {
-    public class CreateSubLocationCommand : IRequest<ApiResponseDTO<SubLocationDto>>
+    public class CreateSubLocationCommand : IRequest<SubLocationDto>
     {
         public string? Code { get; set; }
         public string? SubLocationName { get; set; }

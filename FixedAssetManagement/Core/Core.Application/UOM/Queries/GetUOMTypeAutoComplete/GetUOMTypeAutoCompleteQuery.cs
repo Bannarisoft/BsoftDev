@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.UOM.Queries.GetUOMTypeAutoComplete
 {
-    public class GetUOMTypeAutoCompleteQuery: IRequest<ApiResponseDTO<List<UOMTypeAutoCompleteDto>>>
+    public class GetUOMTypeAutoCompleteQuery: IRequest<List<UOMTypeAutoCompleteDto>>
     {
         public string? SearchPattern { get; set; }
     }
