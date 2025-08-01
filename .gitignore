@@ -38,3 +38,9 @@
 /PurchaseManagement/PurchaseManagement.API/bin
 /PurchaseManagement/PurchaseManagement.Infrastructure/obj
 /PurchaseManagement/PurchaseManagement.Infrastructure/bin
+/InventoryManagement/Core/Core.Application/obj
+/InventoryManagement/Core/Core.Application/obj
+/InventoryManagement/InventoryManagement.Infrastructure/obj
+/InventoryManagement/InventoryManagement.API/obj
+/InventoryManagement/Core/Core.Application/obj
+/InventoryManagement/Core/Core.Domain/obj
