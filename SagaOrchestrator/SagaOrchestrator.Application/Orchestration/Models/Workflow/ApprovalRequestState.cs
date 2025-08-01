@@ -14,5 +14,6 @@ namespace SagaOrchestrator.Application.Orchestration.Models.Workflow
         public int ModuleTransactionId { get; set; }
         public int UnitId { get; set; }
         public int DepartmentId { get; set; }
+        public string Payload { get; set; }
     }
 }

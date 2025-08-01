@@ -32,7 +32,7 @@ namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.Appro
         }
         public async Task<bool> Handle(ApproveApprovalRequestCommand request, CancellationToken cancellationToken)
         {
-            int? ApprovalStepDetailId = await _approvalRequestQuery.GetApprovalStepDetailByIdAsync(request.WorkFlowTypeId, request.ModuleTransactionId,request.UnitId,request.DepartmentId);
+            // int? ApprovalStepDetailId = await _approvalRequestQuery.GetApprovalStepDetailByIdAsync(request.WorkFlowTypeId, request.ModuleTransactionId,request.UnitId,request.DepartmentId);
 
             var status = await _miscMasterQuery.GetMiscMasterByName(MiscEnumEntity.ApprovalStatus, MiscEnumEntity.Approved);
             string currentIp = _ipAddressService.GetSystemIPAddress();
@@ -51,21 +51,21 @@ namespace BackgroundService.Application.Workflow.ApprovalRequests.Commands.Appro
                 ModifiedByName = username
             };
             var result = await _approvalRequestCommand.Approve(ApprovalReq);
-            if (ApprovalStepDetailId is not null)
-            {
-                var correlationId = Guid.NewGuid();
-                var @event = new TransactionCreatedEvent
-                {
-                    CorrelationId = correlationId,
-                    ModuleTypeName = request.ModuleTypeName,
-                    ModuleTransactionId = request.ModuleTransactionId,
-                    UnitId = request.UnitId,
-                    DepartmentId = request.DepartmentId
-                };
+            // if (ApprovalStepDetailId is not null)
+            // {
+            //     var correlationId = Guid.NewGuid();
+            //     var @event = new TransactionCreatedEvent
+            //     {
+            //         CorrelationId = correlationId,
+            //         ModuleTypeName = request.ModuleTypeName,
+            //         ModuleTransactionId = request.ModuleTransactionId,
+            //         UnitId = request.UnitId,
+            //         DepartmentId = request.DepartmentId
+            //     };
                 
-                await _eventPublisher.SaveEventAsync(@event);
-                await _eventPublisher.PublishPendingEventsAsync();
-            }
+            //     await _eventPublisher.SaveEventAsync(@event);
+            //     await _eventPublisher.PublishPendingEventsAsync();
+            // }
              
 
             return result;          

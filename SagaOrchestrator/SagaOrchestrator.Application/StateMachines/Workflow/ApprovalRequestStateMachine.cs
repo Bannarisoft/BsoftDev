@@ -36,6 +36,7 @@ namespace SagaOrchestrator.Application.StateMachines.Workflow
                           context.Saga.ModuleTransactionId = context.Data.ModuleTransactionId;
                           context.Saga.UnitId = context.Data.UnitId;
                           context.Saga.DepartmentId = context.Data.DepartmentId;
+                          context.Saga.Payload = context.Data.Payload;
                       })
                       .Send(new Uri("queue:approval-request-task-queue"), context => new CreateApprovalRequestCommand
                       {
@@ -43,7 +44,8 @@ namespace SagaOrchestrator.Application.StateMachines.Workflow
                           ModuleTypeName = context.Saga.ModuleTypeName,
                           ModuleTransactionId = context.Saga.ModuleTransactionId,
                           UnitId = context.Saga.UnitId,
-                          DepartmentId = context.Saga.DepartmentId
+                          DepartmentId = context.Saga.DepartmentId,
+                          Payload = context.Saga.Payload
                       })
                       .TransitionTo(CreatingApprovalRequest)
 

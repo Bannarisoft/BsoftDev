@@ -37,13 +37,12 @@ namespace BackgroundService.Infrastructure.Repositories.Workflow.ApprovalRequest
             return false; 
         }
 
-        public async Task<int> CreateAsync(ApprovalRequest approvalRequest)
+        public async Task<bool> CreateBulkAsync(List<ApprovalRequest> approvalRequest)
         {
              _notificationDbContext.Entry(approvalRequest);
-            await _notificationDbContext.ApprovalRequest.AddAsync(approvalRequest);
-            await _notificationDbContext.SaveChangesAsync();
+            await _notificationDbContext.ApprovalRequest.AddRangeAsync(approvalRequest);
+           return await _notificationDbContext.SaveChangesAsync() > 0;
 
-            return approvalRequest.Id;
         }
 
         public async Task<bool> Reject(ApprovalRequest approvalRequest)
