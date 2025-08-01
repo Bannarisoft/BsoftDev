@@ -10,34 +10,39 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
     public class NotificationConfigQueryRepository : INotificationConfigQueryRepository
     {
         private readonly IDbConnection _dbConnection;       
+        private readonly IIPAddressService _ipAddressService;
 
-        public NotificationConfigQueryRepository(IDbConnection dbConnection)
+        public NotificationConfigQueryRepository(IDbConnection dbConnection, IIPAddressService iPAddressService)
         {
-            _dbConnection = dbConnection;            
+            _dbConnection = dbConnection;
+            _ipAddressService = iPAddressService;
         }
 
         public async Task<NotificationConfigDto> GetByIdAsync(int Id)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             const string query = @" select 
                     NC.Id, ModuleName, NotificationEventTypeId, NC.IsActive, NC.IsDeleted, NC.CreatedBy, NC.CreatedDate, NC.CreatedByName, NC.CreatedIP, NC.ModifiedBy, NC.ModifiedDate, NC.ModifiedByName, NC.ModifiedIP,MM.Code
                     FROM  AppNotification.NotificationConfig NC
                     INNER JOIN AppData.MiscMaster  MM on MM.id=NC.NotificationEventTypeId
-                    WHERE NC.Id = @Id AND NC.IsDeleted = 0";
+                    WHERE NC.Id = @Id AND NC.UnitId=@UnitId AND  NC.IsDeleted = 0";
 
-            var notificationConfig = await _dbConnection.QueryFirstOrDefaultAsync<NotificationConfigDto>(query, new { Id });
+            var notificationConfig = await _dbConnection.QueryFirstOrDefaultAsync<NotificationConfigDto>(query, new { Id,UnitId });
             return notificationConfig;
         }
 
         public async Task<List<NotificationConfigAutoCompleteDto>> GetNotificationConfigAutoCompleteAsync(string searchPattern)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             searchPattern = searchPattern ?? string.Empty;
             const string query = @"
-             SELECT NC.Id, NC.ModuleName 
+            SELECT distinct NC.Id, NC.ModuleName 
             FROM AppNotification.NotificationConfig NC            
-            WHERE NC.IsDeleted = 0 
+            WHERE  NC.UnitId=@UnitId AND  NC.IsDeleted = 0 
             AND ModuleName LIKE @SearchPattern";
             var parameters = new
             {
+                UnitId,
                 SearchPattern = $"%{searchPattern}%"
             };
             var notificationConfig = await _dbConnection.QueryAsync<NotificationConfigAutoCompleteDto>(query, parameters);
@@ -46,19 +51,19 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
 
         public async Task<(IEnumerable<dynamic>, int)> GetAllNotificationConfigAsync(int PageNumber, int PageSize, string? SearchTerm)
         {
+            var UnitId = _ipAddressService.GetUnitId();
             var query = $$"""
             DECLARE @TotalCount INT;
             SELECT @TotalCount = COUNT(*) 
             FROM AppNotification.NotificationConfig
-            WHERE IsDeleted = 0
+            WHERE UnitId=@UnitId AND IsDeleted = 0
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search)")}};
 
             SELECT 
             NC.Id, ModuleName, NotificationEventTypeId, NC.IsActive, NC.IsDeleted, NC.CreatedBy, NC.CreatedDate, NC.CreatedByName, NC.CreatedIP, NC.ModifiedBy, NC.ModifiedDate, NC.ModifiedByName, NC.ModifiedIP,MM.Code
             FROM  AppNotification.NotificationConfig NC
             INNER JOIN AppData.MiscMaster  MM on MM.id=NC.NotificationEventTypeId
-            WHERE 
-            NC.IsDeleted = 0
+            WHERE NC.UnitId=@UnitId AND NC.IsDeleted = 0
             {{(string.IsNullOrEmpty(SearchTerm) ? "" : "AND (ModuleName LIKE @Search )")}}
             ORDER BY Id desc
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -68,6 +73,7 @@ namespace  BackgroundService.Infrastructure.Repositories.Notification.Notificati
 
             var parameters = new
             {
+                UnitId,
                 Search = $"%{SearchTerm}%",
                 Offset = (PageNumber - 1) * PageSize,
                 PageSize

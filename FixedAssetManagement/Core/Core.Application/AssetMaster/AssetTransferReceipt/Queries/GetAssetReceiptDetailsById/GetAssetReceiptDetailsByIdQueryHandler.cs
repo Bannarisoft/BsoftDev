@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetTransferReceipt;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetReceiptDetailsById
 {
-    public class GetAssetReceiptDetailsByIdQueryHandler : IRequestHandler<GetAssetReceiptDetailsByIdQuery, ApiResponseDTO<List<AssetReceiptDetailsByIdDto>>> 
+    public class GetAssetReceiptDetailsByIdQueryHandler : IRequestHandler<GetAssetReceiptDetailsByIdQuery, List<AssetReceiptDetailsByIdDto>>
     {
          private readonly IAssetTransferReceiptQueryRepository _assetTransferReceiptQueryRepository;
         private readonly IMapper _mapper;        
@@ -23,18 +24,15 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<AssetReceiptDetailsByIdDto>>> Handle(GetAssetReceiptDetailsByIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<AssetReceiptDetailsByIdDto>> Handle(GetAssetReceiptDetailsByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _assetTransferReceiptQueryRepository.GetByAssetReceiptId(request.AssetReceiptId);
 
         // Check if data exists
         if (result is null || !result.Any())
         {
-            return new ApiResponseDTO<List<AssetReceiptDetailsByIdDto>>
-            {
-                IsSuccess = false,
-                Message = $"No records found for ID {request.AssetReceiptId}."
-            };
+            throw new ValidationException($"No records found for ID {request.AssetReceiptId}.");
+           
         }
 
         // Map list of results
@@ -50,12 +48,7 @@ namespace Core.Application.AssetMaster.AssetTransferReceipt.Queries.GetAssetRece
         );
         await _mediator.Publish(domainEvent, cancellationToken);
 
-        return new ApiResponseDTO<List<AssetReceiptDetailsByIdDto>>
-        {
-            IsSuccess = true,
-            Message = "Success",
-            Data = assetTransferReceiptList
-        };
+        return  assetTransferReceiptList;
         }
     }
 }

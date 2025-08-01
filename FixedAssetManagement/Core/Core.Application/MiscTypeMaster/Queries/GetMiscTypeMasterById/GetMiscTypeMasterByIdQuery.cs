@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MiscTypeMaster.Queries.GetMiscTypeMasterById
 {
-    public class GetMiscTypeMasterByIdQuery :  IRequest<ApiResponseDTO<GetMiscTypeMasterDto>>
+    public class GetMiscTypeMasterByIdQuery :  IRequest<GetMiscTypeMasterDto>
     {
 
         public int Id { get; set; }

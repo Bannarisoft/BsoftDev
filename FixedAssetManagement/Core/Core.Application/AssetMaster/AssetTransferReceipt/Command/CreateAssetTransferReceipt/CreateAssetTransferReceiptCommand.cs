@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetTransferReceipt.Command.CreateAssetTransferReceipt
 {
-    public class CreateAssetTransferReceiptCommand   : IRequest<ApiResponseDTO<int>>
+    public class CreateAssetTransferReceiptCommand   : IRequest<int>
     {
           public AssetTransferReceiptHdrDto? AssetTransferReceiptHdrDto { get; set; }
     }

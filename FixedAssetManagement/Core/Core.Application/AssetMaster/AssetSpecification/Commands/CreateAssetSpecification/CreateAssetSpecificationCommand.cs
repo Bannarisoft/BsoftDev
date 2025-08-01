@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetSpecification.Commands.CreateAssetSpecification
 {
-   public class CreateAssetSpecificationCommand : IRequest<ApiResponseDTO<string>>
+   public class CreateAssetSpecificationCommand : IRequest<string>
     {
         public int AssetId { get; set; }
         public List<SpecificationItem>? Specifications { get; set; }

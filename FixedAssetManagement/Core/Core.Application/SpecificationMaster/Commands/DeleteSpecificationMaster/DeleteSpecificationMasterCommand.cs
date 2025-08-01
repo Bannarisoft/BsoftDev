@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.SpecificationMaster.Commands.DeleteSpecificationMaster
 {
-    public class DeleteSpecificationMasterCommand :  IRequest<ApiResponseDTO<SpecificationMasterDTO>>  
+    public class DeleteSpecificationMasterCommand :  IRequest<SpecificationMasterDTO>
     {
          public int Id { get; set; }    
     }

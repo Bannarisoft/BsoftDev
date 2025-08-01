@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.AssetSubCategories.Queries.GetAssetSubCategoriesByCategoryId
 {
-    public class GetAssetSubCategoriesByCategoryIdQuery : IRequest<ApiResponseDTO<List<AssetSubCategoriesAutoCompleteDto>>> 
+    public class GetAssetSubCategoriesByCategoryIdQuery : IRequest<List<AssetSubCategoriesAutoCompleteDto>>
     {
         public int AssetCategoriesId { get; set; }
     }

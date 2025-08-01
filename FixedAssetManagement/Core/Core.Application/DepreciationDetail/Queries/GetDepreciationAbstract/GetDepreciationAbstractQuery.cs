@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.DepreciationDetail.Queries.GetDepreciationAbstract
 {
-    public class GetDepreciationAbstractQuery  : IRequest<ApiResponseDTO<List<DepreciationAbstractDto>>>
+    public class GetDepreciationAbstractQuery  : IRequest<List<DepreciationAbstractDto>>
     {
         public int companyId {get; set;   }
         public int unitId {get; set;   }

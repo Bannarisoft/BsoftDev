@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.UOM.Command.CreateUOM
 {
-    public class CreateUOMCommand : IRequest<ApiResponseDTO<UOMDto>>
+    public class CreateUOMCommand : IRequest<UOMDto>
     {
         public string? Code { get; set; }
         public string? UOMName { get; set; }

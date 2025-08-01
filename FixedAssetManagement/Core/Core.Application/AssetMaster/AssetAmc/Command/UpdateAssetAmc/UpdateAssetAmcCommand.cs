@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc
 {
-    public class UpdateAssetAmcCommand :IRequest<ApiResponseDTO<int>> 
+    public class UpdateAssetAmcCommand :IRequest<int>
     {
     
         public int Id {get;set;}

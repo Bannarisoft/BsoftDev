@@ -6,11 +6,12 @@ using AutoMapper;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetAmc;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc
 {
-    public class UpdateAssetAmcCommandHandler : IRequestHandler<UpdateAssetAmcCommand, ApiResponseDTO<int>>
+    public class UpdateAssetAmcCommandHandler : IRequestHandler<UpdateAssetAmcCommand, int>
     {
         private readonly IAssetAmcCommandRepository _iassetamccommandrepository;
         private readonly IMediator _imediator;
@@ -22,7 +23,7 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc
             _imapper = imapper; 
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(UpdateAssetAmcCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(UpdateAssetAmcCommand request, CancellationToken cancellationToken)
         {
                 var assetamc = _imapper.Map<Core.Domain.Entities.AssetMaster.AssetAmc>(request);
                 // Calculate EndDate based on StartDate and Period (in months)
@@ -34,7 +35,8 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc
                 var result = await _iassetamccommandrepository.UpdateAsync(request.Id, assetamc);
                 if (result <= 0) // AssetAmc not found
                 {
-                    return new ApiResponseDTO<int> { IsSuccess = false, Message = "AssetAmc not found." };
+                    throw new ValidationException("AssetAmc not found.");
+                    
                 }
                 //Domain Event
                 var domainEvent = new AuditLogsDomainEvent(
@@ -44,7 +46,7 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.UpdateAssetAmc
                     details: $"AssetAmc details was updated",
                     module: "AssetAmc");
                 await _imediator.Publish(domainEvent, cancellationToken);
-                return new ApiResponseDTO<int> { IsSuccess = true, Message = "AssetAmc Updated Successfully.", Data = result }; 
+                return result; 
         }
     }
 }

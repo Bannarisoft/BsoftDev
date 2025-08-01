@@ -6,72 +6,35 @@ using AutoMapper;
 using Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTransfered;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetTransferIssue;
+using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.AssetMaster.AssetTransferIssue.Queries.GetAssetTranferedById
 {
-    public class GetAssetTranferedByIdQueryHanlder : IRequestHandler<GetAssetTranferedByIdQuery, ApiResponseDTO<AssetTransferJsonDto>>
+   public class  GetAssetTranferedByIdQueryHanlder  : IRequestHandler<GetAssetTranferedByIdQuery, AssetTransferJsonDto>
 
     {
-        private readonly IAssetTransferQueryRepository _assetTransferQueryRepository;
+       private readonly IAssetTransferQueryRepository _assetTransferQueryRepository;       
 
 
-        // ✅ Constructor
-        public GetAssetTranferedByIdQueryHanlder(IAssetTransferQueryRepository assetTransferQueryRepository)
+       // ✅ Constructor
+        public GetAssetTranferedByIdQueryHanlder ( IAssetTransferQueryRepository assetTransferQueryRepository)
         {
             _assetTransferQueryRepository = assetTransferQueryRepository;
         }
-        
-         public async Task<ApiResponseDTO<AssetTransferJsonDto>> Handle(GetAssetTranferedByIdQuery request, CancellationToken cancellationToken)
-    {
-        var assetTransfer = await _assetTransferQueryRepository.GetAssetTransferByIdAsync(request.AssetTransferId);
-
-        if (assetTransfer == null)
+         // ✅ Handle Method
+        public async Task<AssetTransferJsonDto> Handle(GetAssetTranferedByIdQuery request, CancellationToken cancellationToken)
         {
-            return new ApiResponseDTO<AssetTransferJsonDto>
+            var assetTransfer = await _assetTransferQueryRepository.GetAssetTransferByIdAsync(request.AssetTransferId);
+
+            if (assetTransfer == null)
             {
-                IsSuccess = false,
-                Message = $"Asset Transfer Issue with ID {request.AssetTransferId} not found.",
-                Data = null,
-                StatusCode = StatusCodes.Status404NotFound
-            };
+                throw new ValidationException($"Asset Transfer Issue with ID {request.AssetTransferId} not found.");
+             
+            }
+                return assetTransfer;            
         }
-
-        return new ApiResponseDTO<AssetTransferJsonDto>
-        {
-            IsSuccess = true,
-            Message = "Asset Transfer retrieved successfully.",
-            Data = assetTransfer,
-            StatusCode = StatusCodes.Status200OK
-        };
-    }
-        // ✅ Handle Method
-        // public async Task<ApiResponseDTO<AssetTransferJsonDto>> Handle(GetAssetTranferedByIdQuery request, CancellationToken cancellationToken)
-        // {
-        //     var assetTransfer = await _assetTransferQueryRepository.GetAssetTransferByIdAsync(request.AssetTransferId);
-
-        //     if (assetTransfer == null)
-        //     {
-        //         return new ApiResponseDTO<AssetTransferJsonDto>
-        //         {
-        //             IsSuccess = false,
-        //             Message = $"Asset Transfer Issue with ID {request.AssetTransferId} not found.",
-        //             Data = null,
-        //             StatusCode = StatusCodes.Status404NotFound
-
-        //         };
-        //     }
-        //       return new ApiResponseDTO<AssetTransferJsonDto>
-        //     {
-        //         IsSuccess = true,
-        //         Message = "Asset Transfer retrieved successfully.",
-        //         Data = assetTransfer,
-        //         StatusCode = StatusCodes.Status200OK
-        //     };
-
-
-        // }
     }
 }
+
 

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterByIdSplit
 {
-    public class GetAssetMasterByIdSplitQuery : IRequest<ApiResponseDTO<AssetMasterSplitDto>>
+    public class GetAssetMasterByIdSplitQuery : IRequest<AssetMasterSplitDto>
     {
         public int Id { get; set; }
     }

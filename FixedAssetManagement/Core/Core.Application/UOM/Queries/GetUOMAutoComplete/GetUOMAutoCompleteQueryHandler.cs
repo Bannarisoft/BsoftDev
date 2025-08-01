@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUOM;
 using Core.Application.UOM.Queries.GetUOMs;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.UOM.Queries.GetUOMAutoComplete
 {
-    public class GetUOMAutoCompleteQueryHandler : IRequestHandler<GetUOMAutoCompleteQuery, ApiResponseDTO<List<UOMAutoCompleteDto>>>
+    public class GetUOMAutoCompleteQueryHandler : IRequestHandler<GetUOMAutoCompleteQuery, List<UOMAutoCompleteDto>>
     {
            private readonly IUOMQueryRepository _uomQueryRepository;
         private readonly IMapper _mapper;
@@ -22,16 +23,13 @@ namespace Core.Application.UOM.Queries.GetUOMAutoComplete
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<List<UOMAutoCompleteDto>>> Handle(GetUOMAutoCompleteQuery request, CancellationToken cancellationToken)
+        public async Task<List<UOMAutoCompleteDto>> Handle(GetUOMAutoCompleteQuery request, CancellationToken cancellationToken)
         {
             var result = await _uomQueryRepository.GetUOM(request.SearchPattern);
             if (result is null || result.Count is 0)
             {
-                return new ApiResponseDTO<List<UOMAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = "No UOM found matching the search pattern."
-                };
+               throw new ValidationException("No UOM found matching the search pattern.");
+                
             }
               var uom = _mapper.Map<List<UOMAutoCompleteDto>>(result);
               //Domain Event
@@ -43,7 +41,7 @@ namespace Core.Application.UOM.Queries.GetUOMAutoComplete
                      module:"UOM"
                  );
                  await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<UOMAutoCompleteDto>> { IsSuccess = true, Message = "Success", Data = uom };  
+            return uom;  
         }
     }
 }

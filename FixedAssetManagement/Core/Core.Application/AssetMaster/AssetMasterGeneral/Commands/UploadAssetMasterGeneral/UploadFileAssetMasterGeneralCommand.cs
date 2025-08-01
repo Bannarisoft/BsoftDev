@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadAssetMasterGeneral
 {
-    public class UploadFileAssetMasterGeneralCommand : IRequest<ApiResponseDTO<AssetMasterImageDto>>
+    public class UploadFileAssetMasterGeneralCommand : IRequest<AssetMasterImageDto>
     {
         public IFormFile? File { get; set; }
         // public string? CompanyName { get; set; }  

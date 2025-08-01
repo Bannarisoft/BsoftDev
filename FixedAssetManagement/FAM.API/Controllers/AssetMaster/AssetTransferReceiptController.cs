@@ -24,14 +24,13 @@ namespace FAM.API.Controllers.AssetMaster
     {
         private readonly ILogger<AssetTransferReceiptController> _logger;
          private readonly IMediator _mediator;
-        private readonly IValidator<CreateAssetTransferReceiptCommand> _createAssetTransferReceiptCommandValidator;
 
-        public AssetTransferReceiptController(ILogger<AssetTransferReceiptController> logger,IMediator mediator,IValidator<CreateAssetTransferReceiptCommand> createAssetTransferReceiptCommandValidator)
+        public AssetTransferReceiptController(ILogger<AssetTransferReceiptController> logger,IMediator mediator
+        )
         :base(mediator)
         {
             _logger = logger;
             _mediator=mediator;
-            _createAssetTransferReceiptCommandValidator=createAssetTransferReceiptCommandValidator;
         }
 
         [HttpGet("GetAssetTransferReceiptPending")]
@@ -101,36 +100,17 @@ namespace FAM.API.Controllers.AssetMaster
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateAssetTransferReceiptCommand  createAssetTransferReceiptCommand)
         {
-             // Validate the incoming command
-            var validationResult = await _createAssetTransferReceiptCommandValidator.ValidateAsync(createAssetTransferReceiptCommand);
-            if (!validationResult.IsValid)
-            {
-                
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                });
-            }
-            // Process the command
+             
             var CreatedAssetReceiptId = await _mediator.Send(createAssetTransferReceiptCommand);
 
-            if (CreatedAssetReceiptId.IsSuccess)
-            {
-          
+            
             return Ok(new
             {
                 StatusCode = StatusCodes.Status201Created,
-                message =CreatedAssetReceiptId.Message,
-                data = CreatedAssetReceiptId.Data
+                message =CreatedAssetReceiptId,
+                data = CreatedAssetReceiptId
             });
-            }
-            return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = CreatedAssetReceiptId.Message
-                });
+           
         }
 
 
@@ -140,12 +120,11 @@ namespace FAM.API.Controllers.AssetMaster
         {
             var assetreceipt = await Mediator.Send(new GetAssetReceiptDetailsByIdQuery() { AssetReceiptId = id});
           
-            if(assetreceipt.IsSuccess)
-            {
+           
                 
-              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetreceipt.Data,message = assetreceipt.Message });
-            }
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetreceipt.Message });
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetreceipt,message = assetreceipt });
+            
+            
            
         }
 

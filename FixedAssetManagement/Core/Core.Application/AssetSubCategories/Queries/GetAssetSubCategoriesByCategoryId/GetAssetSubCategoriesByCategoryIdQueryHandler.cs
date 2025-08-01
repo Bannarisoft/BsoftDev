@@ -7,11 +7,12 @@ using Core.Application.AssetSubCategories.Queries.GetAssetSubCategories;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetSubCategories;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetSubCategories.Queries.GetAssetSubCategoriesByCategoryId
 {
-    public class GetAssetSubCategoriesByCategoryIdQueryHandler : IRequestHandler<GetAssetSubCategoriesByCategoryIdQuery,ApiResponseDTO<List<AssetSubCategoriesAutoCompleteDto>>>
+    public class GetAssetSubCategoriesByCategoryIdQueryHandler : IRequestHandler<GetAssetSubCategoriesByCategoryIdQuery,List<AssetSubCategoriesAutoCompleteDto>>
     {
         
         private readonly IAssetSubCategoriesQueryRepository _iAssetSubCategoriesQueryRepository;
@@ -25,18 +26,15 @@ namespace Core.Application.AssetSubCategories.Queries.GetAssetSubCategoriesByCat
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<List<AssetSubCategoriesAutoCompleteDto>>> Handle(GetAssetSubCategoriesByCategoryIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<AssetSubCategoriesAutoCompleteDto>> Handle(GetAssetSubCategoriesByCategoryIdQuery request, CancellationToken cancellationToken)
         {
              var result = await _iAssetSubCategoriesQueryRepository.GetSubcategoriesByAssetCategoryIdAsync(request.AssetCategoriesId);
 
             // Check if data exists
             if (result is null || !result.Any())
             {
-                return new ApiResponseDTO<List<AssetSubCategoriesAutoCompleteDto>>
-                {
-                    IsSuccess = false,
-                    Message = $"No records found for ID {request.AssetCategoriesId}."
-                };
+                throw new ValidationException($"No records found for ID {request.AssetCategoriesId}.");
+              
             }
 
             // Map list of results
@@ -52,12 +50,7 @@ namespace Core.Application.AssetSubCategories.Queries.GetAssetSubCategoriesByCat
             );
             await _mediator.Publish(domainEvent, cancellationToken);
 
-            return new ApiResponseDTO<List<AssetSubCategoriesAutoCompleteDto>>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = assetSubCategoriesList
-            };
+            return  assetSubCategoriesList;
         }
     }
 }

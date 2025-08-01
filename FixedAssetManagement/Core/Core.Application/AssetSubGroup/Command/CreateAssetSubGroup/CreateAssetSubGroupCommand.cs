@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Core.Application.AssetSubGroup.Command.CreateAssetSubGroup
 {
-    public class CreateAssetSubGroupCommand : IRequest<ApiResponseDTO<int>>
+    public class CreateAssetSubGroupCommand : IRequest<int>
     {
         public string? Code { get; set; }
         public string? SubGroupName { get; set; }

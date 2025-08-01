@@ -3,12 +3,13 @@ using Core.Application.AssetSubGroup.Queries.GetAssetSubGroup;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetSubGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AssetSubGroup.Command.CreateAssetSubGroup
 {
-    public class CreateAssetSubGroupCommandHandler : IRequestHandler<CreateAssetSubGroupCommand, ApiResponseDTO<int>>
+    public class CreateAssetSubGroupCommandHandler : IRequestHandler<CreateAssetSubGroupCommand, int>
     {
         private readonly IAssetSubGroupCommandRepository _iAssetSubGroupCommandRepository;
         private readonly IMediator _iMediator;
@@ -22,7 +23,7 @@ namespace Core.Application.AssetSubGroup.Command.CreateAssetSubGroup
             _iMapper = iMapper;
             _logger = logger;
         }
-        public async Task<ApiResponseDTO<int>> Handle(CreateAssetSubGroupCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateAssetSubGroupCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Starting creation process for AssetSubGroup: {request}");
              // Check if AssetSubGroup code already exists
@@ -30,12 +31,8 @@ namespace Core.Application.AssetSubGroup.Command.CreateAssetSubGroup
             if (exists)
             {
                  _logger.LogWarning($"AssetSubGroup Code {request.Code} already exists.");
-                 return new ApiResponseDTO<int>
-            {
-            IsSuccess = false,
-            Message = "AssetSubGroup Code already exists.",
-            Data = 0
-            };
+                 throw new ValidationException("AssetSubGroup Code already exists.");
+               
             }
             var assetSubGroup = _iMapper.Map<Core.Domain.Entities.AssetSubGroup>(request);
             
@@ -54,19 +51,10 @@ namespace Core.Application.AssetSubGroup.Command.CreateAssetSubGroup
             if (result > 0)
                   {
                      _logger.LogInformation($"AssetSubGroupId {result} created successfully");
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "AssetSubGroup created successfully",
-                           Data = result
-                      };
+                        return  result;
                  }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "AssetSubGroup Creation Failed",
-                Data = result
-            };
+                 throw new Exception("AssetSubGroup Creation Failed");
+           
         }
     }
 }

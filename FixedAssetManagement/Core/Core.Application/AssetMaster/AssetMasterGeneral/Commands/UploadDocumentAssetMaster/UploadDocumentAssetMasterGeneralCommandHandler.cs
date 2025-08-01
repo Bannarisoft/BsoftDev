@@ -2,12 +2,13 @@ using Contracts.Interfaces.External.IUser;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadDocumentAssetMaster
 {
-    public class UploadDocumentAssetMasterGeneralCommandHandler : IRequestHandler<UploadDocumentAssetMasterGeneralCommand, ApiResponseDTO<AssetMasterDocumentDto>>
+    public class UploadDocumentAssetMasterGeneralCommandHandler : IRequestHandler<UploadDocumentAssetMasterGeneralCommand, AssetMasterDocumentDto>
     {        
         private readonly IAssetMasterGeneralQueryRepository _assetMasterGeneralQueryRepository;
         private readonly ILogger<UploadDocumentAssetMasterGeneralCommandHandler> _logger;
@@ -26,18 +27,20 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadDocumen
             _companyGrpcClient = companyGrpcClient;
         }
 
-        public async Task<ApiResponseDTO<AssetMasterDocumentDto>> Handle(UploadDocumentAssetMasterGeneralCommand request, CancellationToken cancellationToken)
+        public async Task<AssetMasterDocumentDto> Handle(UploadDocumentAssetMasterGeneralCommand request, CancellationToken cancellationToken)
         {
             if (request.File == null || request.File.Length == 0)
             {
-                return new ApiResponseDTO<AssetMasterDocumentDto> { IsSuccess = false, Message = "No file uploaded" };
+                throw new ValidationException("No file uploaded");
+                
             }
              // 🔹 Fetch Base Directory from Database
             string baseDirectory = await _assetMasterGeneralQueryRepository.GetDocumentDirectoryAsync();
             if (string.IsNullOrWhiteSpace(baseDirectory))
             {
                 _logger.LogError("Base directory path not found in database.");
-                return new ApiResponseDTO<AssetMasterDocumentDto> { IsSuccess = false, Message = "Base directory not configured." };
+                throw new ValidationException("Base directory not configured.");
+                
             }
             
             var companyId =_ipAddressService.GetCompanyId();
@@ -80,12 +83,13 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Commands.UploadDocumen
                     AssetDocument = formattedPath,  // ✅ Correctly formatted file path
                     AssetDocumentBase64 = base64Image  // ✅ Convert to Base64
                 };
-                return new ApiResponseDTO<AssetMasterDocumentDto> { IsSuccess = true, Data = response };
+                return  response;
             }
             catch (Exception ex)
             {
                 _logger.LogError($"File upload failed: {ex.Message}");
-                return new ApiResponseDTO<AssetMasterDocumentDto> { IsSuccess = false, Message = $"File upload failed: {ex.Message}" };
+                throw new Exception($"File upload failed: {ex.Message}");
+                
             }
         }   
         private void EnsureDirectoryExists(string path)

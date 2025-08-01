@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAdditionalCost.Commands.CreateAssetAdditionalCost
 {
-    public class CreateAssetAdditionalCostCommand :IRequest<ApiResponseDTO<int>> 
+    public class CreateAssetAdditionalCostCommand :IRequest<int>
     {
         public int AssetId { get; set; }   
         public int AssetSourceId { get; set; }   

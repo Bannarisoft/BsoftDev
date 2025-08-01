@@ -7,11 +7,12 @@ using Core.Application.AssetMaster.AssetDisposal.Queries.GetAssetDisposal;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetDisposal;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetDisposal.Queries.GetAssetDisposalById
 {
-    public class GetAssetDisposalByIdQueryHandler : IRequestHandler<GetAssetDisposalByIdQuery,ApiResponseDTO<AssetDisposalDto>>
+    public class GetAssetDisposalByIdQueryHandler : IRequestHandler<GetAssetDisposalByIdQuery,AssetDisposalDto>
     {
         
         private readonly IAssetDisposalQueryRepository _iAssetDisposalQueryRepository;
@@ -25,13 +26,14 @@ namespace Core.Application.AssetMaster.AssetDisposal.Queries.GetAssetDisposalByI
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<AssetDisposalDto>> Handle(GetAssetDisposalByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AssetDisposalDto> Handle(GetAssetDisposalByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetDisposalQueryRepository.GetByIdAsync(request.Id);
             // Check if the entity exists
             if (result is null)
             {
-                return new ApiResponseDTO<AssetDisposalDto> { IsSuccess = false, Message =$"Asset ID {request.Id} not found." };
+                throw new ValidationException( $"Asset ID {request.Id} not found.");
+                
             }
             // Map a single entity
             var assetDisposal = _mapper.Map<AssetDisposalDto>(result);
@@ -45,7 +47,7 @@ namespace Core.Application.AssetMaster.AssetDisposal.Queries.GetAssetDisposalByI
                     module:"AssetDisposal"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<AssetDisposalDto> { IsSuccess = true, Message = "Success", Data = assetDisposal };
+          return assetDisposal;
         }
         
     }

@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Core.Application.WDVDepreciation.Commands.LockDepreciation
 {
-    public class LockDepreciationCommand  : IRequest<ApiResponseDTO<CalculationDepreciationDto>>
+    public class LockDepreciationCommand  : IRequest<CalculationDepreciationDto>
     {      
         public int FinYearId { get; set; }     
     }

@@ -13,14 +13,13 @@ namespace FAM.API.Controllers.AssetMaster
     {
         private readonly ILogger<AssetIssueTransferApproval> _logger;
         private readonly IMediator _mediator;
-        private readonly IValidator<UpdateAssetTranferIssueApprovalCommand> _updateAssetTranferIssueApprovalCommand;
 
-        public AssetIssueTransferApproval(ILogger<AssetIssueTransferApproval> logger, IMediator mediator, IValidator<UpdateAssetTranferIssueApprovalCommand> updateAssetTranferIssueApprovalCommand)
+        public AssetIssueTransferApproval(ILogger<AssetIssueTransferApproval> logger, IMediator mediator)
         : base(mediator)
         {
             _logger = logger;
             _mediator = mediator;
-            _updateAssetTranferIssueApprovalCommand = updateAssetTranferIssueApprovalCommand;
+            
         }
         [HttpGet]
         public async Task<IActionResult> GetAllAssetIssueTransferPendingAsync([FromQuery] int PageNumber,[FromQuery] int PageSize,[FromQuery] string? TransferType = null,[FromQuery] DateTimeOffset? FromDate = null,
@@ -53,45 +52,21 @@ namespace FAM.API.Controllers.AssetMaster
         {
             var assettransfer = await Mediator.Send(new GetAssetTransferIssueByIdQuery() { Id = id});
           
-            if(assettransfer.IsSuccess)
-            {
-                
-              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assettransfer.Data,message = assettransfer.Message });
-            }
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assettransfer.Message });
+              
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assettransfer,message = assettransfer });
            
         }
             [HttpPost("update-status")]
             public async Task<IActionResult> UpdateStatus([FromBody] UpdateAssetTranferIssueApprovalCommand command)
             {
-                 // Validate the incoming command
-                var validationResult = await _updateAssetTranferIssueApprovalCommand.ValidateAsync(command);
-       
-                if (!validationResult.IsValid)
-                {
-                    return BadRequest(new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "Validation failed",
-                        errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                    });
-                }
+           
                 var response = await _mediator.Send(command);
-
-                if (!response.IsSuccess)
-                {
-                    return BadRequest(new
-                    {
-                        message = response.Message,
-                        statusCode = StatusCodes.Status400BadRequest
-                    });
-                }
 
                 return Ok(new
                 {
-                    message = response.Message,
+                    message = response,
                     statusCode = StatusCodes.Status200OK,
-                    data = response.Data
+                    data = response
                 });
             }
          

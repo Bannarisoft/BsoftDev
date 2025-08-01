@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IUOM;
 using Core.Application.UOM.Queries.GetUOMs;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.UOM.Queries.GetUOMById
 {
-    public class GetUOMByIdQueryHandler : IRequestHandler<GetUOMByIdQuery, ApiResponseDTO<UOMDto>>
+    public class GetUOMByIdQueryHandler : IRequestHandler<GetUOMByIdQuery, UOMDto>
     {
          private readonly IUOMQueryRepository _uomQueryRepository;        
         private readonly IMapper _mapper;
@@ -22,16 +23,13 @@ namespace Core.Application.UOM.Queries.GetUOMById
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<ApiResponseDTO<UOMDto>> Handle(GetUOMByIdQuery request, CancellationToken cancellationToken)
+        public async Task<UOMDto> Handle(GetUOMByIdQuery request, CancellationToken cancellationToken)
         {
            var result = await _uomQueryRepository.GetByIdAsync(request.Id);
             if (result is null)
             {
-                return new ApiResponseDTO<UOMDto>
-                {
-                    IsSuccess = false,
-                    Message = "UOMId not found"
-                };
+                throw new ValidationException("UOMId not found");
+               
             }  
            var location = _mapper.Map<UOMDto>(result);
 
@@ -44,7 +42,7 @@ namespace Core.Application.UOM.Queries.GetUOMById
                     module:"UOM"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<UOMDto> { IsSuccess = true, Message = "Success", Data = location };
+          return location;
         }
     }
 }

@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Core.Application.MiscTypeMaster.Command.DeleteMiscTypeMaster
 {
-    public class DeleteMiscTypeMasterCommand  : IRequest<ApiResponseDTO<GetMiscTypeMasterDto>>
+    public class DeleteMiscTypeMasterCommand  : IRequest<bool>
     {
           public int Id { get; set; }
     }

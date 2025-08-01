@@ -7,11 +7,12 @@ using Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetPurchase;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetPurchase;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetPurchaseById
 {
-    public class GetAssetPurchaseByIdQueryHandler : IRequestHandler<GetAssetPurchaseByIdQuery,ApiResponseDTO<AssetPurchaseDetailsDto>>
+    public class GetAssetPurchaseByIdQueryHandler : IRequestHandler<GetAssetPurchaseByIdQuery,AssetPurchaseDetailsDto>
     {
          private readonly IAssetPurchaseQueryRepository _iAssetPurchaseQueryRepository;  
         private readonly IMapper _mapper;
@@ -23,13 +24,14 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetPurchaseByI
             _mediator = mediator;
         }
 
-        public async Task<ApiResponseDTO<AssetPurchaseDetailsDto>> Handle(GetAssetPurchaseByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AssetPurchaseDetailsDto> Handle(GetAssetPurchaseByIdQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetPurchaseQueryRepository.GetByIdAsync(request.Id);
             // Check if the entity exists
             if (result is null)
             {
-                return new ApiResponseDTO<AssetPurchaseDetailsDto> { IsSuccess = false, Message =$"AssetPurchase ID {request.Id} not found." };
+                throw new ValidationException($"AssetPurchase ID {request.Id} not found.");
+                
             }
             // Map a single entity
             var assetGroup = _mapper.Map<AssetPurchaseDetailsDto>(result);
@@ -43,7 +45,7 @@ namespace Core.Application.AssetMaster.AssetPurchase.Queries.GetAssetPurchaseByI
                     module:"AssetPurchaseDetails"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-          return new ApiResponseDTO<AssetPurchaseDetailsDto> { IsSuccess = true, Message = "Success", Data = assetGroup };
+          return  assetGroup;
         }
     }
 }

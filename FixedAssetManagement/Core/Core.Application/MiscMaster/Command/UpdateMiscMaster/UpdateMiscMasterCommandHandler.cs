@@ -7,11 +7,12 @@ using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.MiscMaster.Queries.GetMiscMasterById;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.MiscMaster.Command.UpdateMiscMaster
 {
-    public class UpdateMiscMasterCommandHandler  : IRequestHandler<UpdateMiscMasterCommand, ApiResponseDTO<bool>>
+    public class UpdateMiscMasterCommandHandler  : IRequestHandler<UpdateMiscMasterCommand, bool>
     {
 
          private readonly IMiscMasterCommandRepository _miscMasterCommandRepository;
@@ -29,14 +30,15 @@ namespace Core.Application.MiscMaster.Command.UpdateMiscMaster
         }
 
 
-           public async Task<ApiResponseDTO<bool>> Handle(UpdateMiscMasterCommand request, CancellationToken cancellationToken)
+           public async Task<bool> Handle(UpdateMiscMasterCommand request, CancellationToken cancellationToken)
         {
                    
                 var existingMisctype = await _miscMasterQueryRepository.GetByMiscMasterCodeAsync(request.Code,request.MiscTypeId,request.Id );
 
                 if (existingMisctype != null)
                 {
-                    return new ApiResponseDTO<bool>{IsSuccess = false, Message = "MiscMaster already exists"};
+                    throw new ValidationException("MiscMaster already exists");
+                    
                 }              
                  var miscmaster  = _imapper.Map<Core.Domain.Entities.MiscMaster>(request);         
                 var MiscMasterresult = await _miscMasterCommandRepository.UpdateAsync(request.Id, miscmaster);                
@@ -52,10 +54,10 @@ namespace Core.Application.MiscMaster.Command.UpdateMiscMaster
               
                 if(MiscMasterresult)
                 {
-                    return new ApiResponseDTO<bool>{IsSuccess = true, Message = "MiscMasterresult updated successfully."};
+                    return MiscMasterresult;
                 }
-
-                return new ApiResponseDTO<bool>{IsSuccess = false, Message = "MiscMasterresult not updated."};
+            throw new Exception("MiscMasterresult not updated.");
+                
            
         }
        

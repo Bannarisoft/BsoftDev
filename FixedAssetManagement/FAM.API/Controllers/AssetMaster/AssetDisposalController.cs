@@ -20,16 +20,13 @@ namespace FAM.API.Controllers.AssetMaster
     {
         private readonly ILogger<AssetDisposalController> _logger;
         private readonly IMediator _mediator;
-        private readonly IValidator<CreateAssetDisposalCommand> _createAssetDisposalCommand;
-        private readonly IValidator<UpdateAssetDisposalCommand> _updateAssetDisposalCommand;
 
-        public AssetDisposalController(ILogger<AssetDisposalController> logger, IMediator mediator,IValidator<CreateAssetDisposalCommand> createAssetDisposalCommand,IValidator<UpdateAssetDisposalCommand> updateAssetDisposalCommand)
+        public AssetDisposalController(ILogger<AssetDisposalController> logger, IMediator mediator
+        )
         : base(mediator)
         {
             _logger = logger;
             _mediator = mediator;
-            _createAssetDisposalCommand=createAssetDisposalCommand;
-            _updateAssetDisposalCommand=updateAssetDisposalCommand;
         }
         [HttpGet("DisposalType")]
         public async Task<IActionResult> GetDisposalTypes()
@@ -58,12 +55,7 @@ namespace FAM.API.Controllers.AssetMaster
         {
             var assetdisposal = await Mediator.Send(new GetAssetDisposalByIdQuery() { Id = id});
           
-            if(assetdisposal.IsSuccess)
-            {
-                
-              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetdisposal.Data,message = assetdisposal.Message });
-            }
-            return NotFound( new { StatusCode=StatusCodes.Status404NotFound, message = assetdisposal.Message });
+              return Ok(new { StatusCode=StatusCodes.Status200OK, data = assetdisposal,message = assetdisposal });
            
         }
 
@@ -93,38 +85,16 @@ namespace FAM.API.Controllers.AssetMaster
         public async Task<IActionResult> CreateAsync(CreateAssetDisposalCommand createAssetDisposalCommand)
         {
             
-            // Validate the incoming command
-            var validationResult = await _createAssetDisposalCommand.ValidateAsync(createAssetDisposalCommand);
-            _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-            if (!validationResult.IsValid)
-            {
-                
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = "Validation failed",
-                    errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                });
-            }
-
-            // Process the command
             var CreatedAssetDisposalId = await _mediator.Send(createAssetDisposalCommand);
 
-            if (CreatedAssetDisposalId.IsSuccess)
-            {
-          
+           
             return Ok(new
             {
                 StatusCode = StatusCodes.Status201Created,
-                message =CreatedAssetDisposalId.Message,
-                data = CreatedAssetDisposalId.Data
+                message ="Asset Disposal created successfully.",
+                data = CreatedAssetDisposalId
             });
-            }
-            return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = CreatedAssetDisposalId.Message
-                });
+          
         
         }
 
@@ -132,37 +102,14 @@ namespace FAM.API.Controllers.AssetMaster
         public async Task<IActionResult> UpdateAsync(UpdateAssetDisposalCommand updateAssetDisposalCommand )
         {
         
-                // Validate the incoming command
-                var validationResult = await _updateAssetDisposalCommand.ValidateAsync(updateAssetDisposalCommand);
-                _logger.LogWarning($"Validation failed: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-                if (!validationResult.IsValid)
-                {
-                
-                    return BadRequest(new
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        message = "Validation failed",
-                        errors = validationResult.Errors.Select(e => e.ErrorMessage)
-                    });
-                }
-
-                var updatedassetdisposal = await _mediator.Send(updateAssetDisposalCommand);
-
-                if (updatedassetdisposal.IsSuccess)
-                {
-                    
+             await _mediator.Send(updateAssetDisposalCommand);
+             
                 return Ok(new
                     {
-                        message = updatedassetdisposal.Message,
+                        message = "Asset Disposal Updated Successfully.",
                         statusCode = StatusCodes.Status200OK
                     });
-                }
-               
-                return NotFound(new
-                {
-                    message =updatedassetdisposal.Message,
-                    statusCode = StatusCodes.Status404NotFound
-                });   
+                
         }
 
         

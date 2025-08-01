@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAmc.Queries.GetExistingVendorDetails
 {
-    public class GetExistingVendorDetailsQueryHandler :  IRequestHandler<GetExistingVendorDetailsQuery,ApiResponseDTO<List<GetExistingVendorDetailsDto>>>
+    public class GetExistingVendorDetailsQueryHandler :  IRequestHandler<GetExistingVendorDetailsQuery,List<GetExistingVendorDetailsDto>>
     {
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
@@ -22,7 +22,7 @@ namespace Core.Application.AssetMaster.AssetAmc.Queries.GetExistingVendorDetails
             _iAssetAmcQueryRepository = iAssetAmcQueryRepository;   
         }
 
-        public async Task<ApiResponseDTO<List<GetExistingVendorDetailsDto>>> Handle(GetExistingVendorDetailsQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetExistingVendorDetailsDto>> Handle(GetExistingVendorDetailsQuery request, CancellationToken cancellationToken)
         {
             var result = await _iAssetAmcQueryRepository.GetVendorDetails(request.OldUnitCode,request.VendorCode);
             var assetunits  = _mapper.Map<List<GetExistingVendorDetailsDto>>(result);
@@ -35,7 +35,7 @@ namespace Core.Application.AssetMaster.AssetAmc.Queries.GetExistingVendorDetails
                     module:"ExistingVendorDetails"
                 );
                 await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<List<GetExistingVendorDetailsDto>> { IsSuccess = true, Message = "Success", Data = assetunits };
+            return assetunits;
         }
     }
 }

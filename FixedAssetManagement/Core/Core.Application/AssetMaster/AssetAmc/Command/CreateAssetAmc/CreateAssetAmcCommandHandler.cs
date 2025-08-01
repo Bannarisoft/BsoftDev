@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Core.Application.AssetMaster.AssetAmc.Command.CreateAssetAmc
 {
-    public class CreateAssetAmcCommandHandler : IRequestHandler<CreateAssetAmcCommand, ApiResponseDTO<int>>
+    public class CreateAssetAmcCommandHandler : IRequestHandler<CreateAssetAmcCommand, int>
     {
         private readonly IAssetAmcCommandRepository _iassetamccommandrepository;
         private readonly IMediator _imediator;
@@ -25,7 +25,7 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.CreateAssetAmc
           
         }
 
-        public async Task<ApiResponseDTO<int>> Handle(CreateAssetAmcCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateAssetAmcCommand request, CancellationToken cancellationToken)
         {
             var assetAmc = _imapper.Map<Core.Domain.Entities.AssetMaster.AssetAmc>(request);
 
@@ -50,23 +50,13 @@ namespace Core.Application.AssetMaster.AssetAmc.Command.CreateAssetAmc
                 details: $"AssetAmc details was created",
                 module: "AssetAmc");
             await _imediator.Publish(domainEvent, cancellationToken);
-            var assetamcDto = _imapper.Map<AssetAmcDto>(assetAmc);
+             _imapper.Map<AssetAmcDto>(assetAmc);
             if (result > 0)
                   {
                      
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "AssetAmc created successfully",
-                           Data = result
-                      };
+                        return  result;
                  }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "AssetAmc Creation Failed",
-                Data = result
-            };
+            throw new Exception("AssetAmc Creation Failed");
         }
     }
 }

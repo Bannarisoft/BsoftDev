@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using BackgroundService.Application.Notification.Common.Interfaces;
 using BackgroundService.Application.Notification.Common.Interfaces.INotificationGroup;
 using BackgroundService.Infrastructure.Data.Notification;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackgroundService.Infrastructure.Repositories.Notification.NotificationGroup
@@ -12,17 +8,19 @@ namespace BackgroundService.Infrastructure.Repositories.Notification.Notificatio
     public class NotificationGroupCommandRepository : INotificationGroupCommand
     {
         private readonly NotificationDbContext _notificationDbContext;
+        private readonly IIPAddressService _ipAddressService;
 
-        public NotificationGroupCommandRepository(NotificationDbContext notificationDbContext)
+        public NotificationGroupCommandRepository(NotificationDbContext notificationDbContext, IIPAddressService ipAddressService)
         {
             _notificationDbContext = notificationDbContext;
+            _ipAddressService = ipAddressService;
         }
         public async Task<int> CreateAsync(Domain.Entities.Notification.NotificationGroup notificationGroup)
         {
+            notificationGroup.UnitId = _ipAddressService.GetUnitId();
             _notificationDbContext.Entry(notificationGroup);
             await _notificationDbContext.NotificationGroup.AddAsync(notificationGroup);
             await _notificationDbContext.SaveChangesAsync();
-
             return notificationGroup.Id;
         }
 

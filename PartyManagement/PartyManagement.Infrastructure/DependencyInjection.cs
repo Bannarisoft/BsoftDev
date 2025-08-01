@@ -5,7 +5,7 @@ using Core.Application.Common.Interfaces.IMiscMaster;
 using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.Common.Interfaces.IPartyGroup;
 using Core.Application.Common.Mappings;
-using Core.Domain.Entities;
+using Core.Application.Interfaces.GST;
 using Infrastructure.Data;
 using InventoryManagement.Infrastructure.Services;
 using Microsoft.Data.SqlClient;
@@ -18,6 +18,7 @@ using PartyManagement.Infrastructure.Repositories;
 using PartyManagement.Infrastructure.Repositories.MiscMaster;
 using PartyManagement.Infrastructure.Repositories.MiscTypeMaster;
 using PartyManagement.Infrastructure.Repositories.PartyGroup;
+using PartyManagement.Infrastructure.Services;
 using Serilog;
 
 namespace PartyManagement.Infrastructure
@@ -110,8 +111,7 @@ namespace PartyManagement.Infrastructure
             services.AddTransient<IFileUploadService, FileUploadRepository>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
             services.AddTransient<IJwtTokenHelper, JwtTokenHelper>();
-            
-
+			services.AddHttpClient<IGSTAuthService, GSTAuthService>(); 
             // AutoMapper profiles
             services.AddAutoMapper(
             typeof(PartyGroupProfile),

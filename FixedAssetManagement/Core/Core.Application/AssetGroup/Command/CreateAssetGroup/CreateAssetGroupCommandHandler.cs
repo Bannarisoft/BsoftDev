@@ -7,12 +7,13 @@ using Core.Application.AssetGroup.Queries.GetAssetGroup;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetGroup;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Application.AssetGroup.Command.CreateAssetGroup
 {
-    public class CreateAssetGroupCommandHandler : IRequestHandler<CreateAssetGroupCommand, ApiResponseDTO<int>>
+    public class CreateAssetGroupCommandHandler : IRequestHandler<CreateAssetGroupCommand, int>
     {
         private readonly IAssetGroupCommandRepository _iAssetGroupCommandRepository;
         private readonly IMediator _imediator;
@@ -26,7 +27,7 @@ namespace Core.Application.AssetGroup.Command.CreateAssetGroup
             _imapper = imapper;
             _logger = logger;
         }
-        public async Task<ApiResponseDTO<int>> Handle(CreateAssetGroupCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateAssetGroupCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Starting creation process for AssetGroup: {request}");
              // Check if AssetGroup code already exists
@@ -34,12 +35,8 @@ namespace Core.Application.AssetGroup.Command.CreateAssetGroup
             if (exists)
             {
                  _logger.LogWarning($"AssetGroup Code {request.Code} already exists.");
-                 return new ApiResponseDTO<int>
-            {
-            IsSuccess = false,
-            Message = "AssetGroup Code already exists.",
-            Data = 0
-            };
+                throw new ValidationException("AssetGroup Code already exists.");
+                
             }
             var assetGroup = _imapper.Map<Core.Domain.Entities.AssetGroup>(request);
             
@@ -54,23 +51,15 @@ namespace Core.Application.AssetGroup.Command.CreateAssetGroup
                 module: "AssetGroup");
             await _imediator.Publish(domainEvent, cancellationToken);
             _logger.LogInformation($"AssetGroup {assetGroup.GroupName} Created successfully.");
-            var assetGroupDtoDto = _imapper.Map<AssetGroupDto>(assetGroup);
+            
             if (result > 0)
                   {
                      _logger.LogInformation($"AssetGroupId {result} created successfully");
-                        return new ApiResponseDTO<int>
-                       {
-                           IsSuccess = true,
-                           Message = "AssetGroup created successfully",
-                           Data = result
-                      };
+                        return  result;
                  }
-            return new ApiResponseDTO<int>
-            {
-                IsSuccess = true,
-                Message = "AssetGroup Creation Failed",
-                Data = result
-            };
+
+                 throw new Exception("AssetGroup Creation Failed");
+           
         }
     }
 }

@@ -3,11 +3,12 @@ using Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGene
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetMasterGeneral;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMasterGeneralById
 {
-    public class GetAssetMasterGeneralByIdQueryHandler : IRequestHandler<GetAssetMasterGeneralByIdQuery, ApiResponseDTO<AssetMasterDTO>>
+    public class GetAssetMasterGeneralByIdQueryHandler : IRequestHandler<GetAssetMasterGeneralByIdQuery, AssetMasterDTO>
     {
         private readonly IAssetMasterGeneralQueryRepository _assetMasterRepository;
         private readonly IMapper _mapper;
@@ -19,7 +20,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
             _mapper =mapper;
             _mediator = mediator;            
         }
-        public async Task<ApiResponseDTO<AssetMasterDTO>> Handle(GetAssetMasterGeneralByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AssetMasterDTO> Handle(GetAssetMasterGeneralByIdQuery request, CancellationToken cancellationToken)
         {
           //  var assetMaster = await _assetMasterRepository.GetByIdAsync(request.Id);
            var (assetResult, locationResult, purchaseDetails, spec, warranty, amc, disposal, insurance,additionalCost) = await _assetMasterRepository.GetAssetMasterByIdAsync(request.Id);
@@ -68,12 +69,9 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
              }        
 
             if (asset is null)
-            {                
-                return new ApiResponseDTO<AssetMasterDTO>
-                {
-                    IsSuccess = false,
-                    Message = "AssetName with ID {request.Id} not found."
-                };   
+            {     
+                throw new ValidationException("AssetName with ID {request.Id} not found.");            
+                
             }       
             //Domain Event
             var domainEvent = new AuditLogsDomainEvent(
@@ -84,12 +82,7 @@ namespace Core.Application.AssetMaster.AssetMasterGeneral.Queries.GetAssetMaster
                 module:"AssetMasterGeneral"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<AssetMasterDTO>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = asset
-            };       
+            return asset;       
         }      
     }
 }

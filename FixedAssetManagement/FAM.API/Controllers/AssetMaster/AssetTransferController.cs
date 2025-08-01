@@ -27,14 +27,11 @@ namespace FAM.API.Controllers.AssetMaster
 
     {
 
-        private readonly IValidator<CreateAssetTransferIssueCommand> _createAssetTransferIssueCommandValidator;
-        private readonly IValidator<UpdateAssetTransferIssueCommand> _UpdateAssetTransferIssueCommandValidator;
         private readonly IAssetTransferQueryRepository _assetTransferQueryRepository;
 
-        public AssetTransferController(ISender mediator, IValidator<CreateAssetTransferIssueCommand> createAssetTransferIssueCommand, IValidator<UpdateAssetTransferIssueCommand> updateAssetTransferIssueCommand, IAssetTransferQueryRepository assetTransferQueryRepository) : base(mediator)
+        public AssetTransferController(ISender mediator, IAssetTransferQueryRepository assetTransferQueryRepository) 
+        : base(mediator)
         {
-            _createAssetTransferIssueCommandValidator = createAssetTransferIssueCommand;
-            _UpdateAssetTransferIssueCommandValidator = updateAssetTransferIssueCommand;
             _assetTransferQueryRepository = assetTransferQueryRepository;
 
         }
@@ -64,44 +61,16 @@ namespace FAM.API.Controllers.AssetMaster
         }
 
         [HttpGet("GetAllAssetTransfersByAssetTransferId/{id}")]
-        //[HttpGet("GetAllAssetTransfers/{id}")]
         public async Task<IActionResult> GetAllAssetTransfersAsync(int id)
         {
             var query = new GetAllTransferQuery { AssetTransferId = id };
             var result = await Mediator.Send(query);
-
-            if (result == null || result.Data == null)
+            if (result == null)
             {
-                var notFoundResponse = new ApiResponseDTO<object>
-                {
-                    IsSuccess = false,
-                    Message = $"Asset Transfer with ID {id} not found.",
-                    Data = null,
-                    StatusCode = StatusCodes.Status404NotFound
-                };
-                return StatusCode(notFoundResponse.StatusCode, notFoundResponse);
+                return NotFound($"Asset Transfer with ID {id} not found.");
             }
-
-            // Return success response with proper status code and structure
-            return StatusCode(result.StatusCode, new
-            {
-                statusCode = result.StatusCode,
-                isSuccess = result.IsSuccess,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
-
-        // public async Task<IActionResult> GetAllAssetTransfersAsync(int id)
-        // {
-        //     var query = new GetAllTransferQuery { AssetTransferId = id };
-        //     var result = await Mediator.Send(query);
-        //     if (result == null)
-        //     {
-        //         return NotFound($"Asset Transfer with ID {id} not found.");
-        //     }
-        //     return Ok(result);
-        // }
 
 
         [HttpGet("GetCategoryByDepartmentId/{id}")]
@@ -117,7 +86,7 @@ namespace FAM.API.Controllers.AssetMaster
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Data = assetCategoryList.Data,
+                Data = assetCategoryList,
 
             });
         }
@@ -128,16 +97,7 @@ namespace FAM.API.Controllers.AssetMaster
         public async Task<IActionResult> CreateAsync(CreateAssetTransferIssueCommand command)
         {
 
-            var validationResult = await _createAssetTransferIssueCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation Failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
+           
             if (command == null)
                 return BadRequest(new ApiResponseDTO<AssetTransferIssueHdr>
                 {
@@ -146,27 +106,14 @@ namespace FAM.API.Controllers.AssetMaster
                 });
 
             var response = await Mediator.Send(command);
-            if (response.IsSuccess)
-            {
+          
                 return StatusCode(StatusCodes.Status201Created, new
                 {
                     StatusCode = StatusCodes.Status201Created,
-                    Message = response.Message,
-                    Data = response.Data
+                    Message = response,
+                    Data = response
                 });
-            }
-
-            return BadRequest(new
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = response.Message,
-                Errors = ""
-            });
-            // if (!response.IsSuccess)
-
-            //     return BadRequest(response);
-
-            // return Ok(response);
+           
         }
 
         [HttpGet("{id}")]
@@ -174,39 +121,17 @@ namespace FAM.API.Controllers.AssetMaster
         {
             var query = new GetAssetTranferedByIdQuery { AssetTransferId = id };
             var result = await Mediator.Send(query);
-
-            if (result == null || result.Data == null)
+            if (result == null)
             {
-                return StatusCode(StatusCodes.Status404NotFound, new
-                {
-                    statusCode = StatusCodes.Status404NotFound,
-                    isSuccess = false,
-                    message = $"Asset Transfer with ID {id} not found.",
-                    data = (object)null
-                });
+                return NotFound($"Asset Transfer with ID {id} not found.");
             }
-
-            return StatusCode(result.StatusCode, new
-            {
-                statusCode = result.StatusCode,
-                isSuccess = result.IsSuccess,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(new
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = result,
+                    Data = result
+                });
         }
-
-
-        // [HttpGet("{id}")]
-        // public async Task<IActionResult> GetAssetTransferByIdAsync(int id)
-        // {
-        //     var query = new GetAssetTranferedByIdQuery { AssetTransferId = id };
-        //     var result = await Mediator.Send(query);
-        //     if (result == null)
-        //     {
-        //         return NotFound($"Asset Transfer with ID {id} not found.");
-        //     }
-        //     return Ok(result);
-        // }
 
 
 
@@ -215,152 +140,56 @@ namespace FAM.API.Controllers.AssetMaster
         public async Task<IActionResult> UpdateAssetTransferIssue([FromBody] UpdateAssetTransferIssueCommand command)
         {
 
-            var validationResult = await _UpdateAssetTransferIssueCommandValidator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(new
-                {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Validation Failed",
-                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray()
-                });
-            }
 
-            var result = await Mediator.Send(command);
+             await Mediator.Send(command);
 
-            if (!result.IsSuccess)
-            {
-                return NotFound(result);
-            }
 
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
+                message = "Asset Transfer Updated Successfully",
                 errors = ""
             });
         }
 
-         [HttpGet("GetAssetsByCategory/{categoryId}/{assetDepartmentId}")]
-            public async Task<IActionResult> GetAssetsByCategoryAsync(int categoryId, int assetDepartmentId)
-            {
-                var query = new GetAssetsByCategoryQuery
-                {
-                    AssetCategoryId = categoryId,
-                    AssetDepartmentId = assetDepartmentId
-                };
+        [HttpGet("GetAssetsByCategory/{categoryId}/{assetDepartmentId}")]
+        public async Task<IActionResult> GetAssetsByCategoryAsync(int categoryId, int assetDepartmentId)
+        {
+            var query = new GetAssetsByCategoryQuery { AssetCategoryId = categoryId, AssetDepartmentId = assetDepartmentId };
+            var result = await Mediator.Send(query);
+            return Ok(result);
 
-                var result = await Mediator.Send(query);
-
-                if (result == null || result.Data == null || (result.Data is IEnumerable<object> list && !list.Any()))
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, new
-                    {
-                        statusCode = StatusCodes.Status404NotFound,
-                        isSuccess = false,
-                        message = $"No assets found for Category ID {categoryId} and Department ID {assetDepartmentId}.",
-                        data = (object)null
-                    });
-                }
-
-                return StatusCode(result.StatusCode, new
-                {
-                    statusCode = result.StatusCode,
-                    isSuccess = result.IsSuccess,
-                    message = result.Message,
-                    data = result.Data
-                });
-            }
-
-        // [HttpGet("GetAssetsByCategory/{categoryId}/{assetDepartmentId}")]
-        // public async Task<IActionResult> GetAssetsByCategoryAsync(int categoryId, int assetDepartmentId)
-        // {
-        //     var query = new GetAssetsByCategoryQuery { AssetCategoryId = categoryId, AssetDepartmentId = assetDepartmentId };
-        //     var result = await Mediator.Send(query);
-        //     return Ok(result);
-
-        // }
-        
+        }
         [HttpGet("GetAssetDetailsToTransfer/{AssetId}")]
-          
         public async Task<IActionResult> GetAssetDetailsToTransferByIdAsync(int AssetId)
         {
-            // 🔹 Step 1: Restriction Check
+
+            // 🔹 Check if the asset is pending or approved (with AckStatus <> 1)
             bool isRestricted = await _assetTransferQueryRepository.IsAssetPendingOrApprovedAsync(AssetId);
+
             if (isRestricted)
             {
-                return BadRequest(new
+                var errorResponse = new ApiResponseDTO<object>
                 {
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    message = $"Asset ID {AssetId} is in 'Pending' or 'Approved' state with unacknowledged status.",
-                    data = (object)null
-                });
+                    IsSuccess = false,
+                    Message = $"Asset ID {AssetId} is in 'Pending' or 'Approved' state with unacknowledged status.",
+                    Data = null,
+                    StatusCode = StatusCodes.Status400BadRequest
+                };
+                return BadRequest(errorResponse);
             }
 
-            // 🔹 Step 2: Query Execution
             var query = new GetAssetDetailsToTransferQuery { AssetId = AssetId };
             var result = await Mediator.Send(query);
-
-            // 🔹 Step 3: Not Found Check
-            if (result == null || result.Data == null)
-            {
-                return NotFound(new
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    message = $"Asset with ID {AssetId} not found.",
-                    data = (object)null
-                });
-            }
-
-            // 🔹 Step 4: Success Response (Fixed 200 OK)
-            return Ok(new
+           
+                  return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                message = result.Message,
-                data = result.Data
-            });
+                message = result,
+                data = result
+            }); 
+
         }
-
-
-        // [HttpGet("GetAssetDetailsToTransfer/{AssetId}")]
-        // public async Task<IActionResult> GetAssetDetailsToTransferByIdAsync(int AssetId)
-        // {
-
-        //     // 🔹 Check if the asset is pending or approved (with AckStatus <> 1)
-        //     bool isRestricted = await _assetTransferQueryRepository.IsAssetPendingOrApprovedAsync(AssetId);
-
-        //     if (isRestricted)
-        //     {
-        //         var errorResponse = new ApiResponseDTO<object>
-        //         {
-        //             IsSuccess = false,
-        //             Message = $"Asset ID {AssetId} is in 'Pending' or 'Approved' state with unacknowledged status.",
-        //             Data = null,
-        //             StatusCode = StatusCodes.Status400BadRequest
-        //         };
-        //         return BadRequest(errorResponse);
-        //     }
-
-        //     var query = new GetAssetDetailsToTransferQuery { AssetId = AssetId };
-        //     var result = await Mediator.Send(query);
-        //       if (result == null || result.Data == null)
-        //         {
-        //             var notFoundResponse = new ApiResponseDTO<object>
-        //             {
-        //                 IsSuccess = false,
-        //                 Message = $"Asset with ID {AssetId} not found.",
-        //                 Data = null,
-        //                 StatusCode = StatusCodes.Status404NotFound
-        //             };
-        //             return NotFound(notFoundResponse);
-        //         }
-
-        //         // Return result as is, since it already has ApiResponseDTO<T>
-
-
-        //         return Ok(result); 
-
-        // }
 
 
 
@@ -385,18 +214,16 @@ namespace FAM.API.Controllers.AssetMaster
         }
 
 
-      //  [HttpGet("GetCustodiansByDepartment")]
         [HttpGet("GetCustodiansByDepartment")]
         public async Task<IActionResult> GetCustodiansByDepartment([FromQuery] int departmentId, [FromQuery] string oldUnitId)
         {
             if (string.IsNullOrWhiteSpace(oldUnitId))
             {
-                return StatusCode(StatusCodes.Status400BadRequest, new ApiResponseDTO<List<GetAssetCustodianDto>>
+                return BadRequest(new ApiResponseDTO<List<GetAssetCustodianDto>>
                 {
                     IsSuccess = false,
                     Message = "OldUnitId not found in user token.",
-                    Data = null,
-                    StatusCode = StatusCodes.Status400BadRequest
+                    Data = null
                 });
             }
 
@@ -408,31 +235,8 @@ namespace FAM.API.Controllers.AssetMaster
 
             var response = await Mediator.Send(query);
 
-            return StatusCode(response.StatusCode, response);
+            return Ok(response);
         }
-
-        // public async Task<IActionResult> GetCustodiansByDepartment([FromQuery] int departmentId, [FromQuery] string oldUnitId)
-        // {
-        //     if (string.IsNullOrWhiteSpace(oldUnitId))
-        //     {
-        //         return BadRequest(new ApiResponseDTO<List<GetAssetCustodianDto>>
-        //         {
-        //             IsSuccess = false,
-        //             Message = "OldUnitId not found in user token.",
-        //             Data = null
-        //         });
-        //     }
-
-        //     var query = new GetAssetCustodianQuery
-        //     {
-        //         OldUnitId = oldUnitId,
-        //         DepartmentId = departmentId
-        //     };
-
-        //     var response = await Mediator.Send(query);
-
-        //     return Ok(response);
-        // }
 
         [HttpGet("GetCategoriesByCustodian")]
        
@@ -449,7 +253,7 @@ namespace FAM.API.Controllers.AssetMaster
             return Ok(new
             {
                 StatusCode = StatusCodes.Status200OK,
-                Data = assetCategoryList.Data,
+                Data = assetCategoryList,
 
             });
         }
@@ -492,22 +296,11 @@ namespace FAM.API.Controllers.AssetMaster
 
             var response = await Mediator.Send(query);
 
-            if (response == null || !response.IsSuccess)
+            return Ok(new
             {
-                var notFoundResponse = new ApiResponseDTO<List<GetAssetDetailsToTransferHdrDto>>
-                {
-                    IsSuccess = false,
-                    Message = response?.Message ?? $"No assets found for DepartmentId {departmentId}.",
-                    Data = null,
-                    StatusCode = 404,
-                    Errors = new List<string> { "No matching records found." }
-                };
-                return NotFound(notFoundResponse);
-            }
-
-            // Success case
-            response.StatusCode = 200;
-            return Ok(response);
+                StatusCode = StatusCodes.Status200OK,
+                data = response
+            });
         }
 
         

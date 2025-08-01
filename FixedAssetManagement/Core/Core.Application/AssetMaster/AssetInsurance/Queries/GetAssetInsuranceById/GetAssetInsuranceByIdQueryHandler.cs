@@ -7,11 +7,12 @@ using Core.Application.AssetMaster.AssetInsurance.Queries.GetAssetInsurance;
 using Core.Application.Common.HttpResponse;
 using Core.Application.Common.Interfaces.IAssetMaster.IAssetInsurance;
 using Core.Domain.Events;
+using FluentValidation;
 using MediatR;
 
 namespace Core.Application.AssetMaster.AssetInsurance.Queries.GetAssetInsuranceById
 {
-    public class GetAssetInsuranceByIdQueryHandler  : IRequestHandler<GetAssetInsuranceByIdQuery, ApiResponseDTO<GetAssetInsuranceDto>>
+    public class GetAssetInsuranceByIdQueryHandler  : IRequestHandler<GetAssetInsuranceByIdQuery, GetAssetInsuranceDto>
     {   
 
          private readonly IAssetInsuranceQueryRepository  _assetInsuranceQueryRepository;
@@ -27,17 +28,14 @@ namespace Core.Application.AssetMaster.AssetInsurance.Queries.GetAssetInsuranceB
             _mediator = mediator;
         }
        
-       public async Task<ApiResponseDTO<GetAssetInsuranceDto>> Handle(GetAssetInsuranceByIdQuery request, CancellationToken cancellationToken)
+       public async Task<GetAssetInsuranceDto> Handle(GetAssetInsuranceByIdQuery request, CancellationToken cancellationToken)
         {
             var assetInsurance = await _assetInsuranceQueryRepository.GetByAssetIdAsync(request.Id);
              var assetinsuranceDto = _mapper.Map<GetAssetInsuranceDto>(assetInsurance);
              if (assetInsurance is null)
-            {                
-                return new ApiResponseDTO<GetAssetInsuranceDto>
-                {
-                    IsSuccess = false,
-                    Message = "AssetLocation with ID {request.Id} not found."
-                };   
+            {         
+                throw new ValidationException("AssetLocation with ID {request.Id} not found.");       
+                  
             }      
 
               //Domain Event
@@ -49,12 +47,7 @@ namespace Core.Application.AssetMaster.AssetInsurance.Queries.GetAssetInsuranceB
                 module:"AssetMasterGeneral"
             );
             await _mediator.Publish(domainEvent, cancellationToken);
-            return new ApiResponseDTO<GetAssetInsuranceDto>
-            {
-                IsSuccess = true,
-                Message = "Success",
-                Data = assetinsuranceDto
-            };       
+            return  assetinsuranceDto;       
 
         }
     }
