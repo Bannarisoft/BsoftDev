@@ -1,6 +1,8 @@
 using System.Data;
 using Core.Application.Common.Interfaces;
 using Core.Application.Common.Interfaces.AuditLog;
+using Core.Application.Common.Interfaces.IMiscMaster;
+using Core.Application.Common.Interfaces.IMiscTypeMaster;
 using Core.Application.Common.Interfaces.IPartyGroup;
 using Core.Application.Common.Mappings;
 using Core.Domain.Entities;
@@ -13,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using PartyManagement.Infrastructure.Data;
 using PartyManagement.Infrastructure.Repositories;
+using PartyManagement.Infrastructure.Repositories.MiscMaster;
+using PartyManagement.Infrastructure.Repositories.MiscTypeMaster;
 using PartyManagement.Infrastructure.Repositories.PartyGroup;
 using Serilog;
 
@@ -94,6 +98,10 @@ namespace PartyManagement.Infrastructure
                   // Register repositories
             services.AddScoped<IPartyGroupCommandRepository, PartyGroupCommandRepository>();
             services.AddScoped<IPartyGroupQueryRepository, PartyGroupQueryRepository>();
+            services.AddScoped<IMiscTypeMasterCommandRepository, MiscTypeMasterCommandRepository>();
+            services.AddScoped<IMiscTypeMasterQueryRepository, MiscTypeMasterQueryRepository>();
+            services.AddScoped<IMiscMasterCommandRepository, MiscMasterCommandRepository>();
+            services.AddScoped<IMiscMasterQueryRepository, MiscMasterQueryRepository>();
 
 
 
@@ -106,7 +114,9 @@ namespace PartyManagement.Infrastructure
 
             // AutoMapper profiles
             services.AddAutoMapper(
-            typeof(PartyGroupProfile)
+            typeof(PartyGroupProfile),
+            typeof(MiscTypeMasterProfile),
+            typeof(MiscMasterProfile)
 
             );
             return services;

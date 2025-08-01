@@ -113,16 +113,30 @@ namespace PartyManagement.API.Controllers
             return Ok(new { StatusCode = StatusCodes.Status200OK, data = MachineMaster });
         }
 
-        [HttpGet("{id}")]
-        [ActionName(nameof(GetByIdAsync))]
+       [HttpGet("{id}")]
+       [ActionName(nameof(GetByIdAsync))]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var machine = await Mediator.Send(new GetPartyGroupByIdQuery() { Id = id });
+            var partyGroup = await Mediator.Send(new GetPartyGroupByIdQuery() { Id = id });
 
-           
-                return Ok(new { StatusCode = StatusCodes.Status200OK, data = machine, message = "Id Fetched Successfully" });
-            
+            if (partyGroup == null)
+            {
+                return NotFound(new
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    data = (object?)null,
+                    message = $"PartyGroup with ID {id} not found"
+                });
+            }
+
+            return Ok(new
+            {
+                StatusCode = StatusCodes.Status200OK,
+                data = partyGroup,
+                message = "ID fetched successfully"
+            });
         }
+
 
       
     }
